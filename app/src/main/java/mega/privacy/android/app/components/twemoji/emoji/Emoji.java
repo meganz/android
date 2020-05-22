@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
+
 import static android.graphics.Color.WHITE;
 import static java.util.Arrays.asList;
 
@@ -55,8 +57,8 @@ public class Emoji implements Serializable {
     return unicode;
   }
 
-  @NonNull public Bitmap getBitmap(final Context context) {
-    return BitmapFactory.decodeResource(context.getResources(), resource);
+  @NonNull public Bitmap getBitmap() {
+    return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), resource);
 
   }
 

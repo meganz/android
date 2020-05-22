@@ -27,6 +27,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaPricing;
@@ -88,6 +89,12 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     private TextView monthSectionPro3;
     private TextView storageSectionPro3;
     private TextView bandwidthSectionPro3;
+
+    //business elements:
+    private RelativeLayout businessLayout;
+    private TextView monthSectionBusiness;
+    private TextView storageSectionBusiness;
+    private TextView bandwidhtSectionBusiness;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -161,7 +168,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         freeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout);
         freeLayout.setOnClickListener(this);
         titleFree = (TextView) v.findViewById(R.id.choose_account_free_title_text);
-        titleFree.setText(getString(R.string.free_account).toUpperCase());
+        titleFree.setText(getString(R.string.free_account));
         storageSectionFree = (TextView) v.findViewById(R.id.storage_free);
         bandwidthSectionFree = (TextView) v.findViewById(R.id.bandwidth_free);
         achievementsSectionFree = (TextView) v.findViewById(R.id.achievements_free);
@@ -209,6 +216,14 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         //END -- PRO III ACCOUNT
 
+        //BUSINESS
+        businessLayout = v.findViewById(R.id.choose_account_business_layout);
+        businessLayout.setOnClickListener(this);
+        monthSectionBusiness = v.findViewById(R.id.month_business);
+        storageSectionBusiness = v.findViewById(R.id.storage_business);
+        bandwidhtSectionBusiness = v.findViewById(R.id.bandwidth_business);
+        //END -- BUSINESS
+
         setPricingInfo();
         return v;
     }
@@ -236,6 +251,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 onUpgrade3Click(v);
                 break;
             }
+            case R.id.choose_account_business_layout:
+                megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
+                break;
         }
     }
 
@@ -629,6 +647,42 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
                 bandwidthSectionProLite.setText(resultLiteBandwidth);
 
+            } else if (account.getLevel() == BUSINESS && account.getMonths() == 1) {
+                double price = account.getAmount() / 100.00;
+                String priceString = df.format(price);
+                String[] s = priceString.split("\\.");
+                String textMonth = "";
+                if (s.length == 1) {
+                    String[] s1 = priceString.split(",");
+                    if (s1.length == 1) {
+                        textMonth = s1[0];
+                    } else if (s1.length == 2) {
+                        textMonth = s1[0]+","+s1[1]+" €";
+                    }
+                }else if (s.length == 2) {
+                    textMonth = s[0]+","+s[1]+" €";
+                }
+
+                String textToShowBusinessMonth = getString(R.string.type_month, textMonth);
+                String unlimitedSpace = getString(R.string.unlimited_space);
+                String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
+
+                try{
+                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[A]", "<font color=\'#2ba6de\'>");
+                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[/A]", "</font>");
+                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[B]", "<font color=\'#2ba6de\'>");
+                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[/B]", "</font>");
+                    unlimitedSpace = unlimitedSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
+                    unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
+                    unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color=\'#7a7a7a\'>");
+                    unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
+                }catch (Exception e){
+                    logError("NullPointerException happens when getting the storage string", e);
+                }
+
+                monthSectionBusiness.setText(getSpannedHtmlText(textToShowBusinessMonth));
+                storageSectionBusiness.setText(getSpannedHtmlText(unlimitedSpace));
+                bandwidhtSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
             }
             accounts.add(account);
         }

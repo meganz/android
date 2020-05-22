@@ -1476,7 +1476,7 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        String downloadLocationDefaultPath = getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation();
 
         if(!nodeList.isEmpty() && isVoiceClip(nodeList.get(0).getName())){
             File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());

@@ -463,7 +463,10 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	@Override
 	public void onDestroy() {
-		adapter.clearTakenDownDialog();
+		if (adapter != null) {
+			adapter.clearTakenDownDialog();
+		}
+
 		super.onDestroy();
 	}
 
@@ -472,7 +475,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		downloadLocationDefaultPath = getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation();
 
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);

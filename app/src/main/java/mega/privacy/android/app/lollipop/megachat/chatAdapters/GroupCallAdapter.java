@@ -710,14 +710,13 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     //Group call: default my avatar
     private void createDefaultAvatar(ViewHolderGroupCall holder, long peerId, String peerName, String peerEmail){
-        int color = getColorAvatar(context,megaApi, peerId);
         String name = null;
         if(peerName != null && peerName.trim().length() > 0){
             name = peerName;
         }else if(peerEmail != null && peerEmail.length() > 0) {
             name = peerEmail;
         }
-        holder.avatarImage.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+        holder.avatarImage.setImageBitmap(getDefaultAvatar(getColorAvatar(peerId), name, AVATAR_SIZE, true));
     }
 
     public RecyclerView getListFragment() {
@@ -799,7 +798,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     public void updateMuteIcon() {
         for (InfoPeerGroupCall peer : peers) {
             ViewHolderGroupCall holder = getHolder(peers.indexOf(peer));
-            if (!peer.isAudioOn() && peer.isVideoOn()) {
+            if (holder != null && !peer.isAudioOn() && peer.isVideoOn()) {
                 displayMuteIcon(holder.microSurface, peer);
             }
         }

@@ -46,6 +46,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaUtilsAndroid.createThumbnail;
 
@@ -668,7 +669,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileSize.setText(getFolderInfo(currentFile));
 		} else {
 			long nodeSize = currentFile.length();
-			holder.textViewFileSize.setText(getSizeString(nodeSize));
+			holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(currentFile.lastModified() / 1000)));
 		}
 
 		if (multipleSelect && isItemChecked(position)) {

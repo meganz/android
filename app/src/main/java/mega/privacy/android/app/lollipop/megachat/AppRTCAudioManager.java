@@ -124,8 +124,9 @@ public class AppRTCAudioManager {
     private void onProximitySensorChangedState() {
         // The proximity sensor should only be activated when there are exactly two available audio devices.
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
-            boolean isNear;
-            if (proximitySensor.sensorReportsNearState()) {
+            boolean isNear = proximitySensor.sensorReportsNearState();
+
+            if (isNear) {
                 logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
@@ -133,7 +134,6 @@ public class AppRTCAudioManager {
                     logDebug("Disabling the speakerphone");
                     defaultAudioDevice = AudioDevice.EARPIECE;
                     updateSpeakerDeviceState();
-                    if (proximitySensorListener != null) proximitySensorListener.needToUpdate(true);
                 }
             } else {
                 logDebug("Status of proximity sensor is: Far");
@@ -143,9 +143,10 @@ public class AppRTCAudioManager {
                     logDebug("Enabling the speakerphone");
                     defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
                     updateSpeakerDeviceState();
-                    if (proximitySensorListener != null) proximitySensorListener.needToUpdate(false);
                 }
             }
+
+            if (proximitySensorListener != null) proximitySensorListener.needToUpdate(isNear);
         }
     }
 

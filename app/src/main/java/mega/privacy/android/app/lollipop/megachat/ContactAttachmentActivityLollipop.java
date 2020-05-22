@@ -50,7 +50,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -348,7 +348,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			if(contact!=null) {
 				if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
 					Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-					i.putExtra("name", c.getMail());
+					i.putExtra(NAME, c.getMail());
 					this.startActivity(i);
 				}
 				else{

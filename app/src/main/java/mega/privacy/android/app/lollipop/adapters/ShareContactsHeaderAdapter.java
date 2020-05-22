@@ -30,13 +30,12 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
@@ -206,34 +205,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 holder.emailTextView.setText(mail);
 
                 holder.contactStateIcon.setVisibility(View.VISIBLE);
-                if (megaChatApi != null) {
-                    int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle());
-                    if (userStatus == MegaChatApi.STATUS_ONLINE) {
-                        logDebug("This user is connected");
-                        holder.contactStateIcon.setVisibility(View.VISIBLE);
-                        holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_online));
-                    } else if (userStatus == MegaChatApi.STATUS_AWAY) {
-                        logDebug("This user is away");
-                        holder.contactStateIcon.setVisibility(View.VISIBLE);
-                        holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_away));
-                    } else if (userStatus == MegaChatApi.STATUS_BUSY) {
-                        logDebug("This user is busy");
-                        holder.contactStateIcon.setVisibility(View.VISIBLE);
-                        holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_busy));
-                    } else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-                        logDebug("This user is offline");
-                        holder.contactStateIcon.setVisibility(View.VISIBLE);
-                        holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_offline));
-                    } else if (userStatus == MegaChatApi.STATUS_INVALID) {
-                        logWarning("INVALID status: " + userStatus);
-                        holder.contactStateIcon.setVisibility(View.GONE);
-                    } else {
-                        logDebug("This user status is: " + userStatus);
-                        holder.contactStateIcon.setVisibility(View.GONE);
-                    }
-                }
-
-                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, megaApi, contact));
+                setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle()), holder.contactStateIcon);
+                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, contact));
                 UserAvatarListenerShare listener = new UserAvatarListenerShare(mContext, holder);
 
                 File avatar = buildAvatarFile(mContext,mail + ".jpg");
@@ -274,7 +247,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 holder.contactNameTextView.setText(contact.getPhoneContactInfo().getName());
                 holder.emailTextView.setText(contact.getPhoneContactInfo().getEmail());
-                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, megaApi, contact));
+                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, contact));
             }
         } else if (contact.isProgress()) {
             holder.itemLayout.setVisibility(View.GONE);

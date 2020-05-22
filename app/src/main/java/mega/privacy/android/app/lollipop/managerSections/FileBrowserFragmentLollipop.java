@@ -66,6 +66,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -505,7 +506,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-		downloadLocationDefaultPath = getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation();
 		lastPositionStack = new Stack<>();
 
 		if (megaChatApi == null) {
@@ -691,8 +692,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
     @Override
 	public void onDestroy() {
-		if (adapter != null)
+		if (adapter != null) {
 			adapter.clearTakenDownDialog();
+		}
+
 		super.onDestroy();
 	}
 
@@ -1045,7 +1048,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                     return;
                 }
             } else {
-                if (n.getName().equals("Camera Uploads")) {
+                if (n.getName().equals(context.getString(R.string.section_photo_sync))) {
                     if (prefs != null) {
                         prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
                     }
@@ -1057,7 +1060,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             }
             
         } else {
-            if (n.getName().equals("Camera Uploads")) {
+            if (n.getName().equals(context.getString(R.string.section_photo_sync))) {
                 
                 if (prefs != null) {
                     prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
@@ -1090,7 +1093,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 }
             }
         } else {
-            if (n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)) {
+            if (n.getName().equals(context.getString(R.string.section_secondary_media_uploads))) {
                 if (prefs != null) {
                     prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
                 }
@@ -1119,7 +1122,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
             
-            if (megaApi.getRootNode().getHandle() == n.getHandle()) {
+            if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == n.getHandle()) {
                 
                 if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);

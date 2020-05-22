@@ -96,7 +96,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int REMOTE_VIDEO_NOT_INIT = -1;
     final private static int REMOTE_VIDEO_ENABLED = 1;
     final private static int REMOTE_VIDEO_DISABLED = 0;
-    final private static int BIG_LETTER_SIZE = 60;
+    final private static int BIG_LETTER_SIZE = 120;
     final private static int MIN_PEERS_LIST = 7;
     final private static int MAX_PEERS_GRID = 6;
     final private static int ARROW_ANIMATION = 250;
@@ -310,6 +310,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
             displayLinearFAB(true);
             checkIncomingCall();
+
             return;
         }
 
@@ -734,11 +735,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void setAvatarLayout() {
-        if (chat.isGroup()) return;
+        if (chat.isGroup())
+            return;
+
         setProfileAvatar(megaChatApi.getMyUserHandle());
         setProfileAvatar(chat.getPeerHandle(0));
-        myAvatarLayout.setVisibility(View.VISIBLE);
-        contactAvatarLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -861,7 +862,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
         /*Default Avatar*/
-        Bitmap defaultBitmapAvatar = getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), name, AVATAR_SIZE, true);
+        Bitmap defaultBitmapAvatar = getDefaultAvatar(getColorAvatar(peerId), name, AVATAR_SIZE, true);
         setBitmap(defaultBitmapAvatar, peerId);
 
         /*Avatar*/
@@ -892,7 +893,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         /*Default Avatar*/
-        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), avatarLetter, BIG_LETTER_SIZE, true));
+        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatar(getColorAvatar(peerId), avatarLetter, BIG_LETTER_SIZE, true));
         /*Avatar*/
         Bitmap bitmap = profileAvatar(peerId, peerEmail);
         if (bitmap == null) return;
@@ -986,6 +987,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         application.createChatAudioManager();
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         sendSignalPresence();
     }
@@ -1135,7 +1137,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
             return;
 
-        logDebug("Showing Reconnecting bar");
         reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
         reconnectingText.setText(getString(R.string.reconnecting_message));
         reconnectingLayout.setVisibility(View.VISIBLE);
@@ -1565,9 +1566,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @param needToBeEnable Value is true, if it has to be activated. False in the opposite case.
      */
     private void updateVideoFABStatus(boolean needToBeEnable) {
-        if (!videoFAB.isShown())
-            return;
-
         if (needToBeEnable) {
             //Enable video FAB
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1577,6 +1575,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
         }
+
+        if(!videoFAB.isShown()) videoFAB.show();
     }
 
     /**
@@ -2306,21 +2306,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private String getName(long peerid) {
         String name = " ";
-        if (megaChatApi == null || chat == null) return name;
+        if (megaChatApi == null) return name;
 
         if (peerid == megaChatApi.getMyUserHandle()) {
             name = megaChatApi.getMyFullname();
             if (name == null) name = megaChatApi.getMyEmail();
 
         } else {
-            name = chat.getPeerFullnameByHandle(peerid);
+            name = getFirstNameDB(peerid);
             if (name == null) {
-                name = megaChatApi.getContactEmail(peerid);
-                if (name == null) {
-                    CallNonContactNameListener listener = new CallNonContactNameListener(this, peerid, false, name);
-                    megaChatApi.getUserEmail(peerid, listener);
-                }
+                CallNonContactNameListener listener = new CallNonContactNameListener(this, peerid, false, name);
+                megaChatApi.getUserEmail(peerid, listener);
             }
+
         }
         return name;
     }
@@ -2435,6 +2433,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkIncomingCall() {
         setAvatarLayout();
+        myAvatarLayout.setVisibility(View.VISIBLE);
+        contactAvatarLayout.setVisibility(View.VISIBLE);
         updateSubtitleNumberOfVideos();
 
         if(chat.isGroup()){

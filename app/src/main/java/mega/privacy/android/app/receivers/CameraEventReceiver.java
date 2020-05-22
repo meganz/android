@@ -11,6 +11,6 @@ public class CameraEventReceiver extends BroadcastReceiver {
     
     @Override
     public void onReceive(final Context context,Intent intent) {
-        startCameraUploadService(context);
+        startCameraUploadServiceIgnoreAttr(context);
     }
 }

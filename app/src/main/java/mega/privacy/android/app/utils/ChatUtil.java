@@ -13,10 +13,13 @@ import androidx.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,6 +28,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -36,6 +40,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
@@ -47,6 +52,7 @@ import nz.mega.sdk.MegaStringList;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ChatUtil {
 
@@ -391,6 +397,15 @@ public class ChatUtil {
         return outFile;
     }
 
+    /**
+     * Method for adding a reaction in a message.
+     *
+     * @param context        Context of Activity.
+     * @param chatId         The chat ID.
+     * @param message        The msg ID.
+     * @param emoji          The chosen reaction.
+     * @param isFromKeyboard If it's from the keyboard.
+     */
     public static void addReactionInMsg(Context context, long chatId, MegaChatMessage message, Emoji emoji, boolean isFromKeyboard) {
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
@@ -409,6 +424,13 @@ public class ChatUtil {
         }
     }
 
+    /**
+     * Method for removing a reaction from a message.
+     *
+     * @param chatId   The chat ID.
+     * @param message  The msg ID.
+     * @param reaction The chosen reaction.
+     */
     public static void delReactionInMsg(long chatId, MegaChatMessage message, String reaction) {
         MegaChatError error = MegaApplication.getInstance().getMegaChatApi().delReaction(chatId, message.getMsgId(), reaction);
         if (error.getErrorCode() == MegaChatError.ERROR_OK) {
@@ -416,6 +438,14 @@ public class ChatUtil {
         }
     }
 
+    /**
+     * Method for knowing if the option to add reactions should be visible.
+     *
+     * @param context  Context of Activity.
+     * @param chatRoom The chat.
+     * @param message  The message.
+     * @return True, if it should be visible. False, the opposite.
+     */
     public static boolean shouldReactionOptionsBeVisible(Context context, MegaChatRoom chatRoom, AndroidMegaChatMessage message) {
         return chatRoom != null && message != null &&
                 context instanceof ChatActivityLollipop &&
@@ -425,14 +455,116 @@ public class ChatUtil {
                         || chatRoom.isPreview());
     }
 
+    /**
+     * Method of obtaining the reaction list
+     *
+     * @param listReactions   The string list.
+     * @param invalidReaction The invalid reaction
+     * @return The reaction list.
+     */
     public static ArrayList<String> getReactionsList(MegaStringList listReactions, boolean invalidReaction) {
         ArrayList<String> list = new ArrayList<>();
         for (int i = 0; i < listReactions.size(); i++) {
             list.add(i, listReactions.get(i));
         }
-        if(invalidReaction) {
+        if (invalidReaction) {
             list.add(INVALID_REACTION);
         }
         return list;
+    }
+
+    /**
+     * Sets the contact status icon
+     *
+     * @param userStatus         contact's status
+     * @param contactStateIcon  view in which the status icon has to be set
+     */
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon) {
+        if (contactStateIcon == null) {
+            return;
+        }
+
+        contactStateIcon.setVisibility(View.VISIBLE);
+
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_online));
+                break;
+
+            case MegaChatApi.STATUS_AWAY:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_away));
+                break;
+
+            case MegaChatApi.STATUS_BUSY:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_busy));
+                break;
+
+            case MegaChatApi.STATUS_OFFLINE:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_offline));
+                break;
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                contactStateIcon.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Sets the contact status icon and status text
+     *
+     * @param userStatus         contact's status
+     * @param contactStateIcon  view in which the status icon has to be set
+     * @param contactStateText  view in which the status text has to be set
+     */
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon, TextView contactStateText) {
+        MegaApplication app = MegaApplication.getInstance();
+        setContactStatus(userStatus, contactStateIcon);
+
+        if (contactStateText == null) {
+            return;
+        }
+
+        contactStateText.setVisibility(View.VISIBLE);
+
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                contactStateText.setText(app.getString(R.string.online_status));
+                break;
+
+            case MegaChatApi.STATUS_AWAY:
+                contactStateText.setText(app.getString(R.string.away_status));
+                break;
+
+            case MegaChatApi.STATUS_BUSY:
+                contactStateText.setText(app.getString(R.string.busy_status));
+                break;
+
+            case MegaChatApi.STATUS_OFFLINE:
+                contactStateText.setText(app.getString(R.string.offline_status));
+                break;
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                contactStateText.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * If the contact has last green, sets is as status text
+     *
+     * @param context           current Context
+     * @param userStatus        contact's status
+     * @param lastGreen         contact's last green
+     * @param contactStateText  view in which the last green has to be set
+     */
+    public static void setContactLastGreen(Context context, int userStatus, String lastGreen, MarqueeTextView contactStateText) {
+        if (contactStateText == null || isTextEmpty(lastGreen)) {
+            return;
+        }
+
+        if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+            contactStateText.setText(lastGreen);
+            contactStateText.isMarqueeIsNecessary(context);
+        }
     }
 }

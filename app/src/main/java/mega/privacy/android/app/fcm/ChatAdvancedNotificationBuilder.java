@@ -589,11 +589,12 @@ public final class ChatAdvancedNotificationBuilder {
 
         int color;
         if(chat.isGroup()){
-            color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
+            color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
         }else{
-            color = getColorAvatar(context, megaApi, chat.getPeerHandle(0));
+            color = getColorAvatar(chat.getPeerHandle(0));
         }
-        return getDefaultAvatar(context, color, chat.getTitle(), AVATAR_SIZE, true, true);
+
+        return getDefaultAvatar(color, chat.getTitle(), AVATAR_SIZE, true, true);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -817,7 +818,6 @@ public final class ChatAdvancedNotificationBuilder {
             NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
             NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
 
-
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
 
@@ -845,6 +845,7 @@ public final class ChatAdvancedNotificationBuilder {
                         .setVibrate(pattern)
                         .addAction(actionAnswer)
                         .addAction(actionIgnore)
+                        .setDeleteIntent(pendingIntentIgnore)
                         .setColor(ContextCompat.getColor(context, R.color.mega))
                         .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -874,7 +875,8 @@ public final class ChatAdvancedNotificationBuilder {
                         .setAutoCancel(false)
                         .setContentIntent(null)
                         .addAction(actionAnswer)
-                        .addAction(actionIgnore);
+                        .addAction(actionIgnore)
+                        .setDeleteIntent(pendingIntentIgnore);
 
                 if(chatToAnswer.isGroup()){
                     notificationBuilder.setContentTitle(chatToAnswer.getTitle());

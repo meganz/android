@@ -84,6 +84,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -652,6 +653,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         }
         else if (type == ZIP_ADAPTER) {
             ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
+        } else if (type == LINKS_ADAPTER) {
+            LinksFragment.imageDrag.getLocationOnScreen(location);
         }
     }
 
@@ -2069,7 +2072,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
     public void showPropertiesActivity(){
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffLine){
-            i.putExtra("name", pdfFileName);
+            i.putExtra(NAME, pdfFileName);
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -2086,7 +2089,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("name", node.getName());
+            i.putExtra(NAME, node.getName());
             if (nC == null) {
                 nC = new NodeController(this);
             }

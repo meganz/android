@@ -90,7 +90,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -438,7 +438,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		}
 
 		prefs = dbH.getPreferences();
-		downloadLocationDefaultPath = getDownloadLocation(this);
+		downloadLocationDefaultPath = getDownloadLocation();
 
 		lastPositionStack = new Stack<>();
 		
@@ -832,7 +832,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
         boolean askMe = askMe(this);
         prefs = dbH.getPreferences();
-        downloadLocationDefaultPath = getDownloadLocation(this);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         if (askMe) {
             File[] fs = getExternalFilesDirs(null);

@@ -44,6 +44,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -313,7 +314,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.permissionsIcon.setVisibility(View.GONE);
 
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(getSizeString(nodeSize));
+            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             setImageParams(holder.imageView, 48, 0);
 
@@ -750,7 +751,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				}
 
 			}else{
-				if(n.getName().equals("Camera Uploads")){
+				if(n.getName().equals(context.getString(R.string.section_photo_sync))){
 					if (prefs != null){
 						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
 					}
@@ -761,7 +762,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			}
 
 		}else{
-			if(n.getName().equals("Camera Uploads")){
+			if(n.getName().equals(context.getString(R.string.section_photo_sync))){
 				if (prefs != null){
 					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
 				}
@@ -790,7 +791,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				}
 			}
 		}else{
-			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
+			if(n.getName().equals(context.getString(R.string.section_secondary_media_uploads))){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
 				}

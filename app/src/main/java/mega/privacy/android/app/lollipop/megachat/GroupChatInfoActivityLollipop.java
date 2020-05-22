@@ -78,7 +78,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -855,9 +855,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void createGroupChatAvatar(){
         logDebug("createGroupChatAvatar()");
-        int color = ContextCompat.getColor(this, R.color.divider_upgrade_account);
-        String title = chat.getTitle();
-        avatarImageView.setImageBitmap(getDefaultAvatar(this, color, title, AVATAR_SIZE, true));
+        avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), chat.getTitle(), AVATAR_SIZE, true));
     }
 
     public void showParticipantsPanel(MegaChatParticipant participant){

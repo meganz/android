@@ -5,124 +5,117 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <LinearLayout
         android:id="@+id/export_MK_fragment_container"
-        android:background="@color/white">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="24dp"
+        android:background="@color/white"
+        android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/export_mk_full_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/export_mk_full_layout">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/title_export_MK_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/backup_title"
-                android:textColor="@color/delete_account"
-                android:textSize="20sp"/>
+                android:textAllCaps="true"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/subtitle_export_MK_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/title_export_MK_layout"
+                android:layout_marginTop="33dp"
                 android:text="@string/backup_subtitle"
                 android:textColor="@color/name_my_account"
-                android:textSize="16sp"
-                android:layout_below="@id/title_export_MK_layout"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/first_par_export_MK_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/subtitle_export_MK_layout"
+                android:layout_marginTop="20dp"
                 android:text="@string/backup_first_paragraph"
                 android:textColor="@color/mail_my_account"
-                android:textSize="16sp"
-                android:layout_below="@id/subtitle_export_MK_layout"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/second_par_export_MK_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/first_par_export_MK_layout"
+                android:layout_marginTop="16dp"
                 android:text="@string/backup_second_paragraph"
                 android:textColor="@color/mail_my_account"
-                android:textSize="16sp"
-                android:layout_below="@id/first_par_export_MK_layout"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/third_par_export_MK_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/second_par_export_MK_layout"
+                android:layout_marginTop="24dp"
                 android:text="@string/backup_third_paragraph"
                 android:textColor="@color/name_my_account"
-                android:textSize="14sp"
-                android:layout_below="@id/second_par_export_MK_layout"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/action_export_MK_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/third_par_export_MK_layout"
+                android:layout_marginTop="20dp"
                 android:text="@string/backup_action"
                 android:textColor="@color/mail_my_account"
-                android:textSize="10sp"
-                android:layout_below="@id/third_par_export_MK_layout"/>
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:id="@+id/MK_buttons_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:gravity="left"
-                android:orientation="horizontal"
                 android:layout_below="@id/action_export_MK_layout"
-                android:layout_margin="24dp">
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:background="@color/white"
+                android:gravity="start"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/print_MK_button"
+                    style="@style/AccentBorderBackgroundBorderlessButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:textColor="@color/white"
                     android:text="@string/context_option_print"
-                    android:background="@color/accentColor"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:tint="@android:color/white"/>
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/copy_MK_button"
+                    style="@style/AccentBorderBackgroundBorderlessButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:textColor="@color/white"
+                    android:layout_marginStart="8dp"
                     android:text="@string/context_copy"
-                    android:background="@color/accentColor"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:tint="@android:color/white"
-                    android:layout_marginLeft="8dp"/>
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/save_MK_button"
+                    style="@style/AccentBorderBackgroundBorderlessButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/white"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
+                    android:layout_marginStart="8dp"
                     android:text="@string/save_action"
-                    android:background="@color/accentColor"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:tint="@android:color/white"
-                    android:layout_marginLeft="8dp"/>
+                    android:textSize="14sp" />
             </LinearLayout>
 
         </RelativeLayout>
