@@ -429,20 +429,27 @@ public class BaseActivity extends AppCompatActivity {
      *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
      */
     public void showSnackbar (int type, View view, String s, long idChat) {
-        logDebug(("showSnackbar: " + s));
+        logDebug("Show snackbar: " + s);
         Display  display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        Snackbar snackbar = null;
-        if (type == MESSAGE_SNACKBAR_TYPE) {
-            snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
-        }
-        else if (type == NOT_SPACE_SNACKBAR_TYPE) {
-            snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        }
-        else {
-            snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+        Snackbar snackbar;
+        try {
+            switch (type) {
+                case MESSAGE_SNACKBAR_TYPE:
+                    snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
+                    break;
+                case NOT_SPACE_SNACKBAR_TYPE:
+                    snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+                    break;
+                default:
+                    snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+                    break;
+            }
+        } catch (Exception e) {
+            logError("Error showing snackbar", e);
+            return;
         }
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
