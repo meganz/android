@@ -7452,14 +7452,24 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			refreshSearch();
 		}
 
-        checkCameraUploadFolder(true);
+        checkCameraUploadFolder(true,null);
 		refreshRubbishBin();
 		setToolbarTitle();
 	}
 
-    private void checkCameraUploadFolder(boolean shouldDisable) {
+    private void checkCameraUploadFolder(boolean shouldDisable, ArrayList<MegaNode> updatedNodes) {
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
+        boolean ignoreUpdate = false;
+        if(updatedNodes != null) {
+            List<Long> handles = new ArrayList<>();
+            for(MegaNode node : updatedNodes) {
+                handles.add(node.getHandle());
+            }
+            ignoreUpdate = !handles.contains(primaryHandle) && !handles.contains(secondaryHandle);
+            logDebug("Updated nodes don't include CU/MU, return.");
+        }
+        if(ignoreUpdate) return;
 		MegaPreferences prefs = dbH.getPreferences();
 		boolean isSecondaryEnabled = false;
 		if(prefs != null) {
@@ -14766,7 +14776,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		onNodesInboxUpdate();
 
-		checkCameraUploadFolder(false);
+		checkCameraUploadFolder(false,updatedNodes);
 
 		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFL != null){
