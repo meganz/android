@@ -524,7 +524,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
 
             long callIdReceived  = intent.getLongExtra(UPDATE_CALL_ID, -1);
-            if (callChat == null || callIdReceived  == INVALID_CALL || callIdReceived  != callChat.getId()) {
+            if (callIdReceived == -1) {
                 logWarning("Call recovered is incorrect");
                 return;
             }
