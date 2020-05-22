@@ -833,7 +833,7 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
 
-                    /*Customize notifications*/
+            /*Customize notifications*/
             Bitmap avatarIcon = setUserAvatar(chatToAnswer);
             String titleChat;
             String titleCall;
@@ -842,7 +842,11 @@ public final class ChatAdvancedNotificationBuilder {
                 titleCall = context.getString(R.string.title_notification_incoming_group_call);
             } else {
                 titleChat = getFullName(chatToAnswer);
-                titleCall = context.getString(R.string.title_notification_incoming_individual_call);
+                if(callToAnswer.hasVideoInitialCall()){
+                    titleCall = context.getString(R.string.title_notification_incoming_individual_video_call);
+                }else{
+                    titleCall = context.getString(R.string.title_notification_incoming_individual_audio_call);
+                }
             }
 
             RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications);
@@ -967,6 +971,7 @@ public final class ChatAdvancedNotificationBuilder {
 
             }
 
+
             /*Customize notification*/
             Bitmap avatarIcon = setUserAvatar(chatToAnswer);
             String titleChat;
@@ -976,27 +981,50 @@ public final class ChatAdvancedNotificationBuilder {
                 titleCall = context.getString(R.string.title_notification_incoming_group_call);
             } else {
                 titleChat = getFullName(chatToAnswer);
-                titleCall = context.getString(R.string.title_notification_incoming_individual_call);
+                if(callToAnswer.hasVideoInitialCall()){
+                    titleCall = context.getString(R.string.title_notification_incoming_individual_video_call);
+                }else{
+                    titleCall = context.getString(R.string.title_notification_incoming_individual_audio_call);
+                }
             }
 
-            /*Normal*/
-            RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.layout_group_call_notification);
-            notificationLayout.setTextViewText(R.id.chat_title, titleChat);
-            notificationLayout.setTextViewText(R.id.call_title, titleCall);
+            /*Collapsed*/
+            RemoteViews collapsedView = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications);
+            collapsedView.setTextViewText(R.id.chat_title, titleChat);
+            collapsedView.setTextViewText(R.id.call_title, titleCall);
             if (avatarIcon != null) {
-                notificationLayout.setImageViewBitmap(R.id.avatar_image, avatarIcon);
+                collapsedView.setImageViewBitmap(R.id.avatar_image, avatarIcon);
             }
-            notificationLayout.setTextViewText(R.id.answer_button_text, context.getString(R.string.answer_call_incoming).toUpperCase());
-            notificationLayout.setTextViewText(R.id.ignore_button_text, context.getString(R.string.ignore_call_incoming).toUpperCase());
 
-            notificationLayout.setOnClickPendingIntent(R.id.answer_button_layout, pendingIntentAnswer);
-            notificationLayout.setOnClickPendingIntent(R.id.ignore_button_layout, pendingIntentIgnore);
+            collapsedView.setViewVisibility(R.id.small_layout, View.VISIBLE);
+            collapsedView.setViewVisibility(R.id.big_layout, View.GONE);
+
+            collapsedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming).toUpperCase());
+            collapsedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join).toUpperCase());
+            collapsedView.setOnClickPendingIntent(R.id.decline_button_text, pendingIntentIgnore);
+            collapsedView.setOnClickPendingIntent(R.id.answer_button_text, pendingIntentAnswer);
+
+            /*Expanded*/
+            RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications_expanded);
+            expandedView.setTextViewText(R.id.chat_title, titleChat);
+            expandedView.setTextViewText(R.id.call_title, titleCall);
+            if (avatarIcon != null) {
+                expandedView.setImageViewBitmap(R.id.avatar_image, avatarIcon);
+            }
+
+            expandedView.setViewVisibility(R.id.small_layout, View.VISIBLE);
+            expandedView.setViewVisibility(R.id.big_layout, View.GONE);
+
+            expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming).toUpperCase());
+            expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join).toUpperCase());
+            expandedView.setOnClickPendingIntent(R.id.decline_button_text, pendingIntentIgnore);
+            expandedView.setOnClickPendingIntent(R.id.answer_button_text, pendingIntentAnswer);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
             notificationBuilder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
-            notificationBuilder.setCustomContentView(notificationLayout);
+            notificationBuilder.setCustomContentView(collapsedView);
             notificationBuilder.setContentIntent(null);
-            notificationBuilder.setCustomBigContentView(notificationLayout);
+            notificationBuilder.setCustomBigContentView(expandedView);
             notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify);
             notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
             notificationBuilder.setAutoCancel(true);

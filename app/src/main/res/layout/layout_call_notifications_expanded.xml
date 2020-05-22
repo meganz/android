@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/call_notif_layout"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
     android:orientation="horizontal">
 
     <RelativeLayout
@@ -36,48 +37,48 @@
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="10dp"
             android:orientation="vertical">
-                <TextView
-                    android:id="@+id/chat_title"
-                    style="@style/TextAppearance.Compat.Notification.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:text="TITLE GROUP"
-                    android:textColor="@color/file_list_first_row"
-                    android:textSize="14sp" />
-                <TextView
-                    android:id="@+id/call_title"
-                    style="@style/TextAppearance.Compat.Notification.Info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/chat_title"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:text="Incoming group call"
-                    android:textColor="@color/grey_info_menu"
-                    android:textSize="12sp" />
+            <TextView
+                android:id="@+id/chat_title"
+                style="@style/TextAppearance.Compat.Notification.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:text="TITLE GROUP"
+                android:textColor="@color/file_list_first_row"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/call_title"
+                style="@style/TextAppearance.Compat.Notification.Info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/chat_title"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:text="Incoming group call"
+                android:textColor="@color/grey_info_menu"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="10dp"
             android:background="@color/chat_sliding_panel_separator" />
 
         <LinearLayout
             android:id="@+id/small_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/decline_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
                 android:layout_marginRight="50dp"
                 android:gravity="left|center_vertical">
 
@@ -123,8 +124,6 @@
                     android:text="JOIN"
                     android:textStyle="bold" />
             </RelativeLayout>
-
-
         </LinearLayout>
 
         <LinearLayout
