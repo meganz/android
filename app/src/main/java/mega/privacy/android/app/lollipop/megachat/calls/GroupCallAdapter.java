@@ -28,7 +28,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
-
+import jp.wasabeef.blurry.Blurry;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.RelativeLayout.TRUE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
