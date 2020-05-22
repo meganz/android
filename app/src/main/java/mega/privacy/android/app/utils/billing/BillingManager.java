@@ -330,13 +330,13 @@ public class BillingManager implements PurchasesUpdatedListener {
                 //verify all available purchases
                 List<Purchase> list = new ArrayList<>();
                 for (Purchase purchase : purchasesResult.getPurchasesList()) {
-                    if (verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+                    if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
                         list.add(purchase);
-                        logDebug("purchase added, " + purchase.getOriginalJson());
+                        logDebug("Purchase added, " + purchase.getOriginalJson());
                     }
                 }
                 PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
-                logDebug("final purchase result is " + finalResult.getBillingResult());
+                logDebug("Final purchase result is " + finalResult.getBillingResult());
                 onQueryPurchasesFinished(finalResult);
             }
         };
