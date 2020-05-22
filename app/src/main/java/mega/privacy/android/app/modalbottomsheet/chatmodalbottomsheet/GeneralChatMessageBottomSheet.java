@@ -12,11 +12,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatReactionsFragment;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -30,6 +32,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
     private ChatController chatC;
     private MegaChatRoom chatRoom;
+
+    private LinearLayout reactionsLayout;
+    private ChatReactionsFragment reactionsFragment;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,10 +70,10 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
 
-
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_general_chat_messages, null);
+        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
+        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
         items_layout = contentView.findViewById(R.id.items_layout);
-
         LinearLayout optionForward = contentView.findViewById(R.id.forward_layout);
         LinearLayout editSeparator = contentView.findViewById(R.id.edit_separator);
         LinearLayout optionEdit = contentView.findViewById(R.id.edit_layout);
@@ -77,6 +84,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
         LinearLayout optionDelete = contentView.findViewById(R.id.delete_layout);
         TextView textDelete = contentView.findViewById(R.id.delete_text);
+
+        reactionsFragment.init(context, chatId, messageId, positionMessage);
 
         optionForward.setOnClickListener(this);
         optionEdit.setOnClickListener(this);
@@ -146,12 +155,15 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             deleteSeparator.setVisibility(optionDelete.getVisibility());
             selectSeparator.setVisibility(optionSelect.getVisibility());
             editSeparator.setVisibility(optionEdit.getVisibility());
+
             if (optionEdit.getVisibility() == View.VISIBLE) {
                 copySeparator.setVisibility(View.GONE);
             } else {
                 copySeparator.setVisibility(optionCopy.getVisibility());
             }
         }
+
+        reactionsLayout.setVisibility((shouldReactionOptionsBeVisible(context, chatRoom, message)) ? View.VISIBLE : View.GONE);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);

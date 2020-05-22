@@ -185,43 +185,6 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/separator_select"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
-
-            <LinearLayout
-                android:id="@+id/option_select_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_select_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_select_modal"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_select_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/tab_select_mode"
-                    android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/select_separator"

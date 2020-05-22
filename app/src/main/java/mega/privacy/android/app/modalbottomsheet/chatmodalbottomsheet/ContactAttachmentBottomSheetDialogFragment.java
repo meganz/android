@@ -35,8 +35,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private LinearLayout reactionsLayout;
-    private ChatReactionsFragment reactionsFragment;
+
     private AndroidMegaChatMessage message;
     private long chatId;
     private long messageId;
@@ -46,6 +45,15 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     private int position;
     private int positionMessage;
     private MegaChatRoom chatRoom;
+
+    private LinearLayout reactionsLayout;
+    private ChatReactionsFragment reactionsFragment;
+    private LinearLayout titleContact;
+    private LinearLayout separatorTitleContact;
+    public EmojiTextView titleNameContactChatPanel;
+    public ImageView stateIcon;
+    public EmojiTextView titleMailContactChatPanel;
+    public RoundedImageView contactImageView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,19 +102,21 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             return;
         }
 
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
         mainLinearLayout = contentView.findViewById(R.id.contact_attachment_bottom_sheet);
+        titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
+        separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
         reactionsLayout = contentView.findViewById(R.id.reactions_layout);
         reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
         items_layout = contentView.findViewById(R.id.items_layout);
 
-        EmojiTextView titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);
-        ImageView stateIcon = contentView.findViewById(R.id.contact_attachment_state_circle);
+        titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);
+        stateIcon = contentView.findViewById(R.id.contact_attachment_state_circle);
         stateIcon.setMaxWidth(scaleWidthPx(6, outMetrics));
         stateIcon.setMaxHeight(scaleHeightPx(6, outMetrics));
 
-        EmojiTextView titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
-        RoundedImageView contactImageView = contentView.findViewById(R.id.contact_attachment_thumbnail);
+        titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
+        contactImageView = contentView.findViewById(R.id.contact_attachment_thumbnail);
 
         LinearLayout optionView = contentView.findViewById(R.id.option_view_layout);
         LinearLayout optionInfo = contentView.findViewById(R.id.option_info_layout);
@@ -123,6 +133,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         optionSelect.setOnClickListener(this);
         optionForward.setOnClickListener(this);
         optionDeleteMessage.setOnClickListener(this);
+
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
         LinearLayout viewSeparator = contentView.findViewById(R.id.view_separator);
         LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
@@ -138,6 +149,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         if (context instanceof ChatActivityLollipop && chatRoom != null) {
             reactionsFragment.init(context, chatId, messageId, positionMessage);
+            titleContact.setVisibility(View.GONE);
+            separatorTitleContact.setVisibility(View.GONE);
             optionSelect.setVisibility(View.VISIBLE);
             if (chatC.isInAnonymousMode() || ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
                 optionForward.setVisibility(View.GONE);
@@ -155,6 +168,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 }
             }
         } else {
+            titleContact.setVisibility(View.VISIBLE);
+            separatorTitleContact.setVisibility(View.VISIBLE);
             optionSelect.setVisibility(View.GONE);
             optionForward.setVisibility(View.GONE);
             optionDeleteMessage.setVisibility(View.GONE);
@@ -299,6 +314,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         separatorInfo.setVisibility((optionStartConversation.getVisibility() == View.GONE && optionInvite.getVisibility() == View.GONE) ? View.GONE : View.VISIBLE);
 
         deleteMessageSeparator.setVisibility(optionDeleteMessage.getVisibility());
+
+        reactionsLayout.setVisibility((shouldReactionOptionsBeVisible(context, chatRoom, message)) ? View.VISIBLE : View.GONE);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);

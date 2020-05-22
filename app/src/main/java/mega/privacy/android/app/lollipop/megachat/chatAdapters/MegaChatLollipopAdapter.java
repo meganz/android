@@ -7995,6 +7995,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
+        if(multipleSelect){
+            if (checkIfIsMyMessage(megaMessage.getMessage())) {
+                holder.ownMessageReactionsLayout.setVisibility(View.GONE);
+            } else {
+                holder.contactMessageReactionsLayout.setVisibility(View.GONE);
+            }
+            return;
+        }
+
         MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, megaMessage.getMessage().getMsgId());
         if (noReactions(listReactions, megaMessage.getMessage(), holder)) {
             return;

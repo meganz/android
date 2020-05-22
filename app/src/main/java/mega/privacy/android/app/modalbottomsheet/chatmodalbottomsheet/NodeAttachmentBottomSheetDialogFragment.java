@@ -52,12 +52,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     private ImageView nodeThumb;
     private TextView nodeName;
     private TextView nodeInfo;
-    private LinearLayout optionView;
-
     private RelativeLayout titleLayout;
     private LinearLayout titleSeparator;
     private LinearLayout reactionsLayout;
     private ChatReactionsFragment reactionsFragment;
+    private LinearLayout optionView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,7 +95,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
 
-
         if (message == null || message.getMessage() == null) {
             logWarning("Message is null");
             return;
@@ -111,6 +109,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_attachment_item, null);
         mainLinearLayout = contentView.findViewById(R.id.node_attachment_bottom_sheet);
+        titleLayout = contentView.findViewById(R.id.node_attachment_title_layout);
+        titleSeparator = contentView.findViewById(R.id.title_separator);
         reactionsLayout = contentView.findViewById(R.id.reactions_layout);
         reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
         items_layout = contentView.findViewById(R.id.items_layout);
@@ -119,6 +119,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         nodeName = contentView.findViewById(R.id.node_attachment_name_text);
         nodeInfo = contentView.findViewById(R.id.node_attachment_info_text);
         RelativeLayout nodeIconLayout = contentView.findViewById(R.id.node_attachment_relative_layout_icon);
+
         LinearLayout optionOpenWith = contentView.findViewById(R.id.open_with_layout);
         LinearLayout forwardSeparator = contentView.findViewById(R.id.forward_separator);
         LinearLayout optionForward = contentView.findViewById(R.id.forward_layout);
@@ -144,15 +145,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         optionOpenWith.setOnClickListener(this);
         optionSelect.setOnClickListener(this);
 
-        if(context instanceof ChatActivityLollipop) {
-            reactionsFragment.init(context, chatId, messageId, positionMessage);
-        }
-
         if (chatC.isInAnonymousMode()) {
             optionSaveOffline.setVisibility(View.GONE);
             optionImport.setVisibility(View.GONE);
         }
-
         nodeIconLayout.setVisibility(View.GONE);
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -175,6 +171,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         if (context instanceof ChatActivityLollipop && chatRoom != null) {
+            reactionsFragment.init(context, chatId, messageId, positionMessage);
+            titleLayout.setVisibility(View.GONE);
+            titleSeparator.setVisibility(View.GONE);
             optionSelect.setVisibility(View.VISIBLE);
             if (chatC.isInAnonymousMode() ||
                     ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
@@ -200,6 +199,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 optionOpenWith.setVisibility(View.GONE);
             }
         } else {
+            titleLayout.setVisibility(View.VISIBLE);
+            titleSeparator.setVisibility(View.VISIBLE);
             optionSelect.setVisibility(View.GONE);
             optionForward.setVisibility(View.GONE);
             optionRemove.setVisibility(View.GONE);
@@ -253,12 +254,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             separatorRemove.setVisibility(View.VISIBLE);
         }
 
-        if (shouldReactionOptionsBeVisible(context, chatRoom, message)) {
-            reactionsLayout.setVisibility(View.VISIBLE);
-        } else {
-            reactionsLayout.setVisibility(View.GONE);
-        }
-
         if (optionOpenWith.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE) {
             forwardSeparator.setVisibility(View.VISIBLE);
         } else {
@@ -270,6 +265,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         } else {
             selectSeparator.setVisibility(View.GONE);
         }
+
+        reactionsLayout.setVisibility((shouldReactionOptionsBeVisible(context, chatRoom, message)) ? View.VISIBLE : View.GONE);
+
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);

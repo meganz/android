@@ -36,7 +36,7 @@ import nz.mega.sdk.MegaStringList;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
     private Context context;
@@ -198,7 +198,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 reactionTabs.get(i).addView(separator, lp);
             }
             reactionTabLastSelectedIndex = i;
-//            reactionTabs.get(i).getParent().requestChildFocus(reactionTabs.get(i), reactionTabs.get(i));
+            reactionTabs.get(i).getParent().requestChildFocus(reactionTabs.get(i), reactionTabs.get(i));
         }
     }
 
