@@ -3,7 +3,7 @@
     android:id="@+id/call_notif_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="10dp"
+    android:paddingTop="8dp"
     android:orientation="horizontal">
 
     <RelativeLayout
@@ -24,7 +24,6 @@
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter" />
         </RelativeLayout>
-
     </RelativeLayout>
 
     <LinearLayout
@@ -37,27 +36,44 @@
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="8dp"
             android:orientation="vertical">
-            <TextView
-                android:id="@+id/chat_title"
-                style="@style/TextAppearance.Compat.Notification.Title"
+            <RelativeLayout
+                android:id="@+id/title_chat_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:text="TITLE GROUP"
-                android:textColor="@color/file_list_first_row"
-                android:textSize="16sp" />
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/chat_title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    style="Custom Notification Title"
+                    android:textColor="@color/file_list_first_row"
+                    android:textSize="16sp" />
+                <ImageView
+                    android:id="@+id/chat_status"
+                    style="@style/TextAppearance.Compat.Notification"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_alignTop="@id/chat_title"
+                    android:layout_toRightOf="@id/chat_title"
+                    android:background="@null"
+                    android:src="@drawable/ic_offline"
+                    android:visibility="gone"/>
+            </RelativeLayout>
+            
             <TextView
                 android:id="@+id/call_title"
-                style="@style/TextAppearance.Compat.Notification.Info"
+                style="@style/TextAppearance.Compat.Notification"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/chat_title"
                 android:layout_weight="1"
                 android:maxLines="1"
-                android:text="Incoming group call"
                 android:textColor="@color/grey_info_menu"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -130,21 +146,20 @@
             android:id="@+id/big_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
+            android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/first_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:gravity="left|center_vertical">
+                android:layout_marginBottom="20dp">
 
                 <ImageView
                     android:id="@+id/first_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="4dp"
+                    android:layout_marginRight="10dp"
                     android:src="@drawable/ic_remove_not" />
                 <TextView
                     android:id="@+id/first_button_text"
@@ -152,6 +167,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/first_image"
                     android:textColor="@color/accentColor"
+                    android:layout_centerInParent="true"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -160,14 +176,13 @@
                 android:id="@+id/second_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:gravity="left|center_vertical">
+                android:layout_marginBottom="20dp">
 
                 <ImageView
                     android:id="@+id/second_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="4dp"
+                    android:layout_marginRight="10dp"
                     android:src="@drawable/ic_transfers_pause" />
 
                 <TextView
@@ -176,6 +191,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/second_image"
                     android:textColor="@color/accentColor"
+                    android:layout_centerInParent="true"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -183,14 +199,13 @@
             <RelativeLayout
                 android:id="@+id/third_button_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/third_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="4dp"
+                    android:layout_marginRight="10dp"
                     android:src="@drawable/ic_call" />
 
                 <TextView
@@ -199,14 +214,10 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/third_image"
                     android:textColor="@color/accentColor"
+                    android:layout_centerInParent="true"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
-
         </LinearLayout>
-
-
-
-
     </LinearLayout>
 </LinearLayout>

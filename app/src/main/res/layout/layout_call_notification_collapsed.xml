@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/call_notif_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="64dp"
+    android:paddingTop="8dp"
     android:orientation="horizontal">
 
     <RelativeLayout
@@ -35,7 +35,7 @@
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="8dp"
             android:orientation="vertical">
             <RelativeLayout
                 android:id="@+id/title_chat_layout"
@@ -43,12 +43,13 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/chat_title"
-                    style="@style/TextAppearance.Compat.Notification.Title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dp"
                     android:layout_weight="1"
                     android:maxLines="1"
+                    style="Custom Notification Title"
                     android:textColor="@color/file_list_first_row"
                     android:textSize="16sp" />
                 <ImageView
@@ -76,67 +77,6 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="8dp"
-            android:background="@color/chat_sliding_panel_separator" />
-
-        <LinearLayout
-            android:id="@+id/small_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RelativeLayout
-                android:id="@+id/decline_button_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="50dp"
-                android:gravity="left|center_vertical">
-
-                <ImageView
-                    android:id="@+id/decline_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:src="@drawable/ic_remove_not" />
-                <TextView
-                    android:id="@+id/decline_button_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/decline_image"
-                    android:layout_centerInParent="true"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp"
-                    android:text="IGNORE"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/answer_button_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical">
-
-                <ImageView
-                    android:id="@+id/answer_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:src="@drawable/ic_call" />
-
-                <TextView
-                    android:id="@+id/answer_button_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/answer_image"
-                    android:textColor="@color/accentColor"
-                    android:layout_centerInParent="true"
-                    android:textSize="14sp"
-                    android:text="JOIN"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-        </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>

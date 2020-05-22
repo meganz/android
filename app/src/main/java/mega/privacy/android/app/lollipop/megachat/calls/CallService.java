@@ -84,6 +84,13 @@ public class CallService extends Service{
                         break;
                 }
             }
+
+            if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
+                logDebug("The call on hold change");
+                updateNotificationContent(chatId);
+            }
+
+
         }
     };
 
@@ -103,6 +110,7 @@ public class CallService extends Service{
 
         IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
         filter.addAction(ACTION_CALL_STATUS_UPDATE);
+        filter.addAction(ACTION_CHANGE_CALL_ON_HOLD);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
     }
 
@@ -130,7 +138,6 @@ public class CallService extends Service{
     private void updateNotificationContent(long chatId) {
         Notification notif;
         MegaChatCall call = megaChatApi.getChatCall(chatId);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (call == null) {
                 mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
@@ -141,7 +148,11 @@ public class CallService extends Service{
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     mBuilderCompatO.setContentText(getString(R.string.title_notification_incoming_call));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    mBuilderCompatO.setContentText(getString(R.string.title_notification_call_in_progress));
+                    if(call.isOnHold()){
+                        mBuilderCompatO.setContentText(getString(R.string.call_on_hold));
+                    }else {
+                        mBuilderCompatO.setContentText(getString(R.string.title_notification_call_in_progress));
+                    }
                 }
             }
             notif = mBuilderCompatO.build();
@@ -154,7 +165,11 @@ public class CallService extends Service{
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     mBuilderCompat.setContentText(getString(R.string.title_notification_incoming_call));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
+                    if(call.isOnHold()){
+                        mBuilderCompat.setContentText(getString(R.string.call_on_hold));
+                    }else {
+                        mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
+                    }
                 }
             }
             notif = mBuilderCompat.build();

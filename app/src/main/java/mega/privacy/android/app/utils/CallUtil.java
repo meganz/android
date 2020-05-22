@@ -667,4 +667,32 @@ public class CallUtil {
         }
         return actionBarHeight;
     }
+
+    /**
+     * Method to retrieve the chat ID with an active call.
+     *
+     * @param currentChatId The chat ID with call.
+     */
+    public static long isAnotherActiveCall(long currentChatId) {
+        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
+        if (chatsIDsWithCallActive == null || chatsIDsWithCallActive.isEmpty()) {
+            return currentChatId;
+        }
+
+        MegaChatCall currentCall = MegaApplication.getInstance().getMegaChatApi().getChatCall(currentChatId);
+        if (currentCall != null && currentCall.isOnHold()) {
+            logDebug("Current call ON HOLD, look for other");
+            for (Long anotherChatId : chatsIDsWithCallActive) {
+                if (anotherChatId != currentChatId) {
+                    MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(anotherChatId);
+                    if (!call.isOnHold()) {
+                        logDebug("Another call ACTIVE");
+                        return anotherChatId;
+                    }
+                }
+            }
+        }
+        logDebug("Current call ACTIVE, look for other");
+        return currentChatId;
+    }
 }
