@@ -64,7 +64,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             case CallNotificationIntentService.ANSWER:
             case CallNotificationIntentService.END_ANSWER:
             case CallNotificationIntentService.END_JOIN:
-                if(chatIdCurrentCall == MEGACHAT_INVALID_HANDLE){
+                if (chatIdCurrentCall == MEGACHAT_INVALID_HANDLE) {
                     MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
                     if (call != null) {
                         logDebug("Answering incoming call with status " + callStatusToString(call.getStatus()));
@@ -77,45 +77,53 @@ public class CallNotificationIntentService extends IntentService implements Mega
                             megaChatApi.startChatCall(chatIdIncomingCall, false, this);
                         }
                     }
-                }else{
+                } else {
                     logDebug("Hanging up current call ... ");
                     megaChatApi.hangChatCall(chatIdCurrentCall, this);
                 }
                 break;
+
             case CallNotificationIntentService.DECLINE:
                 logDebug("Hanging up incoming call ... ");
                 megaChatApi.hangChatCall(chatIdIncomingCall, this);
                 break;
+
             case CallNotificationIntentService.IGNORE:
                 logDebug("Ignore incoming call... ");
                 megaChatApi.setIgnoredCall(chatIdIncomingCall);
                 MegaApplication.getInstance().removeChatAudioManager();
                 stopSelf();
                 break;
+
             case CallNotificationIntentService.HOLD_ANSWER:
             case CallNotificationIntentService.HOLD_JOIN:
                 MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
-                if(currentCall == null)
+                if (currentCall == null)
                     break;
 
-                if(currentCall.isOnHold()){
+                if (currentCall.isOnHold()) {
                     logDebug("Answering incoming call ...");
                     MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
                     megaChatApi.answerChatCall(chatIdIncomingCall, false, this);
-                }else {
+                } else {
                     logDebug("Putting the current call on hold...");
                     megaChatApi.setCallOnHold(chatIdCurrentCall, true, this);
                 }
                 break;
+
             default:
                 throw new IllegalArgumentException("Unsupported action: " + action);
-
         }
 
     }
 
+    /**
+     * Method for removing the incoming call notification.
+     *
+     * @param chatIdIncomingCall The chat ID wit the call.
+     */
     public void clearIncomingCallNotification(long chatIdIncomingCall) {
-        logDebug("chatIdIncomingCall: " + chatIdIncomingCall);
+        logDebug("Clear the notification in chat: " + chatIdIncomingCall);
 
         try {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -145,11 +153,11 @@ public class CallNotificationIntentService extends IntentService implements Mega
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                if(request.getChatHandle() == chatIdIncomingCall){
+                if (request.getChatHandle() == chatIdIncomingCall) {
                     logDebug("Incoming call hung up. ");
                     MegaApplication.getInstance().removeChatAudioManager();
                     stopSelf();
-                }else if(request.getChatHandle() == chatIdCurrentCall){
+                } else if (request.getChatHandle() == chatIdCurrentCall) {
                     logDebug("Current call hung up. Answering incoming call ...");
                     MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
                     megaChatApi.answerChatCall(chatIdIncomingCall, false, this);
@@ -178,7 +186,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             } else {
                 logError("Error answering the call" + e.getErrorCode());
             }
-        } else if(request.getType() == MegaChatRequest.TYPE_SET_CALL_ON_HOLD){
+        } else if (request.getType() == MegaChatRequest.TYPE_SET_CALL_ON_HOLD) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("Current call on hold. Answering incoming call ...");
                 MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);

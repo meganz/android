@@ -52,9 +52,8 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     private Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
     private TextureView myTexture = null;
-    private int numParticipants;
 
-    public MegaSurfaceRendererGroup(TextureView view, long peerId, long clientId, int numParticipants) {
+    public MegaSurfaceRendererGroup(TextureView view, long peerId, long clientId) {
         logDebug("MegaSurfaceRendererGroup()");
 
         this.myTexture = view;
@@ -65,7 +64,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.peerId = peerId;
         this.clientId = clientId;
-        this.numParticipants = numParticipants;
         listeners = new ArrayList<>();
     }
 
@@ -88,27 +86,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             dstRect.left = 0;
             dstRect.right = surfaceWidth;
             dstRect.bottom = surfaceHeight;
-//            if (numParticipants == 1) {
-//                dstRectf = new RectF(dstRect);
-//                float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
-//                float dstaspectratio = (float) dstRect.width() / dstRect.height();
-//                if (srcaspectratio != 0 && dstaspectratio != 0) {
-//
-//                    if (srcaspectratio <= dstaspectratio) {
-//                        float newHeight = dstRect.width() / srcaspectratio;
-//                        float decrease = dstRect.height() - newHeight;
-//                        dstRect.top += decrease / 2;
-//                        dstRect.bottom -= decrease / 2;
-//                    } else {
-//                        float newWidth = dstRect.height() * srcaspectratio;
-//                        float decrease = dstRect.width() - newWidth;
-//                        dstRect.left += decrease / 2;
-//                        dstRect.right -= decrease / 2;
-//                    }
-//
-//                    dstRectf = new RectF(dstRect);
-//                }
-//            }
         }
     }
 
@@ -137,19 +114,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             srcRect.right = height;
             srcRect.bottom = height;
         }
-//        if (numParticipants == 1 || height == width) {
-//            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//            srcRect.bottom = height;
-//            srcRect.right = width;
-//        } else if (height > width) {
-//            bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
-//            srcRect.bottom = width;
-//            srcRect.right = width;
-//        } else {
-//            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//            srcRect.right = height;
-//            srcRect.bottom = height;
-//        }
+
         adjustAspectRatio();
         return bitmap;
     }

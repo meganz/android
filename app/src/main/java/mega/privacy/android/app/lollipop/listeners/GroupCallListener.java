@@ -16,7 +16,6 @@ import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class GroupCallListener implements MegaChatVideoListenerInterface {
 
-    private Context context;
     private int width;
     private int height;
     private Bitmap bitmap;
@@ -24,14 +23,13 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     private boolean isLocal;
     private MegaSurfaceRendererGroup localRenderer;
 
-    public GroupCallListener(Context context, TextureView myTexture, long peerid, long clientid, long chatId, int numParticipants) {
+    public GroupCallListener(TextureView myTexture, long peerid, long clientid, long chatId, int numParticipants) {
         logDebug("GroupCallListener");
-        this.context = context;
         this.width = 0;
         this.height = 0;
         this.myTexture = myTexture;
         this.isLocal = isItMe(chatId, peerid, clientid);
-        this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerid, clientid, numParticipants);
+        this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerid, clientid);
     }
 
     @Override

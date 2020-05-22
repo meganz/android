@@ -501,11 +501,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}
 
 			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-
 				long peerId = intent.getLongExtra(UPDATE_PEER_ID, -1);
 				long clientId = intent.getLongExtra(UPDATE_CLIENT_ID, -1);
 				MegaChatSession session = call.getMegaChatSession(peerId, clientId);
-
 				logDebug("The session on hold change");
 
 				if (chatRoom.isGroup()) {
@@ -519,7 +517,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					setWasLocalVideoEnable(false);
 				}
 			}
-
 		}
 	};
 
@@ -1348,7 +1345,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if(callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && chatRoom != null && chatRoom.isGroup() ){
+		if (callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && chatRoom != null && chatRoom.isGroup()) {
 			showGroupCallNotification(chatId);
 			return;
 		}
@@ -1444,39 +1441,39 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
      *
      * @param isSpeakerOn the speaker status.
      */
-    public void createRTCAudioManager(boolean isSpeakerOn) {
-        if (rtcAudioManager != null) {
-            logDebug("Updating RTC Audio Manager values...");
-            rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
-            return;
-        }
+	public void createRTCAudioManager(boolean isSpeakerOn) {
+		if (rtcAudioManager != null) {
+			logDebug("Updating RTC Audio Manager values...");
+			rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
+			return;
+		}
 
-        logDebug("Creating RTC Audio Manager...");
-        rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
-        startProximitySensor();
-        rtcAudioManager.setOnProximitySensorListener(isNear -> {
-            Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
-            intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-        });
-    }
+		logDebug("Creating RTC Audio Manager...");
+		rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
+		startProximitySensor();
+		rtcAudioManager.setOnProximitySensorListener(isNear -> {
+			Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
+			intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		});
+	}
 
     /**
      * Remove the AppRTCAudioManager.
      */
-    public void removeRTCAudioManager() {
-        if (rtcAudioManager == null)
-            return;
+	public void removeRTCAudioManager() {
+		if (rtcAudioManager == null)
+			return;
 
-        try {
-            logDebug("Removing RTC Audio Manager...");
-            unregisterProximitySensor();
-            rtcAudioManager.stop();
-            rtcAudioManager = null;
-        } catch (Exception e) {
-            logError("Exception stopping speaker audio manager", e);
-        }
-    }
+		try {
+			logDebug("Removing RTC Audio Manager...");
+			unregisterProximitySensor();
+			rtcAudioManager.stop();
+			rtcAudioManager = null;
+		} catch (Exception e) {
+			logError("Exception stopping speaker audio manager", e);
+		}
+	}
 
     /**
      * Activate the proximity sensor.

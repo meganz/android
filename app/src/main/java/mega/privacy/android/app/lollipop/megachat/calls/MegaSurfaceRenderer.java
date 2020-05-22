@@ -24,15 +24,10 @@ import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
-
 import org.webrtc.Logging;
-
 import java.nio.ByteBuffer;
-
-import mega.privacy.android.app.MegaApplication;
-
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class MegaSurfaceRenderer implements Callback {

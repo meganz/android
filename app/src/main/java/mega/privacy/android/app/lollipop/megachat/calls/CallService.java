@@ -89,8 +89,6 @@ public class CallService extends Service{
                 logDebug("The call on hold change");
                 updateNotificationContent(chatId);
             }
-
-
         }
     };
 

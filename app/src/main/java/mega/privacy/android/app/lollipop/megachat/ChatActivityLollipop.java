@@ -164,7 +164,7 @@ import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMess
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -549,7 +549,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (intent == null || intent.getAction() == null)
                 return;
 
-            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
             if (chatId != getCurrentChatid()) {
                 logWarning("Call different chat");
                 return;
@@ -2576,8 +2576,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if (participatingInACall()) {
                 ArrayList<Long> chatsIDcalls = getCallsParticipating();
-                for(Long chatId:chatsIDcalls){
-                    if(chatId == chatRoom.getChatId()){
+                for (Long chatId : chatsIDcalls) {
+                    if (chatId == chatRoom.getChatId()) {
                         logDebug("I'm participating in the call of this chat");
                         returnCall(this, chatId);
                         return;
@@ -3381,10 +3381,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("onClick");
 
         switch (v.getId()) {
-            case R.id.home:{
+            case R.id.home:
                 onBackPressed();
                 break;
-            }
+
             case R.id.call_on_hold_layout:
                 if (participatingInACall()) {
                     ArrayList<Long> chatsIDcalls = getCallsParticipating();
@@ -3404,7 +3404,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 break;
 
-            case R.id.send_message_icon_chat:{
+            case R.id.send_message_icon_chat:
                 logDebug("send_message_icon_chat");
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
@@ -3419,18 +3419,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 textChat.setText("", TextView.BufferType.EDITABLE);
                 break;
-            }
+
             case R.id.keyboard_twemoji_chat:
-            case R.id.rl_keyboard_twemoji_chat:{
+            case R.id.rl_keyboard_twemoji_chat:
                 logDebug("keyboard_icon_chat");
                 hideFileStorage();
                 if(emojiKeyboard==null) break;
                 changeKeyboard(keyboardTwemojiButton);
                 break;
-            }
+
 
             case R.id.media_icon_chat:
-            case R.id.rl_media_icon_chat: {
+            case R.id.rl_media_icon_chat:
                 logDebug("media_icon_chat");
                 if (recordView.isRecordingNow()) break;
                 hideKeyboard();
@@ -3440,9 +3440,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 controlCamera();
                 break;
-            }
+
             case R.id.pick_file_storage_icon_chat:
-            case R.id.rl_pick_file_storage_icon_chat:{
+            case R.id.rl_pick_file_storage_icon_chat:
                 logDebug("file storage icon ");
                 if (fileStorageLayout.isShown()) {
                     hideFileStorage();
@@ -3485,26 +3485,26 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
                 }
                 break;
-            }
-            case R.id.toolbar_chat:{
+
+            case R.id.toolbar_chat:
                 logDebug("toolbar_chat");
                 if(recordView.isRecordingNow()) break;
 
                 showGroupInfoActivity();
                 break;
-            }
-            case R.id.message_jump_layout:{
+
+            case R.id.message_jump_layout:
                 goToEnd();
                 break;
-            }
+
             case R.id.pick_attach_chat:
-            case R.id.rl_attach_icon_chat: {
+            case R.id.rl_attach_icon_chat:
                 logDebug("Show attach bottom sheet");
                 hideKeyboard();
                 showSendAttachmentBottomSheet();
                 break;
-            }
-            case R.id.join_button:{
+
+            case R.id.join_button:
                 if (chatC.isInAnonymousMode()) {
                     ifAnonymousModeLogin(true);
                 }
@@ -3512,7 +3512,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     megaChatApi.autojoinPublicChat(idChat, this);
                 }
                 break;
-            }
+
 		}
     }
 
@@ -8166,6 +8166,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    /**
+     * Method for updating the bar that indicates the current call in this chat.
+     */
     private void updateCallBar() {
         if (chatRoom == null || chatRoom.isPreview() ||
                 !chatRoom.isActive() || !isStatusConnected(this, idChat) ||
@@ -8286,11 +8289,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private void updateCallInProgressLayout(){
         MegaChatCall call = megaChatApi.getChatCall(idChat);
-        if (call == null) return;
+        if (call == null)
+            return;
 
-        if(call.isOnHold()){
+        if (call.isOnHold()) {
             showCallInProgressLayout(getString(R.string.call_on_hold), true, call);
-        }else{
+        } else {
             showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
         }
 

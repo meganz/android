@@ -1,10 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -12,13 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import androidx.fragment.app.Fragment;
-
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fragments.BaseFragment;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
@@ -226,7 +219,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, -1, -1, listener);
+                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }
@@ -400,7 +393,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, -1, -1, listener);
+                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }

@@ -728,6 +728,12 @@ public final class ChatAdvancedNotificationBuilder {
         notificationManager.cancel(KeepAliveService.NEW_MESSAGE_NOTIFICATION_ID);
     }
 
+    /**
+     * Method for obtaining the name of the chat participant.
+     *
+     * @param chat The chat room.
+     * @return The name.
+     */
     private String getFullName(MegaChatRoom chat) {
         String fullName = getNicknameContact(chat.getPeerHandle(0));
         if (fullName == null) {
@@ -739,9 +745,8 @@ public final class ChatAdvancedNotificationBuilder {
 
     /**
      * Method for knowing how many buttons need to be displayed in notifications.
-     *
      */
-    private int getNumberButtons(){
+    private int getNumberButtons() {
         ArrayList<Long> currentCalls = getCallsParticipating();
 
         if (participatingInACall() && currentCalls != null) {
@@ -758,14 +763,12 @@ public final class ChatAdvancedNotificationBuilder {
                     }
                 }
             }
-
             if ((!callsActive.isEmpty() && callsOnHold.isEmpty()) || (callsActive.isEmpty() && !callsOnHold.isEmpty())) {
                 return THREE_BUTTONS;
             }
         }
         return TWO_BUTTONS;
     }
-
 
     /**
      * Method for obtaining the number of request required.
@@ -775,10 +778,6 @@ public final class ChatAdvancedNotificationBuilder {
      */
     private int getNumberRequestNotifications(String type, long chatHandleInProgress) {
         switch (type) {
-            case CallNotificationIntentService.DECLINE:
-            case CallNotificationIntentService.IGNORE:
-                return ONE_REQUEST_NEEDED;
-
             case CallNotificationIntentService.ANSWER:
             case CallNotificationIntentService.END_ANSWER:
             case CallNotificationIntentService.END_JOIN:
@@ -845,6 +844,12 @@ public final class ChatAdvancedNotificationBuilder {
         return result;
     }
 
+    /**
+     * Method for showing the incoming call notification, when exists another call in progress.
+     *
+     * @param callToAnswer The call that is being received.
+     * @param callInProgress The current call in progress.
+     */
     public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid() + ", Call in progress ID: " + callInProgress.getChatid());
 
@@ -999,7 +1004,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     /**
-     * The Group incoming call notification, just one call at a time.
+     * Method for showing a incoming group call notification, when no other call is in progress
      *
      * @param callToAnswer The call that is being received.
      */
@@ -1052,9 +1057,9 @@ public final class ChatAdvancedNotificationBuilder {
                 titleCall = context.getString(R.string.title_notification_incoming_group_call);
             } else {
                 titleChat = getFullName(chatToAnswer);
-                if(callToAnswer.hasVideoInitialCall()){
+                if (callToAnswer.hasVideoInitialCall()) {
                     titleCall = context.getString(R.string.title_notification_incoming_individual_video_call);
-                }else{
+                } else {
                     titleCall = context.getString(R.string.title_notification_incoming_individual_audio_call);
                 }
             }

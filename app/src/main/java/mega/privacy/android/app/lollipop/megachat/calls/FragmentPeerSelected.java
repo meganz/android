@@ -163,7 +163,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             myTexture.setAlpha(1.0f);
             myTexture.setRotation(0);
 
-            listener = new GroupCallListener(context, myTexture, peerid, clientid, chatId, ((ChatCallActivity) context).getNumParticipants());
+            listener = new GroupCallListener(myTexture, peerid, clientid, chatId, ((ChatCallActivity) context).getNumParticipants());
             if (isItMe(chatId, peerid, clientid)) {
                 megaChatApi.addChatLocalVideoListener(chatId, listener);
             } else {
@@ -207,7 +207,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, -1, -1, listener);
+                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }
@@ -237,7 +237,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
      * Method to show the call on hold image.
      */
     public void showOnHoldImage(long peerid, long clientid) {
-        if(peerid != this.peerid || clientid != this.clientid)
+        if (peerid != this.peerid || clientid != this.clientid)
             return;
 
         avatarLayout.setVisibility(View.VISIBLE);
@@ -324,7 +324,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, -1, -1, listener);
+                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }

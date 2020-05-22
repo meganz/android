@@ -1310,9 +1310,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
 
-				if (chatIdReceived == -1)
+				if (chatIdReceived == INVALID_HANDLE)
 					return;
 
 				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
