@@ -1781,7 +1781,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			}
 
 			if (handle != INVALID_HANDLE) {
-				megaApi.setCameraUploadsFolderSecondary(handle, setAttrUserListener);
+				megaApi.setCameraUploadsFolders(INVALID_HANDLE,handle, setAttrUserListener);
 			} else {
 				logError("Error choosing the Mega folder to sync the Camera");
 			}
@@ -1796,7 +1796,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             }
 
 			if (handle != INVALID_HANDLE) {
-				megaApi.setCameraUploadsFolder(handle, setAttrUserListener);
+			    //set primary only
+				megaApi.setCameraUploadsFolders(handle, INVALID_HANDLE,setAttrUserListener);
 			} else {
 				logError("Error choosing the Mega folder to sync the Camera");
 			}

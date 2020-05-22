@@ -1019,15 +1019,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, getAttrUserListener);
             return CHECKING_USER_ATTRIBUTE;
         }
-
-        int primaryFolderResult = checkPrimaryFolder();
-        int secondaryFolderResult = checkSecondaryFolder();
-
-        if (primaryFolderResult != 0) {
-            return primaryFolderResult;
-        }
-
-        return secondaryFolderResult;
+        return checkTargetFolders();
     }
 
     private void localFolderUnavailableNotification(int resId, int notiId) {
@@ -1074,21 +1066,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         return true;
     }
 
-    private int checkPrimaryFolder() {
-        if (isNodeInRubbishOrDeleted(cameraUploadHandle)) {
-            cameraUploadHandle = findDefaultFolder(getString(R.string.section_photo_sync));
-            if (cameraUploadHandle == INVALID_HANDLE) {
-                megaApi.createFolder(getString(R.string.section_photo_sync), megaApi.getRootNode(), createFolderListener);
-                return TARGET_FOLDER_NOT_EXIST;
-            } else {
-                megaApi.setCameraUploadsFolder(cameraUploadHandle, setAttrUserListener);
-                return SETTING_USER_ATTRIBUTE;
-            }
-        }
-        return 0;
-    }
-
-    private int checkSecondaryFolder() {
+    private int checkTargetFolders() {
         if (prefs.getSecondaryMediaFolderEnabled() == null) {
             logDebug("Secondary upload setting not defined, so not enabled");
             dbH.setSecondaryUploadEnabled(false);
@@ -1104,26 +1082,43 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             secondaryEnabled = false;
         }
 
+        long primaryToSet =INVALID_HANDLE, secondaryToSet = INVALID_HANDLE;
+        boolean needToSetPrimary = isNodeInRubbishOrDeleted(cameraUploadHandle);
+        boolean needToSetSecondary = false;
+        if (needToSetPrimary) {
+            cameraUploadHandle = findDefaultFolder(getString(R.string.section_photo_sync));
+            if (cameraUploadHandle == INVALID_HANDLE) {
+                megaApi.createFolder(getString(R.string.section_photo_sync), megaApi.getRootNode(), createFolderListener);
+                if(!secondaryEnabled) {
+                    return TARGET_FOLDER_NOT_EXIST;
+                }
+            } else {
+                primaryToSet = cameraUploadHandle;
+            }
+        }
+
         if (secondaryEnabled) {
             logDebug("the secondary uploads are enabled");
-            if (isNodeInRubbishOrDeleted(secondaryUploadHandle)) {
+            needToSetSecondary = isNodeInRubbishOrDeleted(secondaryUploadHandle);
+            if (needToSetSecondary) {
                 secondaryUploadHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
                 if (secondaryUploadHandle == INVALID_HANDLE) {
                     logDebug("must create the folder");
                     megaApi.createFolder(getString(R.string.section_secondary_media_uploads), megaApi.getRootNode(), createFolderListener);
                     return TARGET_FOLDER_NOT_EXIST;
                 } else {
-                    megaApi.setCameraUploadsFolderSecondary(secondaryUploadHandle, setAttrUserListener);
-                    return SETTING_USER_ATTRIBUTE;
+                    secondaryToSet = secondaryUploadHandle;
                 }
             }
         } else {
             logDebug("Secondary NOT Enabled");
         }
+        if (needToSetPrimary || needToSetSecondary) {
+            megaApi.setCameraUploadsFolders(primaryToSet, secondaryToSet, setAttrUserListener);
+            return SETTING_USER_ATTRIBUTE;
+        }
         return 0;
     }
-
-
 
     private void initService() {
         logDebug("initService()");
@@ -1390,10 +1385,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
-    public void onSetFolderAttribute(boolean isSuccessful) {
-        if (isSuccessful) {
-            startWorkerThread();
-        }
+    public void onSetFolderAttribute() {
+        startWorkerThread();
     }
 
     public void onCreateFolder(boolean isSuccessful) {

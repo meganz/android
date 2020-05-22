@@ -8,6 +8,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
+import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -78,35 +79,52 @@ public class SetAttrUserListener extends BaseListener {
                 }
                 break;
             case USER_ATTR_CAMERA_UPLOADS_FOLDER:
-                long handle = request.getNodeHandle();
-                boolean isSecondary = request.getFlag();
-                MegaPreferences prefs = dBH.getPreferences();
-                // Database and preference update
                 if (e.getErrorCode() == MegaError.API_OK) {
+                    MegaPreferences prefs = dBH.getPreferences();
+                    // Database and preference update
                     if (prefs == null) return;
-                    if (isSecondary) {
-                        resetSecondaryTimeline();
-                        dBH.setSecondaryFolderHandle(handle);
-                        prefs.setMegaHandleSecondaryFolder(String.valueOf(handle));
-                    } else {
-                        resetPrimaryTimeline();
-                        dBH.setCamSyncHandle(handle);
-                        prefs.setCamSyncHandle(String.valueOf(handle));
-                    }
-                    forceUpdateCameraUploadFolderIcon(request.getFlag(), request.getNodeHandle());
-                }
 
-                if (context instanceof CameraUploadsService) {
-                    ((CameraUploadsService) context).onSetFolderAttribute(e.getErrorCode() == MegaError.API_OK);
-                } else if (context instanceof ManagerActivityLollipop
-                        && fragmentTag == SETTINGS) {
-                    if (e.getErrorCode() == MegaError.API_OK) {
+                    boolean secondaryEnabled = false;
+                    if (prefs.getSecondaryMediaFolderEnabled() != null) {
+                        secondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+                    }
+                    long primaryHandle = request.getNodeHandle();
+                    long secondonaryHandle = request.getParentHandle();
+                    if(primaryHandle != INVALID_HANDLE){
+                        resetPrimaryTimeline();
+                        dBH.setCamSyncHandle(primaryHandle);
+                        prefs.setCamSyncHandle(String.valueOf(primaryHandle));
+                        forceUpdateCameraUploadFolderIcon(false, primaryHandle);
+                        if (context instanceof CameraUploadsService && !secondaryEnabled) {
+                            ((CameraUploadsService) context).onSetFolderAttribute();
+                        }
+                    }
+                    if (secondaryEnabled && secondonaryHandle != INVALID_HANDLE) {
+                        resetSecondaryTimeline();
+                        dBH.setSecondaryFolderHandle(secondonaryHandle);
+                        prefs.setMegaHandleSecondaryFolder(String.valueOf(secondonaryHandle));
+                        forceUpdateCameraUploadFolderIcon(true, secondonaryHandle);
+                        //make sure to start the process once secondary is enabled
+                        if (context instanceof CameraUploadsService) {
+                            ((CameraUploadsService) context).onSetFolderAttribute();
+                        } else {
+                            JobUtil.stopRunningCameraUploadService(context);
+                            JobUtil.startCameraUploadServiceIgnoreAttr(context);
+                        }
+                    }
+
+                   if (context instanceof ManagerActivityLollipop && fragmentTag == SETTINGS) {
                         SettingsFragmentLollipop settingsFragment = ((ManagerActivityLollipop) context).getSettingsFragment();
                         if (settingsFragment != null) {
-                            settingsFragment.setCUDestinationFolder(isSecondary, handle);
+                            if (primaryHandle != INVALID_HANDLE) {
+                                settingsFragment.setCUDestinationFolder(false, primaryHandle);
+                            }
+                            if (secondonaryHandle != INVALID_HANDLE) {
+                                settingsFragment.setCUDestinationFolder(true, secondonaryHandle);
+                            }
                         }
-                        return;
                     }
+                } else {
                     showSnackbar(context, context.getString(R.string.error_unable_to_setup_cloud_folder));
                     logError("Exception happens when set user attribute" + e.toString());
                 }

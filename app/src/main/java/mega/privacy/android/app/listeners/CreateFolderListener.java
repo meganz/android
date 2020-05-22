@@ -45,9 +45,11 @@ public class CreateFolderListener extends BaseListener {
 
         if (extraAction == ExtraAction.INIT_CU && e.getErrorCode() == MegaError.API_OK) {
             if (name.equals(context.getString(R.string.section_photo_sync))) {
-                api.setCameraUploadsFolder(handle, new SetAttrUserListener(context));
+                //set primary only
+                api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
             } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
-                api.setCameraUploadsFolderSecondary(handle, new SetAttrUserListener(context));
+                //set secondary only
+                api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
             }
         }
 

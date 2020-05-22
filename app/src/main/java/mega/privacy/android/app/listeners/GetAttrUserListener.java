@@ -150,7 +150,7 @@ public class GetAttrUserListener extends BaseListener {
                     }
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
                     // only when both CU and MU are not set, will return API_ENOENT
-                    initCUFolderFromScratch(context, false);
+                    initTargetFoldersFromScratch(context);
                     if (context instanceof CameraUploadsService) {
                         // The unique process run within shoudRun method in CameraUploadsService
                         ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e, true);
@@ -182,7 +182,7 @@ public class GetAttrUserListener extends BaseListener {
 
     private void handle(long handle, boolean isSecondary, MegaError e) {
         if (isNodeInRubbishOrDeleted(handle)) {
-            initCUFolderFromScratch(context, isSecondary);
+            initTargetFoldersFromScratch(context);
         } else {
             boolean shouldCUStop = compareAndUpdateLocalFolderAttribute(handle, isSecondary);
             //stop CU if destination has changed
