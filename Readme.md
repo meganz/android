@@ -13,6 +13,9 @@ This document will guide you to build the application on a Linux machine with An
 
 * [Android NDK](http://developer.android.com/intl/es/ndk/downloads/index.html)
 
+### Install missing dependencies
+* For Debian-based distro: ``` sudo apt install swig cmake libtool libncurses5 ```
+
 ### Build & Run the application
 
 * Get the source code.
