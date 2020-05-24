@@ -463,6 +463,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 						removeValues(chatId);
 						break;
+					case MegaChatCall.CALL_STATUS_DESTROYED:
+						int termCode = intent.getIntExtra(UPDATE_CALL_TERM_CODE, -1);
+						boolean isIgnored = intent.getBooleanExtra(UPDATE_CALL_IGNORE, false);
+						boolean isLocalTermCode = intent.getBooleanExtra(UPDATE_CALL_LOCAL_TERM_CODE, false);
+						checkCallDestroyed(chatId, callId, termCode, isIgnored, isLocalTermCode);
+						break;
 				}
 			}
 		}
@@ -1289,7 +1295,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		removeChatAudioManager();
 	}
 
-	public void checkCallDestroyed(long chatId, MegaChatCall call) {
+	private void checkCallDestroyed(long chatId, long callId, int termCode, boolean isIgnored, boolean isLocalTermCode) {
 		removeValues(chatId);
 
 		if (shouldNotify(this)) {
@@ -1300,20 +1306,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			wakeLock.release();
 		}
 
-		if(call == null)
-		    return;
-
-		clearIncomingCallNotification(call.getId());
+		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 
-			if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
+			if ((termCode == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || termCode == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !isIgnored) {
 				logDebug("TERM_CODE_ANSWER_TIMEOUT");
-				if (!call.isLocalTermCode()) {
+				if (!isLocalTermCode) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-						notificationBuilder.showMissedCallNotification(call);
+						notificationBuilder.showMissedCallNotification(chatId, callId);
 					} catch (Exception e) {
 						logError("EXCEPTION when showing missed call notification", e);
 					}
