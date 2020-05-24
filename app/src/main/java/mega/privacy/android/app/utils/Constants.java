@@ -445,6 +445,7 @@ public class Constants {
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
+    public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
