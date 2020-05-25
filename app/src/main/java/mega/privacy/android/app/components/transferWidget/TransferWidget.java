@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components;
+package mega.privacy.android.app.components.transferWidget;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -16,6 +16,7 @@ import nz.mega.sdk.MegaApiAndroid;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
@@ -63,7 +64,7 @@ public class TransferWidget {
     public void updateState() {
         if (megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)) {
             setPausedTransfers();
-        } else if (isOverQuota()){
+        } else if (isOnTransferOverQuota()){
             setOverQuotaTransfers();
         } else {
             setProgressTransfers();
@@ -76,7 +77,7 @@ public class TransferWidget {
     }
 
     private void setPausedTransfers() {
-        if (isOverQuota()) return;
+        if (isOnTransferOverQuota()) return;
 
         status.setVisibility(VISIBLE);
         status.setImageDrawable(getDrawable(R.drawable.ic_transfers_paused));
@@ -89,7 +90,7 @@ public class TransferWidget {
     }
 
     private void setFailedTransfers() {
-        if (isOverQuota()) return;
+        if (isOnTransferOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_warning_progress_bar));
         status.setVisibility(VISIBLE);
@@ -129,9 +130,5 @@ public class TransferWidget {
         long totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
         return (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
-    }
-
-    private boolean isOverQuota() {
-        return megaApi.getBandwidthOverquotaDelay() > 0;
     }
 }

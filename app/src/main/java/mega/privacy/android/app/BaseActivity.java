@@ -18,6 +18,8 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -46,6 +48,7 @@ import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -718,7 +721,8 @@ public class BaseActivity extends AppCompatActivity {
         transferGeneralOverQuotaWarning.setCanceledOnTouchOutside(false);
 
         TextView text = dialogView.findViewById(R.id.text_transfer_overquota);
-        text.setText(getString(R.string.text_depleted_transfer_overquota));
+        final int stringResource = MegaApplication.getTransfersManagement().isCurrentTransferOverQuota() ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota;
+        text.setText(getString(stringResource, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())));
 
         Button dismissButton = dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
         dismissButton.setOnClickListener(v -> transferGeneralOverQuotaWarning.dismiss());
@@ -743,6 +747,23 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
 
+        new CountDownTimer(megaApi.getBandwidthOverquotaDelay(), 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long bandwidthOverquotaDelay = megaApi.getBandwidthOverquotaDelay();
+                if (bandwidthOverquotaDelay > 0) {
+                    text.setText(getString(stringResource, formatTimeDDHHMMSS(bandwidthOverquotaDelay)));
+                } else {
+                    transferGeneralOverQuotaWarning.dismiss();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        }.start();
         transferGeneralOverQuotaWarning.show();
         isGeneralTransferOverQuotaWarningShown = true;
     }

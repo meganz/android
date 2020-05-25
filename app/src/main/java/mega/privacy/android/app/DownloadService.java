@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -429,6 +430,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if (isFolderLink) {
 				currentDocument = megaApiFolder.authorizeNode(currentDocument);
+			}
+
+			if (TransfersManagement.isOnTransferOverQuota()) {
+				checkTransferOverQuota(false);
 			}
 
 			logDebug("CurrentDocument is not null");
@@ -1622,13 +1627,28 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 				if (e.getValue() != 0) {
 					logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-					Intent intent = new Intent(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA);
-					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+					checkTransferOverQuota(true);
 
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes();
 					isOverquota = true;
 				}
 			}
+		}
+	}
+
+	/**
+	 * Checks if should show transfer over quota warning.
+	 * If so, sends a broadcast to show it in the current view.
+	 *
+	 * @param isCurrentOverQuota	true if the overquota is currently received, false otherwise
+	 */
+	private void checkTransferOverQuota(boolean isCurrentOverQuota) {
+		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+
+		if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
+			transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
+			transfersManagement.setTransferOverQuotaTimestamp();
+			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA));
 		}
 	}
 

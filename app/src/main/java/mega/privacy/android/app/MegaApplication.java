@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
@@ -98,6 +99,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	final String TAG = "MegaApplication";
 
 	static final public String USER_AGENT = "MEGAAndroid/3.7.5_299";
+
+	private static TransfersManagement transfersManagement;
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -501,6 +504,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
+        transfersManagement = new TransfersManagement();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1543,5 +1547,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
+	}
+
+	public static TransfersManagement getTransfersManagement() {
+		return transfersManagement;
 	}
 }

@@ -9,12 +9,14 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatMessage;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 
 public class TimeUtils implements Comparator<Calendar> {
 
@@ -349,5 +351,33 @@ public class TimeUtils implements Comparator<Calendar> {
         }
 
         return null;
+    }
+
+    /**
+     * Formats a time into days, hours, minutes strings from a timestamp in milliseconds.
+     *
+     * @param time  time in milliseconds
+     * @return A string containing the time formatted in days, hours, minutes and seconds
+     */
+    public static String formatTimeDDHHMMSS(long time) {
+        Context context = MegaApplication.getInstance().getApplicationContext();
+        long days = TimeUnit.MILLISECONDS.toDays(time);
+        long hours = TimeUnit.MILLISECONDS.toHours(time) - TimeUnit.DAYS.toHours(days);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(time) - (TimeUnit.DAYS.toMinutes(days) + TimeUnit.HOURS.toMinutes(hours));
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(time) - (TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes));
+        String textDays = context.getString(R.string.label_time_in_days, days);
+        String textHours = context.getString(R.string.label_time_in_hours, hours);
+        String textMinutes = context.getString(R.string.label_time_in_minutes, minutes);
+        String textSeconds = context.getString(R.string.label_time_in_seconds, seconds);
+
+        if (days > 0) {
+            return textDays + " " + textHours + " " + textMinutes + " " + textSeconds;
+        } else if (hours > 0) {
+            return textHours + " " + textMinutes + " " + textSeconds;
+        } else if (minutes > 0) {
+            return textMinutes + " " + textSeconds;
+        } else {
+            return textSeconds;
+        }
     }
 }

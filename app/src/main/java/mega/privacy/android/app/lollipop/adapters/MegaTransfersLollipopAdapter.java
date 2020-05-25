@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.adapters;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,6 +30,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -212,7 +212,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			case MegaTransfer.STATE_COMPLETING:
 			case MegaTransfer.STATE_RETRYING:
 			case MegaTransfer.STATE_QUEUED:
-				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD && megaApi.getBandwidthOverquotaDelay() > 0) {
+				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD && isOnTransferOverQuota()) {
 					holder.imageViewCompleted.setVisibility(View.GONE);
 					holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
 					holder.progressText.setVisibility(View.VISIBLE);

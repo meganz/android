@@ -46,7 +46,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -120,6 +119,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -454,7 +454,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 }
             }
 
-            if (megaApi.getBandwidthOverquotaDelay() > 0) {
+            if (isOnTransferOverQuota()) {
                 showGeneralTransferOverQuotaWarning();
             }
         }
@@ -750,7 +750,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 megaApi.addTransferListener(this);
                 megaApi.addGlobalListener(this);
 
-                if (megaApi.getBandwidthOverquotaDelay() > 0) {
+                if (isOnTransferOverQuota()) {
                     showGeneralTransferOverQuotaWarning();
                 }
             }
