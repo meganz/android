@@ -51,6 +51,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -61,9 +62,6 @@ public class AccountController {
 
     Context context;
     MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH;
-    MegaPreferences prefs = null;
 
     static int count = 0;
 
@@ -78,10 +76,6 @@ public class AccountController {
             else{
                 megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
             }
-        }
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
@@ -445,10 +439,17 @@ public class AccountController {
 
         //clear mega contacts and reset last sync time.
         dbH.clearMegaContacts();
+        new MegaContactGetter(context).clearLastSyncTimeStamp();
+
+        // clean time stamps preference settings after logout
+        clearCUBackUp();
+
         SharedPreferences preferences = context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
         preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
+
         //clear push token
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
+
         new LastShowSMSDialogTimeChecker(context).reset();
 
         //Clear MyAccountInfo

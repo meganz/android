@@ -310,6 +310,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
             displayLinearFAB(true);
             checkIncomingCall();
+
             return;
         }
 
@@ -467,6 +468,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                         hideReconnecting();
                         updateAVFlags(session);
+                        updateSubtitleNumberOfVideos();
                     }
                 }
             }
@@ -734,11 +736,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void setAvatarLayout() {
-        if (chat.isGroup()) return;
+        if (chat.isGroup())
+            return;
+
         setProfileAvatar(megaChatApi.getMyUserHandle());
         setProfileAvatar(chat.getPeerHandle(0));
-        myAvatarLayout.setVisibility(View.VISIBLE);
-        contactAvatarLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -986,6 +988,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         application.createChatAudioManager();
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         sendSignalPresence();
     }
@@ -1135,7 +1138,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
             return;
 
-        logDebug("Showing Reconnecting bar");
         reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
         reconnectingText.setText(getString(R.string.reconnecting_message));
         reconnectingLayout.setVisibility(View.VISIBLE);
@@ -2048,14 +2050,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void updateSubtitleNumberOfVideos() {
-        logDebug("updateSubtitleNumberOfVideos");
-        if (chat == null || callChat == null) return;
+        if (chat == null || getCall() == null)
+            return;
+
         if (!chat.isGroup() || !statusCallInProgress(callChat.getStatus())) {
             linearParticipants.setVisibility(View.GONE);
             return;
         }
 
-        if (getCall() == null) return;
+        logDebug("Updating the number of participants with video on");
         int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
         if (usersWithVideo <= 0) {
             linearParticipants.setVisibility(View.GONE);
@@ -2432,6 +2435,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkIncomingCall() {
         setAvatarLayout();
+        myAvatarLayout.setVisibility(View.VISIBLE);
+        contactAvatarLayout.setVisibility(View.VISIBLE);
         updateSubtitleNumberOfVideos();
 
         if(chat.isGroup()){

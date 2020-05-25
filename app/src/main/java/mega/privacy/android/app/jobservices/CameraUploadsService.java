@@ -42,13 +42,15 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
+import mega.privacy.android.app.listeners.CreateFolderListener;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -63,18 +65,23 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
+import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.ImageProcessor.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
@@ -84,29 +91,28 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private static final String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
     private static final int BATTERY_STATE_LOW = 20;
     private static final int LOW_BATTERY_LEVEL = 20;
-    public static String PHOTO_SYNC = "PhotoSync";
-    public static String CAMERA_UPLOADS = "Camera Uploads";
-    public static String SECONDARY_UPLOADS = "Media Uploads";
-    public static String ACTION_CANCEL = "CANCEL_SYNC";
-    public static String ACTION_STOP = "STOP_SYNC";
-    public static String ACTION_CANCEL_ALL = "CANCEL_ALL";
-    public static String ACTION_LOGOUT = "LOGOUT_SYNC";
-    public static String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER";
-    public static String CU_CACHE_FOLDER = "cu";
+    public static final String CAMERA_UPLOADS_ENGLISH = "Camera Uploads";
+    public static final String SECONDARY_UPLOADS_ENGLISH = "Media Uploads";
+    public static final String ACTION_CANCEL = "CANCEL_SYNC";
+    public static final String ACTION_STOP = "STOP_SYNC";
+    public static final String ACTION_CANCEL_ALL = "CANCEL_ALL";
+    public static final String ACTION_LOGOUT = "LOGOUT_SYNC";
+    public static final String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER";
+    public static final String EXTRA_IGNORE_ATTR_CHECK = "EXTRA_IGNORE_ATTR_CHECK";
+    public static final String CU_CACHE_FOLDER = "cu";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
     public static boolean isServiceRunning = false;
-    
+    public static boolean uploadingInProgress;
+
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
     
     private int notificationId = NOTIFICATION_CAMERA_UPLOADS;
     private String notificationChannelId = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
     private String notificationChannelName = NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
-    
-    private Thread task;
-    
-    public static boolean running = false;
+
+    public static boolean running, ignoreAttr;
     private Handler handler;
     
     private ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -114,7 +120,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
     
-    private boolean isOverQuota = false;
+    private boolean isOverQuota;
     private boolean canceled;
     private boolean stopByNetworkStateChange;
     
@@ -124,26 +130,29 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private String localPath = "";
     private boolean removeGPS = true;
     private ChatSettings chatSettings;
-    private long cameraUploadHandle = -1;
-    private boolean secondaryEnabled = false;
+    private long cameraUploadHandle = INVALID_HANDLE;
+    private boolean secondaryEnabled;
     private String localPathSecondary = "";
-    private long secondaryUploadHandle = -1;
+    private long secondaryUploadHandle = INVALID_HANDLE;
     private MegaNode secondaryUploadNode = null;
     
-    private boolean isLoggingIn = false;
+    private boolean isLoggingIn;
     
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private MegaApplication app;
     
-    private int LOGIN_IN = 12;
+    private static final int LOGIN_IN = 12;
+    private static final int SETTING_USER_ATTRIBUTE = 7;
+    private static final int TARGET_FOLDER_NOT_EXIST = 8;
+    private static final int CHECKING_USER_ATTRIBUTE = 9;
+    private static final int SHOULD_RUN_STATE_FAILED = -1;
     
     private long lastUpdated = 0;
-    private static String gSession;
-    private boolean isSec;
-    private boolean stopped = false;
+    private boolean isSec, isPrimaryHandleSynced, isSecondaryHandleSynced;
+    private boolean stopped;
     private NetworkTypeChangeReceiver receiver;
-    
+
     public class Media {
         public String filePath;
         public long timestamp;
@@ -207,12 +216,19 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         }
     };
-    
+
+    private GetAttrUserListener getAttrUserListener;
+    private SetAttrUserListener setAttrUserListener;
+    private CreateFolderListener createFolderListener;
+
     @Override
     public void onCreate() {
         registerReceiver(chargingStopReceiver,new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+        getAttrUserListener = new GetAttrUserListener(this);
+        setAttrUserListener = new SetAttrUserListener(this);
+        createFolderListener = new CreateFolderListener(this, INIT_CU);
     }
 
     @Override
@@ -220,6 +236,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("onDestroy()");
         super.onDestroy();
         isServiceRunning = false;
+        uploadingInProgress = false;
         if(receiver != null) {
             unregisterReceiver(receiver);
         }
@@ -232,6 +249,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (pauseReceiver != null) {
             unregisterReceiver(pauseReceiver);
         }
+        getAttrUserListener = null;
+        setAttrUserListener = null;
+        createFolderListener = null;
     }
     
     @Nullable
@@ -273,31 +293,27 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         
         if (intent != null && intent.getAction() != null) {
+            logDebug("onStartCommand intent action is " + intent.getAction());
             if (intent.getAction().equals(ACTION_CANCEL) ||
                     intent.getAction().equals(ACTION_STOP) ||
                     intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER) ) {
-                logDebug("Intent action is " + intent.getAction());
                 for(MegaTransfer transfer : cuTransfers) {
                     megaApi.cancelTransfer(transfer,this);
                 }
             } else if(ACTION_CANCEL_ALL.equals(intent.getAction()) || intent.getAction().equals(ACTION_LOGOUT)) {
-                logDebug("Intent action is " + intent.getAction());
                 megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
             }
             stopped = true;
             finish();
             return START_NOT_STICKY;
         }
-        
-        try {
-            logDebug("Start service here, creating new thread");
-            task = createWorkerThread();
-            task.start();
-        } catch (Exception e) {
-            logError("Exception", e);
-            finish();
+
+        if(intent != null){
+            ignoreAttr = intent.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false);
         }
-        logDebug("STARTS NOW");
+
+        logDebug("Start service here, creating new thread");
+        startWorkerThread();
         return START_NOT_STICKY;
     }
 
@@ -317,12 +333,19 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 try {
                     int result = shouldRun();
                     logDebug("onStartJob should run result: " + result + "");
-                    if (result == 0) {
-                        startCameraUploads();
-                    } else if (result == LOGIN_IN) {
-                        logDebug("Waiting for login");
-                    } else {
-                        finish();
+                    switch (result) {
+                        case 0:
+                            startCameraUploads();
+                            break;
+                        case LOGIN_IN:
+                        case CHECKING_USER_ATTRIBUTE:
+                        case TARGET_FOLDER_NOT_EXIST:
+                        case SETTING_USER_ATTRIBUTE:
+                            logDebug("wait for login or check user attribute");
+                            break;
+                        default:
+                            finish();
+                            break;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -331,10 +354,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         };
     }
-    
+
+    private void startWorkerThread(){
+        try {
+            Thread task = createWorkerThread();
+            task.start();
+        } catch (Exception ex) {
+            logError("CameraUploadsService Exception: " + ex.getMessage() + "_" + ex.getStackTrace());
+            finish();
+        }
+    }
+
     private void startCameraUploads() {
         logDebug("startCameraUploads");
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent,false);
+        // really starts the uploading process, before is checking settings.
+        uploadingInProgress = true;
         getFilesFromMediaStore();
     }
     
@@ -402,14 +437,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             finish();
             return;
         }
-        
-        if (!wl.isHeld()) {
-            wl.acquire();
-        }
-        if (!lock.isHeld()) {
-            lock.acquire();
-        }
-        
+
         String projection[] = {
                 MediaStore.MediaColumns.DATA,
                 MediaStore.MediaColumns.DATE_ADDED,
@@ -442,6 +470,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             logDebug("SELECTION video: " + selectionCameraVideo);
 
             if (secondaryEnabled) {
+                secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
                 logDebug("if(secondaryEnabled)");
                 if (prefs.getSecSyncTimeStamp() != null) {
                     secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
@@ -584,6 +613,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 parent = secondaryUploadNode;
             } else {
                 parent = cameraUploadNode;
+            }
+
+            if (parent == null) {
+                continue;
             }
 
             if (file.getType() == SyncRecord.TYPE_PHOTO && !file.isCopyOnly()) {
@@ -867,25 +900,23 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
     
     private boolean checkFile(Media media,String path) {
-        
-        if (media.filePath != null &&
-                path != null &&
-                path.compareTo("") != 0 &&
-                media.filePath.startsWith(path)
-        ) {
-            return true;
-        }
-        
-        return false;
+        return media.filePath != null &&
+                !isTextEmpty(path) &&
+                media.filePath.startsWith(path);
     }
-    
+
     private int shouldRun() {
         logDebug("shouldRun()");
-        
+
         if (!isOnline(this)) {
             logWarning("Not online");
-            finish();
-            return 1;
+            return SHOULD_RUN_STATE_FAILED;
+        }
+
+        UserCredentials credentials = dbH.getCredentials();
+        if (credentials == null) {
+            logWarning("There are not user credentials");
+            return SHOULD_RUN_STATE_FAILED;
         }
 
         if (isDeviceLowOnBattery(batteryIntent)) {
@@ -895,308 +926,129 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         prefs = dbH.getPreferences();
         if (prefs == null) {
             logWarning("Not defined, so not enabled");
-            finish();
-            return 2;
-        } else {
-            if (prefs.getCamSyncEnabled() == null) {
-                logWarning("Not defined, so not enabled");
-                finish();
-                return 3;
-            } else {
-                if (!Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
-                    logDebug("Camera Sync Not enabled");
-                    finish();
-                    return 4;
-                } else {
-                    if (prefs.getCameraFolderExternalSDCard() != null && Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard())) {
-                        Uri uri = Uri.parse(prefs.getUriExternalSDCard());
-                        localPath = getFullPathFromTreeUri(uri,this);
-                    } else {
-                        localPath = prefs.getCamSyncLocalPath();
-                    }
-                    
-                    if (localPath == null) {
-                        logWarning("Not defined, so not enabled");
-                        finish();
-                        return 5;
-                    } else {
-                        if ("".compareTo(localPath) == 0) {
-                            logWarning("Not defined, so not enabled");
-                            finish();
-                            return 6;
-                            
-                        } else {
-                            if(!localPath.endsWith(File.separator)) {
-                                localPath += File.separator;
-                            }
-                            logDebug("Localpath: " + localPath);
-                        }
-                    }
-
-                    if(prefs.getRemoveGPS() != null) {
-                        removeGPS = Boolean.parseBoolean(prefs.getRemoveGPS());
-                        logDebug("Should remove GPS: " + removeGPS);
-                    }
-                    
-                    boolean isWifi = isOnWifi(this);
-                    if (prefs.getCamSyncWifi() == null) {
-                        if (!isWifi) {
-                            logWarning("No wifi...");
-                            finish();
-                            return 7;
-                        }
-                    } else {
-                        if (Boolean.parseBoolean(prefs.getCamSyncWifi())) {
-                            if (!isWifi) {
-                                logDebug("No wifi...");
-                                finish();
-                                return 8;
-                            }
-                        }
-                    }
-                    
-                    UserCredentials credentials = dbH.getCredentials();
-                    if (credentials == null) {
-                        logWarning("There are not user credentials");
-                        finish();
-                        return 11;
-                    }
-                    
-                    gSession = credentials.getSession();
-                    isLoggingIn = MegaApplication.isLoggingIn();
-                    if (megaApi.getRootNode() == null && !isLoggingIn) {
-                        logWarning("RootNode = null");
-                        
-                        running = true;
-                        
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (megaApi.getRootNode() == null) {
-                                    isLoggingIn = MegaApplication.isLoggingIn();
-                                    if (!isLoggingIn) {
-    
-                                        setLoginState(true);
-
-                                        if (megaChatApi == null) {
-                                            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                                        }
-
-                                        int ret = megaChatApi.getInitState();
-
-                                        if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                                            ret = megaChatApi.init(gSession);
-                                            logDebug("shouldRun: result of init ---> " + ret);
-                                            chatSettings = dbH.getChatSettings();
-                                            if (ret == MegaChatApi.INIT_NO_CACHE) {
-                                                logDebug("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-
-                                            } else if (ret == MegaChatApi.INIT_ERROR) {
-                                                logDebug("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-                                                megaChatApi.logout(CameraUploadsService.this);
-                                            } else {
-                                                logDebug("shouldRun: Chat correctly initialized");
-                                            }
-                                        }
-
-                                        logDebug("Camera upload start fast login");
-                                        megaApi.fastLogin(gSession,CameraUploadsService.this);
-                                    } else {
-                                        logWarning("Another login is processing");
-                                    }
-                                } else {
-                                    logDebug("postDelayed RootNode != null");
-                                    
-                                    int r = runLoggedIn();
-                                    logDebug("shouldRunAfterLoginDelayed -> " + r);
-                                    if (r == 0) {
-                                        try {
-                                            startCameraUploads();
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            handleException(e);
-                                        }
-                                    }
-                                }
-                            }
-                        },10 * 1000);
-                        
-                        return LOGIN_IN;
-                    }
-
-                    logDebug("RootNode != null");
-                    int r = runLoggedIn();
-                    return r;
-                }
-            }
+            return SHOULD_RUN_STATE_FAILED;
         }
-    }
-    
-    private int runLoggedIn() {
-        
-        if (prefs.getCamSyncHandle() == null) {
-            logWarning("if (prefs.getCamSyncHandle() == null)");
-            cameraUploadHandle = -1;
+
+        if (prefs.getCamSyncEnabled() == null) {
+            logWarning("Not defined, so not enabled");
+            return SHOULD_RUN_STATE_FAILED;
+        }
+
+        if (!Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+            logWarning("Camera Sync Not enabled");
+            return SHOULD_RUN_STATE_FAILED;
+        }
+
+        if (Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard())) {
+            Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+            localPath = getFullPathFromTreeUri(uri, this);
         } else {
-            logDebug("if (prefs.getCamSyncHandle() != null)");
-            cameraUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
+            localPath = prefs.getCamSyncLocalPath();
+        }
+
+        if (isTextEmpty(localPath)) {
+            logWarning("localPath is not defined, so not enabled");
+            finish();
+            return SHOULD_RUN_STATE_FAILED;
+        }
+
+        if (!localPath.endsWith(SEPARATOR)) {
+            localPath += SEPARATOR;
         }
 
         if(prefs.getRemoveGPS() != null) {
             removeGPS = Boolean.parseBoolean(prefs.getRemoveGPS());
-            logDebug("Should remove GPS: " + removeGPS);
         }
-        
-        if (prefs.getSecondaryMediaFolderEnabled() == null) {
-            logWarning("if (prefs.getSecondaryMediaFolderEnabled() == null)");
-            dbH.setSecondaryUploadEnabled(false);
-            logWarning("Not defined, so not enabled");
-            secondaryEnabled = false;
-        } else {
-            logDebug("if (prefs.getSecondaryMediaFolderEnabled() != null)");
-            if (!Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-                logDebug("Not enabled Secondary");
-                secondaryEnabled = false;
-            } else {
-                secondaryEnabled = true;
-                localPathSecondary = prefs.getLocalPathSecondaryFolder();
-                if(!localPathSecondary.endsWith(File.separator)) {
-                    localPathSecondary += File.separator;
-                }
-                logDebug("localPathSecondary: " + localPathSecondary);
-            }
-        }
-        
-        ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-        if (cameraUploadHandle == -1) {
-            logDebug("Find the Camera Uploads folder of the old PhotoSync");
-            for (int i = 0;i < nl.size();i++) {
-                if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                    cameraUploadHandle = nl.get(i).getHandle();
-                    dbH.setCamSyncHandle(cameraUploadHandle);
-                } else if ((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                    cameraUploadHandle = nl.get(i).getHandle();
-                    dbH.setCamSyncHandle(cameraUploadHandle);
-                    megaApi.renameNode(nl.get(i),CAMERA_UPLOADS,this);
-                }
-            }
 
-            logDebug("If not Camera Uploads nor Photosync");
-            if (cameraUploadHandle == -1) {
-                logWarning("Must create the folder");
-                megaApi.createFolder(CAMERA_UPLOADS,megaApi.getRootNode(),this);
-                return 13;
-            }
-        } else {
-            MegaNode n = megaApi.getNodeByHandle(cameraUploadHandle);
-            if (n == null) {
-                logWarning("Node with cameraUploadHandle is NULL");
-                cameraUploadHandle = -1;
-                for (int i = 0;i < nl.size();i++) {
-                    if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                        cameraUploadHandle = nl.get(i).getHandle();
-                        dbH.setCamSyncHandle(cameraUploadHandle);
-                    } else if ((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                        cameraUploadHandle = nl.get(i).getHandle();
-                        dbH.setCamSyncHandle(cameraUploadHandle);
-                        megaApi.renameNode(nl.get(i),CAMERA_UPLOADS,this);
-                    }
-                }
-                
-                if (cameraUploadHandle == -1) {
-                    logWarning("If not Camera Uploads nor Photosync--- must create the folder");
-                    megaApi.createFolder(CAMERA_UPLOADS,megaApi.getRootNode(),this);
-                    return 14;
-                }
-            } else {
-                logDebug("Sync Folder " + cameraUploadHandle + " Node: " + n.getName());
+        if (prefs.getCamSyncWifi() == null || Boolean.parseBoolean(prefs.getCamSyncWifi())) {
+            if (!isOnWifi(this)) {
+                logWarning("Not start, require WiFi.");
+                return SHOULD_RUN_STATE_FAILED;
             }
         }
-        
-        if (secondaryEnabled) {
-            logDebug("The secondary uploads are enabled");
-            String temp = prefs.getMegaHandleSecondaryFolder();
-            if (temp != null) {
-                if (temp.compareTo("") != 0) {
-                    secondaryUploadHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
-                    if (secondaryUploadHandle == -1) {
-                        for (int i = 0;i < nl.size();i++) {
-                            if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                                secondaryUploadHandle = nl.get(i).getHandle();
-                                dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-                            }
-                        }
-                        
-                        //If not "Media Uploads"
-                        if (secondaryUploadHandle == -1) {
-                            logWarning("Must create the secondary folder");
-                            megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
-                            return 15;
-                        }
-                    } else {
-                        logDebug("SecondaryUploadHandle: " + secondaryUploadHandle);
-                        MegaNode n = megaApi.getNodeByHandle(secondaryUploadHandle);
-                        //If ERROR with the handler (the node may no longer exist): Create the folder Media Uploads
-                        if (n == null) {
-                            secondaryUploadHandle = -1;
-                            logWarning("The secondary media folder may not longer exists");
-                            for (int i = 0;i < nl.size();i++) {
-                                if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                                    secondaryUploadHandle = nl.get(i).getHandle();
-                                    dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-                                }
-                            }
-                            
-                            //If not "Media Uploads"
-                            if (secondaryUploadHandle == -1) {
-                                logWarning("Must create the folder");
-                                megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
-                                return 16;
-                            }
-                        } else {
-                            logDebug("Secondary Folder " + secondaryUploadHandle + " Node: " + n.getName());
-                            secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
-                        }
-                    }
-                } else {
-                    //If empty string as SecondaryHandle
-                    secondaryUploadHandle = -1;
-                    for (int i = 0;i < nl.size();i++) {
-                        if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                            secondaryUploadHandle = nl.get(i).getHandle();
-                            dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-                        }
-                    }
-                    
-                    //If not "Media Uploads"
-                    if (secondaryUploadHandle == -1) {
-                        logWarning("Mmust create the folder");
-                        megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
-                        return 17;
-                    }
-                }
+
+        isLoggingIn = MegaApplication.isLoggingIn();
+        if (megaApi.getRootNode() == null && !isLoggingIn) {
+            logWarning("RootNode = null");
+            running = true;
+            setLoginState(true);
+            megaApi.fastLogin(credentials.getSession(), this);
+            return LOGIN_IN;
+        }
+
+        cameraUploadHandle = getPrimaryFolderHandle();
+        secondaryUploadHandle = getSecondaryFolderHandle();
+
+        //Prevent checking while app alive because it has been handled by global event
+        logDebug("is primary/secondary attr synced: " + isPrimaryHandleSynced + "/" + isSecondaryHandleSynced + ", ignoreAttr: " + ignoreAttr);
+        // Check CU attributes sequentially to prevent potential API_EEXPIRED in parallel set CU attributes
+        if (!ignoreAttr && !isPrimaryHandleSynced) {
+            logDebug("Try to get Camera Uploads primary target folder.");
+            megaApi.getCameraUploadsFolder(getAttrUserListener);
+            return CHECKING_USER_ATTRIBUTE;
+        }
+
+        int primaryFolderResult = checkPrimaryFolder();
+        int secondaryFolderResult = checkSecondaryFolder();
+
+        if (primaryFolderResult != 0) {
+            return primaryFolderResult;
+        }
+
+        return secondaryFolderResult;
+    }
+
+    private int checkPrimaryFolder() {
+        if (isNodeInRubbishOrDeleted(cameraUploadHandle)) {
+            cameraUploadHandle = findDefaultFolder(getString(R.string.section_photo_sync));
+            if (cameraUploadHandle == INVALID_HANDLE) {
+                megaApi.createFolder(getString(R.string.section_photo_sync), megaApi.getRootNode(), createFolderListener);
+                return TARGET_FOLDER_NOT_EXIST;
             } else {
-                for (int i = 0;i < nl.size();i++) {
-                    if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-                        secondaryUploadHandle = nl.get(i).getHandle();
-                        dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-                    }
-                }
-                
-                //If not "Media Uploads"
-                if (secondaryUploadHandle == -1) {
-                    logWarning("Must create the folder");
-                    megaApi.createFolder(SECONDARY_UPLOADS,megaApi.getRootNode(),this);
-                    return 18;
+                megaApi.setCameraUploadsFolder(cameraUploadHandle, setAttrUserListener);
+                return SETTING_USER_ATTRIBUTE;
+            }
+        }
+        return 0;
+    }
+
+    private int checkSecondaryFolder() {
+        if (prefs.getSecondaryMediaFolderEnabled() == null) {
+            logDebug("Secondary upload setting not defined, so not enabled");
+            dbH.setSecondaryUploadEnabled(false);
+            secondaryEnabled = false;
+        } else if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
+            secondaryEnabled = true;
+            localPathSecondary = prefs.getLocalPathSecondaryFolder();
+            if (!localPathSecondary.endsWith(SEPARATOR)) {
+                localPathSecondary += SEPARATOR;
+            }
+        } else {
+            logDebug("Not enabled Secondary");
+            secondaryEnabled = false;
+        }
+
+        if (secondaryEnabled) {
+            logDebug("the secondary uploads are enabled");
+            if (isNodeInRubbishOrDeleted(secondaryUploadHandle)) {
+                secondaryUploadHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
+                if (secondaryUploadHandle == INVALID_HANDLE) {
+                    logDebug("must create the folder");
+                    megaApi.createFolder(getString(R.string.section_secondary_media_uploads), megaApi.getRootNode(), createFolderListener);
+                    return TARGET_FOLDER_NOT_EXIST;
+                } else {
+                    megaApi.setCameraUploadsFolderSecondary(secondaryUploadHandle, setAttrUserListener);
+                    return SETTING_USER_ATTRIBUTE;
                 }
             }
         } else {
             logDebug("Secondary NOT Enabled");
         }
-        
         return 0;
     }
-    
+
+
+
     private void initService() {
         logDebug("initService()");
         registerNetworkTypeChangeReceiver();
@@ -1381,8 +1233,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private synchronized void requestFinished(MegaRequest request,MegaError e) {
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Fast login OK");
-                logDebug("Calling fetchNodes from CameraSyncService");
+                logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
                 megaApi.fetchNodes(this);
             } else {
                 logError("ERROR: " + e.getErrorString());
@@ -1391,37 +1242,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Fetch nodes ok");
-                logDebug("Chat --> connect");
+                logDebug("fetch nodes ok");
                 megaChatApi.connectInBackground(this);
                 setLoginState(false);
-    
-                try {
-                    logDebug("Start service here MegaRequest.TYPE_FETCH_NODES");
-                    task = createWorkerThread();
-                    task.start();
-                } catch (Exception ex) {
-                    logError("Exception", ex);
-                    finish();
-                }
+                logDebug("Start service here MegaRequest.TYPE_FETCH_NODES");
+                startWorkerThread();
             } else {
                 logError("ERROR: " + e.getErrorString());
                 setLoginState(false);
-                finish();
-            }
-        } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Folder created: " + request.getName());
-                String name = request.getName();
-                if (name.contains(CAMERA_UPLOADS)) {
-                    logDebug("CamSync Folder UPDATED DB");
-                    dbH.setCamSyncHandle(request.getNodeHandle());
-                } else {
-                    //Update in database
-                    logDebug("Secondary Folder UPDATED DB");
-                    dbH.setSecondaryFolderHandle(request.getNodeHandle());
-                }
-            } else {
                 finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
@@ -1460,7 +1288,50 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             updateUpload();
         }
     }
-    
+
+    public void onGetPrimaryFolderAttribute(MegaRequest request, MegaError e) {
+        logDebug("onGetPrimaryAttribute: " + request.getNodeHandle() + " -> " + cameraUploadHandle);
+        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+            isPrimaryHandleSynced = true;
+            long cuPrimaryHandleInUserAttr = request.getNodeHandle();
+            if (cameraUploadHandle != cuPrimaryHandleInUserAttr) cameraUploadHandle = cuPrimaryHandleInUserAttr;
+
+            // start to get secondary handle.
+            if (!isSecondaryHandleSynced) {
+                megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
+            }
+        } else {
+            logWarning("Get primary handle faild, finish process.");
+            finish();
+        }
+    }
+
+    public void onGetSecondaryFolderAttribute(MegaRequest request, MegaError e) {
+        logDebug("onGetSecondaryAttribute: " + request.getNodeHandle() + " -> " + secondaryUploadHandle) ;
+        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+            isSecondaryHandleSynced = true;
+            long cuSecondaryHandleInUserAttr = request.getNodeHandle();
+            if(cuSecondaryHandleInUserAttr != secondaryUploadHandle) secondaryUploadHandle = cuSecondaryHandleInUserAttr;
+            // start to upload.
+            startWorkerThread();
+        } else {
+            logWarning("Get secondary handle faild, finish process.");
+            finish();
+        }
+    }
+
+    public void onSetFolderAttribute(boolean isSuccessful) {
+        if (isSuccessful) {
+            startWorkerThread();
+        }
+    }
+
+    public void onCreateFolder(boolean isSuccessful) {
+        if (!isSuccessful) {
+            finish();
+        }
+    }
+
     private void setLoginState(boolean b) {
         isLoggingIn = b;
         MegaApplication.setLoggingIn(b);
@@ -1798,18 +1669,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         //file can not be compress will be uploaded directly?
         File srcFile = new File(localPath);
         if (srcFile.exists()) {
-            StatFs stat = new StatFs(tempRoot);
-            double availableFreeSpace = stat.getAvailableBytes();
-            if (availableFreeSpace > srcFile.length()) {
-                logDebug("Can not compress but got enough disk space, so should be un-supported format issue");
-                String newPath = record.getNewPath();
-                File temp = new File(newPath);
-                dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,localPath,isSecondary);
-                if (newPath.startsWith(tempRoot) && temp.exists()) {
-                    temp.delete();
+            try {
+                StatFs stat = new StatFs(tempRoot);
+                double availableFreeSpace = stat.getAvailableBytes();
+                if (availableFreeSpace > srcFile.length()) {
+                    logDebug("Can not compress but got enough disk space, so should be un-supported format issue");
+                    String newPath = record.getNewPath();
+                    File temp = new File(newPath);
+                    dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING, localPath, isSecondary);
+                    if (newPath.startsWith(tempRoot) && temp.exists()) {
+                        temp.delete();
+                    }
+                } else {
+                    //record will remain in DB and will be re-compressed next launch
                 }
-            } else {
-                //record will remain in DB and will be re-compressed next launch
+            } catch (Exception ex) {
+                logError("Exception happens, cache folder is deleted: " + ex.toString());
             }
         } else {
             logWarning("Compressed video not exists, remove from DB");
@@ -1892,7 +1767,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         return mBuilder.build();
     }
-    
+
     private void showNotification(String title,String content,PendingIntent intent,boolean isAutoCancel) {
         mNotification = createNotification(title, content, intent, isAutoCancel);
         mNotificationManager.notify(notificationId,mNotification);
@@ -2045,7 +1920,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                         
                         output[0] = Float.parseFloat(parts[0]);
                         output[1] = Float.parseFloat(parts[1]);
-                        
+
                     } catch (Exception exc) {
                         secondTry = true;
                         logError("Exception, second try to set GPS coordinates", exc);

@@ -972,6 +972,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
+	public void deleteAllPrimarySyncRecords(int type) {
+		String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE " + KEY_SYNC_SECONDARY + " ='" + encrypt("false") + "'";
+		if (type != SyncRecord.TYPE_ANY) {
+			sql += " AND " + KEY_SYNC_TYPE + " = " + type;
+		}
+		db.execSQL(sql);
+	}
+
     public void deleteVideoRecordsByState(int state){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
@@ -1573,7 +1581,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param chatSettings Chat settings to save.
 	 */
 	private void setChatSettings(SQLiteDatabase db, ChatSettings chatSettings) {
-		logDebug("setChatSettings");
+		if (chatSettings == null) {
+			logError("Error: Chat settings are null");
+			return;
+		}
 
 		db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
 
@@ -1710,8 +1721,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String chatHandle = decrypt(cursor.getString(1));
 				String notificationsEnabled = decrypt(cursor.getString(2));
                 logDebug("notificationsEnabled: " + notificationsEnabled);
-				String ringtone = decrypt(cursor.getString(3));
-				String notificationsSound = decrypt(cursor.getString(4));
 				String writtenText = decrypt(cursor.getString(5));
 
 				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, writtenText);

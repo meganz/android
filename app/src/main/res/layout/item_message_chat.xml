@@ -89,10 +89,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:layout_below="@+id/title_own_message_layout">
+            android:layout_below="@+id/title_own_message_layout"
+            android:background = "@null">
+
+            <!--multiseleccion-->
+            <RelativeLayout
+                android:id="@+id/own_message_select_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:color/transparent"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/own_message_select_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@drawable/ic_unselect_chatroom"/>
+            </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/own_text_and_triangle_layout"
+                android:id="@+id/own_message"
                 android:layout_width="match_parent"
                 android:gravity="right"
                 android:layout_height="wrap_content"
@@ -1174,7 +1195,7 @@
                 android:id="@+id/not_sent_own_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/own_text_and_triangle_layout"
+                android:layout_below="@+id/own_message"
                 android:textColor="@color/text_login"
                 android:layout_alignParentRight="true"
                 android:text="@string/manual_retry_alert"
@@ -1300,6 +1321,26 @@
                         rounded:border_color="@color/border_file_properties"
                         rounded:border_width="0dp"
                         rounded:corner_radius="40dp" />
+                </RelativeLayout>
+
+                <!--multiseleccion-->
+                <RelativeLayout
+                    android:id="@+id/contact_message_select_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/contact_message_select_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:src="@drawable/ic_unselect_chatroom"/>
                 </RelativeLayout>
 
                 <!-- text message-->

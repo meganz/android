@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import mega.privacy.android.app.OpenLinkActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -23,13 +23,15 @@ public class SessionTransferURLListener extends BaseListener {
         if (request.getType() != MegaRequest.TYPE_GET_SESSION_TRANSFER_URL) return;
 
         if (e.getErrorCode() == MegaError.API_OK) {
-            if (request.getLink() != null) {
-                Uri uri = Uri.parse(request.getLink());
+            String link = request.getLink();
+            if (link != null) {
+                Uri uri = Uri.parse(link);
                 if (uri != null) {
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
-                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(uri);
-                    context.startActivity(openTermsIntent);
+                    if (context instanceof OpenLinkActivity) {
+                        ((OpenLinkActivity) context).openWebLink(link);
+                    } else {
+                        context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    }
                     return;
                 }
             }

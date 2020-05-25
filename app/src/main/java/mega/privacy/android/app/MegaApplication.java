@@ -97,7 +97,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.5_298";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.5_305";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -233,9 +233,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				logDebug("TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
+					GetAttrUserListener listener = new GetAttrUserListener(getApplicationContext(), true);
 					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
-						megaApi.getMyChatFilesFolder(new GetAttrUserListener(getApplicationContext(), true));
+						megaApi.getMyChatFilesFolder(listener);
 					}
+					//Ask for MU and CU folder when App in init state
+					megaApi.getCameraUploadsFolder(listener);
+					megaApi.getCameraUploadsFolderSecondary(listener);
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -1287,7 +1291,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		removeChatAudioManager();
 	}
 
-	public void checkCallDestroyed(long chatId) {
+	private void checkCallDestroyed(long chatId) {
 		removeValues(chatId);
 
 		if (shouldNotify(this)) {
@@ -1329,12 +1333,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	public void createChatAudioManager() {
-		if (chatAudioManager != null) return;
+		if (chatAudioManager != null) {
+			return;
+		}
+
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
 	}
 
 	public void removeChatAudioManager() {
-		if (chatAudioManager == null) return;
+		if (chatAudioManager == null) {
+			return;
+		}
+
 		chatAudioManager.stopAudioSignals();
 		chatAudioManager = null;
 	}
@@ -1505,7 +1515,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     public void unregisterReceiver(BroadcastReceiver receiver) {
         super.unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 	}
 
     public static boolean isVerifySMSShowed() {
