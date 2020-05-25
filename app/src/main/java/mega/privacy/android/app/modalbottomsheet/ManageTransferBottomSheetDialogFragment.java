@@ -80,7 +80,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         if (transfer.getType() == TYPE_DOWNLOAD) {
             type.setImageResource(R.drawable.ic_download_transfers);
             getLinkOption.setVisibility(View.GONE);
-            contentView.findViewById(R.id.separator_get_link).setVisibility(View.GONE);
         } else if (transfer.getType() == TYPE_UPLOAD) {
             type.setImageResource(R.drawable.ic_upload_transfers);
         }
@@ -103,15 +102,24 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);
                 viewInFolderOption.setVisibility(View.GONE);
-                contentView.findViewById(R.id.separator_get_link).setVisibility(View.GONE);
                 getLinkOption.setVisibility(View.GONE);
                 clearText.setText(R.string.action_cancel_transfer);
+                break;
+
+            case STATE_CANCELLED:
+                location.setText(R.string.transfer_cancelled);
+                params.rightMargin = 0;
+                stateIcon.setImageBitmap(null);
                 break;
 
             default:
                 location.setText(getActivity().getResources().getString(R.string.transfer_unknown));
                 stateIcon.setImageResource(R.drawable.ic_queue);
                 break;
+        }
+
+        if (getLinkOption.getVisibility() == View.GONE && retryOption.getVisibility() == View.GONE) {
+            contentView.findViewById(R.id.separator_get_link).setVisibility(View.GONE);
         }
 
         stateIcon.setLayoutParams(params);

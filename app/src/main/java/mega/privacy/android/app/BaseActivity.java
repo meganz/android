@@ -135,6 +135,9 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(transferOverQuotaReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -188,6 +191,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferOverQuotaReceiver);
 
         super.onDestroy();
     }
@@ -310,6 +314,15 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             Util.showSnackbar(baseActivity, message);
+        }
+    };
+
+    private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+
+            showGeneralTransferOverQuotaWarning();
         }
     };
 
@@ -706,7 +719,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void showGeneralTransferOverQuotaWarning() {
-        if (transferGeneralOverQuotaWarning != null) return;
+        if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
@@ -714,6 +727,7 @@ public class BaseActivity extends AppCompatActivity {
                 .setOnDismissListener(dialog -> {
                     isGeneralTransferOverQuotaWarningShown = false;
                     transferGeneralOverQuotaWarning = null;
+                    MegaApplication.getTransfersManagement().resetTransferOverQuotaTimestamp();
                 })
                 .setCancelable(false);
 

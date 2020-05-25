@@ -202,7 +202,6 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
@@ -242,6 +241,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -324,8 +324,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public long transferCallback = 0;
 
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
-
-	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
 	//GET PRO ACCOUNT PANEL
 	LinearLayout getProLayout=null;
@@ -794,8 +792,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (drawerItem == DrawerItem.TRANSFERS) {
 				showTransfersTransferOverQuotaWarning();
-			} else {
-				showGeneralTransferOverQuotaWarning();
 			}
 		}
 	};
@@ -2485,7 +2481,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
 		transfersWidget = new TransferWidget(this, transfersWidgetLayout);
-		transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> selectDrawerItemLollipop(drawerItem = DrawerItem.TRANSFERS));
+		transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> {
+		    selectDrawerItemLollipop(drawerItem = DrawerItem.TRANSFERS);
+            if (isOnTransferOverQuota()) {
+                MegaApplication.getTransfersManagement().setHasNotToBeShowDueToTransferOverQuota(true);
+            }
+		});
 
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
@@ -3255,7 +3256,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		checkBusinessStatus();
 
-		showTransfersTransferOverQuotaWarning();
+		if (drawerItem == DrawerItem.TRANSFERS && isTransferOverQuotaWarningShown) {
+            showTransfersTransferOverQuotaWarning();
+        }
 
 		logDebug("END onCreate");
 	}
@@ -3568,6 +3571,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (drawerItem == DrawerItem.ACCOUNT ) {
 			app.refreshAccountInfo();
 		}
+
+		MegaApplication.getTransfersManagement().setIsOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -4519,6 +4524,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	protected void onPause() {
 		logDebug("onPause");
     	managerActivity = null;
+    	MegaApplication.getTransfersManagement().setIsOnTransfersSection(false);
     	super.onPause();
     }
 
@@ -5726,6 +5732,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
 			removeFragment(rChatFL);
 		}
+
+		MegaApplication.getTransfersManagement().setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -11325,22 +11333,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				break;
 			}
-			case R.id.transfers_overview_item_layout: {
-				logDebug("click transfers layout");
-				drawerItem = DrawerItem.TRANSFERS;
-				selectDrawerItemLollipop(drawerItem);
-				break;
-			}
-			case R.id.transfers_overview_three_dots_layout: {
-				logDebug("click show options");
-				showTransfersPanel();
-				break;
-			}
-			case R.id.transfers_overview_action_layout: {
-				logDebug("click play/pause");
-				changeTransfersStatus();
-				break;
-			}
 
 			case R.id.call_in_progress_layout:{
 				if(checkPermissionsCall()){
@@ -14986,11 +14978,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 
 				if(pendingTransfers<=0){
-					if(transfersBottomSheet!=null){
-						if(transfersBottomSheet.isAdded()){
-							transfersBottomSheet.dismiss();
-						}
-					}
 					if (pauseTransfersMenuIcon != null) {
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
@@ -15258,17 +15245,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		selectedChatItemId = chat.getChatId();
 		bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
-
-	private void showTransfersPanel(){
-		logDebug("showChatPanel");
-
-		int pendingTransfers = megaApi.getNumPendingUploads()+megaApi.getNumPendingDownloads();
-
-		if(pendingTransfers>0 && !isBottomSheetDialogShown(transfersBottomSheet)){
-			transfersBottomSheet = new TransfersBottomSheetDialogFragment();
-			transfersBottomSheet.show(getSupportFragmentManager(), transfersBottomSheet.getTag());
-		}
 	}
 
 	public void updateUserNameNavigationView(String fullName){
@@ -16559,17 +16535,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	private boolean shouldShowTransferOverQuotaWarning() {
-		return drawerItem == DrawerItem.TRANSFERS && isTransferOverQuotaWarningShown && transferOverQuotaWarning == null;
-	}
-
 	public int getStorageState() {
 		return storageState;
 	}
 
 	public void showTransfersTransferOverQuotaWarning() {
-		if (!shouldShowTransferOverQuotaWarning()) return;
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		transferOverQuotaWarning = builder.setTitle(R.string.title_transfer_over_quota)
 				.setMessage(R.string.warning_transfer_over_quota)

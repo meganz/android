@@ -50,8 +50,7 @@ public class TransferWidget {
     }
 
     public void update(int transferType) {
-        if (!isOnline(context)
-                || (context instanceof ManagerActivityLollipop && ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS)) return;
+        if (!isOnline(context) || !isOnFileManagementManagerSection()) return;
 
         if (getPendingTransfers() > 0) {
             setProgress(getProgress(), transferType);
@@ -59,6 +58,15 @@ public class TransferWidget {
         } else {
             hide();
         }
+    }
+
+    private boolean isOnFileManagementManagerSection() {
+        return !(context instanceof ManagerActivityLollipop)
+                || (ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.TRANSFERS
+                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.CONTACTS
+                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.ACCOUNT
+                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.SETTINGS
+                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
     }
 
     public void updateState() {
@@ -98,6 +106,8 @@ public class TransferWidget {
     }
 
     private void setProgress(int progress) {
+        if (MegaApplication.getTransfersManagement().hasNotToBeShowDueToTransferOverQuota()) return;
+
         if (transfersWidget.getVisibility() != VISIBLE) {
             transfersWidget.setVisibility(VISIBLE);
         }

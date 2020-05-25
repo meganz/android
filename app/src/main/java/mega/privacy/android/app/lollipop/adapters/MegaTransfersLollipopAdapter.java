@@ -34,6 +34,7 @@ import static mega.privacy.android.app.components.transferWidget.TransfersManage
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaTransfer.*;
 
 
 public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTransfersLollipopAdapter.ViewHolderTransfer> implements OnClickListener {
@@ -122,7 +123,10 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 
-		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+		int transferType = transfer.getType();
+		int transferState = transfer.getState();
+
+		if (transferType == TYPE_DOWNLOAD) {
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
 			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.download_green));
 			MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
@@ -167,7 +171,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 				holder.imageView.setLayoutParams(params);
 			}
-		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+		} else if (transferType == TYPE_UPLOAD) {
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
 			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.upload_blue));
 			holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
@@ -191,8 +195,8 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.optionPause.setVisibility(View.VISIBLE);
 		holder.optionPause.setImageResource(R.drawable.ic_pause_grey);
 
-		switch (transfer.getState()) {
-			case MegaTransfer.STATE_PAUSED:
+		switch (transferState) {
+			case STATE_PAUSED:
 				holder.imageViewCompleted.setVisibility(View.GONE);
                 holder.progressText.setVisibility(View.VISIBLE);
 				holder.progressText.setText(getProgress(transfer));
@@ -201,7 +205,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.optionPause.setImageResource(R.drawable.ic_play_grey);
 				break;
 
-			case MegaTransfer.STATE_ACTIVE:
+			case STATE_ACTIVE:
 				holder.imageViewCompleted.setVisibility(View.GONE);
 				holder.progressText.setVisibility(View.VISIBLE);
 				holder.progressText.setText(getProgress(transfer));
@@ -209,22 +213,33 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.speedText.setText(getSpeedString(transfer.getSpeed()));
 				break;
 
-			case MegaTransfer.STATE_COMPLETING:
-			case MegaTransfer.STATE_RETRYING:
-			case MegaTransfer.STATE_QUEUED:
-				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD && isOnTransferOverQuota()) {
-					holder.imageViewCompleted.setVisibility(View.GONE);
+			case STATE_COMPLETING:
+			case STATE_RETRYING:
+			case STATE_QUEUED:
+				holder.imageViewCompleted.setVisibility(View.GONE);
+				holder.progressText.setVisibility(View.VISIBLE);
+
+				if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
+						|| (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
 					holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
-					holder.progressText.setVisibility(View.VISIBLE);
-					holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));
-				} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD && ((ManagerActivityLollipop) context).getStorageState() == MegaApiJava.STORAGE_STATE_RED) {
-					holder.imageViewCompleted.setVisibility(View.GONE);
-					holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
-					holder.progressText.setVisibility(View.VISIBLE);
-					holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_storage_over_quota)));
-				} else {
+
+					if (transferType == TYPE_DOWNLOAD) {
+						holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));
+					} else {
+						holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_storage_over_quota)));
+					}
+				} else if (transferState == STATE_QUEUED) {
 					holder.textViewCompleted.setVisibility(View.VISIBLE);
 					holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_queued));
+				} else {
+					holder.progressText.setText(getProgress(transfer));
+					holder.speedText.setVisibility(View.VISIBLE);
+
+					if (transferState == STATE_COMPLETING) {
+						holder.speedText.setText(context.getResources().getString(R.string.transfer_completing));
+					} else {
+						holder.speedText.setText(context.getResources().getString(R.string.transfer_retrying));
+					}
 				}
 				break;
 

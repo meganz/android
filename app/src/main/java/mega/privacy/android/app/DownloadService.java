@@ -1615,6 +1615,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(!transfer.isFolderTransfer()){
 				updateProgressNotification();
 			}
+
+			if (!TransfersManagement.isOnTransferOverQuota() && MegaApplication.getTransfersManagement().hasNotToBeShowDueToTransferOverQuota()) {
+				MegaApplication.getTransfersManagement().setHasNotToBeShowDueToTransferOverQuota(false);
+			}
 		}
 	}
 

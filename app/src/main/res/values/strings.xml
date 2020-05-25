@@ -1433,7 +1433,7 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">View</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Resume all transfers</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear completed</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear all transfers</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Pause transfer?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Resume transfer?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Resume</string>
@@ -1445,6 +1445,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Paused</string>
     <string name="transfer_queued" context="Possible state of a transfer">Queued</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->

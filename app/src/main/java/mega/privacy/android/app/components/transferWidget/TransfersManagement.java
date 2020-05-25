@@ -9,13 +9,18 @@ public class TransfersManagement {
     private long transferOverQuotaTimestamp;
     private boolean hasNotToBeShowDueToTransferOverQuota;
     private boolean isCurrentTransferOverQuota;
+    private boolean isOnTransfersSection;
 
     public TransfersManagement() {
-        transferOverQuotaTimestamp = INVALID_VALUE;
+        resetTransferOverQuotaTimestamp();
     }
 
     public void setTransferOverQuotaTimestamp() {
         this.transferOverQuotaTimestamp = System.currentTimeMillis();
+    }
+
+    public void resetTransferOverQuotaTimestamp() {
+        this.transferOverQuotaTimestamp = INVALID_VALUE;
     }
 
     /**
@@ -26,9 +31,6 @@ public class TransfersManagement {
      * @return  True if the warning has to be shown, false otherwise
      */
     public boolean shouldShowTransferOverQuotaWarning() {
-        boolean notInitialized = transferOverQuotaTimestamp == INVALID_VALUE;
-        boolean minorthan1minute = transferOverQuotaTimestamp - System.currentTimeMillis() > WAIT_TIME_TO_SHOW_WARNING;
-
         return transferOverQuotaTimestamp == INVALID_VALUE || transferOverQuotaTimestamp - System.currentTimeMillis() > WAIT_TIME_TO_SHOW_WARNING;
     }
 
@@ -57,5 +59,13 @@ public class TransfersManagement {
      */
     public boolean hasNotToBeShowDueToTransferOverQuota() {
         return hasNotToBeShowDueToTransferOverQuota;
+    }
+
+    public void setIsOnTransfersSection(boolean isOnTransfersSection) {
+        this.isOnTransfersSection = isOnTransfersSection;
+    }
+
+    public boolean isOnTransfersSection() {
+        return isOnTransfersSection;
     }
 }
