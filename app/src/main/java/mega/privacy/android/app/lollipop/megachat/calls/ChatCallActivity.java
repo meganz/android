@@ -2305,22 +2305,21 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private String getName(long peerid) {
-        String name = " ";
-        if (megaChatApi == null) return name;
-
         if (peerid == megaChatApi.getMyUserHandle()) {
-            name = megaChatApi.getMyFullname();
-            if (name == null) name = megaChatApi.getMyEmail();
-
-        } else {
-            name = getFirstNameDB(peerid);
-            if (name == null) {
-                CallNonContactNameListener listener = new CallNonContactNameListener(this, peerid, false, name);
-                megaChatApi.getUserEmail(peerid, listener);
-            }
-
+            return megaChatApi.getMyFullname();
         }
-        return name;
+
+        String nickname = getNicknameContact(peerid);
+        if (nickname != null) {
+            return nickname;
+        }
+
+        String name = chat.getPeerFirstnameByHandle(peerid);
+        if (name != null) {
+            return name;
+        }
+        return chat.getPeerEmailByHandle(peerid);
+
     }
 
     public void updateNonContactName(long peerid, String peerEmail) {
