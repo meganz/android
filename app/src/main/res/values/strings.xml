@@ -2787,9 +2787,20 @@
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
 
-    <string name="label_time_in_days" context="Time in days. The placeholder is for the time value, please adjust the position based on linguistics">%dd</string>
-    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
-    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
-    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
-
+    <plurals name="plural_time_days">
+        <item context="Label that shows a time in days, one day" quantity="one">%1$d day</item>
+        <item context="Label that shows a time in days, more days" quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="plural_time_hours">
+        <item context="Label that shows a time in hours, one hour" quantity="one">%1$d hour</item>
+        <item context="Label that shows a time in hours, more hours" quantity="other">%1$d hours</item>
+    </plurals>
+    <plurals name="plural_time_minutes">
+        <item context="Label that shows a time in minutes, one minute" quantity="one">%1$d minute</item>
+        <item context="Label that shows a time in minutes, more minutes" quantity="other">%1$d minutes</item>
+    </plurals>
+    <plurals name="plural_time_seconds">
+        <item context="Label that shows a time in seconds, one second" quantity="one">%1$d second</item>
+        <item context="Label that shows a time in seconds, more seconds" quantity="other">%1$d seconds</item>
+    </plurals>
 </resources>

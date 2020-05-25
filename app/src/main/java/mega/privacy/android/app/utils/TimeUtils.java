@@ -361,19 +361,19 @@ public class TimeUtils implements Comparator<Calendar> {
      */
     public static String formatTimeDDHHMMSS(long time) {
         Context context = MegaApplication.getInstance().getApplicationContext();
-        long days = TimeUnit.MILLISECONDS.toDays(time);
-        long hours = TimeUnit.MILLISECONDS.toHours(time) - TimeUnit.DAYS.toHours(days);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(time) - (TimeUnit.DAYS.toMinutes(days) + TimeUnit.HOURS.toMinutes(hours));
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(time) - (TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes));
-        String textDays = context.getString(R.string.label_time_in_days, days);
-        String textHours = context.getString(R.string.label_time_in_hours, hours);
-        String textMinutes = context.getString(R.string.label_time_in_minutes, minutes);
-        String textSeconds = context.getString(R.string.label_time_in_seconds, seconds);
+        int days = (int) TimeUnit.MILLISECONDS.toDays(time);
+        int hours = (int) (TimeUnit.MILLISECONDS.toHours(time) - TimeUnit.DAYS.toHours(days));
+        int minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(time) - (TimeUnit.DAYS.toMinutes(days) + TimeUnit.HOURS.toMinutes(hours)));
+        int seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(time) - (TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes)));
+        String textDays = context.getResources().getQuantityString(R.plurals.plural_time_days, days, days);
+        String textHours = context.getResources().getQuantityString(R.plurals.plural_time_hours, hours, hours);
+        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_time_minutes, minutes, minutes);
+        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_time_seconds, seconds, seconds);
 
         if (days > 0) {
-            return textDays + " " + textHours + " " + textMinutes + " " + textSeconds;
+            return textDays + " " + textHours;
         } else if (hours > 0) {
-            return textHours + " " + textMinutes + " " + textSeconds;
+            return textHours + " " + textMinutes;
         } else if (minutes > 0) {
             return textMinutes + " " + textSeconds;
         } else {
