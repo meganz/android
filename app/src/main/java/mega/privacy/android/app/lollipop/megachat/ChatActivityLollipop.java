@@ -128,7 +128,6 @@ import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopA
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
@@ -4438,8 +4437,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 showNodeAttachmentBottomSheet(m, positionInMessages);
                 break;
             case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
-                showContactAttachmentBottomSheet(m, positionInMessages);
-                break;
             case MegaChatMessage.TYPE_VOICE_CLIP:
             case MegaChatMessage.TYPE_NORMAL:
                 showGeneralChatMessageBottomSheet(m, positionInMessages);
@@ -4762,12 +4759,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 if (isOnline(this)) {
                                     if (!chatC.isInAnonymousMode() && m != null) {
                                         if (m.getMessage().getUsersCount() == 1) {
-                                            long userHandle = m.getMessage().getUserHandle(0);
-                                            if(userHandle != megaChatApi.getMyUserHandle()){
-                                                showContactAttachmentBottomSheet(m, positionInMessages);
-                                            }
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }else{
-                                            showContactAttachmentBottomSheet(m, positionInMessages);
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                     }
                                 }
@@ -6970,17 +6964,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void showContactAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("showContactAttachmentBottomSheet: "+position);
-        selectedPosition = position;
-
-        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-        selectedMessageId = message.getMessage().getMsgId();
-        bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-    }
-
     public void showInfoReactionBottomSheet(AndroidMegaChatMessage message, int position, String reaction){
         if (message == null || message.getMessage() == null)
             return;
@@ -7012,7 +6995,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position) {
+    private void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position) {
         selectedPosition = position;
 
         if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;

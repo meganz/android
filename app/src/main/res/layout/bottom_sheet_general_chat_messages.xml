@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -45,13 +44,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Options -->
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/forward_layout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:layout_gravity="left"
                     android:visibility="gone">
 
                     <ImageView
@@ -59,10 +56,8 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
-                        android:paddingTop="2dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
                         android:src="@drawable/ic_forward_grey"
                         android:visibility="visible" />
 
@@ -70,12 +65,13 @@
                         android:id="@+id/forward_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="72dp"
                         android:layout_marginRight="15dp"
                         android:text="@string/forward_menu_item"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp" />
-                </LinearLayout>
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/edit_separator"
@@ -85,12 +81,11 @@
                     android:background="@color/chat_sliding_panel_separator"
                     android:orientation="vertical" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:layout_gravity="left"
                     android:visibility="gone">
 
                     <ImageView
@@ -98,9 +93,8 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
                         android:src="@drawable/ic_rename_white"
                         android:tint="@color/mail_my_account"
                         android:visibility="visible" />
@@ -109,12 +103,13 @@
                         android:id="@+id/edit_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="15dp"
                         android:text="@string/title_edit_profile_info"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp" />
-                </LinearLayout>
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/copy_separator"
@@ -124,12 +119,11 @@
                     android:background="@color/chat_sliding_panel_separator"
                     android:orientation="vertical" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/copy_layout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:layout_gravity="left"
                     android:visibility="gone">
 
                     <ImageView
@@ -137,9 +131,8 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
                         android:src="@drawable/ic_copy_white"
                         android:tint="@color/mail_my_account"
                         android:visibility="visible" />
@@ -148,12 +141,13 @@
                         android:id="@+id/copy_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="15dp"
                         android:text="@string/context_copy"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp" />
-                </LinearLayout>
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/select_separator"
@@ -163,12 +157,11 @@
                     android:background="@color/chat_sliding_panel_separator"
                     android:orientation="vertical" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/select_layout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:layout_gravity="left"
                     android:visibility="gone">
 
                     <ImageView
@@ -176,10 +169,8 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
-                        android:paddingTop="2dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
                         android:src="@drawable/ic_select_modal"
                         android:visibility="visible" />
 
@@ -187,12 +178,149 @@
                         android:id="@+id/option_select_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="15dp"
                         android:text="@string/general_select"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp" />
-                </LinearLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/info_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
+                    android:background="@color/chat_sliding_panel_separator"
+                    android:orientation="vertical" />
+
+                <RelativeLayout
+                    android:id="@+id/option_view_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="left"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/option_view_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:alpha="0.54"
+                        android:src="@drawable/info_ic"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/option_view_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="15dp"
+                        android:text="@string/general_view_contacts"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/option_info_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="left"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/option_info_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:alpha="0.54"
+                        android:src="@drawable/info_ic"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/option_info_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="15dp"
+                        android:text="@string/file_properties_info_info_file"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/invite_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
+                    android:background="@color/chat_sliding_panel_separator"
+                    android:orientation="vertical" />
+
+                <RelativeLayout
+                    android:id="@+id/option_start_conversation_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="left"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/option_start_conversation_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:alpha="0.54"
+                        android:src="@drawable/ic_send_message_modal"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/option_start_conversation_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="15dp"
+                        android:text="@string/context_send_message"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/option_invite_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="left"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/option_invite"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/ic_add_contact_chat_item"
+                        android:tint="@color/mail_my_account"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/option_invite_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="15dp"
+                        android:text="@string/contact_invite"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp" />
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/delete_separator"
@@ -202,12 +330,11 @@
                     android:background="@color/chat_sliding_panel_separator"
                     android:orientation="vertical" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/delete_layout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:layout_gravity="left"
                     android:visibility="gone">
 
                     <ImageView
@@ -215,9 +342,8 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
                         android:src="@drawable/ic_clear_white"
                         android:tint="@color/dark_primary_color"
                         android:visibility="visible" />
@@ -226,12 +352,13 @@
                         android:id="@+id/delete_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="72dp"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="15dp"
                         android:text="@string/context_remove"
                         android:textColor="@color/dark_primary_color"
                         android:textSize="16sp" />
-                </LinearLayout>
+                </RelativeLayout>
 
             </LinearLayout>
 
