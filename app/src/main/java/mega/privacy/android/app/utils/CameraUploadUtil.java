@@ -275,27 +275,38 @@ public class CameraUploadUtil {
      * Or the original cu folder has been deleted or put into rubbish bin
      *
      * @param context     the context where init process is executed
+     * @param isSecondary determine whether it is camera upload or secondary upload
      */
-    public static void initTargetFoldersFromScratch(Context context) {
+    public static void initCUFolderFromScratch(Context context, boolean isSecondary) {
+        if (isSecondary) {
+            initSecondaryFolderFromScratch(context);
+        } else {
+            initPrimaryFolderFromScratch(context);
+        }
+    }
+
+    private static void initPrimaryFolderFromScratch(Context context) {
         MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
         // Find previous camera upload folder, whose name is "Camera Uploads" in English
         long primaryHandle = findDefaultFolder(CAMERA_UPLOADS_ENGLISH);
         if (primaryHandle != INVALID_HANDLE) {
+            api.setCameraUploadsFolder(primaryHandle, new SetAttrUserListener(context));
             // if current device language is not English, rename this folder as "Camera Uploads" in other language
             if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(primaryHandle), context.getString(R.string.section_photo_sync), new RenameListener(context));
-            } else {
-                api.setCameraUploadsFolders(primaryHandle, INVALID_HANDLE, new SetAttrUserListener(context));
             }
         }
+    }
 
+    private static void initSecondaryFolderFromScratch(Context context) {
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+        // Find previous camera upload folder, whose name is "Media Uploads" in English
         long secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS_ENGLISH);
         if (secondaryHandle != INVALID_HANDLE) {
             // if current device language is not English, rename this folder as "Media Uploads" in other language
+            api.setCameraUploadsFolderSecondary(secondaryHandle, new SetAttrUserListener(context));
             if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(secondaryHandle), context.getString(R.string.section_secondary_media_uploads), new RenameListener(context));
-            } else {
-                api.setCameraUploadsFolders(INVALID_HANDLE, secondaryHandle, new SetAttrUserListener(context));
             }
         }
     }

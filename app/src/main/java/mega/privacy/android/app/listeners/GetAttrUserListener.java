@@ -143,20 +143,20 @@ public class GetAttrUserListener extends BaseListener {
 
             case USER_ATTR_CAMERA_UPLOADS_FOLDER:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    long [] handles = getCUHandles(request);
+                    long[] handles = getCUHandles(request);
                     synchronized (this) {
                         handle(handles[0], false, e);
                         handle(handles[1], true, e);
                     }
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
                     // only when both CU and MU are not set, will return API_ENOENT
-                    initTargetFoldersFromScratch(context);
+                    initCUFolderFromScratch(context, false);
                     if (context instanceof CameraUploadsService) {
                         // The unique process run within shoudRun method in CameraUploadsService
                         ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e, true);
                     }
                 } else {
-                    logError("Error getting USER_ATTR_CAMERA_UPLOADS_FOLDER " + e.getErrorString() );
+                    logError("Error getting USER_ATTR_CAMERA_UPLOADS_FOLDER " + e.getErrorString());
                 }
                 break;
         }
@@ -182,7 +182,7 @@ public class GetAttrUserListener extends BaseListener {
 
     private void handle(long handle, boolean isSecondary, MegaError e) {
         if (isNodeInRubbishOrDeleted(handle)) {
-            initTargetFoldersFromScratch(context);
+            initCUFolderFromScratch(context, isSecondary);
         } else {
             boolean shouldCUStop = compareAndUpdateLocalFolderAttribute(handle, isSecondary);
             //stop CU if destination has changed
@@ -204,5 +204,4 @@ public class GetAttrUserListener extends BaseListener {
             }
         }
     }
-
- }
+}

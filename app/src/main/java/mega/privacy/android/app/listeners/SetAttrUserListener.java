@@ -97,6 +97,9 @@ public class SetAttrUserListener extends BaseListener {
                         forceUpdateCameraUploadFolderIcon(false, primaryHandle);
                         if (context instanceof CameraUploadsService && !secondaryEnabled) {
                             ((CameraUploadsService) context).onSetFolderAttribute();
+                        } else if(!secondaryEnabled) {
+                            JobUtil.stopRunningCameraUploadService(context);
+                            JobUtil.startCameraUploadServiceIgnoreAttr(context);
                         }
                     }
                     if (secondaryEnabled && secondonaryHandle != INVALID_HANDLE) {
