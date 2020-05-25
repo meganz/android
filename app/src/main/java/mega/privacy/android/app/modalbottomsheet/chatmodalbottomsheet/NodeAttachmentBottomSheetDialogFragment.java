@@ -190,7 +190,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     optionShare.setVisibility(View.GONE);
                 } else {
                     optionForward.setVisibility(View.VISIBLE);
-                    optionShare.setVisibility(View.VISIBLE);
+                    if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle()) {
+                        optionShare.setVisibility(View.GONE);
+                    } else {
+                        optionShare.setVisibility(View.VISIBLE);
+
+                    }
                 }
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
                     optionRemove.setVisibility(View.GONE);
