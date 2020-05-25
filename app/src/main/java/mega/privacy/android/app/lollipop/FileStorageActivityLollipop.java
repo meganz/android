@@ -377,12 +377,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 		
 		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_filestorage);
+		tB = findViewById(R.id.toolbar_filestorage);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		
+
+		viewContainer = findViewById(R.id.file_storage_container);
+		contentText = findViewById(R.id.file_storage_content_text);
+		listView = findViewById(R.id.file_storage_list_view);
+
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
 		if (prompt != null) {
@@ -402,8 +406,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			url = intent.getExtras().getString(EXTRA_URL);
 			size = intent.getExtras().getLong(EXTRA_SIZE);
 			aB.setTitle(getString(R.string.general_select_to_download));
-		}
-		else{
+		} else {
 			aB.setTitle(getString(R.string.general_select_to_upload));
 		}
 		
@@ -417,16 +420,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			isSetDownloadLocationShown = savedInstanceState.getBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, false);
 			confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
 		}
-		
-        viewContainer = (RelativeLayout) findViewById(R.id.file_storage_container);
-		contentText = (TextView) findViewById(R.id.file_storage_content_text);
-		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 
-		cancelButton = (Button) findViewById(R.id.file_storage_cancel_button);
+		cancelButton = findViewById(R.id.file_storage_cancel_button);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
-		button = (Button) findViewById(R.id.file_storage_button);
+		button = findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 
 		if (fromSaveRecoveryKey) {
