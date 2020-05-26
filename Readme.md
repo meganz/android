@@ -21,7 +21,7 @@ This document will guide you to build the application on a Linux machine with An
 git clone --recursive https://github.com/meganz/android.git
 ```
 
-2. Install in your system the Android NDK 14 and Android NDK 16.
+2. Install in your system the [Android NDK 14](https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip) and [Android NDK 16](https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip).
 
 3. Configure the variable `NDK_ROOT32` to point to your Android NDK 14 installation path and the variable `NDK_ROOT64` to point to your Android NDK 16 installation path at `app/src/main/jni/build.sh`.
 
