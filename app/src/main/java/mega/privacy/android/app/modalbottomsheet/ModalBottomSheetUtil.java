@@ -24,7 +24,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 
 public class ModalBottomSheetUtil {
 
-    static void openWith(MegaNode node) {
+    public static void openWith(MegaNode node) {
         if (node == null) {
             logWarning("Node is null");
             return;

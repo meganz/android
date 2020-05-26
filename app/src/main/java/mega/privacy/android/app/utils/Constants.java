@@ -450,6 +450,11 @@ public class Constants {
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
     public static final String TYPE_CAMERA = "TYPE_CAMERA";
+    public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
+
+    public static final int INVALID_POSITION = -1;
+    public static final int INVALID_ID = -1;
+    public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";

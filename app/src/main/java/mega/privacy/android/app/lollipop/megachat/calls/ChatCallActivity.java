@@ -649,6 +649,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         }
                         hideReconnecting();
                         updateAVFlags(session);
+                        updateSubtitleNumberOfVideos();
                     }
                 }
             }
@@ -2321,16 +2322,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for updating the subtitle of the group call.
      */
     private void updateSubtitleNumberOfVideos() {
-        logDebug("updateSubtitleNumberOfVideos");
-        if (chat == null || callChat == null) return;
+        if (chat == null || getCall() == null)
+            return;
+
         if (!chat.isGroup() || !statusCallInProgress(callChat.getStatus())) {
             linearParticipants.setVisibility(View.GONE);
             return;
         }
 
-        if (getCall() == null)
-            return;
-
+        logDebug("Updating the number of participants with video on");
         int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
         if (usersWithVideo <= 0) {
             linearParticipants.setVisibility(View.GONE);
