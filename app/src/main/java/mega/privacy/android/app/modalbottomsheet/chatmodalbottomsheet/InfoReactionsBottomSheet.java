@@ -13,7 +13,6 @@ import android.widget.RelativeLayout;
 
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,25 +26,32 @@ import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.InfoReactionPagerAdapter;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaStringList;
+
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
+
+    private static final int MIN_HEIGHT = 81;
+    private static final int MAX_HEIGHT_PORT = 359;
+    private static final int MAX_HEIGHT_LAND = 259;
+    private static final int HEIGHT_REACTIONS = 60;
+    private static final int HEIGHT_USERS = 56;
+
     private Context context;
-    private AndroidMegaChatMessage message = null;
     private long chatId;
     private long messageId;
     private DisplayMetrics outMetrics;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
+    private View contentView;
     private LinearLayout infoReactionsTab;
     private int reactionTabLastSelectedIndex = INVALID_POSITION;
     private ArrayList<RelativeLayout> reactionTabs = null;
@@ -71,28 +77,15 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
-        if (!(context instanceof ChatActivityLollipop))
-            return;
-
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong(CHAT_ID, -1);
             messageId = savedInstanceState.getLong(MESSAGE_ID, -1);
             reactionSelected = savedInstanceState.getString(REACTION_SELECTED);
 
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-            if (messageMega != null) {
-                message = new AndroidMegaChatMessage(messageMega);
-            }
-
         } else {
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
-
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-            if (messageMega != null) {
-                message = new AndroidMegaChatMessage(messageMega);
-            }
         }
     }
 
@@ -104,7 +97,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_info_reactions, null);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_info_reactions, null);
+        RelativeLayout generalLayout = contentView.findViewById(R.id.general_layout);
         infoReactionsTab = contentView.findViewById(R.id.info_reactions_tabs);
         infoReactionsPager = contentView.findViewById(R.id.info_reactions_pager);
         infoReactionsPager.addOnPageChangeListener(this);
@@ -131,15 +125,65 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         infoReactionsPager.setCurrentItem(indexToStart);
         onPageSelected(indexToStart);
         BottomSheetUtils.setupViewPager(infoReactionsPager);
-        dialog.setContentView(contentView);
+
+        ViewGroup.LayoutParams params = generalLayout.getLayoutParams();
+        if (params != null) {
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.height = getHeight();
+        } else {
+            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getHeight());
+        }
+
+        dialog.setContentView(contentView, params);
     }
 
-    private void addReaction(int position, String reaction){
+    /**
+     * Method for obtaining the height of the dialogue.
+     *
+     * @return Integer with the height.
+     */
+    private int getHeight() {
+        if (list == null || list.isEmpty())
+            return MIN_HEIGHT;
+
+        ArrayList<Long> totalUsers = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String currentReaction = list.get(i);
+            MegaHandleList listUsers = MegaApplication.getInstance().getMegaChatApi().getReactionUsers(chatId, messageId, currentReaction);
+            totalUsers.add(listUsers.size());
+        }
+
+        long numMaxUsers = 0;
+        for (Long user : totalUsers) {
+            if (user > numMaxUsers) {
+                numMaxUsers = user;
+            }
+        }
+        long totalSize = HEIGHT_REACTIONS + (HEIGHT_USERS * numMaxUsers);
+        if (totalSize > MAX_HEIGHT_PORT) {
+            return px2dp(MAX_HEIGHT_PORT, outMetrics);
+        }
+
+        return px2dp(totalSize, outMetrics);
+    }
+
+    /**
+     * Method for adding a reaction in the dialogue.
+     *
+     * @param position The reaction position.
+     * @param reaction The reaction String.
+     */
+    private void addReaction(int position, String reaction) {
         reactionTabs.add(position, inflateButton(context, reaction, infoReactionsTab));
         reactionTabs.get(position).setOnClickListener(new ReactionsTabsClickListener(infoReactionsPager, position));
     }
 
-    private void removeReaction(int position, String reaction){
+    /**
+     * Method for removing a reaction in the dialogue.
+     *
+     * @param position The reaction position.
+     */
+    private void removeReaction(int position) {
         if (reactionTabs.get(position).isSelected()) {
             reactionTabs.get(position).setSelected(false);
             infoReactionsPager.setCurrentItem(0);
@@ -149,6 +193,15 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         reactionTabs.get(position).removeAllViews();
         reactionTabs.remove(position);
     }
+
+    /**
+     * Method for adding the reaction buttons.
+     *
+     * @param context  Context of the Activity.
+     * @param reaction The reaction.
+     * @param parent   The view parent.
+     * @return The button inflated.
+     */
     private RelativeLayout inflateButton(final Context context, String reaction, final ViewGroup parent) {
         final RelativeLayout button = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.reaction_view, parent, false);
         final EmojiImageView reactionImage = button.findViewById(R.id.reaction_image);
@@ -173,8 +226,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
 
     @Override
     public void onPageSelected(final int i) {
@@ -193,8 +245,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 }
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(px2dp(40, outMetrics), px2dp(2, outMetrics));
                 lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                lp.leftMargin = px2dp(9,outMetrics);
-                lp.rightMargin = px2dp(9,outMetrics);
+                lp.leftMargin = px2dp(9, outMetrics);
+                lp.rightMargin = px2dp(9, outMetrics);
                 reactionTabs.get(i).addView(separator, lp);
             }
             reactionTabLastSelectedIndex = i;
@@ -203,9 +255,16 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) {
-    }
+    public void onPageScrollStateChanged(int state) { }
 
+    /**
+     * Method for controling changes received in reactions.
+     *
+     * @param messageId The message ID.
+     * @param chatId    The chat room ID.
+     * @param reaction  The reaction.
+     * @param count     Number of reactions in a message.
+     */
     public void changeInReactionReceived(long messageId, long chatId, String reaction, int count) {
         if (this.messageId != messageId || this.chatId != chatId)
             return;
@@ -213,17 +272,16 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         if (count == 0) {
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).equals(reaction)) {
-                    removeReaction(i, reaction);
+                    removeReaction(i);
                     list.remove(i);
                     if (reactionsPageAdapter != null) {
                         removeView(reactionsPageAdapter.getView(i));
-//                        reactionsPageAdapter.notifyDataSetChanged();
                     } else {
                         reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
                     }
 
-                    for(int j =0; j<reactionTabs.size(); j++ ){
-                        if(reactionTabs.get(j).isSelected()){
+                    for (int j = 0; j < reactionTabs.size(); j++) {
+                        if (reactionTabs.get(j).isSelected()) {
                             infoReactionsPager.setCurrentItem(j);
                             onPageSelected(j);
                             break;
@@ -238,15 +296,15 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             }
         } else {
             //Found the reaction:
-            int position = -1;
+            int position = INVALID_POSITION;
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).equals(reaction)) {
-                   position = i;
+                    position = i;
                     break;
                 }
             }
-            if(position == -1){
-                addReaction(reactionTabs.size() , reaction);
+            if (position == INVALID_POSITION) {
+                addReaction(reactionTabs.size(), reaction);
                 list.add(reaction);
 
                 if (reactionsPageAdapter != null) {
@@ -254,23 +312,22 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 } else {
                     reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
                 }
-            }else{
+            } else {
                 if (reactionsPageAdapter != null) {
                     reactionsPageAdapter.updatePage(position, reaction);
                 } else {
                     reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
                 }
             }
-
         }
-
     }
 
     /**
      * Aadd a view to the ViewPager.
+     *
      * @param reaction
      */
-    public void addView (String reaction) {
+    public void addView(String reaction) {
         View newPage = new UserReactionListView(context).init(reaction, messageId, chatId);
         reactionsPageAdapter.addView(newPage);
         reactionsPageAdapter.notifyDataSetChanged();
@@ -278,28 +335,12 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
 
     /**
      * Remove a view from the ViewPager
+     *
      * @param defunctPage
      */
-    public void removeView (View defunctPage) {
-        reactionsPageAdapter.removeView (infoReactionsPager, defunctPage);
+    public void removeView(View defunctPage) {
+        reactionsPageAdapter.removeView(infoReactionsPager, defunctPage);
     }
-
-    /**
-     * Get the currently displayed page
-     * @return
-     */
-    public View getCurrentPage () {
-        return reactionsPageAdapter.getView (infoReactionsPager.getCurrentItem());
-    }
-
-    /**
-     * Set the currently displayed page
-     * @param pageToShow
-     */
-    public void setCurrentPage (View pageToShow) {
-        infoReactionsPager.setCurrentItem (reactionsPageAdapter.getItemPosition (pageToShow), true);
-    }
-
 
     private static class ReactionsTabsClickListener implements View.OnClickListener {
         private final ViewPager reactionsPager;

@@ -126,6 +126,4 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
         UserReactionListView view = (UserReactionListView)getView(position);
         view.updateUsers(reaction, msgId, chatId);
     }
-
-
 }

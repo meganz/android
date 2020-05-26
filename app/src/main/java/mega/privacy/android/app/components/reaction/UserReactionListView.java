@@ -17,6 +17,13 @@ public final class UserReactionListView extends ListView {
         setVerticalScrollBarEnabled(true);
     }
 
+    /**
+     * Method for updating users who have reacted to a message with a certain reaction.
+     *
+     * @param reaction String with the reaction.
+     * @param msgId    The message ID.
+     * @param chatId   The chat ID.
+     */
     public void updateUsers(String reaction, long msgId, long chatId) {
         arrayOfUsers.clear();
         MegaHandleList listUsers = MegaApplication.getInstance().getMegaChatApi().getReactionUsers(chatId, msgId, reaction);
@@ -34,5 +41,4 @@ public final class UserReactionListView extends ListView {
         updateUsers(reaction, msgId, chatId);
         return this;
     }
-
 }
