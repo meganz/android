@@ -39,12 +39,10 @@ public class ChatAudioManager {
         logDebug("Initializing audio manager in mode normal...");
 
         if (audioManager != null) {
-            audioManager.setMode(AudioManager.MODE_NORMAL);
             return;
         }
 
         audioManager = (AudioManager) myContext.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_NORMAL);
     }
 
     public void setAudioManagerValues(int callStatus, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
