@@ -17,8 +17,8 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import static mega.privacy.android.app.utils.Constants.*;
 
 public final class RecentEmojiManager implements RecentEmoji {
-    static final int EMOJI_GUESS_SIZE = 5;
-    static final int MAX_RECENTS = 40;
+    private static final int EMOJI_GUESS_SIZE = 5;
+    private static final int MAX_RECENTS = 40;
     private static final String PREFERENCE_EMOJI = "emoji-recent-manager";
     private static final String PREFERENCE_REACTION = "reaction-recent-manager";
     private static final String TIME_DELIMITER = ";";
@@ -77,7 +77,6 @@ public final class RecentEmojiManager implements RecentEmoji {
         return emojiList.getEmojis();
     }
 
-
     @Override
     public void addEmoji(@NonNull final Emoji emoji) {
         emojiList.add(emoji);
@@ -107,6 +106,11 @@ public final class RecentEmojiManager implements RecentEmoji {
         }
     }
 
+    /**
+     * Obtain the preferences.
+     *
+     * @return The preferences related to reactions.
+     */
     private SharedPreferences getPreferences() {
         if (type.equals(TYPE_REACTION)) {
             return context.getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE);
@@ -156,14 +160,12 @@ public final class RecentEmojiManager implements RecentEmoji {
             for (final Data data : emojis) {
                 sortedEmojis.add(data.emoji);
             }
-
             return sortedEmojis;
         }
 
         int size() {
             return emojis.size();
         }
-
         Data get(final int index) {
             return emojis.get(index);
         }

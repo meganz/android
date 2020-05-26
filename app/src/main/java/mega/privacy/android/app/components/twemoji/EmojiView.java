@@ -76,6 +76,7 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
         emojiTabs[i + 1] = inflateButton(context, categories[i].getIcon(), emojisTab);
       }
       emojiTabs[emojiTabs.length - 1] = inflateButton(context, R.drawable.emoji_backspace, emojisTab);
+
     } else if (type.equals(TYPE_REACTION)) {
       emojiTabs = new ImageButton[categories.length + 1];
       emojiTabs[0] = inflateButton(context, R.drawable.emoji_recent, emojisTab);

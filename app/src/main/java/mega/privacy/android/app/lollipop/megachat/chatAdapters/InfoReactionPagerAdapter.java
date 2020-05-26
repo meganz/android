@@ -22,6 +22,11 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
         fillList(listReactions);
     }
 
+    /**
+     * Method for filling in the list of users who have reacted to a message.
+     *
+     * @param listReactions Reactions list.
+     */
     private void fillList(ArrayList<String> listReactions) {
         for (int i = 0; i < listReactions.size(); i++) {
             String reaction = listReactions.get(i);

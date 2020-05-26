@@ -32,9 +32,15 @@ public final class EmojiUtils {
     return false;
   }
 
-  /** returns the emojis that were found in the given text */
-  @NonNull public static List<EmojiRange> emojis(final String text) {
-    if(text == null || text.isEmpty())
+  /**
+   * Method for obtaining the emojis that were found in a text.
+   *
+   * @param text The text.
+   * @return List of emojis.
+   */
+  @NonNull
+  public static List<EmojiRange> emojis(final String text) {
+    if (text == null || text.isEmpty())
       return null;
 
     return EmojiManager.getInstance().findAllEmojis(text);

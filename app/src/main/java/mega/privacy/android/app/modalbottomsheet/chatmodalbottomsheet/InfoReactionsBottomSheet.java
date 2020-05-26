@@ -226,7 +226,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
 
     @Override
     public void onPageSelected(final int i) {
@@ -255,10 +256,11 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) { }
+    public void onPageScrollStateChanged(int state) {
+    }
 
     /**
-     * Method for controling changes received in reactions.
+     * Method for controlling changes received in reactions.
      *
      * @param messageId The message ID.
      * @param chatId    The chat room ID.
@@ -323,9 +325,9 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     /**
-     * Aadd a view to the ViewPager.
+     * Add a view to the ViewPager.
      *
-     * @param reaction
+     * @param reaction The reaction.
      */
     public void addView(String reaction) {
         View newPage = new UserReactionListView(context).init(reaction, messageId, chatId);
@@ -334,9 +336,9 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     /**
-     * Remove a view from the ViewPager
+     * Remove a view from the ViewPager.
      *
-     * @param defunctPage
+     * @param defunctPage The pager.
      */
     public void removeView(View defunctPage) {
         reactionsPageAdapter.removeView(infoReactionsPager, defunctPage);

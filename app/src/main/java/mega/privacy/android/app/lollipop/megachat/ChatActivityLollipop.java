@@ -480,6 +480,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         preservedMessagesSelected = null;
     }
 
+    /**
+     * Method for finding out if the selected message is deleted.
+     *
+     * @param messageSelected The message selected.
+     * @return True if it's removed. False, otherwise.
+     */
     public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
         if (removedMessages != null && !removedMessages.isEmpty()) {
             for (int i = 0; i < removedMessages.size(); i++) {
@@ -4405,6 +4411,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    /**
+     * Method for displaying feedback dialogue in a message.
+     *
+     * @param chatId      The chat ID.
+     * @param megaMessage The message.
+     * @param reaction    The reaction.
+     */
     public void openInfoReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage, String reaction){
         if(chatRoom.getChatId() != chatId)
             return;
@@ -5740,13 +5753,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
         MegaChatMessage message = api.getMessage(idChat, msgid);
-        if(adapter == null || message == null) {
+        if (adapter == null || message == null) {
             logDebug("Message not found");
             return;
         }
 
         adapter.checkReactionUpdated(idChat, message, reaction, count);
-        if(bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof InfoReactionsBottomSheet){
+        if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof InfoReactionsBottomSheet) {
             ((InfoReactionsBottomSheet) bottomSheetDialogFragment).changeInReactionReceived(msgid, idChat, reaction, count);
         }
     }

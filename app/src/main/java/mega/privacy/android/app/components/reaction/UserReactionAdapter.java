@@ -35,7 +35,6 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
-
 public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnClickListener {
     private static final int MAX_WIDTH_PORT = 180;
     private static final int MAX_WIDTH_LAND = 260;
@@ -130,7 +129,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
             if (contact != null) {
                 File avatar = buildAvatarFile(context, email + ".jpg");
                 Bitmap bitmap;
-                if(isFileAvailable(avatar) && avatar.length() > 0){
+                if (isFileAvailable(avatar) && avatar.length() > 0) {
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                     if (bitmap != null) {

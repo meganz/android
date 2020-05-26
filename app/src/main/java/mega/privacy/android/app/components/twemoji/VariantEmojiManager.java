@@ -2,21 +2,16 @@ package mega.privacy.android.app.components.twemoji;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import androidx.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-
-import static mega.privacy.android.app.utils.Constants.TYPE_EMOJI;
-import static mega.privacy.android.app.utils.Constants.TYPE_REACTION;
+import static mega.privacy.android.app.utils.Constants.*;
 
 @SuppressWarnings("PMD.ForLoopCanBeForeach")
 public final class VariantEmojiManager implements VariantEmoji {
-    static final int EMOJI_GUESS_SIZE = 5;
+    private static final int EMOJI_GUESS_SIZE = 5;
     private static final String PREFERENCE_EMOJI = "variant-emoji-manager";
     private static final String PREFERENCE_REACTION = "variant-reaction-manager";
     private static final String EMOJI_DELIMITER = "~";
@@ -25,6 +20,7 @@ public final class VariantEmojiManager implements VariantEmoji {
     @NonNull
     private final Context context;
     private String type;
+
     @NonNull
     private List<Emoji> variantsEmojiList = new ArrayList<>(0);
 

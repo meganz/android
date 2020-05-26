@@ -6,18 +6,12 @@ import android.view.View;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-
 public class EqualSpacingItemDecoration extends RecyclerView.ItemDecoration {
     public static final int HORIZONTAL = 0;
     public static final int VERTICAL = 1;
     public static final int GRID = 2;
     private final int spacing;
     private int displayMode;
-
-    public EqualSpacingItemDecoration(int spacing) {
-        this(spacing, -1);
-    }
 
     public EqualSpacingItemDecoration(int spacing, int displayMode) {
         this.spacing = spacing;
@@ -33,8 +27,6 @@ public class EqualSpacingItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     private void setSpacingForDirection(Rect outRect, RecyclerView.LayoutManager layoutManager, int position, int itemCount) {
-
-        // Resolve display mode automatically
         if (displayMode == -1) {
             displayMode = resolveDisplayMode(layoutManager);
         }

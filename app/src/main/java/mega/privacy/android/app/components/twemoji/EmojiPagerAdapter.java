@@ -34,7 +34,7 @@ public final class EmojiPagerAdapter extends PagerAdapter {
     if(position == RECENT_POSITION){
       newView = new RecentEmojiGridView(pager.getContext()).init(listener, longListener, recentEmoji);
       recentEmojiGridView = (RecentEmojiGridView) newView;
-    }else{
+    } else {
       newView = new EmojiGridView(pager.getContext()).init(listener, longListener, EmojiManager.getInstance().getCategories()[position - 1], variantManager);
     }
 

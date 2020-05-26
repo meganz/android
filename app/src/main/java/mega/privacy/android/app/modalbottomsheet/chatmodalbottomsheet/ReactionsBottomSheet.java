@@ -25,7 +25,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ReactionsBottomSheet extends BottomSheetDialogFragment{
+public class ReactionsBottomSheet extends BottomSheetDialogFragment {
 
     private final static int HEIGHT_REACTIONS_KEYBOARD = 250;
 
@@ -51,7 +51,7 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment{
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
-        if(!(context instanceof ChatActivityLollipop))
+        if (!(context instanceof ChatActivityLollipop))
             return;
 
         if (savedInstanceState != null) {
@@ -110,8 +110,8 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment{
         outState.putLong(MESSAGE_ID, messageId);
     }
 
-    private void closeDialog(){
-        if(reactionsKeyboard != null){
+    private void closeDialog() {
+        if (reactionsKeyboard != null) {
             reactionsKeyboard.persistReactionList();
         }
         dismissAllowingStateLoss();

@@ -113,8 +113,6 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener, RotatableAdapter {
@@ -610,7 +608,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout urlOwnMessageTextrl;
         RelativeLayout forwardOwnRichLinks;
 
-        EmojiTextView urlOwnMessageText;
+        private EmojiTextView urlOwnMessageText;
         LinearLayout urlOwnMessageWarningButtonsLayout;
         Button neverRichLinkButton;
         Button alwaysAllowRichLinkButton;
@@ -639,7 +637,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
-        EmojiTextView urlContactMessageText;
+        private EmojiTextView urlContactMessageText;
         RelativeLayout urlContactMessageTitleLayout;
         TextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
@@ -682,7 +680,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentOwnMessageContactLayout;
         RelativeLayout contentOwnMessageContactLayoutAvatar;
         RoundedImageView contentOwnMessageContactThumb;
-        EmojiTextView contentOwnMessageContactName;
+        private EmojiTextView contentOwnMessageContactName;
         public EmojiTextView contentOwnMessageContactEmail;
         RelativeLayout forwardOwnContact;
 
@@ -725,7 +723,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout titleContactMessage;
 
         TextView timeContactText;
-        EmojiTextView nameContactText;
+        private EmojiTextView nameContactText;
 
         RoundedImageView contactImageView;
         RelativeLayout contentContactMessageLayout;
@@ -7903,6 +7901,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         checkReactionsLayout(chatId, megaMessage, holder, reaction, count);
     }
 
+    /**
+     * Method for displaying the reaction layout.
+     *
+     * @param chatId      The chat room ID.
+     * @param megaMessage The message.
+     * @param holder      The holder.
+     * @param reaction    The reaction.
+     * @param count       The number of reactions in this message.
+     */
     private void checkReactionsLayout(long chatId, AndroidMegaChatMessage megaMessage, final ViewHolderMessageChat holder, String reaction, int count) {
         MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, megaMessage.getMessage().getMsgId());
         if (noReactions(listReactions, megaMessage.getMessage(), holder)) {
@@ -7940,7 +7947,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contactReactionsAdapter.removeItem(reaction);
                 } else {
                     holder.contactReactionsAdapter.updateItem(reaction);
-
                 }
 
                 if (holder.contactReactionsAdapter.getItemCount() > 0) {
@@ -7954,6 +7960,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    /**
+     * Method for creating the reaction array of a message.
+     *
+     * @param listReactions The reactions list.
+     * @param ownMessage    If the message is a own message.
+     * @param chatId        The chat ID.
+     * @param megaMessage   The message.
+     * @param holder        The holder.
+     */
     private void createReactionsAdapter(MegaStringList listReactions, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage, final ViewHolderMessageChat holder) {
         ArrayList<String> list = getReactionsList(listReactions, true);
 
@@ -7968,6 +7983,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    /**
+     * Method to check if there are no reactions in a message.
+     *
+     * @param listReactions The reactions list.
+     * @param message       The message.
+     * @param holder        The holder.
+     * @return True if there isn't reaction. False, if there are some reactions.
+     */
     private boolean noReactions(MegaStringList listReactions, MegaChatMessage message, final ViewHolderMessageChat holder) {
         if (listReactions == null || listReactions.size() <= 0) {
             logDebug("No reactions in this message");
@@ -7986,6 +8009,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return false;
     }
 
+    /**
+     * Check if exists reactions in a message.
+     *
+     * @param positionInAdapter The position of this message.
+     * @param holder            The holder.
+     * @param chatId            The chat ID.
+     * @param megaMessage       The message.
+     */
     private void checkReactionsInMessage(int positionInAdapter, ViewHolderMessageChat holder, long chatId, AndroidMegaChatMessage megaMessage) {
         if (holder == null) {
             holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
@@ -7995,7 +8026,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        if(multipleSelect){
+        if (multipleSelect) {
             if (checkIfIsMyMessage(megaMessage.getMessage())) {
                 holder.ownMessageReactionsLayout.setVisibility(View.GONE);
             } else {

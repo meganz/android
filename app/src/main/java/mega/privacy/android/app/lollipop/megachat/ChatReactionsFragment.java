@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
@@ -25,7 +26,6 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
     private Context context;
     private AndroidMegaChatMessage message = null;
     private long chatId;
-    private long messageId;
     private int positionMessage;
 
     private RelativeLayout firstReaction;
@@ -62,7 +62,6 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
     public void init(Context context, long chatId, long messageId, int positionMessage) {
         this.context = context;
         this.chatId = chatId;
-        this.messageId = messageId;
         this.positionMessage = positionMessage;
         if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
@@ -88,8 +87,8 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
         recentEmoji = new RecentEmojiManager(getContext(), TYPE_REACTION);
     }
 
-    private void initView(Context context){
-        inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    private void initView(Context context) {
+        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.add_reaction_layout, null);
         firstReaction = view.findViewById(R.id.first_emoji_layout);
         firstEmoji = view.findViewById(R.id.first_emoji_image);
@@ -114,7 +113,7 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        for(int i = 0 ; i < getChildCount() ; i++){
+        for (int i = 0; i < getChildCount(); i++) {
             getChildAt(i).layout(l, t, r, b);
         }
     }
@@ -128,7 +127,7 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
 
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
-        switch(view.getId()){
+        switch (view.getId()) {
             case R.id.first_emoji_layout:
             case R.id.first_emoji_image:
                 addReaction(view.findViewById(R.id.first_emoji_image));
@@ -160,17 +159,22 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
         }
     }
 
-    private void addReaction(EmojiImageView imageEmoji){
-        if(recentEmoji != null){
+    /**
+     * Method for adding a reaction in the dialog.
+     *
+     * @param imageEmoji The image Emoji.
+     */
+    private void addReaction(EmojiImageView imageEmoji) {
+        if (recentEmoji != null) {
             recentEmoji.addEmoji(imageEmoji.getEmoji());
         }
 
-        addReactionInMsg(context, chatId, message.getMessage(),imageEmoji.getEmoji(),true);
+        addReactionInMsg(context, chatId, message.getMessage(), imageEmoji.getEmoji(), true);
         closeDialog();
     }
 
-    private void closeDialog(){
-        if(recentEmoji != null){
+    private void closeDialog() {
+        if (recentEmoji != null) {
             recentEmoji.persist();
         }
 

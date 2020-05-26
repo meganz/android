@@ -47,7 +47,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         this.messageId = megaMessage.getMessage().getMsgId();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         chatRoom = megaChatApi.getChatRoom(chatId);
-        if(chatRoom == null)
+        if (chatRoom == null)
             return;
     }
 
@@ -128,6 +128,11 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         return listReactions.get(pos);
     }
 
+    /**
+     * Method to eliminate a reaction
+     *
+     * @param reaction The reaction.
+     */
     public void removeItem(String reaction) {
         if (listReactions == null || listReactions.size() == 0)
             return;
@@ -147,6 +152,11 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         }
     }
 
+    /**
+     * Method for updating a reaction.
+     *
+     * @param reaction The reaction.
+     */
     public void updateItem(String reaction) {
         if (listReactions == null || listReactions.size() == 0)
             return;
@@ -170,6 +180,11 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         }
     }
 
+    /**
+     * Method for adding reactions.
+     *
+     * @param listReactions The reactions list.
+     */
     public void setReactions(ArrayList<String> listReactions) {
         this.listReactions = listReactions;
         notifyDataSetChanged();
