@@ -131,7 +131,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Attachment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -4434,8 +4433,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         int type = m.getMessage().getType();
         switch (type) {
             case MegaChatMessage.TYPE_NODE_ATTACHMENT:
-                showNodeAttachmentBottomSheet(m, positionInMessages);
-                break;
             case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
             case MegaChatMessage.TYPE_VOICE_CLIP:
             case MegaChatMessage.TYPE_NORMAL:
@@ -4528,7 +4525,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         }
                                         else{
                                             logDebug("Image without preview - show node attachment panel for one node");
-                                            showNodeAttachmentBottomSheet(m, positionInMessages);
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
@@ -4645,7 +4642,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                                 startActivity(mediaIntent);
                                             }else{
                                                 logDebug("noAvailableIntent");
-                                                showNodeAttachmentBottomSheet(m, positionInMessages);
+                                                showGeneralChatMessageBottomSheet(m, positionInMessages);
                                             }
                                         }
                                         overridePendingTransition(0,0);
@@ -4739,18 +4736,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         }
                                         else{
                                             logWarning("noAvailableIntent");
-                                            showNodeAttachmentBottomSheet(m, positionInMessages);
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                         overridePendingTransition(0,0);
                                     }
                                     else{
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        showNodeAttachmentBottomSheet(m, positionInMessages);
+                                        showGeneralChatMessageBottomSheet(m, positionInMessages);
                                     }
                                 }
                                 else{
                                     logDebug("show node attachment panel");
-                                    showNodeAttachmentBottomSheet(m, positionInMessages);
+                                    showGeneralChatMessageBottomSheet(m, positionInMessages);
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
@@ -6928,18 +6925,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         selectedMessageId = message.getMessage().getRowId();
         logDebug("Temporal id of MS message: "+message.getMessage().getTempId());
         bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-    }
-
-    public void showNodeAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("showNodeAttachmentBottomSheet: "+position);
-        selectedPosition = position;
-
-        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-        selectedMessageId = message.getMessage().getMsgId();
-
-        bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
