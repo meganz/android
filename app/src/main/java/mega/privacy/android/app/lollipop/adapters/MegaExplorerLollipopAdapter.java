@@ -313,7 +313,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.permissionsIcon.setVisibility(View.GONE);
 
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getCreationTime())));
+            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             setImageParams(holder.imageView, 48, 0);
 
