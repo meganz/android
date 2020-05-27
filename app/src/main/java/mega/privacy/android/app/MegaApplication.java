@@ -1382,18 +1382,20 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 		MegaHandleList handleList = megaChatApi.getChatCalls(callStatus);
 		if (handleList == null || handleList.size() == 0) return;
-
+		MegaChatCall callToLaunch = null;
 		for (int i = 0; i < handleList.size(); i++) {
 			if (openCallChatId != handleList.get(i)) {
-				MegaChatCall callToLaunch = megaChatApi.getChatCall(handleList.get(i));
-				if (callToLaunch != null && !callToLaunch.isOnHold()) {
-					logDebug("Open call");
-					launchCallActivity(callToLaunch);
-					break;
+				if (megaChatApi.getChatCall(handleList.get(i)) != null && !megaChatApi.getChatCall(handleList.get(i)).isOnHold()) {
+					callToLaunch = megaChatApi.getChatCall(handleList.get(i));
 				}
 			} else {
 				logDebug("The call is already opened");
 			}
+		}
+
+		if (callToLaunch != null) {
+			logDebug("Open call");
+			launchCallActivity(callToLaunch);
 		}
 	}
 

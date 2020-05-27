@@ -800,15 +800,15 @@ public final class ChatAdvancedNotificationBuilder {
      *
      * @param chatIdCallInProgress Chat ID with call in progress.
      * @param chatIdCallToAnswer   Chat ID with a incoming call.
-     * @param notificationId       notification ID.
      * @param type                 Type of answer.
      * @return The PendingIntent.
      */
-    private PendingIntent getPendingIntent(long chatIdCallInProgress, long chatIdCallToAnswer, int notificationId, String type) {
+    private PendingIntent getPendingIntent(long chatIdCallInProgress, long chatIdCallToAnswer, String type) {
         Intent intent = new Intent(context, CallNotificationIntentService.class);
         intent.putExtra(CHAT_ID_OF_CURRENT_CALL, chatIdCallInProgress);
         intent.putExtra(CHAT_ID_OF_INCOMING_CALL, chatIdCallToAnswer);
         intent.setAction(type);
+        int notificationId = (MegaApiJava.userHandleToBase64(chatIdCallToAnswer)).hashCode();
         int requestCode = notificationId + getNumberRequestNotifications(type, chatIdCallInProgress);
         return PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
@@ -872,6 +872,8 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.createNotificationChannel(channel);
             }
+
+            PendingIntent intentIgnore = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE);
 
             /*Customize notification*/
             Bitmap avatarIcon = setUserAvatar(chatToAnswer);
@@ -939,17 +941,17 @@ public final class ChatAdvancedNotificationBuilder {
                     expandedView.setTextViewText(R.id.first_button_text, context.getString(R.string.ignore_call_incoming));
                     expandedView.setTextViewText(R.id.second_button_text, context.getString(R.string.hold_and_join_call_incoming));
                     expandedView.setTextViewText(R.id.third_button_text, context.getString(R.string.end_and_join_call_incoming));
-                    expandedView.setOnClickPendingIntent(R.id.first_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.IGNORE));
-                    expandedView.setOnClickPendingIntent(R.id.second_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.HOLD_JOIN));
-                    expandedView.setOnClickPendingIntent(R.id.third_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.END_JOIN));
+                    expandedView.setOnClickPendingIntent(R.id.first_button_layout, intentIgnore);
+                    expandedView.setOnClickPendingIntent(R.id.second_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_JOIN));
+                    expandedView.setOnClickPendingIntent(R.id.third_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.END_JOIN));
 
                 } else {
                     expandedView.setTextViewText(R.id.first_button_text, context.getString(R.string.contact_decline));
                     expandedView.setTextViewText(R.id.second_button_text, context.getString(R.string.hold_and_answer_call_incoming));
                     expandedView.setTextViewText(R.id.third_button_text, context.getString(R.string.end_and_answer_call_incoming));
-                    expandedView.setOnClickPendingIntent(R.id.first_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.DECLINE));
-                    expandedView.setOnClickPendingIntent(R.id.second_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.HOLD_ANSWER));
-                    expandedView.setOnClickPendingIntent(R.id.third_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.END_ANSWER));
+                    expandedView.setOnClickPendingIntent(R.id.first_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.DECLINE));
+                    expandedView.setOnClickPendingIntent(R.id.second_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_ANSWER));
+                    expandedView.setOnClickPendingIntent(R.id.third_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.END_ANSWER));
                 }
 
             } else {
@@ -960,14 +962,14 @@ public final class ChatAdvancedNotificationBuilder {
                 if (chatToAnswer.isGroup()) {
                     expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming));
                     expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join));
-                    expandedView.setOnClickPendingIntent(R.id.decline_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.IGNORE));
-                    expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, notificationId, CallNotificationIntentService.ANSWER));
+                    expandedView.setOnClickPendingIntent(R.id.decline_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE));
+                    expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER));
 
                 } else {
                     expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.contact_decline));
                     expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.answer_call_incoming));
-                    expandedView.setOnClickPendingIntent(R.id.decline_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.DECLINE));
-                    expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, notificationId, CallNotificationIntentService.ANSWER));
+                    expandedView.setOnClickPendingIntent(R.id.decline_button_layout, getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.DECLINE));
+                    expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER));
                 }
 
             }
@@ -987,7 +989,7 @@ public final class ChatAdvancedNotificationBuilder {
             notificationBuilder.setCustomBigContentView(expandedView);
             notificationBuilder.setContentIntent(null);
             notificationBuilder.setAutoCancel(true);
-            notificationBuilder.setDeleteIntent(getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, notificationId, CallNotificationIntentService.IGNORE));
+            notificationBuilder.setDeleteIntent(intentIgnore);
             notificationBuilder.setOngoing(false);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1026,14 +1028,13 @@ public final class ChatAdvancedNotificationBuilder {
             Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
             ignoreIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
             ignoreIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
-
             ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
             int requestCodeIgnore = notificationId + 1;
             PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
             Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
             answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
             answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
-
             answerIntent.setAction(CallNotificationIntentService.ANSWER);
             int requestCodeAnswer = notificationId + 1;
             PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);
