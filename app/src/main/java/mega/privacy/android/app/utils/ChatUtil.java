@@ -32,6 +32,7 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -110,7 +111,7 @@ public class ChatUtil {
         builder.setView(v);
         final AlertDialog shareLinkDialog = builder.create();
 
-        TextView nameGroup = (TextView) v.findViewById(R.id.group_name_text);
+        EmojiTextView nameGroup = v.findViewById(R.id.group_name_text);
         nameGroup.setText(chat.getTitle());
         TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
