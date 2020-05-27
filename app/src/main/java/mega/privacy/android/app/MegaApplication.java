@@ -166,6 +166,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private PowerManager.WakeLock wakeLock;
 
 	private ArrayList<MegaChatListItem> currentActiveGroupChat = new ArrayList<>();
+	private ArrayList<Long> notificationShown = new ArrayList<>();
 
 	private CallListener callListener = new CallListener();
 
@@ -1168,6 +1169,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	 */
 	private void showGroupCallNotification(long chatId) {
 		try {
+			notificationShown.add(chatId);
 			stopService(new Intent(this, IncomingCallService.class));
 			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 			notificationBuilder.checkOneGroupCall(chatId);
@@ -1190,22 +1192,28 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
 			if (item.getOwnPrivilege() != -1) {
 				if (!currentActiveGroupChat.contains(item)) {
+
 					currentActiveGroupChat.add(item);
 					MegaChatCall call = megaChatApi.getChatCall(item.getChatId());
 					if (call != null) {
 						if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-							showGroupCallNotification(item.getChatId());
+							if (notificationShown == null || notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
+								notificationShown.add(item.getChatId());
+								showGroupCallNotification(item.getChatId());
+							}
 							return;
 						}
 					}
 				}
 			} else {
 				currentActiveGroupChat.remove(item);
+				notificationShown.remove(item.getChatId());
 			}
 		}
 
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
 			currentActiveGroupChat.remove(item);
+			notificationShown.remove(item.getChatId());
 		}
 	}
 

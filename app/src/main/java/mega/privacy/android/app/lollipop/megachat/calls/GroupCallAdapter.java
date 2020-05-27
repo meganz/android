@@ -174,11 +174,13 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.rlGeneral.setOnClickListener(null);
         }
 
+        resizeLayout(position, holder.parentSurfaceView);
+        resizeLayout(position, holder.avatarLayout);
+
+
         MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peer.getPeerId(), peer.getClientId());
         if (peer.isVideoOn() && !call.isOnHold() && (session == null || !session.isOnHold())) {
             logDebug("The video is ON, the call is not on hold, the session is not on hold");
-
-            resizeLayout(position, holder.parentSurfaceView);
 
             /*Hide the avatar and show the video*/
             activateVideo(position, holder, peer);
@@ -186,8 +188,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         } else {
             logDebug("The video is OFF or the call is not on hold or the session is not on hold");
-
-            resizeLayout(position, holder.avatarLayout);
 
             /*Hide the video and show the avatar*/
             deactivateVideo(position, holder, peer);
@@ -374,7 +374,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 return;
             }
         }
-
         int numPeersOnCall = peers.size();
         int size;
         if (numPeersOnCall < 7) {
@@ -383,22 +382,23 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             size = px2dp(SIZE_SMALL_AVATAR, outMetrics);
         }
         if (numPeersOnCall == 2 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
+
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarBackground.getLayoutParams();
             layoutParams.width = size;
             layoutParams.height = size;
-            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
+            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
             layoutParams.setMargins(0, 0, 0, scaleHeightPx(MARGIN_BUTTONS_SMALL, outMetrics));
             holder.avatarBackground.setLayoutParams(layoutParams);
-            holder.avatarBackground.setGravity(RelativeLayout.CENTER_IN_PARENT);
+            holder.avatarBackground.setGravity(RelativeLayout.ALIGN_PARENT_BOTTOM);
             return;
         }
 
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarBackground.getLayoutParams();
         layoutParams.width = size;
         layoutParams.height = size;
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, TRUE);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
         layoutParams.setMargins(0, 0, 0, 0);
         holder.avatarBackground.setLayoutParams(layoutParams);
         holder.avatarBackground.setGravity(RelativeLayout.CENTER_IN_PARENT);
@@ -727,6 +727,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 if (peer.isVideoOn()) {
                     deactivateVideo(position, holder, peer);
                 } else {
+                    displayAvatar(position, holder, peer);
                     showOnHoldImage(holder.avatarLayout, holder.avatarImage, holder.avatarImageCallOnHold, peer);
                 }
             } else {
@@ -765,6 +766,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     if (peer.isVideoOn()) {
                         deactivateVideo(position, holder, peer);
                     } else {
+                        displayAvatar(position, holder, peer);
                         showOnHoldImage(holder.avatarLayout, holder.avatarImage, holder.avatarImageCallOnHold, peer);
                     }
                 } else {

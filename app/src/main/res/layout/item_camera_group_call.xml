@@ -54,7 +54,7 @@
             android:id="@+id/avatar_background"
             android:layout_width="88dp"
             android:layout_height="88dp"
-           android:gravity="center"
+            android:gravity="center"
             android:layout_centerInParent="true"
             android:textAlignment="center">
 
