@@ -316,50 +316,52 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private EmojiTextView titleToolbar;
     private MarqueeTextView individualSubtitleToobar;
     private EmojiTextView groupalSubtitleToolbar;
-    LinearLayout subtitleCall;
-    Chronometer subtitleChronoCall;
-    LinearLayout participantsLayout;
-    TextView participantsText;
-    ImageView iconStateToolbar;
+    private LinearLayout subtitleCall;
+    private Chronometer subtitleChronoCall;
+    private LinearLayout participantsLayout;
+    private TextView participantsText;
+    private ImageView iconStateToolbar;
 
-    ImageView privateIconToolbar;
+    private ImageView privateIconToolbar;
 
     float density;
-    DisplayMetrics outMetrics;
-    Display display;
+    private DisplayMetrics outMetrics;
+    private Display display;
 
-    boolean editingMessage = false;
-    MegaChatMessage messageToEdit = null;
+    private boolean editingMessage = false;
+    private MegaChatMessage messageToEdit = null;
 
-    CoordinatorLayout fragmentContainer;
-    RelativeLayout writingContainerLayout;
-    RelativeLayout writingLayout;
+    private CoordinatorLayout fragmentContainer;
+    private RelativeLayout writingContainerLayout;
+    private RelativeLayout writingLayout;
 
-    RelativeLayout joinChatLinkLayout;
-    Button joinButton;
+    private RelativeLayout joinChatLinkLayout;
+    private Button joinButton;
 
-    RelativeLayout chatRelativeLayout;
-    RelativeLayout userTypingLayout;
-    TextView userTypingText;
+    private RelativeLayout chatRelativeLayout;
+    private RelativeLayout userTypingLayout;
+    private TextView userTypingText;
     boolean sendIsTyping=true;
     long userTypingTimeStamp = -1;
     private ImageButton keyboardTwemojiButton;
-    ImageButton mediaButton;
-    ImageButton pickFileStorageButton;
-    ImageButton pickAttachButton;
+    private ImageButton mediaButton;
+    private ImageButton pickFileStorageButton;
+    private ImageButton pickAttachButton;
 
     private EmojiKeyboard emojiKeyboard;
     private RelativeLayout rLKeyboardTwemojiButton;
 
-    RelativeLayout rLMediaButton;
-    RelativeLayout rLPickFileStorageButton;
-    RelativeLayout rLPickAttachButton;
+    private RelativeLayout rLMediaButton;
+    private RelativeLayout rLPickFileStorageButton;
+    private RelativeLayout rLPickAttachButton;
 
-    RelativeLayout callInProgressLayout;
-    TextView callInProgressText;
-    Chronometer callInProgressChrono;
+    private RelativeLayout callOnHoldLayout;
 
-    boolean startVideo = false;
+    private RelativeLayout callInProgressLayout;
+    private TextView callInProgressText;
+    private Chronometer callInProgressChrono;
+
+    private boolean startVideo = false;
 
     private EmojiEditText textChat;
     ImageButton sendIcon;
@@ -557,6 +559,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
             if (chatId != getCurrentChatid()) {
                 logWarning("Call different chat");
+                updateCallBar();
                 return;
             }
 
@@ -802,6 +805,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         callInProgressText = findViewById(R.id.call_in_progress_text);
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
+
+        callOnHoldLayout = findViewById(R.id.call_on_hold_layout);
+        callOnHoldLayout.setOnClickListener(this);
+        callOnHoldLayout.setVisibility(View.GONE);
 
         /*Recording views*/
         recordingLayout = findViewById(R.id.recording_layout);
@@ -2585,7 +2592,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 for (Long chatId : chatsIDcalls) {
                     if (chatId == chatRoom.getChatId()) {
                         logDebug("I'm participating in the call of this chat");
-                        returnCall(this, chatId);
+                        MegaChatCall anotherCall = shouldShowCallOnHoldLayout(chatRoom.getChatId());
+                        if(anotherCall == null) {
+                            returnCall(this, chatId);
+                        }else{
+                            returnCall(this, anotherCall.getChatid());
+                        }
                         return;
                     }
                 }
@@ -3377,6 +3389,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
                 }
                 break;
+
             case R.id.call_in_progress_layout:
                 startVideo = false;
                 if(checkPermissionsCall()){
@@ -8254,6 +8267,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
             callInProgressLayout.setVisibility(View.GONE);
             callInProgressLayout.setOnClickListener(null);
+            callOnHoldLayout.setVisibility(View.GONE);
             setSubtitleVisibility();
         }
     }
@@ -8294,13 +8308,40 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         showCallLayout();
     }
 
+    /**
+     * Method to know if one should show the layout CALL ON HOLD.
+     *
+     * @param currentChatId The current chat ID.
+     */
+    private MegaChatCall shouldShowCallOnHoldLayout(long currentChatId) {
+        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
+        if (chatsIDsWithCallActive == null || chatsIDsWithCallActive.isEmpty()) {
+            return null;
+        }
+
+        MegaChatCall currentCall = megaChatApi.getChatCall(currentChatId);
+        if (currentCall == null || !currentCall.isOnHold())
+            return null;
+
+        for (Long anotherChatId : chatsIDsWithCallActive) {
+            if (anotherChatId != currentChatId && !megaChatApi.getChatCall(anotherChatId).isOnHold()) {
+                return megaChatApi.getChatCall(anotherChatId);
+            }
+        }
+
+        return null;
+    }
+
+
     private void showCallLayout() {
         if (megaChatApi == null)
             return;
-
+        logDebug("show call layout");
         MegaChatCall call = megaChatApi.getChatCall(idChat);
         if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat)))
             return;
+
+        callOnHoldLayout.setVisibility(shouldShowCallOnHoldLayout(idChat) != null ? View.VISIBLE : View.GONE);
 
         logDebug("Call status "+callStatusToString(call.getStatus())+". Group chat: "+isGroup());
         switch (call.getStatus()){
@@ -8385,7 +8426,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
 
         if (call.isOnHold()) {
-            showCallInProgressLayout(getString(R.string.call_on_hold), true, call);
+            MegaChatCall anotherCall = shouldShowCallOnHoldLayout(idChat);
+            if(anotherCall != null){
+                showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, anotherCall);
+            }else{
+                showCallInProgressLayout(getString(R.string.call_on_hold), true, call);
+
+            }
         } else {
             showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
         }

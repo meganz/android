@@ -1710,7 +1710,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         boolean isSpeakerOn = MegaApplication.getSpeakerStatus(callChat.getChatid());
         application.createRTCAudioManager(isSpeakerOn);
-        application.setAudioManagerValues(callChat.getStatus());
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1719,6 +1718,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
         }
+        application.setAudioManagerValues(callChat.getStatus());
+
     }
 
     /**
@@ -1835,6 +1836,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         MegaChatRoom anotherChat = megaChatApi.getChatRoom(anotherChatId);
                         anotherCallTitle.setText(anotherChat.getTitle());
                         anotherCallSubtitle.setText(getString(R.string.call_in_progress_layout));
+                        anotherCallLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+                        anotherCallLayout.setAlpha(1f);
                         anotherCallLayout.setVisibility(View.VISIBLE);
                         return;
                     }
@@ -1850,6 +1853,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         MegaChatRoom anotherChat = megaChatApi.getChatRoom(anotherChatId);
                         anotherCallTitle.setText(anotherChat.getTitle());
                         anotherCallSubtitle.setText(getString(R.string.call_on_hold));
+                        anotherCallLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
+                        anotherCallLayout.setAlpha(0.6f);
                         anotherCallLayout.setVisibility(View.VISIBLE);
                         return;
                     }

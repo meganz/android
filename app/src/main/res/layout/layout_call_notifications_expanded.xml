@@ -3,16 +3,16 @@
     android:id="@+id/call_notif_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp"
+    android:minHeight="65dp"
     android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/avatar_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="top"
-        android:paddingLeft="10dp"
-        android:layout_marginRight="10dp">
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="12dp">
         <RelativeLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -29,14 +29,15 @@
     <LinearLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="3dp"
             android:orientation="vertical">
             <RelativeLayout
                 android:id="@+id/title_chat_layout"
@@ -44,15 +45,14 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/chat_title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    style="@style/TextAppearance.Compat.Notification"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="4dp"
+                    android:ellipsize="end"
                     android:layout_weight="1"
                     android:maxLines="1"
-                    style="Custom Notification Title"
                     android:textColor="@color/file_list_first_row"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
                 <ImageView
                     android:id="@+id/chat_status"
                     style="@style/TextAppearance.Compat.Notification"
@@ -65,7 +65,7 @@
                     android:src="@drawable/ic_offline"
                     android:visibility="gone"/>
             </RelativeLayout>
-            
+
             <TextView
                 android:id="@+id/call_title"
                 style="@style/TextAppearance.Compat.Notification"
@@ -79,40 +79,36 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="10dp"
-            android:background="@color/chat_sliding_panel_separator" />
-
-        <LinearLayout
             android:id="@+id/small_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:gravity="left"
+            android:layout_gravity="left"
             android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/decline_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="50dp"
-                android:gravity="left|center_vertical">
+                android:gravity="left|bottom"
+                android:layout_gravity="left|bottom"
+                android:layout_marginRight="3dp"
+                android:paddingTop="10dp">
 
                 <ImageView
                     android:id="@+id/decline_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="8dp"
                     android:src="@drawable/ic_remove_not" />
                 <TextView
                     android:id="@+id/decline_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
                     android:layout_toRightOf="@id/decline_image"
-                    android:layout_centerInParent="true"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
-                    android:text="IGNORE"
                     android:textStyle="bold" />
             </RelativeLayout>
 
@@ -120,24 +116,26 @@
                 android:id="@+id/answer_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|center_vertical">
+                android:gravity="left|bottom"
+                android:layout_gravity="left|bottom"
+                android:paddingTop="10dp">
 
                 <ImageView
                     android:id="@+id/answer_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="8dp"
                     android:src="@drawable/ic_call" />
 
                 <TextView
                     android:id="@+id/answer_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
                     android:layout_toRightOf="@id/answer_image"
                     android:textColor="@color/accentColor"
-                    android:layout_centerInParent="true"
                     android:textSize="14sp"
-                    android:text="JOIN"
                     android:textStyle="bold" />
             </RelativeLayout>
         </LinearLayout>
@@ -146,14 +144,18 @@
             android:id="@+id/big_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:gravity="left"
+            android:layout_gravity="left"
+            android:paddingTop="5dp"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/first_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp">
+                android:gravity="left"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:id="@+id/first_image"
@@ -165,9 +167,9 @@
                     android:id="@+id/first_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
                     android:layout_toRightOf="@id/first_image"
                     android:textColor="@color/accentColor"
-                    android:layout_centerInParent="true"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -176,7 +178,9 @@
                 android:id="@+id/second_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp">
+                android:gravity="left"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:id="@+id/second_image"
@@ -189,9 +193,9 @@
                     android:id="@+id/second_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
                     android:layout_toRightOf="@id/second_image"
                     android:textColor="@color/accentColor"
-                    android:layout_centerInParent="true"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -199,7 +203,11 @@
             <RelativeLayout
                 android:id="@+id/third_button_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="left">
 
                 <ImageView
                     android:id="@+id/third_image"
@@ -212,9 +220,9 @@
                     android:id="@+id/third_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
                     android:layout_toRightOf="@id/third_image"
                     android:textColor="@color/accentColor"
-                    android:layout_centerInParent="true"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
