@@ -75,7 +75,6 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
@@ -93,7 +92,6 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
-    public static final String INVAILD_PATH = "-1";
     Handler handler = new Handler();
 
 	PreferenceCategory qrCodeCategory;
@@ -1287,7 +1285,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 						if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals(INVAILD_PATH)){
 							localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 						}
-					}
+					} else {
+                        stopRunningCameraUploadService(context);
+                        startCameraUploadServiceIgnoreAttr(context);
+                    }
 				}
 				else{
 					dbH.setSecondaryFolderPath(INVAILD_PATH);
@@ -1301,6 +1302,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				cameraUploadCategory.addPreference(megaSecondaryFolder);
 			}
 			else{
+                resetMUTimestampsAndCache();
 				dbH.setSecondaryUploadEnabled(false);
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
 				cameraUploadCategory.removePreference(localSecondaryFolder);
@@ -1668,7 +1670,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	/**
 	 * Refresh the Camera Uploads service settings depending on the service status.
 	 */
-    private void refreshCameraUploadsSettings() {
+    public void refreshCameraUploadsSettings() {
 		logDebug("refreshCameraUploadsSettings");
         boolean cuEnabled = false;
         if (prefs != null) {
@@ -1804,26 +1806,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		}
 	}
 
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				switch (intent.getAction()) {
-					case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
-						refreshCameraUploadsSettings();
-						break;
-                    case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
-                        // disable UI elements of media upload omly
-                        disableMediaUploadUIProcess();
-                        break;
-					case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
-						taskGetSizeOffline();
-						break;
-				}
-			}
-		}
-	};
-
 	public synchronized void setCUDestinationFolder(boolean isSecondary, long handle) {
 		MegaNode targetNode = megaApi.getNodeByHandle(handle);
 		if (targetNode == null) return;
@@ -1847,12 +1829,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		logDebug("onResume");
 
 		refreshAccountInfo();
-
-		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
-		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
-		LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
 
 	    prefs=dbH.getPreferences();
 
@@ -1885,7 +1861,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	@Override
 	public void onPause(){
 		super.onPause();
-		LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
 	}
 
 	private void refreshAccountInfo(){

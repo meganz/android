@@ -48,8 +48,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
-                GetAttrUserListener listener = new GetAttrUserListener(megaApplication);
-                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
+                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
                 break;
             }
         }

@@ -242,6 +242,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -1311,6 +1312,32 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	};
 
+    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && intent.getAction() != null) {
+                switch (intent.getAction()) {
+                    case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
+                        if (getSettingsFragment() != null) {
+                            sttFLol.refreshCameraUploadsSettings();
+                        }
+                        break;
+                    case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
+                        // disable UI elements of media upload omly
+                        if (getSettingsFragment() != null) {
+                            sttFLol.disableMediaUploadUIProcess();
+                        }
+                        break;
+                    case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
+                        if (getSettingsFragment() != null) {
+                            sttFLol.taskGetSizeOffline();
+                        }
+                        break;
+                }
+            }
+        }
+    };
+
     public void launchPayment(String productId) {
         //start purchase/subscription flow
         SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
@@ -1965,6 +1992,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+        filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+        filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
+        filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+        registerReceiver(updateCUSettingsReceiver, filter);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -4549,7 +4582,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
 
-		unregisterReceiver(cameraUploadLauncherReceiver);
+        unregisterReceiver(cameraUploadLauncherReceiver);
+        unregisterReceiver(updateCUSettingsReceiver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();
@@ -7460,26 +7494,29 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private void checkCameraUploadFolder(boolean shouldDisable, ArrayList<MegaNode> updatedNodes) {
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
-        boolean ignoreUpdate = false;
-        if(updatedNodes != null) {
+
+        if (updatedNodes != null) {
             List<Long> handles = new ArrayList<>();
-            for(MegaNode node : updatedNodes) {
+            for (MegaNode node : updatedNodes) {
                 handles.add(node.getHandle());
             }
-            ignoreUpdate = !handles.contains(primaryHandle) && !handles.contains(secondaryHandle);
-            logDebug("Updated nodes don't include CU/MU, return.");
+            if (!handles.contains(primaryHandle) && !handles.contains(secondaryHandle)) {
+                logDebug("Updated nodes don't include CU/MU, return.");
+                return;
+            }
         }
-        if(ignoreUpdate) return;
-		MegaPreferences prefs = dbH.getPreferences();
-		boolean isSecondaryEnabled = false;
-		if(prefs != null) {
-			isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-		}
+
+        MegaPreferences prefs = dbH.getPreferences();
+        boolean isSecondaryEnabled = false;
+        if (prefs != null) {
+            isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+        }
+
         boolean isPrimaryFolderInRubbish = isNodeInRubbish(primaryHandle);
         boolean isSecondaryFolderInRubbish = isSecondaryEnabled && isNodeInRubbish(secondaryHandle);
 
         if (isSecondaryFolderInRubbish && !isPrimaryFolderInRubbish) {
-			logDebug("MU folder is deleted, backup settings and disable MU.");
+            logDebug("MU folder is deleted, backup settings and disable MU.");
             if (shouldDisable) {
                 backupTimestampsAndFolderHandle();
                 disableMediaUploadProcess();
@@ -7489,7 +7526,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             } else {
                 stopRunningCameraUploadService(app);
             }
-		} else if (isPrimaryFolderInRubbish) {
+        } else if (isPrimaryFolderInRubbish) {
             logDebug("CU folder is deleted, backup settings and disable CU.");
             if (shouldDisable) {
                 backupTimestampsAndFolderHandle();
@@ -7500,7 +7537,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             } else {
                 stopRunningCameraUploadService(app);
             }
-		}
+        }
     }
 
 	public void refreshRubbishBin () {
@@ -10995,11 +11032,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void refreshCloudDrive() {
 		if (rootNode == null) {
 			rootNode = megaApi.getRootNode();
-			if (rootNode == null) {
-				logWarning("Root node is NULL. Maybe user is not logged in");
-				return;
-			}
 		}
+
+        if (rootNode == null) {
+            logWarning("Root node is NULL. Maybe user is not logged in");
+            return;
+        }
 
 		MegaNode parentNode = rootNode;
 

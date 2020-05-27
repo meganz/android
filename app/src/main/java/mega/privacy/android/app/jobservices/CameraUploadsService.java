@@ -71,7 +71,6 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
-import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVAILD_PATH;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -1013,7 +1012,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         //Prevent checking while app alive because it has been handled by global event
         logDebug("ignoreAttr: " + ignoreAttr);
-        // Check CU attributes sequentially to prevent potential API_EEXPIRED in parallel set CU attributes
         if (!ignoreAttr && !isPrimaryHandleSynced) {
             logDebug("Try to get Camera Uploads primary target folder.");
             megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, getAttrUserListener);
@@ -1056,10 +1054,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         // check secondary local folder if media upload is enabled
         if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
             String path = prefs.getLocalPathSecondaryFolder();
-            if(path == null) {
-                return false;
+            // First time enable media upload, haven't set local path.
+            if(INVAILD_PATH.equals(path)) {
+                return true;
             } else {
-                return new File(path).exists();
+                return path != null && new File(path).exists();
             }
         }
         // if not enable secondary

@@ -94,6 +94,8 @@ public class SettingsConstants {
     public static final String KEY_RECOVERY_KEY= "settings_recovery_key";
     public static final String KEY_CHANGE_PASSWORD= "settings_change_password";
 
+    public static final String INVAILD_PATH = "-1";
+
     public static final String CAMERA_UPLOADS_STATUS = "CAMERA_UPLOADS_STATUS";
 
     public static final int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
