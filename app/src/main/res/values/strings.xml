@@ -1534,8 +1534,8 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Insufficient transfer quota</string>
-    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted.\nUpgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Not enough transfer quota available for your IP address.\nUpgrade your account or wait %s to continue your download.</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Not enough transfer quota available for your IP address. Upgrade your account or wait %s to continue your download.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continue without account</string>
 
@@ -2786,24 +2786,12 @@
     <string name="failed_label" context="Label describing some action failed">Failed</string>
     <string name="action_cancel_transfer" context="Action cancel transfer">Cancel transfer</string>
     <string name="title_transfer_over_quota" context="Title of a dialog warning of transfer over quota">Transfer over quota</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted.\nUpgrade your account to continue.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
 
-    <plurals name="plural_time_days">
-        <item context="Label that shows a time in days, one day" quantity="one">%1$d day</item>
-        <item context="Label that shows a time in days, more days" quantity="other">%1$d days</item>
-    </plurals>
-    <plurals name="plural_time_hours">
-        <item context="Label that shows a time in hours, one hour" quantity="one">%1$d hour</item>
-        <item context="Label that shows a time in hours, more hours" quantity="other">%1$d hours</item>
-    </plurals>
-    <plurals name="plural_time_minutes">
-        <item context="Label that shows a time in minutes, one minute" quantity="one">%1$d minute</item>
-        <item context="Label that shows a time in minutes, more minutes" quantity="other">%1$d minutes</item>
-    </plurals>
-    <plurals name="plural_time_seconds">
-        <item context="Label that shows a time in seconds, one second" quantity="one">%1$d second</item>
-        <item context="Label that shows a time in seconds, more seconds" quantity="other">%1$d seconds</item>
-    </plurals>
+    <string name="label_time_in_days" context="Time in days. The placeholder is for the time value, please adjust the position based on linguistics">%dd</string>
+    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
+    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
+    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
 </resources>

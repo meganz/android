@@ -19,7 +19,6 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -181,6 +180,15 @@ public class BaseActivity extends AppCompatActivity {
         retryConnectionsAndSignalPresence();
     }
 
+    /**
+     * Checks if the current activity is in foreground.
+     *
+     * @return True if the current activity is in foreground, false otherwise.
+     */
+    protected boolean isActivityInForeground() {
+        return !isPaused;
+    }
+
     @Override
     protected void onDestroy() {
         logDebug("onDestroy");
@@ -322,7 +330,9 @@ public class BaseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent == null) return;
 
-            showGeneralTransferOverQuotaWarning();
+            if (isActivityInForeground()) {
+                showGeneralTransferOverQuotaWarning();
+            }
         }
     };
 
@@ -761,23 +771,7 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
 
-        new CountDownTimer(megaApi.getBandwidthOverquotaDelay(), 1000) {
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-                long bandwidthOverquotaDelay = megaApi.getBandwidthOverquotaDelay();
-                if (bandwidthOverquotaDelay > 0) {
-                    text.setText(getString(stringResource, formatTimeDDHHMMSS(bandwidthOverquotaDelay)));
-                } else {
-                    transferGeneralOverQuotaWarning.dismiss();
-                }
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-        }.start();
+        createAndShowCountDownTimerInWarning(transferGeneralOverQuotaWarning, stringResource, text);
         transferGeneralOverQuotaWarning.show();
         isGeneralTransferOverQuotaWarningShown = true;
     }

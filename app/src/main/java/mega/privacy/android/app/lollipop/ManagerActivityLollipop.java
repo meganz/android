@@ -245,6 +245,7 @@ import static mega.privacy.android.app.components.transferWidget.TransfersManage
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -790,7 +791,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				transfersWidget.update();
 			}
 
-			if (drawerItem == DrawerItem.TRANSFERS) {
+			if (drawerItem == DrawerItem.TRANSFERS && isActivityInForeground()) {
 				showTransfersTransferOverQuotaWarning();
 			}
 		}
@@ -16541,8 +16542,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void showTransfersTransferOverQuotaWarning() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		int messageResource = R.string.warning_transfer_over_quota;
+
 		transferOverQuotaWarning = builder.setTitle(R.string.title_transfer_over_quota)
-				.setMessage(R.string.warning_transfer_over_quota)
+				.setMessage(getString(messageResource, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())))
 				.setPositiveButton(R.string.my_account_upgrade_pro, (dialog, which) -> { navigateToUpgradeAccount();
 				})
 				.setNegativeButton(R.string.general_dismiss, null)
@@ -16551,6 +16554,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.create();
 
 		transferOverQuotaWarning.setCanceledOnTouchOutside(false);
+		createAndShowCountDownTimerInWarning(transferOverQuotaWarning, messageResource);
 		transferOverQuotaWarning.show();
 		isTransferOverQuotaWarningShown = true;
 	}

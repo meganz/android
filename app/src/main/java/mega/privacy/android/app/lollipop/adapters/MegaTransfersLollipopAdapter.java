@@ -216,12 +216,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			case STATE_COMPLETING:
 			case STATE_RETRYING:
 			case STATE_QUEUED:
-				holder.imageViewCompleted.setVisibility(View.GONE);
 				holder.progressText.setVisibility(View.VISIBLE);
 
 				if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
 						|| (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
 					holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
+					holder.imageViewCompleted.setVisibility(View.GONE);
 
 					if (transferType == TYPE_DOWNLOAD) {
 						holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));
@@ -232,6 +232,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 					holder.textViewCompleted.setVisibility(View.VISIBLE);
 					holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_queued));
 				} else {
+					holder.imageViewCompleted.setVisibility(View.GONE);
 					holder.progressText.setText(getProgress(transfer));
 					holder.speedText.setVisibility(View.VISIBLE);
 

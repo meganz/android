@@ -1751,6 +1751,10 @@ public class Util {
 		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
 
+	public static boolean isAndroidOreoOrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+	}
+
 	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
 		if (focus) {
 			textInputLayout.setEndIconMode(END_ICON_PASSWORD_TOGGLE);

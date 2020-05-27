@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1632,6 +1633,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if (e.getValue() != 0) {
 					logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 					checkTransferOverQuota(true);
+					new TransferOverQuotaNotification(mNotificationManager).show();
+
 
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes();
 					isOverquota = true;

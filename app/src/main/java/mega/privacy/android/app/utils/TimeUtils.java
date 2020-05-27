@@ -1,6 +1,10 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
+import android.os.CountDownTimer;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -361,14 +366,14 @@ public class TimeUtils implements Comparator<Calendar> {
      */
     public static String formatTimeDDHHMMSS(long time) {
         Context context = MegaApplication.getInstance().getApplicationContext();
-        int days = (int) TimeUnit.MILLISECONDS.toDays(time);
-        int hours = (int) (TimeUnit.MILLISECONDS.toHours(time) - TimeUnit.DAYS.toHours(days));
-        int minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(time) - (TimeUnit.DAYS.toMinutes(days) + TimeUnit.HOURS.toMinutes(hours)));
-        int seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(time) - (TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes)));
-        String textDays = context.getResources().getQuantityString(R.plurals.plural_time_days, days, days);
-        String textHours = context.getResources().getQuantityString(R.plurals.plural_time_hours, hours, hours);
-        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_time_minutes, minutes, minutes);
-        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_time_seconds, seconds, seconds);
+        long days = TimeUnit.MILLISECONDS.toDays(time);
+        long hours = TimeUnit.MILLISECONDS.toHours(time) - TimeUnit.DAYS.toHours(days);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(time) - (TimeUnit.DAYS.toMinutes(days) + TimeUnit.HOURS.toMinutes(hours));
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(time) - (TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes));
+        String textDays = context.getString(R.string.label_time_in_days, days);
+        String textHours = context.getString(R.string.label_time_in_hours, hours);
+        String textMinutes = context.getString(R.string.label_time_in_minutes, minutes);
+        String textSeconds = context.getString(R.string.label_time_in_seconds, seconds);
 
         if (days > 0) {
             return textDays + " " + textHours;
@@ -379,5 +384,52 @@ public class TimeUtils implements Comparator<Calendar> {
         } else {
             return textSeconds;
         }
+    }
+
+    /**
+     * Shows and manages a countdown timer in a warning dialog.
+     *
+     * @param alertDialog       warning dialog in which the timer has to be shown
+     * @param stringResource    string resource in which the timer has to be shown
+     * @param textView          TextView of the warning dialog, in which the string resource has to be set.
+     *                          Note: If this parameter is null means the dialog does not have a customized view
+     *                          and the string resource has to be set into the message field of the dialog.
+     */
+    public static void createAndShowCountDownTimerInWarning(AlertDialog alertDialog, int stringResource, TextView textView) {
+        Context context = MegaApplication.getInstance().getApplicationContext();
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+
+        new CountDownTimer(megaApi.getBandwidthOverquotaDelay(), 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long bandwidthOverquotaDelay = megaApi.getBandwidthOverquotaDelay();
+                String textToShow = context.getString(stringResource, formatTimeDDHHMMSS(bandwidthOverquotaDelay));
+
+                if (bandwidthOverquotaDelay > 0) {
+                    if (textView == null) {
+                        alertDialog.setMessage(textToShow);
+                    } else {
+                        textView.setText(textToShow);
+                    }
+                } else {
+                    alertDialog.dismiss();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+            }
+        }.start();
+    }
+
+    /**
+     * Shows and manages a countdown timer in a warning dialog.
+     *
+     * @param alertDialog       warning dialog in which the timer has to be shown
+     * @param stringResource    string resource in which the timer has to be shown
+     */
+    public static void createAndShowCountDownTimerInWarning(AlertDialog alertDialog, int stringResource) {
+        createAndShowCountDownTimerInWarning(alertDialog, stringResource, null);
     }
 }
