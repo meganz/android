@@ -1544,9 +1544,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		logDebug("Launch call: " + chatRoom.getTitle());
-		if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-			setCallLayoutStatus(call.getChatid(), true);
-		}
 	}
 
 	public void clearIncomingCallNotification(long chatCallId) {
@@ -1659,6 +1656,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		if (entryExists) {
 			return hashMapCallLayout.get(chatId);
 		}
+
 		setCallLayoutStatus(chatId, false);
 		return false;
 	}

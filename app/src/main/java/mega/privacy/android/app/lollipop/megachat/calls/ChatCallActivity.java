@@ -422,6 +422,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         createSmallFragment();
         createFullScreenFragment();
 
+        if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT || callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+            application.setCallLayoutStatus(chatId, true);
+        }
+
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
             displayLinearFAB(true);
             checkOutgoingOrIncomingCall();
