@@ -11030,9 +11030,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void refreshCloudDrive() {
-		if (rootNode == null) {
-			rootNode = megaApi.getRootNode();
-		}
+        if (rootNode == null) {
+            rootNode = megaApi.getRootNode();
+        }
 
         if (rootNode == null) {
             logWarning("Root node is NULL. Maybe user is not logged in");
