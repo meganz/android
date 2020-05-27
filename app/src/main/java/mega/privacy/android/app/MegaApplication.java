@@ -1353,7 +1353,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if (callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && chatRoom != null && chatRoom.isGroup()) {
+		if (callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && chatRoom != null && chatRoom.isGroup() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			showGroupCallNotification(chatId);
 			return;
 		}

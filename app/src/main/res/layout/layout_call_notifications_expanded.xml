@@ -3,17 +3,16 @@
     android:id="@+id/call_notif_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="65dp"
+    android:minHeight="64dp"
     android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/avatar_layout"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="top|left"
-        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|top"
         android:layout_marginRight="12dp"
-        android:visibility="gone">
+        android:visibility="visible">
         <RelativeLayout
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -31,14 +30,13 @@
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
+        android:layout_gravity="left|top"
         android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="3dp"
             android:orientation="vertical">
             <RelativeLayout
                 android:id="@+id/title_chat_layout"
@@ -46,18 +44,17 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/chat_title"
-                    style="@style/TextAppearance.Compat.Notification"
+                    style="@style/TextAppearance.Compat.Notification.Info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="4dp"
                     android:ellipsize="end"
-                    android:layout_weight="1"
+                    android:layout_marginRight="4dp"
                     android:maxLines="1"
                     android:textColor="@color/file_list_first_row"
                     android:textSize="14sp" />
                 <ImageView
                     android:id="@+id/chat_status"
-                    style="@style/TextAppearance.Compat.Notification"
+                    style="@style/TextAppearance.Compat.Notification.Info"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:layout_marginTop="4dp"
@@ -70,11 +67,10 @@
 
             <TextView
                 android:id="@+id/call_title"
-                style="@style/TextAppearance.Compat.Notification"
+                style="@style/TextAppearance.Compat.Notification.Info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/chat_title"
-                android:layout_weight="1"
                 android:maxLines="1"
                 android:textColor="@color/grey_info_menu"
                 android:textSize="14sp" />
@@ -94,8 +90,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|bottom"
                 android:layout_gravity="left|bottom"
-                android:layout_marginRight="3dp"
-                android:paddingTop="10dp">
+                android:paddingTop="20dp">
 
                 <ImageView
                     android:id="@+id/decline_image"
@@ -107,10 +102,11 @@
                     android:id="@+id/decline_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="11dp"
                     android:layout_toRightOf="@id/decline_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
+                    android:fontFamily="Roboto"
                     android:textStyle="bold" />
             </RelativeLayout>
 
@@ -120,15 +116,15 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|bottom"
                 android:layout_gravity="left|bottom"
-                android:paddingTop="10dp">
+                android:paddingTop="20dp">
 
                 <ImageView
                     android:id="@+id/answer_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
+                    android:layout_marginLeft="13dp"
                     android:layout_marginRight="8dp"
-                    android:src="@drawable/ic_call" />
+                    android:src="@drawable/ic_call"/>
 
                 <TextView
                     android:id="@+id/answer_button_text"
@@ -138,7 +134,8 @@
                     android:layout_toRightOf="@id/answer_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="Roboto"
+                    android:textStyle="bold"  />
             </RelativeLayout>
         </LinearLayout>
 
@@ -148,7 +145,6 @@
             android:layout_height="wrap_content"
             android:gravity="left"
             android:layout_gravity="left"
-            android:paddingTop="5dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -156,14 +152,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:paddingTop="24dp"
+                android:paddingBottom="14dp">
 
                 <ImageView
                     android:id="@+id/first_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="8dp"
                     android:src="@drawable/ic_remove_not" />
                 <TextView
                     android:id="@+id/first_button_text"
@@ -173,6 +169,7 @@
                     android:layout_toRightOf="@id/first_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
+                    android:fontFamily="Roboto"
                     android:textStyle="bold" />
             </RelativeLayout>
 
@@ -181,14 +178,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp">
 
                 <ImageView
                     android:id="@+id/second_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="8dp"
                     android:src="@drawable/ic_transfers_pause" />
 
                 <TextView
@@ -199,6 +196,7 @@
                     android:layout_toRightOf="@id/second_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
+                    android:fontFamily="Roboto"
                     android:textStyle="bold" />
             </RelativeLayout>
 
@@ -206,16 +204,14 @@
                 android:id="@+id/third_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:layout_marginRight="10dp"
+                android:paddingTop="14dp"
                 android:gravity="left">
 
                 <ImageView
                     android:id="@+id/third_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="8dp"
                     android:src="@drawable/ic_call" />
 
                 <TextView
@@ -226,6 +222,7 @@
                     android:layout_toRightOf="@id/third_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
+                    android:fontFamily="Roboto"
                     android:textStyle="bold" />
             </RelativeLayout>
         </LinearLayout>
