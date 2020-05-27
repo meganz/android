@@ -963,8 +963,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         } else {
             logDebug("Node is file");
-            long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
+            boolean isLinksRoot = type == LINKS_ADAPTER && ((ManagerActivityLollipop) context).getDeepBrowserTreeLinks() == 0;
+            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(node.getSize()),
+                    formatLongDateTime(isLinksRoot ? node.getPublicLinkCreationTime() : node.getModificationTime())));
 
             if(megaApi.hasVersions(node)){
                 holder.versionsIcon.setVisibility(View.VISIBLE);
