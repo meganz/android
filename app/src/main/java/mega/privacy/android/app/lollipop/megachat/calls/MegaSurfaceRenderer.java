@@ -92,19 +92,35 @@ public class MegaSurfaceRenderer implements Callback {
             float dstaspectratio = (float) dstRect.width() / dstRect.height();
             if (srcaspectratio != 0 && dstaspectratio != 0) {
 
-                if ((srcaspectratio > dstaspectratio && isSmallCamera) || (srcaspectratio <= dstaspectratio && !isSmallCamera)) {
-                    float newHeight = dstRect.width() / srcaspectratio;
-                    float decrease = dstRect.height() - newHeight;
-                    dstRect.top += decrease / 2;
-                    dstRect.bottom -= decrease / 2;
+                if (isSmallCamera) {
+                    if (srcaspectratio > dstaspectratio) {
+                        float newHeight = dstRect.width() / srcaspectratio;
+                        float decrease = dstRect.height() - newHeight;
+                        dstRect.top += decrease / 2;
+                        dstRect.bottom -= decrease / 2;
+                        dstRectf = new RectF(dstRect);
+                    } else {
+                        float newWidth = dstRect.height() * srcaspectratio;
+                        float decrease = dstRect.width() - newWidth;
+                        dstRect.left += decrease / 2;
+                        dstRect.right -= decrease / 2;
+                        dstRectf = new RectF(dstRect);
+                    }
                 } else {
-                    float newWidth = dstRect.height() * srcaspectratio;
-                    float decrease = dstRect.width() - newWidth;
-                    dstRect.left += decrease / 2;
-                    dstRect.right -= decrease / 2;
+                    if (srcaspectratio > dstaspectratio) {
+                        float newWidth = dstRect.height() * srcaspectratio;
+                        float decrease = dstRect.width() - newWidth;
+                        dstRect.left += decrease / 2;
+                        dstRect.right -= decrease / 2;
+                        dstRectf = new RectF(dstRect);
+                    } else {
+                        float newHeight = dstRect.width() / srcaspectratio;
+                        float decrease = dstRect.height() - newHeight;
+                        dstRect.top += decrease / 2;
+                        dstRect.bottom -= decrease / 2;
+                        dstRectf = new RectF(dstRect);
+                    }
                 }
-
-                dstRectf = new RectF(dstRect);
             }
         }
     }

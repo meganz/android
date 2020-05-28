@@ -86,6 +86,25 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             dstRect.left = 0;
             dstRect.right = surfaceWidth;
             dstRect.bottom = surfaceHeight;
+
+            dstRectf = new RectF(dstRect);
+            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
+            float dstaspectratio = (float) dstRect.width() / dstRect.height();
+            if (srcaspectratio != 0 && dstaspectratio != 0) {
+                if (srcaspectratio > dstaspectratio) {
+                    float newWidth = dstRect.height() * srcaspectratio;
+                    float decrease = dstRect.width() - newWidth;
+                    dstRect.left += decrease / 2;
+                    dstRect.right -= decrease / 2;
+                    dstRectf = new RectF(dstRect);
+                } else {
+                    float newHeight = dstRect.width() / srcaspectratio;
+                    float decrease = dstRect.height() - newHeight;
+                    dstRect.top += decrease / 2;
+                    dstRect.bottom -= decrease / 2;
+                    dstRectf = new RectF(dstRect);
+                }
+            }
         }
     }
 
@@ -98,23 +117,11 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             } catch (Exception e) {
             }
         }
-
+        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         srcRect.left = 0;
         srcRect.top = 0;
-        if (height == width) {
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            srcRect.bottom = height;
-            srcRect.right = width;
-        } else if (height > width) {
-            bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
-            srcRect.bottom = width;
-            srcRect.right = width;
-        } else {
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            srcRect.right = height;
-            srcRect.bottom = height;
-        }
-
+        srcRect.bottom = height;
+        srcRect.right = width;
         adjustAspectRatio();
         return bitmap;
     }
