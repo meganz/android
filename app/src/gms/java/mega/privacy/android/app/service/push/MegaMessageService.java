@@ -8,15 +8,12 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.io.IOException;
 import java.util.concurrent.Executors;
 
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 
 import static mega.privacy.android.app.utils.Constants.DEVICE_ANDROID;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaMessageService extends FirebaseMessagingService {
 
@@ -56,16 +53,18 @@ public class MegaMessageService extends FirebaseMessagingService {
 
     public static void getToken(Context context) {
         //project number from google-service.json
-        final String id = context.getString(R.string.gcm_defaultSenderId);
         Executors.newFixedThreadPool(1).submit(() -> {
-            FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
-            try {
-                String token = instanceId.getToken(id, "FCM");
+            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    logWarning("Get token failed.");
+                    return;
+                }
+
+                // Get new Instance ID token
+                String token = task.getResult().getToken();
+                logDebug("Get token: " + token);
                 new PushMessageHanlder().sendRegistrationToServer(token, DEVICE_ANDROID);
-            } catch (IOException e) {
-                e.printStackTrace();
-                logError(e.getMessage(), e);
-            }
+            });
         });
     }
 }

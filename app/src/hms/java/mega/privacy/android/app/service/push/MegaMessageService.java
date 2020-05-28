@@ -51,6 +51,7 @@ public class MegaMessageService extends HmsMessageService {
             try {
                 // wait for the callback
                 String token = HmsInstanceId.getInstance(context).getToken(appId, "HCM");
+                logDebug("Get token: " + token);
                 new PushMessageHanlder().sendRegistrationToServer(token, DEVICE_HUAWEI);
             } catch (ApiException e) {
                 logError(e.getMessage(), e);

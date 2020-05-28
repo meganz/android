@@ -70,14 +70,6 @@ android {
             applicationId = "mega.privacy.android.app.huawei"
         }
     }
-    sourceSets {
-        gms {
-            java.srcDirs = ['src/gms/java']
-        }
-        hms {
-            java.srcDirs = ['src/hms/java']
-        }
-    }
 }
 
 dependencies {
@@ -114,8 +106,7 @@ dependencies {
 
     //GMS
     gmsImplementation 'com.google.android.gms:play-services-wallet:18.0.0'
-    gmsImplementation 'com.google.firebase:firebase-messaging:20.1.2'
-    gmsImplementation 'com.google.firebase:firebase-core:17.2.3'
+    gmsImplementation 'com.google.firebase:firebase-messaging:20.2.0'
     gmsImplementation 'com.android.billingclient:billing:2.1.0'
     gmsImplementation 'com.google.android.gms:play-services-location:17.0.0'
     gmsImplementation 'com.google.android.gms:play-services-maps:17.0.0'
@@ -127,5 +118,9 @@ dependencies {
     hmsImplementation 'com.huawei.hms:maps:4.0.1.301'
     hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
 }
-//apply plugin: 'com.huawei.agconnect'
-apply plugin: 'com.google.gms.google-services'
+def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
+if (taskRequests.contains("Hms")) {
+    apply plugin: 'com.huawei.agconnect'
+} else if (taskRequests.contains("Gms")) {
+    apply plugin: 'com.google.gms.google-services'
+}
