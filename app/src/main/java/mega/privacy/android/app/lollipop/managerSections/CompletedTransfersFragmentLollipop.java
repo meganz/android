@@ -191,4 +191,23 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	public boolean isAnyTransferCompleted() {
 		return tL != null && !tL.isEmpty();
 	}
+
+	public void transferRemoved(AndroidCompletedTransfer transfer) {
+		for (int i = 0; i < tL.size(); i++) {
+			AndroidCompletedTransfer completedTransfer = tL.get(i);
+			if (completedTransfer != null && completedTransfer.getId() == transfer.getId()) {
+				tL.remove(i);
+				adapter.removeItemData(i);
+				break;
+			}
+		}
+
+		setEmptyView();
+	}
+
+	public void clearCompletedTransfers() {
+		tL.clear();
+		adapter.setTransfers(tL);
+		setEmptyView();
+	}
 }

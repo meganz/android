@@ -782,7 +782,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
-	private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver transferUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null) return;
@@ -791,7 +791,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				transfersWidget.update();
 			}
 
-			if (drawerItem == DrawerItem.TRANSFERS && isActivityInForeground()) {
+			if (intent.getAction() != null && intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA) && drawerItem == DrawerItem.TRANSFERS && isActivityInForeground()) {
 				showTransfersTransferOverQuotaWarning();
 			}
 		}
@@ -1983,7 +1983,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
 
-			localBroadcastManager.registerReceiver(transferOverQuotaReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA));
+			IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
+			filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
+			localBroadcastManager.registerReceiver(transferUpdateReceiver, filterTransfers);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -2467,6 +2469,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public void onPageSelected(int position) {
 				supportInvalidateOptionsMenu();
 				checkScrollElevation();
+				if (position == COMPLETED_TAB && isTransfersCompletedAdded() && !completedTFLol.isAnyTransferCompleted()) {
+					//Necessary check to update the fragment when all in progress transfers have been cancelled
+					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
+				}
 			}
 
 			@Override
@@ -4560,7 +4566,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(transferOverQuotaReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(transferUpdateReceiver);
 
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
@@ -5566,22 +5572,31 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			mTabsAdapterTransfers = new TransfersPageAdapter(getSupportFragmentManager(), this);
 			viewPagerTransfers.setAdapter(mTabsAdapterTransfers);
 			tabLayoutTransfers.setupWithViewPager(viewPagerTransfers);
+		}
+
+		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && (!isTransfersCompletedAdded() || tFLol.isEmpty());
+
+		if (MegaApplication.getTransfersManagement().thereAreFailedTransfers() || showCompleted) {
+			indexTransfers = COMPLETED_TAB;
 		} else {
-			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-			completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
+			indexTransfers = PENDING_TAB;
 		}
 
 		if (viewPagerTransfers != null) {
 			switch (indexTransfers) {
 				case COMPLETED_TAB:
-					viewPagerTransfers.setCurrentItem(COMPLETED_TAB);
 					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
+					viewPagerTransfers.setCurrentItem(COMPLETED_TAB);
 					break;
 
 				default:
-					viewPagerTransfers.setCurrentItem(PENDING_TAB);
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
+					viewPagerTransfers.setCurrentItem(PENDING_TAB);
 					break;
+			}
+
+			if(mTabsAdapterTransfers != null) {
+				mTabsAdapterTransfers.notifyDataSetChanged();
 			}
 
 			indexTransfers = viewPagerTransfers.getCurrentItem();
@@ -6047,6 +6062,22 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	return lF != null && lF.isAdded();
 	}
 
+	private boolean isTransfersInProgressAdded() {
+		if (mTabsAdapterTransfers == null) return false;
+
+		tFLol = (TransfersFragmentLollipop) mTabsAdapterTransfers.instantiateItem(viewPagerTransfers, PENDING_TAB);
+
+		return tFLol.isAdded();
+	}
+
+	private boolean isTransfersCompletedAdded() {
+		if (mTabsAdapterTransfers == null) return false;
+
+		completedTFLol = (CompletedTransfersFragmentLollipop) mTabsAdapterTransfers.instantiateItem(viewPagerTransfers, COMPLETED_TAB);
+
+		return completedTFLol.isAdded();
+	}
+
     public void checkScrollElevation() {
     	if(drawerItem==null){
     		return;
@@ -6146,9 +6177,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
 
 			case TRANSFERS: {
-				if (getTabItemTransfers() == PENDING_TAB && getTransfersFragment() != null) {
+				if (getTabItemTransfers() == PENDING_TAB && isTransfersInProgressAdded()) {
 					tFLol.checkScroll();
-				} else  if (getTabItemTransfers() == COMPLETED_TAB && getCompletedTransfersFragment() != null) {
+				} else  if (getTabItemTransfers() == COMPLETED_TAB && isTransfersCompletedAdded()) {
 					completedTFLol.checkScroll();
 				}
 			}
@@ -6713,14 +6744,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					break;
 
 				case TRANSFERS:
-					if (getTabItemTransfers() == PENDING_TAB && getTransfersFragment() != null && transfersInProgress.size() > 0) {
+					if (getTabItemTransfers() == PENDING_TAB && isTransfersInProgressAdded() && transfersInProgress.size() > 0) {
 					    if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
                             playTransfersMenuIcon.setVisible(true);
                         } else {
                             pauseTransfersMenuIcon.setVisible(true);
                         }
 						cancelAllTransfersMenuItem.setVisible(true);
-					} else if (getTabItemTransfers() == COMPLETED_TAB && getCompletedTransfersFragment() != null && completedTFLol.isAnyTransferCompleted()) {
+					} else if (getTabItemTransfers() == COMPLETED_TAB && isTransfersInProgressAdded() && completedTFLol.isAnyTransferCompleted()) {
 						clearCompletedTransfers.setVisible(true);
 					}
 
@@ -13982,34 +14013,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (e.getErrorCode() == MegaError.API_OK) {
 			    transfersWidget.updateState();
 
-				if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-					logDebug("Show PLAY button");
-
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-					if (tFLol != null){
-						if (drawerItem == DrawerItem.TRANSFERS) {
-							pauseTransfersMenuIcon.setVisible(false);
-							playTransfersMenuIcon.setVisible(true);
-						}
-					}
-    			}
-    			else{
-					logDebug("Show PAUSE button");
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-					if (tFLol != null){
-						if (drawerItem == DrawerItem.TRANSFERS && getTransfersFragment() != null) {
-							pauseTransfersMenuIcon.setVisible(true);
-							playTransfersMenuIcon.setVisible(false);
-						}
-					}
-    			}
+			    if (drawerItem == DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
+					boolean paused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+					pauseTransfersMenuIcon.setVisible(!paused);
+					playTransfersMenuIcon.setVisible(paused);
+				}
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
 			logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (getTransfersFragment() != null){
+				if (isTransfersInProgressAdded()){
 					tFLol.changeStatusButton(request.getTransferTag());
 				}
 			}
@@ -14023,7 +14038,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (e.getErrorCode() == MegaError.API_OK){
 				transfersWidget.hide();
 
-				if (drawerItem == DrawerItem.TRANSFERS && getTransfersFragment() != null) {
+				if (drawerItem == DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
@@ -14837,8 +14852,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					logDebug("Pressed button positive to clear transfers");
 					dbH.emptyCompletedTransfers();
 
-					if (getCompletedTransfersFragment() != null) {
-						completedTFLol.updateCompletedTransfers();
+					if (isTransfersCompletedAdded()) {
+						completedTFLol.clearCompletedTransfers();
 					}
 					supportInvalidateOptionsMenu();
 				})
@@ -14884,6 +14899,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
 					cancelAllUploads(ManagerActivityLollipop.this);
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
+					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
 				})
 				.setPositiveButton(R.string.general_cancel, null)
 				.show();
@@ -14892,8 +14908,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void addCompletedTransfer(MegaTransfer transfer, MegaError e){
 		logDebug("Node Handle: " + transfer.getNodeHandle());
 
-		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
-		if (completedTFLol != null) {
+		if (isTransfersCompletedAdded()) {
 			completedTFLol.transferFinish(new AndroidCompletedTransfer(transfer, e));
 		}
 	}
@@ -14919,8 +14934,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				transfersInProgress.add(transfer.getTag());
 				transfersWidget.update(transfer.getType());
 
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-				if (tFLol != null){
+				if (isTransfersInProgressAdded()){
 					tFLol.transferStart(transfer);
 				}
 			}
@@ -14992,7 +15006,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				onNodesSharedUpdate();
 
                 transfersWidget.update();
-				if (getTransfersFragment() != null){
+				if (isTransfersInProgressAdded()){
 					tFLol.transferFinish(transfer.getTag());
 				}
 			}
@@ -15026,7 +15040,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					transferCallback = transfer.getNotificationNumber();
 
                     transfersWidget.update(transfer.getType());
-                    if (getTransfersFragment() != null){
+                    if (isTransfersInProgressAdded()){
 						tFLol.transferUpdate(transfer);
 					}
 
@@ -16456,16 +16470,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 	}
 
-	public void removeTransfer(AndroidCompletedTransfer transfer) {
+	public void removeCompletedTransfer(AndroidCompletedTransfer transfer) {
 		dbH.deleteTransfer(transfer.getId());
-		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
-		if (completedTFLol != null) {
-			completedTFLol.updateCompletedTransfers();
+
+		if (isTransfersCompletedAdded()) {
+			completedTFLol.transferRemoved(transfer);
 		}
 	}
 
 	public void retryTransfer(AndroidCompletedTransfer transfer) {
-		dbH.deleteTransfer(transfer.getId());
+		removeCompletedTransfer(transfer);
 
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
 			ArrayList<Long> handleList = new ArrayList<>();
@@ -16604,13 +16618,5 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private RecentChatsFragmentLollipop getChatsFragment() {
 		return rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-	}
-
-	private CompletedTransfersFragmentLollipop getCompletedTransfersFragment() {
-		return completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
-	}
-
-	private TransfersFragmentLollipop getTransfersFragment() {
-		return tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 	}
 }

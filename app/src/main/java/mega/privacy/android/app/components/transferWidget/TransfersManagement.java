@@ -10,6 +10,8 @@ public class TransfersManagement {
     private boolean hasNotToBeShowDueToTransferOverQuota;
     private boolean isCurrentTransferOverQuota;
     private boolean isOnTransfersSection;
+    private boolean failedTransfers;
+    private boolean transferOverQuotaNotificationShown;
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
@@ -67,5 +69,21 @@ public class TransfersManagement {
 
     public boolean isOnTransfersSection() {
         return isOnTransfersSection;
+    }
+
+    public void setFailedTransfers(boolean failedTransfers) {
+        this.failedTransfers = failedTransfers;
+    }
+
+    public boolean thereAreFailedTransfers() {
+        return failedTransfers;
+    }
+
+    public void setTransferOverQuotaNotificationShown(boolean transferOverQuotaNotificationShown) {
+        this.transferOverQuotaNotificationShown = transferOverQuotaNotificationShown;
+    }
+
+    public boolean isTransferOverQuotaNotificationShown() {
+        return transferOverQuotaNotificationShown;
     }
 }

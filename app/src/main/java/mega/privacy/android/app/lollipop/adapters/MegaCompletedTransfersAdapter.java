@@ -207,4 +207,9 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				break;
 		}
 	}
+
+	public void removeItemData(int position) {
+		notifyItemRemoved(position);
+		notifyItemRangeChanged(position, getItemCount());
+	}
 }

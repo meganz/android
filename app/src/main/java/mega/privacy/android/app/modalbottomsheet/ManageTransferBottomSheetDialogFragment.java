@@ -3,7 +3,6 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -110,6 +109,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 location.setText(R.string.transfer_cancelled);
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);
+                viewInFolderOption.setVisibility(View.GONE);
                 break;
 
             default:
@@ -118,7 +118,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
         }
 
-        if (getLinkOption.getVisibility() == View.GONE && retryOption.getVisibility() == View.GONE) {
+        if ((getLinkOption.getVisibility() == View.GONE && retryOption.getVisibility() == View.GONE) || viewInFolderOption.getVisibility() == View.GONE) {
             contentView.findViewById(R.id.separator_get_link).setVisibility(View.GONE);
         }
 
@@ -164,7 +164,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case R.id.option_clear_layout:
-                managerActivity.removeTransfer(transfer);
+                managerActivity.removeCompletedTransfer(transfer);
                 break;
 
             case R.id.option_retry_layout:

@@ -239,4 +239,8 @@ public class TransfersFragmentLollipop extends Fragment {
 		adapter.notifyItemInserted(tL.size() - 1);
 		setEmptyView();
 	}
+
+	public boolean isEmpty() {
+		return tL.isEmpty();
+	}
 }

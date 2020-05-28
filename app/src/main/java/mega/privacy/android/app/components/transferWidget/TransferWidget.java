@@ -50,11 +50,22 @@ public class TransferWidget {
     }
 
     public void update(int transferType) {
-        if (!isOnline(context) || !isOnFileManagementManagerSection()) return;
+        if (!isOnline(context)) return;
+
+        if (context instanceof ManagerActivityLollipop && ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
+            MegaApplication.getTransfersManagement().setFailedTransfers(false);
+        }
+
+        if (!isOnFileManagementManagerSection()) {
+            hide();
+            return;
+        }
 
         if (getPendingTransfers() > 0) {
             setProgress(getProgress(), transferType);
             updateState();
+        } else if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
+            setFailedTransfers();
         } else {
             hide();
         }
@@ -80,7 +91,13 @@ public class TransferWidget {
     }
 
     private void setProgressTransfers() {
-        status.setVisibility(GONE);
+        if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
+            status.setVisibility(VISIBLE);
+            status.setImageDrawable(getDrawable(R.drawable.ic_transfers_error));
+        } else {
+            status.setVisibility(GONE);
+        }
+
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
     }
 

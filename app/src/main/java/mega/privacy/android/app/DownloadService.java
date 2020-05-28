@@ -473,6 +473,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
 				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 			}
+			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
 			megaApi.resetTotalDownloads();
 			errorEBloqued = 0;
@@ -1383,6 +1384,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!transfer.isFolderTransfer()){
 				dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
+				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
+					MegaApplication.getTransfersManagement().setFailedTransfers(true);
+				}
 
 				if (!isVoiceClip) {
 					updateProgressNotification();
@@ -1614,6 +1619,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(isVoiceClipType(transfer.getAppData())) return;
 
 			if(!transfer.isFolderTransfer()){
+				LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 				updateProgressNotification();
 			}
 
@@ -1633,8 +1639,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if (e.getValue() != 0) {
 					logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 					checkTransferOverQuota(true);
-					new TransferOverQuotaNotification(mNotificationManager).show();
-
 
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes();
 					isOverquota = true;
@@ -1652,10 +1656,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void checkTransferOverQuota(boolean isCurrentOverQuota) {
 		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 
-		if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
-			transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
-			transfersManagement.setTransferOverQuotaTimestamp();
-			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA));
+		if (MegaApplication.isActivityVisible()) {
+			if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
+				transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
+				transfersManagement.setTransferOverQuotaTimestamp();
+				LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).setAction(ACTION_TRANSFER_OVER_QUOTA));
+			}
+		} else if (!transfersManagement.isTransferOverQuotaNotificationShown()){
+			transfersManagement.setTransferOverQuotaNotificationShown(true);
+			new TransferOverQuotaNotification(mNotificationManager).show();
 		}
 	}
 

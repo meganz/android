@@ -134,8 +134,9 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(transferOverQuotaReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA));
+        IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
+        filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
+        LocalBroadcastManager.getInstance(this).registerReceiver(transferOverQuotaReceiver, filterTransfers);
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -330,7 +331,7 @@ public class BaseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent == null) return;
 
-            if (isActivityInForeground()) {
+            if (intent.getAction() != null && intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA) && isActivityInForeground()) {
                 showGeneralTransferOverQuotaWarning();
             }
         }

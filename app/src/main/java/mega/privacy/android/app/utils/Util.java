@@ -1755,6 +1755,10 @@ public class Util {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
 	}
 
+	public static boolean isAndroidNougatOrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+	}
+
 	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
 		if (focus) {
 			textInputLayout.setEndIconMode(END_ICON_PASSWORD_TOGGLE);
