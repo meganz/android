@@ -111,6 +111,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static int PAGE_SIZE_VIDEO = 10;
     public static boolean isServiceRunning = false;
     public static boolean uploadingInProgress;
+    public static boolean isCreatingPrimary;
+    public static boolean isCreatingSecondary;
 
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
@@ -1087,7 +1089,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (needToSetPrimary) {
             cameraUploadHandle = findDefaultFolder(getString(R.string.section_photo_sync));
             if (cameraUploadHandle == INVALID_HANDLE) {
-                megaApi.createFolder(getString(R.string.section_photo_sync), megaApi.getRootNode(), createFolderListener);
+                if(!isCreatingPrimary) {
+                    logDebug("Must create CU folder.");
+                    isCreatingPrimary = true;
+                    megaApi.createFolder(getString(R.string.section_photo_sync), megaApi.getRootNode(), createFolderListener);
+                }
                 if(!secondaryEnabled) {
                     return TARGET_FOLDER_NOT_EXIST;
                 }
@@ -1102,8 +1108,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (needToSetSecondary) {
                 secondaryUploadHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
                 if (secondaryUploadHandle == INVALID_HANDLE) {
-                    logDebug("must create the folder");
-                    megaApi.createFolder(getString(R.string.section_secondary_media_uploads), megaApi.getRootNode(), createFolderListener);
+                    if(!isCreatingSecondary) {
+                        logDebug("Must create MU folder.");
+                        isCreatingSecondary = true;
+                        megaApi.createFolder(getString(R.string.section_secondary_media_uploads), megaApi.getRootNode(), createFolderListener);
+                    }
                     return TARGET_FOLDER_NOT_EXIST;
                 } else {
                     secondaryToSet = secondaryUploadHandle;

@@ -39,6 +39,11 @@ public class CreateFolderListener extends BaseListener {
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() != MegaRequest.TYPE_CREATE_FOLDER) return;
 
+        if(extraAction == ExtraAction.INIT_CU) {
+            CameraUploadsService.isCreatingPrimary = false;
+            CameraUploadsService.isCreatingSecondary = false;
+        }
+
         long handle = request.getNodeHandle();
         MegaNode node = api.getNodeByHandle(handle);
         String name = request.getName();

@@ -1253,7 +1253,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				long possibleSecondaryFolderHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
 				if ((setSecondaryFolderHandle == INVALID_HANDLE || isNodeInRubbishOrDeleted(setSecondaryFolderHandle)) &&
 						possibleSecondaryFolderHandle != INVALID_HANDLE) {
-					megaApi.setCameraUploadsFolderSecondary(possibleSecondaryFolderHandle, setAttrUserListener);
+					megaApi.setCameraUploadsFolders(INVALID_HANDLE, possibleSecondaryFolderHandle, setAttrUserListener);
 				}
 
                 restoreSecondaryTimestampsAndSyncRecordProcess();
