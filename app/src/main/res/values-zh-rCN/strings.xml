@@ -387,7 +387,7 @@
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">该共享链接即将失效。</string>
     <plurals name="remove_links_warning_text">
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">该共享链接即将失效。</item>
-        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">这些链接将失效。</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">打开链接</string>
@@ -870,7 +870,7 @@
     <string name="sortby_date" context="category in sort by action">日期</string>
     <string name="sortby_creation_date" context="category in sort by action">创建日期</string>
     <string name="sortby_modification_date" context="category in sort by action">修改日期</string>
-    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">链接创建日期</string>
     <string name="sortby_date_newest" context="sort files by date newest first">从新到旧</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">从旧到新</string>
 
@@ -917,7 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日志已启用</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日志已关闭</string>
-    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">日志尚未启用，由于您未开启所需的权限</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">开启位置</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
@@ -1565,11 +1565,11 @@
 
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">删除链接失败。请稍后再试。</item>
-        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">链接删除失败。请稍后再试。</item>
     </plurals>
     <plurals name="context_link_removal_success">
-        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
-        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">已成功删除链接。</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">已成功删除链接。</item>
     </plurals>
     <string name="context_link_action_error" context="error message">链接操作失败。请稍后再试。</string>
 
@@ -1842,7 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]无 [/B][A]传入的共享文件夹[/A][B]。[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]无 [/B][A]传出的共享文件夹[/A][B]。[/B]</string>
-    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]无[/B][A]公共链接[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">送出邀请</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">接受邀请</string>
@@ -2332,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]阻止您成为联系人。[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">通知[A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">帐户已删除</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]该帐户[/B][A]%s[/A][B]已被删除。[/B]</string>
@@ -2444,14 +2445,14 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]无 [/B][A]通知[/A][B]。[/B]</string>
 
-    <string name="general_setup_mega" context="Permissions screen title">安装MEGA</string>
+    <string name="general_setup_mega" context="Permissions screen title">设置MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA需要访问您的照片，媒体内容和文件，方便您与朋友进行分享，交换加密信息和安全通话。</string>
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">允许访问照片、媒体内容和文件。</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">MEGA需要您的权限以分享照片、媒体内容和文件。</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">开启相机功能</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">允许访问您的相机以扫描文档、拍摄照片和视频通话。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">开启通话功能</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">授权访问您的通讯录</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">开启允许访问通讯录</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">在您的MEGA通讯录中轻松找到联系人。</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA不会将这些数据用于任何其他目的，并且未经您的允许绝不会与您的联系人互动。</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">允许访问您的麦克风以进行加密通话</string>
@@ -2741,12 +2742,12 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">您的MEGA帐户使用的密码可能与其他服务使用的密码相同，并且这些其他服务中至少有一项服务的数据已遭泄露。</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">您的密码遭到泄露（包括且不限于MEGA帐户），您的帐户正在被他人登录和使用。</string>
 
-    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
-    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
-    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
-    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
-    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
-    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+    <string name="add_nickname" context="Button to add a nickname for a user">设置昵称</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">编辑昵称</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">已添加昵称</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">已删除昵称</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">添加昵称时出错</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">昵称</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">正在重新连接</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">已重连。</string>
@@ -2757,12 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">您没有还原文件所需的权限，您想使用已还原的数据创建一个新文件吗？</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">版本已成功创建为新文件。</string>
 
-    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">于%1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">您确定要停止共享这些%1$d文件夹吗？</string>
 
     <string name="download_location" context="Download location label">下载地址</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">总是保存到此位置？</string>
 
-    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
+    <string name="file_provider_title" context="Title of the File Provider activity">添加附件&#8230;&#8230;</string>
 </resources>

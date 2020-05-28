@@ -387,7 +387,7 @@
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">لن يكون هذا الرابط متاحا للعامة بعد الآن</string>
     <plurals name="remove_links_warning_text">
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">لن يكون هذا الرابط متاحا للعامة بعد الآن</item>
-        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">تغيير الاسم</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">فتح الرابط</string>
@@ -870,7 +870,7 @@
     <string name="sortby_date" context="category in sort by action">التاريخ</string>
     <string name="sortby_creation_date" context="category in sort by action">تاريخ الإنشاء</string>
     <string name="sortby_modification_date" context="category in sort by action">تاريخ التعديل</string>
-    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">تاريخ إنشاء الرابط</string>
     <string name="sortby_date_newest" context="sort files by date newest first">الأحدث</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">الأقدم</string>
 
@@ -917,7 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">السجلات تم تفعيلها</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">السجلات تم إيقافها</string>
-    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">لم يتم تمكين السجلات لأنك رفضت منح الأذونات المطلوبة</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">فتح الموقع</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">هذه العملية تستغرق وقتا أطول من المتوقع. أرجو الإنتظار.</string>
@@ -1565,11 +1565,11 @@
 
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
-        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
     </plurals>
     <plurals name="context_link_removal_success">
-        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
-        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">تمت إزالة الرابط بنجاح.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">تمت إزالة الروابط بنجاح.</item>
     </plurals>
     <string name="context_link_action_error" context="error message">فشل عملية الرابط، يرجى إعادة المحاولة لاحقاً.</string>
 
@@ -1842,7 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]لا يوجد [/B][A]مجلدات مشاركة واردة[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]لا يوجد [/B][A]مجلدات مشاركة صادرة[/A][B].[/B]</string>
-    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]لا يوجد [/B][A]روابط عامة[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">الطلبات المرسلة</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">الطلبات المستلمة</string>
@@ -2332,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]تم حظرك كجهة اتصال.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">الإشعارات [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">تم حذف الحساب</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]الحساب [/B][A]%s[/A][B] قد تم حذفه.[/B]</string>
@@ -2451,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">تمكين الكاميرا</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">السماح بالوصول إلى الكاميرا لمسح مستندات والتقاط صور وإجراء مكالمات فيديو.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">تمكين المكالمات</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">منح حق الوصول إلى دفتر العناوين الخاص بك</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">تمكين الوصول إلى دفتر العناوين الخاص بك</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">اكتشف جهات الاتصال بسهولة من دفتر العناوين الخاص بك على ميغا MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">لن تستخدم ميغا MEGA هذه البيانات لأي غرض آخر ولن تتفاعل أبداً مع جهات الاتصال الخاصة بك دون موافقتك.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">السماح بالوصول إلى ميكروفونك لإجراء مكالمات مشفرة.</string>
@@ -2741,12 +2742,12 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">من الممكن أن تقوم باستخدام نفس كلمة المرور لحساب ميغا MEGA الخاص بك لخدمات الأخرى، وأن واحدة من هذه الخدمات الأخرى على الأقل قد تعرضت لاختراق للبيانات.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">تم تسريب كلمة المرور الخاصة بك وتستخدمها الآن  أطراف خبيثة لتسجيل الدخول إلى حساباتك، بما في ذلك على سبيل المثال لا الحصر، حساب ميغا MEGA الخاص بك.</string>
 
-    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
-    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
-    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
-    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
-    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
-    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+    <string name="add_nickname" context="Button to add a nickname for a user">تعيين اسم مستعار</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">تعديل الاسم مستعار</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">تمت إضافة الاسم المستعار</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">تمت إزالة الاسم المستعار</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">حدث خطأ أثناء محاولة إضافة الاسم المستعار</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">الاسم المستعار</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">إعادة الاتصال</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">لقد عدت.</string>
@@ -2757,12 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">ليس لديك الأذونات اللازمة لإعادة هذا الملف. للمتابعة، يمكننا إنشاء ملف جديد بالبيانات التي تم إرجاعها. هل ترغب في المتابعة؟</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">تم إنشاء إصدار كملف جديد بنجاح.</string>
 
-    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">في %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">هل تريد بالتأكيد إيقاف مشاركة هذه المجلدات  %1$d؟</string>
 
     <string name="download_location" context="Download location label">موقع التحميل</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">هل تريد الحفظ دائماً في هذا الموقع؟</string>
 
-    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
+    <string name="file_provider_title" context="Title of the File Provider activity">أرفق من &#8230;</string>
 </resources>

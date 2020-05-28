@@ -1565,7 +1565,7 @@
 
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Penghapusan tautan gagal. Coba lagi nanti.</item>
-        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Failed to remove some links. Please try again later.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
@@ -2332,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]memblok anda sebagai kontak.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Akun dihapus</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Akun [/B][A]%s[/A][B] telah dihapus.[/B]</string>
@@ -2451,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Aktifkan kamera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Untuk memindai dokumen, ambil gambar dan buat panggilan video memungkinkan akses ke kamera Anda.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Aktifkan panggilan</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Berikan akses ke buku alamat anda</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Aktifkan Akses ke Buku Alamat Anda</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Temukan kontak dari buku alamat Anda dengan mudah di MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA tidak akan menggunakan data ini untuk tujuan lain apa pun dan tidak akan pernah berinteraksi dengan kontak anda tanpa persetujuan anda.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Untuk membuat panggilan terenkripsi memungkinkan akses ke mikrofon Anda.</string>
@@ -2715,7 +2716,7 @@
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Hubungi administrator akun bisnis Anda untuk menyelesaikan masalah dan aktifkan akun Anda.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Untuk tujuan bisnis asli.</string>
     <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Penyimpanan[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Transfer quota[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">TANPA BATAS [A]Kuota transfer[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Saat Anda keluar, file dari bagian Offline Anda akan dihapus dari perangkat Anda.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Saat Anda keluar, transfer yang sedang berlangsung akan dibatalkan.</string>
@@ -2741,11 +2742,11 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Ada kemungkinan bahwa Anda menggunakan kata sandi yang sama untuk akun MEGA Anda seperti untuk layanan lain, dan bahwa setidaknya salah satu dari layanan lain ini telah mengalami pelanggaran data.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Kata sandi Anda bocor dan sekarang digunakan oleh aktor jahat untuk masuk ke akun Anda, termasuk, namun tidak terbatas pada, akun MEGA Anda.</string>
 
-    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
-    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
+    <string name="add_nickname" context="Button to add a nickname for a user">Setel Nama Panggilan</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit Nama Panggilan</string>
     <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
     <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
-    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to add the nickname</string>
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Menghubungkan kembali</string>
@@ -2759,7 +2760,7 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to stop sharing these %1$d folders?</string>
 
     <string name="download_location" context="Download location label">Download lokasi</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Selalu simpan ke lokasi ini?</string>

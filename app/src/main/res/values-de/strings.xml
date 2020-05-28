@@ -1565,7 +1565,7 @@
 
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Link-Entfernung fehlgeschlagen. Bitte versuchen Sie es später noch einmal.</item>
-        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Failed to remove some links. Please try again later.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
@@ -2332,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]hat Sie blockiert.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Benachrichtigungen [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account gelöscht</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Der Account [/B][A]%s[/A][B] wurde gelöscht.[/B]</string>
@@ -2451,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Kamera aktivieren</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Kamerazugriff für Dokumentenscanning, Fotos und Videoanrufe freigeben.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Anrufe aktivieren</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Grant access to your address book</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable Access to Your Address Book</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Zugriff auf das Mikrofon für verschlüsselte Anrufe freigeben.</string>
@@ -2735,17 +2736,17 @@
     <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily locked for your safety.</string>
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Details</string>
-    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">E-Mail erneut senden</string>
     <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Account gesperrt</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Wir vermuten, dass Sie das Passwort für Ihren MEGA-Account auch anderswo verwenden, und dass einer dieser Dienste kompromittiert wurde.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Ihr Passwort ist so in Umlauf geraten, und dubiose Personen loggen sich in sämtliche Ihrer Accounts ein, bei denen Sie das Passwort verwenden.</string>
 
-    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
-    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
+    <string name="add_nickname" context="Button to add a nickname for a user">Alias definieren</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit Nickname</string>
     <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
     <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
-    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to add the nickname</string>
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
@@ -2759,7 +2760,7 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to stop sharing these %1$d folders?</string>
 
     <string name="download_location" context="Download location label">Downloadziel</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>

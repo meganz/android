@@ -316,7 +316,7 @@
     <string name="contact_invite" context="positive button on dialog to invite a contact">Invitar</string>
     <string name="contact_reinvite" context="option to reinvite a contact">Reinvitar</string>
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorar</string>
-    <string name="contact_decline" context="option to decline a contact invitation">Declinar</string>
+    <string name="contact_decline" context="option to decline a contact invitation">Rechazar</string>
     <string name="contact_accept" context="option to accept a contact invitation">Aceptar</string>
     <string name="contact_properties_activity" context="title of the contact properties screen">Info</string>
     <!--
@@ -387,7 +387,7 @@
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">El enlace público se eliminará.</string>
     <plurals name="remove_links_warning_text">
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">El enlace público se eliminará.</item>
-        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Estos enlaces ya no estarán disponibles públicamente.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renombrar</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Abrir enlace</string>
@@ -870,7 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Fecha</string>
     <string name="sortby_creation_date" context="category in sort by action">Fecha de creación</string>
     <string name="sortby_modification_date" context="category in sort by action">Fecha de Modificación</string>
-    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Fecha de creación del enlace</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Más reciente</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Más antiguo</string>
 
@@ -917,7 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs activados</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs desactivados</string>
-    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Los logs no se han activado porque has denegado los permisos requeridos</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Abrir ubicación</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Este proceso está tardando más de lo esperado. Por favor espera.</string>
@@ -1565,11 +1565,11 @@
 
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">No se ha podido eliminar el enlace. Vuelve a intentarlo más tarde.</item>
-        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">No se han podido eliminar algunos enlaces. Inténtalo más tarde.</item>
     </plurals>
     <plurals name="context_link_removal_success">
-        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
-        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Enlace eliminado.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Enlaces eliminados.</item>
     </plurals>
     <string name="context_link_action_error" context="error message">Error con el enlace. Vuelve a intentarlo más tarde.</string>
 
@@ -1842,7 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]No hay [/B][A]carpetas compartidas entrantes[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]No hay [/B][A]carpetas compartidas salientes[/A][B].[/B]</string>
-    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No hay [/B][A]enlaces públicos[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Solicitudes enviadas</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Solicitudes recibidas</string>
@@ -2332,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]te ha bloqueado.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notificaciones [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Cuenta eliminada</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]La cuenta [/B][A]%s[/A][B] ha sido eliminada.[/B]</string>
@@ -2451,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activar cámara</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite el acceso a la cámara para escanear documentos, hacer fotos y videollamadas.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activar llamadas</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Activar acceso a contactos</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Activar acceso a tus contactos</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Descubre contactos de tu agenda que tienen MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA no utilizará estos datos para ningún otro propósito y nunca interactuará con tus contactos sin tu consentimiento.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite al acceso al micrófono para realizar llamadas cifradas.</string>
@@ -2741,12 +2742,12 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Es posible que estés utilizando la misma contraseña para tu cuenta de MEGA y para otros servicios, y que al menos uno de estos otros servicios haya sufrido una violación de datos.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Tu contraseña se ha filtrado y está siendo utilizada por terceros para iniciar sesión en tus cuentas, incluida, entre otras, tu cuenta de MEGA.</string>
 
-    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
-    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
-    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
-    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
-    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
-    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+    <string name="add_nickname" context="Button to add a nickname for a user">Elegir alias</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Editar alias</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Alias añadido</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Alias eliminado</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">No se ha podido añadir el alias</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Alias</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconectando</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Has vuelto.</string>
@@ -2757,12 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">No tienes los permisos necesarios para revertir este archivo. Para continuar, podemos crear un nuevo archivo con los datos anteriores. ¿Te gustaría continuar?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">La versión se ha creado como un nuevo archivo.</string>
 
-    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">el %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">¿Estás seguro de que quieres dejar de compartir %1$d carpetas?</string>
 
     <string name="download_location" context="Download location label">Destino de descarga</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">¿Guardar siempre en esta ubicación?</string>
 
-    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
+    <string name="file_provider_title" context="Title of the File Provider activity">Adjuntar desde&#8230;</string>
 </resources>

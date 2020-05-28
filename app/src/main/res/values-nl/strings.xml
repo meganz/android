@@ -387,7 +387,7 @@
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Deze koppeling is niet meer publiekelijk beschikbaar.</string>
     <plurals name="remove_links_warning_text">
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Deze koppeling is niet meer publiekelijk beschikbaar.</item>
-        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Deze links zijn niet meer openbaar beschikbaar.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Naam wijzigen</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open koppeling</string>
@@ -870,7 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Datum</string>
     <string name="sortby_creation_date" context="category in sort by action">Aanmaakdatum</string>
     <string name="sortby_modification_date" context="category in sort by action">Wijzigingsdatum</string>
-    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Aanmaakdatum van link</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Nieuwste</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Oudste</string>
 
@@ -917,7 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs zijn niet ingeschakeld</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs zijn nu uitgeschakeld</string>
-    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logboeken zijn niet ingeschakeld omdat u de vereiste rechten heeft geweigerd</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open locatie</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Dit process duurt langer dan verwacht. Wacht alstublieft.</string>
@@ -1565,11 +1565,11 @@
 
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Link verwijdering mislukt. Probeer later nogmaals.</item>
-        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Sommige links zijn niet verwijderd. Probeer het later opnieuw.</item>
     </plurals>
     <plurals name="context_link_removal_success">
-        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
-        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link succesvol verwijderd.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links succesvol verwijderd.</item>
     </plurals>
     <string name="context_link_action_error" context="error message">Link actie mislukt. Probeer later nogmaals.</string>
 
@@ -1842,7 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Geen[/B][A]Binnenkomende Gedeelde mappen[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Geen[/B][A]Uitgaande Gedeelde mappen[/A][B].[/B]</string>
-    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Nee [/B][A]Openbare Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Verstuur aanvragen</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Ontvangen aanvragen</string>
@@ -2332,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]heeft u als een contact geblokkeerd.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notificaties [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account verwijderd</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Het account [/B][A]%s[/A][B] was verwijderd.[/B]</string>
@@ -2451,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Camera inschakelen</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Bied toegang tot uw camera om documenten te scannen, foto\'s te nemen en video-oproepen te maken.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Oproepen inschakelen</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Geef toegang tot uw adresboek</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Schakel Toegang tot Uw Adresboek in</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Ontdek gemakkelijk contacten uit uw adresboek op MEGA</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA zal deze gegevens niet voor andere doeleinden gebruiken en zal nooit zonder uw toestemming met uw contacten communiceren.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Bied toegang tot uw microfoon om gecodeerde oproepen te maken.</string>
@@ -2741,12 +2742,12 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Het is mogelijk dat u hetzelfde wachtwoord gebruikt voor uw MEGA-account als voor andere services en dat ten minste een van deze andere services een gegevenslek heeft geleden.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Uw wachtwoord is gelekt en wordt nu door slechte personen gebruikt om in te loggen op uw accounts, inclusief, maar niet beperkt tot, uw MEGA-account.</string>
 
-    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
-    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
-    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
-    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
-    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
-    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+    <string name="add_nickname" context="Button to add a nickname for a user">Bijnaam instellen</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Bijnaam Wijzigen</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Bijnaam toegevoegd</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Bijnaam verwijderd</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">Er is een fout opgetreden bij het toevoegen van de bijnaam</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Bijnaam</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Opnieuw verbinden</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">U bent terug.</string>
@@ -2757,12 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">U hebt niet de vereiste machtigingen om dit bestand terug te zetten. Om door te gaan, kunnen we een nieuw bestand maken met de teruggekeerde gegevens. Wilt u doorgaan?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Versie is met succes aangemaakt als een nieuw bestand.</string>
 
-    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">op %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Weet u zeker dat u het delen van deze %1$d - mappen wilt stoppen?</string>
 
     <string name="download_location" context="Download location label">Download locatie</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Altijd op deze locatie opslaan?</string>
 
-    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
+    <string name="file_provider_title" context="Title of the File Provider activity">Bijvoegen vanaf &#8230;</string>
 </resources>
