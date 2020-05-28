@@ -39,7 +39,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="8dp"
                 android:layout_toStartOf="@+id/file_grid_taken_down"
                 android:layout_toEndOf="@+id/file_grid_icon"
                 android:ellipsize="middle"
@@ -51,9 +50,9 @@
                 android:id="@+id/file_grid_taken_down"
                 style="@style/taken_down_icon"
                 android:layout_alignParentEnd="true"
-                android:layout_marginStart="6dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="22dp"
+                android:layout_toStartOf="@+id/file_grid_three_dots"
                 android:src="@drawable/ic_input_warning"
                 tools:ignore="ContentDescription" />
 
