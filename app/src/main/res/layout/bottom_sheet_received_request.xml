@@ -32,13 +32,6 @@
                 rounded:border_width="0dp"
                 rounded:corner_radius="20dp" />
 
-            <TextView
-                android:id="@+id/sliding_received_request_list_initial_letter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="3dp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -81,7 +74,7 @@
         android:layout_marginLeft="16dp"
         android:background="@color/sliding_panel_separator"/>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical">
@@ -188,6 +181,6 @@
 
         </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

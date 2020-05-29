@@ -13,14 +13,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -102,7 +102,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 	private boolean aBshown = true;
 
 	ProgressDialog statusDialog;
-	private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
 
 	float scaleText;
 	AppBarLayout appBarLayout;
@@ -374,7 +374,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 
 		setContentView(R.layout.activity_chat_full_screen_image_viewer);
 
-		draggableView.setViewAnimator(new ExitViewAnimator());
+		draggableView.setViewAnimator(new ExitViewAnimator<>());
 
 		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
 		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
@@ -620,7 +620,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 		final ArrayList<MegaNode> nodeListC = nodeList;
 		final long sizeC = size;
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -756,12 +756,12 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder;
+		androidx.appcompat.app.AlertDialog.Builder builder;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		}
 		else{
-			builder = new android.support.v7.app.AlertDialog.Builder(this);
+			builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 		}
 
 		builder.setMessage(R.string.confirmation_delete_one_attachment);
@@ -893,7 +893,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					logDebug("ISFILE");
-					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
 					if(localPath != null){	
 						try { 
 							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));

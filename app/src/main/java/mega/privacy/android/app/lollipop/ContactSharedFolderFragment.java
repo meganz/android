@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,7 +66,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
-                    i.putExtra("name",userEmail);
+                    i.putExtra(NAME, userEmail);
                     getContext().startActivity(i);
                 }
             });
@@ -103,7 +103,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
 
     private ArrayList<MegaNode> getNodeListToBeDisplayed(ArrayList<MegaNode> fullList) {
         
-        ArrayList newList = new ArrayList<>();
+        ArrayList<MegaNode> newList = new ArrayList<>();
         if (fullList.size() > MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED) {
             for (int i = 0;i < MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED;i++) {
                 newList.add(fullList.get(i));
@@ -190,7 +190,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             }
         } else {
             Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
-            i.putExtra("name",userEmail);
+            i.putExtra(NAME, userEmail);
             i.putExtra("node_position",position);
             getContext().startActivity(i);
         }

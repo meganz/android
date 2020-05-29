@@ -13,10 +13,16 @@
     <item
         android:id="@+id/cab_menu_video_chat"
         android:orderInCategory="105"
-        android:title="@string/tab_archive_chat"
+        android:title="@string/video_button"
         MEGA:showAsAction="always"
         android:icon="@drawable/ic_videocam_white"
         android:enabled="true"/>
+
+    <item
+        android:id="@+id/cab_menu_select_messages"
+        android:orderInCategory="110"
+        android:title="@string/general_select"
+        MEGA:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_invite_chat"

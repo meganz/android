@@ -8,6 +8,6 @@
         android:title="@string/call_button"
         MEGA:showAsAction="always"
         android:icon="@drawable/ic_camera_swap"
-        android:iconTint="@color/white"
+        android:iconTint="@color/background_chat"
         android:enabled="true"/>
 </menu>

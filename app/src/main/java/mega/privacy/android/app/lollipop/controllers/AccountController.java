@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,12 +14,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.StatFs;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.print.PrintHelper;
-import android.support.v7.app.AlertDialog;
-import android.view.View;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.print.PrintHelper;
+import androidx.appcompat.app.AlertDialog;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,6 +49,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -61,9 +60,6 @@ public class AccountController {
 
     Context context;
     MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH;
-    MegaPreferences prefs = null;
 
     static int count = 0;
 
@@ -78,10 +74,6 @@ public class AccountController {
             else{
                 megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
             }
-        }
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
@@ -445,8 +437,10 @@ public class AccountController {
 
         //clear mega contacts and reset last sync time.
         dbH.clearMegaContacts();
-        SharedPreferences preferences = context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
-        preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
+        new MegaContactGetter(context).clearLastSyncTimeStamp();
+
+        // clean time stamps preference settings after logout
+        clearCUBackUp();
 
         new LastShowSMSDialogTimeChecker(context).reset();
 

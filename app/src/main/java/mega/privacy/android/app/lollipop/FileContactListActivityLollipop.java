@@ -10,16 +10,16 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -60,7 +60,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.listeners.ShareListener.*;
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -333,7 +333,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	    
 	    Bundle extras = getIntent().getExtras();
 		if (extras != null){
-			nodeHandle = extras.getLong("name");
+			nodeHandle = extras.getLong(NAME);
 			node=megaApi.getNodeByHandle(nodeHandle);
 			
 			setContentView(R.layout.activity_file_contact_list);
@@ -576,7 +576,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 			if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
 				Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-				i.putExtra("name", listContacts.get(position).getUser());
+				i.putExtra(NAME, listContacts.get(position).getUser());
 				startActivity(i);
 			}
 
@@ -833,7 +833,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showConfirmationRemoveContactFromShare (final String email){
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         String message = getResources().getString(R.string.remove_contact_shared_folder, email);
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> {
@@ -862,7 +862,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.remove_multiple_contacts_shared_folder,contacts.size());
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)

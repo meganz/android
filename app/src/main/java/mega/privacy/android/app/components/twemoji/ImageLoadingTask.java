@@ -3,7 +3,7 @@ package mega.privacy.android.app.components.twemoji;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;

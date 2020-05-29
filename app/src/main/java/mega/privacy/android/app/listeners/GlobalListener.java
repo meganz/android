@@ -1,14 +1,13 @@
 package mega.privacy.android.app.listeners;
 
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -40,9 +39,18 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 continue;
             }
 
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER)
-                    && api.getMyUserHandle().equals(Long.toString(user.getHandle()))) {
-                api.getMyChatFilesFolder(new GetAttrUserListener(MegaApplication.getInstance(), true));
+            boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
+                api.getMyChatFilesFolder(new GetAttrUserListener(megaApplication, true));
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
+                //user has change CU attribute, need to update local ones
+                GetAttrUserListener listener = new GetAttrUserListener(megaApplication);
+                api.getCameraUploadsFolder(listener);
+                api.getCameraUploadsFolderSecondary(listener);
+                break;
             }
         }
     }

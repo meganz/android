@@ -11,14 +11,14 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
@@ -275,7 +275,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		}
 		
 		currentPath = pathZip;
-		downloadLocationDefaultPath = getDownloadLocation(this);
+		downloadLocationDefaultPath = getDownloadLocation();
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		
@@ -421,7 +421,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		String downloadLocationDefaultPath = getDownloadLocation(this);
+		String downloadLocationDefaultPath = getDownloadLocation();
 		
 		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
 		if(!folderzipped){

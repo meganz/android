@@ -3,8 +3,9 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.v4.provider.DocumentFile;
+
+import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SorterContentActivity;

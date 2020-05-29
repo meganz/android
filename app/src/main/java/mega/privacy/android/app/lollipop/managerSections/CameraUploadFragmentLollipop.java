@@ -16,17 +16,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -899,7 +900,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1098,7 +1099,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1511,7 +1512,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 
 		if (isEnabled){
-			resetCUTimeStampsAndCache();
+			resetCUTimestampsAndCache();
             dbH.setCamSyncEnabled(false);
 			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
             stopRunningCameraUploadService(context);
@@ -1524,7 +1525,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                     !TextUtils.isEmpty(prefs.getCamSyncFileUpload()) &&
                     !TextUtils.isEmpty(prefs.getCamSyncWifi())
             ) {
-                resetCUTimeStampsAndCache();
+                resetCUTimestampsAndCache();
                 dbH.setCamSyncEnabled(true);
                 dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
                 
@@ -1548,7 +1549,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     logDebug("AlertDialog");
-                    resetCUTimeStampsAndCache();
+                    resetCUTimestampsAndCache();
                     dbH.setCamSyncEnabled(true);
                     dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
                     File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -1826,7 +1827,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-	public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
+	public String getPath(String fileName, long fileSize, String destDir, MegaNode file) {
 		logDebug("getPath");
 		String path = null;
 		if (destDir != null) {
@@ -1837,25 +1838,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				for (int i = 0; i < listFiles.length; i++) {
 					if (listFiles[i].isDirectory()) {
 						path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
-						if (path != null) {
-							return path;
-						}
 					} else {
-						boolean isOnMegaDownloads = false;
-						path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-						File f = new File(downloadLocationDefaultPath, file.getName());
-						if (f.exists() && (f.length() == file.getSize())) {
-							isOnMegaDownloads = true;
-						}
-						if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))) {
-							return path;
-						}
+						path = getLocalFile(context, fileName, fileSize);
 					}
 				}
 			}
 		}
 
-		return null;
+		return path;
 	}
 
 	private void clearSelections() {
@@ -2019,7 +2009,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (photosyncHandle == -1){
 				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
-					if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
 						dbH.setCamSyncHandle(photosyncHandle);
 						if (listView != null){
@@ -2677,16 +2667,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public ArrayList<PhotoSyncHolder> getNodesArray() {
 		return nodesArray;
 	}
-    
-    private void resetCUTimeStampsAndCache(){
-        dbH.setCamSyncTimeStamp(0);
-        dbH.setCamVideoSyncTimeStamp(0);
-        dbH.setSecSyncTimeStamp(0);
-        dbH.setSecVideoSyncTimeStamp(0);
-        dbH.saveShouldClearCamsyncRecords(true);
-        purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-    }
-    
+
     private void saveCompressionSettings(){
         dbH.setCameraUploadVideoQuality(MEDIUM);
         dbH.setConversionOnCharging(true);
