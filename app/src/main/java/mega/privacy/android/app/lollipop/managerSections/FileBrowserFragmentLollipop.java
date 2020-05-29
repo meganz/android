@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +54,6 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -66,7 +66,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -117,6 +116,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	String downloadLocationDefaultPath;
     
     private int placeholderCount;
+
+    private RelativeLayout transferOverQuotaBanner;
+    private TextView transferOverQuotaBannerText;
 
 	@Override
 	protected MegaNodeAdapter getAdapter() {
@@ -520,14 +522,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	}
 
 	public void checkScroll() {
-		if (recyclerView != null) {
-			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
-			}
-			else if (!isMultipleselect()) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
-			}
-		}
+		if (recyclerView == null) return;
+
+		boolean visible = (adapter != null && adapter.isMultipleSelect())
+				|| MegaApplication.getTransfersManagement().isTransferOverQuotaNotificationShown()
+				|| (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE);
+
+		((ManagerActivityLollipop) context).changeActionBarElevation(visible);
 	}
 
 	@Override
@@ -1518,6 +1519,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				nodes.set(i, updated);
 				break;
 			}
+		}
+	}
+
+	public void setTransferOverQuotaBannerVisibility() {
+    	if (adapter != null) {
+    		adapter.setTransferOverQuotaBannerVisibility();
 		}
 	}
 }

@@ -2391,9 +2391,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public void onPageSelected(int position) {
 				supportInvalidateOptionsMenu();
 				checkScrollElevation();
-				if(position == 1 && isCloudAdded() && fbFLol.isMultipleselect()){
-					fbFLol.actionMode.finish();
+				if (isCloudAdded()) {
+					if(position == RECENTS_TAB && fbFLol.isMultipleselect()){
+						fbFLol.actionMode.finish();
+					}
+
+					if (position == CLOUD_TAB) {
+						fbFLol.setTransferOverQuotaBannerVisibility();
+					}
 				}
+
 				setToolbarTitle();
 				showFabButton();
 			}
@@ -2469,9 +2476,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public void onPageSelected(int position) {
 				supportInvalidateOptionsMenu();
 				checkScrollElevation();
-				if (position == COMPLETED_TAB && isTransfersCompletedAdded() && !completedTFLol.isAnyTransferCompleted()) {
-					//Necessary check to update the fragment when all in progress transfers have been cancelled
-					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
+				//Update the fragment when all in progress transfers have been cancelled
+				refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
+
+				if (position == PENDING_TAB && isTransfersInProgressAdded()) {
+					tFLol.setGetMoreQuotaViewVisibility(isOnTransferOverQuota());
+				} else if (position == COMPLETED_TAB && isTransfersCompletedAdded()) {
+					completedTFLol.setGetMoreQuotaViewVisibility(isOnTransferOverQuota());
 				}
 			}
 
@@ -5574,7 +5585,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			tabLayoutTransfers.setupWithViewPager(viewPagerTransfers);
 		}
 
-		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && (!isTransfersCompletedAdded() || tFLol.isEmpty());
+		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && transfersWidget.getPendingTransfers() <= 0;
 
 		if (MegaApplication.getTransfersManagement().thereAreFailedTransfers() || showCompleted) {
 			indexTransfers = COMPLETED_TAB;

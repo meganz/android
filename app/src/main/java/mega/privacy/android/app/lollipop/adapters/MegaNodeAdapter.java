@@ -36,6 +36,7 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -71,6 +72,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
+    public static final int ITEM_VIEW_OVER_QUOTA_BANNER = 2;
 
     private Context context;
     private MegaApiAndroid megaApi;
@@ -146,6 +148,15 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public TextView textViewFileNameForFile;
         public ImageView takenDownImageForFile;
         public ImageView fileGridSelected;
+    }
+
+    public static class ViewHolderOverQuotaBanner extends ViewHolderBrowser {
+
+        private ViewHolderOverQuotaBanner(View v) {
+            super(v);
+        }
+
+        TextView transferOverQuotaBannerText;
     }
 
     @Override
@@ -481,7 +492,19 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        if (viewType == ITEM_VIEW_TYPE_LIST) {
+        if (viewType == ITEM_VIEW_OVER_QUOTA_BANNER) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.transfer_over_quota_banner, parent, false);
+            ViewHolderOverQuotaBanner holderBanner = new ViewHolderOverQuotaBanner(v);
+            holderBanner.transferOverQuotaBannerText = v.findViewById(R.id.banner_content_text);
+
+            v.findViewById(R.id.banner_upgrade_button).setOnClickListener(v1 -> ((ManagerActivityLollipop) context).navigateToUpgradeAccount());
+            v.findViewById(R.id.banner_dismiss_button).setOnClickListener(v12 -> {
+                MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(false);
+                setTransferOverQuotaBannerVisibility();
+            });
+
+            return holderBanner;
+        } else if (viewType == ITEM_VIEW_TYPE_LIST) {
             logDebug("type: ITEM_VIEW_TYPE_LIST");
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
@@ -604,7 +627,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
         logDebug("Position: " + position);
 
-        if (adapterType == ITEM_VIEW_TYPE_LIST) {
+        if (isTransferOverQuotaBanner(position)) {
+            ViewHolderOverQuotaBanner holderBanner = (ViewHolderOverQuotaBanner) holder;
+            onBindViewHolderOverQuotaBanner(holderBanner);
+        } else if (adapterType == ITEM_VIEW_TYPE_LIST) {
             ViewHolderBrowserList holderList = (ViewHolderBrowserList)holder;
             onBindViewHolderList(holderList,position);
         } else if (adapterType == ITEM_VIEW_TYPE_GRID) {
@@ -612,6 +638,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             onBindViewHolderGrid(holderGrid,position);
         }
         reSelectUnhandledNode();
+    }
+
+    private void onBindViewHolderOverQuotaBanner(ViewHolderOverQuotaBanner holder) {
+        holder.transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())));
     }
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder,int position) {
@@ -1132,7 +1162,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getItemCount() {
         if (nodes != null) {
-            return nodes.size();
+            return MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown() ? nodes.size() + 1 : nodes.size();
         } else {
             return 0;
         }
@@ -1140,7 +1170,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        return adapterType;
+        return isTransferOverQuotaBanner(position) ? ITEM_VIEW_OVER_QUOTA_BANNER : adapterType;
     }
 
     public Object getItem(int position) {
@@ -1346,7 +1376,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     /*
      * Get document at specified position
      */
-    public MegaNode getNodeAt(int position) {
+    private MegaNode getNodeAt(int position) {
         try {
             if (nodes != null) {
                 return nodes.get(position);
@@ -1466,5 +1496,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public void onCancelClicked() {
         unHandledItem = -1;
+    }
+
+    public void setTransferOverQuotaBannerVisibility() {
+        boolean visible = TransfersManagement.isOnTransferOverQuota() && MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown();
+    }
+
+    private boolean isTransferOverQuotaBanner(int position) {
+        return position == 0 && MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown();
     }
 }

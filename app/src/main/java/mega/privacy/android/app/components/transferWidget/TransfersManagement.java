@@ -12,6 +12,7 @@ public class TransfersManagement {
     private boolean isOnTransfersSection;
     private boolean failedTransfers;
     private boolean transferOverQuotaNotificationShown;
+    private boolean isTransferOverQuotaBannerShown;
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
@@ -85,5 +86,13 @@ public class TransfersManagement {
 
     public boolean isTransferOverQuotaNotificationShown() {
         return transferOverQuotaNotificationShown;
+    }
+
+    public void setTransferOverQuotaBannerShown(boolean transferOverQuotaBannerShown) {
+        isTransferOverQuotaBannerShown = transferOverQuotaBannerShown;
+    }
+
+    public boolean isTransferOverQuotaBannerShown() {
+        return isTransferOverQuotaBannerShown;
     }
 }

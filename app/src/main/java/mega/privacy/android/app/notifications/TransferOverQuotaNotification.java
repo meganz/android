@@ -19,6 +19,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -98,7 +99,7 @@ public class TransferOverQuotaNotification {
             new CountDownTimer(megaApi.getBandwidthOverquotaDelay(), 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    if (megaApi.getBandwidthOverquotaDelay() > 0) {
+                    if (isOnTransferOverQuota()) {
                         show();
                     } else {
                         notificationManager.cancel(NOTIFICATION_DOWNLOAD);

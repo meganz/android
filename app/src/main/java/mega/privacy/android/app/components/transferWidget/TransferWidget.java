@@ -148,7 +148,7 @@ public class TransferWidget {
         return ContextCompat.getDrawable(context, drawable);
     }
 
-    private int getPendingTransfers() {
+    public int getPendingTransfers() {
         return megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
     }
 
