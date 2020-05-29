@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -40,6 +41,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     private ChatController chatC;
 
     private int position;
+    private int positionMessage;
+    private MegaChatRoom chatRoom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, INVALID_HANDLE);
             email = savedInstanceState.getString(EMAIL);
+            positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, INVALID_POSITION);
+
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
             if (messageMega != null) {
                 message = new AndroidMegaChatMessage(messageMega);
@@ -57,6 +62,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             if (context instanceof ChatActivityLollipop) {
                 chatId = ((ChatActivityLollipop) context).idChat;
                 messageId = ((ChatActivityLollipop) context).selectedMessageId;
+                positionMessage = ((ChatActivityLollipop) context).selectedPosition;
             } else {
                 chatId = ((ContactAttachmentActivityLollipop) context).chatId;
                 messageId = ((ContactAttachmentActivityLollipop) context).messageId;
@@ -70,7 +76,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         }
 
         logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
-
+        chatRoom = megaChatApi.getChatRoom(chatId);
         chatC = new ChatController(context);
     }
 
@@ -100,16 +106,22 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         LinearLayout optionInfo = contentView.findViewById(R.id.option_info_layout);
         LinearLayout optionStartConversation = contentView.findViewById(R.id.option_start_conversation_layout);
         LinearLayout optionInvite = contentView.findViewById(R.id.option_invite_layout);
-        LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
+        LinearLayout optionForward = contentView.findViewById(R.id.forward_layout);
+        LinearLayout optionSelect = contentView.findViewById(R.id.select_layout);
+        LinearLayout optionDeleteMessage = contentView.findViewById(R.id.delete_layout);
 
         optionView.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
         optionStartConversation.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
+        optionSelect.setOnClickListener(this);
+        optionForward.setOnClickListener(this);
+        optionDeleteMessage.setOnClickListener(this);
 
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
-
-        optionRemove.setVisibility(View.GONE);
+        LinearLayout viewSeparator = contentView.findViewById(R.id.view_separator);
+        LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
+        LinearLayout deleteMessageSeparator = contentView.findViewById(R.id.delete_separator);
 
         if (isScreenInPortrait(context)) {
             titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
@@ -119,8 +131,32 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             titleMailContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
+        if (context instanceof ChatActivityLollipop && chatRoom != null) {
+            optionSelect.setVisibility(View.VISIBLE);
+            if (chatC.isInAnonymousMode() || ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
+                optionForward.setVisibility(View.GONE);
+                optionDeleteMessage.setVisibility(View.GONE);
+            } else {
+                if (!isOnline(context)) {
+                    optionForward.setVisibility(View.GONE);
+                } else {
+                    optionForward.setVisibility(View.VISIBLE);
+                }
+                if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
+                    optionDeleteMessage.setVisibility(View.GONE);
+                } else {
+                    optionDeleteMessage.setVisibility(View.VISIBLE);
+                }
+            }
+        } else {
+            optionSelect.setVisibility(View.GONE);
+            optionForward.setVisibility(View.GONE);
+            optionDeleteMessage.setVisibility(View.GONE);
+        }
+
         long userCount = message.getMessage().getUsersCount();
         if (userCount == 1) {
+            logDebug("One contact attached");
             optionView.setVisibility(View.GONE);
             optionInfo.setVisibility(View.VISIBLE);
 
@@ -152,7 +188,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     } else {
                         optionStartConversation.setVisibility(View.VISIBLE);
                     }
-
                     optionInvite.setVisibility(View.GONE);
                 } else {
                     optionInfo.setVisibility(View.GONE);
@@ -170,7 +205,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
                 stateIcon.setVisibility(View.GONE);
 
-                StringBuilder name = new StringBuilder("");
+                StringBuilder name = new StringBuilder();
                 name.append(message.getMessage().getUserName(0));
                 for (int i = 1; i < userCount; i++) {
                     name.append(", ").append(message.getMessage().getUserName(i));
@@ -246,11 +281,13 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             }
         }
 
-        if (optionInfo.getVisibility() == View.GONE && optionView.getVisibility() == View.GONE) {
-            separatorInfo.setVisibility(View.GONE);
-        } else {
-            separatorInfo.setVisibility(View.VISIBLE);
-        }
+        optionSelect.setVisibility((optionSelect.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+
+        viewSeparator.setVisibility((optionInfo.getVisibility() == View.GONE && optionView.getVisibility() == View.GONE) ? View.GONE : View.VISIBLE);
+
+        separatorInfo.setVisibility((optionStartConversation.getVisibility() == View.GONE && optionInvite.getVisibility() == View.GONE) ? View.GONE : View.VISIBLE);
+
+        deleteMessageSeparator.setVisibility(optionDeleteMessage.getVisibility());
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
@@ -263,6 +300,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             return;
         }
 
+        ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
+        messagesSelected.add(message);
         Intent i;
         long numUsers = message.getMessage().getUsersCount();
 
@@ -283,15 +322,32 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 }
 
                 context.startActivity(i);
-                dismissAllowingStateLoss();
                 break;
 
             case R.id.option_view_layout:
+                logDebug("View option");
                 i = new Intent(context, ContactAttachmentActivityLollipop.class);
                 i.putExtra("chatId", chatId);
-                i.putExtra("messageId", messageId);
+                i.putExtra(MESSAGE_ID, messageId);
                 context.startActivity(i);
-                dismissAllowingStateLoss();
+                break;
+
+            case R.id.select_layout:
+                if (context instanceof ChatActivityLollipop) {
+                    ((ChatActivityLollipop) context).activateActionModeWithItem(positionMessage);
+                }
+                break;
+
+            case R.id.forward_layout:
+                if (context instanceof ChatActivityLollipop) {
+                    ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
+                }
+                break;
+
+            case R.id.delete_layout:
+                if (context instanceof ChatActivityLollipop) {
+                    ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
+                }
                 break;
 
             case R.id.option_invite_layout:
@@ -319,9 +375,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 } else if (email != null) {
                     cC.inviteContact(email);
                 }
-
-
                 break;
+
             case R.id.option_start_conversation_layout:
                 if (context instanceof ChatActivityLollipop) {
                     if (numUsers == 1) {
@@ -342,9 +397,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     logDebug("position: " + position);
                     long userHandle = message.getMessage().getUserHandle(position);
                     ((ContactAttachmentActivityLollipop) context).startConversation(userHandle);
-                    dismissAllowingStateLoss();
                 }
-
                 break;
         }
 
@@ -364,9 +417,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putLong(CHAT_ID, chatId);
         outState.putLong(MESSAGE_ID, messageId);
         outState.putString(EMAIL, email);
+        if (context instanceof ChatActivityLollipop) {
+            outState.putLong(POSITION_SELECTED_MESSAGE, positionMessage);
+        }
     }
 }

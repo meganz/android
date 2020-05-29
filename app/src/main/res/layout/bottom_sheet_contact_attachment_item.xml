@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <RelativeLayout
             android:id="@+id/contact_attachment_relative_layout_avatar"
@@ -37,42 +37,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_toRightOf="@id/contact_attachment_relative_layout_avatar"
-            android:layout_marginLeft="16dp">
-
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
-                android:id="@+id/contact_attachment_chat_name_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"
-                rounded:emojiSize="14sp"
-                android:maxLines="1"
-                android:singleLine="true"/>
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/contact_attachment_relative_layout_avatar">
 
             <ImageView
                 android:id="@+id/contact_attachment_state_circle"
                 android:layout_width="6dp"
                 android:layout_height="6dp"
                 android:layout_alignTop="@id/contact_attachment_chat_name_text"
-                android:layout_toRightOf="@id/contact_attachment_chat_name_text"
-                android:layout_marginTop="8dp"
                 android:layout_marginLeft="6dp"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@id/contact_attachment_chat_name_text"
                 android:background="@null"
                 android:src="@drawable/circle_status_contact_offline" />
+
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                android:id="@+id/contact_attachment_chat_name_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"
+                rounded:emojiSize="14sp" />
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/contact_attachment_chat_mail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/mail_my_account"
                 android:layout_below="@id/contact_attachment_chat_name_text"
                 android:gravity="center_vertical"
-                android:textSize="14sp"
-                rounded:emojiSize="12sp"
                 android:maxLines="1"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14sp"
+                rounded:emojiSize="12sp" />
 
         </RelativeLayout>
 
@@ -82,7 +82,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/chat_sliding_panel_separator"/>
+        android:background="@color/chat_sliding_panel_separator" />
 
 
     <androidx.core.widget.NestedScrollView
@@ -94,25 +94,103 @@
             android:id="@+id/items_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
-            <!-- Options -->
+            <LinearLayout
+                android:id="@+id/forward_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/forward_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_forward_grey"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/forward_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/forward_menu_item"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/select_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="@color/chat_sliding_panel_separator"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@+id/select_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/option_select_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_select_modal"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_select_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/general_select"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/view_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="@color/chat_sliding_panel_separator"
+                android:orientation="vertical" />
+
             <LinearLayout
                 android:id="@+id/option_view_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_view_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
+                    android:alpha="0.54"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/info_ic"
                     android:visibility="visible" />
 
@@ -120,12 +198,12 @@
                     android:id="@+id/option_view_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/general_view_contacts"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/general_view_contacts"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -133,17 +211,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_info_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
+                    android:alpha="0.54"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/info_ic"
                     android:visibility="visible" />
 
@@ -151,12 +229,12 @@
                     android:id="@+id/option_info_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/contact_properties_activity"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/file_properties_info_info_file"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -164,25 +242,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/chat_sliding_panel_separator"/>
+                android:background="@color/chat_sliding_panel_separator"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/option_start_conversation_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_start_conversation_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
+                    android:alpha="0.54"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_chat"
                     android:visibility="visible" />
 
@@ -190,12 +268,12 @@
                     android:id="@+id/option_start_conversation_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/context_send_message"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/context_send_message"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -203,7 +281,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_invite"
@@ -211,52 +289,62 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_add_contact_chat_item"
+                    android:tint="@color/mail_my_account"
                     android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/option_invite_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:text="@string/menu_add_contact"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/contact_invite"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/option_remove_layout"
+                android:id="@+id/delete_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="@color/chat_sliding_panel_separator"
+                android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@+id/delete_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <ImageView
-                    android:id="@+id/option_remove_image"
+                    android:id="@+id/delete_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_clear_white"
                     android:tint="@color/dark_primary_color"
-                    android:src="@drawable/ic_remove"
                     android:visibility="visible" />
 
                 <TextView
-                    android:id="@+id/option_remove_text"
+                    android:id="@+id/delete_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_remove"
                     android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

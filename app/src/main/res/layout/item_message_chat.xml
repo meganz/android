@@ -89,10 +89,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:layout_below="@+id/title_own_message_layout">
+            android:layout_below="@+id/title_own_message_layout"
+            android:background = "@null">
+
+            <!--multiseleccion-->
+            <RelativeLayout
+                android:id="@+id/own_message_select_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:color/transparent"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/own_message_select_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@drawable/ic_unselect_chatroom"/>
+            </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/own_text_and_triangle_layout"
+                android:id="@+id/own_message"
                 android:layout_width="match_parent"
                 android:gravity="right"
                 android:layout_height="wrap_content"
@@ -155,7 +176,7 @@
                             android:layout_marginEnd="12dp"
                             android:textColor="@color/white"
                             android:textSize="14sp"
-                            app:emojiSize="18sp"
+                            app:emojiSize="14sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
 
@@ -221,7 +242,7 @@
                             android:layout_gravity="center_vertical"
                             android:background="@android:color/transparent">
 
-                            <TextView
+                            <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_own_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -230,6 +251,7 @@
                                 android:maxLines="1"
                                 android:textColor="@color/name_my_account"
                                 android:textSize="16sp"
+                                rounded:emojiSize="16sp"
                                 android:background="@android:color/transparent"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginTop="12dp"/>
@@ -1174,7 +1196,7 @@
                 android:id="@+id/not_sent_own_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/own_text_and_triangle_layout"
+                android:layout_below="@+id/own_message"
                 android:textColor="@color/text_login"
                 android:layout_alignParentRight="true"
                 android:text="@string/manual_retry_alert"
@@ -1302,6 +1324,26 @@
                         rounded:corner_radius="40dp" />
                 </RelativeLayout>
 
+                <!--multiseleccion-->
+                <RelativeLayout
+                    android:id="@+id/contact_message_select_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/contact_message_select_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:src="@drawable/ic_unselect_chatroom"/>
+                </RelativeLayout>
+
                 <!-- text message-->
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_contact_message_text"
@@ -1415,7 +1457,7 @@
                             android:layout_gravity="center_vertical"
                             android:background="@android:color/transparent">
 
-                            <TextView
+                            <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_contact_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -1423,6 +1465,7 @@
                                 android:text="@string/title_enable_rich_links"
                                 android:textColor="@color/name_my_account"
                                 android:textSize="16sp"
+                                rounded:emojiSize="16sp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
                                 android:background="@android:color/transparent"

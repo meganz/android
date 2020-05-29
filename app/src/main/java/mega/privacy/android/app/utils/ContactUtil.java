@@ -39,6 +39,9 @@ public class ContactUtil {
     }
 
     public static String getContactNameDB(MegaContactDB contactDB) {
+        if(contactDB == null)
+            return null;
+
         String nicknameText = contactDB.getNickname();
         if (nicknameText != null) {
             return nicknameText;

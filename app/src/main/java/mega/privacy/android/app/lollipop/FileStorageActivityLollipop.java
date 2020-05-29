@@ -368,7 +368,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
-		
+
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
 		if (prompt != null) {
@@ -376,6 +376,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
+
 		setPickFolderType(intent.getStringExtra(PICK_FOLDER_TYPE));
 
 		File[] fs = getExternalFilesDirs(null);
@@ -410,6 +411,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		listView = findViewById(R.id.file_storage_list_view);
 
 		buttonsContainer = findViewById(R.id.options_file_storage_layout);
+
 		cancelButton = findViewById(R.id.file_storage_cancel_button);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
@@ -849,6 +851,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void showConfirmationSaveInSameLocation(){
 		if (setDownloadLocationDialog != null && setDownloadLocationDialog.isShowing()) {
 			return;
+		}
+
+		if (prefs == null) {
+			prefs = dbH.getPreferences();
 		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
