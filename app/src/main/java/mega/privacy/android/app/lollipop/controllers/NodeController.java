@@ -62,6 +62,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeController {
@@ -852,13 +853,16 @@ public class NodeController {
                         String path = dlFiles.get(document);
                         String targetPath = targets.get(document.getHandle());
 
+                        if (isTextEmpty(path)) {
+                            continue;
+                        }
+
                         File destDir = new File(path);
                         File destFile;
                         destDir.mkdirs();
-                        if (destDir.isDirectory()){
-                            destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-                        }
-                        else{
+                        if (destDir.isDirectory()) {
+                            destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName(), destDir.getAbsolutePath() + SEPARATOR));
+                        } else {
                             destFile = destDir;
                         }
 
