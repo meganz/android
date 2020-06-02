@@ -39,22 +39,23 @@ public class CreateFolderListener extends BaseListener {
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() != MegaRequest.TYPE_CREATE_FOLDER) return;
 
-        if(extraAction == ExtraAction.INIT_CU) {
-            CameraUploadsService.isCreatingPrimary = false;
-            CameraUploadsService.isCreatingSecondary = false;
-        }
-
         long handle = request.getNodeHandle();
         MegaNode node = api.getNodeByHandle(handle);
         String name = request.getName();
 
-        if (extraAction == ExtraAction.INIT_CU && e.getErrorCode() == MegaError.API_OK) {
+        if (extraAction == ExtraAction.INIT_CU) {
             if (name.equals(context.getString(R.string.section_photo_sync))) {
+                CameraUploadsService.isCreatingPrimary = false;
                 //set primary only
-                api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
+                }
             } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
+                CameraUploadsService.isCreatingSecondary = false;
                 //set secondary only
-                api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
+                }
             }
         }
 

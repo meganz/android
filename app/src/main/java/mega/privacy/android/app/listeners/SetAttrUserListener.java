@@ -84,10 +84,6 @@ public class SetAttrUserListener extends BaseListener {
                     // Database and preference update
                     if (prefs == null) return;
 
-                    boolean secondaryEnabled = false;
-                    if (prefs.getSecondaryMediaFolderEnabled() != null) {
-                        secondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-                    }
                     long primaryHandle = request.getNodeHandle();
                     long secondonaryHandle = request.getParentHandle();
                     if(primaryHandle != INVALID_HANDLE){
@@ -95,14 +91,14 @@ public class SetAttrUserListener extends BaseListener {
                         dBH.setCamSyncHandle(primaryHandle);
                         prefs.setCamSyncHandle(String.valueOf(primaryHandle));
                         forceUpdateCameraUploadFolderIcon(false, primaryHandle);
-                        if (context instanceof CameraUploadsService && !secondaryEnabled) {
+                        if (context instanceof CameraUploadsService) {
                             ((CameraUploadsService) context).onSetFolderAttribute();
-                        } else if(!secondaryEnabled) {
+                        } else {
                             JobUtil.stopRunningCameraUploadService(context);
                             JobUtil.startCameraUploadServiceIgnoreAttr(context);
                         }
                     }
-                    if (secondaryEnabled && secondonaryHandle != INVALID_HANDLE) {
+                    if (secondonaryHandle != INVALID_HANDLE) {
                         resetSecondaryTimeline();
                         dBH.setSecondaryFolderHandle(secondonaryHandle);
                         prefs.setMegaHandleSecondaryFolder(String.valueOf(secondonaryHandle));
