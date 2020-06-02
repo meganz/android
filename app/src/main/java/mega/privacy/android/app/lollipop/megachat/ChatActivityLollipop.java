@@ -18,6 +18,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -180,7 +182,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends DownloadableActivity implements AudioManager.OnAudioFocusChangeListener, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -244,7 +246,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private final static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     private final static int TYPE_MESSAGE_NEW_MESSAGE = 1;
-
     private int currentRecordButtonState = 0;
     private String mOutputFilePath;
     private int keyboardHeight;
@@ -260,6 +261,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
+    private AudioManager mAudioManager;
 
     ProgressDialog dialog;
     ProgressDialog statusDialog;
@@ -451,6 +453,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
+
+    private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    private static final int FOCUS_GAIN_TYPE = AudioManager.AUDIOFOCUS_GAIN;
+    private static final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
+    private AudioFocusRequest request = null;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -2225,8 +2232,34 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      */
     public void prepareRecording() {
         logDebug("prepareRecording");
-        recordView.playSound(TYPE_START_RECORD);
-        stopReproductions();
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if(SHOULD_BUILD_FOCUS_REQUEST){
+            request = new AudioFocusRequest.Builder(FOCUS_GAIN_TYPE)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setWillPauseWhenDucked(true)
+                    .setOnAudioFocusChangeListener(this)
+                    .build();
+        }else{
+            request = null;
+        }
+
+        if(requestAudioFocus()){
+            recordView.playSound(TYPE_START_RECORD);
+            stopReproductions();
+        }
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                cancelRecording();
+                break;
+        }
     }
 
     /*
@@ -2304,7 +2337,33 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         recordingLayout.setVisibility(View.GONE);
     }
 
+    /**
+     * Method for requesting audio focus.
+     */
+    public boolean requestAudioFocus() {
+        int result;
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            result = mAudioManager.requestAudioFocus(request);
+        } else {
+            result = mAudioManager.requestAudioFocus(this, STREAM_TYPE, FOCUS_GAIN_TYPE);
+        }
+
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
+    /**
+     * Method for leaving the audio focus.
+     */
+    public void abandonAudioFocus() {
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            mAudioManager.abandonAudioFocusRequest(request);
+        } else {
+            mAudioManager.abandonAudioFocus(this);
+        }
+    }
+
     private void destroyAudioRecorderElements(){
+        abandonAudioFocus();
         handlerVisualizer.removeCallbacks(updateVisualizer);
 
         hideRecordingLayout();
@@ -2358,6 +2417,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         try {
             myAudioRecorder.stop();
             recordView.playSound(TYPE_END_RECORD);
+            abandonAudioFocus();
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
