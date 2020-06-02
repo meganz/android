@@ -499,7 +499,9 @@ public class ChatUtil {
         if (chat.isActive()) {
             return chat.getTitle();
         }
-        return MegaApplication.getInstance().getString(R.string.inactive_chat_title, formatDate(MegaApplication.getInstance().getBaseContext(), chat.getCreationTs(), DATE_YYYY_MM_DD_FORMAT));
+
+        MegaApplication app = MegaApplication.getInstance();
+        return app.getString(R.string.inactive_chat_title, formatDate(app.getBaseContext(), chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT));
     }
 
     /**
