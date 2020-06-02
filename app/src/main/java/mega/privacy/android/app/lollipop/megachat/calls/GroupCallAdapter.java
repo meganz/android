@@ -68,10 +68,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId) {
 
-        if (peers != null) {
-            logDebug("peers: " + peers.size());
-        }
-
         this.context = context;
         this.recyclerViewFragment = recyclerView;
         this.peers = peers;
@@ -257,7 +253,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if (numPeersOnCall > MAX_PARTICIPANTS_GRID)
             return;
 
-        logDebug("Distributing participants");
         /*Distribution of participants depending on the number of participants in the call*/
         int width;
         int height;
@@ -307,8 +302,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         holder = callOrHolderNull(position, holder);
         if(holder == null)
             return;
-
-        logDebug("Activating video");
 
         /*Avatar*/
         holder.avatarLayout.setVisibility(View.GONE);
@@ -436,8 +429,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if(holder == null)
             return;
 
-        logDebug("Deactivating video");
-
         /*Avatar*/
         Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
 
@@ -485,7 +476,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if(holder == null)
             return;
 
-        if (!isEstablishedCall(chatId) || peer.isAudioOn() || call.isOnHold()) {
+        if (!isEstablishedCall(chatId) || peer.isAudioOn() || ((ChatCallActivity) context).getCall().isOnHold()) {
             holder.muteIconLayout.setVisibility(View.GONE);
             return;
         }
@@ -512,8 +503,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if(holder == null)
             return;
 
-        logDebug("Checking quality");
-        if (!isEstablishedCall(chatId) || call.isOnHold() || !peer.isVideoOn() || peer.isGoodQuality() || peer.getListener() == null) {
+        if (!isEstablishedCall(chatId) || ((ChatCallActivity) context).getCall().isOnHold() || !peer.isVideoOn() || peer.isGoodQuality() || peer.getListener() == null) {
             holder.qualityIcon.setVisibility(View.GONE);
             holder.qualityBackground.setImageBitmap(null);
             holder.qualityBackground.setVisibility(View.GONE);
@@ -579,7 +569,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if(holder == null)
             return;
 
-        logDebug("Checking the participant selected");
         if (peers.size() <= MAX_PARTICIPANTS_GRID) {
             holder.greenLayer.setVisibility(View.GONE);
             peer.setGreenLayer(false);

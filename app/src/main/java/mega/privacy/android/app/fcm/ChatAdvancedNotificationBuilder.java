@@ -1037,8 +1037,6 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            logDebug("Oreo");
-
             //Create a channel for android Oreo or higher
             NotificationChannel channel = new NotificationChannel(notificationChannelIdIncomingCall, notificationChannelNameIncomingCall, NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("");

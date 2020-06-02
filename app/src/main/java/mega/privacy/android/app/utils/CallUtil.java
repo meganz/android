@@ -38,6 +38,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CallUtil {
 
@@ -116,7 +117,7 @@ public class CallUtil {
             }
         }
 
-        return INVALID_CALL;
+        return MEGACHAT_INVALID_HANDLE;
     }
 
     /**

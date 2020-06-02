@@ -86,7 +86,6 @@ public class CallService extends Service{
             }
 
             if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-                logDebug("The call on hold change");
                 updateNotificationContent(chatId);
             }
         }

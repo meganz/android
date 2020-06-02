@@ -512,15 +512,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
             if (chatIdReceived != getCurrentChatid()) {
                 logWarning("Call in different chat");
-                long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, INVALID_CALL);
+                long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
                 if (callChat != null && callIdReceived != callChat.getId() && (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD))) {
                     checkAnotherCallOnHold();
                 }
                 return;
             }
 
-            long callIdReceived  = intent.getLongExtra(UPDATE_CALL_ID, INVALID_CALL);
-            if (callIdReceived == INVALID_CALL) {
+            long callIdReceived  = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
+            if (callIdReceived == MEGACHAT_INVALID_HANDLE) {
                 logWarning("Call recovered is incorrect");
                 return;
             }
@@ -1315,7 +1315,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if (callChat.isOnHold()) {
                         checkAnotherCallActive();
                     } else {
-                        logDebug("Change CURRENT call to ON HOLD");
                         megaChatApi.setCallOnHold(chatId, true, this);
                         sendSignalPresence();
                     }
@@ -1718,14 +1717,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (chatsIDsWithCallActive != null || !chatsIDsWithCallActive.isEmpty()) {
             for (Long anotherChatId : chatsIDsWithCallActive) {
                 if (callChat.getChatid() != anotherChatId && megaChatApi.getChatCall(anotherChatId) != null && !megaChatApi.getChatCall(anotherChatId).isOnHold()) {
-                    logDebug("Change ANOTHER call to ON HOLD");
                     megaChatApi.setCallOnHold(anotherChatId, true, this);
                     break;
                 }
             }
         }
 
-        logDebug("Change CURRENT call to ACTIVE");
         megaChatApi.setCallOnHold(chatId, false, this);
         sendSignalPresence();
     }
@@ -1745,10 +1742,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        logDebug("Change CURRENT call to ON HOLD");
         megaChatApi.setCallOnHold(chatId, true, this);
-
-        logDebug("Change ANOTHER call to ACTIVE");
         megaChatApi.setCallOnHold(chatCallOnHold.getChatId(), false, this);
 
         sendSignalPresence();
@@ -1799,7 +1793,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         if (getCall() != null && callChat.isOnHold()) {
-            logDebug("Current call ON HOLD, look for other");
             for (Long anotherChatId : chatsIDsWithCallActive) {
                 if (anotherChatId != currentChatId) {
                     MegaChatCall call = megaChatApi.getChatCall(anotherChatId);
@@ -1810,7 +1803,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         } else {
-            logDebug("Current call ACTIVE, look for other");
             for (Long anotherChatId : chatsIDsWithCallActive) {
                 if (anotherChatId != currentChatId) {
                     MegaChatCall call = megaChatApi.getChatCall(anotherChatId);
@@ -1982,7 +1974,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (chat.isGroup()) {
             updateRemoteVideoGroupCall(session);
         } else {
-            logDebug("Updating video status in a one to one call");
             updateRemoteVideoIndividualCall(session);
         }
         checkTypeCall();
@@ -1994,7 +1985,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @param session The session.
      */
     private void updateRemoteVideoIndividualCall(MegaChatSession session) {
-        logDebug("User has video " + session.hasVideo());
         if (cameraFragmentFullScreen != null) {
             cameraFragmentFullScreen.checkValues(session.getPeerid(), session.getClientid());
         }
@@ -2562,7 +2552,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     public int getNumParticipants() {
         if(peersOnCall == null)
-            return INVALID_CALL;
+            return (int) MEGACHAT_INVALID_HANDLE;
 
         return peersOnCall.size();
     }

@@ -200,11 +200,9 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             return;
         }
 
-        logDebug("Removing suface view");
         videoLayout.setVisibility(View.GONE);
 
         if (listener != null) {
-            logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
                 megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
             } else {
@@ -321,7 +319,6 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
         videoLayout.setVisibility(View.GONE);
 
         if (listener != null) {
-            logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
                 megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
             } else {

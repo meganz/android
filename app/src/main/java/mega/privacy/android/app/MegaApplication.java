@@ -506,12 +506,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				long peerId = intent.getLongExtra(UPDATE_PEER_ID, MEGACHAT_INVALID_HANDLE);
 				long clientId = intent.getLongExtra(UPDATE_CLIENT_ID, MEGACHAT_INVALID_HANDLE);
 				MegaChatSession session = call.getMegaChatSession(peerId, clientId);
-				logDebug("The session on hold change");
-
 				if (chatRoom.isGroup()) {
-					logDebug("Is a group");
 					return;
 				}
+
+				logDebug("The session on hold change");
 				if (call.hasLocalVideo() && session.isOnHold()) {
 					setWasLocalVideoEnable(true);
 					megaChatApi.disableVideo(chatIdReceived, null);
@@ -1416,9 +1415,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		clearIncomingCallNotification(call.getId());
 
 		if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
-			logDebug("TERM_CODE_ANSWER_TIMEOUT");
 			if (call.isLocalTermCode() == false) {
-				logDebug("localTermCodeNotLocal");
 				try {
 					ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 					notificationBuilder.showMissedCallNotification(call);
@@ -1441,7 +1438,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
      */
 	public void createRTCAudioManager(boolean isSpeakerOn) {
 		if (rtcAudioManager != null) {
-			logDebug("Updating RTC Audio Manager values...");
 			rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
 			return;
 		}
@@ -1464,7 +1460,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			return;
 
 		try {
-			logDebug("Removing RTC Audio Manager...");
 			unregisterProximitySensor();
 			rtcAudioManager.stop();
 			rtcAudioManager = null;
@@ -1478,7 +1473,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
      */
     public void startProximitySensor() {
         if (rtcAudioManager != null) {
-            logDebug("Starting proximity sensor...");
             rtcAudioManager.startProximitySensor();
         }
     }
@@ -1488,7 +1482,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
      */
     public void unregisterProximitySensor() {
         if (rtcAudioManager != null) {
-            logDebug("Stopping proximity sensor...");
             rtcAudioManager.unregisterProximitySensor();
         }
     }
@@ -1541,7 +1534,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		startActivity(i);
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-		logDebug("Launch call: " + chatRoom.getTitle());
 	}
 
 	public void clearIncomingCallNotification(long chatCallId) {

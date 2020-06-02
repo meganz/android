@@ -565,7 +565,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-                logDebug("Changes in call on hold");
                 updateCallBar();
             }
 
@@ -573,7 +572,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 
                 if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) && callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                    logDebug("Changes in same chat");
                     updateCallBar();
                 }
                 switch (callStatus) {
@@ -7155,11 +7153,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         }else if (request.getType() == MegaChatRequest.TYPE_SET_CALL_ON_HOLD) {
                 if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                    logDebug("Active call on hold. Joinning in the group chat.");
                     MegaChatCall call = megaChatApi.getChatCall(idChat);
                     if (call == null)
                         return;
 
+                    logDebug("Active call on hold. Joinning in the group chat.");
                     if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                         MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
                         megaChatApi.answerChatCall(idChat, false, this);
@@ -8342,7 +8340,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (chatsIDsWithCallActive != null && !chatsIDsWithCallActive.isEmpty()) {
             for (Long anotherChatId : chatsIDsWithCallActive) {
                 if (anotherChatId != currentChatId && megaChatApi.getChatCall(anotherChatId) != null && !megaChatApi.getChatCall(anotherChatId).isOnHold()) {
-                    logDebug("Exists another active call");
                     return megaChatApi.getChatCall(anotherChatId);
                 }
             }
@@ -8366,9 +8363,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         MegaChatCall callInThisChat = megaChatApi.getChatCall(idChat);
         if (callInThisChat == null || (callInThisChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat))){
-            logDebug("The status of the chat is no connected and the call status is not reconnecting");
             if(anotherActiveCall != null){
-                logDebug("There's another active call");
                 updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
                 returnCallOnHoldButton.setVisibility(View.GONE);
             }else{
@@ -8389,12 +8384,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         if(callInThisChat.isOnHold()){
             if(anotherActiveCall != null){
-                logDebug("There's another active call");
                 updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
                 returnCallOnHoldButtonText.setText(getResources().getString(R.string.call_on_hold));
                 returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_transfers_pause);
             }else{
-                logDebug("This call is on hold");
                 updateCallInProgressLayout(callInThisChat, getString(R.string.call_on_hold));
             }
             returnCallOnHoldButton.setVisibility(anotherActiveCall != null ? View.VISIBLE : View.GONE);
@@ -8411,15 +8404,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_RING_IN:
                 if (isGroup()) {
-
                     if(anotherActiveCall != null){
-                        logDebug("There's another active call");
                         updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
                         returnCallOnHoldButton.setVisibility(View.VISIBLE);
                         returnCallOnHoldButtonText.setText(getResources().getString(R.string.title_join_call));
                         returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_transfers_pause);
                     }else{
-                        logDebug("Show Tap to join the call bar");
                         usersWithVideo();
                         long callerHandle = callInThisChat.getCaller();
                         String textLayout;
@@ -8435,10 +8425,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && app.getCallLayoutStatus(idChat)) {
                     if(anotherActiveCall != null){
-                        logDebug("There's another active call");
                         updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
                     }else{
-                        logDebug("Show Tap to return to call bar");
                         tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                     }
                     break;
@@ -8455,11 +8443,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 
                 if(anotherActiveCall != null){
-                    logDebug("There's another active call");
                     updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
                 }else{
                     if (MegaApplication.getCallLayoutStatus(idChat)) {
-                        logDebug("Show Tap to return to call bar");
                         tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                         break;
                     }
@@ -8469,20 +8455,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             case MegaChatCall.CALL_STATUS_RECONNECTING:
                 if(anotherActiveCall != null){
-                    logDebug("There's another active call");
                     updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
                 }else{
                     activateChrono(false, subtitleChronoCall, callInThisChat);
                     callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
                     showCallInProgressLayout(getString(R.string.reconnecting_message), false, callInThisChat);
                     callInProgressLayout.setOnClickListener(this);
-                    logDebug("Show Reconnecting bar");
                 }
                 break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                 if(anotherActiveCall != null){
-                    logDebug("There's another active call");
                     updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
                 }else{
                     callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
@@ -8492,8 +8475,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
 
                     callInProgressLayout.setOnClickListener(null);
-                    logDebug("Show You are back bar");
-
                     showCallInProgressLayout(getString(R.string.connected_message), false, callInThisChat);
                     callInProgressLayout.setAlpha(1);
                     callInProgressLayout.setVisibility(View.VISIBLE);
