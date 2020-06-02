@@ -32,14 +32,16 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
         this.height = 0;
         this.surfaceView = video;
         this.isLocal = isItMe(chatId, peerid, clientid);
-        if (!isSmallCamera && !isLocal) {
-            this.surfaceView.setZOrderOnTop(false);
-            this.surfaceView.setZOrderMediaOverlay(false);
-        } else if (!isSmallCamera && isLocal) {
+
+        if (isSmallCamera && isLocal) {
             this.surfaceView.setZOrderMediaOverlay(true);
-        } else if (isSmallCamera && isLocal) {
-            this.surfaceView.setZOrderMediaOverlay(true);
+        } else if (!isSmallCamera) {
+            if (!isLocal) {
+                this.surfaceView.setZOrderOnTop(false);
+            }
+            this.surfaceView.setZOrderMediaOverlay(isLocal);
         }
+
         surfaceHolder = this.surfaceView.getHolder();
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         this.renderer = new MegaSurfaceRenderer(this.surfaceView, isSmallCamera, outMetrics);
@@ -60,7 +62,7 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
                 int viewWidth = surfaceView.getWidth();
                 int viewHeight = surfaceView.getHeight();
                 if (viewWidth != 0 && viewHeight != 0) {
-                    int holderWidth = viewWidth < width ? viewWidth : width;
+                    int holderWidth = Math.min(viewWidth, width);
                     int holderHeight = holderWidth * viewHeight / viewWidth;
                     if (holderHeight > viewHeight) {
                         holderHeight = viewHeight;

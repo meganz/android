@@ -58,8 +58,10 @@ public class CallNotificationIntentService extends IntentService implements Mega
         clearIncomingCallNotification(chatIdIncomingCall);
 
         final String action = intent.getAction();
-        logDebug("The button clicked is : " + action);
+        if (action == null)
+            return;
 
+        logDebug("The button clicked is : " + action);
         switch (action) {
             case CallNotificationIntentService.ANSWER:
             case CallNotificationIntentService.END_ANSWER:

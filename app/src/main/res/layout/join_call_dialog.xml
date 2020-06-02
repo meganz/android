@@ -36,7 +36,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:orientation="vertical">
-            <TextView
+
+            <Button
                 android:id="@+id/hold_join_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,10 +48,8 @@
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textColor="@color/accentColor"
-                android:text="@string/hold_and_join_call_incoming"
-                android:textStyle="bold"
-                android:textAllCaps="true"/>
-            <TextView
+                android:text="@string/hold_and_join_call_incoming" />
+            <Button
                 android:id="@+id/end_join_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -61,10 +60,8 @@
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textColor="@color/accentColor"
-                android:text="@string/end_and_join_call_incoming"
-                android:textStyle="bold"
-                android:textAllCaps="true"/>
-            <TextView
+                android:text="@string/end_and_join_call_incoming"/>
+            <Button
                 android:id="@+id/cancel_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -75,9 +72,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="right"
                 android:textColor="@color/accentColor"
-                android:text="@string/general_cancel"
-                android:textStyle="bold"
-                android:textAllCaps="true"/>
+                android:text="@string/general_cancel"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

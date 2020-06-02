@@ -146,11 +146,7 @@ public class CallService extends Service{
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     mBuilderCompatO.setContentText(getString(R.string.title_notification_incoming_call));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    if(call.isOnHold()){
-                        mBuilderCompatO.setContentText(getString(R.string.call_on_hold));
-                    }else {
-                        mBuilderCompatO.setContentText(getString(R.string.title_notification_call_in_progress));
-                    }
+                    mBuilderCompatO.setContentText(getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress));
                 }
             }
             notif = mBuilderCompatO.build();
@@ -163,11 +159,7 @@ public class CallService extends Service{
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     mBuilderCompat.setContentText(getString(R.string.title_notification_incoming_call));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    if(call.isOnHold()){
-                        mBuilderCompat.setContentText(getString(R.string.call_on_hold));
-                    }else {
-                        mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
-                    }
+                    mBuilderCompatO.setContentText(getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress));
                 }
             }
             notif = mBuilderCompat.build();

@@ -440,7 +440,7 @@ public class FileUtils {
     }
 
     public static boolean isFileAvailable(File file) {
-        return file != null && file.exists();
+        return file != null && file.exists() && file.length() > 0;
     }
 
     public static boolean isFileDownloadedLatest(File downloadedFile, MegaNode node) {

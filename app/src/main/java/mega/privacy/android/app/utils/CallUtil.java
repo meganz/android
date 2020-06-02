@@ -5,13 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.os.SystemClock;
 import androidx.core.content.ContextCompat;
 
@@ -21,7 +14,6 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -43,7 +35,6 @@ import nz.mega.sdk.MegaHandleList;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -190,22 +181,20 @@ public class CallUtil {
             return;
         }
 
-        if (currentChatCallsList != null) {
-            ArrayList<MegaChatCall> callsActive = new ArrayList<>();
+        ArrayList<MegaChatCall> callsActive = new ArrayList<>();
 
-            for (Long chatIdCall : currentChatCallsList) {
-                MegaChatCall current = megaChatApi.getChatCall(chatIdCall);
-                if (current != null) {
-                    if (!current.isOnHold()) {
-                        callsActive.add(current);
-                    }
+        for (Long chatIdCall : currentChatCallsList) {
+            MegaChatCall current = megaChatApi.getChatCall(chatIdCall);
+            if (current != null) {
+                if (!current.isOnHold()) {
+                    callsActive.add(current);
                 }
             }
-            if (callsActive.isEmpty()) {
-                callInProgressLayout.setVisibility(View.GONE);
-                activateChrono(false, callInProgressChrono, null);
-                return;
-            }
+        }
+        if (callsActive.isEmpty()) {
+            callInProgressLayout.setVisibility(View.GONE);
+            activateChrono(false, callInProgressChrono, null);
+            return;
         }
 
         long chatId = getChatCallInProgress();
@@ -495,14 +484,9 @@ public class CallUtil {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
 
         if (peerId == megaChatApi.getMyUserHandle() || megaApi.getContact(mail) != null) {
-            File avatar = buildAvatarFile(context, mail + ".jpg");
-            Bitmap bitmap;
-            if (isFileAvailable(avatar) && avatar.exists() && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap != null) {
-                    return bitmap;
-                }
+            Bitmap bitmap = getImageAvatar(mail);
+            if(bitmap != null){
+                return bitmap;
             }
 
             if (peerId != megaChatApi.getMyUserHandle()) {
@@ -695,4 +679,5 @@ public class CallUtil {
         logDebug("Current call ACTIVE, look for other");
         return currentChatId;
     }
+
 }

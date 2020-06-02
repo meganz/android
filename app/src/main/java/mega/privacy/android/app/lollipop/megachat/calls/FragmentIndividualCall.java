@@ -58,15 +58,15 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
     public void onCreate(Bundle savedInstanceState) {
         Bundle args = getArguments();
         this.chatId = args.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-        this.peerid = args.getLong(PEER_ID, INVALID_CALL_PEER_ID);
-        this.clientid = args.getLong(CLIENT_ID, INVALID_CALL_CLIENT_ID);
+        this.peerid = args.getLong(PEER_ID, MEGACHAT_INVALID_HANDLE);
+        this.clientid = args.getLong(CLIENT_ID, MEGACHAT_INVALID_HANDLE);
         this.isSmallCamera = args.getBoolean(TYPE_CAMERA, false);
 
         this.chatRoom = megaChatApi.getChatRoom(chatId);
         if (chatRoom == null || megaChatApi.getChatCall(chatId) == null)
             return;
 
-        if (peerid == INVALID_CALL_PEER_ID) {
+        if (peerid == MEGACHAT_INVALID_HANDLE) {
             this.peerid = chatRoom.getPeerHandle(0);
         }
 
@@ -92,7 +92,6 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
             avatarImage.setAlpha(1f);
             muteLayout = contentView.findViewById(R.id.mute_layout);
             muteLayout.setVisibility(View.GONE);
-
         } else {
             contentView = inflater.inflate(R.layout.full_screen_individual_call, container, false);
             surfaceView = contentView.findViewById(R.id.video);
@@ -219,7 +218,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
+                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }
@@ -393,7 +392,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
+                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }

@@ -38,7 +38,7 @@ public class MegaSurfaceRenderer implements Callback {
     private PorterDuffXfermode modesrcin;
     private int surfaceWidth = 0;
     private int surfaceHeight = 0;
-    private int CORNER_RADIUS = 20;
+    private static int CORNER_RADIUS = 20;
     // the bitmap used for drawing.
     private Bitmap bitmap = null;
     private ByteBuffer byteBuffer = null;

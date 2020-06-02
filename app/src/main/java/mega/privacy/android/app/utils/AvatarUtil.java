@@ -297,7 +297,7 @@ public class AvatarUtil {
      */
     public static Bitmap getImageAvatar(String email) {
         File avatar = buildAvatarFile(MegaApplication.getInstance().getBaseContext(), email + ".jpg");
-        if (isFileAvailable(avatar) && avatar.length() > 0) {
+        if (isFileAvailable(avatar)) {
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap != null) {

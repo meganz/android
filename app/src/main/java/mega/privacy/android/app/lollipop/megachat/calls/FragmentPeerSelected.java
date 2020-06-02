@@ -53,14 +53,14 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
     public void onCreate(Bundle savedInstanceState) {
         Bundle args = getArguments();
         this.chatId = args.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-        this.peerid = args.getLong(PEER_ID, INVALID_CALL_PEER_ID);
-        this.clientid = args.getLong(CLIENT_ID, INVALID_CALL_CLIENT_ID);
+        this.peerid = args.getLong(PEER_ID, MEGACHAT_INVALID_HANDLE);
+        this.clientid = args.getLong(CLIENT_ID, MEGACHAT_INVALID_HANDLE);
 
         this.chatRoom = megaChatApi.getChatRoom(chatId);
         if (chatRoom == null || megaChatApi.getChatCall(chatId) == null)
             return;
 
-        if (peerid == INVALID_CALL_PEER_ID) {
+        if (peerid == MEGACHAT_INVALID_HANDLE) {
             this.peerid = chatRoom.getPeerHandle(0);
         }
 
@@ -171,7 +171,6 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             }
 
             videoLayout.addView(listener.getSurfaceView());
-
         } else {
             if (videoLayout.getChildCount() > 0 && !videoLayout.getChildAt(0).equals(listener.getSurfaceView())) {
                 videoLayout.removeAllViews();
@@ -207,7 +206,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
+                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }
@@ -324,7 +323,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, INVALID_CALL_PEER_ID, INVALID_CALL_CLIENT_ID, listener);
+                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
             } else {
                 megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
             }

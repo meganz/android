@@ -323,7 +323,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private ImageView iconStateToolbar;
 
     private ImageView privateIconToolbar;
-    android.app.AlertDialog joinCallDialog;
 
     float density;
     private DisplayMetrics outMetrics;
@@ -2609,7 +2608,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
 
                 logDebug("I'm participating in another call from another chat");
-                showConfirmationToJoinCall(chatRoom);
+                showConfirmationToJoinCall();
                 return;
             }
 
@@ -3264,15 +3263,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.join_call_dialog, null);
-        final TextView holdJoinButton = dialoglayout.findViewById(R.id.hold_join_button);
-        final TextView endJoinButton = dialoglayout.findViewById(R.id.end_join_button);
-        final TextView cancelButton = dialoglayout.findViewById(R.id.cancel_button);
+        final Button holdJoinButton = dialoglayout.findViewById(R.id.hold_join_button);
+        final Button endJoinButton = dialoglayout.findViewById(R.id.end_join_button);
+        final Button cancelButton = dialoglayout.findViewById(R.id.cancel_button);
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setView(dialoglayout);
-        joinCallDialog = builder.create();
-        joinCallDialog.show();
-        final android.app.AlertDialog dialog = joinCallDialog;
+        final android.app.AlertDialog dialog = builder.create();
+        dialog.show();
 
         View.OnClickListener clickListener = v -> {
             switch (v.getId()) {
@@ -3302,30 +3300,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         cancelButton.setOnClickListener(clickListener);
     }
 
-
-    private void showConfirmationToJoinCall(final MegaChatRoom c){
-        logDebug("showConfirmationToJoinCall");
-
-        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which){
-                case DialogInterface.BUTTON_POSITIVE:
-                    logDebug("END & JOIN");
-                    //Find the call in progress:
-                    if(megaChatApi!=null){
-                        endCall(getChatCallInProgress());
-                    }
-                    break;
-
-                case DialogInterface.BUTTON_NEGATIVE:
-                    //No button clicked
-                    break;
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message= getResources().getString(R.string.text_join_call);
-        builder.setTitle(R.string.title_join_call);
-        builder.setMessage(message).setPositiveButton(getApplicationContext().getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    private void showConfirmationToJoinCall(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        builder.setTitle(R.string.title_join_call)
+                .setMessage(R.string.text_join_call)
+                .setPositiveButton(getApplicationContext().getString(R.string.answer_call_incoming).toUpperCase(), (dialog, which) -> endCall(getChatCallInProgress()))
+                .setNegativeButton(R.string.general_cancel, null)
+                .show();
     }
 
     public void controlCamera(){
@@ -7176,15 +7157,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                     logDebug("Active call on hold. Joinning in the group chat.");
                     MegaChatCall call = megaChatApi.getChatCall(idChat);
-                    if (call == null) return;
+                    if (call == null)
+                        return;
+
                     if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                         MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
                         megaChatApi.answerChatCall(idChat, false, this);
-
                     } else if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                         megaChatApi.startChatCall(idChat, false, this);
                     }
-
                 } else {
                     logError("Error putting the call on hold" + e.getErrorCode());
                 }
@@ -8321,7 +8302,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call) {
-
         if (callInProgressText != null) {
             callInProgressText.setText(text);
         }
@@ -8340,8 +8320,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @param call The call.
      */
     private void hideCallBar(MegaChatCall call) {
-        logDebug("Hiding all call elements");
-
         invalidateOptionsMenu();
         activateChrono(false, callInProgressChrono, call);
         activateChrono(false, subtitleChronoCall, call);
@@ -8445,7 +8423,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         usersWithVideo();
                         long callerHandle = callInThisChat.getCaller();
                         String textLayout;
-                        if (callerHandle != -1 && getPeerFullName(callerHandle) != null) {
+                        if (callerHandle != MEGACHAT_INVALID_HANDLE && getPeerFullName(callerHandle) != null) {
                             textLayout = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
                         } else {
                             textLayout = getString(R.string.join_call_layout);
@@ -8546,9 +8524,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (call == null)
             return;
 
-        logDebug("Show "+text+" bar");
         showCallInProgressLayout(text, true, call);
-
         callInProgressLayout.setOnClickListener(this);
         if (isGroup()) {
             subtitleCall.setVisibility(View.VISIBLE);

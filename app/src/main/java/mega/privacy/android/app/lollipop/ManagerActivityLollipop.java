@@ -263,6 +263,7 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
@@ -1312,14 +1313,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
 				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
 
-				if (chatIdReceived == INVALID_HANDLE)
+				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
 					return;
 
-				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if (rChatFL != null && rChatFL.isVisible()) {
+				if (getChatsFragment()  != null && rChatFL.isVisible()) {
 					rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
 				}
-
 				if (isScreenInPortrait(ManagerActivityLollipop.this)) {
 					setCallWidget();
 				} else {

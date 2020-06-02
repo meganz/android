@@ -94,6 +94,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
@@ -421,7 +422,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	/**
-	 * Method for controlling changes in the call.
+	 * Broadcast for controlling changes in the call.
 	 */
 	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
 		@Override
@@ -479,7 +480,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	};
 
 	/**
-	 * Method for controlling changes in sessions.
+	 * Broadcast for controlling changes in sessions.
 	 */
 	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
 		@Override
@@ -487,7 +488,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
 			long chatIdOfCurrentCall = getChatCallInProgress();
 			if (chatIdReceived != chatIdOfCurrentCall) {
 				logWarning("Call in different chat");
@@ -502,8 +503,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}
 
 			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-				long peerId = intent.getLongExtra(UPDATE_PEER_ID, -1);
-				long clientId = intent.getLongExtra(UPDATE_CLIENT_ID, -1);
+				long peerId = intent.getLongExtra(UPDATE_PEER_ID, MEGACHAT_INVALID_HANDLE);
+				long clientId = intent.getLongExtra(UPDATE_CLIENT_ID, MEGACHAT_INVALID_HANDLE);
 				MegaChatSession session = call.getMegaChatSession(peerId, clientId);
 				logDebug("The session on hold change");
 
@@ -1168,14 +1169,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	 * @param chatId The chat ID of the chat with call.
 	 */
 	private void showGroupCallNotification(long chatId) {
-		try {
-			notificationShown.add(chatId);
-			stopService(new Intent(this, IncomingCallService.class));
-			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-			notificationBuilder.checkOneGroupCall(chatId);
-		} catch (Exception e) {
-			logError("ERROR Showing the group call notification ", e);
-		}
+		notificationShown.add(chatId);
+		stopService(new Intent(this, IncomingCallService.class));
+		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+		notificationBuilder.checkOneGroupCall(chatId);
 	}
 
 	@Override
@@ -1183,26 +1180,22 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		if (!item.isGroup())
 			return;
 
-		if (item.getChanges() == 0) {
-			if (!currentActiveGroupChat.contains(item)) {
-				currentActiveGroupChat.add(item);
-			}
+		if (item.getChanges() == 0 && !currentActiveGroupChat.contains(item)) {
+			currentActiveGroupChat.add(item);
 		}
 
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
-			if (item.getOwnPrivilege() != -1) {
+			if (item.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
 				if (!currentActiveGroupChat.contains(item)) {
-
 					currentActiveGroupChat.add(item);
 					MegaChatCall call = megaChatApi.getChatCall(item.getChatId());
-					if (call != null) {
-						if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-							if (notificationShown == null || notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
-								notificationShown.add(item.getChatId());
-								showGroupCallNotification(item.getChatId());
-							}
-							return;
+					if (call != null && call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+						if (notificationShown == null || notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
+							notificationShown.add(item.getChatId());
+							showGroupCallNotification(item.getChatId());
 						}
+						return;
+
 					}
 				}
 			} else {
@@ -1421,23 +1414,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		    return;
 
 		clearIncomingCallNotification(call.getId());
-		//Show missed call if time out ringing (for incoming calls)
-		try {
 
-			if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
-				logDebug("TERM_CODE_ANSWER_TIMEOUT");
-				if (call.isLocalTermCode() == false) {
-					logDebug("localTermCodeNotLocal");
-					try {
-						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-						notificationBuilder.showMissedCallNotification(call);
-					} catch (Exception e) {
-						logError("EXCEPTION when showing missed call notification", e);
-					}
+		if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
+			logDebug("TERM_CODE_ANSWER_TIMEOUT");
+			if (call.isLocalTermCode() == false) {
+				logDebug("localTermCodeNotLocal");
+				try {
+					ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+					notificationBuilder.showMissedCallNotification(call);
+				} catch (Exception e) {
+					logError("EXCEPTION when showing missed call notification", e);
 				}
 			}
-		} catch (Exception e) {
-			logError("EXCEPTION when showing missed call notification", e);
 		}
 	}
 
@@ -1496,7 +1484,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     }
 
     /**
-     * Deactivates the proximity sensor
+     * Disables the proximity sensor
      */
     public void unregisterProximitySensor() {
         if (rtcAudioManager != null) {
@@ -1506,7 +1494,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     }
 
     /**
-     * Create the ChatAudioManager for the incoming and outgoing call.
+     * Creates the ChatAudioManager for the incoming and outgoing call.
      */
 	public void createChatAudioManager() {
 		if (chatAudioManager != null)
