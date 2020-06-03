@@ -28,7 +28,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -112,7 +112,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
 
-        titleNameContactChatPanel.setText(chat.getTitle());
+        titleNameContactChatPanel.setText(getTitleChat(chat));
 
         if (chat.isPreview()) {
             titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
@@ -235,8 +235,8 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             int color;
             String name = null;
 
-            if (!isTextEmpty(chat.getTitle())) {
-                name = chat.getTitle();
+            if (!isTextEmpty(getTitleChat(chat))) {
+                name = getTitleChat(chat);
             } else if (!isTextEmpty(contactMail)) {
                 name = contactMail;
             }

@@ -600,7 +600,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         Button alwaysAllowRichLinkButton;
         Button notNowRichLinkButton;
         RelativeLayout urlOwnMessageTitleLayout;
-        TextView urlOwnMessageTitle;
+        private EmojiTextView urlOwnMessageTitle;
         TextView urlOwnMessageDescription;
 
         LinearLayout urlOwnMessageDisableButtonsLayout;
@@ -625,7 +625,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout urlContactMessageLayout;
         private EmojiTextView urlContactMessageText;
         RelativeLayout urlContactMessageTitleLayout;
-        TextView urlContactMessageTitle;
+        private EmojiTextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
         RelativeLayout forwardContactRichLinks;
 

@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaChatRoom;
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1969,7 +1970,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     filteredChats.clear();
                 }
                 for (MegaChatListItem chat : chatsToSearch) {
-                    if (chat.getTitle().toLowerCase().contains(strings[0].toLowerCase())) {
+                    if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
                         filteredChats.add(chat);
                     }
                 }
