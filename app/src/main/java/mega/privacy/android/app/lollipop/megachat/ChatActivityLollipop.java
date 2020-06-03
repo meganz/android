@@ -191,6 +191,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private static final String MESSAGE_HANDLE_PLAYING = "messageHandleVoicePlaying";
     private static final String USER_HANDLE_PLAYING = "userHandleVoicePlaying";
     private final static String SELECTED_ITEMS = "selectedItems";
+    private final static String JOIN_CALL_DIALOG = "isJoinCallDialogShown";
 
     private final static int NUMBER_MESSAGES_TO_LOAD = 20;
     private final static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -261,6 +262,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
+    private android.app.AlertDialog dialogCall;
 
     ProgressDialog dialog;
     ProgressDialog statusDialog;
@@ -412,6 +414,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private AlertDialog locationDialog;
     private boolean isLocationDialogShown = false;
+    private boolean isJoinCallDialogShown = false;
     private RelativeLayout inputTextLayout;
     private LinearLayout separatorOptions;
 
@@ -579,6 +582,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         cancelRecording();
                         break;
                     case MegaChatCall.CALL_STATUS_DESTROYED:
+                        if (dialogCall != null) {
+                            isJoinCallDialogShown = false;
+                            dialogCall.dismiss();
+                        }
                         usersWithVideo();
                         break;
                 }
@@ -1238,6 +1245,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         mOutputFilePath = savedInstanceState.getString("mOutputFilePath");
                         isShareLinkDialogDismissed = savedInstanceState.getBoolean("isShareLinkDialogDismissed", false);
                         isLocationDialogShown = savedInstanceState.getBoolean("isLocationDialogShown", false);
+                        isJoinCallDialogShown = savedInstanceState.getBoolean(JOIN_CALL_DIALOG, false);
                         recoveredSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_ITEMS);
 
                         if(visibilityMessageJump){
@@ -1479,6 +1487,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("On create: stateHistory: " + stateHistory);
         if (isLocationDialogShown) {
             showSendLocationDialog();
+        }
+
+        if (isJoinCallDialogShown) {
+            MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
+            if (callInThisChat != null && !callInThisChat.isOnHold() && chatRoom.isGroup()) {
+                MegaChatCall anotherCallActive = getAnotherActiveCall(chatRoom.getChatId());
+                if (anotherCallActive != null) {
+                    showJoinCallDialog(callInThisChat.getChatid(), anotherCallActive);
+                }
+            }
         }
     }
 
@@ -2598,14 +2616,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if (participatingInACall()) {
                 long chatIdCallInProgress = getChatCallInProgress();
-                if (chatIdCallInProgress == chatRoom.getChatId()) {
+                if (callInThisChat.isOnHold() || chatIdCallInProgress == chatRoom.getChatId()) {
                     logDebug("I'm participating in the call of this chat");
-                    returnCall(this, chatIdCallInProgress);
+                    returnCall(this, chatRoom.getChatId());
                     return;
                 }
 
                 logDebug("I'm participating in another call from another chat");
-                showConfirmationToJoinCall();
+                MegaChatCall anotherOnHoldCall = getAnotherOnHoldCall(chatRoom.getChatId());
+                if(anotherOnHoldCall != null) {
+                    showJoinCallDialog(chatRoom.getChatId(), anotherOnHoldCall);
+                }
                 return;
             }
 
@@ -3254,9 +3275,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * Dialog to allow joining a group call when another one is active.
      *
      * @param callInThisChat  The chat ID of the group call.
-     * @param anotherCallActive The in progress call.
+     * @param anotherCall The in progress call.
      */
-    public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCallActive) {
+    public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall) {
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.join_call_dialog, null);
@@ -3266,44 +3287,44 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setView(dialoglayout);
-        final android.app.AlertDialog dialog = builder.create();
-        dialog.show();
+        dialogCall = builder.create();
+        isJoinCallDialogShown = true;
+        dialogCall.show();
 
         View.OnClickListener clickListener = v -> {
             switch (v.getId()) {
                 case R.id.hold_join_button:
-                    if(anotherCallActive.isOnHold()){
-                        MegaApplication.setSpeakerStatus(callInThisChat, false);
-                        megaChatApi.answerChatCall(callInThisChat, false, ChatActivityLollipop.this);
+                    if(anotherCall.isOnHold()){
+                        MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
+                        if(callInChat != null){
+                            if (callInChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                                MegaApplication.setSpeakerStatus(callInThisChat, false);
+                                megaChatApi.answerChatCall(callInThisChat, false, ChatActivityLollipop.this);
+                            } else if (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                                megaChatApi.startChatCall(idChat, false, ChatActivityLollipop.this);
+                            }
+                        }
                     }else{
-                        megaChatApi.setCallOnHold(anotherCallActive.getChatid(), true, ChatActivityLollipop.this);
+                        megaChatApi.setCallOnHold(anotherCall.getChatid(), true, ChatActivityLollipop.this);
                     }
                     break;
 
                 case R.id.end_join_button:
-                    endCall(anotherCallActive.getChatid());
+                    endCall(anotherCall.getChatid());
                     break;
 
                 case R.id.cancel_button:
                     break;
 
             }
-            if (dialog != null) {
-                dialog.dismiss();
+            if (dialogCall != null) {
+                isJoinCallDialogShown = false;
+                dialogCall.dismiss();
             }
         };
         holdJoinButton.setOnClickListener(clickListener);
         endJoinButton.setOnClickListener(clickListener);
         cancelButton.setOnClickListener(clickListener);
-    }
-
-    private void showConfirmationToJoinCall(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setTitle(R.string.title_join_call)
-                .setMessage(R.string.text_join_call)
-                .setPositiveButton(getApplicationContext().getString(R.string.answer_call_incoming).toUpperCase(), (dialog, which) -> endCall(getChatCallInProgress()))
-                .setNegativeButton(R.string.general_cancel, null)
-                .show();
     }
 
     public void controlCamera(){
@@ -3430,7 +3451,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }else{
                     returnCall(this, anotherCallActive.getChatid());
                 }
-
                 break;
 
             case R.id.send_message_icon_chat:
@@ -7110,15 +7130,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         } else if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("TYPE_HANG_CHAT_CALL finished with success  ---> answerChatCall chatid = " + idChat);
-                if (megaChatApi == null) return;
-                MegaChatCall call = megaChatApi.getChatCall(idChat);
+                MegaChatCall call = api.getChatCall(idChat);
                 if (call == null) return;
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
-                    megaChatApi.answerChatCall(idChat, false, this);
+                    api.answerChatCall(idChat, false, this);
 
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                    megaChatApi.startChatCall(idChat, false, this);
+                    api.startChatCall(idChat, false, this);
                 }
             } else {
                 logError("ERROR WHEN TYPE_HANG_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
@@ -7687,6 +7706,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     @Override
     public void onSaveInstanceState(Bundle outState){
+        logDebug("onSaveInstance");
         super.onSaveInstanceState(outState);
         outState.putLong("idChat", idChat);
         outState.putLong("selectedMessageId", selectedMessageId);
@@ -7727,6 +7747,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         }
         outState.putBoolean("isLocationDialogShown", isLocationDialogShown);
+        outState.putBoolean(JOIN_CALL_DIALOG, isJoinCallDialogShown);
+
 //        outState.putInt("position_imageDrag", position_imageDrag);
 //        outState.putSerializable("holder_imageDrag", holder_imageDrag);
     }
@@ -8341,6 +8363,23 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (chatsIDsWithCallActive != null && !chatsIDsWithCallActive.isEmpty()) {
             for (Long anotherChatId : chatsIDsWithCallActive) {
                 if (anotherChatId != currentChatId && megaChatApi.getChatCall(anotherChatId) != null && !megaChatApi.getChatCall(anotherChatId).isOnHold()) {
+                    return megaChatApi.getChatCall(anotherChatId);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Method to get another call on hold.
+     *
+     * @return The another call.
+     */
+    private MegaChatCall getAnotherOnHoldCall(long currentChatId) {
+        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
+        if (chatsIDsWithCallActive != null && !chatsIDsWithCallActive.isEmpty()) {
+            for (Long anotherChatId : chatsIDsWithCallActive) {
+                if (anotherChatId != currentChatId && megaChatApi.getChatCall(anotherChatId) != null && megaChatApi.getChatCall(anotherChatId).isOnHold()) {
                     return megaChatApi.getChatCall(anotherChatId);
                 }
             }

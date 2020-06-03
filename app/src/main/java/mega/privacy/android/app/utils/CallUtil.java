@@ -670,7 +670,7 @@ public class CallUtil {
             for (Long anotherChatId : chatsIDsWithCallActive) {
                 if (anotherChatId != currentChatId) {
                     MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(anotherChatId);
-                    if (!call.isOnHold()) {
+                    if (call != null && !call.isOnHold()) {
                         logDebug("Another call ACTIVE");
                         return anotherChatId;
                     }
@@ -681,4 +681,25 @@ public class CallUtil {
         return currentChatId;
     }
 
+    /**
+     * Method to check if there is a call and that it is not on hold before answering it..
+     *
+     * @param currentChatId The current call.
+     * @return The call in progress.
+     */
+    public static long existsAnotherCall(long currentChatId) {
+        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
+        if (chatsIDsWithCallActive == null || chatsIDsWithCallActive.isEmpty()) {
+            return currentChatId;
+        }
+        for (Long anotherChatId : chatsIDsWithCallActive) {
+            if (anotherChatId != currentChatId) {
+                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(anotherChatId);
+                if (call != null && !call.isOnHold()) {
+                    return anotherChatId;
+                }
+            }
+        }
+        return currentChatId;
+    }
 }

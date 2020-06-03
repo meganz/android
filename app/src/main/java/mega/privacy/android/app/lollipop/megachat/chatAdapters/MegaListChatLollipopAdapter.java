@@ -1778,6 +1778,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}else if(messageType==MegaChatMessage.TYPE_CALL_STARTED){
 				logDebug("Message type TYPE_CALL_STARTED");
 				String textToShow = context.getResources().getString(R.string.call_started_messages);
+
+				if (isStatusConnected(context, chat.getChatId())) {
+					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+				} else {
+					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				}
+
 				Spanned result;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
@@ -1786,7 +1793,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
-				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 
 			}else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
 				logDebug("Message type TYPE_CALL_ENDED");

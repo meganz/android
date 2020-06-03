@@ -150,6 +150,8 @@
 
     <color name="turn_on_notifications_background">#FF00A38C</color>
     <color name="turn_on_notifications_statusbar">#FF008270</color>
+    <color name="call_on_hold_banner">#60008270</color>
+
     <color name="turn_on_notifications_text">#B3000000</color>
 
 

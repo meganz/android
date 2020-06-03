@@ -168,6 +168,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
+                            android:gravity="center_vertical"
                             android:visibility="gone">
 
                             <TextView
@@ -182,6 +183,7 @@
                                 android:id="@+id/participants_image"
                                 android:layout_width="18dp"
                                 android:layout_height="18dp"
+                                android:layout_gravity="center_vertical"
                                 android:src="@drawable/ic_videocam_white" />
 
                         </LinearLayout>

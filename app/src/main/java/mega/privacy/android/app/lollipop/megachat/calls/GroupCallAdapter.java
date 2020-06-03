@@ -622,10 +622,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         int iconRightMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
         int iconTopMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
 
-        if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && peers.size() == 2) {
-            if (position == 0 || position == 1) {
-                iconTopMargin += getActionBarHeight(context);
-            }
+        if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && peers.size() == 2 && position == 0) {
+            iconTopMargin += getActionBarHeight(context);
         }
 
         RelativeLayout.LayoutParams paramsImage = new RelativeLayout.LayoutParams(holder.muteIcon.getLayoutParams());
@@ -651,9 +649,13 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     public void updateMuteIcon() {
         for (InfoPeerGroupCall peer : peers) {
             int position = peers.indexOf(peer);
-            ViewHolderGroupCall holder = getHolder(position);
-            if (holder != null && !peer.isAudioOn()) {
-                displayMuteIcon(position, holder, peer);
+            if(!peer.isAudioOn()){
+                ViewHolderGroupCall holder = getHolder(position);
+                if(holder != null){
+                    displayMuteIcon(position, holder, peer);
+                }else{
+                    notifyItemChanged(position);
+                }
             }
         }
     }

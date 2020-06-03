@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -871,6 +872,11 @@ public final class ChatAdvancedNotificationBuilder {
             notificationManager.createNotificationChannel(channel);
         }
 
+        Intent intentCall = new Intent(context, ChatCallActivity.class);
+        intentCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intentCall.putExtra(CHAT_ID, chatIdCallToAnswer);
+        PendingIntent pendingIntentCall = PendingIntent.getActivity(context, 0, intentCall, PendingIntent.FLAG_UPDATE_CURRENT);
+
         PendingIntent intentIgnore = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE);
 
         /*Customize notification*/
@@ -932,7 +938,9 @@ public final class ChatAdvancedNotificationBuilder {
             expandedView.setViewVisibility(R.id.chat_status, GONE);
         }
 
-        if (getNumberButtons() == THREE_BUTTONS) {
+        int numberButtons = getNumberButtons();
+
+        if (numberButtons == THREE_BUTTONS) {
             expandedView.setViewVisibility(R.id.big_layout, View.VISIBLE);
             expandedView.setViewVisibility(R.id.small_layout, GONE);
 
@@ -982,19 +990,22 @@ public final class ChatAdvancedNotificationBuilder {
 
         notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify);
         notificationBuilder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
-        notificationBuilder.setCustomHeadsUpContentView(collapsedViews);
+        if (numberButtons == THREE_BUTTONS) {
+            notificationBuilder.setCustomHeadsUpContentView(collapsedViews);
+        }else{
+            notificationBuilder.setCustomHeadsUpContentView(expandedView);
+        }
         notificationBuilder.setCustomContentView(collapsedViews);
         notificationBuilder.setCustomBigContentView(expandedView);
-        notificationBuilder.setContentIntent(null);
+        notificationBuilder.setContentIntent(pendingIntentCall);
         notificationBuilder.setAutoCancel(true);
         notificationBuilder.setDeleteIntent(intentIgnore);
         notificationBuilder.setOngoing(false);
+        notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilder.setVibrate(patternIncomingCall);
         }
-
-        notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
@@ -1020,6 +1031,11 @@ public final class ChatAdvancedNotificationBuilder {
 
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(callToAnswer.getChatid());
         int notificationId = (MegaApiJava.userHandleToBase64(callToAnswer.getId())).hashCode();
+
+        Intent intentCall = new Intent(context, ChatCallActivity.class);
+        intentCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intentCall.putExtra(CHAT_ID, callToAnswer.getChatid());
+        PendingIntent pendingIntentCall = PendingIntent.getActivity(context, 0, intentCall, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
         ignoreIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
@@ -1104,10 +1120,10 @@ public final class ChatAdvancedNotificationBuilder {
         notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify);
         notificationBuilder.setAutoCancel(true);
         notificationBuilder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
-        notificationBuilder.setCustomHeadsUpContentView(collapsedViews);
+        notificationBuilder.setCustomHeadsUpContentView(expandedView);
         notificationBuilder.setCustomContentView(collapsedViews);
         notificationBuilder.setCustomBigContentView(expandedView);
-        notificationBuilder.setContentIntent(null);
+        notificationBuilder.setContentIntent(pendingIntentCall);
         notificationBuilder.setDeleteIntent(pendingIntentIgnore);
         notificationBuilder.setOngoing(false);
 
