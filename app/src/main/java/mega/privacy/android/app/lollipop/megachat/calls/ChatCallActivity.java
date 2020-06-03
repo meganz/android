@@ -1820,7 +1820,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         MegaChatRoom anotherChat = megaChatApi.getChatRoom(anotherChatId);
         anotherCallTitle.setText(anotherChat.getTitle());
         anotherCallSubtitle.setText(getString(isOnHold ? R.string.call_on_hold : R.string.call_in_progress_layout));
-        anotherCallSubtitle.setBackgroundColor(ContextCompat.getColor(this, isOnHold ? R.color.turn_on_notifications_statusbar : R.color.accentColor));
+        anotherCallLayout.setBackgroundColor(ContextCompat.getColor(this, isOnHold ? R.color.turn_on_notifications_statusbar : R.color.accentColor));
         anotherCallSubtitle.setAlpha(isOnHold ? 0.6f : 1f);
         anotherCallLayout.setVisibility(View.VISIBLE);
     }

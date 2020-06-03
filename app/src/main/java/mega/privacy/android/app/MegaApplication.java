@@ -1459,13 +1459,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		if (rtcAudioManager == null)
 			return;
 
-		try {
-			unregisterProximitySensor();
-			rtcAudioManager.stop();
-			rtcAudioManager = null;
-		} catch (Exception e) {
-			logError("Exception stopping speaker audio manager", e);
-		}
+		unregisterProximitySensor();
+		rtcAudioManager.stop();
+		rtcAudioManager = null;
 	}
 
     /**

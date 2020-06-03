@@ -34,44 +34,33 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
+            android:layout_marginStart="8dp"
             android:orientation="vertical">
 
             <Button
                 android:id="@+id/hold_join_button"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+                android:layout_gravity="end"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="10dp"
-                android:layout_gravity="right"
-                android:textColor="@color/accentColor"
                 android:text="@string/hold_and_join_call_incoming" />
             <Button
                 android:id="@+id/end_join_button"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+                android:layout_gravity="end"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="10dp"
-                android:layout_gravity="right"
-                android:textColor="@color/accentColor"
                 android:text="@string/end_and_join_call_incoming"/>
             <Button
                 android:id="@+id/cancel_button"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+                android:layout_gravity="end"
                 android:layout_marginBottom="8dp"
-                android:layout_marginLeft="10dp"
-                android:layout_gravity="right"
-                android:textColor="@color/accentColor"
                 android:text="@string/general_cancel"/>
         </LinearLayout>
     </LinearLayout>

@@ -848,7 +848,7 @@ public final class ChatAdvancedNotificationBuilder {
     private void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid() + ", Call in progress ID: " + callInProgress.getChatid());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1){
             logWarning("Not supported incoming call notification: " + Build.VERSION.SDK_INT);
             return;
         }
@@ -1014,7 +1014,7 @@ public final class ChatAdvancedNotificationBuilder {
     public void showIncomingGroupCallNotification(MegaChatCall callToAnswer) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
             logWarning("Not supported incoming call notification: " + Build.VERSION.SDK_INT);
             return;
         }
