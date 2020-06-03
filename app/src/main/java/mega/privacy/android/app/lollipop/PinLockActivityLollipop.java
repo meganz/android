@@ -455,9 +455,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		passSixthLetter.setEt(passFifthLetter);
 
 		passFirstLetter.requestFocus();
-		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		imm.showSoftInput(passFirstLetter, InputMethodManager.SHOW_FORCED);
-//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 		//Add TextWatcher to first letter
 		passFirstLetter.addTextChangedListener(new TextWatcher() {
@@ -721,9 +718,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		passFourthLetter.setLayoutParams(textParams);
 
 		passFirstLetter.requestFocus();
-		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		imm.showSoftInput(passFirstLetter, InputMethodManager.SHOW_FORCED);
-//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 		//Add TextWatcher to first letter		
 		passFirstLetter.addTextChangedListener(new TextWatcher() {
@@ -930,11 +924,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				    		passFourthLetter.setCursorVisible(false);
 				    	}
 
-						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-//						imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
-						//						startActivity(intent);
-						//						finish();
+						Util.hideKeyboard(this);
 
 						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
 
@@ -1032,10 +1022,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				    		passFourthLetter.setCursorVisible(false);
 				    	}
 
-						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
-						//						startActivity(intent);
-						//						finish();
+						Util.hideKeyboard(this);
+
 						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
 
 						     public void onTick(long millisUntilFinished) {
