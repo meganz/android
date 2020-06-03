@@ -4378,6 +4378,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		inputFirstName.setOnEditorActionListener(editorActionListener);
 		inputFirstName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
+		inputFirstName.requestFocus();
 
 		inputLastName.setSingleLine();
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
@@ -4459,6 +4460,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		builder.setView(scrollView);
 
 		changeUserAttributeDialog = builder.create();
+		changeUserAttributeDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		changeUserAttributeDialog.show();
 		changeUserAttributeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -4501,7 +4503,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 		});
-		showKeyboardDelayed(inputFirstName);
 	}
 
 	@Override
@@ -8108,36 +8109,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
 		input.setText(text);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					if (document.isFolder()){
-						input.setSelection(0, input.getText().length());
-					}
-					else{
-						String [] s = document.getName().split("\\.");
-						if (s != null){
+		input.requestFocus();
 
-							int numParts = s.length;
-							int lastSelectedPos = 0;
-							if (numParts == 1){
-								input.setSelection(0, input.getText().length());
-							}
-							else if (numParts > 1){
-								for (int i=0; i<(numParts-1);i++){
-									lastSelectedPos += s[i].length();
-									lastSelectedPos++;
-								}
-								lastSelectedPos--; //The last point should not be selected)
-								input.setSelection(0, lastSelectedPos);
-							}
-						}
-						showKeyboardDelayed(v);
+		if (document.isFolder()) {
+			input.setSelection(0, input.getText().length());
+		} else {
+			String[] s = document.getName().split("\\.");
+			if (s != null) {
+
+				int numParts = s.length;
+				int lastSelectedPos = 0;
+				if (numParts == 1) {
+					input.setSelection(0, input.getText().length());
+				} else if (numParts > 1) {
+					for (int i = 0; i < (numParts - 1); i++) {
+						lastSelectedPos += s[i].length();
+						lastSelectedPos++;
 					}
+					lastSelectedPos--; //The last point should not be selected)
+					input.setSelection(0, lastSelectedPos);
 				}
 			}
-		});
+		}
 
 	    layout.addView(input, params);
 
@@ -8242,6 +8235,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		builder.setView(layout);
 		renameDialog = builder.create();
+		renameDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		renameDialog.show();
 		renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
 		{
@@ -9568,14 +9562,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_new_folder));
@@ -9597,6 +9584,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -9737,14 +9725,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
 
 		final TextView text = new TextView(ManagerActivityLollipop.this);
 
@@ -9787,6 +9768,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 
 		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
@@ -9897,14 +9879,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
+
 		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
@@ -9927,6 +9903,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         });
 
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 	}
 
