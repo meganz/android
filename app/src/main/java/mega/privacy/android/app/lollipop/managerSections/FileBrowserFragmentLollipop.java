@@ -70,6 +70,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FileBrowserFragmentLollipop extends RotatableFragment{
@@ -525,7 +526,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		if (recyclerView == null) return;
 
 		boolean visible = (adapter != null && adapter.isMultipleSelect())
-				|| MegaApplication.getTransfersManagement().isTransferOverQuotaNotificationShown()
+				|| MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()
 				|| (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE);
 
 		((ManagerActivityLollipop) context).changeActionBarElevation(visible);
@@ -569,9 +570,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		((ManagerActivityLollipop) context).setToolbarTitle();
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 
+		View v;
+
 		if (((ManagerActivityLollipop) context).isList) {
 			logDebug("isList");
-			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+			v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
 			recyclerView = v.findViewById(R.id.file_list_view_browser);
 			fastScroller = v.findViewById(R.id.fastscroll);
@@ -622,11 +625,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
-            return v;
-
         } else {
 			logDebug("Grid View");
-            View v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
+            v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
             recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
             fastScroller = v.findViewById(R.id.fastscroll);
             
@@ -672,8 +673,19 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
-			return v;
         }
+
+		transferOverQuotaBanner = v.findViewById(R.id.transfer_over_quota_banner);
+		transferOverQuotaBannerText = v.findViewById(R.id.banner_content_text);
+		v.findViewById(R.id.banner_dismiss_button).setOnClickListener(v1 -> hideTransferOverQuotaBanner());
+		v.findViewById(R.id.banner_upgrade_button).setOnClickListener(v12 -> {
+			hideTransferOverQuotaBanner();
+			((ManagerActivityLollipop) context).navigateToUpgradeAccount();
+		});
+
+		setTransferOverQuotaBannerVisibility();
+
+		return v;
     }
     
     @Override
@@ -1523,8 +1535,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setTransferOverQuotaBannerVisibility() {
-    	if (adapter != null) {
-    		adapter.setTransferOverQuotaBannerVisibility();
+    	if (MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()) {
+    		transferOverQuotaBanner.setVisibility(View.VISIBLE);
+    		transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())));
+			createAndShowCountDownTimer(R.string.current_text_depleted_transfer_overquota, transferOverQuotaBanner, transferOverQuotaBannerText);
+		} else {
+    		transferOverQuotaBanner.setVisibility(View.GONE);
 		}
+	}
+
+	private void hideTransferOverQuotaBanner() {
+		MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(false);
+		setTransferOverQuotaBannerVisibility();
 	}
 }

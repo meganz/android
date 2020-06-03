@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 import android.os.CountDownTimer;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -387,15 +388,20 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     /**
-     * Shows and manages a countdown timer in a warning dialog.
+     * Shows and manages a countdown timer in a view.
      *
-     * @param alertDialog       warning dialog in which the timer has to be shown
+     * Note:    The view can be an AlertDialog or any other type of View.
+     *          - If the view is an AlertDialog, it can be:
+     *              * Simple, which does not need any other view received by param.
+     *              * Customized, which must contain a TextView received by param.
+     *          - If the view is any other type of View, it must contain a TextView received by param.
+     *
      * @param stringResource    string resource in which the timer has to be shown
-     * @param textView          TextView of the warning dialog, in which the string resource has to be set.
-     *                          Note: If this parameter is null means the dialog does not have a customized view
-     *                          and the string resource has to be set into the message field of the dialog.
+     * @param alertDialog       warning dialog in which the timer has to be shown
+     * @param v                 View in which the timer has to be shown
+     * @param textView          TextView in which the string resource has to be set
      */
-    public static void createAndShowCountDownTimerInWarning(AlertDialog alertDialog, int stringResource, TextView textView) {
+    public static void createAndShowCountDownTimer(int stringResource, AlertDialog alertDialog, View v, TextView textView) {
         Context context = MegaApplication.getInstance().getApplicationContext();
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
 
@@ -412,8 +418,10 @@ public class TimeUtils implements Comparator<Calendar> {
                     } else {
                         textView.setText(textToShow);
                     }
-                } else {
+                } else if (alertDialog != null) {
                     alertDialog.dismiss();
+                } else if (v != null) {
+                    v.setVisibility(View.GONE);
                 }
             }
 
@@ -428,8 +436,29 @@ public class TimeUtils implements Comparator<Calendar> {
      *
      * @param alertDialog       warning dialog in which the timer has to be shown
      * @param stringResource    string resource in which the timer has to be shown
+     * @param textView          TextView in which the string resource has to be set
      */
-    public static void createAndShowCountDownTimerInWarning(AlertDialog alertDialog, int stringResource) {
-        createAndShowCountDownTimerInWarning(alertDialog, stringResource, null);
+    public static void createAndShowCountDownTimer(int stringResource, AlertDialog alertDialog, TextView textView) {
+        createAndShowCountDownTimer(stringResource, alertDialog, null, textView);
+    }
+
+    /**
+     * Shows and manages a countdown timer in a warning dialog.
+     *
+     * @param alertDialog       warning dialog in which the timer has to be shown
+     * @param stringResource    string resource in which the timer has to be shown
+     */
+    public static void createAndShowCountDownTimer(int stringResource, AlertDialog alertDialog) {
+        createAndShowCountDownTimer(stringResource, alertDialog, null, null);
+    }
+
+    /**
+     * Shows and manages a countdown timer in a view.
+     *
+     * @param stringResource    string resource in which the timer has to be shown
+     * @param textView          TextView in which the string resource has to be set
+     */
+    public static void createAndShowCountDownTimer(int stringResource, View v, TextView textView) {
+        createAndShowCountDownTimer(stringResource, null, v, textView);
     }
 }

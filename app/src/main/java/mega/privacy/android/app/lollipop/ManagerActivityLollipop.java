@@ -139,6 +139,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransferWidget;
+import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
@@ -206,6 +207,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -2480,9 +2482,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
 
 				if (position == PENDING_TAB && isTransfersInProgressAdded()) {
-					tFLol.setGetMoreQuotaViewVisibility(isOnTransferOverQuota());
+					tFLol.setGetMoreQuotaViewVisibility();
 				} else if (position == COMPLETED_TAB && isTransfersCompletedAdded()) {
-					completedTFLol.setGetMoreQuotaViewVisibility(isOnTransferOverQuota());
+					completedTFLol.setGetMoreQuotaViewVisibility();
 				}
 			}
 
@@ -2699,6 +2701,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
+						startActivity(intent);
+						finish();
+						return;
+					} else if (getIntent().getAction().equals(ACTION_SHOW_UPGRADE_ACCOUNT)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
 						startActivity(intent);
 						finish();
 						return;
@@ -3590,7 +3600,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			app.refreshAccountInfo();
 		}
 
-		MegaApplication.getTransfersManagement().setIsOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
+		checkTransferOverQuotaOnResume();
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -5613,6 +5623,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			indexTransfers = viewPagerTransfers.getCurrentItem();
 		}
 
+		supportInvalidateOptionsMenu();
 		setToolbarTitle();
 		showFabButton();
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -7882,6 +7893,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void backToDrawerItem(int item) {
     	if (item == CLOUD_DRIVE_BNV || item == -1) {
     		drawerItem = DrawerItem.CLOUD_DRIVE;
+    		if (isCloudAdded()) {
+    			fbFLol.setTransferOverQuotaBannerVisibility();
+			}
 		}
 		else if (item == CAMERA_UPLOADS_BNV) {
 			drawerItem = DrawerItem.CAMERA_UPLOADS;
@@ -11230,6 +11244,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}
 				return;
+			} else if(ACTION_SHOW_UPGRADE_ACCOUNT.equals(getIntent().getAction())) {
+				navigateToUpgradeAccount();
+			} else if (ACTION_SHOW_TRANSFERS.equals(intent.getAction())){
+				logDebug("Intent show transfers");
+
+				drawerItem = DrawerItem.TRANSFERS;
+				indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+				selectDrawerItemLollipop(drawerItem);
 			}
 
 		}
@@ -16586,7 +16608,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.create();
 
 		transferOverQuotaWarning.setCanceledOnTouchOutside(false);
-		createAndShowCountDownTimerInWarning(transferOverQuotaWarning, messageResource);
+		TimeUtils.createAndShowCountDownTimer(messageResource, transferOverQuotaWarning);
 		transferOverQuotaWarning.show();
 		isTransferOverQuotaWarningShown = true;
 	}
@@ -16604,6 +16626,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		transfersWidgetLayout.setLayoutParams(params);
+	}
+
+	private void checkTransferOverQuotaOnResume() {
+		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+		transfersManagement.setIsOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
+		if (transfersManagement.isTransferOverQuotaNotificationShown()) {
+			transfersManagement.setTransferOverQuotaBannerShown(true);
+			transfersManagement.setTransferOverQuotaNotificationShown(false);
+		}
 	}
 
 	private RubbishBinFragmentLollipop getRubbishBinFragment() {

@@ -17,6 +17,8 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
+
 public class TransfersBaseFragment extends BaseFragment {
 
     protected ImageView emptyImage;
@@ -50,6 +52,8 @@ public class TransfersBaseFragment extends BaseFragment {
         getMoreQuotaView = v.findViewById(R.id.get_more_quota_view);
         v.findViewById(R.id.get_more_quota_upgrade_button).setOnClickListener(v1 -> ((ManagerActivityLollipop) context).navigateToUpgradeAccount());
 
+        setGetMoreQuotaViewVisibility();
+
         return v;
     }
 
@@ -78,7 +82,7 @@ public class TransfersBaseFragment extends BaseFragment {
         }
     }
 
-    public void setGetMoreQuotaViewVisibility(boolean visible) {
-        getMoreQuotaView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    public void setGetMoreQuotaViewVisibility() {
+        getMoreQuotaView.setVisibility(isOnTransferOverQuota() ? View.VISIBLE : View.GONE);
     }
 }

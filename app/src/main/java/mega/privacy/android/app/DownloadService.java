@@ -1664,7 +1664,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		} else if (!transfersManagement.isTransferOverQuotaNotificationShown()){
 			transfersManagement.setTransferOverQuotaNotificationShown(true);
-			new TransferOverQuotaNotification(mNotificationManager).show();
+			stopForeground(true);
+			new TransferOverQuotaNotification().show();
+			mNotificationManager.cancel(notificationId);
 		}
 	}
 

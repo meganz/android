@@ -487,6 +487,11 @@
         </service>
 
         <service
+            android:name="mega.privacy.android.app.notifications.DownloadNotificationIntentService"
+            android:exported="false" >
+        </service>
+
+        <service
             android:name="UploadService"
             android:exported="false" >
         </service>

@@ -779,7 +779,7 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
 
-        createAndShowCountDownTimerInWarning(transferGeneralOverQuotaWarning, stringResource, text);
+        createAndShowCountDownTimer(stringResource, transferGeneralOverQuotaWarning, text);
         transferGeneralOverQuotaWarning.show();
         isGeneralTransferOverQuotaWarningShown = true;
     }

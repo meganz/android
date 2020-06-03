@@ -51,6 +51,7 @@ public class TransfersManagement {
 
     public void setHasNotToBeShowDueToTransferOverQuota(boolean hasNotToBeShowDueToTransferOverQuota) {
         this.hasNotToBeShowDueToTransferOverQuota = hasNotToBeShowDueToTransferOverQuota;
+        setTransferOverQuotaBannerShown(hasNotToBeShowDueToTransferOverQuota);
     }
 
     /**

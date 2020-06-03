@@ -64,6 +64,8 @@
 			</LinearLayout>
 		</RelativeLayout>
 
+		<include layout="@layout/transfer_over_quota_banner"/>
+
 		<RelativeLayout
 			android:id="@+id/relative_layout_recycler"
 			android:layout_width="wrap_content"
@@ -75,7 +77,7 @@
 				android:id="@+id/file_list_view_browser"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:choiceMode="multipleChoice" />
+				android:choiceMode="multipleChoice"/>
 
 			<mega.privacy.android.app.components.scrollBar.FastScroller
 				android:id="@+id/fastscroll"
