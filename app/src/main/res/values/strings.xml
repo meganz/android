@@ -2771,6 +2771,7 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
 
 </resources>

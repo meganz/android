@@ -32,6 +32,7 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -39,6 +40,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
@@ -47,6 +49,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 
 public class ChatUtil {
 
@@ -110,8 +113,8 @@ public class ChatUtil {
         builder.setView(v);
         final AlertDialog shareLinkDialog = builder.create();
 
-        TextView nameGroup = (TextView) v.findViewById(R.id.group_name_text);
-        nameGroup.setText(chat.getTitle());
+        EmojiTextView nameGroup = v.findViewById(R.id.group_name_text);
+        nameGroup.setText(getTitleChat(chat));
         TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
 
@@ -485,4 +488,34 @@ public class ChatUtil {
             contactStateText.isMarqueeIsNecessary(context);
         }
     }
+
+    /**
+     * Method for obtaining the title of a MegaChatRoom.
+     *
+     * @param chat The chat room.
+     * @return String with the title.
+     */
+    public static String getTitleChat(MegaChatRoom chat) {
+        if (chat.isActive()) {
+            return chat.getTitle();
+        }
+
+        MegaApplication app = MegaApplication.getInstance();
+        return app.getString(R.string.inactive_chat_title, formatDate(app.getBaseContext(), chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT));
+    }
+
+    /**
+     * Method for obtaining the title of a MegaChatListItem.
+     *
+     * @param chat The chat room.
+     * @return String with the title.
+     */
+    public static String getTitleChat(MegaChatListItem chat) {
+        if (chat.isActive()) {
+            return chat.getTitle();
+        }
+
+        return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
+    }
+
 }

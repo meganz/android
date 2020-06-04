@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatMessage;
 
+import static android.text.format.DateFormat.getBestDateTimePattern;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -25,6 +26,7 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_SHORT_FORMAT = 1;
     public static final int DATE_SHORT_SHORT_FORMAT = 2;
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
+    public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
 
     int type;
 
@@ -144,6 +146,10 @@ public class TimeUtils implements Comparator<Calendar> {
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
                 df = new SimpleDateFormat("MMM d, YYYY");
+                break;
+            case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
+                Locale locale = context.getResources().getConfiguration().locale;
+                df = new SimpleDateFormat(getBestDateTimePattern (locale, "YYYY-MM-dd HH:mm"), locale);
                 break;
             default:
                 df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
