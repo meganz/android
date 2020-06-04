@@ -1870,7 +1870,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
         if (handleList.size() > 0) {
-            megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, chatRoom.getAuthorizationToken(), new GetPeerAttributesListener(this));
+            megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, new GetPeerAttributesListener(this));
         }
     }
 

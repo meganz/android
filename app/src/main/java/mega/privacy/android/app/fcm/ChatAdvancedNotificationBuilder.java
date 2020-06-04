@@ -296,7 +296,7 @@ public final class ChatAdvancedNotificationBuilder {
             if (request != null) {
                 MegaHandleList handleList = MegaHandleList.createInstance();
                 handleList.addMegaHandle(msg.getUserHandle());
-                megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, chatRoom.getAuthorizationToken(), new GetPeerAttributesListener(context, request));
+                megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, new GetPeerAttributesListener(context, request));
             }
         }
 

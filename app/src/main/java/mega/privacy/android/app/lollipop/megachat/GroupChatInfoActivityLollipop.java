@@ -1296,7 +1296,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
      */
     private void requestUserAttributes(MegaHandleList handleList, HashMap<Integer, MegaChatParticipant> participantRequests) {
         if (handleList.size() > 0) {
-            megaChatApi.loadUserAttributes(chatHandle, handleList, chat.getAuthorizationToken(), new GetPeerAttributesListener(this, participantRequests));
+            megaChatApi.loadUserAttributes(chatHandle, handleList, new GetPeerAttributesListener(this, participantRequests));
         }
     }
 

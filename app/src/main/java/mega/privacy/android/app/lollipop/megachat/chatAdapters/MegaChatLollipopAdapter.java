@@ -7732,7 +7732,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else {
                 MegaHandleList handleList = MegaHandleList.createInstance();
                 handleList.addMegaHandle(handle);
-                megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, chatRoom.getAuthorizationToken(),
+                megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList,
                         new GetPeerAttributesListener(context, holder, this));
             }
         } else {
