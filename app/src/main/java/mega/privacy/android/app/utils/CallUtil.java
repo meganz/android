@@ -682,7 +682,7 @@ public class CallUtil {
     }
 
     /**
-     * Method to check if there is a call and that it is not on hold before answering it..
+     * Method to check if there is a call and that it is not on hold before answering it.
      *
      * @param currentChatId The current call.
      * @return The call in progress.
