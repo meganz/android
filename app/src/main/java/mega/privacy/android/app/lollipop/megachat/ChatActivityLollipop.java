@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
+import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
@@ -455,7 +456,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-    private static final int FOCUS_GAIN_TYPE = AudioManager.AUDIOFOCUS_GAIN;
+    private static final int FOCUS_TYPE = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     private static final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
     private AudioFocusRequest request = null;
 
@@ -968,7 +969,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
             }
         });
 
-
         /*
          *Events of the recording
          */
@@ -981,7 +981,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
                     return;
                 }
                 if (!isAllowedToRecord()) return;
-                prepareRecording();
+
+                prepareToRecord();
             }
 
             @Override
@@ -2227,25 +2228,67 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-     *Prepare recording
+    /**
+     * Method for getting the focus of the audio manager.
      */
-    public void prepareRecording() {
-        logDebug("prepareRecording");
+    private void prepareToRecord() {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        if(SHOULD_BUILD_FOCUS_REQUEST){
-            request = new AudioFocusRequest.Builder(FOCUS_GAIN_TYPE)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setWillPauseWhenDucked(true)
-                    .setOnAudioFocusChangeListener(this)
-                    .build();
-        }else{
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            AudioAttributes mAudioAttributes =
+                    new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build();
+            request =
+                    new AudioFocusRequest.Builder(FOCUS_TYPE)
+                            .setAudioAttributes(mAudioAttributes)
+                            .setAcceptsDelayedFocusGain(true)
+                            .setWillPauseWhenDucked(true)
+                            .setOnAudioFocusChangeListener(this)
+                            .build();
+
+        } else {
             request = null;
         }
 
-        if(requestAudioFocus()){
-            recordView.playSound(TYPE_START_RECORD);
-            stopReproductions();
+        if (requestAudioFocus()) {
+            prepareRecording();
+        }
+    }
+
+    /*
+     *Prepare recording
+     */
+    private void prepareRecording() {
+        logDebug("prepareRecording");
+        recordView.playSound(TYPE_START_RECORD);
+        stopReproductions();
+    }
+
+
+    /**
+     * Method for requesting audio focus.
+     */
+    public boolean requestAudioFocus() {
+        int focusRequest;
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            focusRequest = mAudioManager.requestAudioFocus(request);
+        } else {
+            focusRequest = mAudioManager.requestAudioFocus(this, STREAM_TYPE, FOCUS_TYPE);
+        }
+        return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
+    /**
+     * Method for leaving the audio focus.
+     */
+    public void abandonAudioFocus() {
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            if(request != null) {
+                mAudioManager.abandonAudioFocusRequest(request);
+            }
+        } else {
+            mAudioManager.abandonAudioFocus(this);
         }
     }
 
@@ -2337,31 +2380,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
         recordingLayout.setVisibility(View.GONE);
     }
 
-    /**
-     * Method for requesting audio focus.
-     */
-    public boolean requestAudioFocus() {
-        int result;
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            result = mAudioManager.requestAudioFocus(request);
-        } else {
-            result = mAudioManager.requestAudioFocus(this, STREAM_TYPE, FOCUS_GAIN_TYPE);
-        }
-
-        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-    }
-
-    /**
-     * Method for leaving the audio focus.
-     */
-    public void abandonAudioFocus() {
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            mAudioManager.abandonAudioFocusRequest(request);
-        } else {
-            mAudioManager.abandonAudioFocus(this);
-        }
-    }
-
     private void destroyAudioRecorderElements(){
         abandonAudioFocus();
         handlerVisualizer.removeCallbacks(updateVisualizer);
@@ -2391,6 +2409,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
             myAudioRecorder.stop();
             myAudioRecorder.reset();
             myAudioRecorder = null;
+            abandonAudioFocus();
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
