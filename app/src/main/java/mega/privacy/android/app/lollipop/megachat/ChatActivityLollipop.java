@@ -1303,7 +1303,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 text = getString(R.string.chat_link_copied_clipboard);
                         }
                     }
-                    showChat(text);
+                    initAndShowChat(text);
                 }
             }
         }
@@ -1363,9 +1363,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             String title;
             setSizeInputText(true);
             if (chatRoom.hasCustomTitle()) {
-                title = getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle());
+                title = getString(R.string.type_message_hint_with_customized_title, getTitleChat(chatRoom));
             } else {
-                title = getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle());
+                title = getString(R.string.type_message_hint_with_default_title, getTitleChat(chatRoom));
             }
             textChat.setHint(transformEmojis(title, textChat.getTextSize()));
         }
@@ -1382,112 +1382,104 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private void updateTitle() {
         initializeInputText();
-        titleToolbar.setText(chatRoom.getTitle());
+        titleToolbar.setText(getTitleChat(chatRoom));
     }
 
-    private void showChat(String textSnackbar){
-        if(idChat!=-1) {
-            //Recover chat
-            logDebug("Recover chat with id: " + idChat);
-            chatRoom = megaChatApi.getChatRoom(idChat);
-            if(chatRoom==null){
-                logError("Chatroom is NULL - finish activity!!");
-                finish();
-            }
-
-            megaChatApi.closeChatRoom(idChat, this);
-            boolean result = megaChatApi.openChatRoom(idChat, this);
-
-            logDebug("Result of open chat: " + result);
-            if(result){
-                MegaApplication.setClosedChat(false);
-            }
-
-            if(!result){
-                logError("Error on openChatRoom");
-                if(errorOpenChatDialog==null){
-                    androidx.appcompat.app.AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-                    }
-                    else{
-                        builder = new AlertDialog.Builder(this);
-                    }
-                    builder.setTitle(getString(R.string.chat_error_open_title));
-                    builder.setMessage(getString(R.string.chat_error_open_message));
-
-                    builder.setPositiveButton(getString(R.string.general_ok),
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    finish();
-                                }
-                            }
-                    );
-                    errorOpenChatDialog = builder.create();
-                    errorOpenChatDialog.show();
-                }
-            }
-            else {
-                initializeInputText();
-                int chatConnection = megaChatApi.getChatConnectionState(idChat);
-                logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
-                if (adapter == null) {
-                    createAdapter();
-                }else {
-                    adapter.notifyDataSetChanged();
-                }
-                setPreviewersView();
-                titleToolbar.setText(chatRoom.getTitle());
-                setChatSubtitle();
-                if (!chatRoom.isPublic()) {
-                    privateIconToolbar.setVisibility(View.VISIBLE);
-                }
-                else {
-                    privateIconToolbar.setVisibility(View.GONE);
-                }
-
-                isOpeningChat = true;
-
-                String textToShowB = String.format(getString(R.string.chat_loading_messages));
-
-                try {
-                    textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
-                    textToShowB = textToShowB.replace("[/A]", "</font>");
-                    textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
-                    textToShowB = textToShowB.replace("[/B]", "</font>");
-                } catch (Exception e) {
-                }
-                Spanned resultB = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultB = Html.fromHtml(textToShowB, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    resultB = Html.fromHtml(textToShowB);
-                }
-
-                emptyScreen(resultB.toString());
-
-                if(textSnackbar!=null){
-                    String chatLink = getIntent().getStringExtra("CHAT_LINK");
-                    if (chatLink != null && !isShareLinkDialogDismissed) {
-                        showShareChatLinkDialog(this, chatRoom, chatLink);
-                    }
-                    else {
-                        showSnackbar(SNACKBAR_TYPE, textSnackbar, -1);
-                    }
-                }
-
-                loadHistory();
-                logDebug("On create: stateHistory: " + stateHistory);
-                if (isLocationDialogShown) {
-                    showSendLocationDialog();
-                }
-            }
-        }
-        else{
+    /**
+     * Opens a new chat conversation, checking if the id is valid and if the ChatRoom exists.
+     * If an error ocurred opening the chat, an error dialog is shown.
+     *
+     * @return True if the chat was successfully opened, false otherwise
+     */
+    private boolean initChat() {
+        if (idChat == MEGACHAT_INVALID_HANDLE) {
             logError("Chat ID -1 error");
+            return false;
         }
 
-        logDebug("FINISH on Create");
+        //Recover chat
+        logDebug("Recover chat with id: " + idChat);
+        chatRoom = megaChatApi.getChatRoom(idChat);
+        if (chatRoom == null) {
+            logError("Chatroom is NULL - finish activity!!");
+            finish();
+        }
+
+        megaChatApi.closeChatRoom(idChat, this);
+        if (megaChatApi.openChatRoom(idChat, this)) {
+            MegaApplication.setClosedChat(false);
+            return true;
+        }
+
+        logError("Error openChatRoom");
+        if (errorOpenChatDialog == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.chat_error_open_title))
+                    .setMessage(getString(R.string.chat_error_open_message))
+                    .setPositiveButton(getString(R.string.general_ok), (dialog, whichButton) -> finish());
+            errorOpenChatDialog = builder.create();
+            errorOpenChatDialog.show();
+        }
+        return false;
+    }
+
+    /**
+     * Opens a new chat conversation.
+     * If it went well, shows the chat with the empty state and requests messages.
+     *
+     * @param textSnackbar  if there is a chat link involved in the action, it it indicates the "Copy chat link" dialog has to be shown.
+     *                      If not, a simple Snackbar has to be shown with this text.
+     */
+    private void initAndShowChat(String textSnackbar) {
+        if (!initChat()) {
+            return;
+        }
+
+        initializeInputText();
+
+        int chatConnection = megaChatApi.getChatConnectionState(idChat);
+        logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
+
+        if (adapter == null) {
+            createAdapter();
+        } else {
+            adapter.notifyDataSetChanged();
+        }
+
+        setPreviewersView();
+        titleToolbar.setText(chatRoom.getTitle());
+        setChatSubtitle();
+        privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
+        isOpeningChat = true;
+
+        String textToShowB = getString(R.string.chat_loading_messages);
+
+        try {
+            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShowB = textToShowB.replace("[/A]", "</font>");
+            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Exception formatting string", e);
+        }
+
+        emptyScreen(getSpannedHtmlText(textToShowB).toString());
+
+        if (!isTextEmpty(textSnackbar)) {
+            String chatLink = getIntent().getStringExtra(CHAT_LINK_EXTRA);
+
+            if (!isTextEmpty(chatLink) && !isShareLinkDialogDismissed) {
+                showShareChatLinkDialog(this, chatRoom, chatLink);
+            } else {
+                showSnackbar(SNACKBAR_TYPE, textSnackbar, MEGACHAT_INVALID_HANDLE);
+            }
+        }
+
+        loadHistory();
+        logDebug("On create: stateHistory: " + stateHistory);
+        if (isLocationDialogShown) {
+            showSendLocationDialog();
+        }
     }
 
     private void emptyScreen(String text){
@@ -3357,32 +3349,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
         String message= getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
-
-    public void showConfirmationRejoinChat(final long publicHandle){
-        logDebug("showConfirmationRejoinChat");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        logDebug("Rejoin chat!: " + publicHandle);
-                        megaChatApi.autorejoinPublicChat(idChat, publicHandle, chatActivity);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        //No button clicked
-                        break;
-                    }
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        String message= getResources().getString(R.string.confirmation_rejoin_chat_link);
-        builder.setMessage(message).setPositiveButton(R.string.action_join, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
@@ -7254,15 +7220,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 logError("ERROR WHEN CREATING CHAT " + e.getErrorString());
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.create_chat_error), -1);
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
-            if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode()==MegaChatError.ERROR_EXIST){
-                if (idChat != -1 && megaChatApi.getChatRoom(idChat) != null) {
+        } else if (request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW) {
+            if (e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST) {
+                if (idChat != MEGACHAT_INVALID_HANDLE && megaChatApi.getChatRoom(idChat) != null) {
                     logDebug("Close previous chat");
                     megaChatApi.closeChatRoom(idChat, this);
                 }
+
                 idChat = request.getChatHandle();
                 megaChatApi.addChatListener(this);
+                
                 if (idChat != MEGACHAT_INVALID_HANDLE) {
                     dbH.setLastPublicHandle(idChat);
                     dbH.setLastPublicHandleTimeStamp();
@@ -7270,54 +7237,57 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
 
                 MegaApplication.setOpenChatId(idChat);
-                showChat(null);
-                supportInvalidateOptionsMenu();
-                if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
-                    if (megaChatApi.getChatRoom(idChat).isActive()) {
-                        logWarning("ERROR: You are already a participant of the chat link or are trying to open it again");
-                    } else {
-                        showConfirmationRejoinChat(request.getUserHandle());
-                    }
-                }
-            }
-            else {
 
-                String text;
-                if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                    text = getString(R.string.invalid_chat_link);
+                if (e.getErrorCode() == MegaChatError.ERROR_EXIST && !megaChatApi.getChatRoom(idChat).isActive()) {
+                    if (initChat()) {
+                        //Chat successfully initialized, now can rejoin
+                        megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+                    } else {
+                        logWarning("Error opening chat before rejoin");
+                    }
+                    return;
                 }
-                else{
+
+                initAndShowChat(null);
+                supportInvalidateOptionsMenu();
+            } else {
+                String text;
+                if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
+                    text = getString(R.string.invalid_chat_link);
+                } else {
                     showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
                     text = getString(R.string.error_chat_link);
                 }
 
                 emptyScreen(text);
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+        } else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-
-                if (request.getUserHandle() != -1) {
+                if (request.getUserHandle() != MEGACHAT_INVALID_HANDLE) {
                     //Rejoin option
-                    showChat(null);
+                    initializeInputText();
+                    titleToolbar.setText(chatRoom.getTitle());
+                    isOpeningChat = true;
+                    loadHistory();
                 } else {
                     //Join
                     setChatSubtitle();
                     setPreviewersView();
-                    supportInvalidateOptionsMenu();
                 }
+
+                supportInvalidateOptionsMenu();
             } else {
                 logError("ERROR WHEN JOINING CHAT " + e.getErrorCode() + " " + e.getErrorString());
-                showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
+                showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
+        } else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
             logDebug("TYPE_LAST_GREEN requested");
 
         }else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+
             long chatHandle = request.getChatHandle();
             chatRoom = megaChatApi.getChatRoom(chatHandle);
-            String chatTitle = chatRoom.getTitle();
+            String chatTitle = getTitleChat(chatRoom);
 
             if(chatTitle==null){
                 chatTitle = "";
@@ -7331,6 +7301,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
                 if(request.getFlag()){
                     logDebug("Chat archived");
                     sendBroadcastChatArchived(chatTitle);
