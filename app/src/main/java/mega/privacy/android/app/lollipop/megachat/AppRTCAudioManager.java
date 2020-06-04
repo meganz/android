@@ -237,15 +237,15 @@ public class AppRTCAudioManager {
             }
         };
 
-        // Request audio playout focus (without ducking) and install listener for changes in focus.
-        int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Log.d(TAG, "Audio focus request granted for VOICE_CALL streams");
-        } else {
-            Log.e(TAG, "Audio focus request failed");
-        }
-
         if(apprtcContext instanceof ChatCallActivity){
+            // Request audio playout focus (without ducking) and install listener for changes in focus.
+            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                logDebug("Audio focus request granted for VOICE_CALL streams");
+            } else {
+                logError("Audio focus request failed");
+            }
+
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
             // best possible VoIP performance.
@@ -254,8 +254,14 @@ public class AppRTCAudioManager {
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             }
         }else if(apprtcContext instanceof ChatActivityLollipop){
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
 
+            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                logDebug("Audio focus request granted for STREAM_MUSIC streams");
+            } else {
+                logError("Audio focus request failed");
+            }
+            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         }
 
         // Always disable microphone mute during a WebRTC call.

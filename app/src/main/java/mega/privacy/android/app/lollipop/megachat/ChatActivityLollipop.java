@@ -982,7 +982,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
                 }
                 if (!isAllowedToRecord()) return;
 
-                prepareToRecord();
+                if (getAudioFocus()) {
+                    prepareRecording();
+                }
             }
 
             @Override
@@ -2229,9 +2231,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
     }
 
     /**
-     * Method for getting the focus of the audio manager.
+     * Knowing if permits have been successfully got.
+     *
+     * @return True, if it has been successful. False, if not.
      */
-    private void prepareToRecord() {
+    public boolean getAudioFocus() {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (SHOULD_BUILD_FOCUS_REQUEST) {
             AudioAttributes mAudioAttributes =
@@ -2251,9 +2255,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
             request = null;
         }
 
-        if (requestAudioFocus()) {
-            prepareRecording();
-        }
+        return requestAudioFocus();
     }
 
     /*
@@ -2269,7 +2271,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
     /**
      * Method for requesting audio focus.
      */
-    public boolean requestAudioFocus() {
+    private boolean requestAudioFocus() {
         int focusRequest;
         if (SHOULD_BUILD_FOCUS_REQUEST) {
             focusRequest = mAudioManager.requestAudioFocus(request);
@@ -8734,6 +8736,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
         if(rtcAudioManager == null) return;
         activateSpeaker();
         rtcAudioManager.unregisterProximitySensor();
+        destroySpeakerAudioManger();
     }
 
     private void destroySpeakerAudioManger(){
