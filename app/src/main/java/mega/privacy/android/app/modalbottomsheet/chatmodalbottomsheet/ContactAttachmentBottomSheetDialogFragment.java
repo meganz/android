@@ -161,7 +161,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             optionInfo.setVisibility(View.VISIBLE);
 
             long userHandle = message.getMessage().getUserHandle(0);
-            setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), stateIcon);
+            setContactStatus(getUserStatus(userHandle), stateIcon);
 
             if (userHandle != megaChatApi.getMyUserHandle()) {
 

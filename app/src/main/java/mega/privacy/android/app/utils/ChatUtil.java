@@ -537,4 +537,16 @@ public class ChatUtil {
 
         return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
     }
+
+    /**
+     * Gets the user's online status.
+     *
+     * @param userHandle    handle of the user
+     * @return The user's status.
+     */
+    public static int getUserStatus(long userHandle) {
+        return isContact(userHandle)
+                ? MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(userHandle)
+                : MegaChatApi.STATUS_INVALID;
+    }
 }

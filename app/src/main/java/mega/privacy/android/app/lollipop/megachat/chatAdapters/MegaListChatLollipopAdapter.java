@@ -945,7 +945,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-			setContactStatus(megaChatApi.getUserOnlineStatus(chat.getPeerHandle()), ((ViewHolderNormalChatList)holder).contactStateIcon);
+			setContactStatus(getUserStatus(chat.getPeerHandle()), ((ViewHolderNormalChatList)holder).contactStateIcon);
 		}
 		else{
 			logWarning("Holder is NULL: " + position);

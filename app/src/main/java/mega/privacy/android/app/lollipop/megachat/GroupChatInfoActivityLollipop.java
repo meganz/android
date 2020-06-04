@@ -278,7 +278,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege);
             participants.add(participant);
 
-            int userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
+            int userStatus = getUserStatus(peerHandle);
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                 megaChatApi.requestLastGreen(participant.getHandle(), null);
             }

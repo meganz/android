@@ -21,6 +21,7 @@ import mega.privacy.android.app.MegaApplication;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class ContactUtil {
 
@@ -199,5 +200,34 @@ public class ContactUtil {
     public static void updateLastName(Context context, String lastName, String email) {
         MegaApplication.getInstance().getDbH().setContactLastName(lastName, email);
         updateView(context);
+    }
+
+    /**
+     * Checks if the user who their handle is received by parameter is a contact.
+     *
+     * @param userHandle    handle of the user
+     * @return true if the user is a contact, false otherwise.
+     */
+    public static boolean isContact(long userHandle) {
+        if (userHandle == INVALID_HANDLE) {
+            return false;
+        }
+
+        return isContact(MegaApiJava.userHandleToBase64(userHandle));
+    }
+
+    /**
+     * Checks if the user who their email of handle in base64 is received by parameter is a contact.
+     *
+     * @param emailOrUserHandleBase64   email or user's handle in base64
+     * @return true if the user is a contact, false otherwise.
+     */
+    public static boolean isContact(String emailOrUserHandleBase64) {
+        if (isTextEmpty(emailOrUserHandleBase64)) {
+            return false;
+        }
+
+        MegaUser contact = MegaApplication.getInstance().getMegaApi().getContact(emailOrUserHandleBase64);
+        return contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
     }
 }
