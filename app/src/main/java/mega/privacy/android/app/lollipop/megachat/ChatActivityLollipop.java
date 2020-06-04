@@ -1325,9 +1325,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             String title;
             setSizeInputText(true);
             if (chatRoom.hasCustomTitle()) {
-                title = getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle());
+                title = getString(R.string.type_message_hint_with_customized_title, getTitleChat(chatRoom));
             } else {
-                title = getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle());
+                title = getString(R.string.type_message_hint_with_default_title, getTitleChat(chatRoom));
             }
             textChat.setHint(transformEmojis(title, textChat.getTextSize()));
         }
@@ -1344,7 +1344,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private void updateTitle() {
         initializeInputText();
-        titleToolbar.setText(chatRoom.getTitle());
+        titleToolbar.setText(getTitleChat(chatRoom));
     }
 
     /**
@@ -1379,7 +1379,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             builder.setTitle(getString(R.string.chat_error_open_title))
                     .setMessage(getString(R.string.chat_error_open_message))
                     .setPositiveButton(getString(R.string.general_ok), (dialog, whichButton) -> finish());
-
             errorOpenChatDialog = builder.create();
             errorOpenChatDialog.show();
         }
@@ -7195,9 +7194,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("TYPE_LAST_GREEN requested");
 
         }else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+
             long chatHandle = request.getChatHandle();
             chatRoom = megaChatApi.getChatRoom(chatHandle);
-            String chatTitle = chatRoom.getTitle();
+            String chatTitle = getTitleChat(chatRoom);
 
             if(chatTitle==null){
                 chatTitle = "";
@@ -7211,6 +7211,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
                 if(request.getFlag()){
                     logDebug("Chat archived");
                     sendBroadcastChatArchived(chatTitle);

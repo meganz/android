@@ -636,9 +636,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        int maxAllowed = getMaxAllowed(chat.getTitle());
+        int maxAllowed = getMaxAllowed(getTitleChat(chat));
         input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxAllowed)});
-        input.setText(chat.getTitle());
+        input.setText(getTitleChat(chat));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         input.setOnEditorActionListener((v, actionId, event) -> {
@@ -743,7 +743,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         } else if (request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
             long chatHandle = request.getChatHandle();
             MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
-            String chatTitle = chat.getTitle();
+            String chatTitle = getTitleChat(chat);
 
             if (chatTitle == null) {
                 chatTitle = "";
@@ -1166,8 +1166,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             peers.addPeer(chat.getPeerHandle(i), chat.getPeerPrivilege(i));
         }
 
-        CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chat.getTitle());
-        megaChatApi.createPublicChat(peers, chat.getTitle(), listener);
+        CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, getTitleChat(chat));
+        megaChatApi.createPublicChat(peers, getTitleChat(chat), listener);
     }
 
 
