@@ -1779,11 +1779,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				logDebug("Message type TYPE_CALL_STARTED");
 				String textToShow = context.getResources().getString(R.string.call_started_messages);
 
-				if (isStatusConnected(context, chat.getChatId())) {
-					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-				} else {
-					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-				}
+				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, isStatusConnected(context, chat.getChatId()) ? R.color.accentColor : R.color.file_list_second_row));
 
 				Spanned result;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

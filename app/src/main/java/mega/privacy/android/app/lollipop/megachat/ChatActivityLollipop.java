@@ -583,7 +583,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         break;
                     case MegaChatCall.CALL_STATUS_DESTROYED:
                         if (dialogCall != null) {
-                            isJoinCallDialogShown = false;
                             dialogCall.dismiss();
                         }
                         usersWithVideo();
@@ -1493,8 +1492,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
             if (callInThisChat != null && !callInThisChat.isOnHold() && chatRoom.isGroup()) {
                 MegaChatCall anotherCallActive = getAnotherActiveCall(chatRoom.getChatId());
-                if (anotherCallActive != null) {
+                if (anotherCallActive != null ) {
                     showJoinCallDialog(callInThisChat.getChatid(), anotherCallActive);
+                }else{
+                    MegaChatCall anotherCallOnHold = getAnotherCallOnHold(chatRoom.getChatId());
+                    if(anotherCallOnHold != null){
+                        showJoinCallDialog(callInThisChat.getChatid(), anotherCallOnHold);
+                    }
                 }
             }
         }
@@ -3278,7 +3282,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @param anotherCall The in progress call.
      */
     public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall) {
-
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.join_call_dialog, null);
         final Button holdJoinButton = dialoglayout.findViewById(R.id.hold_join_button);
@@ -3318,10 +3321,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             }
             if (dialogCall != null) {
-                isJoinCallDialogShown = false;
                 dialogCall.dismiss();
             }
         };
+
+        dialogCall.setOnDismissListener(dialog -> isJoinCallDialogShown = false);
         holdJoinButton.setOnClickListener(clickListener);
         endJoinButton.setOnClickListener(clickListener);
         cancelButton.setOnClickListener(clickListener);
