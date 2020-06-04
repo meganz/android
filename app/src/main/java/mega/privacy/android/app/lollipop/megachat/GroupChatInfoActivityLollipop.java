@@ -81,7 +81,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
     private static final int MAX_LENGTH_CHAT_TITLE = 60;
-    private static final int PARTICIPANTS_EXTRA = 10;
 
     private ChatController chatC;
     private long chatHandle;
@@ -1252,40 +1251,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         requestUserAttributes(handleList, participantRequests);
-
-        checkIfShouldAskForMoreUsersAttributes(copyOfPendingParticipantRequests);
-    }
-
-    /**
-     *  If there are participants not visibles in the UI but already scrolled without attributes,
-     *  it launches a request to ask for them.
-     *
-     * @param pendingParticipantRequests HashMap in which the pending participants to check, and their positions in the adapter are stored
-     */
-    private void checkIfShouldAskForMoreUsersAttributes(HashMap<Integer, MegaChatParticipant> pendingParticipantRequests) {
-        MegaHandleList handleList = MegaHandleList.createInstance();
-        HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
-        int i = 0;
-
-        for (Integer position : pendingParticipantRequests.keySet()) {
-            MegaChatParticipant participant = pendingParticipantRequests.get(position);
-            if (participant != null) {
-                participantRequests.put(position, participant);
-                handleList.addMegaHandle(participant.getHandle());
-            }
-
-            i++;
-
-            boolean maxRequestReached = i % PARTICIPANTS_EXTRA == 0;
-            if (i == pendingParticipantRequests.size() || maxRequestReached) {
-                requestUserAttributes(handleList, participantRequests);
-
-                if (maxRequestReached) {
-                    handleList = MegaHandleList.createInstance();
-                    participantRequests = new HashMap<>();
-                }
-            }
-        }
     }
 
     /**
