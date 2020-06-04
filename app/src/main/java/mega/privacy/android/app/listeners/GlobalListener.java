@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -134,6 +135,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 int state = (int) event.getNumber();
                 if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
                     api.getAccountDetails(null);
+                } else if (state == MegaApiJava.STORAGE_STATE_PAYWALL) {
+                    Intent intent = new Intent(megaApplication.getApplicationContext(), OverDiskQuotaPaywallActivity.class);
+                    megaApplication.startActivity(intent);
                 } else {
                     megaApplication.setStorageState(state);
 

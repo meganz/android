@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 29
@@ -16,8 +18,8 @@ android {
 
     sourceSets.main {
         java {
-            srcDirs += 'src/main/jni/mega/sdk/bindings/java/nz/mega/sdk'
-            srcDirs += 'src/main/jni/megachat/sdk/bindings/java/nz/mega/sdk'
+            srcDirs += 'src/main/jni/mega/sdk/bindings/java'
+            srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
             exclude '**/MegaApiSwing.java'
         }
         jni.srcDirs = [] //disable automatic ndk-build
@@ -99,6 +101,11 @@ dependencies {
     implementation 'com.android.billingclient:billing:2.1.0'
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
 }
 
 apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+}

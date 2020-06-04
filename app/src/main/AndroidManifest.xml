@@ -598,6 +598,13 @@
                 android:value="mega.privacy.android.app.lollipop.PinActivityLollipop" />
         </activity>
 
+        <activity
+            android:name=".activities.OverDiskQuotaPaywallActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar"
+            android:launchMode="singleTop">
+        </activity>
+
     </application>
 
 </manifest>
