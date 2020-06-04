@@ -2528,35 +2528,38 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         logDebug("getPhoneContacts");
         ArrayList<PhoneContactInfo> contactList = new ArrayList<>();
 
-        ContentResolver cr = getContentResolver();
-        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME},
-                null,
-                null,
-                null);
-
         try {
-            while (cursor.moveToNext()) {
-                long id = cursor.getLong(0);
-                String name = cursor.getString(1);
+            ContentResolver cr = getContentResolver();
+            Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                    new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME},
+                    null,
+                    null,
+                    null);
 
-                String emailAddress = null;
-                Cursor cursore = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
-                        new String[]{String.valueOf(id)},
-                        ContactsContract.Contacts.SORT_KEY_PRIMARY);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    long id = cursor.getLong(0);
+                    String name = cursor.getString(1);
 
-                if (cursore != null && cursore.moveToFirst()) {
-                    emailAddress = cursore.getString(cursore.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                    cursore.close();
+                    String emailAddress = null;
+                    Cursor cursore = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                            new String[]{String.valueOf(id)},
+                            ContactsContract.Contacts.SORT_KEY_PRIMARY);
+
+                    if (cursore != null && cursore.moveToFirst()) {
+                        emailAddress = cursore.getString(cursore.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                        cursore.close();
+                    }
+
+                    if (emailAddress != null && !emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
+                        contactList.add(new PhoneContactInfo(id, name, emailAddress, null));
+                    }
                 }
 
-                if (emailAddress != null && !emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
-                    contactList.add(new PhoneContactInfo(id, name, emailAddress, null));
-                }
+                cursor.close();
             }
-            cursor.close();
         } catch (Exception e) {
             logWarning("Exception getting phone contacts", e);
         }

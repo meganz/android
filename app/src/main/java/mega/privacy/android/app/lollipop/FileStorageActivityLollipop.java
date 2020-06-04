@@ -82,6 +82,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
+	public static final String IS_CU_OR_MU_FOLDER = "IS_CU_OR_MU_FOLDER";
 
 	public static final String EXTRA_URL = "fileurl";
 	public static final String EXTRA_SIZE = "filesize";
@@ -142,6 +143,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
 	private Boolean cameraFolderSettings;
+	private Boolean isCUOrMUFolder;
 	private String sdRoot;
 	private boolean hasSDCard;
     private String prompt;
@@ -375,12 +377,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 		
 		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_filestorage);
+		tB = findViewById(R.id.toolbar_filestorage);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		
+
+		viewContainer = findViewById(R.id.file_storage_container);
+		contentText = findViewById(R.id.file_storage_content_text);
+		listView = findViewById(R.id.file_storage_list_view);
+
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
 		if (prompt != null) {
@@ -389,6 +395,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
+		isCUOrMUFolder = intent.getBooleanExtra(IS_CU_OR_MU_FOLDER, false);
 		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
 		hasSDCard = (sdRoot != null);
 		
@@ -399,8 +406,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			url = intent.getExtras().getString(EXTRA_URL);
 			size = intent.getExtras().getLong(EXTRA_SIZE);
 			aB.setTitle(getString(R.string.general_select_to_download));
-		}
-		else{
+		} else {
 			aB.setTitle(getString(R.string.general_select_to_upload));
 		}
 		
@@ -414,16 +420,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			isSetDownloadLocationShown = savedInstanceState.getBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, false);
 			confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
 		}
-		
-        viewContainer = (RelativeLayout) findViewById(R.id.file_storage_container);
-		contentText = (TextView) findViewById(R.id.file_storage_content_text);
-		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 
-		cancelButton = (Button) findViewById(R.id.file_storage_cancel_button);
+		cancelButton = findViewById(R.id.file_storage_cancel_button);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
-		button = (Button) findViewById(R.id.file_storage_button);
+		button = findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 
 		if (fromSaveRecoveryKey) {
@@ -700,8 +702,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
-					if ((prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
-							&& dbH.getAskSetDownloadLocation() && !cameraFolderSettings) {
+					if (!isCUOrMUFolder && (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
+							&& dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
 					} else {
 						finishPickFolder();
@@ -760,6 +762,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void showConfirmationSaveInSameLocation(){
 		if (setDownloadLocationDialog != null && setDownloadLocationDialog.isShowing()) {
 			return;
+		}
+
+		if (prefs == null) {
+			prefs = dbH.getPreferences();
 		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);

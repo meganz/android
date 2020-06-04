@@ -260,7 +260,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if (!multipleSelect) {
 					//Multiselect OFF
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					createGroupChatAvatar(holder, chat.getTitle());
+					createGroupChatAvatar(holder, getTitleChat(chat));
 				} else {
 					logDebug("Multiselect ON");
 
@@ -272,7 +272,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						logDebug("NOT selected");
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						createGroupChatAvatar(holder, chat.getTitle());
+						createGroupChatAvatar(holder, getTitleChat(chat));
 					}
 				}
 			}
@@ -973,7 +973,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(holder!=null){
 
 			MegaChatListItem chat = chats.get(position);
-			String title = chat.getTitle();
+			String title = getTitleChat(chat);
 
 			if(title!=null){
 				logDebug("ChatRoom id: "+chat.getChatId());
