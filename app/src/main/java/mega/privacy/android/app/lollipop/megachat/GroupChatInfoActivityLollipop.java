@@ -1293,7 +1293,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                         if (hasParticipantAttributes(participant)) {
                             participants.set(positionInArray, participant);
-                            adapter.updateParticipant(positionInAdapter, participants);
+                            //- 1 for decrementing the header position already incremented into adapter.updateParticipant() method
+                            adapter.updateParticipant(positionInAdapter - 1, participants);
                         }
 
                         participantUpdates.remove(positionInAdapter);
@@ -1312,7 +1313,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
      * @return True if the participant was correctly updated, false otherwise.
      */
     public boolean hasParticipantAttributes(MegaChatParticipant participant) {
-        return !isTextEmpty(participant.getEmail()) && !isTextEmpty(participant.getFullName());
+        return !isTextEmpty(participant.getEmail()) || !isTextEmpty(participant.getFullName());
     }
 
     private void updateAdapterHeader() {
