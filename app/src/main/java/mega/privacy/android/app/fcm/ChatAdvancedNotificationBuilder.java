@@ -1072,19 +1072,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         /*Customize notification*/
         Bitmap avatarIcon = setUserAvatar(chatToAnswer);
-        String titleChat;
-        String titleCall;
-        if (chatToAnswer.isGroup()) {
-            titleChat = getTitleChat(chatToAnswer);
-            titleCall = context.getString(R.string.title_notification_incoming_group_call);
-        } else {
-            titleChat = getFullName(chatToAnswer);
-            if (callToAnswer.hasVideoInitialCall()) {
-                titleCall = context.getString(R.string.title_notification_incoming_individual_video_call);
-            } else {
-                titleCall = context.getString(R.string.title_notification_incoming_individual_audio_call);
-            }
-        }
+        String titleChat = getTitleChat(chatToAnswer);
+        String titleCall = context.getString(R.string.title_notification_incoming_group_call);
 
         /*Collapsed*/
         RemoteViews collapsedViews = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications);
