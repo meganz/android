@@ -2,34 +2,35 @@ package mega.privacy.android.app;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -37,9 +38,15 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
+import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 
 public class OpenPasswordLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
 	
@@ -56,7 +63,10 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	AlertDialog decryptionKeyDialog;
 
 	RelativeLayout fragmentContainer;
-	
+	private String mPassword;
+	private View mErrorView;
+	private EditText mPasswordEdit;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -66,7 +76,15 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		
 		super.onDestroy();
 	}
-	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mPasswordEdit != null) {
+			showKeyboardDelayed(mPasswordEdit);
+		}
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
@@ -105,81 +123,98 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	public void askForPasswordDialog(){
 		logDebug("askForPasswordDialog");
 
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.password_text));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = input.getText().toString();
-					if (value.trim().length() == 0) {
-						finish();
-						return false;
-					}
-					decrypt(value);
-					decryptionKeyDialog.dismiss();
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.hint_set_password_protection_dialog));
-		builder.setPositiveButton(getString(R.string.general_decryp),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString();
-						if (value.trim().length() == 0) {
-							finish();
-						}
-						decrypt(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						finish();
-					}
-				});
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_with_error_hint, null);
 
+		builder.setView(v).setPositiveButton(R.string.general_decryp, null)
+				.setNegativeButton(R.string.general_cancel, null);
 
-		builder.setView(layout);
+		TextView titleView = v.findViewById(R.id.title);
+		titleView.setText(getString(R.string.hint_set_password_protection_dialog));
+		mPasswordEdit = v.findViewById(R.id.text);
+		mPasswordEdit.setSingleLine();
+		mErrorView = v.findViewById(R.id.error);
+		((TextView)v.findViewById(R.id.error_text)).setText(R.string.invalid_link_password);
+
+		if (TextUtil.isTextEmpty(mPassword)) {
+			mPasswordEdit.setHint(getString(R.string.password_text));
+			mPasswordEdit.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		} else {
+			showErrorMessage();
+		}
+
+		mPasswordEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		mPasswordEdit.setOnEditorActionListener((v1, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE) {
+				tryToDecrypt();
+				return true;
+			}
+			return false;
+		});
+		mPasswordEdit.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
+		mPasswordEdit.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				hideErrorMessage();
+			}
+		});
+
 		decryptionKeyDialog = builder.create();
 		decryptionKeyDialog.setCanceledOnTouchOutside(false);
 		decryptionKeyDialog.show();
+
+		// Set onClickListeners for buttons after showing the dialog would prevent
+		// the dialog from dismissing automatically on clicking the buttons
+		decryptionKeyDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((view) -> {
+			tryToDecrypt();
+		});
+		decryptionKeyDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+				.setOnClickListener((view) -> finish());
+
+		showKeyboardDelayed(mPasswordEdit);
 	}
 
-	private void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-		handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
+	private void tryToDecrypt() {
+		mPassword = mPasswordEdit.getText().toString();
+		if (mPassword.trim().length() == 0) {
+			mPassword = "";
+			showErrorMessage();
+			return;
+		}
+
+		decrypt(mPassword);
+		decryptionKeyDialog.dismiss();
+	}
+
+	private void showErrorMessage() {
+		if (mPasswordEdit == null || mErrorView == null) return;
+
+		mPasswordEdit.setText(mPassword);
+		mPasswordEdit.setSelectAllOnFocus(true);
+		mPasswordEdit.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+		mPasswordEdit.getBackground().mutate().clearColorFilter();
+		mPasswordEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
+				this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+
+		mErrorView.setVisibility(View.VISIBLE);
+	}
+
+	private void hideErrorMessage() {
+		if (mPasswordEdit == null || mErrorView == null) return;
+
+		mErrorView.setVisibility(View.GONE);
+		mPasswordEdit.setTextColor(ContextCompat.getColor(
+				OpenPasswordLinkActivity.this, R.color.name_my_account));
+		mPasswordEdit.getBackground().mutate().clearColorFilter();
+		mPasswordEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
+				OpenPasswordLinkActivity.this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 	}
 
 	public void decrypt(String value){

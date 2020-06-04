@@ -49,6 +49,7 @@ import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1715,9 +1716,12 @@ public class Util {
     public static void showKeyboardDelayed(final View view) {
 		Handler handler = new Handler();
         handler.postDelayed(() -> {
-			InputMethodManager imm =
-					(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			// The view needs to request the focus or the keyboard may not pops up
+			if (view.requestFocus()) {
+				InputMethodManager imm = (InputMethodManager)
+						MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
 		}, 50);
     }
 

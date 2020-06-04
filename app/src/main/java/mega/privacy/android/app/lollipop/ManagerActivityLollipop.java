@@ -74,7 +74,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -109,7 +108,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -9184,22 +9182,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void showOpenLinkDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_open_link, null);
-		builder.setView(v);
+		View v = inflater.inflate(R.layout.dialog_with_error_hint, null);
+		builder.setView(v).setPositiveButton(R.string.context_open_link, null)
+				.setNegativeButton(R.string.general_cancel, null);
 
-		TextView title = (TextView) v.findViewById(R.id.link_title);
+		TextView title = v.findViewById(R.id.title);
 
-		openLinkText = (EditText) v.findViewById(R.id.link_text);
+		openLinkText = v.findViewById(R.id.text);
 		openLinkText.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -9219,9 +9214,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 
-		openLinkError = (RelativeLayout) v.findViewById(R.id.link_error);
-		openLinkError.setVisibility(View.GONE);
-		openLinkErrorText = (TextView) v.findViewById(R.id.link_error_text);
+		openLinkError = v.findViewById(R.id.error);
+		openLinkErrorText = v.findViewById(R.id.error_text);
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 			title.setText(R.string.action_open_link);
@@ -9232,34 +9226,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			openLinkText.setHint(R.string.hint_enter_chat_link);
 		}
 
-		OnClickListener clickListener = new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				switch (v.getId()) {
-					case R.id.link_cancel_button: {
-						dismissOpenLinkDialog();
-						break;
-					}
-					case R.id.link_open_button: {
-						hideKeyboardView(managerActivity, v, 0);
-						openLink(openLinkText.getText().toString());
-						break;
-					}
-				}
-			}
-		};
-
-		Button cancelButton = (Button) v.findViewById(R.id.link_cancel_button);
-		cancelButton.setOnClickListener(clickListener);
-		openLinkOpenButton = (Button) v.findViewById(R.id.link_open_button);
-		openLinkOpenButton.setOnClickListener(clickListener);
-
 		openLinkDialog = builder.create();
 		openLinkDialog.setCanceledOnTouchOutside(false);
 
 		try {
 			openLinkDialog.show();
 			openLinkDialogIsShown = true;
+
+			// Set onClickListeners for buttons after showing the dialog would prevent
+			// the dialog from dismissing automatically on clicking the buttons
+			openLinkOpenButton = openLinkDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+			openLinkOpenButton.setOnClickListener((view) -> {
+				hideKeyboard(managerActivity, 0);
+				openLink(openLinkText.getText().toString());
+			});
+			openLinkDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener((view) ->
+					dismissOpenLinkDialog());
 		}catch (Exception e){}
 	}
 
