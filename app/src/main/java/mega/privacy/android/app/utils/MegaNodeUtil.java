@@ -32,6 +32,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.CAMERA_UPLOADS;
 import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -346,9 +347,11 @@ public class MegaNodeUtil {
             cameraSyncHandle = prefs.getCamSyncHandle();
         }
 
-        if (cameraSyncHandle != null && !cameraSyncHandle.isEmpty() && n.getHandle() == Long.parseLong(cameraSyncHandle)) {
-            return true;
-        } else if (n.getName().equals("Camera Uploads")) {
+        if (cameraSyncHandle != null && !cameraSyncHandle.isEmpty()) {
+            if (n.getHandle() == Long.parseLong(cameraSyncHandle)) {
+                return true;
+            }
+        } else if (n.getName().equals(CAMERA_UPLOADS)) {
             if (prefs != null) {
                 prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
             }
@@ -361,8 +364,8 @@ public class MegaNodeUtil {
             secondaryMediaHandle = prefs.getMegaHandleSecondaryFolder();
         }
 
-        if (secondaryMediaHandle != null && !secondaryMediaHandle.isEmpty() && n.getHandle() == Long.parseLong(secondaryMediaHandle)) {
-            return true;
+        if (secondaryMediaHandle != null && !secondaryMediaHandle.isEmpty()) {
+            return n.getHandle() == Long.parseLong(secondaryMediaHandle);
         } else if (n.getName().equals(SECONDARY_UPLOADS)) {
             if (prefs != null) {
                 prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
