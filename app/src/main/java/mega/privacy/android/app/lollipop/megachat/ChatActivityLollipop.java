@@ -458,7 +458,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private static final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
     private AudioFocusRequest request = null;
     private AudioManager mAudioManager = null;
-    private AudioFocusListener audioFocusListener = new AudioFocusListener(this);
+    private AudioFocusListener audioFocusListener = null;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -981,7 +981,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     return;
                 }
                 if (!isAllowedToRecord()) return;
-
+                audioFocusListener = new AudioFocusListener(ChatActivityLollipop.this);
                 request = getRequest(audioFocusListener, FOCUS_TYPE);
                 if (getAudioFocus(mAudioManager, audioFocusListener, request, FOCUS_TYPE, STREAM_TYPE)) {
                     prepareRecording();

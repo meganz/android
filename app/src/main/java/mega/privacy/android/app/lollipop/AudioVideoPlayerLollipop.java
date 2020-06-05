@@ -339,7 +339,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private static final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
     private AudioFocusRequest request = null;
     private AudioManager mAudioManager = null;
-    private AudioFocusListener audioFocusListener = new AudioFocusListener(this);
+    private AudioFocusListener audioFocusListener = null;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
