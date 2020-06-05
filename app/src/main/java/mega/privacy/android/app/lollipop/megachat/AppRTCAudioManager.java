@@ -239,7 +239,7 @@ public class AppRTCAudioManager {
 
         if(apprtcContext instanceof ChatCallActivity){
             // Request audio playout focus (without ducking) and install listener for changes in focus.
-            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 logDebug("Audio focus request granted for VOICE_CALL streams");
             } else {

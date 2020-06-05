@@ -18,7 +18,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
-import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
@@ -120,6 +119,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
@@ -183,7 +183,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ChatActivityLollipop extends DownloadableActivity implements AudioManager.OnAudioFocusChangeListener, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -262,7 +262,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
-    private AudioManager mAudioManager;
 
     ProgressDialog dialog;
     ProgressDialog statusDialog;
@@ -455,10 +454,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
-    private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     private static final int FOCUS_TYPE = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     private static final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
     private AudioFocusRequest request = null;
+    private AudioManager mAudioManager = null;
+    private AudioFocusListener audioFocusListener = new AudioFocusListener(this);
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -715,7 +715,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         setContentView(R.layout.activity_chat);
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -982,7 +982,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
                 }
                 if (!isAllowedToRecord()) return;
 
-                if (getAudioFocus()) {
+                request = getRequest(audioFocusListener, FOCUS_TYPE);
+                if (getAudioFocus(mAudioManager, audioFocusListener, request, FOCUS_TYPE, STREAM_TYPE)) {
                     prepareRecording();
                 }
             }
@@ -2230,34 +2231,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Knowing if permits have been successfully got.
-     *
-     * @return True, if it has been successful. False, if not.
-     */
-    public boolean getAudioFocus() {
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            AudioAttributes mAudioAttributes =
-                    new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build();
-            request =
-                    new AudioFocusRequest.Builder(FOCUS_TYPE)
-                            .setAudioAttributes(mAudioAttributes)
-                            .setAcceptsDelayedFocusGain(true)
-                            .setWillPauseWhenDucked(true)
-                            .setOnAudioFocusChangeListener(this)
-                            .build();
-
-        } else {
-            request = null;
-        }
-
-        return requestAudioFocus();
-    }
-
     /*
      *Prepare recording
      */
@@ -2267,45 +2240,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
         stopReproductions();
     }
 
-
-    /**
-     * Method for requesting audio focus.
-     */
-    private boolean requestAudioFocus() {
-        int focusRequest;
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            focusRequest = mAudioManager.requestAudioFocus(request);
-        } else {
-            focusRequest = mAudioManager.requestAudioFocus(this, STREAM_TYPE, FOCUS_TYPE);
-        }
-        return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-    }
-
-    /**
-     * Method for leaving the audio focus.
-     */
-    public void abandonAudioFocus() {
-        if (SHOULD_BUILD_FOCUS_REQUEST) {
-            if(request != null) {
-                mAudioManager.abandonAudioFocusRequest(request);
-            }
-        } else {
-            mAudioManager.abandonAudioFocus(this);
-        }
-    }
-
-    @Override
-    public void onAudioFocusChange(int focusChange) {
-        switch (focusChange) {
-            case AudioManager.AUDIOFOCUS_GAIN:
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS:
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                cancelRecording();
-                break;
-        }
-    }
 
     /*
      * Start recording
@@ -2383,7 +2317,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
     }
 
     private void destroyAudioRecorderElements(){
-        abandonAudioFocus();
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
         handlerVisualizer.removeCallbacks(updateVisualizer);
 
         hideRecordingLayout();
@@ -2400,7 +2334,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
     /*
      * Cancel recording and reset the audio recorder
      */
-    private void cancelRecording() {
+    public void cancelRecording() {
         if (!isRecordingNow() || myAudioRecorder == null)
             return;
 
@@ -2411,7 +2345,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
             myAudioRecorder.stop();
             myAudioRecorder.reset();
             myAudioRecorder = null;
-            abandonAudioFocus();
+            abandonAudioFocus(audioFocusListener, mAudioManager, request);
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
@@ -2438,7 +2372,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
         try {
             myAudioRecorder.stop();
             recordView.playSound(TYPE_END_RECORD);
-            abandonAudioFocus();
+            abandonAudioFocus(audioFocusListener, mAudioManager, request);
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
@@ -2451,7 +2385,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements AudioM
     /*
      *Hide chat options while recording
      */
-
     private void hideChatOptions(){
         logDebug("hideChatOptions");
         textChat.setVisibility(View.INVISIBLE);

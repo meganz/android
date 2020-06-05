@@ -15,6 +15,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -115,6 +117,7 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -153,6 +156,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -331,6 +335,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private GetMediaFilesTask getMediaFilesTask;
     private long [] nodeHandles;
 
+    private static final int FOCUS_TYPE = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
+    private static final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
+    private AudioFocusRequest request = null;
+    private AudioManager mAudioManager = null;
+    private AudioFocusListener audioFocusListener = new AudioFocusListener(this);
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -360,7 +370,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
                 if ((callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT || callStatus == MegaChatCall.CALL_STATUS_RING_IN)
                         && player != null && player.getPlayWhenReady()) {
-                    player.setPlayWhenReady(false);
+                    stopPlayback();
                 }
             }
         }
@@ -369,8 +379,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
-
         setContentView(R.layout.activity_audiovideoplayer);
 
         audioVideoPlayerLollipop = this;
@@ -394,6 +402,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             finish();
             return;
         }
+
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         if (savedInstanceState != null) {
             logDebug("savedInstanceState NOT null");
@@ -1111,7 +1121,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
                     if (playWhenReady && participatingInACall()) {
                         //Not allow to play content when a call is in progress
-                        player.setPlayWhenReady(false);
+                        stopPlayback();
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
                     }
 
@@ -1205,7 +1215,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 }
             });
             numErrors = 0;
-            player.setPlayWhenReady(playWhenReady);
+            if (playWhenReady) {
+                startPlayback();
+            } else {
+                stopPlayback();
+            }
             player.seekTo(currentTime);
             player.setVideoDebugListener(this);
         }
@@ -1332,7 +1346,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             else {
                 player.prepare(mediaSource);
             }
-            player.setPlayWhenReady(true);
+            startPlayback();
         }
         else {
             showErrorDialog();
@@ -1704,7 +1718,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
             // Pause either video or audio as per UX advise
             if (playWhenReady) {
-                player.setPlayWhenReady(false);
+                stopPlayback();
             }
 
             currentTime = player.getCurrentPosition();
@@ -1845,9 +1859,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                if (player != null) {
-                    player.setPlayWhenReady(false);
-                }
+                stopPlayback();
                 if (playlistFragment != null && playlistFragment.isAdded()){
                     playlistFragment.setSearchOpen(true);
                     playlistFragment.hideController();
@@ -3379,6 +3391,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (megaApiFolder != null) {
             megaApiFolder.httpServerStop();
         }
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
 
         if (player != null){
             player.release();
@@ -3641,6 +3654,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     public void onBackPressed() {
         retryConnectionsAndSignalPresence();
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
 
         if (!onPlaylist){
             super.onBackPressed();
@@ -3847,6 +3861,21 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
+    }
+
+    private void startPlayback() {
+        audioFocusListener = new AudioFocusListener(this);
+        request = getRequest(audioFocusListener, FOCUS_TYPE);
+        if (getAudioFocus(mAudioManager, audioFocusListener, request, FOCUS_TYPE, STREAM_TYPE) && player != null) {
+            player.setPlayWhenReady(true);
+        }
+    }
+
+    public void stopPlayback() {
+        if (player != null) {
+            player.setPlayWhenReady(false);
+        }
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
     }
 
     public void askConfirmationNoAppInstaledBeforeDownload (String parentPath,String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
