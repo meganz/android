@@ -54,6 +54,8 @@ public class TransfersBaseFragment extends BaseFragment {
 
         setGetMoreQuotaViewVisibility();
 
+        managerActivity.supportInvalidateOptionsMenu();
+
         return v;
     }
 
@@ -65,9 +67,7 @@ public class TransfersBaseFragment extends BaseFragment {
     }
 
     public void checkScroll() {
-        if (listView == null) return;
-
-        ((ManagerActivityLollipop) context).changeActionBarElevation(listView.canScrollVertically(-1));
+        managerActivity.changeActionBarElevation(listView != null && listView.canScrollVertically(-1));
     }
 
     protected void setEmptyView(int size) {

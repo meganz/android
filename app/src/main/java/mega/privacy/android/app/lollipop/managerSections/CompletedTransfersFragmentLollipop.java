@@ -78,6 +78,7 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 
 		setEmptyView(tL.size());
 		adapter.notifyDataSetChanged();
+		managerActivity.supportInvalidateOptionsMenu();
 	}
 
 	public boolean isAnyTransferCompleted() {
@@ -95,6 +96,7 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 		}
 
 		setEmptyView(tL.size());
+        managerActivity.supportInvalidateOptionsMenu();
 	}
 
 	public void clearCompletedTransfers() {

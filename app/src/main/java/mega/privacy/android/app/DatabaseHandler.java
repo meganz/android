@@ -25,6 +25,7 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1850,10 +1851,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.delete(TABLE_COMPLETED_TRANSFERS, null,null);
 	}
 
+    /**
+     * Gets the completed transfers.
+     *
+     * @return The list with the completed transfers.
+     */
 	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(){
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " ORDER BY " + KEY_TRANSFER_TIMESTAMP + " DESC";
+		return getCompletedTransfers(selectQuery);
+	}
+
+    /**
+     * Gets the completed transfers which have as state cancelled or failed.
+     *
+     * @return The list the cancelled or failed transfers.
+     */
+	public ArrayList<AndroidCompletedTransfer> getFailedORCancelledTransfers(){
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS
+				+ " WHERE " + KEY_TRANSFER_STATE + " = '" +  encrypt(MegaTransfer.STATE_CANCELLED +"")
+				+ "' OR " + KEY_TRANSFER_STATE + " = '" + encrypt(MegaTransfer.STATE_FAILED +"") + "'"
+				+ " ORDER BY " + KEY_TRANSFER_TIMESTAMP + " DESC";
+		return getCompletedTransfers(selectQuery);
+	}
+
+    /**
+     * Gets a list with completed transfers depending on the query received by parameter.
+     *
+     * @param selectQuery   the query which selects specific completed transfers
+     * @return The list with the completed transfers.
+     */
+	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(String selectQuery){
 		ArrayList<AndroidCompletedTransfer> cTs = new ArrayList<AndroidCompletedTransfer> ();
 
-		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " ORDER BY " + KEY_TRANSFER_TIMESTAMP + " DESC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		try {
 			if (cursor.moveToLast()){

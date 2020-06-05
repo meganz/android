@@ -699,6 +699,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem logoutMenuItem;
 	private MenuItem forgotPassMenuItem;
 	private MenuItem inviteMenuItem;
+	private MenuItem retryTransfers;
 	private MenuItem clearCompletedTransfers;
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem rubbishBinMenuItem;
@@ -2479,13 +2480,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public void onPageSelected(int position) {
 				supportInvalidateOptionsMenu();
 				checkScrollElevation();
-				//Update the fragment when all in progress transfers have been cancelled
-				refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
 
 				if (position == PENDING_TAB && isTransfersInProgressAdded()) {
 					tFLol.setGetMoreQuotaViewVisibility();
-				} else if (position == COMPLETED_TAB && isTransfersCompletedAdded()) {
-					completedTFLol.setGetMoreQuotaViewVisibility();
+				} else if (position == COMPLETED_TAB) {
+					//Update the fragment when all in progress transfers have been cancelled
+					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
+
+					if (isTransfersCompletedAdded()) {
+						completedTFLol.setGetMoreQuotaViewVisibility();
+					}
 				}
 			}
 
@@ -5625,7 +5629,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			indexTransfers = viewPagerTransfers.getCurrentItem();
 		}
 
-		supportInvalidateOptionsMenu();
 		setToolbarTitle();
 		showFabButton();
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -6510,6 +6513,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
+		retryTransfers = menu.findItem(R.id.action_menu_retry_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
 		playTransfersMenuIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_play_white, R.color.black));
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
@@ -6777,6 +6781,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						cancelAllTransfersMenuItem.setVisible(true);
 					} else if (getTabItemTransfers() == COMPLETED_TAB && isTransfersInProgressAdded() && completedTFLol.isAnyTransferCompleted()) {
 						clearCompletedTransfers.setVisible(true);
+						retryTransfers.setVisible(thereAreFailedOrCancelledTransfers());
 					}
 
 					break;
@@ -7407,6 +7412,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				return true;
 			}
+			case R.id.action_menu_retry_transfers:
+				retryAllTransfers();
+				return true;
+
             default:{
 	            return super.onOptionsItemSelected(item);
             }
@@ -16572,11 +16581,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return storageState;
 	}
 
+    /**
+     * Shows a transfer over quota warning.
+     */
 	public void showTransfersTransferOverQuotaWarning() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		int messageResource = R.string.warning_transfer_over_quota;
 
-		transferOverQuotaWarning = builder.setTitle(R.string.title_transfer_over_quota)
+		transferOverQuotaWarning = builder.setTitle(R.string.label_transfer_over_quota)
 				.setMessage(getString(messageResource, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())))
 				.setPositiveButton(R.string.my_account_upgrade_pro, (dialog, which) -> { navigateToUpgradeAccount();
 				})
@@ -16591,13 +16603,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		isTransferOverQuotaWarningShown = true;
 	}
 
-	private void updateTransfersWidgetPosition(boolean hide) {
+    /**
+     * Updates the position of the transfers widget.
+     *
+     * @param bNVHidden  indicates if the bottom navigation view is hidden or not.
+     */
+	private void updateTransfersWidgetPosition(boolean bNVHidden) {
 		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
 		if (transfersWidgetLayout.getVisibility() == View.GONE) return;
 
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
 
-		if (hide) {
+		if (bNVHidden) {
 			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 		} else {
 			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
@@ -16606,6 +16623,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		transfersWidgetLayout.setLayoutParams(params);
 	}
 
+    /**
+     * Updates values of TransfersManagement object after the activity comes from background.
+     */
 	private void checkTransferOverQuotaOnResume() {
 		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 		transfersManagement.setIsOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
@@ -16613,6 +16633,35 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			transfersManagement.setTransferOverQuotaBannerShown(true);
 			transfersManagement.setTransferOverQuotaNotificationShown(false);
 		}
+	}
+
+    /**
+     * Gets the failed and cancelled transfers.
+     *
+     * @return  A list with the failed and cancelled transfers.
+     */
+	public ArrayList<AndroidCompletedTransfer> getFailedAndCancelledTransfers() {
+		return dbH.getFailedORCancelledTransfers();
+	}
+
+    /**
+     * Retries all the failed and cancelled transfers.
+     */
+	private void retryAllTransfers() {
+		ArrayList<AndroidCompletedTransfer> failedOrCancelledTransfers = getFailedAndCancelledTransfers();
+		for (AndroidCompletedTransfer transfer : failedOrCancelledTransfers) {
+			retryTransfer(transfer);
+		}
+	}
+
+    /**
+     * Checks if there are failed or cancelled transfers.
+     *
+     * @return True if there are failed or cancelled transfers, false otherwise.
+     */
+	private boolean thereAreFailedOrCancelledTransfers() {
+		ArrayList<AndroidCompletedTransfer> failedOrCancelledTransfers = getFailedAndCancelledTransfers();
+		return failedOrCancelledTransfers.size() > 0;
 	}
 
 	private RubbishBinFragmentLollipop getRubbishBinFragment() {

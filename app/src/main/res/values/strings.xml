@@ -1434,6 +1434,7 @@
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Resume all transfers</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear all transfers</string>
+    <string name="option_to_retry_transfers" context="Label indicating and action to retry failed or cancelled transfers">Retry all transfers</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Pause transfer?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Resume transfer?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Resume</string>
@@ -2790,7 +2791,6 @@
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
     <string name="action_cancel_transfer" context="Action cancel transfer">Cancel transfer</string>
-    <string name="title_transfer_over_quota" context="Title of a dialog warning of transfer over quota">Transfer over quota</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
