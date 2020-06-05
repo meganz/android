@@ -72,7 +72,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     LoginFragmentLollipop loginFragment;
     ChooseAccountFragmentLollipop chooseAccountFragment;
     CreateAccountFragmentLollipop createAccountFragment;
-    ConfirmEmailFragmentLollipop confirmEmailFragment;
 
     ActionBar aB;
     int visibleFragment;
@@ -313,14 +312,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, tourFragment);
-                ft.commitNowAllowingStateLoss();
+                ft.replace(R.id.fragment_container_login, tourFragment).commit();
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
-                if (confirmEmailFragment == null) {
-                    confirmEmailFragment = new ConfirmEmailFragmentLollipop();
-                }
+                ConfirmEmailFragmentLollipop confirmEmailFragment = new ConfirmEmailFragmentLollipop();
 
                 if (passwdTemp != null && emailTemp != null) {
                     confirmEmailFragment.setEmailTemp(emailTemp);
@@ -329,8 +325,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, confirmEmailFragment);
-                ft.commitNowAllowingStateLoss();
+                ft.replace(R.id.fragment_container_login, confirmEmailFragment).commit();
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 

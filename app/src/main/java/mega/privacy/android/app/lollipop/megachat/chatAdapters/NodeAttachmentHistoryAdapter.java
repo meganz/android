@@ -42,7 +42,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
+import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -626,7 +627,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 }
 
             } else {
-                holder.fullNameTitle = ((NodeAttachmentHistoryActivity)context).chatRoom.getTitle();
+                holder.fullNameTitle = getTitleChat(((NodeAttachmentHistoryActivity)context).chatRoom);
             }
         }
 

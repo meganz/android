@@ -112,7 +112,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
 
-        titleNameContactChatPanel.setText(chat.getTitle());
+        titleNameContactChatPanel.setText(getTitleChat(chat));
 
         if (chat.isPreview()) {
             titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
@@ -235,8 +235,8 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             int color;
             String name = null;
 
-            if (!isTextEmpty(chat.getTitle())) {
-                name = chat.getTitle();
+            if (!isTextEmpty(getTitleChat(chat))) {
+                name = getTitleChat(chat);
             } else if (!isTextEmpty(contactMail)) {
                 name = contactMail;
             }

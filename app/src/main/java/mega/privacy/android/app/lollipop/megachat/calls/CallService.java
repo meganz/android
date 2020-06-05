@@ -35,6 +35,7 @@ import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -191,7 +192,7 @@ public class CallService extends Service{
             long userHandle;
             MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
             if (chat != null) {
-                title = chat.getTitle();
+                title = getTitleChat(chat);
 
                 if (chat.isGroup()) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -246,7 +247,7 @@ public class CallService extends Service{
             long userHandle;
             MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
             if (chat != null) {
-                title = chat.getTitle();
+                title = getTitleChat(chat);
 
                 if (chat.isGroup()) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

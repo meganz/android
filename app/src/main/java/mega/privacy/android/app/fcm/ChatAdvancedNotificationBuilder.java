@@ -271,7 +271,7 @@ public final class ChatAdvancedNotificationBuilder {
                         }
 
                         CharSequence cs = " ";
-                        String title = chats.get(i).getTitle();
+                        String title = getTitleChat(chats.get(i));
                         if (chats.get(i).isGroup()) {
                             long lastMsgSender = message.getUserHandle();
 
@@ -352,21 +352,21 @@ public final class ChatAdvancedNotificationBuilder {
 
                 if (unreadMessages > 1) {
                     String numberString = "+" + unreadMessages;
-                    title = chat.getTitle() + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
+                    title = getTitleChat(chat) + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
                 } else {
-                    title = chat.getTitle();
+                    title = getTitleChat(chat);
                 }
             } else {
 
                 if (unreadMessages > 1) {
                     String numberString = unreadMessages + "";
-                    title = chat.getTitle() + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
+                    title = getTitleChat(chat) + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
                 } else {
-                    title = chat.getTitle();
+                    title = getTitleChat(chat);
                 }
             }
         } else {
-            title = chat.getTitle();
+            title = getTitleChat(chat);
         }
 
         title = converterShortCodes(title);
@@ -389,7 +389,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setShowWhen(true)
                     .setGroup(groupKey)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
-            messagingStyleContentO = new NotificationCompat.MessagingStyle(chat.getTitle());
+            messagingStyleContentO = new NotificationCompat.MessagingStyle(getTitleChat(chat));
         } else {
             notificationBuilder = new Notification.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
@@ -401,7 +401,7 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
             }
 
-            messagingStyleContent = new Notification.MessagingStyle(chat.getTitle());
+            messagingStyleContent = new Notification.MessagingStyle(getTitleChat(chat));
         }
 
         int sizeFor = (int) unreadMessageList.size() - 1;
@@ -594,7 +594,7 @@ public final class ChatAdvancedNotificationBuilder {
             color = getColorAvatar(chat.getPeerHandle(0));
         }
 
-        return getDefaultAvatar(color, chat.getTitle(), AVATAR_SIZE, true, true);
+        return getDefaultAvatar(color, getTitleChat(chat), AVATAR_SIZE, true, true);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -850,7 +850,7 @@ public final class ChatAdvancedNotificationBuilder {
                         .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
                 if(chatToAnswer.isGroup()){
-                    notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
+                    notificationBuilderO.setContentTitle(getTitleChat(chatToAnswer));
                 }
                 else{
                     notificationBuilderO.setContentTitle(getFullName(chatToAnswer));
@@ -879,7 +879,7 @@ public final class ChatAdvancedNotificationBuilder {
                         .setDeleteIntent(pendingIntentIgnore);
 
                 if(chatToAnswer.isGroup()){
-                    notificationBuilder.setContentTitle(chatToAnswer.getTitle());
+                    notificationBuilder.setContentTitle(getTitleChat(chatToAnswer));
                 }else{
                     notificationBuilder.setContentTitle(getFullName(chatToAnswer));
                 }
@@ -1008,7 +1008,7 @@ public final class ChatAdvancedNotificationBuilder {
         MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
         String notificationContent;
         if (chat.isGroup()) {
-            notificationContent = chat.getTitle();
+            notificationContent = getTitleChat(chat);
         } else {
             notificationContent = getFullName(chat);
         }

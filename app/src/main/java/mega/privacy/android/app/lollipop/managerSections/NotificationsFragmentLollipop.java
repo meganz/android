@@ -173,9 +173,9 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 emptyTextView.setVisibility(View.VISIBLE);
 
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+                    emptyImageView.setImageResource(R.drawable.ic_zero_data_notifications_landscape);
                 }else{
-                    emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+                    emptyImageView.setImageResource(R.drawable.ic_zero_data_notifications);
                 }
 
                 String textToShow = String.format(getString(R.string.context_empty_notifications));

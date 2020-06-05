@@ -80,12 +80,13 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -276,7 +277,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             this.startService(intentService);
         }
         application.createChatAudioManager();
-        titleToolbar.setText(chat.getTitle());
+        titleToolbar.setText(getTitleChat(chat));
         updateSubTitle();
 
         if (chat.isGroup()) {

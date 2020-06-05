@@ -2783,6 +2783,9 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
@@ -2797,6 +2800,4 @@
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
     <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
     <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
-
-    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
 </resources>

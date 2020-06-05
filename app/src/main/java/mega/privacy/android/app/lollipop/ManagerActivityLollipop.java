@@ -246,6 +246,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -4416,6 +4417,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 		inputFirstName.setOnEditorActionListener(editorActionListener);
 		inputFirstName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
+		inputFirstName.requestFocus();
 
 		inputLastName.setSingleLine();
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
@@ -4497,6 +4499,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		builder.setView(scrollView);
 
 		changeUserAttributeDialog = builder.create();
+		changeUserAttributeDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		changeUserAttributeDialog.show();
 		changeUserAttributeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -4539,7 +4542,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 			}
 		});
-		showKeyboardDelayed(inputFirstName);
 	}
 
 	@Override
@@ -8186,36 +8188,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
 		input.setText(text);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					if (document.isFolder()){
-						input.setSelection(0, input.getText().length());
-					}
-					else{
-						String [] s = document.getName().split("\\.");
-						if (s != null){
+		input.requestFocus();
 
-							int numParts = s.length;
-							int lastSelectedPos = 0;
-							if (numParts == 1){
-								input.setSelection(0, input.getText().length());
-							}
-							else if (numParts > 1){
-								for (int i=0; i<(numParts-1);i++){
-									lastSelectedPos += s[i].length();
-									lastSelectedPos++;
-								}
-								lastSelectedPos--; //The last point should not be selected)
-								input.setSelection(0, lastSelectedPos);
-							}
-						}
-						showKeyboardDelayed(v);
+		if (document.isFolder()) {
+			input.setSelection(0, input.getText().length());
+		} else {
+			String[] s = document.getName().split("\\.");
+			if (s != null) {
+
+				int numParts = s.length;
+				int lastSelectedPos = 0;
+				if (numParts == 1) {
+					input.setSelection(0, input.getText().length());
+				} else if (numParts > 1) {
+					for (int i = 0; i < (numParts - 1); i++) {
+						lastSelectedPos += s[i].length();
+						lastSelectedPos++;
 					}
+					lastSelectedPos--; //The last point should not be selected)
+					input.setSelection(0, lastSelectedPos);
 				}
 			}
-		});
+		}
 
 	    layout.addView(input, params);
 
@@ -8320,6 +8314,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 		builder.setView(layout);
 		renameDialog = builder.create();
+		renameDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		renameDialog.show();
 		renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
 		{
@@ -9646,14 +9641,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_new_folder));
@@ -9675,6 +9663,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -9815,14 +9804,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
 
 		final TextView text = new TextView(ManagerActivityLollipop.this);
 
@@ -9865,6 +9847,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 
 		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
@@ -9975,14 +9958,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
+
 		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
@@ -10005,6 +9982,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         });
 
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 	}
 
@@ -13242,7 +13220,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
 			long chatHandle = request.getChatHandle();
 			MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
-			String chatTitle = chat.getTitle();
+			String chatTitle = getTitleChat(chat);
 
 			if(chatTitle==null){
 				chatTitle = "";

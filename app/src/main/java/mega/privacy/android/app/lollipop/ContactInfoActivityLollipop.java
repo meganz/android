@@ -114,8 +114,9 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
+import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -458,8 +459,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					checkNickname(user.getHandle());
 				} else {
 					String fullName = "";
-					if (!isTextEmpty(chat.getTitle())) {
-						fullName = chat.getTitle();
+					if (!isTextEmpty(getTitleChat(chat))) {
+						fullName = getTitleChat(chat);
 					} else if (userEmailExtra != null) {
 						fullName = userEmailExtra;
 					}
@@ -1793,7 +1794,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_clear_chat,chat.getTitle());
+		String message= getResources().getString(R.string.confirmation_clear_chat, getTitleChat(chat));
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
