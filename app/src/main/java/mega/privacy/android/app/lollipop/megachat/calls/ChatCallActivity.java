@@ -2478,7 +2478,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkTerminatingCall() {
         clearHandlers();
-        application.removeRTCAudioManager();
         MegaApplication.setSpeakerStatus(chatId, false);
         finishActivity();
     }

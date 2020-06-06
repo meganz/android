@@ -1294,7 +1294,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private void removeValues(long chatId) {
 		removeStatusVideoAndSpeaker(chatId);
-        removeRTCAudioManager();
+
+		if(!inACall()){
+			removeRTCAudioManager();
+		}
 	}
 
 	private void checkCallDestroyed(long chatId) {
@@ -1344,7 +1347,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
      */
     public void createRTCAudioManager(boolean isSpeakerOn, int callStatus) {
         if (rtcAudioManager != null) {
-			setAudioManagerValues(callStatus);
+			updateStatusRingIn(callStatus);
 			return;
         }
 
@@ -1407,6 +1410,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
             rtcAudioManager.unregisterProximitySensor();
         }
     }
+
+    private void updateStatusRingIn(int callStatus){
+		rtcAudioManager.updateStatus(callStatus);
+	}
 
     private void updateStatusInProgress(int callStatus){
 		if(rtcAudioManager!= null){

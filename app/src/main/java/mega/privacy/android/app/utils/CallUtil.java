@@ -74,6 +74,24 @@ public class CallUtil {
         return true;
     }
 
+    public static boolean inACall(){
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
+        MegaHandleList listCalls = megaChatApi.getChatCalls();
+
+        if ((listCalls.size() - listCallsDestroy.size()) == 0) {
+            logDebug("No calls in progress");
+            return false;
+        }
+
+        if ((listCalls.size() - listCallsDestroy.size()) == listCallsUserNoPresent.size()) {
+            logDebug("I'm not participating in any of the calls there");
+            return false;
+        }
+
+        return true;
+    }
     /**
      * Retrieve the id of a chat that has a call in progress.
      *
@@ -435,7 +453,7 @@ public class CallUtil {
             logError("Error preparing mediaPlayer", e);
             return;
         }
-        logDebug("Start outgoing call sound");
+        logDebug("*************Start outgoing call sound");
         mediaPlayer.start();
     }
 

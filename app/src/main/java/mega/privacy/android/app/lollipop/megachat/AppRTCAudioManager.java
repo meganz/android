@@ -55,6 +55,7 @@ public class AppRTCAudioManager {
     private boolean isSpeakerOn = false;
     private OnProximitySensorListener proximitySensorListener;
     private int typeStatus;
+    private boolean isTemporary = false;
 
     // Default audio device; speaker phone for video calls or earpiece for audio
     // only calls.
@@ -92,6 +93,7 @@ public class AppRTCAudioManager {
         wiredHeadsetReceiver = new WiredHeadsetReceiver();
         amState = AudioManagerState.UNINITIALIZED;
         typeStatus = callStatus;
+        isTemporary = false;
         start(null, statusSpeaker);
         if (apprtcContext instanceof ChatActivityLollipop) {
             registerProximitySensor();
@@ -104,7 +106,6 @@ public class AppRTCAudioManager {
         if (bluetoothManager == null){
             bluetoothManager = AppRTCBluetoothManager.create(apprtcContext, this);
         }
-        bluetoothManager.start();
     }
     public void stopBluetooth() {
         if (bluetoothManager == null)
@@ -122,7 +123,14 @@ public class AppRTCAudioManager {
         if(newTypeStatus == typeStatus)
             return;
 
-        if(typeStatus == MegaChatCall.CALL_STATUS_RING_IN){
+        if(newTypeStatus == -1){
+            newTypeStatus = typeStatus;
+        }
+
+        if(newTypeStatus == MegaChatCall.CALL_STATUS_RING_IN){
+            typeStatus = newTypeStatus;
+            setValues();
+        }else if(typeStatus == MegaChatCall.CALL_STATUS_RING_IN){
             typeStatus = newTypeStatus;
             if(apprtcContext instanceof MegaApplication){
                 int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
@@ -173,17 +181,17 @@ public class AppRTCAudioManager {
                 logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-                if ((apprtcContext instanceof MegaApplication && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
-                    logDebug("Disabling the speakerphone");
-                    selectAudioDevice(AudioDevice.EARPIECE);
+                if ((apprtcContext instanceof MegaApplication && isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+                    logDebug("Disabling the speakerphone:");
+                    selectAudioDevice(AudioDevice.EARPIECE, true);
                 }
             } else {
                 logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if ((apprtcContext instanceof MegaApplication && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
-                    logDebug("Enabling the speakerphone");
-                    selectAudioDevice(AudioDevice.SPEAKER_PHONE);
+                if ((apprtcContext instanceof MegaApplication && isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+                    logDebug("Enabling the speakerphone: ");
+                    selectAudioDevice(AudioDevice.SPEAKER_PHONE, true);
                 }
             }
 
@@ -192,10 +200,11 @@ public class AppRTCAudioManager {
     }
 
     public void setValues(){
-        if((typeStatus != MegaChatCall.CALL_STATUS_RING_IN && typeStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT) || bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING) {
+        if((typeStatus != MegaChatCall.CALL_STATUS_RING_IN && typeStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT) ||
+                bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE ||
+                bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING) {
             return;
         }
-
         logDebug("Updating values of Chat Audio Manager...");
         MegaHandleList listCallsRequest = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsRing =  MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
@@ -226,7 +235,7 @@ public class AppRTCAudioManager {
 
     public void updateSpeakerStatus(boolean speakerStatus) {
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
-            selectAudioDevice(speakerStatus ? AudioDevice.SPEAKER_PHONE : AudioDevice.EARPIECE);
+            selectAudioDevice(speakerStatus ? AudioDevice.SPEAKER_PHONE : AudioDevice.EARPIECE, false);
         }
     }
 
@@ -394,14 +403,18 @@ public class AppRTCAudioManager {
                 setSpeakerphoneOn(true);
                 break;
             case EARPIECE:
+                if(!isTemporary) {
+                    isSpeakerOn = false;
+                }
                 setSpeakerphoneOn(false);
                 break;
             case WIRED_HEADSET:
+                isSpeakerOn = false;
                 setSpeakerphoneOn(false);
                 break;
             case BLUETOOTH:
-                setSpeakerphoneOn(false);
                 isSpeakerOn = false;
+                setSpeakerphoneOn(false);
                 break;
             default:
                 Log.e(TAG, "Invalid audio device selection");
@@ -436,17 +449,19 @@ public class AppRTCAudioManager {
         }
 
         Log.d(TAG, "setDefaultAudioDevice(device=" + defaultAudioDevice + ")");
-        updateAudioDeviceState();
+//        updateAudioDeviceState();
     }
 
     /**
      * Changes selection of the currently active audio device.
      */
-    public void selectAudioDevice(AudioDevice device) {
+    public void selectAudioDevice(AudioDevice device, boolean temporary) {
         ThreadUtils.checkIsOnMainThread();
         if (!audioDevices.contains(device)) {
             Log.e(TAG, "Can not select " + device + " from available " + audioDevices);
         }
+
+        isTemporary = temporary;
         userSelectedAudioDevice = device;
         updateAudioDeviceState();
     }
@@ -655,8 +670,8 @@ public class AppRTCAudioManager {
                 audioDeviceSetUpdated = true;
             }
         }
-        updateAudioDevice(audioDeviceSetUpdated);
 
+        updateAudioDevice(audioDeviceSetUpdated);
         Log.d(TAG, "updateAudioDeviceState done");
     }
 
