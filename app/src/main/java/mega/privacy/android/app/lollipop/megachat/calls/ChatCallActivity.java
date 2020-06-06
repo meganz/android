@@ -1212,6 +1212,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     displayLinearFAB(false);
+
+                    application.setSpeakerStatus(callChat.getChatid(), true);
                     megaChatApi.answerChatCall(chatId, true, this);
                     clearHandlers();
                     answerCallFAB.clearAnimation();
@@ -1259,6 +1261,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Click on answer fab");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     displayLinearFAB(false);
+                    application.setSpeakerStatus(callChat.getChatid(), false);
                     megaChatApi.answerChatCall(chatId, false, this);
                     clearHandlers();
                     answerCallFAB.clearAnimation();
@@ -1804,10 +1807,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for updating speaker status, ON or OFF.
      */
     private void updateLocalSpeakerStatus() {
-        if (getCall() == null || !statusCallInProgress(callChat.getStatus())) return;
+        if (getCall() == null || (!statusCallInProgress(callChat.getStatus()) && callChat.getStatus() != MegaChatCall.CALL_STATUS_RING_IN)) return;
         boolean isSpeakerOn = application.getSpeakerStatus(callChat.getChatid());
-        application.createRTCAudioManager(isSpeakerOn);
-        application.setAudioManagerValues(callChat.getStatus());
+        application.updateSpeakerStatus(isSpeakerOn, callChat.getStatus());
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -2476,7 +2478,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkTerminatingCall() {
         clearHandlers();
-        application.removeChatAudioManager();
         application.removeRTCAudioManager();
         MegaApplication.setSpeakerStatus(chatId, false);
         finishActivity();

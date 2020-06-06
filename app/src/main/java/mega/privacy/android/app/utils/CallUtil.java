@@ -4,12 +4,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.SystemClock;
 import androidx.core.content.ContextCompat;
+
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.IOException;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -379,5 +390,136 @@ public class CallUtil {
         builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
         builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
+
+    public static void setAudioManagerValues(AudioManager audioManager, MediaPlayer mediaPlayer, Vibrator vibrator, int callStatus, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
+        logDebug("Call status: " + callStatusToString(callStatus));
+
+        if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+            if (listCallsRing != null && listCallsRing.size() > 0) {
+                logDebug("There was also an incoming call (stop incoming call sound)");
+                stopAudioSignals(vibrator, mediaPlayer);
+            }
+
+            outgoingCallSound(audioManager, mediaPlayer);
+
+        } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+            if (listCallsRequest == null || listCallsRequest.size() < 1) {
+                logDebug("I'm not calling");
+                if (listCallsRing != null && listCallsRing.size() > 1) {
+                    logDebug("There is another incoming call (stop the sound of the previous incoming call)");
+                    stopAudioSignals(vibrator, mediaPlayer);
+                }
+
+                incomingCallSound(audioManager, mediaPlayer);
+            }
+
+            checkVibration(audioManager, vibrator);
+        }
+    }
+
+    private static void outgoingCallSound(AudioManager audioManager, MediaPlayer mediaPlayer) {
+        if (audioManager == null || mediaPlayer == null || (mediaPlayer != null && mediaPlayer.isPlaying()))
+            return;
+
+        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0);
+        Resources res = MegaApplication.getInstance().getBaseContext().getResources();
+        AssetFileDescriptor afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call);
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+        mediaPlayer.setLooping(true);
+        try {
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            logDebug("Preparing mediaPlayer");
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logError("Error preparing mediaPlayer", e);
+            return;
+        }
+        logDebug("Start outgoing call sound");
+        mediaPlayer.start();
+    }
+
+    private static void incomingCallSound(AudioManager audioManager, MediaPlayer mediaPlayer) {
+        if (audioManager == null || mediaPlayer == null || (mediaPlayer != null && mediaPlayer.isPlaying()))
+            return;
+
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
+        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        if (ringtoneUri == null) return;
+        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
+        mediaPlayer.setLooping(true);
+
+        try {
+            mediaPlayer.setDataSource(MegaApplication.getInstance().getBaseContext(), ringtoneUri);
+            logDebug("Preparing mediaPlayer");
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logError("Error preparing mediaPlayer", e);
+            return;
+        }
+        logDebug("Start incoming call sound");
+        mediaPlayer.start();
+    }
+
+    private static void checkVibration(AudioManager audioManager, Vibrator vibrator) {
+        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING)+", Voice call volume: "+audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
+
+        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
+            if (vibrator == null || !vibrator.hasVibrator()) return;
+            stopVibration(vibrator);
+            return;
+        }
+
+        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
+            startVibration(vibrator);
+            return;
+        }
+
+        if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0 || audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL) == 0) {
+            return;
+        }
+        startVibration(vibrator);
+    }
+
+
+    private static void startVibration(Vibrator vibrator) {
+        if (vibrator == null || !vibrator.hasVibrator()) return;
+        logDebug("Vibration begins");
+        long[] pattern = {0, 1000, 500, 500, 1000};
+        vibrator.vibrate(pattern, 0);
+    }
+
+    public static void stopAudioSignals(Vibrator vibrator, MediaPlayer mediaPlayer) {
+        logDebug("Stop sound and vibration");
+        stopSound(mediaPlayer);
+        stopVibration(vibrator);
+    }
+
+    private static void stopSound(MediaPlayer mediaPlayer) {
+        try {
+            if (mediaPlayer != null) {
+                logDebug("Stopping sound...");
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+                mediaPlayer.release();
+            }
+        } catch (Exception e) {
+            logWarning("Exception stopping player", e);
+        }
+    }
+
+    private static void stopVibration(Vibrator vibrator) {
+        try {
+            if (vibrator != null && vibrator.hasVibrator()) {
+                logDebug("Canceling vibration...");
+                vibrator.cancel();
+            }
+        } catch (Exception e) {
+            logWarning("Exception canceling vibrator", e);
+        }
+    }
+
 
 }
