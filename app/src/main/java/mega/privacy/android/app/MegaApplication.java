@@ -53,7 +53,6 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatAudioManager;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import nz.mega.sdk.MegaAccountSession;
@@ -158,8 +157,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
-	private ChatAudioManager chatAudioManager = null;
     private AppRTCAudioManager rtcAudioManager = null;
+    private AppRTCAudioManager rtcAudioManagerRingInCall = null;
 
     private static MegaApplication singleApplicationInstance;
 
@@ -453,8 +452,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS
 								|| callStatus == MegaChatCall.CALL_STATUS_JOINING
 								|| callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
-							updateStatusInProgress(callStatus);
-							stopSounds();
+                            updateRTCAudioMangerTypeStatus(callStatus);
 							clearIncomingCallNotification(callId);
 						}
 
@@ -1247,14 +1245,16 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logDebug("The call is already opened");
 			return;
 		}
+
 		MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 		if (callToLaunch == null || callToLaunch.getStatus() > MegaChatCall.CALL_STATUS_IN_PROGRESS){
 			logWarning("Launch not in correct status");
 			return;
 		}
+
 		logDebug("Open the call");
 		if (shouldNotify(this) && !isActivityVisible()) {
-			PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
 			if (pm != null) {
 				wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
 			}
@@ -1263,7 +1263,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}
 			toIncomingCall(this, callToLaunch, megaChatApi);
 		} else {
-			launchCallActivity(callToLaunch);
+            launchCallActivity(callToLaunch);
 		}
 	}
 
@@ -1297,7 +1297,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 		if(!inACall()){
 			removeRTCAudioManager();
-		}
+            removeRTCAudioManagerRingIn();
+		}else if(participatingInACall()){
+            removeRTCAudioManagerRingIn();
+        }
 	}
 
 	private void checkCallDestroyed(long chatId) {
@@ -1346,15 +1349,35 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
      * @param isSpeakerOn the speaker status.
      */
     public void createRTCAudioManager(boolean isSpeakerOn, int callStatus) {
-        if (rtcAudioManager != null) {
-			updateStatusRingIn(callStatus);
-			return;
-        }
+        if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
+            if(rtcAudioManagerRingInCall != null){
+                removeRTCAudioManagerRingIn();
+            }
+            rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
 
-        logDebug("Creating RTC Audio Manager");
-        rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
-		startProximitySensor();
-        setAudioManagerValues(callStatus);
+        }else {
+            if (rtcAudioManager != null) {
+                return;
+            }
+            logDebug("Creating RTC Audio Manager");
+            rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
+        }
+    }
+
+    /**
+     * Remove the AppRTCAudioManager.
+     */
+    public void removeRTCAudioManagerRingIn() {
+        if (rtcAudioManagerRingInCall == null)
+            return;
+
+        try {
+            logDebug("Removing RTC Audio Manager");
+            rtcAudioManagerRingInCall.stop();
+            rtcAudioManagerRingInCall = null;
+        } catch (Exception e) {
+            logError("Exception stopping speaker audio manager", e);
+        }
     }
 
     /**
@@ -1366,12 +1389,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
         try {
 			logDebug("Removing RTC Audio Manager");
-            unregisterProximitySensor();
-			stopSounds();
             rtcAudioManager.stop();
             rtcAudioManager = null;
         } catch (Exception e) {
             logError("Exception stopping speaker audio manager", e);
+        }
+    }
+
+    private void updateRTCAudioMangerTypeStatus(int callStatus){
+        removeRTCAudioManagerRingIn();
+        stopSounds();
+        if(rtcAudioManager != null){
+            rtcAudioManager.setTypeStatus(callStatus);
         }
     }
 
@@ -1380,10 +1409,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	 */
 	public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus){
 		if (rtcAudioManager != null) {
-			rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
+            rtcAudioManager.updateSpeakerStatus(isSpeakerOn, callStatus);
 			return;
 		}
-		createRTCAudioManager(isSpeakerOn, callStatus);
+
+        createRTCAudioManager(isSpeakerOn, callStatus);
 	}
 
     /**
@@ -1411,32 +1441,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         }
     }
 
-    private void updateStatusRingIn(int callStatus){
-		rtcAudioManager.updateStatus(callStatus);
-	}
-
-    private void updateStatusInProgress(int callStatus){
-		if(rtcAudioManager!= null){
-			if(rtcAudioManager.getTypeStatus() == MegaChatCall.CALL_STATUS_RING_IN){
-				startProximitySensor();
-			}
-			rtcAudioManager.updateStatus(callStatus);
-		}
-	}
-
+    /**
+     * Method for stopping the sound of incoming or outgoing calls.
+     */
     public void stopSounds(){
 		if(rtcAudioManager!= null){
-			rtcAudioManager.stopSounds();
+            rtcAudioManager.stopSounds();
 		}
-	}
-
-    /**
-     * Update the values of the ChatAudioManager depending on the call status.
-     *
-     * @param callStatus The current call status.
-     */
-	private void setAudioManagerValues(int callStatus){
-		//rtcAudioManager.setValues(callStatus);
 	}
 
 	public void checkQueuedCalls() {
@@ -1452,12 +1463,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("launchCallActivity: " + call.getStatus());
-		MegaApplication.setShowPinScreen(false);
+
+        MegaApplication.setShowPinScreen(false);
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra(CHAT_ID, call.getChatid());
 		i.putExtra(CALL_ID, call.getId());
-		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(i);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		logDebug("Launch call: " + getTitleChat(chatRoom));

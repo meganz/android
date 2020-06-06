@@ -8648,7 +8648,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             speakerWasActivated = true;
         }
         if(rtcAudioManager != null){
-            rtcAudioManager.updateSpeakerStatus(true);
+            rtcAudioManager.updateSpeakerStatus(true, -1);
         }
     }
 

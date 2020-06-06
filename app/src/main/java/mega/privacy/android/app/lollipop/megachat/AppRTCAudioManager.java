@@ -15,19 +15,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
+import android.media.AudioAttributes;
 import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.util.Log;
 import org.webrtc.ThreadUtils;
-import org.webrtc.VideoFrame;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
@@ -46,8 +52,8 @@ public class AppRTCAudioManager {
     private AudioManager audioManager;
     private AudioManagerEvents audioManagerEvents;
     private AudioManagerState amState;
-    private MediaPlayer mediaPlayer = new MediaPlayer();
-    private Vibrator vibrator = (Vibrator) MegaApplication.getInstance().getBaseContext().getSystemService(Context.VIBRATOR_SERVICE);
+    private MediaPlayer mediaPlayer;
+    private Vibrator vibrator;
     private int savedAudioMode = AudioManager.MODE_INVALID;
     private boolean savedIsSpeakerPhoneOn = false;
     private boolean savedIsMicrophoneMute = false;
@@ -55,7 +61,7 @@ public class AppRTCAudioManager {
     private boolean isSpeakerOn = false;
     private OnProximitySensorListener proximitySensorListener;
     private int typeStatus;
-    private boolean isTemporary = false;
+    private boolean isTemporary;
 
     // Default audio device; speaker phone for video calls or earpiece for audio
     // only calls.
@@ -115,38 +121,6 @@ public class AppRTCAudioManager {
         bluetoothManager = null;
     }
 
-    public int getTypeStatus() {
-        return typeStatus;
-    }
-
-    public void updateStatus(int newTypeStatus){
-        if(newTypeStatus == typeStatus)
-            return;
-
-        if(newTypeStatus == -1){
-            newTypeStatus = typeStatus;
-        }
-
-        if(newTypeStatus == MegaChatCall.CALL_STATUS_RING_IN){
-            typeStatus = newTypeStatus;
-            setValues();
-        }else if(typeStatus == MegaChatCall.CALL_STATUS_RING_IN){
-            typeStatus = newTypeStatus;
-            if(apprtcContext instanceof MegaApplication){
-                int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
-                if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    logDebug("Audio focus request failed");
-                }
-
-                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                    audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                }
-            }
-            return;
-        }
-        typeStatus = newTypeStatus;
-    }
-
     public void setOnProximitySensorListener(OnProximitySensorListener proximitySensorListener) {
         this.proximitySensorListener = proximitySensorListener;
     }
@@ -199,20 +173,179 @@ public class AppRTCAudioManager {
         }
     }
 
-    public void setValues(){
+    public void setTypeStatus(int typeStatus) {
+        this.typeStatus = typeStatus;
+    }
+
+    private void setValues(){
         if((typeStatus != MegaChatCall.CALL_STATUS_RING_IN && typeStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT) ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING) {
             return;
         }
+
         logDebug("Updating values of Chat Audio Manager...");
         MegaHandleList listCallsRequest = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsRing =  MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-        setAudioManagerValues(audioManager, mediaPlayer, vibrator, typeStatus, listCallsRequest, listCallsRing);
+
+        setAudioManagerValues(typeStatus, listCallsRequest, listCallsRing);
+    }
+
+    private void setAudioManagerValues(int callStatus, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
+        logDebug("Call status: " + callStatusToString(callStatus));
+
+        if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+            if (listCallsRing != null && listCallsRing.size() > 0) {
+                logDebug("There was also an incoming call (stop incoming call sound)");
+                stopAudioSignals();
+            }
+
+            outgoingCallSound();
+        } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+            if (listCallsRequest == null || listCallsRequest.size() < 1) {
+                logDebug("I'm not calling");
+                if (listCallsRing != null && listCallsRing.size() > 1) {
+                    logDebug("There is another incoming call (stop the sound of the previous incoming call)");
+                    stopAudioSignals();
+                }
+
+                incomingCallSound();
+            }
+
+            checkVibration();
+        }
+    }
+
+    private void outgoingCallSound() {
+        if (audioManager == null || (mediaPlayer != null && mediaPlayer.isPlaying()))
+            return;
+
+        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0);
+        Resources res = MegaApplication.getInstance().getBaseContext().getResources();
+        AssetFileDescriptor afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call);
+        if(mediaPlayer != null){
+            stopSound();
+        }
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+        mediaPlayer.setLooping(true);
+        try {
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            logDebug("Preparing mediaPlayer");
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logError("Error preparing mediaPlayer", e);
+            return;
+        }
+        logDebug("Start outgoing call sound");
+        mediaPlayer.start();
+    }
+
+    private void incomingCallSound() {
+        if (audioManager == null || (mediaPlayer != null && mediaPlayer.isPlaying()))
+            return;
+
+        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        if (ringtoneUri == null)
+            return;
+
+        if(mediaPlayer != null){
+            stopSound();
+        }
+        mediaPlayer = new MediaPlayer();
+//        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
+//        mediaPlayer.setLooping(true);
+
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
+        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
+        mediaPlayer.setLooping(true);
+
+        try {
+            mediaPlayer.setDataSource(MegaApplication.getInstance().getBaseContext(), ringtoneUri);
+            logDebug("Preparing mediaPlayer");
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logError("Error preparing mediaPlayer", e);
+            return;
+        }
+        logDebug("Start incoming call sound");
+        mediaPlayer.start();
+    }
+
+    private void checkVibration() {
+        if(audioManager == null)
+            return;
+
+        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING)+", Voice call volume: "+audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
+
+        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
+            if (vibrator == null || !vibrator.hasVibrator()) return;
+            stopVibration();
+            return;
+        }
+
+        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
+            startVibration();
+            return;
+        }
+
+        if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0) {
+            return;
+        }
+        startVibration();
+    }
+
+
+    private void startVibration() {
+        if (vibrator != null)
+            return;
+
+        vibrator = (Vibrator) apprtcContext.getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator == null || !vibrator.hasVibrator())
+            return;
+
+        logDebug("Vibration begins");
+        long[] pattern = {0, 1000, 500, 500, 1000};
+        vibrator.vibrate(pattern, 0);
+    }
+
+    private void stopAudioSignals() {
+        logDebug("Stop sound and vibration");
+        stopSound();
+        stopVibration();
+    }
+
+    private void stopSound() {
+        try {
+            if (mediaPlayer != null) {
+                logDebug("Stopping sound...");
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+        } catch (Exception e) {
+            logWarning("Exception stopping player", e);
+        }
+    }
+
+    private void stopVibration() {
+        try {
+            if (vibrator != null && vibrator.hasVibrator()) {
+                logDebug("Canceling vibration...");
+                vibrator.cancel();
+                vibrator = null;
+            }
+        } catch (Exception e) {
+            logWarning("Exception canceling vibrator", e);
+        }
     }
 
     public void stopSounds(){
-        stopAudioSignals(vibrator, mediaPlayer);
+        stopAudioSignals();
     }
 
     public void unregisterProximitySensor() {
@@ -233,7 +366,8 @@ public class AppRTCAudioManager {
         return new AppRTCAudioManager(context, isSpeakerOn, callStatus);
     }
 
-    public void updateSpeakerStatus(boolean speakerStatus) {
+    public void updateSpeakerStatus(boolean speakerStatus, int callStatus) {
+        typeStatus = callStatus;
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
             selectAudioDevice(speakerStatus ? AudioDevice.SPEAKER_PHONE : AudioDevice.EARPIECE, false);
         }
@@ -326,9 +460,11 @@ public class AppRTCAudioManager {
             // best possible VoIP performance.
             // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
             if(typeStatus ==  MegaChatCall.CALL_STATUS_RING_IN){
-                audioManager.setMode(AudioManager.MODE_RINGTONE);
+                audioManager.setMode(AudioManager.MODE_NORMAL);
             }else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            }else{
+                audioManager.setMode(AudioManager.MODE_NORMAL);
             }
 
         }else if(apprtcContext instanceof ChatActivityLollipop){
@@ -364,6 +500,7 @@ public class AppRTCAudioManager {
             return;
         }
 
+        typeStatus = -1;
         amState = AudioManagerState.UNINITIALIZED;
 
         unregisterReceiver(wiredHeadsetReceiver);
