@@ -74,7 +74,12 @@ public class CallUtil {
         return true;
     }
 
-    public static boolean inACall(){
+    /**
+     * Retrieve if there's a call in progress that you're participating in or a incoming call.
+     *
+     * @return True if you're on a call in progress o exists a incoming call. Otherwise false.
+     */
+    public static boolean existsAnOgoingOrIncomingCall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
@@ -92,6 +97,7 @@ public class CallUtil {
 
         return true;
     }
+
     /**
      * Retrieve the id of a chat that has a call in progress.
      *

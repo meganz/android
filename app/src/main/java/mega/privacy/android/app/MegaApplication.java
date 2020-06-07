@@ -1295,10 +1295,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private void removeValues(long chatId) {
 		removeStatusVideoAndSpeaker(chatId);
 
-		if(!inACall()){
-			removeRTCAudioManager();
+        if (!existsAnOgoingOrIncomingCall()) {
+            removeRTCAudioManager();
             removeRTCAudioManagerRingIn();
-		}else if(participatingInACall()){
+        } else if (participatingInACall()) {
             removeRTCAudioManagerRingIn();
         }
 	}
@@ -1346,16 +1346,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     /**
      * Create or update the AppRTCAudioManager for the in progress call.
      *
-     * @param isSpeakerOn the speaker status.
+     * @param isSpeakerOn Speaker status.
+     * @param callStatus  Call status.
      */
     public void createRTCAudioManager(boolean isSpeakerOn, int callStatus) {
-        if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
-            if(rtcAudioManagerRingInCall != null){
+        if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+            if (rtcAudioManagerRingInCall != null) {
                 removeRTCAudioManagerRingIn();
             }
             rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
 
-        }else {
+        } else {
             if (rtcAudioManager != null) {
                 return;
             }
@@ -1365,9 +1366,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     }
 
     /**
-     * Remove the AppRTCAudioManager.
+     * Remove the incoming call AppRTCAudioManager.
      */
-    public void removeRTCAudioManagerRingIn() {
+    private void removeRTCAudioManagerRingIn() {
         if (rtcAudioManagerRingInCall == null)
             return;
 
@@ -1381,14 +1382,14 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     }
 
     /**
-     * Remove the AppRTCAudioManager.
+     * Remove the ongoing call AppRTCAudioManager.
      */
-    public void removeRTCAudioManager() {
+    private void removeRTCAudioManager() {
         if (rtcAudioManager == null)
             return;
 
         try {
-			logDebug("Removing RTC Audio Manager");
+            logDebug("Removing RTC Audio Manager");
             rtcAudioManager.stop();
             rtcAudioManager = null;
         } catch (Exception e) {
@@ -1396,25 +1397,33 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         }
     }
 
-    private void updateRTCAudioMangerTypeStatus(int callStatus){
+    /**
+     * Method for updating the call status of the Audio Manger.
+     *
+     * @param callStatus Call status.
+     */
+    private void updateRTCAudioMangerTypeStatus(int callStatus) {
         removeRTCAudioManagerRingIn();
         stopSounds();
-        if(rtcAudioManager != null){
+        if (rtcAudioManager != null) {
             rtcAudioManager.setTypeStatus(callStatus);
         }
     }
 
-	/**
-	 * Update the speaker.
-	 */
-	public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus){
-		if (rtcAudioManager != null) {
+    /**
+     * Method for updating the call status of the Speaker status .
+     *
+     * @param isSpeakerOn If the speaker is on.
+     * @param callStatus  Call status.
+     */
+    public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus) {
+        if (rtcAudioManager != null) {
             rtcAudioManager.updateSpeakerStatus(isSpeakerOn, callStatus);
-			return;
-		}
+            return;
+        }
 
         createRTCAudioManager(isSpeakerOn, callStatus);
-	}
+    }
 
     /**
      * Activate the proximity sensor.
@@ -1423,11 +1432,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         if (rtcAudioManager != null) {
             logDebug("Starting proximity sensor...");
             rtcAudioManager.startProximitySensor();
-			rtcAudioManager.setOnProximitySensorListener(isNear -> {
-				Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
-				intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
-				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-			});
+            rtcAudioManager.setOnProximitySensorListener(isNear -> {
+                Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
+                intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            });
         }
     }
 
@@ -1444,11 +1453,14 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     /**
      * Method for stopping the sound of incoming or outgoing calls.
      */
-    public void stopSounds(){
-		if(rtcAudioManager!= null){
-            rtcAudioManager.stopSounds();
-		}
-	}
+    public void stopSounds() {
+        if (rtcAudioManager != null) {
+            rtcAudioManager.stopAudioSignals();
+        }
+        if (rtcAudioManagerRingInCall != null) {
+            rtcAudioManagerRingInCall.stopAudioSignals();
+        }
+    }
 
 	public void checkQueuedCalls() {
 		logDebug("checkQueuedCalls");

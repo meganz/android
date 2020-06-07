@@ -178,8 +178,8 @@ public class AppRTCAudioManager {
         this.typeStatus = typeStatus;
     }
 
-    private void setValues(){
-        if((typeStatus != MegaChatCall.CALL_STATUS_RING_IN && typeStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT) ||
+    private void setValues() {
+        if ((typeStatus != MegaChatCall.CALL_STATUS_RING_IN && typeStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT) ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING) {
             return;
@@ -187,7 +187,7 @@ public class AppRTCAudioManager {
 
         logDebug("Updating values of Chat Audio Manager...");
         MegaHandleList listCallsRequest = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-        MegaHandleList listCallsRing =  MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+        MegaHandleList listCallsRing = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
 
         setAudioManagerValues(typeStatus, listCallsRequest, listCallsRing);
     }
@@ -224,7 +224,7 @@ public class AppRTCAudioManager {
         audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0);
         Resources res = MegaApplication.getInstance().getBaseContext().getResources();
         AssetFileDescriptor afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call);
-        if(mediaPlayer != null){
+        if (mediaPlayer != null) {
             stopSound();
         }
         mediaPlayer = new MediaPlayer();
@@ -251,13 +251,11 @@ public class AppRTCAudioManager {
         if (ringtoneUri == null)
             return;
 
-        if(mediaPlayer != null){
+        if (mediaPlayer != null) {
             stopSound();
         }
-        mediaPlayer = new MediaPlayer();
-//        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
-//        mediaPlayer.setLooping(true);
 
+        mediaPlayer = new MediaPlayer();
         audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
@@ -277,10 +275,10 @@ public class AppRTCAudioManager {
     }
 
     private void checkVibration() {
-        if(audioManager == null)
+        if (audioManager == null)
             return;
 
-        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING)+", Voice call volume: "+audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
+        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING) + ", Voice call volume: " + audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
 
         if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
             if (vibrator == null || !vibrator.hasVibrator()) return;
@@ -299,7 +297,6 @@ public class AppRTCAudioManager {
         startVibration();
     }
 
-
     private void startVibration() {
         if (vibrator != null)
             return;
@@ -313,7 +310,7 @@ public class AppRTCAudioManager {
         vibrator.vibrate(pattern, 0);
     }
 
-    private void stopAudioSignals() {
+    public void stopAudioSignals() {
         logDebug("Stop sound and vibration");
         stopSound();
         stopVibration();
@@ -343,10 +340,6 @@ public class AppRTCAudioManager {
         } catch (Exception e) {
             logWarning("Exception canceling vibrator", e);
         }
-    }
-
-    public void stopSounds(){
-        stopAudioSignals();
     }
 
     public void unregisterProximitySensor() {
@@ -454,14 +447,9 @@ public class AppRTCAudioManager {
                 audioManager.setMode(AudioManager.MODE_NORMAL);
             }else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            }else{
-                audioManager.setMode(AudioManager.MODE_NORMAL);
             }
-
-        }else if(apprtcContext instanceof ChatActivityLollipop){
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            }
+        }else if(apprtcContext instanceof ChatActivityLollipop && (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)){
+            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         }
 
         // Always disable microphone mute during a WebRTC call.
@@ -496,7 +484,7 @@ public class AppRTCAudioManager {
 
         unregisterReceiver(wiredHeadsetReceiver);
 
-        stopSounds();
+        stopAudioSignals();
         stopBluetooth();
 
         // Restore previously stored audio states.

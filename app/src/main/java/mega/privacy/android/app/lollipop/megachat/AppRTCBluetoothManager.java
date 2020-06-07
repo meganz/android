@@ -449,21 +449,21 @@ public class AppRTCBluetoothManager {
     apprtcAudioManager.updateAudioDeviceState();
   }
 
+    private void startTimerInit() {
+        ThreadUtils.checkIsOnMainThread();
+        handler.postDelayed(bluetoothInitTimeoutRunnable, BLUETOOTH_TIMEOUT_MS);
+    }
+
+    private void cancelTimeInit() {
+        ThreadUtils.checkIsOnMainThread();
+        handler.removeCallbacks(bluetoothInitTimeoutRunnable);
+    }
+
   /** Starts timer which times out after BLUETOOTH_SCO_TIMEOUT_MS milliseconds. */
   private void startTimer() {
     ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "startTimer");
     handler.postDelayed(bluetoothTimeoutRunnable, BLUETOOTH_SCO_TIMEOUT_MS);
-  }
-
-  private void startTimerInit() {
-    ThreadUtils.checkIsOnMainThread();
-      handler.postDelayed(bluetoothInitTimeoutRunnable, BLUETOOTH_TIMEOUT_MS);
-  }
-  /** Cancels any outstanding timer tasks. */
-  private void cancelTimeInit() {
-    ThreadUtils.checkIsOnMainThread();
-    handler.removeCallbacks(bluetoothInitTimeoutRunnable);
   }
 
   /** Cancels any outstanding timer tasks. */
