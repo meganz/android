@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Set;
 import org.webrtc.ThreadUtils;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-
 /**
  * AppRTCProximitySensor manages functions related to Bluetoth devices in the
  * AppRTC demo.
@@ -44,7 +42,6 @@ public class AppRTCBluetoothManager {
 
   // Maximum number of SCO connection attempts.
   private static final int MAX_SCO_CONNECTION_ATTEMPTS = 2;
-  private boolean isConnecting = false;
   // Bluetooth connection state.
   public enum State {
     // Bluetooth is not available; no adapter or Bluetooth is off.
@@ -105,7 +102,6 @@ public class AppRTCBluetoothManager {
       Log.d(TAG, "BluetoothServiceListener.onServiceConnected: BT state=" + bluetoothState);
       // Android only supports one connected Bluetooth Headset at a time.
       bluetoothHeadset = (BluetoothHeadset) proxy;
-      isConnecting = true;
       updateAudioDeviceState();
       Log.d(TAG, "onServiceConnected done: BT state=" + bluetoothState);
     }

@@ -39,6 +39,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
@@ -404,29 +405,24 @@ public class AppRTCAudioManager {
                 switch (focusChange) {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         typeOfChange = "AUDIOFOCUS_GAIN";
-                        startBluetooth();
-                        break;
                     case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
                         typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT";
-                        startBluetooth();
-                        break;
                     case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE:
                         typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE";
-                        startBluetooth();
-                        break;
                     case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK:
                         typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK";
                         startBluetooth();
                         break;
+
                     case AudioManager.AUDIOFOCUS_LOSS:
                         typeOfChange = "AUDIOFOCUS_LOSS";
-                        break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                         typeOfChange = "AUDIOFOCUS_LOSS_TRANSIENT";
-                        break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                         typeOfChange = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
+                        stopBluetooth();
                         break;
+
                     default:
                         typeOfChange = "AUDIOFOCUS_INVALID";
                         break;
@@ -435,25 +431,20 @@ public class AppRTCAudioManager {
             }
         };
 
-        if(apprtcContext instanceof MegaApplication){
-            if(typeStatus ==  MegaChatCall.CALL_STATUS_RING_IN){
-                int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_RING, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
-                if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    logDebug("Audio focus request failed");
-                }
-            }else {
-                int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
-                if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    logDebug("Audio focus request failed");
-                }
-            }
-        }else if(apprtcContext instanceof ChatActivityLollipop){
-            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
-            if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                logDebug("Audio focus request failed");
-            }
-        }
+        int resultRequestFocus = AudioManager.AUDIOFOCUS_REQUEST_FAILED;
 
+        if (apprtcContext instanceof MegaApplication) {
+            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+                resultRequestFocus = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_RING, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
+            } else {
+                resultRequestFocus = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
+            }
+        } else if (apprtcContext instanceof ChatActivityLollipop) {
+            resultRequestFocus = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
+        }
+        if (resultRequestFocus != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            logDebug("Audio focus request failed");
+        }
         if(apprtcContext instanceof MegaApplication){
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
@@ -500,7 +491,7 @@ public class AppRTCAudioManager {
             return;
         }
 
-        typeStatus = -1;
+        typeStatus = INVALID_STATE_CALL;
         amState = AudioManagerState.UNINITIALIZED;
 
         unregisterReceiver(wiredHeadsetReceiver);
