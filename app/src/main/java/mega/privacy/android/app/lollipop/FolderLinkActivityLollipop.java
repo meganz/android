@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -31,13 +32,17 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -81,6 +86,7 @@ import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFrag
 import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -170,6 +176,10 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	public static final int FOLDER_LINK = 2;
 
 	private FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment;
+
+	private String mKey;
+	private View mErrorView;
+	private EditText mKeyEdit;
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -629,123 +639,122 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	
 	public void askForDecryptionKeyDialog(){
 		logDebug("askForDecryptionKeyDialog");
-		
-		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
-	    final EditText input = new EditText(this);
-	    layout.addView(input, params);		
-		
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.alert_decryption_key));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this,
+				R.style.AppCompatAlertDialogStyle);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
+
+		builder.setTitle(getString(R.string.alert_decryption_key)).setMessage(
+				getString(R.string.message_decryption_key)).setView(v)
+				.setPositiveButton(R.string.general_decryp, null)
+				.setNegativeButton(R.string.general_cancel, null);
+
+		mKeyEdit = v.findViewById(R.id.text);
+		mKeyEdit.setSingleLine();
+		mErrorView = v.findViewById(R.id.error);
+		((TextView)v.findViewById(R.id.error_text)).setText(R.string.invalid_decryption_key);
+
+		if (TextUtil.isTextEmpty(mKey)) {
+			mKeyEdit.setHint(getString(R.string.alert_decryption_key));
+			mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		} else {
+			showErrorMessage();
+		}
+
+		mKeyEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		mKeyEdit.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
+		mKeyEdit.setOnEditorActionListener((v1, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE) {
+				tryToDecrypt();
+				return true;
+			}
+			return false;
+		});
+
+		mKeyEdit.addTextChangedListener(new TextWatcher() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-					if (url.contains("#F!")) {
-						// old folder link format
-						if (value.startsWith("!")) {
-							logDebug("Decryption key with exclamation!");
-							url = url + value;
-						} else {
-							url = url + "!" + value;
-						}
-					} else if (url.contains(SEPARATOR + "folder" + SEPARATOR)) {
-						// new folder link format
-						if (value.startsWith("#")) {
-							logDebug("Decryption key with hash!");
-							url = url + value;
-						} else {
-							url = url + "#" + value;
-						}
-					}
-
-					logDebug("Folder link to import: " + url);
-					decryptionIntroduced=true;
-					megaApiFolder.loginToFolder(url, folderLinkActivity);
-					decryptionKeyDialog.dismiss();
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				hideErrorMessage();
 			}
 		});
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.alert_decryption_key));
-		builder.setMessage(getString(R.string.message_decryption_key));
-		builder.setPositiveButton(getString(R.string.general_decryp),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							logWarning("Empty key, ask again!");
-							decryptionIntroduced=false;
-							askForDecryptionKeyDialog();
-							return;
-						}else{
-							if (url.contains("#F!")) {
-								// old folder link format
-								if (value.startsWith("!")) {
-									logDebug("Decryption key with exclamation!");
-									url = url + value;
-								} else {
-									url = url + "!" + value;
-								}
-							} else if (url.contains(SEPARATOR + "folder" + SEPARATOR)) {
-								// new folder link format
-								if (value.startsWith("#")) {
-									logDebug("Decryption key with hash!");
-									url = url + value;
-								} else {
-									url = url + "#" + value;
-								}
-							}
-							logDebug("Folder link to import: " + url);
-							decryptionIntroduced=true;
-							megaApiFolder.loginToFolder(url, folderLinkActivity);
-						}
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), 
-				new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				finish();
-			}
-		});
-		builder.setView(layout);
+
 		decryptionKeyDialog = builder.create();
+		decryptionKeyDialog.setCanceledOnTouchOutside(false);
 		decryptionKeyDialog.show();
+
+		// Set onClickListeners for buttons after showing the dialog would prevent
+		// the dialog from dismissing automatically on clicking the buttons
+		decryptionKeyDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((view) -> {
+			tryToDecrypt();
+		});
+		decryptionKeyDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+				.setOnClickListener((view) -> finish());
+
+		showKeyboardDelayed(mKeyEdit);
 	}
-	
-	private void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-		handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {				
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+
+	private void tryToDecrypt() {
+		mKey = mKeyEdit.getText().toString().trim();
+		if (mKey.length() == 0) {
+			mKey = "";
+			showErrorMessage();
+			return;
+		}
+
+		String urlWithKey = "";
+
+		if (url.contains("#F!")) {
+			// old folder link format
+			if (mKey.startsWith("!")) {
+				logDebug("Decryption key with exclamation!");
+				urlWithKey = url + mKey;
+			} else {
+				urlWithKey = url + "!" + mKey;
 			}
-		}, 50);
+		} else if (url.contains(SEPARATOR + "folder" + SEPARATOR)) {
+			// new folder link format
+			if (mKey.startsWith("#")) {
+				logDebug("Decryption key with hash!");
+				urlWithKey = url + mKey;
+			} else {
+				urlWithKey = url + "#" + mKey;
+			}
+		}
+
+		logDebug("Folder link to import: " + urlWithKey);
+		decryptionIntroduced=true;
+		megaApiFolder.loginToFolder(urlWithKey, folderLinkActivity);
+		decryptionKeyDialog.dismiss();
+	}
+
+	private void showErrorMessage() {
+		if (mKeyEdit == null || mErrorView == null) return;
+
+		mKeyEdit.setText(mKey);
+		mKeyEdit.setSelectAllOnFocus(true);
+		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+		mKeyEdit.getBackground().mutate().clearColorFilter();
+		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
+				this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+
+		mErrorView.setVisibility(View.VISIBLE);
+	}
+
+	private void hideErrorMessage() {
+		if (mKeyEdit == null || mErrorView == null) return;
+
+		mErrorView.setVisibility(View.GONE);
+		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		mKeyEdit.getBackground().mutate().clearColorFilter();
+		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
+				this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 	}
 
 	@Override
@@ -786,6 +795,10 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		super.onResume();
     	folderLinkActivity = this;
 		logDebug("onResume");
+
+		if (mKeyEdit != null) {
+			showKeyboardDelayed(mKeyEdit);
+		}
 	}
 
 	public void toSelectFolder(long [] hashes, long size, String sdRoot, String prompt) {

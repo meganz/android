@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,16 +21,18 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,6 +51,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -110,6 +114,10 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	MegaNode target = null;
 
 	public static final int FILE_LINK = 1;
+
+	private String mKey;
+	private View mErrorView;
+	private EditText mKeyEdit;
 
 	@Override
 	public void onDestroy(){
@@ -264,124 +272,123 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		return super.onOptionsItemSelected(item);
 	}
 
-		public void askForDecryptionKeyDialog(){
-			logDebug("askForDecryptionKeyDialog");
+	public void askForDecryptionKeyDialog(){
+		logDebug("askForDecryptionKeyDialog");
 
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this,
+				R.style.AppCompatAlertDialogStyle);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
+		builder.setTitle(getString(R.string.alert_decryption_key)).setMessage(
+				getString(R.string.message_decryption_key)).setView(v)
+				.setPositiveButton(R.string.general_decryp, null)
+				.setNegativeButton(R.string.general_cancel, null);
 
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.password_text));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-					if (url.contains("#!")) {
-						// old folder link format
-						if (value.startsWith("!")) {
-							logDebug("Decryption key with exclamation!");
-							url = url + value;
-						} else {
-							url = url + "!" + value;
-						}
-					} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
-						// new folder link format
-						if (value.startsWith("#")) {
-							logDebug("Decryption key with hash!");
-							url = url + value;
-						} else {
-							url = url + "#" + value;
-						}
-					}
-					logDebug("File link to import: " + url);
-					decryptionIntroduced=true;
-					importLink(url);
-					decryptionKeyDialog.dismiss();
-					return true;
-				}
-				return false;
+		mKeyEdit = v.findViewById(R.id.text);
+		mKeyEdit.setSingleLine();
+		mErrorView = v.findViewById(R.id.error);
+		((TextView)v.findViewById(R.id.error_text)).setText(R.string.invalid_decryption_key);
+
+		if (TextUtil.isTextEmpty(mKey)) {
+			mKeyEdit.setHint(getString(R.string.alert_decryption_key));
+			mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		} else {
+			showErrorMessage();
+		}
+
+		mKeyEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		mKeyEdit.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
+		mKeyEdit.setOnEditorActionListener((v1, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE) {
+				tryToDecrypt();
+				return true;
 			}
+			return false;
 		});
-		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+		mKeyEdit.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				hideErrorMessage();
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.alert_decryption_key));
-		builder.setMessage(getString(R.string.message_decryption_key));
-		builder.setPositiveButton(getString(R.string.general_decryp),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-
-						if (value.length() == 0) {
-							logWarning("Empty key, ask again!");
-							decryptionIntroduced=false;
-							askForDecryptionKeyDialog();
-							return;
-						}else{
-							if (url.contains("#!")) {
-								// old folder link format
-								if (value.startsWith("!")) {
-									logDebug("Decryption key with exclamation!");
-									url = url + value;
-								} else {
-									url = url + "!" + value;
-								}
-							} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
-								// new folder link format
-								if (value.startsWith("#")) {
-									logDebug("Decryption key with hash!");
-									url = url + value;
-								} else {
-									url = url + "#" + value;
-								}
-							}
-							logDebug("File link to import: " + url);
-							decryptionIntroduced=true;
-							importLink(url);
-						}
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						finish();
-					}
-				});
-		builder.setView(layout);
 		decryptionKeyDialog = builder.create();
+		decryptionKeyDialog.setCanceledOnTouchOutside(false);
 		decryptionKeyDialog.show();
+
+		// Set onClickListeners for buttons after showing the dialog would prevent
+		// the dialog from dismissing automatically on clicking the buttons
+		decryptionKeyDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((view) -> {
+			tryToDecrypt();
+		});
+		decryptionKeyDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+				.setOnClickListener((view) -> finish());
+
+		showKeyboardDelayed(mKeyEdit);
 	}
 
-	private void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-		handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+	private void tryToDecrypt() {
+		mKey = mKeyEdit.getText().toString().trim();
+		if (mKey.length() == 0) {
+			mKey = "";
+			showErrorMessage();
+			return;
+		}
+
+		String urlWithKey = "";
+		if (url.contains("#!")) {
+			// old folder link format
+			if (mKey.startsWith("!")) {
+				logDebug("Decryption key with exclamation!");
+				urlWithKey = url + mKey;
+			} else {
+				urlWithKey = url + "!" + mKey;
 			}
-		}, 50);
+		} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
+			// new folder link format
+			if (mKey.startsWith("#")) {
+				logDebug("Decryption key with hash!");
+				urlWithKey = url + mKey;
+			} else {
+				urlWithKey = url + "#" + mKey;
+			}
+		}
+
+		logDebug("File link to import: " + urlWithKey);
+		decryptionIntroduced = true;
+		importLink(urlWithKey);
+		decryptionKeyDialog.dismiss();
+	}
+
+	private void showErrorMessage() {
+		if (mKeyEdit == null || mErrorView == null) return;
+
+		mKeyEdit.setText(mKey);
+		mKeyEdit.setSelectAllOnFocus(true);
+		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+		mKeyEdit.getBackground().mutate().clearColorFilter();
+		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
+				this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+
+		mErrorView.setVisibility(View.VISIBLE);
+	}
+
+	private void hideErrorMessage() {
+		if (mKeyEdit == null || mErrorView == null) return;
+
+		mErrorView.setVisibility(View.GONE);
+		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		mKeyEdit.getBackground().mutate().clearColorFilter();
+		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
+				this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 	}
 
 	@Override
@@ -389,7 +396,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
     	super.onResume();
 
     	Intent intent = getIntent();
-    	
+
     	if (intent != null){
     		if (intent.getAction() != null){
     			if (intent.getAction().equals(ACTION_IMPORT_LINK_FETCH_NODES)){
@@ -399,8 +406,12 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
     		}
     	}
     	setIntent(null);
+
+		if (mKeyEdit != null) {
+			showKeyboardDelayed(mKeyEdit);
+		}
 	}
-	
+
 	private void importLink(String url) {
 
 		if(!isOnline(this))
@@ -410,7 +421,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		}
 
 		if(this.isFinishing()) return;
-		
+
 		ProgressDialog temp = null;
 		try {
 			temp = new ProgressDialog(this);
@@ -419,9 +430,9 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		}
 		catch(Exception ex)
 		{ return; }
-		
+
 		statusDialog = temp;
-		
+
 		megaApi.getPublicNode(url, this);
 	}
 
@@ -439,11 +450,11 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish: " + request.getRequestString()+ " code: "+e.getErrorCode());
 		if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
+			try {
+				statusDialog.dismiss();
+			} catch (Exception ex) {
+			}
+
 			if (e.getErrorCode() == MegaError.API_OK) {
 				document = request.getPublicMegaNode();
 

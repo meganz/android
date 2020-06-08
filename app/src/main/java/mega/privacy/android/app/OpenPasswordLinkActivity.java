@@ -123,15 +123,15 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 	public void askForPasswordDialog(){
 		logDebug("askForPasswordDialog");
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this,
+				R.style.AppCompatAlertDialogStyle);
 		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_with_error_hint, null);
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 
-		builder.setView(v).setPositiveButton(R.string.general_decryp, null)
+		builder.setTitle(getString(R.string.hint_set_password_protection_dialog)).setView(v)
+				.setPositiveButton(R.string.general_decryp, null)
 				.setNegativeButton(R.string.general_cancel, null);
 
-		TextView titleView = v.findViewById(R.id.title);
-		titleView.setText(getString(R.string.hint_set_password_protection_dialog));
 		mPasswordEdit = v.findViewById(R.id.text);
 		mPasswordEdit.setSingleLine();
 		mErrorView = v.findViewById(R.id.error);
@@ -145,6 +145,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		}
 
 		mPasswordEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		mPasswordEdit.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
 		mPasswordEdit.setOnEditorActionListener((v1, actionId, event) -> {
 			if (actionId == EditorInfo.IME_ACTION_DONE) {
 				tryToDecrypt();
@@ -152,7 +153,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 			}
 			return false;
 		});
-		mPasswordEdit.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
+
 		mPasswordEdit.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -210,11 +211,10 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		if (mPasswordEdit == null || mErrorView == null) return;
 
 		mErrorView.setVisibility(View.GONE);
-		mPasswordEdit.setTextColor(ContextCompat.getColor(
-				OpenPasswordLinkActivity.this, R.color.name_my_account));
+		mPasswordEdit.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
 		mPasswordEdit.getBackground().mutate().clearColorFilter();
 		mPasswordEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
-				OpenPasswordLinkActivity.this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 	}
 
 	public void decrypt(String value){

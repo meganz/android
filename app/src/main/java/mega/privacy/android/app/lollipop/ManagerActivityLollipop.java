@@ -9180,13 +9180,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void showOpenLinkDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this,
+				R.style.AppCompatAlertDialogStyle);
 		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_with_error_hint, null);
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 		builder.setView(v).setPositiveButton(R.string.context_open_link, null)
 				.setNegativeButton(R.string.general_cancel, null);
-
-		TextView title = v.findViewById(R.id.title);
 
 		openLinkText = v.findViewById(R.id.text);
 		openLinkText.addTextChangedListener(new TextWatcher() {
@@ -9218,11 +9217,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		openLinkErrorText = v.findViewById(R.id.error_text);
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-			title.setText(R.string.action_open_link);
+			builder.setTitle(R.string.action_open_link);
 			openLinkText.setHint(R.string.hint_paste_link);
 		}
 		else if (drawerItem == DrawerItem.CHAT) {
-			title.setText(R.string.action_open_chat_link);
+			builder.setTitle(R.string.action_open_chat_link);
 			openLinkText.setHint(R.string.hint_enter_chat_link);
 		}
 

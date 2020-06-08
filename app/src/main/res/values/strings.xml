@@ -558,6 +558,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please enter the decryption key for the link</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Invalid decryption key</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
