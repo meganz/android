@@ -29,6 +29,8 @@ public class TransferOverQuotaNotification {
     public TransferOverQuotaNotification() {
         app = MegaApplication.getInstance();
         this.notificationManager = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
+
+        MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(true);
     }
 
     public void show() {

@@ -88,6 +88,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
@@ -114,7 +115,6 @@ import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
@@ -180,7 +180,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends TransfersManagementActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -706,6 +706,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
+        registerTransfersReceiver();
+
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
         setContentView(R.layout.activity_chat);
@@ -1133,6 +1135,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         userTypingLayout = findViewById(R.id.user_typing_layout);
         userTypingLayout.setVisibility(View.GONE);
         userTypingText = findViewById(R.id.user_typing_text);
+
+        setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
 
         initAfterIntent(getIntent(), savedInstanceState);
 
@@ -1762,26 +1766,67 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    /**
+     * Updates the views that have to be shown at the bottom of the UI.
+     *
+     * @param show  indicates which layout has to be shown at the bottom of the UI
+     */
     public void setBottomLayout(int show) {
-        if (show == SHOW_JOIN_LAYOUT) {
-            writingContainerLayout.setVisibility(View.GONE);
-            joinChatLinkLayout.setVisibility(View.VISIBLE);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
-            params.addRule(RelativeLayout.ABOVE, R.id.join_chat_layout_chat_layout);
-            messagesContainerLayout.setLayoutParams(params);
-            fragmentVoiceClip.setVisibility(View.GONE);
-        }else if (show == SHOW_NOTHING_LAYOUT) {
-            writingContainerLayout.setVisibility(View.GONE);
-            joinChatLinkLayout.setVisibility(View.GONE);
-            fragmentVoiceClip.setVisibility(View.GONE);
-        }else{
-            writingContainerLayout.setVisibility(View.VISIBLE);
-            joinChatLinkLayout.setVisibility(View.GONE);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
-            params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
-            messagesContainerLayout.setLayoutParams(params);
-            fragmentVoiceClip.setVisibility(View.VISIBLE);
+        updateTransfersWidgetPosition(show);
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
+
+        switch (show) {
+            case SHOW_JOIN_LAYOUT:
+                writingContainerLayout.setVisibility(View.GONE);
+                joinChatLinkLayout.setVisibility(View.VISIBLE);
+                params.addRule(RelativeLayout.ABOVE, R.id.join_chat_layout_chat_layout);
+                messagesContainerLayout.setLayoutParams(params);
+                fragmentVoiceClip.setVisibility(View.GONE);
+                break;
+
+            case SHOW_NOTHING_LAYOUT:
+                writingContainerLayout.setVisibility(View.GONE);
+                joinChatLinkLayout.setVisibility(View.GONE);
+                fragmentVoiceClip.setVisibility(View.GONE);
+                break;
+
+            default:
+                writingContainerLayout.setVisibility(View.VISIBLE);
+                joinChatLinkLayout.setVisibility(View.GONE);
+                params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
+                messagesContainerLayout.setLayoutParams(params);
+                fragmentVoiceClip.setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * Updates the position of the transfers widget in relation to which view is shown at the bottom of the UI.
+     *
+     * @param show  indicates which layout is shown at the bottom of the UI
+     */
+    private void updateTransfersWidgetPosition(int show) {
+        RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
+        if (transfersWidgetLayout.getVisibility() == View.GONE) return;
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+
+        switch (show) {
+            case SHOW_JOIN_LAYOUT:
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                params.addRule(RelativeLayout.ABOVE, R.id.join_chat_layout_chat_layout);
+                break;
+
+            case SHOW_NOTHING_LAYOUT:
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                break;
+
+            default:
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
+        }
+
+        transfersWidgetLayout.setLayoutParams(params);
     }
 
     public void setCustomSubtitle(){

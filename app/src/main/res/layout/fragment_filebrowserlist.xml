@@ -64,13 +64,16 @@
 			</LinearLayout>
 		</RelativeLayout>
 
-		<include layout="@layout/transfer_over_quota_banner"/>
+		<include layout="@layout/transfer_over_quota_banner"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/call_in_progress_layout"/>
 
 		<RelativeLayout
 			android:id="@+id/relative_layout_recycler"
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_below="@id/call_in_progress_layout"
+			android:layout_below="@id/transfer_over_quota_banner"
 			android:layout_above="@id/relative_layout_file_list_browser_camera_upload_on_off">
 
 			<androidx.recyclerview.widget.RecyclerView

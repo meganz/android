@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +65,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -1352,11 +1354,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onTransferStart(MegaApiJava api,MegaTransfer transfer) {
         logDebug("onTransferStart: " + transfer.getFileName());
         cuTransfers.add(transfer);
+        launchTransferUpdateIntent();
     }
     
     @Override
     public void onTransferUpdate(MegaApiJava api,MegaTransfer transfer) {
         transferUpdated(api,transfer);
+        launchTransferUpdateIntent();
     }
     
     private synchronized void transferUpdated(MegaApiJava api,MegaTransfer transfer) {
@@ -1395,6 +1399,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("transfer.getNodeHandle:" + transfer.getNodeHandle());
 
         try {
+            launchTransferUpdateIntent();
             transferFinished(api, transfer, e);
         } catch (Throwable th) {
             logError("onTransferFinish error", th);
@@ -2031,5 +2036,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         logDebug("Device battery level is " + level);
         return level <= LOW_BATTERY_LEVEL && !isCharging(CameraUploadsService.this);
+    }
+
+    /**
+     * Sends a broadcast to update the transfer widget where needed.
+     */
+    private void launchTransferUpdateIntent() {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, MegaTransfer.TYPE_UPLOAD));
     }
 }

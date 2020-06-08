@@ -56,7 +56,7 @@ public class TransferWidget {
             MegaApplication.getTransfersManagement().setFailedTransfers(false);
         }
 
-        if (!isOnFileManagementManagerSection()) {
+        if (context instanceof ManagerActivityLollipop && !isOnFileManagementManagerSection()) {
             hide();
             return;
         }
@@ -72,12 +72,11 @@ public class TransferWidget {
     }
 
     private boolean isOnFileManagementManagerSection() {
-        return !(context instanceof ManagerActivityLollipop)
-                || (ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.TRANSFERS
+        return ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.TRANSFERS
                 && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.CONTACTS
                 && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.ACCOUNT
                 && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.SETTINGS
-                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS;
     }
 
     public void updateState() {
@@ -104,6 +103,7 @@ public class TransferWidget {
     private void setPausedTransfers() {
         if (isOnTransferOverQuota()) return;
 
+        progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
         status.setVisibility(VISIBLE);
         status.setImageDrawable(getDrawable(R.drawable.ic_transfers_paused));
     }

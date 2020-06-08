@@ -72,6 +72,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -98,7 +99,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
+public class FolderLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener{
 
 	public static ImageView imageDrag;
 	
@@ -388,6 +389,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		megaApi.httpServerStop();
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerTransfersReceiver();
 
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
 
@@ -488,7 +490,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
+		listView.setItemAnimator(new DefaultItemAnimator());
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
 		separator = (View) findViewById(R.id.separator_3);
@@ -620,6 +622,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     	
     	aB.setTitle("MEGA - " + getString(R.string.general_loading));
 
+		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
 		
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());

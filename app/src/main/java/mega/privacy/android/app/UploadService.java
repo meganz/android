@@ -174,6 +174,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
+    /**
+     * Sends a broadcast to update the transfer widget where needed.
+     */
+    private void launchTransferUpdateIntent() {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, MegaTransfer.TYPE_UPLOAD));
+    }
+
 	@Override
 	public void onDestroy(){
 		logDebug("onDestroy");
@@ -627,6 +634,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		logDebug("Upload start: " + transfer.getFileName());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+		    launchTransferUpdateIntent();
 			String appData = transfer.getAppData();
 
 			if(appData!=null){
@@ -651,6 +659,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferFinish(final MegaApiJava api, final MegaTransfer transfer, MegaError error) {
 		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
+
+		launchTransferUpdateIntent();
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
 			LocalBroadcastManager.getInstance(getApplicationContext())
@@ -885,6 +895,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
+		    launchTransferUpdateIntent();
 
             if(isTransferBelongsToFolderTransfer(transfer)){
                 return;

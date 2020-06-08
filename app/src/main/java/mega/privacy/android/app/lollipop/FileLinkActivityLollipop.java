@@ -46,6 +46,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import nz.mega.sdk.MegaApiAndroid;
@@ -64,7 +65,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
+public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener {
 	
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -114,7 +115,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
-		{	
+		{
 			megaApi.removeRequestListener(this);
 		}
 		
@@ -219,6 +220,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		importButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
+
+		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
+
+		registerTransfersReceiver();
 
 		try{
 			statusDialog.dismiss();

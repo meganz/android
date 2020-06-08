@@ -1362,6 +1362,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+			launchTransferUpdateIntent();
 			transfersCount++;
 			updateProgressNotification();
 		}
@@ -1384,7 +1385,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!transfer.isFolderTransfer()){
 				dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
-                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
+                launchTransferUpdateIntent();
 				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
 					MegaApplication.getTransfersManagement().setFailedTransfers(true);
 				}
@@ -1604,6 +1605,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+			launchTransferUpdateIntent();
 			if (canceled) {
 				logDebug("Transfer cancel: " + transfer.getNodeHandle());
 
@@ -1668,6 +1670,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			new TransferOverQuotaNotification().show();
 			mNotificationManager.cancel(notificationId);
 		}
+	}
+
+	/**
+	 * Sends a broadcast to update the transfer widget where needed.
+	 */
+	private void launchTransferUpdateIntent() {
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, MegaTransfer.TYPE_DOWNLOAD));
 	}
 
 	@Override

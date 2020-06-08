@@ -547,8 +547,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private TransfersPageAdapter mTabsAdapterTransfers;
 	private ViewPager viewPagerTransfers;
 
-	private TransferWidget transfersWidget;
-
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
 	private TextView callInProgressText;
@@ -786,14 +784,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
-	private BroadcastReceiver transferUpdateReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver transferOverQuotaUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null) return;
+			updateWidget(intent);
 
-			if (transfersWidget != null) {
-				transfersWidget.update();
-			}
+			if (intent == null) return;
 
 			if (intent.getAction() != null && intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA) && drawerItem == DrawerItem.TRANSFERS && isActivityInForeground()) {
 				showTransfersTransferOverQuotaWarning();
@@ -1989,9 +1985,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 			filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
-			localBroadcastManager.registerReceiver(transferUpdateReceiver, filterTransfers);
+			localBroadcastManager.registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+
+		registerTransfersReceiver();
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -2504,14 +2502,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
 
-		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
-		transfersWidget = new TransferWidget(this, transfersWidgetLayout);
-		transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> {
-		    selectDrawerItemLollipop(drawerItem = DrawerItem.TRANSFERS);
-            if (isOnTransferOverQuota()) {
-                MegaApplication.getTransfersManagement().setHasNotToBeShowDueToTransferOverQuota(true);
-            }
-		});
+		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout), this);
 
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
@@ -4593,7 +4584,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(transferUpdateReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(transferOverQuotaUpdateReceiver);
 
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
@@ -11231,7 +11222,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}
 				return;
-			} else if(ACTION_SHOW_UPGRADE_ACCOUNT.equals(getIntent().getAction())) {
+			} else if(ACTION_SHOW_UPGRADE_ACCOUNT.equals(intent.getAction())) {
 				navigateToUpgradeAccount();
 			} else if (ACTION_SHOW_TRANSFERS.equals(intent.getAction())){
 				logDebug("Intent show transfers");
@@ -11244,7 +11235,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
      	super.onNewIntent(intent);
     	setIntent(intent);
-    	return;
 	}
 
 	public void navigateToUpgradeAccount(){
@@ -14959,7 +14949,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if(!transfer.isFolderTransfer()){
 				transfersInProgress.add(transfer.getTag());
-				transfersWidget.update(transfer.getType());
 
 				if (isTransfersInProgressAdded()){
 					tFLol.transferStart(transfer);
@@ -15032,7 +15021,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
 
-                transfersWidget.update();
 				if (isTransfersInProgressAdded()){
 					tFLol.transferFinish(transfer.getTag());
 				}
@@ -15066,7 +15054,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(transferCallback<transfer.getNotificationNumber()){
 					transferCallback = transfer.getNotificationNumber();
 
-                    transfersWidget.update(transfer.getType());
                     if (isTransfersInProgressAdded()){
 						tFLol.transferUpdate(transfer);
 					}
