@@ -117,7 +117,7 @@ public class GetPeerAttributesListener extends ChatBaseListener {
         }
 
         adapter.setChatRoom(chat);
-        new ChatController(context).setNonContactAttributesInDB(chat, peerHandle);
+        new ChatController(context).setNonContactAttributesInDB(peerHandle);
         adapter.notifyItemChanged(holder.getAdapterPosition());
     }
 

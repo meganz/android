@@ -141,9 +141,8 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         }
     }
 
-    public void updateAdapter() {
-        if ((!isPreview && receivedFirstName && receivedLastName && receivedEmail)
-                || (isPreview && receivedFirstName && receivedLastName)) {
+    private void updateAdapter() {
+        if (receivedFirstName || receivedLastName || receivedEmail) {
             logDebug("updateAdapter");
             if (adapter instanceof MegaChatLollipopAdapter) {
                 adapter.notifyItemChanged(holder.getAdapterPosition());

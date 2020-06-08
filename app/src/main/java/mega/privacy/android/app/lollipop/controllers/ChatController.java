@@ -2205,23 +2205,23 @@ public class ChatController {
     /**
      * Stores in DB the user's attributes of a non contact.
      *
-     * @param chat          chat from which the attributes are get
      * @param peerHandle    identifier of the user to save
      */
-    public void setNonContactAttributesInDB (MegaChatRoom chat, long peerHandle) {
+    public void setNonContactAttributesInDB (long peerHandle) {
         DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
-        String firstName = chat.getPeerFirstnameByHandle(peerHandle);
+        String firstName = megaChatApi.getUserFirstnameFromCache(peerHandle);
         if (!isTextEmpty(firstName)) {
             dbH.setNonContactFirstName(firstName, peerHandle + "");
         }
 
-        String lastName = chat.getPeerLastnameByHandle(peerHandle);
+        String lastName = megaChatApi.getUserLastnameFromCache(peerHandle);
         if (!isTextEmpty(lastName)) {
             dbH.setNonContactLastName(lastName, peerHandle + "");
         }
 
-        String email = chat.getPeerEmailByHandle(peerHandle);
+        String email = megaChatApi.getUserEmailFromCache(peerHandle);
         if (!isTextEmpty(lastName)) {
             dbH.setNonContactEmail(email, peerHandle + "");
         }

@@ -1753,6 +1753,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         String participant = getContactNameDB(handle);
 
         if (isTextEmpty(participant)) {
+            participant = chatC.getFirstName(handle, chatRoom);
+        }
+
+        if (isTextEmpty(participant)) {
             //Get the firstname
             participant = chatRoom.getPeerFirstnameByHandle(handle);
         }
@@ -1886,11 +1890,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         chatRoom = megaChatApi.getChatRoom(chatId);
 
-        setCustomSubtitle();
-
         for (int i = 0; i < handleList.size(); i++) {
-            chatC.setNonContactAttributesInDB(chatRoom, handleList.get(i));
+            chatC.setNonContactAttributesInDB(handleList.get(i));
         }
+
+        setCustomSubtitle();
     }
 
     public void setLastGreen(String date){

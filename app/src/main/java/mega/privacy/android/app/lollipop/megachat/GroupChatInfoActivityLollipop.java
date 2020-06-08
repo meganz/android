@@ -1280,15 +1280,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         for (int i = 0; i < handleList.size(); i++) {
             long handle = handleList.get(i);
-            chatC.setNonContactAttributesInDB(chat, handle);
+            chatC.setNonContactAttributesInDB(handle);
 
             for (Integer positionInAdapter : participantUpdates.keySet()) {
                 if (participantUpdates.get(positionInAdapter).getHandle() == handle) {
                     int positionInArray = adapter.getParticipantPositionInArray(positionInAdapter);
                     if (positionInArray >= 0 && positionInArray < participants.size() && participants.get(positionInArray).getHandle() == handle) {
                         MegaChatParticipant participant = participantUpdates.get(positionInAdapter);
-                        participant.setEmail(chat.getPeerEmailByHandle(handle));
-                        participant.setFullName(getParticipantName(handle));
+                        participant.setEmail(megaChatApi.getUserEmailFromCache(handle));
+                        participant.setFullName(megaChatApi.getUserFullnameFromCache(handle));
                         participant.setPrivilege(chat.getPeerPrivilegeByHandle(handle));
 
                         if (hasParticipantAttributes(participant)) {
