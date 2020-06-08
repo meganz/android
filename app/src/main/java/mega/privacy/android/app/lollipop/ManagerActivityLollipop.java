@@ -2450,6 +2450,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("Offline mode: Do not init, chat already initialized");
 				}
 			}
+
+			return;
         }
 
 		transfersOverViewLayout = findViewById(R.id.transfers_overview_item_layout);
