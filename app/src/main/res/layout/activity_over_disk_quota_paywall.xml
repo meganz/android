@@ -10,31 +10,28 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#e95757"
-            android:orientation="vertical"
-            android:paddingBottom="22dp">
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/storage_full_xl" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="23dp"
                 android:fontFamily="sans-serif-light"
+                android:layout_centerHorizontal="true"
                 android:text="@string/over_disk_quota_paywall_header"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="28dp"
-                android:src="@drawable/ic_storage_full" />
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,7 +79,7 @@
                     android:layout_marginStart="10dp"
                     android:text="@string/over_disk_quota_paywall_deletion_warning"
                     android:textColor="@color/black_87_opacity"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
