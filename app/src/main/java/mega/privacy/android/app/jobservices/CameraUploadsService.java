@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
+
 import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.core.app.NotificationCompat;
@@ -67,6 +68,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -1116,6 +1119,25 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         // end new logic
         mIntent = new Intent(this,ManagerActivityLollipop.class);
         mIntent.setAction(ACTION_CANCEL_CAM_SYNC);
+
+        // Clear activities which sit above ManagerActivityLollipop(reveal the root main activity).
+        // Without "clear top" flag, a new ManagerActivity will be created in the event that
+        // another activity (e.g. FullScreenImageViewer) stacks on the root ManagerActivity, though
+        // ManagerActivity's launchMode is "singleTop". This case is likely to bring about an infinite
+        // task stack: ManagerActivity->FullScreenImageViewer->ManagerActivity->FullScreenImageViewer
+        // ->xxx (from bottom to top). This is not only a bug but violates the Android UX principle
+        // that the user shouldn't see the Main Activity more than once as navigating back.
+        // Yet this solution gives rise to another problem: the already shown
+        // FullScreenImageViewer, AudioVideoPlayer etc. would be eliminated unexpectedly.
+        // The root cause is the defect of UI technical design.
+        // TODO: Solution: 1. Only a single activity acting as a container of all fragments (
+        // Google official recommended way). In this way, utilize the fragment transaction(addBackStack)
+        // to persist the FullScreenImageViewerFragment in the navigation-back path 2.(Alternative),
+        // take "Transfer list" out as a separate activity, then it is able to sit above
+        // FullScreenImageViewer. (Separate this independent UI functional component from the
+        // Main Activity UI logic)
+        mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        mIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
         mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
         tempRoot = new File(getCacheDir(),CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
         File root = new File(tempRoot);
