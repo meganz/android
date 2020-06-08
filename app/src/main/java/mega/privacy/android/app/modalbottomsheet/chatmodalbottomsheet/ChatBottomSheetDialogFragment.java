@@ -283,16 +283,9 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.chat_list_mute_chat_layout:
-                if (chatPrefs == null) {
-                    chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(notificationsEnabled), "");
-                    dbH.setChatItemPreferences(chatPrefs);
-                } else if (notificationsEnabled) {
-                    chatC.muteChat(chat);
-                } else {
-                    chatC.unmuteChat(chat);
+                if(context instanceof ManagerActivityLollipop) {
+                    createMuteAlertDialog(context, chat.getChatId());
                 }
-
-                ((ManagerActivityLollipop) context).showMuteIcon(chat);
                 break;
 
             case R.id.chat_list_archive_chat_layout:

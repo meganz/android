@@ -350,7 +350,7 @@ public class ChatController {
     public void muteChats(ArrayList<MegaChatListItem> chats){
         for(int i=0; i<chats.size();i++){
             muteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
+            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i).getChatId());
         }
     }
 
@@ -377,7 +377,7 @@ public class ChatController {
     public void unmuteChats(ArrayList<MegaChatListItem> chats){
         for(int i=0; i<chats.size();i++){
             unmuteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
+            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i).getChatId());
         }
     }
 

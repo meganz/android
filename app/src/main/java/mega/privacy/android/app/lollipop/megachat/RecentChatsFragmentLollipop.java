@@ -1391,27 +1391,23 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 //        }
     }
 
-    public void showMuteIcon(MegaChatListItem item) {
-        logDebug("Chat ID: " + item.getChatId());
+    public void showMuteIcon(long chatId) {
+        logDebug("Chat ID: " + chatId);
+        clearSelections();
+        hideMultipleSelect();
 
-        long chatHandleToUpdate = item.getChatId();
-        int indexToReplace = -1;
-        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-        while (itrReplace.hasNext()) {
-            MegaChatListItem chat = itrReplace.next();
-            if (chat != null) {
-                if (chat.getChatId() == chatHandleToUpdate) {
-                    indexToReplace = itrReplace.nextIndex() - 1;
-                    break;
+        if (adapterList == null || adapterList.getItemCount() == 0) {
+            setChats();
+        } else if (chats != null && !chats.isEmpty()) {
+            for (MegaChatListItem chat : chats) {
+                if (chat.getChatId() == chatId) {
+                    int pos = chats.indexOf(chat);
+                    if (pos != INVALID_POSITION) {
+                        adapterList.notifyItemChanged(pos);
+                    } else {
+                        setChats();
+                    }
                 }
-            } else {
-                break;
-            }
-        }
-        if (indexToReplace != -1) {
-            logDebug("Index to replace: " + indexToReplace);
-            if (adapterList != null) {
-                adapterList.showMuteIcon(indexToReplace);
             }
         }
     }
@@ -1750,22 +1746,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     actionMode.invalidate();
                     break;
                 }
-                case R.id.cab_menu_mute: {
-                    clearSelections();
-                    hideMultipleSelect();
-                    ChatController chatC = new ChatController(context);
-                    chatC.muteChats(chats);
-//                    setChats();
+                case R.id.cab_menu_mute:
+                case R.id.cab_menu_unmute:
+                    createMuteAlertDialog(context, chats.get(0).getChatId());
                     break;
-                }
-                case R.id.cab_menu_unmute: {
-                    clearSelections();
-                    hideMultipleSelect();
-                    ChatController chatC = new ChatController(context);
-                    chatC.unmuteChats(chats);
-//                    setChats();
-                    break;
-                }
+
                 case R.id.cab_menu_archive:
                 case R.id.cab_menu_unarchive: {
                     clearSelections();
@@ -1868,30 +1853,21 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
 
-                    for (int i = 0; i < selected.size(); i++) {
-                        MegaChatListItem chat = selected.get(i);
+                    if(selected.size() == 1){
+                        MegaChatListItem chat = selected.get(0);
                         if (chat != null) {
-
                             String chatHandle = String.valueOf(chat.getChatId());
                             if (dbH.areNotificationsEnabled(chatHandle)) {
-                                logDebug("Chat UNMUTED");
                                 showUnmute = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    for (int i = 0; i < selected.size(); i++) {
-                        MegaChatListItem chat = selected.get(i);
-                        if (chat != null) {
-
-                            String chatHandle = String.valueOf(chat.getChatId());
-                            if (!(dbH.areNotificationsEnabled(chatHandle))) {
-                                logDebug("Chat MUTED");
+                                showMute = false;
+                            }else{
                                 showMute = true;
-                                break;
+                                showUnmute = false;
                             }
                         }
+                    }else{
+                        showMute = false;
+                        showUnmute = false;
                     }
 
                     menu.findItem(R.id.cab_menu_mute).setVisible(showUnmute);

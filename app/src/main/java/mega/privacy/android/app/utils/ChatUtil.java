@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -34,6 +33,8 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -50,6 +51,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatUtil {
 
@@ -516,6 +518,70 @@ public class ChatUtil {
         }
 
         return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
+    }
+
+    private static String getStringPlural(String option){
+        try{
+            option = option.replace("[A]", "");
+            option = option.replace("[/A]", "");
+            option = option.replace("[B]", "");
+            option = option.replace("[/B]", "");
+            option = option.replace("[C]", "");
+            option = option.replace("[/C]", "");
+        }catch (Exception e){
+            logWarning("Error replacing text.");
+        }
+        return option;
+    }
+
+    public static void createMuteAlertDialog(Context context, long chatId){
+        if(chatId == MEGACHAT_INVALID_HANDLE)
+            return;
+
+        final android.app.AlertDialog muteDialog;
+        android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        dialogBuilder.setTitle(context.getString(R.string.title_dialog_mute_chatroom_notifications));
+        final CharSequence[] items = {
+                context.getString(R.string.mute_chatroom_notification_option_off),
+                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)),
+                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)),
+                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)),
+                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)),
+                context.getString(R.string.mute_chatroom_notification_option_indefinitely)};
+
+
+        String chatHandle = String.valueOf(chatId);
+        int itemClicked = 0;
+        if (!MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle)) {
+            itemClicked = 1;
+        }
+
+        dialogBuilder.setSingleChoiceItems(items, itemClicked, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                ChatController chatC = new ChatController(context);
+
+                switch (item){
+                    case 0:
+                        chatC.unmuteChat(chatId);
+                        if(context instanceof ManagerActivityLollipop){
+                            ((ManagerActivityLollipop)context).showMuteIcon(chatId);
+                        }
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                        chatC.muteChat(chatId);
+                        if(context instanceof ManagerActivityLollipop){
+                            ((ManagerActivityLollipop)context).showMuteIcon(chatId);
+                        }
+                        break;
+                }
+            }
+        });
+        muteDialog = dialogBuilder.create();
+        muteDialog.show();
     }
 
 }

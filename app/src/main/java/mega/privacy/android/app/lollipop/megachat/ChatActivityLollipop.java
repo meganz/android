@@ -381,6 +381,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private MenuItem contactInfoMenuItem;
     private MenuItem leaveMenuItem;
     private MenuItem archiveMenuItem;
+    private MenuItem muteMenuItem;
 
     String intentAction;
     MegaChatLollipopAdapter adapter;
@@ -1974,6 +1975,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         contactInfoMenuItem = menu.findItem(R.id.cab_menu_contact_info_chat);
         leaveMenuItem = menu.findItem(R.id.cab_menu_leave_chat);
         archiveMenuItem = menu.findItem(R.id.cab_menu_archive_chat);
+        muteMenuItem = menu.findItem(R.id.cab_menu_mute_chat);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -1983,6 +1985,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("onPrepareOptionsMenu");
 
         if(chatRoom!=null){
+            muteMenuItem.setVisible(true);
             selectMenuItem.setVisible(true);
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
@@ -1994,6 +1997,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
+                muteMenuItem.setVisible(false);
                 leaveMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
@@ -2099,6 +2103,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         }else{
             logWarning("Chatroom NULL on create menu");
+            muteMenuItem.setVisible(false);
             leaveMenuItem.setVisible(false);
             callMenuItem.setVisible(false);
             videoMenuItem.setVisible(false);
@@ -2215,6 +2220,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 chatC.archiveChat(chatRoom);
                 break;
             }
+            case R.id.cab_menu_mute_chat:
+                createMuteAlertDialog(this, chatRoom.getChatId());
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

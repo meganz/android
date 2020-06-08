@@ -4088,11 +4088,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void showMuteIcon(MegaChatListItem item){
-		logDebug("showMuteIcon");
+	public void showMuteIcon(long chatId){
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 		if (rChatFL != null) {
-			rChatFL.showMuteIcon(item);
+			rChatFL.showMuteIcon(chatId);
 		}
 	}
 
