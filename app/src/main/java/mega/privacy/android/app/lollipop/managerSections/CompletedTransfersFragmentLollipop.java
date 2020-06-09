@@ -60,6 +60,11 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 		setEmptyView(tL.size());
 	}
 
+	/**
+	 * Adds new completed transfer.
+	 *
+	 * @param transfer	the transfer to add
+	 */
 	public void transferFinish(AndroidCompletedTransfer transfer) {
 		if (tL != null) {
 			tL.add(0, transfer);
@@ -81,10 +86,20 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 		managerActivity.supportInvalidateOptionsMenu();
 	}
 
+	/**
+	 * Checks if there is any completed transfer.
+	 *
+	 * @return True if there is any completed transfer, false otherwise.
+	 */
 	public boolean isAnyTransferCompleted() {
 		return !tL.isEmpty();
 	}
 
+	/**
+	 * Removes a completed transfer.
+	 *
+	 * @param transfer	transfer to remove
+	 */
 	public void transferRemoved(AndroidCompletedTransfer transfer) {
 		for (int i = 0; i < tL.size(); i++) {
 			AndroidCompletedTransfer completedTransfer = tL.get(i);
@@ -99,6 +114,9 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
         managerActivity.supportInvalidateOptionsMenu();
 	}
 
+	/**
+	 * Removes all completed transfers.
+	 */
 	public void clearCompletedTransfers() {
 		tL.clear();
 		adapter.setTransfers(tL);

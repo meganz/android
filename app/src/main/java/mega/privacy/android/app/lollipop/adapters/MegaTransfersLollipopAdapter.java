@@ -254,6 +254,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.optionPause.setTag(holder);
 	}
 
+	/**
+	 * Get the progress of a transfer.
+	 *
+	 * @param transfer	transfer to get the progress
+	 * @return The progress of the transfer.
+	 */
     private String getProgress(MegaTransfer transfer) {
         return Math.round(100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes()) + "%";
     }
@@ -295,7 +301,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 		switch (v.getId()) {
 			case R.id.transfers_list_option_remove:
-				((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, true);
+				((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t);
 				break;
 
 			case R.id.transfers_list_option_pause:

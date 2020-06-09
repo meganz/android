@@ -45,6 +45,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -173,13 +174,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         };
         pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
-
-    /**
-     * Sends a broadcast to update the transfer widget where needed.
-     */
-    private void launchTransferUpdateIntent() {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, MegaTransfer.TYPE_UPLOAD));
-    }
 
 	@Override
 	public void onDestroy(){
@@ -634,7 +628,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		logDebug("Upload start: " + transfer.getFileName());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-		    launchTransferUpdateIntent();
+		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			String appData = transfer.getAppData();
 
 			if(appData!=null){
@@ -660,7 +654,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferFinish(final MegaApiJava api, final MegaTransfer transfer, MegaError error) {
 		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
 
-		launchTransferUpdateIntent();
+		launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
 			LocalBroadcastManager.getInstance(getApplicationContext())
@@ -895,7 +889,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
-		    launchTransferUpdateIntent();
+		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
             if(isTransferBelongsToFolderTransfer(transfer)){
                 return;

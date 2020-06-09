@@ -66,6 +66,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -1362,7 +1363,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
-			launchTransferUpdateIntent();
+			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 			transfersCount++;
 			updateProgressNotification();
 		}
@@ -1385,7 +1386,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!transfer.isFolderTransfer()){
 				dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
-                launchTransferUpdateIntent();
+                launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
 					MegaApplication.getTransfersManagement().setFailedTransfers(true);
 				}
@@ -1605,7 +1606,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
-			launchTransferUpdateIntent();
+			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 			if (canceled) {
 				logDebug("Transfer cancel: " + transfer.getNodeHandle());
 
@@ -1670,13 +1671,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			new TransferOverQuotaNotification().show();
 			mNotificationManager.cancel(notificationId);
 		}
-	}
-
-	/**
-	 * Sends a broadcast to update the transfer widget where needed.
-	 */
-	private void launchTransferUpdateIntent() {
-		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, MegaTransfer.TYPE_DOWNLOAD));
 	}
 
 	@Override

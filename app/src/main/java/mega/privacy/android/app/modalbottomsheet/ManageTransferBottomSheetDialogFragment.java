@@ -113,7 +113,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             default:
-                location.setText(getActivity().getResources().getString(R.string.transfer_unknown));
+                location.setText(R.string.transfer_unknown);
                 stateIcon.setImageResource(R.drawable.ic_queue);
                 break;
         }

@@ -1,6 +1,12 @@
 package mega.privacy.android.app.components.transferWidget;
 
+import android.content.Intent;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import mega.privacy.android.app.MegaApplication;
+
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class TransfersManagement {
     private static final long INVALID_VALUE = -1;
@@ -18,10 +24,16 @@ public class TransfersManagement {
         resetTransferOverQuotaTimestamp();
     }
 
+    /**
+     * Sets the current time as timestamp to avoid show duplicated transfer over quota warnings.
+     */
     public void setTransferOverQuotaTimestamp() {
         this.transferOverQuotaTimestamp = System.currentTimeMillis();
     }
 
+    /**
+     * Sets the transfer over quota time stamp as invalid.
+     */
     public void resetTransferOverQuotaTimestamp() {
         this.transferOverQuotaTimestamp = INVALID_VALUE;
     }
@@ -37,6 +49,11 @@ public class TransfersManagement {
         return transferOverQuotaTimestamp == INVALID_VALUE || transferOverQuotaTimestamp - System.currentTimeMillis() > WAIT_TIME_TO_SHOW_WARNING;
     }
 
+    /**
+     * Checks if it is on transfer over quota.
+     *
+     * @return True if it is on transfer over quota, false otherwise.
+     */
     public static boolean isOnTransferOverQuota() {
         return MegaApplication.getInstance().getMegaApi().getBandwidthOverquotaDelay() > 0;
     }
@@ -45,10 +62,24 @@ public class TransfersManagement {
         isCurrentTransferOverQuota = currentTransferOverQuota;
     }
 
+    /**
+     * Checks if the transfer over quota has occurred at this moment
+     * or it occurred in other past moment.
+     *
+     * @return  True if the transfer over quota has occurred at this moment, false otherwise.
+     */
     public boolean isCurrentTransferOverQuota() {
         return isCurrentTransferOverQuota;
     }
 
+    /**
+     * Sets if the widget has to be shown depending on if it is on transfer over quota
+     * and the Transfers section has been opened from the transfers widget.
+     * Also sets if the "transfer over quota" banner has to be shown due to the same reason.
+     *
+     * @param hasNotToBeShowDueToTransferOverQuota  true if it is on transfer over quota and the Transfers section
+     *                                              has been opened from the transfers widget, false otherwise
+     */
     public void setHasNotToBeShowDueToTransferOverQuota(boolean hasNotToBeShowDueToTransferOverQuota) {
         this.hasNotToBeShowDueToTransferOverQuota = hasNotToBeShowDueToTransferOverQuota;
         setTransferOverQuotaBannerShown(hasNotToBeShowDueToTransferOverQuota);
@@ -95,5 +126,14 @@ public class TransfersManagement {
 
     public boolean isTransferOverQuotaBannerShown() {
         return isTransferOverQuotaBannerShown;
+    }
+
+    /**
+     * Sends a broadcast to update the transfer widget where needed.
+     *
+     * @param transferType  the transfer type.
+     */
+    public static void launchTransferUpdateIntent(int transferType) {
+        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
     }
 }

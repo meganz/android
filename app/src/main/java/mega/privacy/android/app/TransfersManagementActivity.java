@@ -23,6 +23,9 @@ public class TransfersManagementActivity extends PinActivityLollipop {
 
     protected TransferWidget transfersWidget;
 
+    /**
+     * Broadcast to update the transfers widget.
+     */
     protected BroadcastReceiver transfersUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -30,14 +33,28 @@ public class TransfersManagementActivity extends PinActivityLollipop {
         }
     };
 
+    /**
+     * Registers the transfers BroadcastReceiver.
+     */
     protected void registerTransfersReceiver() {
         LocalBroadcastManager.getInstance(this).registerReceiver(transfersUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
     }
 
+    /**
+     * Sets a view as transfers widget.
+     *
+     * @param transfersWidgetLayout RelativeLayout view to set
+     */
     protected void setTransfersWidgetLayout(RelativeLayout transfersWidgetLayout) {
         setTransfersWidgetLayout(transfersWidgetLayout, null);
     }
 
+    /**
+     * Sets a view as transfers widget.
+     *
+     * @param transfersWidgetLayout RelativeLayout view to set
+     * @param context               current Context, only used to identify if the view belongs to the ManagerActivity
+     */
     protected void setTransfersWidgetLayout(RelativeLayout transfersWidgetLayout, Context context) {
         transfersWidget = new TransferWidget(this, transfersWidgetLayout);
         transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> {
@@ -53,6 +70,10 @@ public class TransfersManagementActivity extends PinActivityLollipop {
         });
     }
 
+    /**
+     * Defines the click action of the transfers widget.
+     * Launches an Intent to navigate to In progress tab in Transfers section.
+     */
     protected void openTransfersSection() {
         if (megaApi.isLoggedIn() == 0 || dbH.getCredentials() == null) {
             logWarning("No logged in, no action.");
@@ -68,6 +89,11 @@ public class TransfersManagementActivity extends PinActivityLollipop {
         finish();
     }
 
+    /**
+     * Updates the state of the transfers widget when the correspondent LocalBroadcast has been received.
+     *
+     * @param intent    Intent received in the LocalBroadcast
+     */
     protected void updateWidget(Intent intent) {
         if (intent == null) return;
 

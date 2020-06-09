@@ -187,28 +187,6 @@ public class FileUtil {
         return setLocalIntentParams(context, node, intent, localPath, true);
     }
 
-    public static MegaNode getOutgoingOrIncomingParent(MegaApiAndroid megaApi, MegaNode node) {
-        if (isOutgoingOrIncomingFolder(node)) {
-            return node;
-        }
-
-        MegaNode parentNode = node;
-
-        while (megaApi.getParentNode(parentNode) != null) {
-            parentNode = megaApi.getParentNode(parentNode);
-
-            if (isOutgoingOrIncomingFolder(parentNode)) {
-                return parentNode;
-            }
-        }
-
-        return null;
-    }
-
-    private static boolean isOutgoingOrIncomingFolder(MegaNode node) {
-        return node.isOutShare() || node.isInShare();
-    }
-
     public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
         if (f == null) return;
 
@@ -429,38 +407,6 @@ public class FileUtil {
         return downloadedFile.lastModified() - node.getModificationTime() * 1000 >= 0;
     }
 
-    private static void copyFolder(File source, File destination) throws IOException {
-
-        if (source.isDirectory()) {
-            if (!destination.exists() && !destination.mkdirs()) {
-                throw new IOException("Cannot create dir " + destination.getAbsolutePath());
-            }
-
-            String[] children = source.list();
-            if (children != null) {
-                for (String child : children) {
-                    copyFolder(new File(source, child), new File(destination, child));
-                }
-            }
-        } else {
-            File directory = destination.getParentFile();
-            if (directory != null && !directory.exists() && !directory.mkdirs()) {
-                throw new IOException("Cannot create dir " + directory.getAbsolutePath());
-            }
-
-            InputStream in = new FileInputStream(source);
-            OutputStream out = new FileOutputStream(destination);
-
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-        }
-    }
-
     public static String getExternalStoragePath(String filePath) {
         return Environment.getExternalStorageDirectory().getAbsolutePath() + filePath;
     }
@@ -545,23 +491,6 @@ public class FileUtil {
             e.printStackTrace();
         }
     }
-
-    public static boolean appendStringToFile(final String appendContents, final File file) {
-        boolean result = false;
-        try {
-            if (file != null && file.canWrite()) {
-                Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
-                out.write(appendContents);
-                out.close();
-                result = true;
-            }
-        } catch (IOException e) {
-            logError("Error appending string data to file", e);
-            e.printStackTrace();
-        }
-        return result;
-    }
-
 
     /**
      * @param fileName The original file name

@@ -1534,6 +1534,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		}
 	}
 
+	/**
+	 * Sets the "transfer over quota" banner visibility.
+	 */
 	public void setTransferOverQuotaBannerVisibility() {
     	if (MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()) {
     		transferOverQuotaBanner.setVisibility(View.VISIBLE);
@@ -1544,6 +1547,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		}
 	}
 
+	/**
+	 * Hides the "transfer over quota" banner.
+	 */
 	private void hideTransferOverQuotaBanner() {
 		MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(false);
 		setTransferOverQuotaBannerVisibility();

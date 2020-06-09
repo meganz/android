@@ -70,6 +70,12 @@ public class TransfersBaseFragment extends BaseFragment {
         managerActivity.changeActionBarElevation(listView != null && listView.canScrollVertically(-1));
     }
 
+    /**
+     * Shows an empty view if there are not transfers
+     * and the list if there are.
+     *
+     * @param size  the size of the list of transfers
+     */
     protected void setEmptyView(int size) {
         if (size == 0) {
             emptyImage.setVisibility(View.VISIBLE);
@@ -82,7 +88,12 @@ public class TransfersBaseFragment extends BaseFragment {
         }
     }
 
+    /**
+     * Sets the visibility of the view "Get more quota".
+     */
     public void setGetMoreQuotaViewVisibility() {
-        getMoreQuotaView.setVisibility(isOnTransferOverQuota() ? View.VISIBLE : View.GONE);
+        if (getMoreQuotaView != null) {
+            getMoreQuotaView.setVisibility(isOnTransferOverQuota() ? View.VISIBLE : View.GONE);
+        }
     }
 }

@@ -642,6 +642,14 @@ public class OfflineUtils {
         return false;
     }
 
+    /**
+     * Replaces the root parent path by "Offline" in the offline path received.
+     * Used to show the location of an offline node in the app.
+     *
+     * @param path      path from which the root parent path has to be replaced
+     * @param handle    identifier of the offline node
+     * @return The path with the root parent path replaced by "Offline".
+     */
     public static String removeInitialOfflinePath(String path, long handle) {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiAndroid megaApi = app.getMegaApi();
@@ -661,6 +669,13 @@ public class OfflineUtils {
         return app.getString(R.string.section_saved_for_offline_new) + path;
     }
 
+    /**
+     * Removes the "Offline" root parent of a path.
+     * Used to open the location of an offline node in the app.
+     *
+     * @param path  path from which the "Offline" root parent has to be removed
+     * @return  The path without the "Offline" root parent.
+     */
     public static String removeInitialOfflinePath(String path) {
         return path.replace(MegaApplication.getInstance().getString(R.string.section_saved_for_offline_new), "");
     }

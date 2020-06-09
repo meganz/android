@@ -72,7 +72,7 @@ import mega.privacy.android.app.utils.SDCardOperator;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -451,11 +451,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		emptyImageView = findViewById(R.id.file_storage_empty_image);
 		emptyTextView = findViewById(R.id.file_storage_empty_text);
-		if (isScreenInPortrait(this)) {
-			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-		} else {
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-		}
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+
 		String textToShow = String.format(getString(R.string.file_browser_empty_folder_new));
 		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
@@ -501,6 +498,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	/**
+	 * Sets the type of pick folder action.
+	 *
+	 * @param pickFolderString	the type of pick folder action.
+	 */
 	private void setPickFolderType(String pickFolderString) {
 		if (isTextEmpty(pickFolderString)) {
 			pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD;
@@ -513,6 +515,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	/**
+	 * Sets the view to pick from Internal Storage.
+	 */
 	private void openPickFromInternalStorage() {
 		pickingFromSDCard = false;
 		root = buildExternalStorageFile("");
@@ -532,6 +537,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		checkPath();
 	}
 
+	/**
+	 * Sets the view to pick from SD card.
+	 */
 	private void openPickFromSDCard() {
 		pickingFromSDCard = true;
 
@@ -548,7 +556,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		String sdCardRoot = sdCardOperator.getSDCardRoot();
-		//don't use DocumentFile
 		if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
 			sdRoot = sdCardRoot;
 		} else if (isBasedOnFileStorage()) {
@@ -569,12 +576,20 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	/**
+	 * Opens a SD card path.
+	 */
 	private void openSDCardPath() {
 		path = new File(sdRoot);
 		showRootWithSDView(false);
 		checkPath();
 	}
 
+	/**
+	 * Requests SD card permissions.
+	 *
+	 * @param sdCardRoot	the root path of the SD card.¡
+	 */
 	private void requestSDCardPermission(String sdCardRoot) {
 		Intent intent = null;
 		if (isBasedOnFileStorage()) {
@@ -595,6 +610,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		startActivityForResult(intent, REQUEST_CODE_TREE);
 	}
 
+	/**
+	 * Shows or hides the root view with Internal storage and External storage.
+	 *
+	 * @param show	true if the root with both storages has to be shown, false otherwise
+	 */
 	private void showRootWithSDView(boolean show) {
 		if (show) {
 			contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
@@ -607,13 +627,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	/**
+	 * Shows the empty view or the list view depending on if there are items in the adapter.
+	 * Hides both if the root view with Internal storage and External storage is shown.
+	 */
 	private void showEmptyState() {
 		if (rootLevelLayout.getVisibility() == View.VISIBLE) {
 			listView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		} else if (adapter != null && adapter.getItemCount() > 0) {
-			int count = adapter.getItemCount();
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -624,6 +647,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	/**
+	 * Changes the path shown in the screen or finish the activity it the current one is not valid.
+	 */
 	private void checkPath() {
 		if (path == null){
 			finish();
@@ -1189,6 +1215,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             e.printStackTrace();
             logError("Initialize SDCardOperator failed", e);
         }
+
         if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
             try {
                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
@@ -1201,6 +1228,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
         } else {
             createFolderWithFile(value);
         }
+
         setFiles(path);
     }
 
@@ -1217,14 +1245,15 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		return m.find();
 	}
 
+	/**
+	 * Starts the action mode if needed.
+	 */
 	public void checkActionMode() {
-		if (mode == Mode.PICK_FILE) {
-			logDebug("Mode.PICK_FILE");
-			// handle long press
-			if (adapter != null && !adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}
+		if (mode != Mode.PICK_FILE) return;
+
+		if (adapter != null && !adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = startSupportActionMode(new ActionBarCallBack());
 		}
 	}
 
@@ -1234,7 +1263,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		if (requestCode == REQUEST_CODE_TREE) {
 			if (intent == null) {
-				logDebug("intent NULL");
+				logWarning("intent NULL");
 				if (resultCode != Activity.RESULT_OK) {
 					if (isBasedOnFileStorage()) {
 						showSnackbar(viewContainer, getString(R.string.download_requires_permission));
@@ -1247,48 +1276,60 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 			Uri treeUri = intent.getData();
 			if (treeUri == null) {
-				logDebug("tree uri is null!");
+				logWarning("tree uri is null!");
 				onCannotWriteOnSDCard();
+				return;
 			}
 
 			DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-			if (pickedDir != null && pickedDir.canWrite()) {
-				logDebug("sd card uri is " + treeUri);
-				dbH.setSDCardUri(treeUri.toString());
+			if (pickedDir == null || !pickedDir.canWrite()) {
+				logWarning("PickedDir null or cannot write.");
+				return;
+			}
 
-				SDCardOperator sdCardOperator = null;
-				try {
-					sdCardOperator = new SDCardOperator(this);
-				} catch (SDCardOperator.SDCardException e) {
-					e.printStackTrace();
-					logError("SDCardOperator initialize failed", e);
+			dbH.setSDCardUri(treeUri.toString());
+
+			SDCardOperator sdCardOperator = null;
+			try {
+				sdCardOperator = new SDCardOperator(this);
+			} catch (SDCardOperator.SDCardException e) {
+				e.printStackTrace();
+				logError("SDCardOperator initialize failed", e);
+			}
+
+			if (sdCardOperator == null) {
+				onCannotWriteOnSDCard();
+				return;
+			}
+
+			if (isBasedOnFileStorage()) {
+				sdRoot = sdCardOperator.getSDCardRoot();
+				openSDCardPath();
+			} else {
+				String pathString = getFullPathFromTreeUri(treeUri, this);
+				if (isTextEmpty(pathString)) {
+					logWarning("getFullPathFromTreeUri is Null.");
+					return;
 				}
-				if (sdCardOperator != null) {
-					if (isBasedOnFileStorage()) {
-						sdRoot = sdCardOperator.getSDCardRoot();
-						openSDCardPath();
-					} else {
-						path = new File(getFullPathFromTreeUri(treeUri, this));
 
-						if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-							dbH.setCameraFolderExternalSDCard(true);
-							dbH.setUriExternalSDCard(treeUri.toString());
-						} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-							dbH.setMediaFolderExternalSdCard(true);
-							dbH.setUriMediaExternalSdCard(treeUri.toString());
-						} else if (pickFolderType.equals(PickFolderType.NONE_ONLY_DOWNLOAD)) {
+				path = new File(pathString);
 
-						}
-
-						finishPickFolder();
-					}
-				} else {
-					onCannotWriteOnSDCard();
+				if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
+					dbH.setCameraFolderExternalSDCard(true);
+					dbH.setUriExternalSDCard(treeUri.toString());
+				} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
+					dbH.setMediaFolderExternalSdCard(true);
+					dbH.setUriMediaExternalSdCard(treeUri.toString());
 				}
+
+				finishPickFolder();
 			}
 		}
 	}
 
+	/**
+	 * Shows a warning indicating no SD card was detected.
+	 */
 	private void onCannotWriteOnSDCard() {
 		showSnackbar(viewContainer, getString(R.string.no_external_SD_card_detected));
 		new Handler().postDelayed(this::openPickFromInternalStorage, 2000);

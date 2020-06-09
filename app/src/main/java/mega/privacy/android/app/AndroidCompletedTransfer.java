@@ -153,6 +153,12 @@ public class AndroidCompletedTransfer {
         this.parentHandle = parentHandle;
     }
 
+    /**
+     * Remove the last character of the path if it is a file separator.
+     *
+     * @param path  path of a file.
+     * @return The path without the last item if it is a file separator.
+     */
     private String removeLastFileSeparator(String path) {
         if (!isTextEmpty(path) && path.charAt(path.length() - 1) == '/') {
             path = path.substring(0, path.length() - 1);
@@ -161,6 +167,12 @@ public class AndroidCompletedTransfer {
         return path;
     }
 
+    /**
+     * Gets the path of a transfer.
+     *
+     * @param transfer  MegaTransfer from which the path has to be obtained
+     * @return  The path of the transfer.
+     */
     private String getTransferPath(MegaTransfer transfer) {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiAndroid megaApi = app.getMegaApi();

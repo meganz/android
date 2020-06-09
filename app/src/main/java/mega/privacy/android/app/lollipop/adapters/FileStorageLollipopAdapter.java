@@ -105,7 +105,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
         }
 
         if (mode == Mode.PICK_FILE) {
-            if (document.getFile().canRead() == false) {
+            if (!document.getFile().canRead()) {
                 setViewAlpha(holder.imageView, .4f);
                 holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 
@@ -193,22 +193,23 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
         return currentFiles == null ? 0 : currentFiles.size();
     }
 
+    /**
+     * Checks if the view item has to be enabled or not.
+     *
+     * @param position  position of the item
+     * @return True if the view item has to be enabled, false otherwise.
+     */
     public boolean isEnabled(int position) {
         if (currentFiles.size() == 0) {
-            logWarning("return");
-            return false;
-        }
-        FileDocument document = currentFiles.get(position);
-        if (mode == Mode.PICK_FOLDER && !document.isFolder()) {
-            logWarning("return");
-            return false;
-        }
-        if (document.getFile().canRead() == false) {
-            logWarning("return");
             return false;
         }
 
-        return true;
+        FileDocument document = currentFiles.get(position);
+        if (mode == Mode.PICK_FOLDER && !document.isFolder()) {
+            return false;
+        }
+
+        return document.getFile().canRead();
     }
 
     public void toggleSelection(int pos) {
@@ -329,7 +330,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
         ArrayList<FileDocument> nodes = new ArrayList<FileDocument>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.valueAt(i) == true) {
+            if (selectedItems.valueAt(i)) {
                 FileDocument document = getDocumentAt(selectedItems.keyAt(i));
                 if (document != null) {
                     nodes.add(document);

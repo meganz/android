@@ -35,6 +35,12 @@ public class SDCardUtils {
         return false;
     }
 
+    /**
+     * Gets the name of a SD card folder from an Uri.
+     *
+     * @param treeUri   the Uri to get the name of the folder
+     * @return The name of the SD card folder.
+     */
     public static String getSDCardDirName(Uri treeUri) {
         DocumentFile pickedDir = DocumentFile.fromTreeUri(MegaApplication.getInstance(), treeUri);
         return pickedDir != null && pickedDir.canWrite() ? pickedDir.getName() : null;

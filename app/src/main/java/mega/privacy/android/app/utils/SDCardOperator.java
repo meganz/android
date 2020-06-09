@@ -238,9 +238,16 @@ public class SDCardOperator {
         isSDCardDownload = SDCardDownload;
     }
 
+    /**
+     * Checks if the download path belongs to an SD card.
+     *
+     * @param context       current Context
+     * @param downloadPath  download path
+     * @return The new SDCardOperator to continue its initialization.
+     */
     private static SDCardOperator checkDownloadPath(Context context, String downloadPath) {
         DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-        boolean isSDCardPath = SDCardOperator.isSDCardPath(downloadPath);
+        boolean isSDCardPath = isSDCardPath(downloadPath);
         SDCardOperator sdCardOperator = null;
 
         try {
@@ -275,6 +282,13 @@ public class SDCardOperator {
         return sdCardOperator;
     }
 
+    /**
+     * Inits the SDCardOperator.
+     *
+     * @param context       current Context
+     * @param parentPath    SD card parent path
+     * @return The initialized SDCardOperator.
+     */
     public static SDCardOperator initSDCardOperator(Context context, String parentPath) {
         SDCardOperator sdCardOperator;
 

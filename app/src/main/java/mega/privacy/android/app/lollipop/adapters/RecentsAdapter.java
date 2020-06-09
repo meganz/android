@@ -172,7 +172,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.actionBy.setText(formatUserAction(userAction));
             }
 
-            parentNode = getOutgoingOrIncomingParent(megaApi, parentNode);
+            parentNode = getOutgoingOrIncomingParent(parentNode);
 
             if (parentNode == null) {
 //              No outShare, no inShare

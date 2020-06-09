@@ -326,6 +326,9 @@ public class BaseActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Broadcast to show a warning when transfer over quota occurs.
+     */
     private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -736,6 +739,9 @@ public class BaseActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }
 
+    /**
+     * Shows a warning indicating transfer over quota occurred.
+     */
     public void showGeneralTransferOverQuotaWarning() {
         if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
 
@@ -784,6 +790,9 @@ public class BaseActivity extends AppCompatActivity {
         isGeneralTransferOverQuotaWarningShown = true;
     }
 
+    /**
+     * Launches an intent to navigate to Login screen.
+     */
     protected void navigateToLogin() {
         Intent intent = new Intent(this, LoginActivityLollipop.class);
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
@@ -791,6 +800,9 @@ public class BaseActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Launches an intent to navigate to Upgrade Account screen.
+     */
     protected void navigateToUpgradeAccount() {
         Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);

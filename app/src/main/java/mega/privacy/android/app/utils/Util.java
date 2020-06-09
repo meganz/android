@@ -496,6 +496,13 @@ public class Util {
 	    return false;
 	}
 
+	/**
+	 * Gets a speed or size string.
+	 *
+	 * @param unit		the unit to show in the string
+	 * @param isSpeed	true if the string is a speed, false if it is a size
+	 * @return The speed or size string.
+	 */
 	private static String getUnitString(long unit, boolean isSpeed) {
 		Context context = MegaApplication.getInstance().getApplicationContext();
 		DecimalFormat df = new DecimalFormat("#.##");
@@ -518,10 +525,22 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Gets a speed string.
+	 *
+	 * @param speed	the speed to show in the string
+	 * @return The speed string.
+	 */
 	public static String getSpeedString (long speed){
 		return getUnitString(speed, true);
 	}
 
+	/**
+	 * Gets a size string.
+	 *
+	 * @param size	the size to show in the string
+	 * @return The size string.
+	 */
 	public static String getSizeString(long size){
 		return getUnitString(size, false);
 	}

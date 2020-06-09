@@ -756,6 +756,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         }
 	}
 
+	/**
+	 * Checks the Media Uploads local path.
+	 */
 	private void checkMediaUploadsPath() {
 		localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 

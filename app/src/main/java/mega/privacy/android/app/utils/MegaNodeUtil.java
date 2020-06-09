@@ -214,6 +214,12 @@ public class MegaNodeUtil {
         }
     }
 
+    /**
+     * Gets the root parent folder of a node.
+     *
+     * @param node  MegaNode to get its root parent path
+     * @return The path of the root parent of the node.
+     */
     public static String getParentFolderPath(MegaNode node) {
         if (node != null) {
             MegaApplication app = MegaApplication.getInstance();
@@ -491,5 +497,40 @@ public class MegaNodeUtil {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
         MegaNode node =  megaApi.getNodeByHandle(handle);
         return node == null || megaApi.isInRubbish(node);
+    }
+
+    /**
+     * Gets the parent outgoing or incoming MegaNode folder of a node.
+     *
+     * @param node  MegaNode to get its parent
+     * @return The outgoing or incoming parent folder.
+     */
+    public static MegaNode getOutgoingOrIncomingParent(MegaNode node) {
+        if (isOutgoingOrIncomingFolder(node)) {
+            return node;
+        }
+
+        MegaNode parentNode = node;
+        MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
+
+        while (megaApi.getParentNode(parentNode) != null) {
+            parentNode = megaApi.getParentNode(parentNode);
+
+            if (isOutgoingOrIncomingFolder(parentNode)) {
+                return parentNode;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if a node is an outgoing or an incoming folder.
+     *
+     * @param node  MegaNode to check
+     * @return  True if the node is an outgoing or incoming folder, false otherwise.
+     */
+    private static boolean isOutgoingOrIncomingFolder(MegaNode node) {
+        return node.isOutShare() || node.isInShare();
     }
 }

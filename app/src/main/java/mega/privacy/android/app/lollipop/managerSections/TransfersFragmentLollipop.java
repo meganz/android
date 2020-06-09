@@ -71,6 +71,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		setEmptyView(tL.size());
 	}
 
+	/**
+	 * Updates the state of a transfer.
+	 *
+	 * @param transfer	transfer to update
+	 */
 	public void transferUpdate(MegaTransfer transfer) {
 		try {
 			ListIterator li = tL.listIterator();
@@ -90,6 +95,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		}
 	}
 
+	/**
+	 * Changes the status (play/pause) of the button of a transfer.
+	 *
+	 * @param tag	identifier of the transfer to change the status of the button
+	 */
 	public void changeStatusButton(int tag) {
 		logDebug("tag: " + tag);
 
@@ -109,6 +119,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		adapter.notifyItemChanged(index);
 	}
 
+	/**
+	 * Removes a transfer when finishes.
+	 *
+	 * @param transferTag	identifier of the transfer to remove
+	 */
 	public void transferFinish(int transferTag) {
 		for (int i = 0; i < tL.size(); i++) {
 			MegaTransfer transfer = tL.get(i);
@@ -122,6 +137,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		setEmptyView(tL.size());
 	}
 
+	/**
+	 * Adds a transfer when starts.
+	 *
+	 * @param transfer	transfer to add
+	 */
 	public void transferStart(MegaTransfer transfer) {
 		if (!transfer.isStreamingTransfer()) {
 			tL.add(transfer);
@@ -131,6 +151,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		setEmptyView(tL.size());
 	}
 
+	/**
+	 * Checks if there is any transfer in progress.
+	 *
+	 * @return True if there is not any transfer, false otherwise.
+	 */
 	public boolean isEmpty() {
 		return tL.isEmpty();
 	}

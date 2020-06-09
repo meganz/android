@@ -34,7 +34,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 58;
+	private static final int DATABASE_VERSION = 57;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -808,16 +808,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 56) {
-			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
-			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_TIMESTAMP + " TEXT;");
-		}
-
-		if (oldVersion <= 57) {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_URI_MEDIA_EXTERNAL_SD_CARD + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " = '" + encrypt("false") + "';");
 
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_TIMESTAMP + " TEXT;");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ERROR + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ERROR + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ORIGINAL_PATH + " TEXT;");
@@ -1789,15 +1786,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
+	/**
+	 * Deletes the oldest completed transfer.
+	 */
 	private void deleteOldestTransfer() {
 		ArrayList<AndroidCompletedTransfer> completedTransfers = getCompletedTransfers();
 		deleteTransfer(completedTransfers.get(0).getId());
 	}
 
+	/**
+	 * Deletes a completed transfer.
+	 *
+	 * @param id	the identifier of the transfer to delete
+	 */
 	public void deleteTransfer(int id) {
 		db.delete(TABLE_COMPLETED_TRANSFERS, KEY_ID + "=" + id, null);
 	}
 
+	/**
+	 * Gets a completed transfer.
+	 *
+	 * @param id	the identifier of the transfer to get
+	 * @return The completed transfer which has the id value as identifier.
+	 */
 	public AndroidCompletedTransfer getcompletedTransfer(int id) {
 		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " WHERE " + KEY_ID + " = '" + id + "'";
 

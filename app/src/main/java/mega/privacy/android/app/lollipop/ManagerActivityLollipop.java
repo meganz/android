@@ -784,6 +784,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
+	/**
+	 * Broadcast to show a "transfer over quota" warning if it is on Transfers section.
+	 */
 	private BroadcastReceiver transferOverQuotaUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -5594,11 +5597,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && transfersWidget.getPendingTransfers() <= 0;
 
-		if (MegaApplication.getTransfersManagement().thereAreFailedTransfers() || showCompleted) {
-			indexTransfers = COMPLETED_TAB;
-		} else {
-			indexTransfers = PENDING_TAB;
-		}
+		indexTransfers = MegaApplication.getTransfersManagement().thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
 		if (viewPagerTransfers != null) {
 			switch (indexTransfers) {
@@ -5628,7 +5627,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void selectDrawerItemChat(){
 		logDebug("selectDrawerItemChat");
 
-		((MegaApplication)getApplication()).setRecentChatVisible(true);
+		MegaApplication.setRecentChatVisible(true);
 
 		try {
 			ChatAdvancedNotificationBuilder notificationBuilder;
@@ -10859,6 +10858,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
+	/**
+	 * Shows the bottom sheet to manage a completed transfer.
+	 *
+	 * @param transfer	the completed transfer to manage.
+	 */
 	public void showManageTransferOptionsPanel(AndroidCompletedTransfer transfer) {
 		if (transfer == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
@@ -14852,6 +14856,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	/**
+	 * Pauses a transfer.
+	 *
+	 * @param mT	the transfer to pause
+	 */
     public void pauseIndividualTransfer(MegaTransfer mT) {
         if (mT == null) {
             logWarning("Transfer object is null.");
@@ -14862,11 +14871,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         megaApi.pauseTransfer(mT, mT.getState() != MegaTransfer.STATE_PAUSED, managerActivity);
     }
 
+	/**
+	 * Shows a warning to ensure if it is sure of remove all completed transfers.
+	 */
 	public void showConfirmationClearCompletedTransfers() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers))
 				.setPositiveButton(R.string.general_clear, (dialog, which) -> {
-					logDebug("Pressed button positive to clear transfers");
 					dbH.emptyCompletedTransfers();
 
 					if (isTransfersCompletedAdded()) {
@@ -14878,40 +14889,26 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.show();
 	}
 
-	public void showConfirmationCancelTransfer(final MegaTransfer mT, final boolean cancel) {
+	/**
+	 * Shows a warning to ensure if it is sure of cancel a transfer.
+	 *
+	 * @param mT	the transfer to cancel
+	 */
+	public void showConfirmationCancelTransfer(final MegaTransfer mT) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		int message;
-		int positiveButton;
-
-		if (cancel) {
-			message = R.string.cancel_transfer_confirmation;
-			positiveButton = R.string.context_delete;
-		} else if (mT.getState() == MegaTransfer.STATE_PAUSED) {
-			message = R.string.menu_resume_individual_transfer;
-			positiveButton = R.string.button_resume_individual_transfer;
-		} else {
-			message = R.string.menu_pause_individual_transfer;
-			positiveButton = R.string.action_pause;
-		}
-
-		builder.setMessage(message)
-				.setPositiveButton(positiveButton, (dialog, which) -> {
-					logDebug("Pressed button positive to cancel transfer");
-					if (cancel) {
-						megaApi.cancelTransfer(mT, managerActivity);
-					} else {
-						pauseIndividualTransfer(mT);
-					}
-				})
+		builder.setMessage(R.string.cancel_transfer_confirmation)
+				.setPositiveButton(R.string.context_delete, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
 				.setNegativeButton(R.string.general_cancel, null)
 				.show();
 	}
 
+	/**
+	 * Shows a warning to ensure if it is sure of cancel all transfers.
+	 */
 	public void showConfirmationCancelAllTransfers() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
 				.setNegativeButton(R.string.context_delete, (dialog, which) -> {
-					logDebug("Pressed button positive to cancel transfer");
 					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
 					cancelAllUploads(ManagerActivityLollipop.this);
@@ -14922,9 +14919,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.show();
 	}
 
+	/**
+	 * Add a completed transfer to the Completed tab in Transfers section.
+	 *
+	 * @param transfer	the completed transfer to add
+	 * @param e			the error received in onTransferFinish()
+	 */
 	public void addCompletedTransfer(MegaTransfer transfer, MegaError e){
-		logDebug("Node Handle: " + transfer.getNodeHandle());
-
 		if (isTransfersCompletedAdded()) {
 			completedTFLol.transferFinish(new AndroidCompletedTransfer(transfer, e));
 		}
@@ -15321,6 +15322,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		fabButton.hide();
 	}
 
+	/**
+	 * Updates the fabButton position depending on if the bottom navigation view is shown or not
+	 * and shows it.
+	 *
+	 * @param withBottomNavigationView	true if the bottom navigation view is shown, false otherwise
+	 */
 	private void updateFabPositionAndShow(boolean withBottomNavigationView) {
 		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
 
@@ -15336,6 +15343,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		fabButton.show();
 	}
 
+	/**
+	 * Shows or hides the fabButton depending on the current section.
+	 */
 	public void showFabButton() {
 		if (drawerItem == null) {
 			return;
@@ -15429,7 +15439,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			default:
 				hideFabButton();
-				break;
 		}
 	}
 
@@ -16484,6 +16493,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 	}
 
+	/**
+	 * Removes a completed transfer from Completed tab in Transfers section.
+	 *
+	 * @param transfer	the completed transfer to remove
+	 */
 	public void removeCompletedTransfer(AndroidCompletedTransfer transfer) {
 		dbH.deleteTransfer(transfer.getId());
 
@@ -16492,6 +16506,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	/**
+	 * Retries a transfer that finished wrongly.
+	 *
+	 * @param transfer	the transfer to retry
+	 */
 	public void retryTransfer(AndroidCompletedTransfer transfer) {
 		removeCompletedTransfer(transfer);
 
@@ -16515,6 +16534,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	/**
+	 * Opens a location of a transfer.
+	 *
+	 * @param transfer	the transfer to open its location
+	 */
 	public void openTransferLocation(AndroidCompletedTransfer transfer) {
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
 			if (transfer.getIsOfflineFile()) {
@@ -16569,7 +16593,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
     /**
-     * Shows a transfer over quota warning.
+     * Shows a "transfer over quota" warning.
      */
 	public void showTransfersTransferOverQuotaWarning() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -16593,7 +16617,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     /**
      * Updates the position of the transfers widget.
      *
-     * @param bNVHidden  indicates if the bottom navigation view is hidden or not.
+     * @param bNVHidden  true if the bottom navigation view is hidden, false otherwise
      */
 	private void updateTransfersWidgetPosition(boolean bNVHidden) {
 		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);

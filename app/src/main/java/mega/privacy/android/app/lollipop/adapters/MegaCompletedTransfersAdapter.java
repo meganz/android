@@ -139,11 +139,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 			}
 		}
 
-		if (transfer.getType() == TYPE_DOWNLOAD) {
-			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
-		} else if (transfer.getType() == TYPE_UPLOAD) {
-			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
-		}
+		holder.iconDownloadUploadView.setImageResource(transfer.getType() == TYPE_DOWNLOAD ? R.drawable.ic_download_transfers : R.drawable.ic_upload_transfers);
 
 		holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
         RelativeLayout.LayoutParams params1 =  (RelativeLayout.LayoutParams) holder.imageViewCompleted.getLayoutParams();
