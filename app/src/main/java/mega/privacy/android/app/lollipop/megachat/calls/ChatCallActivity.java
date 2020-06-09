@@ -266,15 +266,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        logDebug("Start call Service");
-        Intent intentService = new Intent(this, CallService.class);
-        intentService.putExtra(CHAT_ID, callChat.getChatid());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(intentService);
-        } else {
-            this.startService(intentService);
-        }
-
         app.createChatAudioManager();
         titleToolbar.setText(getTitleChat(chat));
         updateSubTitle();
@@ -446,11 +437,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
 
         long newChatId = extras.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-        if (megaChatApi == null)
+        if (megaChatApi == null) {
             return;
+        }
 
         if (chatId != MEGACHAT_INVALID_HANDLE && chatId == newChatId) {
-            logDebug("Same calls");
+            logDebug("Same call");
             chat = megaChatApi.getChatRoom(chatId);
             checkInitialCallStatus();
 
@@ -582,6 +574,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
             if (chatIdReceived != getCurrentChatid()) {
                 logWarning("Call in different chat");
+                long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
+                if (callChat != null && callIdReceived != callChat.getId() && (intent.getAction().equals(ACTION_SESSION_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD))) {
+                    checkAnotherCallOnHold();
+                }
                 return;
             }
 
@@ -651,7 +647,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
         super.onCreate(savedInstanceState);
         cancelIncomingCallNotification(this);
         setContentView(R.layout.activity_calls_chat);
@@ -677,7 +672,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             finish();
             return;
         }
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         fragmentContainer = findViewById(R.id.file_info_fragment_container);
 
@@ -1036,7 +1030,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     protected void onResume() {
-        logDebug("onResume");
         super.onResume();
         stopService(new Intent(this, IncomingCallService.class));
         restoreHeightAndWidth();
@@ -1816,6 +1809,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void anotherCallLayout(boolean isOnHold, long anotherChatId) {
         MegaChatRoom anotherChat = megaChatApi.getChatRoom(anotherChatId);
+        if (!anotherChat.isGroup()) {
+            MegaChatCall anotherCall = megaChatApi.getChatCall(anotherChatId);
+            if (anotherCall != null) {
+                MegaChatSession sessionAnotherChat = anotherCall.getMegaChatSession(anotherCall.getSessionsPeerid().get(0), anotherCall.getSessionsClientid().get(0));
+                if (sessionAnotherChat != null && sessionAnotherChat.isOnHold()) {
+                    isOnHold = true;
+                }
+            }
+        }
         anotherCallTitle.setText(anotherChat.getTitle());
         anotherCallSubtitle.setText(getString(isOnHold ? R.string.call_on_hold : R.string.call_in_progress_layout));
         anotherCallSubtitle.setAlpha(1f);

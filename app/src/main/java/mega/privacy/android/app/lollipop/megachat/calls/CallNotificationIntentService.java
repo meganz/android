@@ -51,10 +51,8 @@ public class CallNotificationIntentService extends IntentService implements Mega
     @Override
     protected void onHandleIntent(Intent intent) {
         logDebug("onHandleIntent");
-
         chatIdCurrentCall = intent.getExtras().getLong(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
         chatIdIncomingCall = intent.getExtras().getLong(CHAT_ID_OF_INCOMING_CALL, MEGACHAT_INVALID_HANDLE);
-
         clearIncomingCallNotification(chatIdIncomingCall);
 
         final String action = intent.getAction();
@@ -129,13 +127,14 @@ public class CallNotificationIntentService extends IntentService implements Mega
 
         try {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (megaChatApi == null) return;
-            MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
-            if (call == null) return;
+            if (megaChatApi == null)
+                return;
 
-            long chatCallId = call.getId();
-            String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
-            int notificationId = (notificationCallId).hashCode();
+            MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
+            if (call == null)
+                return;
+
+            int notificationId = MegaApiJava.userHandleToBase64(chatIdIncomingCall).hashCode();
             notificationManager.cancel(notificationId);
         } catch (Exception e) {
             logError("EXCEPTION", e);
@@ -158,6 +157,8 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 if (request.getChatHandle() == chatIdIncomingCall) {
                     logDebug("Incoming call hung up. ");
                     MegaApplication.getInstance().removeChatAudioManager();
+                    clearIncomingCallNotification(chatIdIncomingCall);
+
                     stopSelf();
                 } else if (request.getChatHandle() == chatIdCurrentCall) {
                     logDebug("Current call hung up. Answering incoming call ...");
@@ -184,6 +185,8 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 i.setAction(SECOND_CALL);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(i);
+                clearIncomingCallNotification(chatIdIncomingCall);
+
                 stopSelf();
             } else {
                 logError("Error answering the call" + e.getErrorCode());

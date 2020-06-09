@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
+import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatAudioManager;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
@@ -472,7 +473,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						break;
 
 					case MegaChatCall.CALL_STATUS_DESTROYED:
-						clearIncomingCallNotification(callId);
 						checkCallDestroyed(chatId);
 						break;
 				}
@@ -1509,6 +1509,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
+    public void openCallService(long chatId) {
+        logDebug("Start call Service. Chat iD = " + chatId);
+        Intent intentService = new Intent(this, CallService.class);
+        intentService.putExtra(CHAT_ID, chatId);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            this.startForegroundService(intentService);
+        } else {
+            this.startService(intentService);
+        }
+    }
+
 	public void checkQueuedCalls() {
 		logDebug("checkQueuedCalls");
 		try {
@@ -1522,7 +1533,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus()));
-
+        openCallService(call.getChatid());
 		MegaApplication.setShowPinScreen(false);
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra(CHAT_ID, call.getChatid());
