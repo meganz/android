@@ -18,6 +18,7 @@ import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.TimeUtils.*
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
 
@@ -74,19 +75,34 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     private fun updateStrings() {
 
         val email = megaApi.myEmail
-        val dates = megaApi.overquotaWarningsTs
+        val warningsTs = megaApi.overquotaWarningsTs
         val files = megaApi.numNodes
         val size = app.myAccountInfo.usedFormatted
-        val ts = megaApi.overquotaDeadlineTs
+        val deadlineTs = megaApi.overquotaDeadlineTs
 
-        overDiskQuotaPaywallText?.text = String.format(getString(R.string.over_disk_quota_paywall_text),
-                email, dates, files, size)
+        if (warningsTs.size() == 1) {
+            overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, 1,
+                    email, formatDate(this, warningsTs.get(0), DATE_LONG_FORMAT, false), files, size)
+        } else {
+            var dates = String()
+            val lastWarningIndex: Int = warningsTs.size() - 1
+            for (i in 0 until lastWarningIndex) {
+                if (dates.isEmpty()) {
+                    dates += formatDate(this, warningsTs.get(i), DATE_LONG_FORMAT, false)
+                } else if (i != lastWarningIndex) {
+                    dates = dates + ", " + formatDate(this, warningsTs.get(i), DATE_LONG_FORMAT, false)
+                }
+            }
 
-        var text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning), ts)
+            overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, warningsTs.size(),
+                    email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size)
+        }
+
+        var text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning), getHumanizedTimestamp(deadlineTs))
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")
-            text = text.replace("[M]", "<font color='"+ resources.getColor(R.color.mega) +"'>")
+            text = text.replace("[M]", "<font color='" + resources.getColor(R.color.mega) + "'>")
             text = text.replace("[/M]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)

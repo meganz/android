@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatMessage;
 
@@ -130,55 +131,82 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
-    public static String formatDate(Context context, long timestamp, int format){
+    /**
+     Gets a date formatted string from a timestamp.
+     * @param context   Current context.
+     * @param timestamp Timestamp to get the date formatted string.
+     * @return The date formatted string.
+     */
+    public static String formatDate(Context context, long timestamp){
+        return formatDate(context, timestamp, DATE_LONG_FORMAT, true);
+    }
 
-        java.text.DateFormat df;
+    /**
+     * Gets a date formatted string from a timestamp.
+     * @param context   Current context.
+     * @param timestamp Timestamp to get the date formatted string.
+     * @param format    Date format.
+     * @return The date formatted string.
+     */
+    public static String formatDate(Context context, long timestamp, int format){
+        return formatDate(context, timestamp, format, true);
+    }
+
+    /**
+     * Gets a date formatted string from a timestamp.
+     * @param context   Current context.
+     * @param timestamp Timestamp to get the date formatted string.
+     * @param format    Date format.
+     * @param humanized Use humanized date format (i.e. today, yesterday or week day).
+     * @return The date formatted string.
+     */
+    public static String formatDate(Context context, long timestamp, int format, boolean humanized) {
+
+        Locale locale = Locale.getDefault();
+        DateFormat df;
 
         switch (format) {
-            case DATE_LONG_FORMAT:
-                df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-                break;
             case DATE_SHORT_FORMAT:
-                df = new SimpleDateFormat("EEE d MMM");
+                df = new SimpleDateFormat("EEE d MMM", locale);
                 break;
             case DATE_SHORT_SHORT_FORMAT:
-                df = new SimpleDateFormat("d MMM");
+                df = new SimpleDateFormat("d MMM", locale);
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
-                df = new SimpleDateFormat("MMM d, YYYY");
+                df = new SimpleDateFormat("MMM d, YYYY", locale);
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
-                Locale locale = context.getResources().getConfiguration().locale;
                 df = new SimpleDateFormat(getBestDateTimePattern (locale, "YYYY-MM-dd HH:mm"), locale);
                 break;
+            case DATE_LONG_FORMAT:
             default:
-                df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+                df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, locale);
                 break;
         }
 
         Calendar cal = calculateDateFromTimestamp(timestamp);
 
-        //Compare to yesterday
-        Calendar calToday = Calendar.getInstance();
-        Calendar calYesterday = Calendar.getInstance();
-        calYesterday.add(Calendar.DATE, -1);
-        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+        if (humanized) {
+            // Check if date is today, yesterday or less of a week
+            Calendar calToday = Calendar.getInstance();
+            Calendar calYesterday = Calendar.getInstance();
+            calYesterday.add(Calendar.DATE, -1);
+            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
-        if (tc.compare(cal, calToday) == 0) {
-            return context.getString(R.string.label_today);
-        } else if (tc.compare(cal, calYesterday) == 0) {
-            return context.getString(R.string.label_yesterday);
-        } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
-            Date date = cal.getTime();
-            String dayWeek = new SimpleDateFormat("EEEE").format(date);
-            return dayWeek;
-        } else {
-            TimeZone tz = cal.getTimeZone();
-            df.setTimeZone(tz);
-            Date date = cal.getTime();
-            String formattedDate = df.format(date);
-            return formattedDate;
+            if (tc.compare(cal, calToday) == 0) {
+                return context.getString(R.string.label_today);
+            } else if (tc.compare(cal, calYesterday) == 0) {
+                return context.getString(R.string.label_yesterday);
+            } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
+                Date date = cal.getTime();
+                return new SimpleDateFormat("EEEE", locale).format(date);
+            }
         }
+
+        TimeZone tz = cal.getTimeZone();
+        df.setTimeZone(tz);
+        Date date = cal.getTime();
+        return df.format(date);
     }
 
     public static String formatShortDateTime(long timestamp){
@@ -355,5 +383,36 @@ public class TimeUtils implements Comparator<Calendar> {
         }
 
         return null;
+    }
+
+    /**
+     * Converts a milliseconds timestamp into a humanized format string.
+     * @param timestamp Timestamp to get the formatted string.
+     * @return The humanized format string.
+     */
+    public static String getHumanizedTimestamp(long timestamp) {
+        Context context = MegaApplication.getInstance().getApplicationContext();
+        if (timestamp <= 0) {
+            return context.getString(R.string.label_time_in_seconds, 0);
+        }
+
+        long ts_seconds = timestamp / 1000;
+
+        long days = ts_seconds / (24 * 3600);
+        long hours = ts_seconds / 3600;
+        long minutes = (ts_seconds % 3600) / 60;
+        long seconds = ts_seconds % 60;
+
+        if (days > 0) {
+            return context.getResources().getQuantityString(R.plurals.label_time_in_days_full, (int)days, (int)days);
+        } else if (hours > 0) {
+            return context.getString(R.string.label_time_in_hours, hours) + " " +
+                    context.getString(R.string.label_time_in_minutes, minutes);
+        } else if (minutes > 0) {
+            return context.getString(R.string.label_time_in_minutes, minutes) + " " +
+                    context.getString(R.string.label_time_in_seconds, seconds);
+        } else {
+            return context.getString(R.string.label_time_in_seconds, seconds);
+        }
     }
 }
