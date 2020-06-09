@@ -54,6 +54,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         getLastSyncTimeStamp();
     }
 
+    public void clearLastSyncTimeStamp() {
+        preferences.edit().clear().apply();
+    }
+
     private void getLastSyncTimeStamp() {
         lastSyncTimestamp = preferences.getLong(LAST_SYNC_TIMESTAMP_KEY, 0);
     }

@@ -275,7 +275,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
 
             }
-            infoTitleChatText.setText(chat.getTitle());
+            infoTitleChatText.setText(getTitleChat(chat));
 
             editImageView = findViewById(R.id.chat_group_contact_properties_edit_icon);
             editImageView.setOnClickListener(this);
@@ -856,7 +856,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void createGroupChatAvatar(){
         logDebug("createGroupChatAvatar()");
-        avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), chat.getTitle(), AVATAR_SIZE, true));
+        avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), getTitleChat(chat), AVATAR_SIZE, true));
     }
 
     public void showParticipantsPanel(MegaChatParticipant participant){
@@ -1039,9 +1039,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        int maxAllowed = getMaxAllowed(chat.getTitle());
+        int maxAllowed = getMaxAllowed(getTitleChat(chat));
         input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxAllowed)});
-        input.setText(chat.getTitle());
+        input.setText(getTitleChat(chat));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -1211,7 +1211,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         } else if (request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
             long chatHandle = request.getChatHandle();
             MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
-            String chatTitle = chat.getTitle();
+            String chatTitle = getTitleChat(chat);
 
             if (chatTitle == null) {
                 chatTitle = "";
@@ -1546,7 +1546,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
                 logDebug("Change status: CHANGE_TYPE_TITLE");
-                infoTitleChatText.setText(chat.getTitle());
+                infoTitleChatText.setText(getTitleChat(chat));
                 createGroupChatAvatar();
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
@@ -1730,8 +1730,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             peers.addPeer(chat.getPeerHandle(i), chat.getPeerPrivilege(i));
         }
 
-        CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chat.getTitle());
-        megaChatApi.createPublicChat(peers, chat.getTitle(), listener);
+        CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, getTitleChat(chat));
+        megaChatApi.createPublicChat(peers, getTitleChat(chat), listener);
     }
 
 

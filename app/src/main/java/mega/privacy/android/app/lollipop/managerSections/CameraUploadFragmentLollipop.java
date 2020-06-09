@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -899,7 +900,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1098,7 +1099,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1511,7 +1512,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 
 		if (isEnabled){
-			resetCUTimeStampsAndCache();
+			resetCUTimestampsAndCache();
             dbH.setCamSyncEnabled(false);
 			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
             stopRunningCameraUploadService(context);
@@ -1524,7 +1525,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                     !TextUtils.isEmpty(prefs.getCamSyncFileUpload()) &&
                     !TextUtils.isEmpty(prefs.getCamSyncWifi())
             ) {
-                resetCUTimeStampsAndCache();
+                resetCUTimestampsAndCache();
                 dbH.setCamSyncEnabled(true);
                 dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
                 
@@ -1548,7 +1549,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     logDebug("AlertDialog");
-                    resetCUTimeStampsAndCache();
+                    resetCUTimestampsAndCache();
                     dbH.setCamSyncEnabled(true);
                     dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
                     File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -2008,7 +2009,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (photosyncHandle == -1){
 				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
-					if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
 						dbH.setCamSyncHandle(photosyncHandle);
 						if (listView != null){
@@ -2666,16 +2667,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public ArrayList<PhotoSyncHolder> getNodesArray() {
 		return nodesArray;
 	}
-    
-    private void resetCUTimeStampsAndCache(){
-        dbH.setCamSyncTimeStamp(0);
-        dbH.setCamVideoSyncTimeStamp(0);
-        dbH.setSecSyncTimeStamp(0);
-        dbH.setSecVideoSyncTimeStamp(0);
-        dbH.saveShouldClearCamsyncRecords(true);
-        purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-    }
-    
+
     private void saveCompressionSettings(){
         dbH.setCameraUploadVideoQuality(MEDIUM);
         dbH.setConversionOnCharging(true);

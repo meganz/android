@@ -82,6 +82,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
@@ -93,7 +94,6 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
 
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
@@ -235,9 +235,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				logDebug("TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
+					GetAttrUserListener listener = new GetAttrUserListener(getApplicationContext(), true);
 					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
-						megaApi.getMyChatFilesFolder(new GetAttrUserListener(getApplicationContext(), true));
+						megaApi.getMyChatFilesFolder(listener);
 					}
+					//Ask for MU and CU folder when App in init state
+					megaApi.getCameraUploadsFolder(listener);
+					megaApi.getCameraUploadsFolderSecondary(listener);
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -1378,7 +1382,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		startActivity(i);
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-		logDebug("Launch call: " + chatRoom.getTitle());
+		logDebug("Launch call: " + getTitleChat(chatRoom));
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
 			setCallLayoutStatus(call.getChatid(), true);
 		}
