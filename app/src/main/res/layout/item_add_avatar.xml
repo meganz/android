@@ -47,7 +47,7 @@
         style="@style/TransparentBlackTextView"
         android:layout_below="@+id/chip_layout"
         android:layout_centerHorizontal="true"
-        android:ellipsize="middle"
+        android:ellipsize="end"
         android:fontFamily="roboto"
         android:gravity="center"
         android:maxWidth="60dp"
