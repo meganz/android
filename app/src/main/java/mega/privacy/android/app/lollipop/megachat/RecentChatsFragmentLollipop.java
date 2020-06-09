@@ -12,16 +12,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -73,8 +73,9 @@ import nz.mega.sdk.MegaChatRoom;
 
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -737,7 +738,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             case R.id.call_in_progress_layout: {
                 logDebug("call_in_progress_layout");
                 if (checkPermissionsCall()) {
-                    returnCall(context, megaChatApi);
+                    returnCall(context);
                 }
                 break;
             }
@@ -1041,6 +1042,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     onLastMessageChange(indexToReplace);
+                    onUnreadCountChange(indexToReplace, item.getUnreadCount() == 0);
                 }
             }
 
@@ -1457,6 +1459,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public String getParticipantFullName(MegaChatRoom chat, long i) {
+
+        String nickname = getNicknameContact(chat.getPeerHandle(i));
+        if(nickname != null) return nickname;
+
         String participantFirstName = chat.getPeerFirstname(i);
         String participantLastName = chat.getPeerLastname(i);
 
@@ -1667,7 +1673,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("REQUEST_CAMERA -> returnTheCall");
-                        returnCall(context, megaChatApi);
+                        returnCall(context);
                     }
                 }
                 break;
@@ -1676,7 +1682,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");
-                        returnCall(context, megaChatApi);
+                        returnCall(context);
                     }
                 }
                 break;
@@ -1697,7 +1703,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         Snackbar snackbar = Snackbar.make(bannerContainer, getString(R.string.on_permanently_denied), Snackbar.LENGTH_LONG)
                                 .setAction(getString(R.string.action_settings), PermissionUtils.toAppInfo(getContext()))
                                 .setDuration(DURATION);
-                        TextView snackbarTextView = snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+                        TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
                         snackbarTextView.setMaxLines(MAX_LINES);
                         snackbar.show();
                     }

@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Mục đã chia sẻ</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Thư mục được chia sẻ</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Thùng rác</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Danh Bạ</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Mục Nhận Đuợc</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Mục Gửi Đi</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Links</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Mục Chia Sẻ Nhận Được</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Mục chia sẻ nhận được từ</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Trả lại về chủ sở hữu</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Loại bỏ chia sẻ</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Xóa đường dẫn liên kết</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Đường liên kết này không còn được được công khai nữa.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Đường liên kết này không còn được được công khai nữa.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Đường liên kết này không còn được được công khai nữa.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Đổi tên</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Mở đường dẫn liên kết</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Mở</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Ngày</string>
     <string name="sortby_creation_date" context="category in sort by action">Ngày Tạo</string>
     <string name="sortby_modification_date" context="category in sort by action">Ngày Chỉnh Sửa</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Mới nhất</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Cũ nhất</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Bản ghi chép đã được bật</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Bản ghi chép đã được tắt</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Đi đến vị trí chứa tệp tin</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Quý trình hiện diễn ra lâu hơn dự đoán. Xin chờ.</string>
@@ -1369,7 +1377,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]trong tổng %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Xóa khỏi mục Lưu Ngoại Tuyến</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Xóa khỏi Lưu Ngoại Tuyến?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Chọn trạng thái hoạt động online</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Đã đọc xong</string>
@@ -1520,7 +1528,7 @@
         <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
     </plurals>
 
-    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Hết băng thông truyền tải</string>
+    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Không đủ thông truyền tải</string>
     <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Mục bạn muốn tải xuống sẽ làm quá tải băng thông bạn hiện đang có cho truyền tải ở địa chỉ IP này, nếu tiếp tục thực hiện các phiên tải có thể sẽ bị gián đoạn.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Xem các gói cước</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Tiếp tục tiến hành không cần tài khoản</string>
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Hiện thông tin</string>
 
-    <string name="context_link_removal_error" context="error message">Xóa bỏ đường liên kết thất bại. Xin thử lại sau.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Xóa bỏ đường liên kết thất bại. Xin thử lại sau.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Failed to remove some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Thao tác với đường liên kết thất bại. Xin thử lại sau.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Bằng địa chỉ email của người muốn mời</string>
@@ -1753,7 +1768,7 @@
 
     <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">Chỉ có thể mời tên liên lạc có sử dụng MEGA</string>
 
-    <string name="invalid_connection_state" context="Info label about the connectivity state of the chat">Đã ngắt kết nối tới chát</string>
+    <string name="invalid_connection_state" context="Info label about the connectivity state of the chat">Đang kết nối lại tới chát</string>
 
     <string name="call_error" context="Message show when a call cannot be established">Lỗi. Không tiến hành được cuộc gọi</string>
 
@@ -1820,13 +1835,14 @@
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Không có tệp nào trong [/B][A]%1$s[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Không có tệp trong [/B][A]Lưu về Ngoại Tuyến[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Không có tên [/B][A]Liên Lạc[/A][B] nào.[/B]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Không có tên [/B][A]Liên Lạc[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Không có[/A] [B]Cuộc Trò Chuyện[/B] nào</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Đang tải[/A] các [B]Cuộc Trò Chuyện&#8230;[/B]</string>
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Không có [/B][A]Thư Mục Chia Sẻ Nhân Được[/A][B] nào.[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Không có [/B][A]Thư Mục Chia Sẻ Gửi Đi[/A][B] nào.[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Yêu cầu gửi đi</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Yêu cầu đã nhận</string>
@@ -1857,11 +1873,12 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Tài khoản MEGA của quý khách đã bị chấm dứt hoạt động do vi phạm lỗi có nêu trong Điều Khoản Sử Dụng của MEGA, chẳng hạn như lạm dụng hệ thống, quyền hạn sử dụng hay tàng trữ dữ liệu phi pháp.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Không có tệp nào</string>
-    <string name="label_file_size_byte" context="size in byte">B</string>
-    <string name="label_file_size_kilo_byte" context="size in kilobyte">KB</string>
-    <string name="label_file_size_mega_byte" context="size in megabyte">MB</string>
-    <string name="label_file_size_giga_byte" context="size in gigabyte">GB</string>
-    <string name="label_file_size_tera_byte" context="size in terabyte">TB</string>
+    <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
+    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
+    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s MB</string>
+    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s GB</string>
+    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s TB</string>
+    <string name="label_mega_byte" context="Size in megabytes.">MB</string>
 
     <plurals name="number_of_versions" formatted="false">
         <item context="Number of versions of a file shown on the screen info of the file, version item" quantity="one">%1$d phiên bản</item>
@@ -2315,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]đã chặn tên bạn khỏi danh bạ liên lạc.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Thông báo [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Tài khoản bị xóa</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Tài khoản [/B][A]%s[/A][B] đã bị xóa.[/B]</string>
@@ -2355,8 +2373,8 @@
     <string name="billing_period_title" context="title of billing period">Chu kỳ thanh toán</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
     <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
-    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Monthly[/A] %s/month</string>
-    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Yearly[/A] %s/year</string>
+    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Định kỳ mỗi tháng[/A] giá %s</string>
+    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Định kỳ hằng năm[/A] giá %s</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Hủy</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Tiếp tục</string>
 
@@ -2434,11 +2452,11 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Truy cập camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Cho phép ứng dụng MEGA sử dụng camera chủa điện thoại để thao tác các việc như quét tài liệu, chụp ảnh và gọi video khi bạn yêu cầu.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Thực hiện cuộc gọi</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Grant access to your address book</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable Access to Your Address Book</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Cho phép ứng dụng MEGA sử dụng micrôphone của điện thoại để thực hiện cuộc gọi khi bạn yêu cầu.</string>
-    <string name="general_enable_access" context="General enable access">Cho phép sử dụng</string>
+    <string name="general_enable_access" context="General enable access">Cho Phép Quyền Hạn</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Tệp Tin Đã Chia Sẻ</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Tệp đsính kèm đã được gửi đi rồi</string>
@@ -2724,6 +2742,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">It is possible that you are using the same password for your MEGA account as for other services, and that at least one of these other services has suffered a data breach.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Your password leaked and is now being used by bad actors to log into your accounts, including, but not limited to, your MEGA account.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">Đặt Tên</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit Nickname</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to add the nickname</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back.</string>
 
@@ -2733,6 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">You do not have the permissions required to revert this file. In order to continue, we can create a new file with the reverted data. Would you like to proceed?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version was created as a new file successfully.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to stop sharing these %1$d folders?</string>
+
     <string name="download_location" context="Download location label">Vị trí tải về</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 </resources>

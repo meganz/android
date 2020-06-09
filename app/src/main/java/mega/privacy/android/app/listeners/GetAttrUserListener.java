@@ -13,16 +13,15 @@ import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
-
     /**
      * Indicates if the request is only to update the DB.
      * If so, the rest of the actions in onRequestFinish() can be ignored.
      */
     private boolean onlyDBUpdate;
-
     public GetAttrUserListener(Context context) {
         super(context);
     }
@@ -46,7 +45,6 @@ public class GetAttrUserListener extends BaseListener {
 
         switch (request.getParamType()) {
             case USER_ATTR_MY_CHAT_FILES_FOLDER:
-
                 MegaNode myChatFolderNode = null;
                 boolean myChatFolderFound = false;
 
@@ -69,7 +67,6 @@ public class GetAttrUserListener extends BaseListener {
                 } else {
                     logError("Error getting \"My chat files\" folder: " + e.getErrorString());
                 }
-
                 if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
                     dBH.setMyChatFilesFolderHandle(myChatFolderNode.getHandle());
                     myChatFolderFound = true;
@@ -83,14 +80,12 @@ public class GetAttrUserListener extends BaseListener {
 
                 if (context instanceof FileExplorerActivityLollipop) {
                     FileExplorerActivityLollipop fileExplorerActivityLollipop = (FileExplorerActivityLollipop) context;
-
                     if (myChatFolderFound) {
                         fileExplorerActivityLollipop.setMyChatFilesFolder(myChatFolderNode);
                         fileExplorerActivityLollipop.checkIfFilesExistsInMEGA();
                     }
                 } else if (context instanceof ChatActivityLollipop) {
                     ChatActivityLollipop chatActivityLollipop = (ChatActivityLollipop) context;
-
                     if (myChatFolderFound) {
                         chatActivityLollipop.setMyChatFilesFolder(myChatFolderNode);
 
@@ -102,13 +97,37 @@ public class GetAttrUserListener extends BaseListener {
                     }
                 } else if (context instanceof NodeAttachmentHistoryActivity) {
                     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = (NodeAttachmentHistoryActivity) context;
-
                     if (myChatFolderFound) {
                         nodeAttachmentHistoryActivity.setMyChatFilesFolder(myChatFolderNode);
                         nodeAttachmentHistoryActivity.handleStoredData();
                     }
                 }
-
+                break;
+            case USER_ATTR_FIRSTNAME:
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    updateFirstName(context, request.getText(), request.getEmail());
+                }
+                break;
+            case USER_ATTR_LASTNAME:
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    updateLastName(context, request.getText(), request.getEmail());
+                }
+                break;
+            case USER_ATTR_ALIAS:
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    String nickname = request.getName();
+                    if (nickname == null) {
+                        updateDBNickname(api, context, request.getMegaStringMap());
+                        break;
+                    }
+                    dBH.setContactNickname(nickname, request.getNodeHandle());
+                    notifyNicknameUpdate(context, request.getNodeHandle());
+                } else if (e.getErrorCode() == MegaError.API_ENOENT) {
+                    dBH.setContactNickname(null, request.getNodeHandle());
+                    notifyNicknameUpdate(context, request.getNodeHandle());
+                } else {
+                    logError("Error recovering the alias" + e.getErrorCode());
+                }
                 break;
         }
     }

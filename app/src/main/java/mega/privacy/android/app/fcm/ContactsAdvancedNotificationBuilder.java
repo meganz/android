@@ -8,21 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -449,36 +443,18 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     private Bitmap createDefaultAvatar(String email){
-        MegaUser contact = megaApi.getContact(email);
-        int color = getColorAvatar(context, megaApi, contact);
-        return getDefaultAvatar(context, color, email, AVATAR_SIZE, true, false);
+        return getDefaultAvatar(getColorAvatar(megaApi.getContact(email)), email, AVATAR_SIZE, true, false);
     }
 
     public Bitmap setUserAvatar(String contactMail){
         logDebug("setUserAvatar");
 
-        File avatar = buildAvatarFile(context, contactMail + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    return createDefaultAvatar(contactMail);
-                }
-                else{
-                    return getCircleBitmap(bitmap);
-                }
-            }
-            else{
-                return createDefaultAvatar(contactMail);
-            }
-        }
-        else{
+        Bitmap bitmap = getImageAvatar(contactMail);
+        if(bitmap == null){
             return createDefaultAvatar(contactMail);
         }
+
+        return bitmap;
     }
 
     public Notification buildSummaryIPC(String groupKey) {

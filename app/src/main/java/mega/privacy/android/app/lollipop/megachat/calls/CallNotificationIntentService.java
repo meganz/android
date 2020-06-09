@@ -56,6 +56,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             megaChatApi.hangChatCall(chatHandleInProgress, this);
         } else if (IGNORE.equals(action)) {
             megaChatApi.setIgnoredCall(chatHandleToAnswer);
+            MegaApplication.getInstance().removeChatAudioManager();
             stopSelf();
         } else {
             throw new IllegalArgumentException("Unsupported action: " + action);
@@ -91,7 +92,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
         if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             logDebug("TYPE_HANG_CHAT_CALL");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {

@@ -6,8 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 
 import java.util.Objects;
 
@@ -17,8 +17,8 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
     // Fraction of the drawable's intrinsic size we want the badge to be.
-    private static final float SIZE_FACTOR = .4f;
-    private static final float HALF_SIZE_FACTOR = SIZE_FACTOR / 2;
+    private static final float SIZE_FACTOR = .5f;
+    private static final float HALF_SIZE_FACTOR = SIZE_FACTOR / 4;
 
     private Paint backgroundPaint;
     private Paint bigBackgroundPaint;
@@ -84,7 +84,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
         final Rect textBounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), textBounds);
-        canvas.drawText(text, x1, y1 + textBounds.height() / 2, textPaint);
+        canvas.drawText(text, x1, y1 + (float)(textBounds.height() / 2.5), textPaint);
     }
 
     public void setEnabled(boolean enabled) {

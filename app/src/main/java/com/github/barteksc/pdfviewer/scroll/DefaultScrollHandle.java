@@ -2,7 +2,7 @@ package com.github.barteksc.pdfviewer.scroll;
 
 import android.content.Context;
 import android.os.Handler;
-import android.support.v4.view.MotionEventCompat;
+import androidx.core.view.MotionEventCompat;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 import android.widget.TextView;

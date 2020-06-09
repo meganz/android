@@ -3,13 +3,13 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -142,8 +142,8 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
             searchView.setIconifiedByDefault(true);
         }
 
-        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
-        searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
+        searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(ContextCompat.getColor(this,R.color.black));
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(this,R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));

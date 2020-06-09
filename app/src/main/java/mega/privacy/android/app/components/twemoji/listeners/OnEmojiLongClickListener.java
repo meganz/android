@@ -1,6 +1,6 @@
 package mega.privacy.android.app.components.twemoji.listeners;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;

@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.StatFs;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +31,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -639,5 +640,23 @@ public class OfflineUtils {
         }
 
         return false;
+    }
+
+    /**
+     * Shares a offline node.
+     * If the node is a folder and the app has network connection, shares a folder link.
+     * If the node is a file, shares the file.
+     *
+     * @param context
+     * @param offline
+     */
+    public static void shareOfflineNode(Context context, MegaOffline offline) {
+        if (offline.isFolder()) {
+            if (isOnline(context)) {
+                shareNode(context, MegaApplication.getInstance().getMegaApi().getNodeByHandle(Long.parseLong(offline.getHandle())));
+            }
+        } else {
+            shareFile(context, getOfflineFile(context, offline));
+        }
     }
 }

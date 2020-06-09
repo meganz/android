@@ -6,12 +6,12 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -266,7 +266,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				setNodes(nodes);
 				parentHandle = -1;
 				adapter.setParentHandle(-1);
-				changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+				changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
 				if (context instanceof FileProviderActivity){
 					((FileProviderActivity)context).setParentHandle(parentHandle);
 					logDebug("PArentHandle change to: " + parentHandle);
@@ -298,7 +298,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			}			
 		}
 
-		changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+		changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
 	}
 
 	@Override
@@ -400,7 +400,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				((FileProviderActivity)context).setIncParentHandle(parentHandle);
 				logDebug("The parent handle change to: " + parentHandle);
 			}
-			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+			changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
 			findNodes();
 			
 			setNodes(nodes);

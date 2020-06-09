@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -191,10 +191,10 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             mail = contact.getFullName();
         }
 
-        int color = getColorAvatar(context, megaApi, contact.getMegaUser());
+        int color = getColorAvatar(contact.getMegaUser());
 
         if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
-            return getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE,true);
+            return getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE,true);
         }
 
         /*Avatar*/
@@ -217,7 +217,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         } else {
             fullName = mail;
         }
-        return getDefaultAvatar(context, color, fullName, AVATAR_SIZE,true);
+        return getDefaultAvatar(color, fullName, AVATAR_SIZE,true);
     }
 
 

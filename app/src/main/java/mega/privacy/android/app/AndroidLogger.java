@@ -1,20 +1,21 @@
 package mega.privacy.android.app;
 
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaLoggerInterface;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class AndroidLogger extends MegaLogger implements MegaLoggerInterface {
 
     public static final String LOG_FILE_NAME = "logSDK.txt";
 
-    public AndroidLogger(String fileName, boolean fileLogger) {
-        super(fileName, fileLogger);
+    public AndroidLogger(String fileName) {
+        super(fileName);
     }
 
     public void log(String time, int logLevel, String source, String message) {
         //save to log file
-        if (isReadyToWriteToFile(Util.getFileLoggerSDK())) {
+        if (isReadyToWriteToFile(getStatusLoggerSDK())) {
             fileLogQueue.add(createMessage(time, logLevel, source, message));
         }
     }

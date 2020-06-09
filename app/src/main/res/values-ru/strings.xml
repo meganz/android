@@ -252,10 +252,11 @@
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Загрузки медиа</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Входящие</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Сохранено локально</string>
-    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</string>
+    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Общие элементы</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Общие папки</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Корзина</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Контакты</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Входящие</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Исходящие</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Ссылки</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Входящие общие папки</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Открытый доступ от</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Покинуть общее пользование</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Закрыть доступ</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Удалить ссылку</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Эта ссылка больше не будет общедоступна.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Эта ссылка больше не будет общедоступна.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Эта ссылка больше не будет общедоступна.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Эти ссылки больше не будут доступны публично.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Переименовать</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Открыть ссылку</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Открыть</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Дата</string>
     <string name="sortby_creation_date" context="category in sort by action">Дата создания</string>
     <string name="sortby_modification_date" context="category in sort by action">Дата изменения</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Дата создания ссылки</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Новейшие</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">старейшие</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Журнал включён</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Журнал отключён</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Журналы не были включены, потому что вы отказали в необходимых разрешениях</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Расположение</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Процесс длится дольше ожидаемого. Пожалуйста, подождите.</string>
@@ -1203,7 +1211,7 @@
 
     <string name="no_results_found" context="Text shown after searching and no results found">Ничего не найдено</string>
 
-    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</string>
+    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
     <string name="online_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">В сети</string>
     <string name="away_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Отсутствует</string>
     <string name="busy_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Занят</string>
@@ -1400,7 +1408,7 @@
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">В сети</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Отсутствует</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Занят</item>
-        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</item>
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</item>
     </string-array>
 
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">Нет локальных файлов</string>
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Подробнее</string>
 
-    <string name="context_link_removal_error" context="error message">Не удалось удалить ссылку. Попробуйте позже.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Не удалось удалить ссылку. Попробуйте позже.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Не удалось удалить некоторые ссылки. Пожалуйста, попробуйте позже.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Ссылка успешно удалена.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Ссылки успешно удалены.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Не удалось. Попробуйте позже.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Эл. почта пользователя</string>
@@ -1827,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Нет [/B][A]входящих общих папок[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Нет [/B][A]исходящих общих папок[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Нет [/B][A]публичных ссылок[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Отправленные запросы</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Полученные запросы</string>
@@ -1857,11 +1873,12 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Ваша учетная запись была прервана из-за нарушения Условий предоставления услуг MEGA, таких как злоупотребление правами других лиц; обмен и/или импорт незаконных данных; или злоупотребление системой.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Нет файлов</string>
-    <string name="label_file_size_byte" context="size in byte">Б</string>
-    <string name="label_file_size_kilo_byte" context="size in kilobyte">КБ</string>
-    <string name="label_file_size_mega_byte" context="size in megabyte">МБ</string>
-    <string name="label_file_size_giga_byte" context="size in gigabyte">ГБ</string>
-    <string name="label_file_size_tera_byte" context="size in terabyte">ТБ</string>
+    <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Б</string>
+    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s КБ</string>
+    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s МБ</string>
+    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s ГБ</string>
+    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s ТБ</string>
+    <string name="label_mega_byte" context="Size in megabytes.">МБ</string>
 
     <plurals name="number_of_versions" formatted="false">
         <item context="Number of versions of a file shown on the screen info of the file, version item" quantity="one">Версия %1$d</item>
@@ -2315,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]заблокировал ваш контакт.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Оповещения [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Аккаунт удалён</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Аккаунт [/B][A]%s[/A][B] был удалён.[/B]</string>
@@ -2434,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Разрешить доступ к камере</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Разрешите доступ к камере для сканирования документов, фотографирования и видеозвонков.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Разрешить звонки</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Предоставить доступ к адресной книге</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Откройте доступ к вашей адресной книге</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Легко находите контакты из своей адресной книги в MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA не будет использовать эти данные для каких-либо других целей и никогда не будет взаимодействовать с вашими контактами без вашего согласия.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Разрешите доступ к микрофону для зашифрованных звонков.</string>
@@ -2724,6 +2742,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Возможно, вы используете тот же пароль для своего аккаунта MEGA, что и для других служб, и что по крайней мере одна из этих других служб пострадала от утечки данных.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Ваш пароль утёк и теперь используется плохими игроками для входа в ваши аккаунты, включая, но не ограничиваясь аккаунтом MEGA.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">Задать псевдоним</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Изменить псевдоним</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Псевдоним добавлен</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Псевдоним удален</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">При попытке добавить псевдоним произошла ошибка</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Псевдоним</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Переподключение</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Вы вернулись.</string>
 
@@ -2733,6 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">У вас нет прав, необходимых для восстановления этого файла. Чтобы продолжить, мы можем создать новый файл с восстановленными данными. Хотите продолжить?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Версия была успешно создана как новый файл.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">%1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Вы действительно хотите закрыть доступ к этим %1$d папкам?</string>
+
     <string name="download_location" context="Download location label">Папка загрузки</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Всегда сохранять в эту папку?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Прикрепить из&#8230;</string>
 </resources>

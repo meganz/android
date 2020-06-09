@@ -15,8 +15,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.service.notification.StatusBarNotification;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -53,7 +52,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 
 public final class ChatAdvancedNotificationBuilder {
 
@@ -448,6 +449,10 @@ public final class ChatAdvancedNotificationBuilder {
                 messageContent = converterShortCodes(messageContent);
                 String sender = chat.getPeerFirstnameByHandle(msg.getUserHandle());
                 sender = converterShortCodes(sender);
+                String nickName = getNicknameContact(msg.getUserHandle());
+                if(nickName != null){
+                    sender = converterShortCodes(nickName);
+                }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     messagingStyleContentO.addMessage(messageContent, msg.getTimestamp(), sender);
@@ -588,11 +593,12 @@ public final class ChatAdvancedNotificationBuilder {
 
         int color;
         if(chat.isGroup()){
-            color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
+            color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
         }else{
-            color = getColorAvatar(context, megaApi, chat.getPeerHandle(0));
+            color = getColorAvatar(chat.getPeerHandle(0));
         }
-        return getDefaultAvatar(context, color, chat.getTitle(), AVATAR_SIZE, true, true);
+
+        return getDefaultAvatar(color, chat.getTitle(), AVATAR_SIZE, true, true);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -772,7 +778,14 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
+    private String getFullName(MegaChatRoom chat) {
+        String fullName = getNicknameContact(chat.getPeerHandle(0));
+        if (fullName == null) {
+            fullName = chat.getPeerFullname(0);
+        }
 
+        return fullName;
+    }
 
     public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid() +
@@ -809,7 +822,6 @@ public final class ChatAdvancedNotificationBuilder {
             NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
             NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
 
-
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
 
@@ -837,6 +849,7 @@ public final class ChatAdvancedNotificationBuilder {
                         .setVibrate(pattern)
                         .addAction(actionAnswer)
                         .addAction(actionIgnore)
+                        .setDeleteIntent(pendingIntentIgnore)
                         .setColor(ContextCompat.getColor(context, R.color.mega))
                         .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -844,7 +857,7 @@ public final class ChatAdvancedNotificationBuilder {
                     notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
                 }
                 else{
-                    notificationBuilderO.setContentTitle(chatToAnswer.getPeerFullname(0));
+                    notificationBuilderO.setContentTitle(getFullName(chatToAnswer));
                 }
 
                 Bitmap largeIcon = setUserAvatar(chatToAnswer);
@@ -866,12 +879,13 @@ public final class ChatAdvancedNotificationBuilder {
                         .setAutoCancel(false)
                         .setContentIntent(null)
                         .addAction(actionAnswer)
-                        .addAction(actionIgnore);
+                        .addAction(actionIgnore)
+                        .setDeleteIntent(pendingIntentIgnore);
 
                 if(chatToAnswer.isGroup()){
                     notificationBuilder.setContentTitle(chatToAnswer.getTitle());
                 }else{
-                    notificationBuilder.setContentTitle(chatToAnswer.getPeerFullname(0));
+                    notificationBuilder.setContentTitle(getFullName(chatToAnswer));
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -992,18 +1006,17 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void showMissedCallNotification(MegaChatCall call) {
-        logDebug("Chat ID: " + call.getChatid() + ", Call ID: " + call.getId());
+    public void showMissedCallNotification(long chatId, long chatCallId) {
+        logDebug("Chat ID: " + chatId + ", Call ID: " + chatCallId);
 
-        MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
+        MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
         String notificationContent;
         if (chat.isGroup()) {
             notificationContent = chat.getTitle();
         } else {
-            notificationContent = chat.getPeerFullname(0);
+            notificationContent = getFullName(chat);
         }
 
-        long chatCallId = call.getId();
         String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
         int notificationId = (notificationCallId).hashCode() + NOTIFICATION_MISSED_CALL;
 

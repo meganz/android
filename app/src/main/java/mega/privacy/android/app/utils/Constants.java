@@ -55,6 +55,9 @@ public class Constants {
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
     public static final String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
+    public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
+    public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
+    public static final String ACTION_TAKE_PROFILE_PICTURE = "ACTION_TAKE_PROFILE_PICTURE";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -64,6 +67,7 @@ public class Constants {
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
+    public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
@@ -248,7 +252,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
-
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
@@ -275,6 +278,7 @@ public class Constants {
     public static final int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
     public static final int GENERAL_OTHERS_ADAPTER = 2023;
     public static final int RECENTS_ADAPTER = 2024;
+    public static final int LINKS_ADAPTER = 2025;
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -345,6 +349,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
+    public static final String TYPE_TEXT_PLAIN = "text/plain";
 
     public static final int RICH_WARNING_TRUE = 1;
     public static final int RICH_WARNING_FALSE = 0;
@@ -374,6 +379,10 @@ public class Constants {
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+
+    public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
+    public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
+    public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
 
     /**
      * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
@@ -414,6 +423,7 @@ public class Constants {
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";
+    public static final String MESSAGE_ID = "messageId";
     public static final String CALL_ID = "callId";
     public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
     public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
@@ -423,13 +433,17 @@ public class Constants {
     public static final String CHAT_TITLE = "CHAT_TITLE";
     public static final String SELECTED_CONTACTS = "SELECTED_CONTACTS";
     public static final String NODE_HANDLES = "NODE_HANDLES";
+    public static final String NAME = "name";
     public static final String HANDLE = "handle";
+    public static final String EMAIL = "email";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
     public static final String SELECTED_CHATS = "SELECTED_CHATS";
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
+    public static final String URL_FILE_LINK = "URL_FILE_LINK";
+    public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";

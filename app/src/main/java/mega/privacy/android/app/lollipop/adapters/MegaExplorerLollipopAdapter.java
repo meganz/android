@@ -6,8 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -51,6 +51,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 	
@@ -286,19 +287,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     if(mS.getNodeHandle()==node.getHandle()){
                         MegaUser user= megaApi.getContact(mS.getUser());
                         if(user!=null){
-                            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                            if(contactDB!=null){
-                                if(!contactDB.getName().equals("")){
-                                    holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
-                                }
-                                else{
-                                    holder.textViewFileSize.setText(user.getEmail());
-                                }
-                            }
-                            else{
-                                logDebug("The contactDB is null: ");
-                                holder.textViewFileSize.setText(user.getEmail());
-                            }
+                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         }
                         else{
                             holder.textViewFileSize.setText(mS.getUser());
@@ -324,7 +313,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.permissionsIcon.setVisibility(View.GONE);
 
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(getSizeString(nodeSize));
+            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             setImageParams(holder.imageView, 48, 0);
 
@@ -738,81 +727,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public void setSelectFile(boolean selectFile) {
 		this.selectFile = selectFile;
 	}
-
-	private boolean isCameraUploads(MegaNode n){
-		String cameraSyncHandle = null;
-
-		//Check if the item is the Camera Uploads folder
-		if(dbH.getPreferences()!=null){
-			prefs = dbH.getPreferences();
-			if(prefs.getCamSyncHandle()!=null){
-				cameraSyncHandle = prefs.getCamSyncHandle();
-			}else{
-				cameraSyncHandle = null;
-			}
-		}else{
-			prefs=null;
-		}
-
-		if(cameraSyncHandle!=null){
-			if(!(cameraSyncHandle.equals(""))){
-				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
-					return true;
-				}
-
-			}else{
-				if(n.getName().equals("Camera Uploads")){
-					if (prefs != null){
-						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-					}
-					dbH.setCamSyncHandle(n.getHandle());
-					logDebug("FOUND Camera Uploads!!----> " + n.getHandle());
-					return true;
-				}
-			}
-
-		}else{
-			if(n.getName().equals("Camera Uploads")){
-				if (prefs != null){
-					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-				}
-				dbH.setCamSyncHandle(n.getHandle());
-				logDebug("FOUND Camera Uploads!!: " + n.getHandle());
-				return true;
-			}
-		}
-
-		//Check if the item is the Media Uploads folder
-		String secondaryMediaHandle = null;
-
-		if(prefs!=null){
-			if(prefs.getMegaHandleSecondaryFolder()!=null){
-				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
-			}else{
-				secondaryMediaHandle = null;
-			}
-		}
-
-		if(secondaryMediaHandle!=null){
-			if(!(secondaryMediaHandle.equals(""))){
-				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
-					logDebug("Click on Media Uploads");
-					return true;
-				}
-			}
-		}else{
-			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
-				if (prefs != null){
-					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
-				}
-				dbH.setSecondaryFolderHandle(n.getHandle());
-				logDebug("FOUND Media Uploads!!: " + n.getHandle());
-				return true;
-			}
-		}
-		return false;
-	}
-
 
 	@Override
 	public void onClick(View v) {
