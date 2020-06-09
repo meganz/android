@@ -70,7 +70,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         getLinkOption.setOnClickListener(this);
         LinearLayout clearOption = contentView.findViewById(R.id.option_clear_layout);
         clearOption.setOnClickListener(this);
-        TextView clearText = contentView.findViewById(R.id.option_clear_text);
         LinearLayout retryOption = contentView.findViewById(R.id.option_retry_layout);
         retryOption.setOnClickListener(this);
 
@@ -92,7 +91,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 location.setText(transfer.getPath());
                 stateIcon.setImageResource(R.drawable.ic_complete_transfer);
                 retryOption.setVisibility(View.GONE);
-                clearText.setText(R.string.general_clear);
                 break;
 
             case STATE_FAILED:
@@ -102,7 +100,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 stateIcon.setImageBitmap(null);
                 viewInFolderOption.setVisibility(View.GONE);
                 getLinkOption.setVisibility(View.GONE);
-                clearText.setText(R.string.action_cancel_transfer);
                 break;
 
             case STATE_CANCELLED:
