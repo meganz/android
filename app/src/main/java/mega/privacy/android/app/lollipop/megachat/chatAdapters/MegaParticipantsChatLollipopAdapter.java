@@ -246,7 +246,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
                 }
 
-                holderList.itemLayout.setOnClickListener(this);
                 holderList.itemLayout.setTag(holderList);
 
                 v.setTag(holderList);
@@ -385,6 +384,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
                 holderParticipantsList.threeDotsLayout.setOnClickListener(this);
+                holderParticipantsList.itemLayout.setOnClickListener(this);
                 holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
 
                 /*Default Avatar*/
@@ -407,6 +407,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     if (holderParticipantsList.contactMail == null) {
                         holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
                         holderParticipantsList.threeDotsLayout.setOnClickListener(null);
+                        holderParticipantsList.itemLayout.setOnClickListener(null);
                         bitmap = getAvatarBitmap(nameFileHandle);
                     } else {
                         contact = megaApi.getContact(holderParticipantsList.contactMail);
