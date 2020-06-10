@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -151,7 +152,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.notification_new_contact_request), email);
+				String textToShow = String.format(context.getString(R.string.notification_new_contact_request), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -210,7 +211,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_contact_request_notification_cancelled), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_contact_request_notification_cancelled), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -269,7 +270,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.notification_new_contact), email);
+				String textToShow = String.format(context.getString(R.string.notification_new_contact), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -328,7 +329,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_account_notification_deleted), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_account_notification_deleted), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -387,7 +388,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.notification_reminder_contact_request), email);
+				String textToShow = String.format(context.getString(R.string.notification_reminder_contact_request), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -447,7 +448,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_deleted), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_deleted), getNicknameForNotificationsSection(context, email));
+
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -506,7 +508,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_blocked), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_blocked), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -565,7 +567,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_accepted), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_accepted), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -623,7 +625,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_denied), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_denied), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -681,7 +683,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_ignored), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_ignored), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -739,7 +741,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_accepted), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_accepted), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -797,7 +799,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_denied), email);
+				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_denied), getNicknameForNotificationsSection(context, email));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -855,7 +857,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String email = alert.getEmail();
 
-				String textToShow = String.format(context.getString(R.string.notification_new_shared_folder), email);
+				String textToShow = String.format(context.getString(R.string.notification_new_shared_folder), getNicknameForNotificationsSection(context, email));
+
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -919,21 +922,21 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				Spanned result = null;
 				//TYPE_DELETEDSHARE (0: value 1 if access for this user was removed by the share owner, otherwise
 				//value 0 if someone left the folder)
+
 				if(alert.getNumber(0)==0){
 					MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
 					if(node!=null){
 						holder.itemLayout.setOnClickListener(this);
-						textToShow = String.format(context.getString(R.string.notification_left_shared_folder_with_name), email, node.getName());
+						textToShow = String.format(context.getString(R.string.notification_left_shared_folder_with_name), getNicknameForNotificationsSection(context, email), node.getName());
 					}
 					else{
 						holder.itemLayout.setOnClickListener(null);
-						textToShow = String.format(context.getString(R.string.notification_left_shared_folder), email);
+						textToShow = String.format(context.getString(R.string.notification_left_shared_folder), getNicknameForNotificationsSection(context, email));
 					}
 				}
 				else{
-					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), email);
+					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), getNicknameForNotificationsSection(context, email));
 				}
-
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -998,13 +1001,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					String numFilesString = context.getResources().getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
 					String numFoldersString = context.getResources().getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
 
-					textToShow = context.getResources().getString(R.string.subtitle_notification_added_folders_and_files, email, numFoldersString, numFilesString);
+					textToShow = context.getResources().getString(R.string.subtitle_notification_added_folders_and_files, getNicknameForNotificationsSection(context, email), numFoldersString, numFilesString);
 				}
 				else if(numFolders>0){
-					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, email, numFolders);
+					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, getNicknameForNotificationsSection(context, email), numFolders);
 				}
 				else{
-					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_files, numFiles, email, numFiles);
+					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_files, numFiles, getNicknameForNotificationsSection(context, email), numFiles);
 				}
 
 				try{
@@ -1068,7 +1071,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String email = alert.getEmail();
 				int itemCount = (int) alert.getNumber(0);
 
-				String textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount, email, itemCount);
+				String textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount, getNicknameForNotificationsSection(context, email), itemCount);
 
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
