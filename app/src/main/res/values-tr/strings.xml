@@ -1458,7 +1458,6 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Detayları gör</string>
 
-    <string name="context_link_removal_error" context="error message">Bağlantı silme başarısız oldu. Lütfen daha sonra tekrar deneyin.</string>
     <string name="context_link_action_error" context="error message">Bağlantı eylemi başarısız oldu. Lütfen daha sonra tekrar deneyin.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Kullanıcının e-postasını yazın</string>

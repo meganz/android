@@ -42,14 +42,13 @@ public class ChatAudioManager {
     }
 
     public void initializeAudioManager() {
+        logDebug("Initializing audio manager in mode normal...");
+
         if (audioManager != null) {
-            audioManager.setMode(AudioManager.MODE_NORMAL);
             return;
         }
 
-        logDebug("Initializing audio manager...");
         audioManager = (AudioManager) myContext.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setMode(AudioManager.MODE_NORMAL);
     }
 
     public void setAudioManagerValues(int callStatus, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
@@ -60,7 +59,6 @@ public class ChatAudioManager {
                 logDebug("There was also an incoming call (stop incoming call sound)");
                 stopAudioSignals();
             }
-
             outgoingCallSound();
 
         } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
@@ -168,7 +166,6 @@ public class ChatAudioManager {
     public void stopAudioSignals() {
         if (audioManager != null) {
             abandonAudioFocus(audioFocusListener, audioManager, request);
-            audioManager = null;
         }
         logDebug("Stop sound and vibration");
         stopSound();

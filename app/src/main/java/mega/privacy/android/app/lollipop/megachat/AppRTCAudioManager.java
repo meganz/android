@@ -237,31 +237,32 @@ public class AppRTCAudioManager {
             }
         };
 
+        int typeStream = -1;
+        int typeFocus = -1;
         if(apprtcContext instanceof ChatCallActivity){
+            typeStream = AudioManager.STREAM_VOICE_CALL;
+            typeFocus = AudioManager.AUDIOFOCUS_GAIN;
+        }else if(apprtcContext instanceof ChatActivityLollipop){
+            typeStream = AudioManager.STREAM_MUSIC;
+            typeFocus = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
+        }
+
+        if (apprtcContext instanceof ChatCallActivity || apprtcContext instanceof ChatActivityLollipop) {
             // Request audio playout focus (without ducking) and install listener for changes in focus.
-            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
+            int result = audioManager.requestAudioFocus(audioFocusChangeListener, typeStream, typeFocus);
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 logDebug("Audio focus request granted for VOICE_CALL streams");
             } else {
                 logError("Audio focus request failed");
             }
-
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
             // best possible VoIP performance.
             // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                logDebug("Mode communication");
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             }
-        }else if(apprtcContext instanceof ChatActivityLollipop){
-
-            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
-            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                logDebug("Audio focus request granted for STREAM_MUSIC streams");
-            } else {
-                logError("Audio focus request failed");
-            }
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         }
 
         // Always disable microphone mute during a WebRTC call.
