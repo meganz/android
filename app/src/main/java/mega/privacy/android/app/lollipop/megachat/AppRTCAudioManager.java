@@ -244,17 +244,15 @@ public class AppRTCAudioManager {
             Log.e(TAG, "Audio focus request failed");
         }
 
-        if(apprtcContext instanceof MegaApplication){
+        if (apprtcContext instanceof MegaApplication || apprtcContext instanceof ChatActivityLollipop) {
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
             // best possible VoIP performance.
             // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                logDebug("Mode communication");
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             }
-        }else if(apprtcContext instanceof ChatActivityLollipop){
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-
         }
 
         // Always disable microphone mute during a WebRTC call.

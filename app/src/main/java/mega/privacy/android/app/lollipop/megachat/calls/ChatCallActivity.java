@@ -2928,11 +2928,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
+
     /**
      * Check when the number of participants changes in the call and update UI.
      */
     private void checkParticipantChanges(boolean isAdded, int posRemoved, int posInserted) {
-
         logDebug("Checking for changes in the number of participants");
         if ((lessThanSevenParticipants() && adapterGrid == null) ||
                 (lessThanSevenParticipants() && !isAdded && peersOnCall.size() == MAX_PARTICIPANTS_GRID) ||
@@ -2961,7 +2961,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     adapterGrid.notifyItemRemoved(posRemoved);
                     adapterGrid.notifyItemRangeChanged(posRemoved, peersOnCall.size());
                 }
-
             } else {
                 int rangeToUpdate;
                 if (isAdded) {

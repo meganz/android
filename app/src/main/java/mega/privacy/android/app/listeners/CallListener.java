@@ -43,6 +43,11 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentStatus.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
             intentStatus.putExtra(UPDATE_CALL_ID, call.getId());
             intentStatus.putExtra(UPDATE_CALL_STATUS, callStatus);
+            if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
+                intentStatus.putExtra(UPDATE_CALL_TERM_CODE, call.getTermCode());
+                intentStatus.putExtra(UPDATE_CALL_IGNORE, call.isIgnored());
+                intentStatus.putExtra(UPDATE_CALL_LOCAL_TERM_CODE, call.isLocalTermCode());
+            }
             LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentStatus);
         }
 

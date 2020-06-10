@@ -8556,6 +8556,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             individualSubtitleToobar.setVisibility(View.GONE);
             setGroupalSubtitleToolbarVisibility(false);
         }
+
         usersWithVideo();
         activateChrono(true, subtitleChronoCall, call);
         invalidateOptionsMenu();

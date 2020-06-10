@@ -102,7 +102,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.5_307";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.6_310";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -432,10 +432,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
-			long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
-			if (chatId == -1 || callId == -1)
+			long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+			long callId = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
+			if (chatId == MEGACHAT_INVALID_HANDLE || callId == MEGACHAT_INVALID_HANDLE) {
+				logError("Error. Chat id " + chatId + ", Call id "+callId);
 				return;
+			}
 
 			if (intent.getAction().equals(ACTION_UPDATE_CALL)) {
 				stopService(new Intent(getInstance(), IncomingCallService.class));
@@ -448,9 +450,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					case MegaChatCall.CALL_STATUS_RING_IN:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 					case MegaChatCall.CALL_STATUS_RECONNECTING:
+						logDebug("Call status is "+callStatusToString(callStatus));
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-						if (listAllCalls == null || listAllCalls.size() == 0)
+						if (listAllCalls == null || listAllCalls.size() == 0){
+							logError("Calls not found");
 							return;
+						}
 
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
 							createChatAudioManager();
@@ -471,9 +476,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						clearIncomingCallNotification(callId);
 						removeValues(chatId);
 						break;
-
 					case MegaChatCall.CALL_STATUS_DESTROYED:
-						checkCallDestroyed(chatId);
+						int termCode = intent.getIntExtra(UPDATE_CALL_TERM_CODE, -1);
+						boolean isIgnored = intent.getBooleanExtra(UPDATE_CALL_IGNORE, false);
+						boolean isLocalTermCode = intent.getBooleanExtra(UPDATE_CALL_LOCAL_TERM_CODE, false);
+						checkCallDestroyed(chatId, callId, termCode, isIgnored, isLocalTermCode);
 						break;
 				}
 			}
@@ -1398,7 +1405,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         removeRTCAudioManager();
     }
 
-	private void checkCallDestroyed(long chatId) {
+	private void checkCallDestroyed(long chatId, long callId, int termCode, boolean isIgnored, boolean isLocalTermCode) {
 		removeValues(chatId);
 
 		if (shouldNotify(this)) {
@@ -1409,21 +1416,24 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			wakeLock.release();
 		}
 
-		MegaChatCall call = megaChatApi.getChatCallByCallId(chatId);
-		if(call == null)
-		    return;
+		clearIncomingCallNotification(callId);
+		//Show missed call if time out ringing (for incoming calls)
+		try {
 
-		clearIncomingCallNotification(call.getId());
-
-		if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
-			if (call.isLocalTermCode() == false) {
-				try {
-					ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-					notificationBuilder.showMissedCallNotification(call);
-				} catch (Exception e) {
-					logError("EXCEPTION when showing missed call notification", e);
+			if ((termCode == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || termCode == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !isIgnored) {
+				logDebug("TERM_CODE_ANSWER_TIMEOUT");
+				if (!isLocalTermCode) {
+					logDebug("localTermCodeNotLocal");
+					try {
+						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+						notificationBuilder.showMissedCallNotification(chatId, callId);
+					} catch (Exception e) {
+						logError("EXCEPTION when showing missed call notification", e);
+					}
 				}
 			}
+		} catch (Exception e) {
+			logError("EXCEPTION when showing missed call notification", e);
 		}
 	}
 
@@ -1442,7 +1452,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
 			return;
 		}
-
 		logDebug("Creating RTC Audio Manager...");
 		rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
 		startProximitySensor();
