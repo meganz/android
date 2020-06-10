@@ -3,12 +3,6 @@ package mega.privacy.android.app.lollipop.megaachievements;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +12,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,31 +37,36 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
 
 public class AchievementsActivity extends PinActivityLollipop implements MegaRequestListenerInterface {
+    private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
 
     FrameLayout fragmentContainer;
     Toolbar tB;
     ActionBar aB;
-    int visibleFragment;
-    int achievementType;
-    private AchievementsFragment achievementsFragment;
-    private ReferralBonusesFragment referralBonusesFragment;
-    private InviteFriendsFragment inviteFriendsFragment;
-    private InfoAchievementsFragment infoAchievementsFragment;
 
-    public MegaAchievementsDetails megaAchievements;
-    public ArrayList<ReferralBonus> referralBonuses;
+    // Static complex data(hard to be parcelable) for user achievements which
+    // would survive the recreation of the activity (e.g. screen rotation)
+    // the data can be shared in the scope of Achievements related UIs
+    public static MegaAchievementsDetails sMegaAchievements;
+    public static ArrayList<ReferralBonus> sReferralBonuses = new ArrayList<>();
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
     private androidx.appcompat.app.AlertDialog successDialog;
 
-    DisplayMetrics outMetrics;
+    private Callback mCallback;
 
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
@@ -95,10 +100,6 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             return;
         }
 
-        Display display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
-
         setContentView(R.layout.activity_achievements);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_achievements);
@@ -119,27 +120,13 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
         }
 
-        visibleFragment = ACHIEVEMENTS_FRAGMENT;
-        achievementsFragment = new AchievementsFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container_achievements, achievementsFragment, "achievementsFragment");
-        ft.commitNow();
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.fragment_container_achievements, new AchievementsFragment(), TAG_ACHIEVEMENTS);
+            ft.commitNow();
 
-        referralBonuses = new ArrayList<>();
-        megaApi.getAccountAchievements(this);
-
-        if (savedInstanceState != null) {
-            visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, ACHIEVEMENTS_FRAGMENT);
-            achievementType = savedInstanceState.getInt("achievementType", -1);
+            megaApi.getAccountAchievements(this);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putInt(VISIBLE_FRAGMENT, visibleFragment);
-        outState.putInt("achievementType", achievementType);
     }
 
     @Override
@@ -147,13 +134,14 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         logDebug("onOptionsItemSelected");
 
         int id = item.getItemId();
-        switch(id) {
+        switch (id) {
             case android.R.id.home: {
-                if(visibleFragment==ACHIEVEMENTS_FRAGMENT){
+                if (getSupportFragmentManager().findFragmentById(R.id.fragment_container_achievements) instanceof AchievementsFragment) {
+                    sMegaAchievements = null;
+                    sReferralBonuses = null;
                     finish();
-                }
-                else{
-                    showFragment(ACHIEVEMENTS_FRAGMENT, -1);
+                } else {
+                    getSupportFragmentManager().popBackStack();
                 }
 
                 break;
@@ -162,72 +150,61 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         return super.onOptionsItemSelected(item);
     }
 
-    public void showFragment(int fragment, int type){
-        logDebug("showFragment: " + fragment + " type: " + achievementType);
-        visibleFragment = fragment;
-        achievementType = type;
+    public void showFragment(int fragmentName, int type){
+        logDebug("showFragment: " + fragmentName + " type: " + type);
 
-        if(visibleFragment==ACHIEVEMENTS_FRAGMENT){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = null;
+        String tag = "";
 
-            hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
-
-            aB.setTitle(getString(R.string.achievements_title));
-            if(achievementsFragment==null){
-                achievementsFragment = new AchievementsFragment();
-            }
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container_achievements, achievementsFragment, "achievementsFragment");
-            ft.commitNow();
-
-            achievementsFragment.updateValues();
+        switch (fragmentName) {
+            case ACHIEVEMENTS_FRAGMENT:
+                hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
+                aB.setTitle(getString(R.string.achievements_title));
+                fragment = new AchievementsFragment();
+                tag = "achievementsFragment";
+                break;
+            case INVITE_FRIENDS_FRAGMENT:
+                aB.setTitle(getString(R.string.title_referral_bonuses));
+                fragment = new InviteFriendsFragment();
+                tag = "inviteFriendsFragment";
+                ft.addToBackStack(tag);
+                break;
+            case BONUSES_FRAGMENT:
+                aB.setTitle(getString(R.string.title_referral_bonuses));
+                fragment = new ReferralBonusesFragment();
+                tag = "referralBonusesFragment";
+                ft.addToBackStack(tag);
+                break;
+            case INFO_ACHIEVEMENTS_FRAGMENT:
+                Bundle bundle = new Bundle();
+                bundle.putInt("achievementType", type);
+                fragment = new InfoAchievementsFragment();
+                fragment.setArguments(bundle);
+                tag = "infoAchievementsFragment";
+                ft.addToBackStack(tag);
+                break;
+            default:
+                break;
         }
-        else if(visibleFragment==INVITE_FRIENDS_FRAGMENT){
 
-            aB.setTitle(getString(R.string.title_referral_bonuses));
-            if(inviteFriendsFragment==null){
-                inviteFriendsFragment = new InviteFriendsFragment();
-            }
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container_achievements, inviteFriendsFragment, "inviteFriendsFragment");
-            ft.commitNow();
-        }
-        else if(visibleFragment==BONUSES_FRAGMENT){
-
-            if(referralBonusesFragment==null) {
-                referralBonusesFragment = new ReferralBonusesFragment();
-            }
-
-            aB.setTitle(getString(R.string.title_referral_bonuses));
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container_achievements, referralBonusesFragment, "referralBonusesFragment");
-            ft.commitNow();
-        }
-        else if(visibleFragment==INFO_ACHIEVEMENTS_FRAGMENT){
-            Bundle bundle = new Bundle();
-            bundle.putInt("achievementType", achievementType);
-
-            infoAchievementsFragment = new InfoAchievementsFragment();
-            infoAchievementsFragment.setArguments(bundle);
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container_achievements, infoAchievementsFragment, "infoAchievementsFragment");
-            ft.commitNow();
+        if (fragment != null) {
+            ft.replace(R.id.fragment_container_achievements, fragment, tag);
+            ft.commit();
         }
     }
 
     @Override
     public void onBackPressed() {
         logDebug("onBackPressedLollipop");
-        retryConnectionsAndSignalPresence();
 
-        if(visibleFragment==ACHIEVEMENTS_FRAGMENT){
-            super.onBackPressed();
+        if(getSupportFragmentManager().findFragmentById(R.id.fragment_container_achievements) instanceof AchievementsFragment){
+            // GC the static data as user manually leave the activity
+            sMegaAchievements = null;
+            sReferralBonuses = null;
         }
-        else{
-            showFragment(ACHIEVEMENTS_FRAGMENT, -1);
-        }
+
+        super.onBackPressed();
     }
 
     @Override
@@ -247,16 +224,11 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         if(request.getType()==MegaRequest.TYPE_GET_ACHIEVEMENTS){
             if (e.getErrorCode() == MegaError.API_OK){
 
-                megaAchievements=request.getMegaAchievementsDetails();
-                if(megaAchievements!=null){
+                sMegaAchievements =request.getMegaAchievementsDetails();
+                if(sMegaAchievements !=null){
                     calculateReferralBonuses();
-                    if(visibleFragment==ACHIEVEMENTS_FRAGMENT){
-                        if(achievementsFragment.isAdded()){
-                            achievementsFragment.updateValues();
-                        }
-                    }
-                    else {
-                        showFragment(visibleFragment, achievementType);
+                    if (mCallback != null) {
+                        mCallback.onAchievementsReceived();
                     }
                 }
             }
@@ -266,26 +238,26 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         }
     }
 
-    public void calculateReferralBonuses() {
+    private void calculateReferralBonuses() {
         logDebug("calculateReferralBonuses");
 
-        long count = megaAchievements.getAwardsCount();
+        long count = sMegaAchievements.getAwardsCount();
 
         for (int i = 0; i < count; i++) {
-            int type = megaAchievements.getAwardClass(i);
+            int type = sMegaAchievements.getAwardClass(i);
 
-            int awardId = megaAchievements.getAwardId(i);
+            int awardId = sMegaAchievements.getAwardId(i);
 
-            int rewardId = megaAchievements.getRewardAwardId(awardId);
+            int rewardId = sMegaAchievements.getRewardAwardId(awardId);
             logDebug("AWARD ID: " + awardId + " REWARD id: " + rewardId);
 
             if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE) {
 
                 ReferralBonus rBonus = new ReferralBonus();
 
-                rBonus.setEmails(megaAchievements.getAwardEmails(i));
+                rBonus.setEmails(sMegaAchievements.getAwardEmails(i));
 
-                long daysLeft = megaAchievements.getAwardExpirationTs(i);
+                long daysLeft = sMegaAchievements.getAwardExpirationTs(i);
                 logDebug("Registration AwardExpirationTs: " + daysLeft);
 
                 Calendar start = calculateDateFromTimestamp(daysLeft);
@@ -299,10 +271,10 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
                 rBonus.setDaysLeft(diffDays);
 
-                rBonus.setStorage(megaAchievements.getRewardStorageByAwardId(awardId));
-                rBonus.setTransfer(megaAchievements.getRewardTransferByAwardId(awardId));
+                rBonus.setStorage(sMegaAchievements.getRewardStorageByAwardId(awardId));
+                rBonus.setTransfer(sMegaAchievements.getRewardTransferByAwardId(awardId));
 
-                referralBonuses.add(rBonus);
+                sReferralBonuses.add(rBonus);
             } else {
                 logDebug("MEGA_ACHIEVEMENT: " + type);
             }
@@ -348,6 +320,21 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             } else {
                 showInviteConfirmationDialog(getString(R.string.invite_sent_text, email));
             }
+        }
+    }
+
+    // Fragments that require the achievements data should implement this interface and register as callback
+    interface Callback {
+        void onAchievementsReceived();
+    }
+
+    public void setCallback(Callback cb) {
+        if (cb == null) return;
+        mCallback = cb;
+
+        // Data already retrieved, notify the callback
+        if (sMegaAchievements != null) {
+            mCallback.onAchievementsReceived();
         }
     }
 }

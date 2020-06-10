@@ -1,12 +1,7 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -16,26 +11,27 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.Util.getSizeString;
 
-public class InviteFriendsFragment extends Fragment implements OnClickListener{
-
-	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
-
-	Context context;
+public class InviteFriendsFragment extends Fragment implements OnClickListener, AchievementsActivity.Callback{
 	ActionBar aB;
 	int height;
 
 	Button inviteContactsBtn;
-
 	TextView titleCard;
 
 	DisplayMetrics outMetrics;
@@ -47,7 +43,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	public void onCreate (Bundle savedInstanceState){
 		logDebug("onCreate");
 		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+			megaApi = ((MegaApplication) getActivity().getApplication()).getMegaApi();
 		}
 
 		super.onCreate(savedInstanceState);
@@ -61,14 +57,11 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
 
-		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		density = ((Activity) context).getResources().getDisplayMetrics().density;
+		density = getActivity().getResources().getDisplayMetrics().density;
 
 		height = outMetrics.heightPixels;
 		int width = outMetrics.widthPixels;
@@ -77,48 +70,57 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		logDebug("The achievements are: " + enabledAchievements);
 
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
-
-		titleCard = (TextView) v.findViewById(R.id.title_card_invite_fragment);
-
-		long referralsStorageValue = ((AchievementsActivity)context).megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-		long referralsTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-
-		titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
         inviteContactsBtn = v.findViewById(R.id.invite_contacts_button);
         inviteContactsBtn.setOnClickListener(this);
+		titleCard = (TextView) v.findViewById(R.id.title_card_invite_fragment);
+
 		return v;
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		logDebug("onAttach");
-		super.onAttach(activity);
-		context = activity;
-		aB = ((AppCompatActivity)activity).getSupportActionBar();
+	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		// Activity actionbar has been created which might be accessed by UpdateUI().
+		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
+		// The root view has been created, fill it with the data when data ready
+		((AchievementsActivity)getActivity()).setCallback(this);
 	}
 
-	@Override
-	public void onAttach(Context context) {
-		logDebug("onAttach context");
-		super.onAttach(context);
-		this.context = context;
-		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
-	}
+//	@Override
+//	public void onAttach(Context context) {
+//		logDebug("onAttach context");
+//		super.onAttach(context);
+//		this.context = context;
+//	}
 
 	@Override
 	public void onClick(View v) {
 		if(v.getId() == R.id.invite_contacts_button) {
 		    logDebug("To InviteContactActivity.");
-            Intent intent = new Intent(context, InviteContactActivity.class);
+            Intent intent = new Intent(getContext(), InviteContactActivity.class);
             intent.putExtra(InviteContactActivity.KEY_FROM, true);
-            ((AchievementsActivity)context).startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
+            getActivity().startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
         }
 	}
 
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 
-		((AchievementsActivity) context).showFragment(ACHIEVEMENTS_FRAGMENT, -1);
+		((AchievementsActivity) getActivity()).showFragment(ACHIEVEMENTS_FRAGMENT, -1);
 		return 0;
+	}
+
+	private void updateUI() {
+		if (AchievementsActivity.sMegaAchievements == null || getContext() == null) return;
+
+		long referralsStorageValue = AchievementsActivity.sMegaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+		long referralsTransferValue = AchievementsActivity.sMegaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+
+		titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
+	}
+
+	@Override
+	public void onAchievementsReceived() {
+		updateUI();
 	}
 }

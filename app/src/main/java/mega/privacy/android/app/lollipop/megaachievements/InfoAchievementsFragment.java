@@ -1,20 +1,22 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -22,16 +24,13 @@ import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
+import static mega.privacy.android.app.utils.Util.getSizeString;
 
-public class InfoAchievementsFragment extends Fragment{
-	
-	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
-
-	Context context;
+public class InfoAchievementsFragment extends Fragment implements AchievementsActivity.Callback {
 	ActionBar aB;
-	int height;
 
 	ImageView icon;
 	ImageView checkIcon;
@@ -39,8 +38,6 @@ public class InfoAchievementsFragment extends Fragment{
 	TextView firstParagraph;
 	TextView secondParagraph;
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 	int achievementType=-1;
 	int awardId = -1;
 	int rewardId = -1;
@@ -48,21 +45,8 @@ public class InfoAchievementsFragment extends Fragment{
 	int indexAward;
 
 	@Override
-	public void onCreate (Bundle savedInstanceState){
-		logDebug("onCreate");
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
 
 		View v = inflater.inflate(R.layout.fragment_info_achievements, container, false);
 
@@ -79,23 +63,35 @@ public class InfoAchievementsFragment extends Fragment{
 		}
 		achievementType = arguments.getInt("achievementType");
 
-		final AchievementsActivity achievementsActivity = (AchievementsActivity)context;
-		if (achievementsActivity.megaAchievements == null) {
-			logWarning("MegaAchievementsDetails are null.");
-			return v;
-		}
+		return v;
+	}
 
-		long count = achievementsActivity.megaAchievements.getAwardsCount();
+	@Override
+	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		// Activity actionbar has been created which might be accessed by UpdateUI().
+		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
+		// The root view has been created, fill it with the data when data ready
+		((AchievementsActivity)getActivity()).setCallback(this);
+	}
+
+	private void updateUI() {
+		MegaAchievementsDetails data = AchievementsActivity.sMegaAchievements;
+		Context context = getContext();
+
+		if (data == null || context == null) return;
+
+		long count = data.getAwardsCount();
 		for(int i=0; i<count; i++) {
-			int type = achievementsActivity.megaAchievements.getAwardClass(i);
+			int type = data.getAwardClass(i);
 
 			if(type == achievementType) {
-				awardId = achievementsActivity.megaAchievements.getAwardId(i);
+				awardId = data.getAwardId(i);
 
-				rewardId = achievementsActivity.megaAchievements.getRewardAwardId(awardId);
+				rewardId = data.getRewardAwardId(awardId);
 				logDebug("AWARD ID: " + awardId + " REWARD id: " + rewardId);
 
-				long daysLeft= achievementsActivity.megaAchievements.getAwardExpirationTs(i);
+				long daysLeft= data.getAwardExpirationTs(i);
 
 				Calendar start = calculateDateFromTimestamp(daysLeft);
 				Calendar end = Calendar.getInstance();
@@ -112,14 +108,13 @@ public class InfoAchievementsFragment extends Fragment{
 			else{
 				logWarning("No match for achievement award!");
 			}
-
 		}
 
 		if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL){
 			aB.setTitle(getString(R.string.title_install_app));
-            long installAppStorageValue = achievementsActivity.megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
-            long installAppTransferValue = achievementsActivity.megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
-            icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mobile_big));
+			long installAppStorageValue = data.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
+			long installAppTransferValue = data.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
+			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mobile_big));
 
 			if(awardId==-1){
 				logWarning("No award for this achievement");
@@ -145,64 +140,26 @@ public class InfoAchievementsFragment extends Fragment{
 					title.setText(context.getResources().getString(R.string.expired_label));
 				}
 
-				long storageAppInstall = achievementsActivity.megaAchievements.getRewardStorageByAwardId(awardId);
-				long transferAppInstall = achievementsActivity.megaAchievements.getRewardTransferByAwardId(awardId);
+				long storageAppInstall = data.getRewardStorageByAwardId(awardId);
+				long transferAppInstall = data.getRewardTransferByAwardId(awardId);
 				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_mobile_app, getSizeString(storageAppInstall), getSizeString(transferAppInstall)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 		}else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
-            aB.setTitle(getString(R.string.title_add_phone));
-            long addPhoneStorageValue = achievementsActivity.megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
-            long addPhoneTransferValue = achievementsActivity.megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
-            icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.il_verify_phone_big));
+			aB.setTitle(getString(R.string.title_add_phone));
+			long addPhoneStorageValue = data.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+			long addPhoneTransferValue = data.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.il_verify_phone_big));
 
-            if(awardId==-1){
-                logDebug("No award for this achievement");
-                checkIcon.setVisibility(View.GONE);
-                title.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
-                title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                firstParagraph.setText(getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
-                secondParagraph.setVisibility(View.GONE);
-            }
-            else{
-                if(diffDays<=15){
-                    title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
-                }
-                else{
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.bonus_ts_border));
-                }
-
-                if(diffDays>0){
-                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
-                }
-                else{
-                    title.setText(context.getResources().getString(R.string.expired_label));
-                }
-
-                long storageAddPhone = achievementsActivity.megaAchievements.getRewardStorageByAwardId(awardId);
-                long transferAddPhone = achievementsActivity.megaAchievements.getRewardTransferByAwardId(awardId);
-                firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_add_phone, getSizeString(storageAddPhone), getSizeString(transferAddPhone)));
-                secondParagraph.setVisibility(View.GONE);
-            }
-        }
-		else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
-
-			aB.setTitle(getString(R.string.title_install_desktop));
-            long installDesktopStorageValue = achievementsActivity.megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
-            long installDesktopTransferValue = achievementsActivity.megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
-			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega_big));
-
-			if(awardId==-1) {
-				logWarning("No award for this achievement");
+			if(awardId==-1){
+				logDebug("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
-				title.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
+				title.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-				firstParagraph.setText(getString(R.string.paragraph_info_achievement_install_desktop, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
+				firstParagraph.setText(getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 			else{
-
 				if(diffDays<=15){
 					title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
 					title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
@@ -218,8 +175,45 @@ public class InfoAchievementsFragment extends Fragment{
 					title.setText(context.getResources().getString(R.string.expired_label));
 				}
 
-				long storageDesktopInstall = achievementsActivity.megaAchievements.getRewardStorageByAwardId(awardId);
-				long transferDesktopInstall = achievementsActivity.megaAchievements.getRewardTransferByAwardId(awardId);
+				long storageAddPhone = data.getRewardStorageByAwardId(awardId);
+				long transferAddPhone = data.getRewardTransferByAwardId(awardId);
+				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_add_phone, getSizeString(storageAddPhone), getSizeString(transferAddPhone)));
+				secondParagraph.setVisibility(View.GONE);
+			}
+		}
+		else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
+
+			aB.setTitle(getString(R.string.title_install_desktop));
+			long installDesktopStorageValue = data.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
+			long installDesktopTransferValue = data.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
+			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega_big));
+
+			if(awardId==-1) {
+				logWarning("No award for this achievement");
+				checkIcon.setVisibility(View.GONE);
+				title.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
+				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+				firstParagraph.setText(getString(R.string.paragraph_info_achievement_install_desktop, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
+				secondParagraph.setVisibility(View.GONE);
+			}
+			else{
+				if(diffDays<=15){
+					title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+				}
+				else{
+					title.setBackground(ContextCompat.getDrawable(context, R.drawable.bonus_ts_border));
+				}
+
+				if(diffDays>0){
+					title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+				}
+				else{
+					title.setText(context.getResources().getString(R.string.expired_label));
+				}
+
+				long storageDesktopInstall = data.getRewardStorageByAwardId(awardId);
+				long transferDesktopInstall = data.getRewardTransferByAwardId(awardId);
 				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_desktop, getSizeString(storageDesktopInstall), getSizeString(transferDesktopInstall)));
 				secondParagraph.setVisibility(View.GONE);
 
@@ -246,38 +240,15 @@ public class InfoAchievementsFragment extends Fragment{
 				title.setText(context.getResources().getString(R.string.expired_label));
 			}
 
-			long storageRegistration = achievementsActivity.megaAchievements.getRewardStorageByAwardId(awardId);
+			long storageRegistration = data.getRewardStorageByAwardId(awardId);
 			firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_registration, getSizeString(storageRegistration)));
 			secondParagraph.setVisibility(View.GONE);
 
 		}
-//		else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE){
-//			aB.setTitle(getString(R.string.title_referral_bonuses));
-//            long referralsStorageValue = achievementsActivity.megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-//            long referralsTransfeValue = achievementsActivity.megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-//			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_invite_friends));
-//
-//            title.setText(getString(R.string.figures_achievements_text, getSizeString(referralsStorageValue), getSizeString(referralsTransfeValue)));
-//            firstParagraph.setText(getString(R.string.string_test));
-//            secondParagraph.setVisibility(View.GONE);
-//        }
-
-		return v;
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		logDebug("onAttach");
-		super.onAttach(activity);
-		context = activity;
-		aB = ((AppCompatActivity)activity).getSupportActionBar();
-	}
-
-	@Override
-	public void onAttach(Context context) {
-		logDebug("onAttach context");
-		super.onAttach(context);
-		this.context = context;
-		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
+	public void onAchievementsReceived() {
+		updateUI();
 	}
 }
