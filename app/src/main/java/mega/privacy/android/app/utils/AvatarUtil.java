@@ -297,9 +297,6 @@ public class AvatarUtil {
 
         if (isFileAvailable(avatar) && avatar.length() > 0) {
             bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), new BitmapFactory.Options());
-            if (bitmap == null) {
-                avatar.delete();
-            }
         }
 
         return bitmap;
@@ -324,47 +321,24 @@ public class AvatarUtil {
     }
 
     /**
-     * Retrieve the avatar image of a particular user.
-     *
-     * @param email The String containing the user's email.
-     * @return The bitmap with the avatar image.
-     */
-    public static Bitmap getImageAvatar(String email) {
-        Bitmap bitmap = getAvatarBitmap(email);
-
-        return bitmap != null ? getCircleBitmap(bitmap) : null;
-    }
-
-    /**
      * Sets the user's avatar
      *
-     * @param user              MegaUser object which contains all the user's data
+     * @param handle            user's handle
      * @param email             user's email
      * @param fullName          user's full name
-     * @param avatarImageView   view in which the avatar has to be ser
+     * @param avatarImageView   view in which the avatar has to be set
      */
-    public static void setImageAvatar(MegaUser user, String email, String fullName, ImageView avatarImageView) {
+    public static void setImageAvatar(long handle, String email, String fullName, ImageView avatarImageView) {
         if (avatarImageView == null) {
             return;
         }
 
-        Bitmap bitmap = getImageAvatar(email);
+        Bitmap bitmap = getUserAvatar(MegaApiAndroid.userHandleToBase64(handle), email);
         if (bitmap != null) {
             avatarImageView.setImageBitmap(bitmap);
             return;
         }
 
-        avatarImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(user), fullName, AVATAR_SIZE, true));
-    }
-
-    /**
-     * Sets the user's avatar
-     *
-     * @param email             user's email
-     * @param fullName          user's full name
-     * @param avatarImageView   view in which the avatar has to be ser
-     */
-    public static void setImageAvatar(String email, String fullName, ImageView avatarImageView) {
-        setImageAvatar(MegaApplication.getInstance().getMegaApi().getContact(email), email, fullName, avatarImageView);
+        avatarImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(handle), fullName, AVATAR_SIZE, true));
     }
 }

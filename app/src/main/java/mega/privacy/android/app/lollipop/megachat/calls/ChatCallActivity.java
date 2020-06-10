@@ -57,9 +57,9 @@ import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -195,6 +195,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private MenuItem cameraSwapMenuItem;
     private MegaApplication application =  MegaApplication.getInstance();
     private boolean inTemporaryState = false;
+
+    private ChatController chatC;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -483,6 +485,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         cancelIncomingCallNotification(this);
         setContentView(R.layout.activity_calls_chat);
         application.setShowPinScreen(true);
+
+        chatC = new ChatController(this);
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -856,12 +860,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             email = megaChatApi.getMyEmail();
             name = megaChatApi.getMyFullname();
         } else {
-            email = chat.getPeerEmail(0);
-            name = chat.getPeerFullname(0);
-            String nickname = getNicknameContact(chat.getPeerHandle(0));
-            if(nickname != null){
-                name = nickname;
-            }
+            email = chatC.getParticipantEmail(chat.getPeerHandle(0));
+            name = chatC.getParticipantFullName(chat.getPeerHandle(0));
         }
         /*Default Avatar*/
         Bitmap defaultBitmapAvatar = getDefaultAvatar(getColorAvatar(peerId), name, AVATAR_SIZE, true);
@@ -1716,15 +1716,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (session.getStatus() == MegaChatSession.SESSION_STATUS_INITIAL || session.hasAudio()) {
             mutateContactCallLayout.setVisibility(View.GONE);
         } else {
-            String name = chat.getPeerFirstname(0);
-            if (isTextEmpty(name)) {
-                if (megaChatApi != null) {
-                    name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
-                }
-                if (name == null) {
-                    name = " ";
-                }
-            }
+            String name = chatC.getParticipantFirstName(chat.getPeerHandle(0));
             mutateCallText.setText(getString(R.string.muted_contact_micro, name));
             mutateContactCallLayout.setVisibility(View.VISIBLE);
         }
@@ -2316,17 +2308,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return megaChatApi.getMyFullname();
         }
 
-        String nickname = getNicknameContact(peerid);
-        if (nickname != null) {
-            return nickname;
-        }
-
-        String name = chat.getPeerFirstnameByHandle(peerid);
-        if (name != null) {
-            return name;
-        }
-        return chat.getPeerEmailByHandle(peerid);
-
+        return chatC.getParticipantFirstName(peerid);
     }
 
     public void updateNonContactName(long peerid, String peerEmail) {

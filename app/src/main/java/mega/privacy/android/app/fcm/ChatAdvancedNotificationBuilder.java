@@ -87,6 +87,8 @@ public final class ChatAdvancedNotificationBuilder {
     private MegaChatRequest request;
     private boolean isUpdatingUserName;
 
+    private ChatController chatC;
+
     public static ChatAdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         Context appContext = context.getApplicationContext();
         Context safeContext = ContextCompat.createDeviceProtectedStorageContext(appContext);
@@ -108,6 +110,8 @@ public final class ChatAdvancedNotificationBuilder {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChatSummaryChannel(context);
         }
+
+        chatC = new ChatController(context);
     }
 
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, MegaHandleList unreadHandleList) {
@@ -280,15 +284,7 @@ public final class ChatAdvancedNotificationBuilder {
         if (chatRoom == null) return null;
 
         long lastMsgSender = msg.getUserHandle();
-        String nameAction = getNicknameContact(lastMsgSender);
-
-        if (isTextEmpty(nameAction)) {
-            nameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-        }
-
-        if (isTextEmpty(nameAction)) {
-            nameAction = new ChatController(context).getFirstName(lastMsgSender, chatRoom);
-        }
+        String nameAction = chatC.getParticipantFirstName(lastMsgSender);
 
         if (isTextEmpty(nameAction)) {
             nameAction = context.getString(R.string.unknown_name_label);
@@ -570,7 +566,7 @@ public final class ChatAdvancedNotificationBuilder {
     private Bitmap setUserAvatar(MegaChatRoom chat){
         logDebug("Chat ID: " + chat.getChatId());
         if(!chat.isGroup()) {
-            File avatar = buildAvatarFile(context, chat.getPeerEmail(0) + ".jpg");
+            File avatar = buildAvatarFile(context, chatC.getParticipantEmail(chat.getPeerHandle(0)) + ".jpg");
             if (isFileAvailable(avatar) && avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
@@ -771,15 +767,6 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    private String getFullName(MegaChatRoom chat) {
-        String fullName = getNicknameContact(chat.getPeerHandle(0));
-        if (fullName == null) {
-            fullName = chat.getPeerFullname(0);
-        }
-
-        return fullName;
-    }
-
     public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid() +
                 ", Call in progress ID: " + callInProgress.getChatid());
@@ -850,7 +837,7 @@ public final class ChatAdvancedNotificationBuilder {
                     notificationBuilderO.setContentTitle(getTitleChat(chatToAnswer));
                 }
                 else{
-                    notificationBuilderO.setContentTitle(getFullName(chatToAnswer));
+                    notificationBuilderO.setContentTitle(chatC.getParticipantFullName(chatToAnswer.getPeerHandle(0)));
                 }
 
                 Bitmap largeIcon = setUserAvatar(chatToAnswer);
@@ -878,7 +865,7 @@ public final class ChatAdvancedNotificationBuilder {
                 if(chatToAnswer.isGroup()){
                     notificationBuilder.setContentTitle(getTitleChat(chatToAnswer));
                 }else{
-                    notificationBuilder.setContentTitle(getFullName(chatToAnswer));
+                    notificationBuilder.setContentTitle(chatC.getParticipantFullName(chatToAnswer.getPeerHandle(0)));
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1007,7 +994,7 @@ public final class ChatAdvancedNotificationBuilder {
         if (chat.isGroup()) {
             notificationContent = getTitleChat(chat);
         } else {
-            notificationContent = getFullName(chat);
+            notificationContent = chatC.getParticipantFullName(chat.getPeerHandle(0));
         }
 
         String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
@@ -1043,7 +1030,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
-            if (chat.getPeerEmail(0) != null) {
+            if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
 
                 Bitmap largeIcon = setUserAvatar(chat);
                 if (largeIcon != null) {
@@ -1075,7 +1062,7 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
             }
 
-            if (chat.getPeerEmail(0) != null) {
+            if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Bitmap largeIcon = setUserAvatar(chat);

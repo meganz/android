@@ -195,7 +195,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     optionInvite.setVisibility(View.VISIBLE);
                 }
 
-                setImageAvatar(userEmail, userName, contactImageView);
+                setImageAvatar(contact.getHandle(), userEmail, userName, contactImageView);
             }
         } else {
             MegaUser contact;
@@ -229,7 +229,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 titleNameContactChatPanel.setText(email);
 
-                setImageAvatar(null, userCount + "", contactImageView);
+                setImageAvatar(INVALID_HANDLE,null, userCount + "", contactImageView);
             } else {
                 optionView.setVisibility(View.GONE);
 
@@ -250,7 +250,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 long userHandle = message.getMessage().getUserHandle(position);
                 String name = message.getMessage().getUserName(position);
                 if (isTextEmpty(name)) {
-                    name = chatC.getFullName(userHandle, chatId);
+                    name = chatC.getParticipantFullName(userHandle);
                     if (name.trim().isEmpty()) {
                         name = email;
                     }
@@ -277,7 +277,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     optionInvite.setVisibility(View.VISIBLE);
                 }
 
-                setImageAvatar(email, name, contactImageView);
+                setImageAvatar(userHandle, email, name, contactImageView);
             }
         }
 

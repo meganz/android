@@ -111,7 +111,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         String sharedNodesDescription = getSubtitleDescription(sharedNodes);
         titleMailContactPanel.setText(sharedNodesDescription);
 
-        setImageAvatar(contact.getMegaUser(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
+        setImageAvatar(contact.getMegaUser().getHandle(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
 
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);

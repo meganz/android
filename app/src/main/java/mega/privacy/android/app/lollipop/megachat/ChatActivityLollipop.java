@@ -1738,40 +1738,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     /**
-     * Gets a participant's name to show.
-     * It depends on the availability of the participant's attributes.
-     * It would be set following this order: nickname -> first name -> last name -> email
-     *
-     * @param handle    participant's identifier
-     * @return The participant's name to show.
-     */
-    private String getParticipantName(long handle) {
-        //Check DB name
-        String participant = getContactNameDB(handle);
-
-        if (isTextEmpty(participant)) {
-            participant = chatC.getFirstName(handle, chatRoom);
-        }
-
-        if (isTextEmpty(participant)) {
-            //Get the firstname
-            participant = chatRoom.getPeerFirstnameByHandle(handle);
-        }
-
-        if (isTextEmpty(participant)) {
-            //Get the lastname
-            participant = chatRoom.getPeerLastnameByHandle(handle);
-        }
-
-        if (isTextEmpty(participant)) {
-            //Get the email
-            participant = chatRoom.getPeerEmailByHandle(handle);
-        }
-
-        return participant;
-    }
-
-    /**
      * When the group chat has a custom title, the subtitle has to contain the participants' names.
      * It sets the custom subtitle. The subtitle would contain the participant's names following these rules:
      * - If the group has four or less participants: all their names.
@@ -1789,7 +1755,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 customSubtitle.append(", ");
             }
 
-            String participantName = getParticipantName(chatRoom.getPeerHandle(i));
+            String participantName = chatC.getParticipantFullName(chatRoom.getPeerHandle(i));
             if (isTextEmpty(participantName)) {
                 sendGetPeerAttributesRequest(participantsCount);
                 return;
@@ -4974,7 +4940,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     MegaChatParticipant participantTyping = new MegaChatParticipant(userHandleTyping);
                     UserTyping currentUserTyping = new UserTyping(participantTyping);
 
-                    String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
+                    String nameTyping = chatC.getParticipantFirstName(userHandleTyping);
 
                     logDebug("userHandleTyping: " + userHandleTyping);
 
@@ -5016,7 +4982,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         MegaChatParticipant participantTyping = new MegaChatParticipant(userHandleTyping);
                         UserTyping currentUserTyping = new UserTyping(participantTyping);
 
-                        String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
+                        String nameTyping = chatC.getParticipantFirstName(userHandleTyping);
                         if (isTextEmpty(nameTyping)) {
                             nameTyping = getString(R.string.transfer_unknown);
                         }
@@ -7453,10 +7419,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         setIntent(intent);
     }
 
-    public String getPeerFullName(long userHandle){
-        return chatRoom.getPeerFullnameByHandle(userHandle);
-    }
-
     public MegaChatRoom getChatRoom() {
         return chatRoom;
     }
@@ -8249,8 +8211,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                     long callerHandle = call.getCaller();
                     String textLayout;
-                    if (callerHandle != -1 && getPeerFullName(callerHandle) != null) {
-                        textLayout = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
+                    String callerFullName = chatC.getParticipantFullName(callerHandle);
+                    if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {
+                        textLayout = getString(R.string.join_call_layout_in_group_call, callerFullName);
                     } else {
                         textLayout = getString(R.string.join_call_layout);
                     }

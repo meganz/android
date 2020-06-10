@@ -1090,18 +1090,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 
-	private String getMessageSenderName(MegaChatRoom chatRoom, long chatId,long handle){
-		String fullNameAction = getNicknameContact(handle);
-
-		if(fullNameAction == null )
-			fullNameAction = chatRoom.getPeerFullnameByHandle(handle);
-
-		if(isTextEmpty(fullNameAction))
-			fullNameAction = cC.getFullName(handle, chatId);
-
-		return fullNameAction;
-	}
-
 	public void setLastMessage(int position, ViewHolderChatList holder){
 		logDebug("position: " + position);
 		if(holder == null){
@@ -1139,7 +1127,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					logDebug("I have changed the permissions");
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
+					String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 					if (isTextEmpty(fullNameAction)) {
 						if(!((ViewHolderNormalChatList)holder).nameRequestedAction){
 							logDebug("Call for nonContactHandle: "+ chat.getLastMessageSender());
@@ -1239,7 +1227,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameTitle = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageHandle());
+					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
 
 					if(fullNameTitle.trim().length()<=0){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1289,7 +1277,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 						else{
 							logDebug("By other");
-							String fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
+							String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 							if(fullNameAction.trim().length()<=0){
 
 								if(fullNameAction.isEmpty()){
@@ -1367,7 +1355,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 							else{
 								logDebug("The participant was removed");
-								String fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
+								String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 								if(fullNameAction.trim().length()<=0){
 									if(fullNameAction.isEmpty()){
 										if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1466,7 +1454,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						logDebug("I was change by someone");
 						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-						String fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
+						String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 
 						if(fullNameAction.trim().length()<=0){
 							if(fullNameAction.isEmpty()){
@@ -1514,7 +1502,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					logDebug("Participant privilege change!");
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameTitle = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageHandle());
+					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
 
 					if(fullNameTitle.trim().length()<=0){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1561,7 +1549,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 					else{
 						logDebug("By other");
-						String fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
+						String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 						if(fullNameAction.trim().length()<=0){
 							if(fullNameAction.isEmpty()){
 								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1626,7 +1614,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				else{
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
+					String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 					if(fullNameAction.trim().length()<=0){
 						if(fullNameAction.isEmpty()){
 							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1953,20 +1941,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).currentPosition = position;
 							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-							String fullNameAction = "";
-							if(chatRoom!=null){
-								fullNameAction = converterShortCodes(getMessageSenderName(chatRoom, chat.getChatId(), lastMsgSender));
-								if(fullNameAction==null){
-									fullNameAction = "";
-								}
-
-								if(fullNameAction.trim().length()<=0){
-									fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-								}
-							}
-							else{
-								logWarning("ERROR: the chatroom is NULL: " + chat.getChatId());
-							}
+							String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
 							if(fullNameAction.trim().length()<=0){
 
@@ -2044,20 +2019,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).currentPosition = position;
 							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-							String fullNameAction = "";
-							if(chatRoom!=null){
-								fullNameAction = converterShortCodes(getMessageSenderName(chatRoom, chat.getChatId(), lastMsgSender));
-								if(fullNameAction==null){
-									fullNameAction = "";
-								}
-
-								if(fullNameAction.trim().length()<=0){
-									fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-								}
-							}
-							else{
-								logWarning("ERROR: the chatroom is NULL: " + chat.getChatId());
-							}
+							String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
 							if(fullNameAction.trim().length()<=0){
 
@@ -2135,20 +2097,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).currentPosition = position;
 							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-							String fullNameAction = "";
-							if(chatRoom!=null){
-								fullNameAction = converterShortCodes(getMessageSenderName(chatRoom, chat.getChatId(), lastMsgSender));
-								if(fullNameAction==null){
-									fullNameAction = "";
-								}
-
-								if(fullNameAction.trim().length()<=0){
-									fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-								}
-							}
-							else{
-								logWarning("ERROR: the chatroom is NULL: " + chat.getChatId());
-							}
+							String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
 							if(fullNameAction.trim().length()<=0){
 
@@ -2222,17 +2171,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList) holder).currentPosition = position;
 					((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
 
-					String fullNameAction = "";
-					if (chatRoom != null) {
-						fullNameAction = converterShortCodes(getMessageSenderName(chatRoom, chat.getChatId(), lastMsgSender));
-						if (fullNameAction == null) {
-							fullNameAction = "";
-						}
-
-						if (fullNameAction.trim().length() <= 0) {
-							fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-						}
-					}
+					String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
 					if (fullNameAction.trim().length() <= 0 && fullNameAction.isEmpty() && !(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
 						fullNameAction = context.getString(R.string.unknown_name_label);
@@ -2320,20 +2259,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						((ViewHolderNormalChatList)holder).currentPosition = position;
 						((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-						String fullNameAction = "";
-						if(chatRoom!=null){
-							fullNameAction = converterShortCodes(getMessageSenderName(chatRoom, chat.getChatId(), lastMsgSender));
-							if(fullNameAction==null){
-								fullNameAction = "";
-							}
-
-							if(fullNameAction.trim().length()<=0){
-								fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-							}
-						}
-						else{
-							logWarning("ERROR: the chatroom is NULL: " + chat.getChatId());
-						}
+						String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
 						if(fullNameAction.trim().length()<=0){
 
@@ -2437,7 +2363,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		else{
 			MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-			fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
+			fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 			if(fullNameAction.trim().length()<=0){
 				if(fullNameAction.isEmpty()){
 					if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){

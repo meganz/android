@@ -176,17 +176,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setTitle(getString(R.string.activity_title_contacts_attached));
 
-		if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
-			aB.setSubtitle(megaChatApi.getMyFullname());
-		}
-		else{
-			String fullNameAction = cC.getFullName(message.getMessage().getUserHandle(), chatId);
-
-			if(fullNameAction==null){
-				fullNameAction = "";
-			}
-			aB.setSubtitle(fullNameAction);
-		}
+		aB.setSubtitle(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() ? megaChatApi.getMyFullname()
+				: cC.getParticipantFullName(message.getMessage().getUserHandle()));
 
 		container = (RelativeLayout) findViewById(R.id.contact_attachment_chat);
 

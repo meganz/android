@@ -69,7 +69,6 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -238,28 +237,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
     }
 
-    /**
-     * Gets the text to show in name field of the participant.
-     * If the participant has an alias, it returns the alias.
-     * If the participant has a full name, it returns the full name.
-     * Otherwise, it returns the email, even if it is empty.
-     *
-     * @param handle    identifier of the participant.
-     * @return The text to show in name field.
-     */
-    private String getParticipantName(long handle) {
-        String fullName = getContactNameDB(handle);
-
-        if (fullName == null) {
-            fullName = chat.getPeerFullnameByHandle(handle);
-        }
-
-        if (isTextEmpty(fullName)) {
-            fullName = chat.getPeerEmailByHandle(handle);
-        }
-        return fullName;
-    }
-
     public void setParticipants() {
         //Set the first element = me
         participantsCount = chat.getPeerCount();
@@ -272,8 +249,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             long peerHandle = chat.getPeerHandle(i);
-            String fullName = getParticipantName(peerHandle);
-            String participantEmail = chat.getPeerEmailByHandle(peerHandle);
+            String fullName = chatC.getParticipantFullName(peerHandle);
+            String participantEmail = chatC.getParticipantEmail(peerHandle);
             MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege);
             participants.add(participant);
 
@@ -308,7 +285,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         for (MegaChatParticipant participant : participants) {
             if (participant.getHandle() == contactHandle) {
                 int pos = participants.indexOf(participant);
-                participants.get(pos).setFullName(getParticipantName(contactHandle));
+                participants.get(pos).setFullName(chatC.getParticipantFullName(contactHandle));
                 pos = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR ? pos + 1 : pos;
                 adapter.updateParticipant(pos, participants);
                 break;
@@ -392,17 +369,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
      * Shows an alert dialog to confirm the deletion of a participant.
      *
      * @param handle        participant's handle
-     * @param chatToChange  identifier of the chat where the participant has to be removed
      */
-    public void showRemoveParticipantConfirmation(long handle, MegaChatRoom chatToChange) {
-        logDebug("Participant Handle: " + handle + ", Chat ID: " + chatToChange.getChatId());
-
+    public void showRemoveParticipantConfirmation(long handle) {
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(groupChatInfoActivity, R.style.AppCompatAlertDialogStyle);
-        String name = chatToChange.getPeerFullnameByHandle(handle);
+        String name = chatC.getParticipantFullName(handle);
         builder.setMessage(getResources().getString(R.string.confirmation_remove_chat_contact, name))
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeParticipant())
                 .setNegativeButton(R.string.general_cancel, null)
@@ -1287,8 +1261,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     int positionInArray = adapter.getParticipantPositionInArray(positionInAdapter);
                     if (positionInArray >= 0 && positionInArray < participants.size() && participants.get(positionInArray).getHandle() == handle) {
                         MegaChatParticipant participant = participantUpdates.get(positionInAdapter);
-                        participant.setEmail(megaChatApi.getUserEmailFromCache(handle));
-                        participant.setFullName(megaChatApi.getUserFullnameFromCache(handle));
+                        participant.setEmail(chatC.getParticipantEmail(handle));
+                        participant.setFullName(chatC.getParticipantFullName(handle));
                         participant.setPrivilege(chat.getPeerPrivilegeByHandle(handle));
 
                         if (hasParticipantAttributes(participant)) {

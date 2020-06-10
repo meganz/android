@@ -257,4 +257,25 @@ public class ContactUtil {
         MegaUser contact = MegaApplication.getInstance().getMegaApi().getContact(emailOrUserHandleBase64);
         return contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
     }
+
+    /**
+     * Gets a contact's email from DB.
+     *
+     * @param contactHandle contact's identifier
+     * @return The contact's email.
+     */
+    public static String getContactEmailDB(long contactHandle) {
+        MegaContactDB contactDB = getContactDB(contactHandle);
+        return contactDB != null ? getContactEmailDB(contactDB) : null;
+    }
+
+    /**
+     * Gets a contact's email from DB.
+     *
+     * @param contactDB contact's MegaContactDB
+     * @return The contact's email.
+     */
+    public static String getContactEmailDB(MegaContactDB contactDB) {
+        return contactDB != null ? contactDB.getMail() : null;
+    }
 }

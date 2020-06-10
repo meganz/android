@@ -7722,7 +7722,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             return null;
         }
 
-        String name = cC.getFullName(handle, chatRoom);
+        String name = cC.getParticipantFullName(handle);
         if (!isTextEmpty(name)) {
             return name;
         }
