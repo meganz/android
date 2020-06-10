@@ -999,10 +999,10 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void showMissedCallNotification(MegaChatCall call) {
-        logDebug("Chat ID: " + call.getChatid() + ", Call ID: " + call.getId());
+    public void showMissedCallNotification(long chatId, long chatCallId) {
+        logDebug("Chat ID: " + chatId + ", Call ID: " + chatCallId);
 
-        MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
+        MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
         String notificationContent;
         if (chat.isGroup()) {
             notificationContent = getTitleChat(chat);
@@ -1010,7 +1010,6 @@ public final class ChatAdvancedNotificationBuilder {
             notificationContent = getFullName(chat);
         }
 
-        long chatCallId = call.getId();
         String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
         int notificationId = (notificationCallId).hashCode() + NOTIFICATION_MISSED_CALL;
 

@@ -568,9 +568,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                         cancelRecording();
                         break;
-                    case MegaChatCall.CALL_STATUS_DESTROYED:
-                        usersWithVideo();
-                        break;
                 }
             }
 
@@ -8331,6 +8328,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             individualSubtitleToobar.setVisibility(View.GONE);
             setGroupalSubtitleToolbarVisibility(false);
         }
+
         usersWithVideo();
         activateChrono(true, subtitleChronoCall, call);
         invalidateOptionsMenu();
