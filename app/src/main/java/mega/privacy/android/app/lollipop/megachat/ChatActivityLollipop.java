@@ -567,9 +567,6 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                         cancelRecording();
                         break;
-                    case MegaChatCall.CALL_STATUS_DESTROYED:
-                        usersWithVideo();
-                        break;
                 }
             }
 
@@ -8391,6 +8388,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
             individualSubtitleToobar.setVisibility(View.GONE);
             setGroupalSubtitleToolbarVisibility(false);
         }
+
         usersWithVideo();
         activateChrono(true, subtitleChronoCall, call);
         invalidateOptionsMenu();

@@ -999,10 +999,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null) return;
+			if (intent == null)
+				return;
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
 			if (getContactsFragment() != null) {
 				cFLol.updateContact(userHandle);
+			}
+
+			if(getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0){
+				inSFLol.updateNicknames(userHandle);
+			}
+			if(getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0){
+				outSFLol.updateNicknames(userHandle);
 			}
 		}
 	};
@@ -2537,6 +2545,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					logDebug("Offline mode: Do not init, chat already initialized");
 				}
 			}
+
+			return;
         }
 
 		///Check the MK or RK file
@@ -6554,6 +6564,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					upgradeAccountMenuItem.setVisible(true);
 					importLinkMenuItem.setVisible(true);
 					addMenuItem.setEnabled(true);
+					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
 					if (getTabItemCloud() == CLOUD_TAB) {
@@ -15402,7 +15413,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					default:
 						hideFabButton();
-						break;
 				}
 				break;
 
@@ -15415,7 +15425,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					default:
 						hideFabButton();
-						break;
 				}
 				break;
 

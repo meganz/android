@@ -18,6 +18,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class UserAvatarListener implements MegaRequestListenerInterface {
     
@@ -39,6 +40,11 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
     
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+        if (holder == null || holder.contactMail == null) {
+            logWarning("Holder or mail is NULL");
+            return;
+        }
+
         if (e.getErrorCode() == MegaError.API_OK) {
             if (holder.contactMail.compareTo(request.getEmail()) == 0) {
                 File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");

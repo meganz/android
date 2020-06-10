@@ -348,9 +348,11 @@
         <item name="android:colorControlActivated">@color/accentColor</item>
     </style>
 
-    <style name="AccentBorderBackgroundBorderlessButton" parent="@style/Widget.AppCompat.Button.Borderless">
+    <style name="AccentBorderBackgroundBorderlessButton" parent="ButtonStyle">
         <item name="android:background">@drawable/background_button_border_accent</item>
         <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
         <item name="android:textColor">@color/accentColor</item>
         <item name="android:gravity">center</item>
     </style>
