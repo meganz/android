@@ -1849,7 +1849,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING || (isSessionOnHold() && !chat.isGroup())) {
+        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING || (!callChat.isOnHold() && isSessionOnHold() && !chat.isGroup())) {
             disableFab(onHoldFAB);
         } else {
             enableFab(onHoldFAB);
