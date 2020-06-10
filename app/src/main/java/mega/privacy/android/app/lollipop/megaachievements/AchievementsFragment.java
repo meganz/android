@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +16,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -31,6 +35,7 @@ import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
@@ -40,9 +45,8 @@ import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
-public class AchievementsFragment extends Fragment implements OnClickListener, AchievementsActivity.Callback {
-	private ActionBar aB;
-
+public class AchievementsFragment extends Fragment implements OnClickListener
+		, AchievementsFetcher.DataCallback {
 	private LinearLayout parentLinearLayout;
 
 	private DisplayMetrics outMetrics;
@@ -95,8 +99,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 	private TextView figureBaseQuotaTransfer;
 	private TextView textBaseQuotaStorage;
 	private TextView textBaseQuotaTransfer;
-	private long storageBaseQuota;
-	private long transferBaseQuota;
 
 	private TextView titleInstallApp;
 	private TextView figureInstallAppStorage;
@@ -148,7 +150,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 	public void onCreate (Bundle savedInstanceState){
 		logDebug("onCreate");
 		if (megaApi == null){
-			megaApi = ((MegaApplication) getActivity().getApplication()).getMegaApi();
+			megaApi = MegaApplication.getInstance().getMegaApi();
 		}
 
 		super.onCreate(savedInstanceState);
@@ -161,7 +163,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		density = getActivity().getResources().getDisplayMetrics().density;
+		density = getResources().getDisplayMetrics().density;
 
 		boolean enabledAchievements = megaApi.isAchievementsEnabled();
 		logDebug("The achievements are: " + enabledAchievements);
@@ -178,7 +180,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 
 		titleReferralBonuses = (TextView) v.findViewById(R.id.title_referral_bonuses);
 
-		int orientation = getContext().getResources().getConfiguration().orientation;
+		int orientation = getResources().getConfiguration().orientation;
 
 		if(orientation == Configuration.ORIENTATION_LANDSCAPE){
 			titleReferralBonuses.setMaxWidth(scaleWidthPx(250, outMetrics));
@@ -361,10 +363,10 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		// Activity actionbar has been created which might be accessed by UpdateUI().
-		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
 		// The root view has been created, fill it with the data when data ready
-		((AchievementsActivity)getActivity()).setCallback(this);
+		if (sFetcher != null) {
+			sFetcher.setDataCallback(this);
+		}
 	}
 
 	@Override
@@ -411,32 +413,36 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 		}
 	}
 
-	public void updateUI(){
+	private void updateUI(){
 		logDebug("updateValues");
-		Context context = getContext();
+		if (sFetcher == null) return;
 
-		if(AchievementsActivity.sMegaAchievements == null || context == null) {
+		Context context = getContext();
+		MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
+		ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
+
+		if(details == null || context == null || bonuses == null) {
 			return;
 		}
 
 		long totalStorage = 0;
 		long totalTransfer = 0;
 
-		storageReferrals = AchievementsActivity.sMegaAchievements.currentStorageReferrals();
+		storageReferrals = details.currentStorageReferrals();
 		totalStorage = totalStorage + storageReferrals;
-		transferReferrals = AchievementsActivity.sMegaAchievements.currentTransferReferrals();
+		transferReferrals = details.currentTransferReferrals();
 		totalTransfer = totalTransfer + transferReferrals;
 
 		logDebug("After referrals: storage: " + getSizeString(totalStorage) + " transfer " + getSizeString(totalTransfer));
 
-		long referralsStorageValue = AchievementsActivity.sMegaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-		long referralsTransferValue = AchievementsActivity.sMegaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-		long installAppStorageValue = AchievementsActivity.sMegaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
-		long installAppTransferValue = AchievementsActivity.sMegaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
-        long addPhoneStorageValue = AchievementsActivity.sMegaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
-        long addPhoneTransferValue = AchievementsActivity.sMegaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
-		long installDesktopStorageValue = AchievementsActivity.sMegaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
-		long installDesktopTransferValue = AchievementsActivity.sMegaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
+		long referralsStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+		long referralsTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+		long installAppStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
+		long installAppTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
+        long addPhoneStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+        long addPhoneTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+		long installDesktopStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
+		long installDesktopTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 
 		if(transferReferrals>0||storageReferrals>0){
 
@@ -448,16 +454,16 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 
 			logDebug("Check if referrals are expired");
 			int expiredNumber = 0;
-			if(AchievementsActivity.sReferralBonuses !=null){
-				for(int i = 0; i<AchievementsActivity.sReferralBonuses.size(); i++){
-					ReferralBonus referralBonus = AchievementsActivity.sReferralBonuses.get(i);
+			if(bonuses !=null){
+				for(int i = 0; i<bonuses.size(); i++){
+					ReferralBonus referralBonus = bonuses.get(i);
 					if(referralBonus.getDaysLeft()<0){
 						expiredNumber++;
 					}
 				}
 			}
 
-			if(expiredNumber>=AchievementsActivity.sReferralBonuses.size()-1){
+			if(expiredNumber>=bonuses.size()-1){
 				logDebug("All the referrals are expired");
 				figuresReferralBonusesLayout.setAlpha(0.5f);
 				referralBonusIcon.setAlpha(0.5f);
@@ -474,14 +480,14 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 		zeroFiguresAddPhoneText.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
 		zeroFiguresInstallDesktopText.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
 
-		long count = AchievementsActivity.sMegaAchievements.getAwardsCount();
+		long count = details.getAwardsCount();
 
 		for(int i=0; i<count; i++){
-			int type = AchievementsActivity.sMegaAchievements.getAwardClass(i);
+			int type = details.getAwardClass(i);
 
-			int awardId = AchievementsActivity.sMegaAchievements.getAwardId(i);
+			int awardId = details.getAwardId(i);
 
-			int rewardId = AchievementsActivity.sMegaAchievements.getRewardAwardId(awardId);
+			int rewardId = details.getRewardAwardId(awardId);
 			logDebug("AWARD ID: "+awardId+" REWARD id: "+rewardId);
 			logDebug("type: " + type + " AWARD ID: "+awardId+" REWARD id: "+rewardId);
 
@@ -491,7 +497,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 				figuresInstallAppLayout.setVisibility(View.VISIBLE);
 				zeroFiguresInstallAppText.setVisibility(View.GONE);
 
-				storageInstallApp = AchievementsActivity.sMegaAchievements.getRewardStorageByAwardId(awardId);
+				storageInstallApp = details.getRewardStorageByAwardId(awardId);
 				if(storageInstallApp>0){
 					figureInstallAppStorage.setText(getSizeString(storageInstallApp));
 					figureInstallAppStorage.setVisibility(View.VISIBLE);
@@ -502,7 +508,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 					textInstallAppStorage.setVisibility(View.INVISIBLE);
 				}
 
-				transferInstallApp = AchievementsActivity.sMegaAchievements.getRewardTransferByAwardId(awardId);
+				transferInstallApp = details.getRewardTransferByAwardId(awardId);
 				if(transferInstallApp>0){
 					figureInstallAppTransfer.setText(getSizeString(transferInstallApp));
 					figureInstallAppTransfer.setVisibility(View.VISIBLE);
@@ -514,7 +520,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 				}
 
 				daysLeftInstallAppText.setVisibility(View.VISIBLE);
-				daysLeftInstallApp = AchievementsActivity.sMegaAchievements.getAwardExpirationTs(i);
+				daysLeftInstallApp = details.getAwardExpirationTs(i);
 				logDebug("Install App AwardExpirationTs: " + daysLeftInstallApp);
 
 				Calendar start = calculateDateFromTimestamp(daysLeftInstallApp);
@@ -550,7 +556,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
                 figuresAddPhoneLayout.setVisibility(View.VISIBLE);
                 zeroFiguresAddPhoneText.setVisibility(View.GONE);
 
-                storageAddPhone = AchievementsActivity.sMegaAchievements.getRewardStorageByAwardId(awardId);
+                storageAddPhone = details.getRewardStorageByAwardId(awardId);
                 if(storageAddPhone>0){
                     figureAddPhoneStorage.setText(getSizeString(storageAddPhone));
                     figureAddPhoneStorage.setVisibility(View.VISIBLE);
@@ -561,7 +567,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
                     textAddPhoneStorage.setVisibility(View.INVISIBLE);
                 }
 
-                transferAddPhone = AchievementsActivity.sMegaAchievements.getRewardTransferByAwardId(awardId);
+                transferAddPhone = details.getRewardTransferByAwardId(awardId);
                 if(transferAddPhone>0){
                     figureAddPhoneTransfer.setText(getSizeString(transferAddPhone));
                     figureAddPhoneTransfer.setVisibility(View.VISIBLE);
@@ -573,7 +579,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
                 }
 
                 daysLeftAddPhoneText.setVisibility(View.VISIBLE);
-                daysLeftAddPhone = AchievementsActivity.sMegaAchievements.getAwardExpirationTs(i);
+                daysLeftAddPhone = details.getAwardExpirationTs(i);
                 logDebug("Add phone AwardExpirationTs: "+daysLeftAddPhone);
 
                 Calendar start = calculateDateFromTimestamp(daysLeftAddPhone);
@@ -609,7 +615,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 				figuresInstallDesktopLayout.setVisibility(View.VISIBLE);
 				zeroFiguresInstallDesktopText.setVisibility(View.GONE);
 
-				storageInstallDesktop = AchievementsActivity.sMegaAchievements.getRewardStorageByAwardId(awardId);
+				storageInstallDesktop = details.getRewardStorageByAwardId(awardId);
 				if(storageInstallDesktop>0){
 					figureInstallDesktopStorage.setText(getSizeString(storageInstallDesktop));
 					textInstallDesktopStorage.setVisibility(View.VISIBLE);
@@ -620,7 +626,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 					textInstallDesktopStorage.setVisibility(View.INVISIBLE);
 				}
 
-				transferInstallDesktop = AchievementsActivity.sMegaAchievements.getRewardTransferByAwardId(awardId);
+				transferInstallDesktop = details.getRewardTransferByAwardId(awardId);
 				if(transferInstallDesktop>0){
 					figureInstallDesktopTransfer.setText(getSizeString(transferInstallDesktop));
 					figureInstallDesktopTransfer.setVisibility(View.VISIBLE);
@@ -632,7 +638,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 				}
 
 				daysLeftInstallDesktopText.setVisibility(View.VISIBLE);
-				daysLeftInstallDesktop = AchievementsActivity.sMegaAchievements.getAwardExpirationTs(i);
+				daysLeftInstallDesktop = details.getAwardExpirationTs(i);
 				logDebug("Install Desktop AwardExpirationTs: " + daysLeftInstallDesktop);
 
 				Calendar start = calculateDateFromTimestamp(daysLeftInstallDesktop);
@@ -665,7 +671,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME){
 				logDebug("MEGA_ACHIEVEMENT_WELCOME");
-				storageRegistration = AchievementsActivity.sMegaAchievements.getRewardStorageByAwardId(awardId);
+				storageRegistration = details.getRewardStorageByAwardId(awardId);
 				if(storageRegistration>0){
 					figureRegistrationStorage.setText(getSizeString(storageRegistration));
 					figureRegistrationStorage.setVisibility(View.VISIBLE);
@@ -676,7 +682,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 					textRegistrationStorage.setVisibility(View.INVISIBLE);
 				}
 
-				transferRegistration= AchievementsActivity.sMegaAchievements.getRewardTransferByAwardId(awardId);
+				transferRegistration= details.getRewardTransferByAwardId(awardId);
 				if(transferRegistration>0){
 					figureRegistrationTransfer.setText(getSizeString(transferRegistration));
 					figureRegistrationTransfer.setVisibility(View.VISIBLE);
@@ -687,7 +693,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 					textRegistrationTransfer.setVisibility(View.INVISIBLE);
 				}
 
-				daysLeftRegistration= AchievementsActivity.sMegaAchievements.getAwardExpirationTs(i);
+				daysLeftRegistration= details.getAwardExpirationTs(i);
 				logDebug("Registration AwardExpirationTs: " + daysLeftRegistration);
 
 				Calendar start = calculateDateFromTimestamp(daysLeftRegistration);
@@ -722,14 +728,14 @@ public class AchievementsFragment extends Fragment implements OnClickListener, A
 			}
 		}
 
-		storageQuota = AchievementsActivity.sMegaAchievements.currentStorage();
+		storageQuota = details.currentStorage();
 
 		logDebug("My calculated totalTransfer: " + totalStorage);
 		String sizeString = getSizeString(storageQuota);
 		figureUnlockedRewardStorage.setText(getNumberAndUnit(sizeString)[0]);
 		figureUnlockedRewardStorageUnit.setText(getNumberAndUnit(sizeString)[1]);
 
-		transferQuota = AchievementsActivity.sMegaAchievements.currentTransfer();
+		transferQuota = details.currentTransfer();
         sizeString = getSizeString(transferQuota);
 		logDebug("My calculated totalTransfer: " + totalTransfer);
         figureUnlockedRewardTransfer.setText(getNumberAndUnit(sizeString)[0]);

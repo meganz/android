@@ -19,23 +19,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
@@ -45,28 +36,20 @@ import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 
-public class AchievementsActivity extends PinActivityLollipop implements MegaRequestListenerInterface {
+public class AchievementsActivity extends PinActivityLollipop {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
 
     FrameLayout fragmentContainer;
     Toolbar tB;
     ActionBar aB;
 
-    // Static complex data(hard to be parcelable) for user achievements which
-    // would survive the recreation of the activity (e.g. screen rotation)
-    // the data can be shared in the scope of Achievements related UIs
-    public static MegaAchievementsDetails sMegaAchievements;
-    public static ArrayList<ReferralBonus> sReferralBonuses = new ArrayList<>();
-
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    public static AchievementsFetcher sFetcher;
     private androidx.appcompat.app.AlertDialog successDialog;
-
-    private Callback mCallback;
 
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
@@ -125,7 +108,19 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             ft.add(R.id.fragment_container_achievements, new AchievementsFragment(), TAG_ACHIEVEMENTS);
             ft.commitNow();
 
-            megaApi.getAccountAchievements(this);
+            sFetcher = new AchievementsFetcher();
+            sFetcher.setRequestCallback(() -> {
+                showSnackbar(getString(R.string.cancel_subscription_error));
+            });
+            sFetcher.fetch();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (sFetcher != null) {
+            sFetcher.setRequestCallback(null);
         }
     }
 
@@ -137,8 +132,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         switch (id) {
             case android.R.id.home: {
                 if (getSupportFragmentManager().findFragmentById(R.id.fragment_container_achievements) instanceof AchievementsFragment) {
-                    sMegaAchievements = null;
-                    sReferralBonuses = null;
+                    sFetcher.setDataCallback(null);
+                    sFetcher = null;
                     finish();
                 } else {
                     getSupportFragmentManager().popBackStack();
@@ -199,86 +194,12 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         logDebug("onBackPressedLollipop");
 
         if(getSupportFragmentManager().findFragmentById(R.id.fragment_container_achievements) instanceof AchievementsFragment){
-            // GC the static data as user manually leave the activity
-            sMegaAchievements = null;
-            sReferralBonuses = null;
+            // GC the fetcher as user manually leave the activity
+            sFetcher.setDataCallback(null);
+            sFetcher = null;
         }
 
         super.onBackPressed();
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        logDebug("onRequestStart: "+request.getRequestString());
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish: " + request.getRequestString() + "__" + e.getErrorCode());
-
-        if(request.getType()==MegaRequest.TYPE_GET_ACHIEVEMENTS){
-            if (e.getErrorCode() == MegaError.API_OK){
-
-                sMegaAchievements =request.getMegaAchievementsDetails();
-                if(sMegaAchievements !=null){
-                    calculateReferralBonuses();
-                    if (mCallback != null) {
-                        mCallback.onAchievementsReceived();
-                    }
-                }
-            }
-            else{
-                showSnackbar(getString(R.string.cancel_subscription_error));
-            }
-        }
-    }
-
-    private void calculateReferralBonuses() {
-        logDebug("calculateReferralBonuses");
-
-        long count = sMegaAchievements.getAwardsCount();
-
-        for (int i = 0; i < count; i++) {
-            int type = sMegaAchievements.getAwardClass(i);
-
-            int awardId = sMegaAchievements.getAwardId(i);
-
-            int rewardId = sMegaAchievements.getRewardAwardId(awardId);
-            logDebug("AWARD ID: " + awardId + " REWARD id: " + rewardId);
-
-            if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE) {
-
-                ReferralBonus rBonus = new ReferralBonus();
-
-                rBonus.setEmails(sMegaAchievements.getAwardEmails(i));
-
-                long daysLeft = sMegaAchievements.getAwardExpirationTs(i);
-                logDebug("Registration AwardExpirationTs: " + daysLeft);
-
-                Calendar start = calculateDateFromTimestamp(daysLeft);
-                Calendar end = Calendar.getInstance();
-                Date startDate = start.getTime();
-                Date endDate = end.getTime();
-                long startTime = startDate.getTime();
-                long endTime = endDate.getTime();
-                long diffTime = startTime - endTime;
-                long diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-                rBonus.setDaysLeft(diffDays);
-
-                rBonus.setStorage(sMegaAchievements.getRewardStorageByAwardId(awardId));
-                rBonus.setTransfer(sMegaAchievements.getRewardTransferByAwardId(awardId));
-
-                sReferralBonuses.add(rBonus);
-            } else {
-                logDebug("MEGA_ACHIEVEMENT: " + type);
-            }
-        }
     }
 
     public void showInviteConfirmationDialog(String contentText){
@@ -306,35 +227,17 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK && data != null) {
             String email = data.getStringExtra(InviteContactActivity.KEY_SENT_EMAIL);
             int sentNumber = data.getIntExtra(InviteContactActivity.KEY_SENT_NUMBER, 1);
-            if(sentNumber > 1) {
+            if (sentNumber > 1) {
                 showInviteConfirmationDialog(getString(R.string.invite_sent_text_multi));
             } else {
                 showInviteConfirmationDialog(getString(R.string.invite_sent_text, email));
             }
-        }
-    }
-
-    // Fragments that require the achievements data should implement this interface and register as callback
-    interface Callback {
-        void onAchievementsReceived();
-    }
-
-    public void setCallback(Callback cb) {
-        if (cb == null) return;
-        mCallback = cb;
-
-        // Data already retrieved, notify the callback
-        if (sMegaAchievements != null) {
-            mCallback.onAchievementsReceived();
         }
     }
 }
