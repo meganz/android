@@ -85,9 +85,8 @@ public class AchievementsActivity extends PinActivityLollipop {
 
         setContentView(R.layout.activity_achievements);
 
-        fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_achievements);
-        tB = (Toolbar) findViewById(R.id.toolbar_achievements);
-        tB.setTitle(getString(R.string.achievements_title));
+        fragmentContainer = findViewById(R.id.fragment_container_achievements);
+        tB = findViewById(R.id.toolbar_achievements);
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
@@ -160,13 +159,11 @@ public class AchievementsActivity extends PinActivityLollipop {
                 tag = "achievementsFragment";
                 break;
             case INVITE_FRIENDS_FRAGMENT:
-                aB.setTitle(getString(R.string.title_referral_bonuses));
                 fragment = new InviteFriendsFragment();
                 tag = "inviteFriendsFragment";
                 ft.addToBackStack(tag);
                 break;
             case BONUSES_FRAGMENT:
-                aB.setTitle(getString(R.string.title_referral_bonuses));
                 fragment = new ReferralBonusesFragment();
                 tag = "referralBonusesFragment";
                 ft.addToBackStack(tag);

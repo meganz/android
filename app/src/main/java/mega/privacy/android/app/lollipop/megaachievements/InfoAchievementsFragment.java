@@ -16,13 +16,9 @@ import androidx.fragment.app.Fragment;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaAchievementsDetails;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -31,7 +27,7 @@ import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
 public class InfoAchievementsFragment extends Fragment implements AchievementsFetcher.DataCallback {
-	ActionBar aB;
+	ActionBar actionBar;
 
 	ImageView icon;
 	ImageView checkIcon;
@@ -70,12 +66,37 @@ public class InfoAchievementsFragment extends Fragment implements AchievementsFe
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		// Activity actionbar has been created which might be accessed by UpdateUI().
-		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
 		// The root view has been created, fill it with the data when data ready
 		if (sFetcher != null) {
 			sFetcher.setDataCallback(this);
 		}
+
+		updateBarTitle();
+	}
+
+	private void updateBarTitle() {
+		actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+		if (actionBar == null) return;
+		String title = "";
+
+		switch (achievementType) {
+			case MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL:
+				title = getString(R.string.title_install_app);
+				break;
+			case MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE:
+				title = getString(R.string.title_add_phone);
+				break;
+			case MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL:
+				title = getString(R.string.title_install_desktop);
+				break;
+			case MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME:
+				title = getString(R.string.title_regitration);
+				break;
+			default:
+				break;
+		}
+
+		actionBar.setTitle(title);
 	}
 
 	private void updateUI() {
@@ -115,7 +136,6 @@ public class InfoAchievementsFragment extends Fragment implements AchievementsFe
 		}
 
 		if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL){
-			aB.setTitle(getString(R.string.title_install_app));
 			long installAppStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
 			long installAppTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
 			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mobile_big));
@@ -150,7 +170,6 @@ public class InfoAchievementsFragment extends Fragment implements AchievementsFe
 				secondParagraph.setVisibility(View.GONE);
 			}
 		}else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
-			aB.setTitle(getString(R.string.title_add_phone));
 			long addPhoneStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
 			long addPhoneTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
 			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.il_verify_phone_big));
@@ -186,8 +205,6 @@ public class InfoAchievementsFragment extends Fragment implements AchievementsFe
 			}
 		}
 		else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
-
-			aB.setTitle(getString(R.string.title_install_desktop));
 			long installDesktopStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 			long installDesktopTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega_big));
@@ -224,7 +241,6 @@ public class InfoAchievementsFragment extends Fragment implements AchievementsFe
 			}
 		}
 		else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME){
-			aB.setTitle(getString(R.string.title_regitration));
 			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_registration_big));
 //            long registrationStorageValue = achievementsActivity.megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
 //            long registrationTransferValue = achievementsActivity.megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);

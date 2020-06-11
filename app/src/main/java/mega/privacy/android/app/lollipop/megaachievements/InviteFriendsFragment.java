@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -30,7 +29,6 @@ import static mega.privacy.android.app.utils.Util.getSizeString;
 
 public class InviteFriendsFragment extends Fragment implements OnClickListener
 		, AchievementsFetcher.DataCallback{
-	ActionBar aB;
 	int height;
 
 	Button inviteContactsBtn;
@@ -83,7 +81,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// Activity actionbar has been created which might be accessed by UpdateUI().
-		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
+		((AppCompatActivity) getActivity()).getSupportActionBar()
+				.setTitle(getString(R.string.title_referral_bonuses));
 		// The root view has been created, fill it with the data when data ready
 		if (sFetcher != null) {
 			sFetcher.setDataCallback(this);
