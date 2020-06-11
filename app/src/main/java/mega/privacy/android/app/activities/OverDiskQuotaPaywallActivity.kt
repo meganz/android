@@ -82,7 +82,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
 
         if (warningsTs.size() == 1) {
             overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, 1,
-                    email, formatDate(this, warningsTs.get(0), DATE_LONG_FORMAT, false), files, size)
+                    email, formatDate(this, warningsTs.get(0), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         } else {
             var dates = String()
             val lastWarningIndex: Int = warningsTs.size() - 1
@@ -95,7 +95,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
             }
 
             overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, warningsTs.size(),
-                    email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size)
+                    email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         }
 
         var text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning), getHumanizedTimestamp(deadlineTs))
@@ -115,5 +115,25 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
             Html.fromHtml(text)
         }
         deletionWarningText?.text = result
+    }
+
+    private fun getProPlanNeeded(): String {
+        val plans = app.myAccountInfo.pricing
+
+        val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
+
+        for (i in 0 until plans.numProducts) {
+            if (plans.getGBStorage(i) > app.myAccountInfo.usedStorage / gb) {
+                return when(plans.getProLevel(i)) {
+                    1 -> "PRO I"
+                    2 -> "PRO II"
+                    3 -> "PRO III"
+                    4 -> "PRO Lite"
+                    else -> "PRO"
+                }
+            }
+        }
+
+        return "PRO"
     }
 }
