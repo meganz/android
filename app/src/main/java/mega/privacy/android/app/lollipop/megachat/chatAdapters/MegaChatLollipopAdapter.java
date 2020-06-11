@@ -1659,8 +1659,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (Math.abs(((ChatActivityLollipop) context).generalUnreadCount) > 0) {
             if (((ChatActivityLollipop) context).lastIdMsgSeen != -1 && ((ChatActivityLollipop) context).lastIdMsgSeen == message.getMsgId()) {
                 MegaChatMessage nextMessage = messages.get(position).getMessage();
-                if (nextMessage.getType() == MegaChatMessage.TYPE_CALL_STARTED || nextMessage.getType() == MegaChatMessage.TYPE_CALL_ENDED || nextMessage.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                    ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+                if (nextMessage.getType() == MegaChatMessage.TYPE_CALL_STARTED ||
+                        nextMessage.getType() == MegaChatMessage.TYPE_CALL_ENDED ||
+                        nextMessage.getType() == MegaChatMessage.TYPE_TRUNCATE ||
+                        nextMessage.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS ||
+                        nextMessage.getType() == MegaChatMessage.TYPE_PRIV_CHANGE ||
+                        nextMessage.getType() == MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE ||
+                        nextMessage.getType() == MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE ||
+                        nextMessage.getType() == MegaChatMessage.TYPE_SET_PRIVATE_MODE) {
+
+                            ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
                     ((ChatActivityLollipop) context).lastIdMsgSeen = nextMessage.getMsgId();
                     return;
                 }
@@ -1673,13 +1681,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     userHandle = message.getUserHandle();
                 }
-                if (userHandle == myUserHandle) {
-                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
-                    ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
-                } else {
-                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
-                    ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
-                }
+
+                params.addRule(RelativeLayout.BELOW, userHandle == myUserHandle ? R.id.message_chat_own_message_layout : R.id.message_chat_contact_message_layout);
+                ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
 
                 String numberString;
                 long unreadMessages = Math.abs(((ChatActivityLollipop) context).generalUnreadCount);
