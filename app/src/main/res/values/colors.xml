@@ -106,6 +106,7 @@
     <color name="login_title">#FFD90007</color>
 
     <color name="copyright_text">#FF333333</color>
+    <color name="notification_subtitle">#54000000</color>
 
     <color name="transparent_transparent_black">#35000000</color>
     <color name="status_bar_login">#33000000</color>

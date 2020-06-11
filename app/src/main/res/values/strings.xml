@@ -1176,6 +1176,9 @@
 
     <string name="general_mute" context="button">Mute</string>
     <string name="general_unmute" context="button">Unmute</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications</string>
+
     <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
     <string name="mute_chatroom_notification_option_off" context="">Off</string>
     <string name="mute_chatroom_notification_option_indefinitely" context="">Until I turn it on again</string>

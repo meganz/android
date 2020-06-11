@@ -2221,7 +2221,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
             }
             case R.id.cab_menu_mute_chat:
-                createMuteAlertDialog(this, chatRoom.getChatId());
+                createMuteChatRoomAlertDialog(this, chatRoom.getChatId());
                 break;
         }
         return super.onOptionsItemSelected(item);

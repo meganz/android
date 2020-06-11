@@ -683,6 +683,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private MenuItem refreshMenuItem;
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
+	private MenuItem doNotDisturbMenuItem;
 	private MenuItem upgradeAccountMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
@@ -6425,6 +6426,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshMenuItem = menu.findItem(R.id.action_menu_refresh);
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
+		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
 		rubbishBinMenuItem = menu.findItem(R.id.action_menu_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
@@ -6713,6 +6715,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (searchExpand) {
 						openSearchView();
 					} else {
+						doNotDisturbMenuItem.setVisible(true);
 						inviteMenuItem.setVisible(true);
 						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
 							selectMenuItem.setVisible(true);
@@ -6916,6 +6919,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
+					doNotDisturbMenuItem.setVisible(false);
 				}
 				return true;
 			}
@@ -6990,6 +6994,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				return true;
 			}
+			case R.id.action_menu_do_not_disturb:
+				if (drawerItem == DrawerItem.CHAT){
+					createMuteChatAlertDialog(this);
+				}
+				return true;
+
 	        case R.id.action_menu_kill_all_sessions:{
 				showConfirmationCloseAllSessions();
 	        	return true;

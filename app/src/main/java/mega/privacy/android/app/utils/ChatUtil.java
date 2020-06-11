@@ -56,6 +56,12 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
+    private static final int NOTIFICATIONS_OFF = 0;
+    private static final int NOTIFICATIONS_30_MINUTES = 1;
+    private static final int NOTIFICATIONS_1_HOUR = 2;
+    private static final int NOTIFICATIONS_6_HOURS = 3;
+    private static final int NOTIFICATIONS_24_HOURS = 4;
+    private static final int NOTIFICATIONS_UNDEFINED = 5;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -534,14 +540,65 @@ public class ChatUtil {
         return option;
     }
 
-    public static void createMuteAlertDialog(Context context, long chatId){
-        if(chatId == MEGACHAT_INVALID_HANDLE)
+    /**
+     * Method for displaying a dialog to mute all chat notifications.
+     *
+     * @param context The context of Activity.
+     */
+    public static void createMuteChatAlertDialog(Activity context) {
+        final android.app.AlertDialog muteDialog;
+        android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
+        dialogBuilder.setCustomTitle(view);
+        CharSequence[] items = {
+                context.getString(R.string.mute_chatroom_notification_option_off),
+                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 10, 10)),
+                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)),
+                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24))};
+
+
+        int itemClicked = NOTIFICATIONS_OFF;
+//        if (!MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle)) {
+//            itemClicked = NOTIFICATIONS_30_MINUTES;
+//        }
+
+        dialogBuilder.setSingleChoiceItems(items, itemClicked, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                switch (item) {
+                    case NOTIFICATIONS_OFF:
+                        dialog.dismiss();
+                        break;
+
+                    case NOTIFICATIONS_30_MINUTES:
+                    case NOTIFICATIONS_1_HOUR:
+                    case NOTIFICATIONS_6_HOURS:
+                    case NOTIFICATIONS_24_HOURS:
+                    case NOTIFICATIONS_UNDEFINED:
+                        dialog.dismiss();
+                        break;
+                }
+            }
+        });
+
+        dialogBuilder.setPositiveButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
+        muteDialog = dialogBuilder.create();
+        muteDialog.show();
+    }
+
+    /**
+     * Method to display a dialog to mute a specific chat room.
+     *
+     * @param context The context of Activity.
+     * @param chatId  The chat ID.
+     */
+    public static void createMuteChatRoomAlertDialog(Context context, long chatId) {
+        if (chatId == MEGACHAT_INVALID_HANDLE)
             return;
 
         final android.app.AlertDialog muteDialog;
         android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         dialogBuilder.setTitle(context.getString(R.string.title_dialog_mute_chatroom_notifications));
-        final CharSequence[] items = {
+        CharSequence[] items = {
                 context.getString(R.string.mute_chatroom_notification_option_off),
                 getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)),
                 getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)),
@@ -551,35 +608,40 @@ public class ChatUtil {
 
 
         String chatHandle = String.valueOf(chatId);
-        int itemClicked = 0;
+        int itemClicked = NOTIFICATIONS_OFF;
         if (!MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle)) {
-            itemClicked = 1;
+            itemClicked = NOTIFICATIONS_30_MINUTES;
         }
 
         dialogBuilder.setSingleChoiceItems(items, itemClicked, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 ChatController chatC = new ChatController(context);
 
-                switch (item){
-                    case 0:
+                switch (item) {
+                    case NOTIFICATIONS_OFF:
                         chatC.unmuteChat(chatId);
-                        if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop)context).showMuteIcon(chatId);
+                        if (context instanceof ManagerActivityLollipop) {
+                            ((ManagerActivityLollipop) context).showMuteIcon(chatId);
                         }
+                        dialog.dismiss();
                         break;
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
+
+                    case NOTIFICATIONS_30_MINUTES:
+                    case NOTIFICATIONS_1_HOUR:
+                    case NOTIFICATIONS_6_HOURS:
+                    case NOTIFICATIONS_24_HOURS:
+                    case NOTIFICATIONS_UNDEFINED:
                         chatC.muteChat(chatId);
-                        if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop)context).showMuteIcon(chatId);
+                        if (context instanceof ManagerActivityLollipop) {
+                            ((ManagerActivityLollipop) context).showMuteIcon(chatId);
                         }
+                        dialog.dismiss();
                         break;
                 }
             }
         });
+
+        dialogBuilder.setPositiveButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
         muteDialog = dialogBuilder.create();
         muteDialog.show();
     }
