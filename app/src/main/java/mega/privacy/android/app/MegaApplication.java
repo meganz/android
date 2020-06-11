@@ -445,12 +445,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
 				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+				logDebug("Call status is "+callStatusToString(callStatus));
+
 				switch (callStatus) {
 					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 					case MegaChatCall.CALL_STATUS_RING_IN:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 					case MegaChatCall.CALL_STATUS_RECONNECTING:
-						logDebug("Call status is "+callStatusToString(callStatus));
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
 						if (listAllCalls == null || listAllCalls.size() == 0){
 							logError("Calls not found");
@@ -464,7 +465,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 						if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
 							removeChatAudioManager();
-							clearIncomingCallNotification(callId);
+							clearIncomingCallNotification(chatId);
 						}
 						if (listAllCalls.size() == 1) {
 							checkOneCall(listAllCalls.get(0));
@@ -473,7 +474,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-						clearIncomingCallNotification(callId);
+						clearIncomingCallNotification(chatId);
 						removeValues(chatId);
 						break;
 					case MegaChatCall.CALL_STATUS_DESTROYED:
@@ -1416,7 +1417,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			wakeLock.release();
 		}
 
-		clearIncomingCallNotification(callId);
+		clearIncomingCallNotification(chatId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 

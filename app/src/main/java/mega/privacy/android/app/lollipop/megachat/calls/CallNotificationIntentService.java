@@ -92,6 +92,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 logDebug("Ignore incoming call... ");
                 megaChatApi.setIgnoredCall(chatIdIncomingCall);
                 MegaApplication.getInstance().removeChatAudioManager();
+                clearIncomingCallNotification(chatIdIncomingCall);
                 stopSelf();
                 break;
 
