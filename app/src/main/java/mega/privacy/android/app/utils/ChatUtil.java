@@ -56,12 +56,6 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
-    private static final int NOTIFICATIONS_OFF = 0;
-    private static final int NOTIFICATIONS_30_MINUTES = 1;
-    private static final int NOTIFICATIONS_1_HOUR = 2;
-    private static final int NOTIFICATIONS_6_HOURS = 3;
-    private static final int NOTIFICATIONS_24_HOURS = 4;
-    private static final int NOTIFICATIONS_UNDEFINED = 5;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -557,7 +551,7 @@ public class ChatUtil {
                 getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24))};
 
 
-        int itemClicked = NOTIFICATIONS_OFF;
+        int itemClicked = 0;
 //        if (!MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle)) {
 //            itemClicked = NOTIFICATIONS_30_MINUTES;
 //        }
@@ -565,15 +559,11 @@ public class ChatUtil {
         dialogBuilder.setSingleChoiceItems(items, itemClicked, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 switch (item) {
-                    case NOTIFICATIONS_OFF:
+                    case 0:
                         dialog.dismiss();
                         break;
 
-                    case NOTIFICATIONS_30_MINUTES:
-                    case NOTIFICATIONS_1_HOUR:
-                    case NOTIFICATIONS_6_HOURS:
-                    case NOTIFICATIONS_24_HOURS:
-                    case NOTIFICATIONS_UNDEFINED:
+                    default:
                         dialog.dismiss();
                         break;
                 }
@@ -583,6 +573,42 @@ public class ChatUtil {
         dialogBuilder.setPositiveButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
         muteDialog = dialogBuilder.create();
         muteDialog.show();
+    }
+
+    private static int getItemClicked(String typeMute){
+        switch (typeMute){
+            case NOTIFICATIONS_30_MINUTES:
+                return 1;
+            case NOTIFICATIONS_1_HOUR:
+                return 2;
+            case NOTIFICATIONS_6_HOURS:
+                return 3;
+            case NOTIFICATIONS_24_HOURS:
+                return 4;
+            case NOTIFICATIONS_DISABLED:
+                return 5;
+            default:
+                return 0;
+        }
+    }
+
+    private static String getTypeMute(int itemClicked){
+        switch (itemClicked){
+            case 0 :
+                return NOTIFICATIONS_ENABLED;
+            case 1:
+                return NOTIFICATIONS_30_MINUTES;
+            case 2:
+                return NOTIFICATIONS_1_HOUR;
+            case 3:
+                return NOTIFICATIONS_6_HOURS;
+            case 4:
+                return NOTIFICATIONS_24_HOURS;
+            case 5:
+                return NOTIFICATIONS_DISABLED;
+            default:
+                return NOTIFICATIONS_ENABLED;
+        }
     }
 
     /**
@@ -608,30 +634,24 @@ public class ChatUtil {
 
 
         String chatHandle = String.valueOf(chatId);
-        int itemClicked = NOTIFICATIONS_OFF;
-        if (!MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle)) {
-            itemClicked = NOTIFICATIONS_30_MINUTES;
-        }
+        String typeMuted = MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle);
+        int itemClicked = getItemClicked(typeMuted);
 
         dialogBuilder.setSingleChoiceItems(items, itemClicked, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 ChatController chatC = new ChatController(context);
-
+                String typeMute = getTypeMute(item);
                 switch (item) {
-                    case NOTIFICATIONS_OFF:
-                        chatC.unmuteChat(chatId);
+                    case 0:
+                        chatC.unmuteChat(chatId, typeMute);
                         if (context instanceof ManagerActivityLollipop) {
                             ((ManagerActivityLollipop) context).showMuteIcon(chatId);
                         }
                         dialog.dismiss();
                         break;
 
-                    case NOTIFICATIONS_30_MINUTES:
-                    case NOTIFICATIONS_1_HOUR:
-                    case NOTIFICATIONS_6_HOURS:
-                    case NOTIFICATIONS_24_HOURS:
-                    case NOTIFICATIONS_UNDEFINED:
-                        chatC.muteChat(chatId);
+                    default:
+                        chatC.muteChat(chatId, typeMute);
                         if (context instanceof ManagerActivityLollipop) {
                             ((ManagerActivityLollipop) context).showMuteIcon(chatId);
                         }

@@ -909,10 +909,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     boolean enabled = notificationsSwitch.isChecked();
 
                     ChatController chatC = new ChatController(this);
+                    String typeMute = enabled ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_ENABLED;
                     if (enabled) {
-                        chatC.unmuteChat(chatHandle);
+                        chatC.unmuteChat(chatHandle, typeMute);
                     } else {
-                        chatC.muteChat(chatHandle);
+                        chatC.muteChat(chatHandle, typeMute);
                     }
                 }
 

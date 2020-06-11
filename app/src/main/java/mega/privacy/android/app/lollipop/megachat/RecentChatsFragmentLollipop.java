@@ -1857,7 +1857,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         MegaChatListItem chat = selected.get(0);
                         if (chat != null) {
                             String chatHandle = String.valueOf(chat.getChatId());
-                            if (dbH.areNotificationsEnabled(chatHandle)) {
+                            if (!dbH.areNotificationsEnabled(chatHandle).equals(NOTIFICATIONS_ENABLED)) {
                                 showUnmute = true;
                                 showMute = false;
                             }else{

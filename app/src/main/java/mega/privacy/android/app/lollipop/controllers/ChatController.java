@@ -347,54 +347,40 @@ public class ChatController {
         }
     }
 
-    public void muteChats(ArrayList<MegaChatListItem> chats){
-        for(int i=0; i<chats.size();i++){
-            muteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i).getChatId());
-        }
-    }
-
-    public void muteChat(long chatHandle){
+    public void muteChat(long chatHandle, String typeMute){
         logDebug("Chat handle: " + chatHandle);
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
 
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), "");
+            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), typeMute, "");
             dbH.setChatItemPreferences(chatPrefs);
 
         }
         else{
-            chatPrefs.setNotificationsEnabled(Boolean.toString(false));
+            chatPrefs.setNotificationsEnabled(typeMute);
             dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chatHandle));
         }
     }
 
-    public void muteChat(MegaChatListItem chat){
+    public void muteChat(MegaChatListItem chat, String typeMute){
         logDebug("Chat ID:" + chat.getChatId());
-        muteChat(chat.getChatId());
+        muteChat(chat.getChatId(), typeMute);
     }
 
-    public void unmuteChats(ArrayList<MegaChatListItem> chats){
-        for(int i=0; i<chats.size();i++){
-            unmuteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i).getChatId());
-        }
-    }
-
-    public void unmuteChat(MegaChatListItem chat){
+    public void unmuteChat(MegaChatListItem chat, String typeMute){
         logDebug("Chat ID: " + chat.getChatId());
-        unmuteChat(chat.getChatId());
+        unmuteChat(chat.getChatId(), typeMute);
     }
 
-    public void unmuteChat(long chatHandle){
+    public void unmuteChat(long chatHandle, String typeMute){
         logDebug("Chant handle: " + chatHandle);
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "");
+            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), typeMute, "");
             dbH.setChatItemPreferences(chatPrefs);
         }
         else{
-            chatPrefs.setNotificationsEnabled(Boolean.toString(true));
+            chatPrefs.setNotificationsEnabled(typeMute);
             dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chatHandle));
         }
     }

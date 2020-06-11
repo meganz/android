@@ -32,7 +32,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 56;
+	private static final int DATABASE_VERSION = 57;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -347,7 +347,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CONTACTS_TABLE);
 
 		String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " BOOLEAN, " +
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " TEXT, " +
 				KEY_CHAT_ITEM_RINGTONE+ " TEXT, "+KEY_CHAT_ITEM_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_ITEM_WRITTEN_TEXT+ " TEXT"+")";
 		db.execSQL(CREATE_CHAT_ITEM_TABLE);
 
@@ -584,7 +584,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if(oldVersion <= 22) {
 			String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " BOOLEAN, " +
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " TEXT, " +
 					KEY_CHAT_ITEM_RINGTONE + " TEXT, " + KEY_CHAT_ITEM_SOUND_NOTIFICATIONS + " TEXT" + ")";
 			db.execSQL(CREATE_CHAT_ITEM_TABLE);
 
@@ -1732,23 +1732,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return null;
 	}
 
-	public boolean areNotificationsEnabled (String handle){
+	public String areNotificationsEnabled (String handle){
         logDebug("areNotificationsEnabled: " + handle);
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		boolean result = true;
+		String result = NOTIFICATIONS_ENABLED;
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){
-
 				String notificationsEnabled = decrypt(cursor.getString(2));
-				boolean muteB = Boolean.parseBoolean(notificationsEnabled);
-				if(muteB==true){
-					result = true;
-				}
-				else{
-					result = false;
-				}
+				return notificationsEnabled;
 			}
 		}
 

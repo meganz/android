@@ -702,8 +702,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			logDebug("There is individual chat preferences");
 
 			boolean notificationsEnabled = true;
-			if (chatPrefs.getNotificationsEnabled() != null){
-				notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
+			if (chatPrefs.getNotificationsEnabled() != ""){
+				notificationsEnabled = chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED);
 			}
 			notificationsSwitch.setChecked(notificationsEnabled);
 		}
@@ -1237,15 +1237,16 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					boolean enabled = notificationsSwitch.isChecked();
 
 					ChatController chatC = new ChatController(this);
+					String typeMute =  enabled ? NOTIFICATIONS_ENABLED: NOTIFICATIONS_DISABLED;
 					if(enabled){
-						chatC.unmuteChat(chatHandle);
+						chatC.unmuteChat(chatHandle, typeMute);
 					}
 					else{
-						chatC.muteChat(chatHandle);
+						chatC.muteChat(chatHandle, typeMute);
 					}
 
 					if(chatPrefs!=null){
-						chatPrefs.setNotificationsEnabled(Boolean.toString(enabled));
+						chatPrefs.setNotificationsEnabled(typeMute);
 					}
 					else{
 						if(chat!=null){
