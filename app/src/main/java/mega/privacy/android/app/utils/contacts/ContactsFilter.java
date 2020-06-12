@@ -53,7 +53,7 @@ public class ContactsFilter {
                 // phone number or email
                 String contactInfo = iterator.next();
                 if (megaContact.getEmail().equals(contactInfo) ||
-                        megaContact.getNormalizedPhoneNumber().equals(Util.normalizePhoneNumberByNetwork(context, contactInfo))) {
+                        (megaContact.getNormalizedPhoneNumber() != null && megaContact.getNormalizedPhoneNumber().equals(Util.normalizePhoneNumberByNetwork(context, contactInfo)))) {
                     iterator.remove();
                 }
             }

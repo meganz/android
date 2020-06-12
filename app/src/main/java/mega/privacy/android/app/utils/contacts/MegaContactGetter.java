@@ -7,10 +7,13 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -187,18 +190,37 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     // when there's no matched user, should be considered as successful
                     updateLastSyncTimestamp();
                 }
-                MegaContact contact;
-                for (int i = 0; i < table.size(); i++) {
-                    contact = new MegaContact();
-                    MegaStringList list = table.get(i);
-                    contact.id = list.get(1);
-                    contact.normalizedPhoneNumber = list.get(0);
-                    contact.handle = getUserHandler(list.get(1));
-                    //the normalized phone number is the key
-                    contact.localName = map.get(list.get(0));
 
-                    logDebug("contact: " + contact);
-                    megaContacts.add(contact);
+                MegaContact contact;
+                Map<String,MegaContact> temp = new HashMap<>();
+                for (int i = 0; i < table.size(); i++) {
+                    MegaStringList list = table.get(i);
+                    String id = list.get(1);
+                    String data = list.get(0);
+
+                    MegaContact ex = temp.get(id);
+                    if (ex != null) {
+                        if(ex.email == null) {
+                            ex.email = data;
+                        }
+                        if(ex.normalizedPhoneNumber == null) {
+                            ex.normalizedPhoneNumber = data;
+                        }
+                    } else {
+                        contact = new MegaContact();
+                        contact.id = id;
+                        if (TextUtil.isEmail(data)) {
+                            contact.email = data;
+                        } else {
+                            contact.normalizedPhoneNumber = data;
+                        }
+                        contact.handle = getUserHandler(contact.id);
+                        //the normalized phone number is the key
+                        contact.localName = map.get(data);
+                        logDebug("contact: " + contact);
+                        megaContacts.add(contact);
+                        temp.put(id, contact);
+                    }
                 }
                 if (megaContacts.size() > 0) {
                     currentContactIndex = 0;
@@ -338,9 +360,15 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         for (ContactsUtil.LocalContact contact : localContacts) {
             String name = contact.getName();
             List<String> normalizedPhoneNumberSet = contact.getNormalizedPhoneNumberList();
+            List<String> emailSet = contact.getEmailList();
             if (!normalizedPhoneNumberSet.isEmpty()) {
                 for (String phoneNumber : normalizedPhoneNumberSet) {
                     stringMap.set(phoneNumber, name);
+                }
+            }
+            if (!emailSet.isEmpty()) {
+                for (String email : emailSet) {
+                    stringMap.set(email, name);
                 }
             }
         }
