@@ -102,7 +102,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 		DecryptAlertDialog.Builder builder = new DecryptAlertDialog.Builder();
 		builder.setListener(this).setTitle(getString(R.string.hint_set_password_protection_dialog))
 				.setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
-				.setErrorMessage(R.string.invalid_link_password).setKey(mKey)
+				.setErrorMessage(R.string.invalid_link_password).setKey(mKey).setShownPassword(true)
 				.build().show(getSupportFragmentManager(), "decrypt");
 	}
 

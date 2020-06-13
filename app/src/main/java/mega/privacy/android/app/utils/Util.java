@@ -86,11 +86,9 @@ import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -133,6 +131,9 @@ public class Util {
 	public static boolean DEBUG = false;
 
 	public static HashMap<String, String> countryCodeDisplay;
+
+	// 150ms, a smaller value may cause the keyboard to fail to open
+	private final static int SHOW_IM_DELAY = 150;
 
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
@@ -1724,7 +1725,7 @@ public class Util {
 						MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
-		}, 50);
+		}, SHOW_IM_DELAY);
     }
 
     public static Spanned getSpannedHtmlText(String string) {
