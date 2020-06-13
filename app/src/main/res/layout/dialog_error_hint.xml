@@ -5,10 +5,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="20dp"
-    android:paddingLeft="24dp"
-    android:paddingRight="24dp"
-    android:paddingBottom="8dp">
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp">
 
     <EditText
         android:id="@+id/text"
@@ -26,8 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/text"
         android:layout_marginTop="-6dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
         android:visibility="gone">
 
         <TextView
@@ -41,10 +39,10 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:src="@drawable/ic_input_warning"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:tint="@color/dark_primary_color"/>
 
     </RelativeLayout>

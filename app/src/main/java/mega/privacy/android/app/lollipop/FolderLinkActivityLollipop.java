@@ -14,7 +14,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -22,27 +21,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
-import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,18 +34,25 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -86,7 +77,6 @@ import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFrag
 import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
-import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -96,26 +86,60 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.SCROLL_TO_POSITION;
+import static mega.privacy.android.app.utils.Constants.SEPARATOR;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.UPDATE_IMAGE_DRAG;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtils.showSnackBarWhenDownloading;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
+import static mega.privacy.android.app.utils.PreviewUtils.getBitmapForCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
+import static mega.privacy.android.app.utils.Util.askMe;
+import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
-public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener{
-
+public class FolderLinkActivityLollipop extends DownloadableActivity implements
+		MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
 	public static ImageView imageDrag;
 	
 	FolderLinkActivityLollipop folderLinkActivity = this;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	MegaChatApiAndroid megaChatApi;
-	
-	private AlertDialog decryptionKeyDialog;
-	
+
 	ActionBar aB;
 	Toolbar tB;
 	Toolbar fileLinktB;
@@ -178,8 +202,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	private FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private String mKey;
-	private View mErrorView;
-	private EditText mKeyEdit;
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -189,7 +211,44 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		}
 	}
 
-	
+	private void decrypt() {
+		if (TextUtils.isEmpty(mKey)) return;
+		String urlWithKey = "";
+
+		if (url.contains("#F!")) {
+			// old folder link format
+			if (mKey.startsWith("!")) {
+				logDebug("Decryption key with exclamation!");
+				urlWithKey = url + mKey;
+			} else {
+				urlWithKey = url + "!" + mKey;
+			}
+		} else if (url.contains(SEPARATOR + "folder" + SEPARATOR)) {
+			// new folder link format
+			if (mKey.startsWith("#")) {
+				logDebug("Decryption key with hash!");
+				urlWithKey = url + mKey;
+			} else {
+				urlWithKey = url + "#" + mKey;
+			}
+		}
+
+		logDebug("Folder link to import: " + urlWithKey);
+		decryptionIntroduced=true;
+		megaApiFolder.loginToFolder(urlWithKey, folderLinkActivity);
+	}
+
+	@Override
+	public void onDialogPositiveClick(String key) {
+		mKey = key;
+		decrypt();
+	}
+
+	@Override
+	public void onDialogNegativeClick() {
+		finish();
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -640,121 +699,12 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	public void askForDecryptionKeyDialog(){
 		logDebug("askForDecryptionKeyDialog");
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this,
-				R.style.AppCompatAlertDialogStyle);
-		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_error_hint, null);
-
-		builder.setTitle(getString(R.string.alert_decryption_key)).setMessage(
-				getString(R.string.message_decryption_key)).setView(v)
-				.setPositiveButton(R.string.general_decryp, null)
-				.setNegativeButton(R.string.general_cancel, null);
-
-		mKeyEdit = v.findViewById(R.id.text);
-		mKeyEdit.setSingleLine();
-		mErrorView = v.findViewById(R.id.error);
-		((TextView)v.findViewById(R.id.error_text)).setText(R.string.invalid_decryption_key);
-
-		if (TextUtil.isTextEmpty(mKey)) {
-			mKeyEdit.setHint(getString(R.string.alert_decryption_key));
-			mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		} else {
-			showErrorMessage();
-		}
-
-		mKeyEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		mKeyEdit.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
-		mKeyEdit.setOnEditorActionListener((v1, actionId, event) -> {
-			if (actionId == EditorInfo.IME_ACTION_DONE) {
-				tryToDecrypt();
-				return true;
-			}
-			return false;
-		});
-
-		mKeyEdit.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				hideErrorMessage();
-			}
-		});
-
-		decryptionKeyDialog = builder.create();
-		decryptionKeyDialog.setCanceledOnTouchOutside(false);
-		decryptionKeyDialog.show();
-
-		// Set onClickListeners for buttons after showing the dialog would prevent
-		// the dialog from dismissing automatically on clicking the buttons
-		decryptionKeyDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((view) -> {
-			tryToDecrypt();
-		});
-		decryptionKeyDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
-				.setOnClickListener((view) -> finish());
-
-		showKeyboardDelayed(mKeyEdit);
-	}
-
-	private void tryToDecrypt() {
-		mKey = mKeyEdit.getText().toString().trim();
-		if (mKey.length() == 0) {
-			mKey = "";
-			showErrorMessage();
-			return;
-		}
-
-		String urlWithKey = "";
-
-		if (url.contains("#F!")) {
-			// old folder link format
-			if (mKey.startsWith("!")) {
-				logDebug("Decryption key with exclamation!");
-				urlWithKey = url + mKey;
-			} else {
-				urlWithKey = url + "!" + mKey;
-			}
-		} else if (url.contains(SEPARATOR + "folder" + SEPARATOR)) {
-			// new folder link format
-			if (mKey.startsWith("#")) {
-				logDebug("Decryption key with hash!");
-				urlWithKey = url + mKey;
-			} else {
-				urlWithKey = url + "#" + mKey;
-			}
-		}
-
-		logDebug("Folder link to import: " + urlWithKey);
-		decryptionIntroduced=true;
-		megaApiFolder.loginToFolder(urlWithKey, folderLinkActivity);
-		decryptionKeyDialog.dismiss();
-	}
-
-	private void showErrorMessage() {
-		if (mKeyEdit == null || mErrorView == null) return;
-
-		mKeyEdit.setText(mKey);
-		mKeyEdit.setSelectAllOnFocus(true);
-		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-		mKeyEdit.getBackground().mutate().clearColorFilter();
-		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
-				this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
-
-		mErrorView.setVisibility(View.VISIBLE);
-	}
-
-	private void hideErrorMessage() {
-		if (mKeyEdit == null || mErrorView == null) return;
-
-		mErrorView.setVisibility(View.GONE);
-		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		mKeyEdit.getBackground().mutate().clearColorFilter();
-		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
-				this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		DecryptAlertDialog.Builder builder = new DecryptAlertDialog.Builder();
+		builder.setListener(this).setTitle(getString(R.string.alert_decryption_key))
+				.setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
+				.setMessage(getString(R.string.message_decryption_key))
+				.setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
+				.build().show(getSupportFragmentManager(), "decrypt");
 	}
 
 	@Override
@@ -789,16 +739,11 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
 	}
 
-
 	@Override
 	protected void onResume() {
 		super.onResume();
     	folderLinkActivity = this;
 		logDebug("onResume");
-
-		if (mKeyEdit != null) {
-			showKeyboardDelayed(mKeyEdit);
-		}
 	}
 
 	public void toSelectFolder(long [] hashes, long size, String sdRoot, String prompt) {

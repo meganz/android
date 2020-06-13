@@ -9230,6 +9230,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		try {
 			openLinkDialog.show();
+			openLinkText.requestFocus();
 			openLinkDialogIsShown = true;
 
 			// Set onClickListeners for buttons after showing the dialog would prevent

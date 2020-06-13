@@ -1714,6 +1714,8 @@ public class Util {
 	}
 
     public static void showKeyboardDelayed(final View view) {
+		if (view == null) return;
+
 		Handler handler = new Handler();
         handler.postDelayed(() -> {
 			// The view needs to request the focus or the keyboard may not pops up

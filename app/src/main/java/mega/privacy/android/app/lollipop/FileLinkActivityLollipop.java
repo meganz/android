@@ -11,35 +11,31 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.io.File;
 import java.util.Locale;
@@ -51,7 +47,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
-import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -61,14 +56,41 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_IMPORT_LINK_FETCH_NODES;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.SEPARATOR;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.URL_FILE_LINK;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
+import static mega.privacy.android.app.utils.PreviewUtils.getBitmapForCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 
-public class FileLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener {
+public class FileLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
 	
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -80,7 +102,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	String url;
 	Handler handler;
 	ProgressDialog statusDialog;
-	AlertDialog decryptionKeyDialog;
 
 	File previewFile = null;
 	Bitmap preview = null;
@@ -116,8 +137,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	public static final int FILE_LINK = 1;
 
 	private String mKey;
-	private View mErrorView;
-	private EditText mKeyEdit;
 
 	@Override
 	public void onDestroy(){
@@ -275,75 +294,18 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	public void askForDecryptionKeyDialog(){
 		logDebug("askForDecryptionKeyDialog");
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this,
-				R.style.AppCompatAlertDialogStyle);
-		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_error_hint, null);
-
-		builder.setTitle(getString(R.string.alert_decryption_key)).setMessage(
-				getString(R.string.message_decryption_key)).setView(v)
-				.setPositiveButton(R.string.general_decryp, null)
-				.setNegativeButton(R.string.general_cancel, null);
-
-		mKeyEdit = v.findViewById(R.id.text);
-		mKeyEdit.setSingleLine();
-		mErrorView = v.findViewById(R.id.error);
-		((TextView)v.findViewById(R.id.error_text)).setText(R.string.invalid_decryption_key);
-
-		if (TextUtil.isTextEmpty(mKey)) {
-			mKeyEdit.setHint(getString(R.string.alert_decryption_key));
-			mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		} else {
-			showErrorMessage();
-		}
-
-		mKeyEdit.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		mKeyEdit.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
-		mKeyEdit.setOnEditorActionListener((v1, actionId, event) -> {
-			if (actionId == EditorInfo.IME_ACTION_DONE) {
-				tryToDecrypt();
-				return true;
-			}
-			return false;
-		});
-
-		mKeyEdit.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				hideErrorMessage();
-			}
-		});
-
-		decryptionKeyDialog = builder.create();
-		decryptionKeyDialog.setCanceledOnTouchOutside(false);
-		decryptionKeyDialog.show();
-
-		// Set onClickListeners for buttons after showing the dialog would prevent
-		// the dialog from dismissing automatically on clicking the buttons
-		decryptionKeyDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((view) -> {
-			tryToDecrypt();
-		});
-		decryptionKeyDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
-				.setOnClickListener((view) -> finish());
-
-		showKeyboardDelayed(mKeyEdit);
+		DecryptAlertDialog.Builder builder = new DecryptAlertDialog.Builder();
+		builder.setListener(this).setTitle(getString(R.string.alert_decryption_key))
+				.setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
+				.setMessage(getString(R.string.message_decryption_key))
+				.setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
+				.build().show(getSupportFragmentManager(), "decrypt");
 	}
 
-	private void tryToDecrypt() {
-		mKey = mKeyEdit.getText().toString().trim();
-		if (mKey.length() == 0) {
-			mKey = "";
-			showErrorMessage();
-			return;
-		}
-
+	private void decrypt() {
+		if (TextUtils.isEmpty(mKey)) return;
 		String urlWithKey = "";
+
 		if (url.contains("#!")) {
 			// old folder link format
 			if (mKey.startsWith("!")) {
@@ -365,30 +327,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		logDebug("File link to import: " + urlWithKey);
 		decryptionIntroduced = true;
 		importLink(urlWithKey);
-		decryptionKeyDialog.dismiss();
-	}
-
-	private void showErrorMessage() {
-		if (mKeyEdit == null || mErrorView == null) return;
-
-		mKeyEdit.setText(mKey);
-		mKeyEdit.setSelectAllOnFocus(true);
-		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-		mKeyEdit.getBackground().mutate().clearColorFilter();
-		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
-				this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
-
-		mErrorView.setVisibility(View.VISIBLE);
-	}
-
-	private void hideErrorMessage() {
-		if (mKeyEdit == null || mErrorView == null) return;
-
-		mErrorView.setVisibility(View.GONE);
-		mKeyEdit.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		mKeyEdit.getBackground().mutate().clearColorFilter();
-		mKeyEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
-				this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 	}
 
 	@Override
@@ -406,10 +344,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
     		}
     	}
     	setIntent(null);
-
-		if (mKeyEdit != null) {
-			showKeyboardDelayed(mKeyEdit);
-		}
 	}
 
 	private void importLink(String url) {
@@ -985,4 +919,14 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		finish();
 	}
 
+	@Override
+	public void onDialogPositiveClick(String key) {
+		mKey = key;
+		decrypt();
+	}
+
+	@Override
+	public void onDialogNegativeClick() {
+		finish();
+	}
 }
