@@ -32,6 +32,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     private Context context;
 
     private ArrayList<MegaContact> megaContacts = new ArrayList<>();
+    private ArrayList<MegaContact> megaContactsWithEmail = new ArrayList<>();
 
     private int currentContactIndex;
 
@@ -215,11 +216,16 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                             contact.normalizedPhoneNumber = data;
                         }
                         contact.handle = getUserHandler(contact.id);
-                        //the normalized phone number is the key
+                        //the returned data is the key
                         contact.localName = map.get(data);
-                        logDebug("contact: " + contact);
-                        megaContacts.add(contact);
                         temp.put(id, contact);
+                    }
+                }
+                for (MegaContact megaContact : temp.values()) {
+                    if (megaContact.email != null) {
+                        megaContactsWithEmail.add(megaContact);
+                    } else {
+                        megaContacts.add(megaContact);
                     }
                 }
                 if (megaContacts.size() > 0) {
@@ -229,9 +235,13 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                         api.getUserEmail(getUserHandler(firstContact.id), this);
                     }
                 } else {
-                    logWarning("No mega contacts.");
-                    if (updater != null) {
-                        updater.noContacts();
+                    if(megaContactsWithEmail.size() > 0) {
+                        processFinished(api, megaContactsWithEmail);
+                    } else {
+                        logWarning("No mega contacts.");
+                        if (updater != null) {
+                            updater.noContacts();
+                        }
                     }
                 }
             } else {
@@ -268,24 +278,29 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             currentContactIndex++;
             //all the emails have been gotten.
             if (currentContactIndex >= megaContacts.size()) {
-                // save to db
-                dbH.clearMegaContacts();
-                dbH.batchInsertMegaContacts(megaContacts);
-
-                // filter out
-                List<MegaContact> list = filterOut(api, megaContacts);
-                //when request is successful, update the timestamp.
-                updateLastSyncTimestamp();
-                currentContactIndex = 0;
-                if (updater != null) {
-                    updater.onFinish(list);
-                }
+                megaContacts.addAll(megaContactsWithEmail);
+                processFinished(api,megaContacts);
             } else {
                 MegaContact nextContact = getCurrentContactIndex();
                 if (nextContact != null) {
                     api.getUserEmail(getUserHandler(nextContact.id), this);
                 }
             }
+        }
+    }
+
+    private void processFinished(MegaApiJava api, ArrayList<MegaContact> list) {
+        // save to db
+        dbH.clearMegaContacts();
+        dbH.batchInsertMegaContacts(list);
+
+        // filter out
+        list = filterOut(api, list);
+        //when request is successful, update the timestamp.
+        updateLastSyncTimestamp();
+        currentContactIndex = 0;
+        if (updater != null) {
+            updater.onFinish(list);
         }
     }
 
