@@ -46,6 +46,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -374,7 +375,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             long chatHandle = request.getChatHandle();
             MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
 
-            String chatTitle = chat.getTitle();
+            String chatTitle = getTitleChat(chat);
 
             if(chatTitle==null){
                 chatTitle = "";

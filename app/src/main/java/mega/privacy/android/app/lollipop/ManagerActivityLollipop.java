@@ -242,6 +242,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -980,10 +981,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null) return;
+			if (intent == null)
+				return;
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
 			if (getContactsFragment() != null) {
 				cFLol.updateContact(userHandle);
+			}
+
+			if(getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0){
+				inSFLol.updateNicknames(userHandle);
+			}
+			if(getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0){
+				outSFLol.updateNicknames(userHandle);
 			}
 		}
 	};
@@ -2299,7 +2308,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //				mainFabButtonChat.setVisibility(View.GONE);
 //				fabButtonsLayout.startAnimation(collectionFABLayoutOut);
 				fabButtonsLayout.setVisibility(View.GONE);
-				fabButton.setVisibility(View.VISIBLE);
+				fabButton.show();
 			}
 
 			@Override
@@ -2472,6 +2481,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("Offline mode: Do not init, chat already initialized");
 				}
 			}
+
+			return;
         }
 
 		transfersOverViewLayout = findViewById(R.id.transfers_overview_item_layout);
@@ -4378,6 +4389,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		inputFirstName.setOnEditorActionListener(editorActionListener);
 		inputFirstName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
+		inputFirstName.requestFocus();
 
 		inputLastName.setSingleLine();
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
@@ -4459,6 +4471,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		builder.setView(scrollView);
 
 		changeUserAttributeDialog = builder.create();
+		changeUserAttributeDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		changeUserAttributeDialog.show();
 		changeUserAttributeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -4501,7 +4514,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 		});
-		showKeyboardDelayed(inputFirstName);
 	}
 
 	@Override
@@ -6479,6 +6491,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					upgradeAccountMenuItem.setVisible(true);
 					importLinkMenuItem.setVisible(true);
 					addMenuItem.setEnabled(true);
+					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
 					if (getTabItemCloud() == CLOUD_TAB) {
@@ -8108,36 +8121,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
 		input.setText(text);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					if (document.isFolder()){
-						input.setSelection(0, input.getText().length());
-					}
-					else{
-						String [] s = document.getName().split("\\.");
-						if (s != null){
+		input.requestFocus();
 
-							int numParts = s.length;
-							int lastSelectedPos = 0;
-							if (numParts == 1){
-								input.setSelection(0, input.getText().length());
-							}
-							else if (numParts > 1){
-								for (int i=0; i<(numParts-1);i++){
-									lastSelectedPos += s[i].length();
-									lastSelectedPos++;
-								}
-								lastSelectedPos--; //The last point should not be selected)
-								input.setSelection(0, lastSelectedPos);
-							}
-						}
-						showKeyboardDelayed(v);
+		if (document.isFolder()) {
+			input.setSelection(0, input.getText().length());
+		} else {
+			String[] s = document.getName().split("\\.");
+			if (s != null) {
+
+				int numParts = s.length;
+				int lastSelectedPos = 0;
+				if (numParts == 1) {
+					input.setSelection(0, input.getText().length());
+				} else if (numParts > 1) {
+					for (int i = 0; i < (numParts - 1); i++) {
+						lastSelectedPos += s[i].length();
+						lastSelectedPos++;
 					}
+					lastSelectedPos--; //The last point should not be selected)
+					input.setSelection(0, lastSelectedPos);
 				}
 			}
-		});
+		}
 
 	    layout.addView(input, params);
 
@@ -8242,6 +8247,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		builder.setView(layout);
 		renameDialog = builder.create();
+		renameDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		renameDialog.show();
 		renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
 		{
@@ -9568,14 +9574,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_new_folder));
@@ -9597,6 +9596,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -9737,14 +9737,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
 
 		final TextView text = new TextView(ManagerActivityLollipop.this);
 
@@ -9787,6 +9780,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 
 		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
@@ -9897,14 +9891,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
+		input.requestFocus();
+
 		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
 		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
 		set.setOnClickListener(new OnClickListener() {
@@ -9927,6 +9915,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         });
 
 		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		newFolderDialog.show();
 	}
 
@@ -13218,7 +13207,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
 			long chatHandle = request.getChatHandle();
 			MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
-			String chatTitle = chat.getTitle();
+			String chatTitle = getTitleChat(chat);
 
 			if(chatTitle==null){
 				chatTitle = "";
@@ -15450,14 +15439,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			secondFabButtonChat.setClickable(true);
 			thirdFabButtonChat.setClickable(true);
 			isFabOpen = true;
-			fabButton.setVisibility(View.GONE);
+			fabButton.hide();
 			fabButtonsLayout.setVisibility(View.VISIBLE);
 			logDebug("Open COLLECTION FAB");
 		}
 	}
 
 	public void hideFabButton(){
-		fabButton.setVisibility(View.GONE);
+		fabButton.hide();
 	}
 
 	public void showFabButton(){
@@ -15471,11 +15460,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case CLOUD_DRIVE:{
 				logDebug("Cloud Drive SECTION");
 				lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-				fabButton.setVisibility(View.VISIBLE);
+				fabButton.show();
 				break;
 			}
 			case RUBBISH_BIN:{
-				fabButton.setVisibility(View.GONE);
+				fabButton.hide();
 				break;
 			}
 			case SHARED_ITEMS:{
@@ -15488,7 +15477,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (isIncomingAdded()) {
 							if (deepBrowserTreeIncoming <= 0) {
 								logDebug("showFabButton: fabButton GONE");
-								fabButton.setVisibility(View.GONE);
+								fabButton.hide();
 							}
 							else {
 								//Check the folder's permissions
@@ -15502,17 +15491,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 										case MegaShare.ACCESS_READWRITE:
 										case MegaShare.ACCESS_FULL: {
 											lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-											fabButton.setVisibility(View.VISIBLE);
+											fabButton.show();
 											break;
 										}
 										case MegaShare.ACCESS_READ: {
-											fabButton.setVisibility(View.GONE);
+											fabButton.hide();
 											break;
 										}
 									}
 								}
 								else {
-									fabButton.setVisibility(View.GONE);
+									fabButton.hide();
 								}
 							}
 						}
@@ -15522,11 +15511,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						logDebug("showFabButton: OUTGOING TAB");
 						if (isOutgoingAdded()) {
 							if (deepBrowserTreeOutgoing <= 0) {
-								fabButton.setVisibility(View.GONE);
+								fabButton.hide();
 							}
 							else {
 								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-								fabButton.setVisibility(View.VISIBLE);
+								fabButton.show();
 							}
 						}
 						break;
@@ -15543,7 +15532,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						break;
 
 					default: {
-						fabButton.setVisibility(View.GONE);
+						fabButton.hide();
 						break;
 					}
 				}
@@ -15555,11 +15544,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					case 0:
 					case 1:{
 						lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-						fabButton.setVisibility(View.VISIBLE);
+						fabButton.show();
 						break;
 					}
 					default:{
-						fabButton.setVisibility(View.GONE);
+						fabButton.hide();
 						break;
 					}
 				}
@@ -15569,25 +15558,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if(megaChatApi!=null){
 					fabButton.setImageDrawable(mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-					fabButton.setVisibility(View.VISIBLE);
+					fabButton.show();
 				}
 				else{
-					fabButton.setVisibility(View.GONE);
+					fabButton.hide();
 				}
 				break;
 			}
 			case SEARCH: {
 				if (shouldShowFabWhenSearch()){
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-					fabButton.setVisibility(View.VISIBLE);
+					fabButton.show();
 				} else {
-					fabButton.setVisibility(View.GONE);
+					fabButton.hide();
 				}
 				break;
 			}
 			default:{
 				logDebug("Default GONE fabButton");
-				fabButton.setVisibility(View.GONE);
+				fabButton.hide();
 				break;
 			}
 		}
