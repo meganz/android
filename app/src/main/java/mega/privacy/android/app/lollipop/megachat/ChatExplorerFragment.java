@@ -40,7 +40,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import nz.mega.sdk.MegaApiAndroid;
@@ -193,14 +192,16 @@ public class ChatExplorerFragment extends Fragment {
                 super.onScrolled(recyclerView, dx, dy);
                 if (context instanceof FileExplorerActivityLollipop) {
                     if (listView.canScrollVertically(-1)) {
-                        ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
                         if (addLayout.getVisibility() == View.VISIBLE) {
                             addLayout.setElevation(px2dp(4, outMetrics));
+                        } else {
+                            ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
                         }
                     } else {
-                        ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
                         if (addLayout.getVisibility() == View.VISIBLE) {
                             addLayout.setElevation(0);
+                        } else {
+                            ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
                         }
                     }
                 }

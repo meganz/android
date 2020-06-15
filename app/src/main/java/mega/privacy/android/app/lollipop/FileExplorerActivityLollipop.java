@@ -108,7 +108,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -853,15 +852,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void changeActionBarElevation(boolean whitElevation) {
-		chatExplorer = getChatExplorerFragment();
-		if (chatExplorer == null || chatExplorer.isHidden()) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				if (whitElevation) {
-					abL.setElevation(px2dp(4, outMetrics));
-				}
-				else {
-					abL.setElevation(0);
-				}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			if (whitElevation) {
+				abL.setElevation(px2dp(4, outMetrics));
+			} else {
+				abL.setElevation(0);
 			}
 		}
 	}
