@@ -3040,21 +3040,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
 					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
+					firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
 
                     //reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
+					getIntent().removeExtra("firstLogin");
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
 
 						switch (accountType){
-							case 0:{
-								logDebug("Intent firstTimeAfterInstallation==true");
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
+							case FREE:{
+								if (firstLogin) {
+									logDebug("First login. Go to Camera Uploads configuration.");
+									drawerItem = DrawerItem.CAMERA_UPLOADS;
+								} else {
+									drawerItem = DrawerItem.ACCOUNT;
+									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+									displayedAccountType = -1;
+								}
 								setIntent(null);
-								displayedAccountType = -1;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case PRO_I:{
@@ -3092,9 +3099,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 	        		}
 	        		else{
-						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
-                        if (firstLogin){
-							logDebug("intent firstLogin==true");
+						if (firstLogin){
+							logDebug("First login. Go to Camera Uploads configuration.");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -3118,12 +3124,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 						switch (accountType){
 							case FREE:{
-								logDebug("Intent firstTimeAfterInstallation==true");
-
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
-								displayedAccountType = -1;
+								if (firstLogin) {
+									logDebug("First login. Go to Camera Uploads configuration.");
+									drawerItem = DrawerItem.CAMERA_UPLOADS;
+								} else {
+									drawerItem = DrawerItem.ACCOUNT;
+									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+									displayedAccountType = -1;
+								}
 								setIntent(null);
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case PRO_I:{

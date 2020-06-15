@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.GetUserDataListener
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.*
@@ -27,6 +28,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     private var deletionWarningText: TextView? = null
     private var dismissButton: Button? = null
     private var upgradeButton: Button? = null
+    private var proPlanNeeded: Int? = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +63,11 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
             }
             R.id.upgrade_button -> {
                 logInfo("Starting upgrade process after Over Disk Quota Paywall")
+
+                val intent: Intent? = Intent(applicationContext, ManagerActivityLollipop::class.java)
+                intent?.putExtra("upgradeAccount", true)
+                intent?.putExtra("accountType", proPlanNeeded)
+                startActivity(intent)
                 finish()
             }
         }
@@ -124,6 +131,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
 
         for (i in 0 until plans.numProducts) {
             if (plans.getGBStorage(i) > app.myAccountInfo.usedStorage / gb) {
+                proPlanNeeded = plans.getProLevel(i)
                 return when(plans.getProLevel(i)) {
                     1 -> "PRO I"
                     2 -> "PRO II"
