@@ -172,6 +172,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	boolean startVideo = false;
 
+	private RelativeLayout verifyCredentialsLayout;
+	private TextView verifiedText;
+	private ImageView verifiedImage;
+
 	RelativeLayout sharedFoldersLayout;
 	TextView sharedFoldersText;
 	Button sharedFoldersButton;
@@ -406,6 +410,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			dividerNotificationsLayout = findViewById(R.id.divider_notifications_layout);
 
+			//Verify credentials layout
+			verifyCredentialsLayout = findViewById(R.id.chat_contact_properties_verify_credentials_layout);
+			verifyCredentialsLayout.setOnClickListener(this);
+			verifiedText = findViewById(R.id.chat_contact_properties_verify_credentials_info);
+			verifiedImage = findViewById(R.id.chat_contact_properties_verify_credentials_info_icon);
+
 			//Shared folders layout
 			sharedFoldersLayout = findViewById(R.id.chat_contact_properties_shared_folders_layout);
 			sharedFoldersLayout.setOnClickListener(this);
@@ -501,6 +511,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
 				}
 			}
+
+			updateVerifyCredentialsLayout();
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
@@ -1277,6 +1289,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				}
 				break;
 			}
+			case R.id.chat_contact_properties_verify_credentials_layout:
+				break;
 		}
 	}
 
@@ -2491,5 +2505,21 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	public void setWaitingForCall() {
 		waitingForCall = true;
+	}
+
+	public void updateVerifyCredentialsLayout() {
+		if (user != null) {
+			verifyCredentialsLayout.setVisibility(View.VISIBLE);
+
+			if (megaApi.areCredentialsVerified(user)) {
+				verifiedText.setText(R.string.label_verified);
+				verifiedImage.setVisibility(View.VISIBLE);
+			} else {
+				verifiedText.setText(R.string.label_not_verified);
+				verifiedImage.setVisibility(View.GONE);
+			}
+		} else {
+			verifyCredentialsLayout.setVisibility(View.GONE);
+		}
 	}
 }
