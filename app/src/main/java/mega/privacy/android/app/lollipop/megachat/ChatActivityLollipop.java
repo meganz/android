@@ -7946,7 +7946,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             lastMessage = messages.get(index);
                         }
 
-                        if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
+                        if (lastMessage.getMessage() != null && app.isActivityVisible()) {
                             boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                             logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                         }
@@ -7969,7 +7969,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 lastMessage = messages.get(index);
                             }
 
-                            if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
+                            if (lastMessage.getMessage() != null && app.isActivityVisible()) {
                                 boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                                 logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                             }

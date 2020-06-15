@@ -1,5 +1,6 @@
 package mega.privacy.android.app;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -52,6 +53,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatAudioManager;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -114,7 +116,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 
-	private static boolean activityVisible = false;
+	// The current App Activity
+	private Activity currentActivity = null;
+
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 
@@ -205,6 +209,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 			// If receive the API_EPAYWALL error at any request should display the ODQ Paywall
 			if (e.getErrorCode() == MegaError.API_EPAYWALL) {
+				if (getCurrentActivity() instanceof ManagerActivityLollipop) {
+					UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) getCurrentActivity()).getUpgradeAccountFragment();
+					if (upAFL != null && upAFL.isVisible()) {
+						return;
+					}
+				}
 				Intent intent = new Intent(getApplicationContext(), OverDiskQuotaPaywallActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				startActivity(intent);
@@ -385,7 +395,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		@Override
 		public void run() {
 			try {
-				if (activityVisible) {
+				if (isActivityVisible()) {
 					logDebug("KEEPALIVE: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
 						backgroundStatus = megaChatApi.getBackgroundStatus();
@@ -781,9 +791,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		return dbH;
 	}
 
-	public static boolean isActivityVisible() {
-		logDebug("isActivityVisible() => " + activityVisible);
-		return activityVisible;
+	public boolean isActivityVisible() {
+		logDebug("Activity visible? => " + (currentActivity != null));
+		return getCurrentActivity() != null;
 	}
 
 	public static void setFirstConnect(boolean firstConnect){
@@ -800,16 +810,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
 		MegaApplication.showInfoChatMessages = showInfoChatMessages;
-	}
-
-	public static void activityResumed() {
-		logDebug("activityResumed()");
-		activityVisible = true;
-	}
-
-	public static void activityPaused() {
-		logDebug("activityPaused()");
-		activityVisible = false;
 	}
 
 	public static boolean isShowPinScreen() {
@@ -849,8 +849,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         openCallChatId = value;
 	}
 
-	public static boolean isRecentChatVisible() {
-		if(activityVisible){
+	public boolean isRecentChatVisible() {
+		if(isActivityVisible()){
 			return recentChatVisible;
 		}
 		else{
@@ -1078,7 +1078,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				AccountController aC = new AccountController(this);
 				aC.logoutConfirmed(this);
 
-				if(activityVisible){
+				if(isActivityVisible()){
 					logDebug("Launch intent to login screen");
 					Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
 					tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -1201,7 +1201,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			return;
 		}
 
-		if(activityVisible){
+		if(isActivityVisible()){
 
 			try{
 				if(msg!=null){
@@ -1553,5 +1553,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
+	}
+
+	public Activity getCurrentActivity() {
+		return currentActivity;
+	}
+
+	public void setCurrentActivity(Activity currentActivity) {
+		this.currentActivity = currentActivity;
 	}
 }
