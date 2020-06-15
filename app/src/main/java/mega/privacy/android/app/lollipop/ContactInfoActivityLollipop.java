@@ -1238,12 +1238,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 					ChatController chatC = new ChatController(this);
 					String typeMute =  enabled ? NOTIFICATIONS_ENABLED: NOTIFICATIONS_DISABLED;
-					if(enabled){
-						chatC.unmuteChat(chatHandle, typeMute);
-					}
-					else{
-						chatC.muteChat(chatHandle, typeMute);
-					}
+					chatC.muteChat(chatHandle, typeMute);
 
 					if(chatPrefs!=null){
 						chatPrefs.setNotificationsEnabled(typeMute);

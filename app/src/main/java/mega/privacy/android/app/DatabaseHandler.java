@@ -1699,8 +1699,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //	}
 
 	public int setNotificationEnabledChatItem(String enabled, String handle){
-        logDebug("setNotificationEnabledChatItem: " + enabled + " " + handle);
-
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(enabled));
 		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
@@ -1733,15 +1731,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public String areNotificationsEnabled (String handle){
-        logDebug("areNotificationsEnabled: " + handle);
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		String result = NOTIFICATIONS_ENABLED;
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){
-				String notificationsEnabled = decrypt(cursor.getString(2));
-				return notificationsEnabled;
+				result = decrypt(cursor.getString(2));
 			}
 		}
 

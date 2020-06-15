@@ -1314,7 +1314,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
             }
         } else {
-            prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "");
+            prefs = new ChatItemPreferences(Long.toString(idChat), NOTIFICATIONS_ENABLED, "");
             dbH.setChatItemPreferences(prefs);
         }
         refreshTextInput();

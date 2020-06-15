@@ -351,37 +351,12 @@ public class ChatController {
         logDebug("Chat handle: " + chatHandle);
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
-
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), typeMute, "");
-            dbH.setChatItemPreferences(chatPrefs);
-
-        }
-        else{
-            chatPrefs.setNotificationsEnabled(typeMute);
-            dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chatHandle));
-        }
-    }
-
-    public void muteChat(MegaChatListItem chat, String typeMute){
-        logDebug("Chat ID:" + chat.getChatId());
-        muteChat(chat.getChatId(), typeMute);
-    }
-
-    public void unmuteChat(MegaChatListItem chat, String typeMute){
-        logDebug("Chat ID: " + chat.getChatId());
-        unmuteChat(chat.getChatId(), typeMute);
-    }
-
-    public void unmuteChat(long chatHandle, String typeMute){
-        logDebug("Chant handle: " + chatHandle);
-        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-        if(chatPrefs==null){
             chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), typeMute, "");
             dbH.setChatItemPreferences(chatPrefs);
         }
         else{
             chatPrefs.setNotificationsEnabled(typeMute);
-            dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chatHandle));
+            dbH.setNotificationEnabledChatItem(typeMute, Long.toString(chatHandle));
         }
     }
 

@@ -636,29 +636,13 @@ public class ChatUtil {
         String chatHandle = String.valueOf(chatId);
         String typeMuted = MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle);
         int itemClicked = getItemClicked(typeMuted);
-
-        dialogBuilder.setSingleChoiceItems(items, itemClicked, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                ChatController chatC = new ChatController(context);
-                String typeMute = getTypeMute(item);
-                switch (item) {
-                    case 0:
-                        chatC.unmuteChat(chatId, typeMute);
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showMuteIcon(chatId);
-                        }
-                        dialog.dismiss();
-                        break;
-
-                    default:
-                        chatC.muteChat(chatId, typeMute);
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showMuteIcon(chatId);
-                        }
-                        dialog.dismiss();
-                        break;
-                }
+        dialogBuilder.setSingleChoiceItems(items, itemClicked, (dialog, item) -> {
+            ChatController chatC = new ChatController(context);
+            chatC.muteChat(chatId, getTypeMute(item));
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).showMuteIcon(chatId);
             }
+            dialog.dismiss();
         });
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
