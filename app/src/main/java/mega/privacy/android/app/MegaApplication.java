@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
@@ -201,6 +202,14 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
 			logDebug("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
+
+			// If receive the API_EPAYWALL error at any request should display the ODQ Paywall
+			if (e.getErrorCode() == MegaError.API_EPAYWALL) {
+				Intent intent = new Intent(getApplicationContext(), OverDiskQuotaPaywallActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				startActivity(intent);
+				return;
+			}
 
 			if (e.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
 				LocalBroadcastManager.getInstance(getApplicationContext())
