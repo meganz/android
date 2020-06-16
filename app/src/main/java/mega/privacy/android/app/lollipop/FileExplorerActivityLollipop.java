@@ -778,6 +778,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						supportInvalidateOptionsMenu();
 						changeTitle();
 
+						checkFragmentScroll(position);
+
 						if (!multiselect) {
 							return;
 						}
@@ -786,28 +788,26 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 							clearQuerySearch();
 							collapseSearchView();
 						}
-						cDriveExplorer = getCloudExplorerFragment();
-						iSharesExplorer = getIncomingExplorerFragment();
+
 						if (position == 0) {
 							if (iSharesExplorer != null ) {
 								iSharesExplorer.hideMultipleSelect();
-							}
-							if (cDriveExplorer != null) {
-								cDriveExplorer.checkScroll();
 							}
 						}
 						else if (position == 1) {
 							if (cDriveExplorer != null) {
 								cDriveExplorer.hideMultipleSelect();
 							}
-							if (iSharesExplorer != null) {
-								iSharesExplorer.checkScroll();
-							}
 						}
 					}
 				});
 			}
 		}
+	}
+
+	private void checkFragmentScroll(int position) {
+		CheckScrollInterface fragment = (CheckScrollInterface)mTabsAdapterExplorer.getItem(position);
+		fragment.checkScroll();
 	}
 
 	public void chooseFragment (int fragment) {

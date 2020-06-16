@@ -39,6 +39,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.CheckScrollInterface;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
@@ -57,7 +58,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatExplorerFragment extends Fragment {
+public class ChatExplorerFragment extends Fragment implements CheckScrollInterface {
 
     private static final int RECENTS_MAX_SIZE = 6;
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
@@ -190,28 +191,7 @@ public class ChatExplorerFragment extends Fragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (context instanceof FileExplorerActivityLollipop) {
-                    if (listView.canScrollVertically(-1)) {
-                        if (addLayout.getVisibility() == View.VISIBLE) {
-                            addLayout.setElevation(px2dp(4, outMetrics));
-                        } else {
-                            ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-                        }
-                    } else {
-                        if (addLayout.getVisibility() == View.VISIBLE) {
-                            addLayout.setElevation(0);
-                        } else {
-                            ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
-                        }
-                    }
-                }
-                else if (context instanceof ChatExplorerActivity && addLayout != null && addLayout.getVisibility() == View.VISIBLE) {
-                    if (listView.canScrollVertically(-1)) {
-                        addLayout.setElevation(px2dp(4, outMetrics));
-                    } else {
-                        addLayout.setElevation(0);
-                    }
-                }
+                checkScroll();
             }
         });
 
@@ -299,6 +279,32 @@ public class ChatExplorerFragment extends Fragment {
         }
 
         return v;
+    }
+
+    @Override
+    public void checkScroll() {
+         if (context instanceof FileExplorerActivityLollipop) {
+            boolean addLayoutVisible = (addLayout.getVisibility() == View.VISIBLE);
+
+            if (listView.canScrollVertically(-1)) {
+                if (addLayoutVisible) {
+                    addLayout.setElevation(px2dp(4, outMetrics));
+                }
+                ((FileExplorerActivityLollipop) context).changeActionBarElevation(!addLayoutVisible);
+            } else {
+                if (addLayoutVisible) {
+                    addLayout.setElevation(0);
+                }
+                ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+            }
+        }
+        else if (context instanceof ChatExplorerActivity && addLayout != null && addLayout.getVisibility() == View.VISIBLE) {
+            if (listView.canScrollVertically(-1)) {
+                addLayout.setElevation(px2dp(4, outMetrics));
+            } else {
+                addLayout.setElevation(0);
+            }
+        }
     }
 
     private void showConnecting() {

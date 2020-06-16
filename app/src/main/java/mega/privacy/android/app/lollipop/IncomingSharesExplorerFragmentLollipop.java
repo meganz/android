@@ -60,7 +60,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment implements OnClickListener{
+public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
+		implements OnClickListener, CheckScrollInterface{
 
 	private DisplayMetrics outMetrics;
 	private Context context;
@@ -231,6 +232,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		handler.removeCallbacksAndMessages(null);
 	}
 
+	@Override
 	public void checkScroll() {
 		if (recyclerView == null) {
 			return;
@@ -286,7 +288,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
-
+				checkScroll();
 			}
 		});
 
