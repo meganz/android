@@ -156,6 +156,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
+import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
@@ -453,6 +454,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
+    private MegaPushNotificationSettings push = null;
+    private ChatItemPreferences chatPrefs = null;
+
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
         this.preservedMessagesSelected = preservedData;
@@ -598,6 +602,25 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     };
 
+    private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
+
+            long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
+            if (chatId != getCurrentChatid()) {
+                logWarning("Different chat");
+                return;
+            }
+
+            if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHATROOM)) {
+               String typeMute = intent.getStringExtra(TYPE_MUTE);
+               selectMuteOption(chatId, typeMute);
+            }
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -706,6 +729,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+
+        IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+        filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHATROOM);
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
@@ -2225,6 +2252,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isEnableChatNotifications(long chatId){
+        if(push == null){
+            push = MegaPushNotificationSettings.createInstance();
+        }
+        return push.isChatEnabled(chatId);
     }
 
     /*
@@ -7379,6 +7413,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
@@ -7489,6 +7524,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         return;
     }
 
+    private void selectMuteOption(long chatId, String typeMute) {
+        if (push != null) {
+            controlMuteNotifications(this, chatId, typeMute, push);
+        } else {
+            megaApi.getPushNotificationSettings(this);
+        }
+    }
+
     public String getPeerFullName(long userHandle){
         return chatRoom.getPeerFullnameByHandle(userHandle);
     }
@@ -7519,7 +7562,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         removeProgressDialog();
-
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
             logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
 
@@ -7597,6 +7639,22 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 else{
                     logDebug("Attribute USER_ATTR_GEOLOCATION disabled");
                     MegaApplication.setEnabledGeoLocation(false);
+                }
+            }
+        }else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+            if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+                if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+                    if (e.getErrorCode() == MegaError.API_ENOENT) {
+                        push = MegaPushNotificationSettings.createInstance();
+                    } else {
+                        push = request.getMegaPushNotificationSettings();
+                    }
+                    chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatRoom.getChatId()));
+                    String typeMute = NOTIFICATIONS_ENABLED;
+                    if (chatPrefs != null) {
+                        typeMute = chatPrefs.getNotificationsEnabled();
+                    }
+                    selectMuteOption(chatRoom.getChatId(), typeMute);
                 }
             }
         }

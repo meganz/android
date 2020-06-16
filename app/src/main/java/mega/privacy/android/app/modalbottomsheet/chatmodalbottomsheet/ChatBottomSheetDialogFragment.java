@@ -192,11 +192,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
             if (chatPrefs != null) {
-                notificationsEnabled = true;
-                if (chatPrefs.getNotificationsEnabled() != null) {
-                    notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-                }
-
+                notificationsEnabled = isChatRoomEnabled(chatPrefs);
                 if (!notificationsEnabled) {
                     optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
                     optionMuteChatText.setText(getString(R.string.general_unmute));
@@ -283,7 +279,8 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.chat_list_mute_chat_layout:
-                if(context instanceof ManagerActivityLollipop) {
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).setMuteSelectedChat(chat.getChatId());
                     createMuteChatRoomAlertDialog(context, chat.getChatId());
                 }
                 break;

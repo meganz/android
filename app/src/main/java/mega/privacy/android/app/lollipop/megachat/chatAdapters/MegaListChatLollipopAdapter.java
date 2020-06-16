@@ -284,24 +284,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			setLastMessage(position, holder);
 
 			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-			if(chatPrefs!=null) {
-				logDebug("Chat prefs exists!!!");
-				boolean notificationsEnabled = true;
-				if (chatPrefs.getNotificationsEnabled() != null) {
-					notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-				}
-
-				if (!notificationsEnabled) {
-					logDebug("Chat is MUTE");
+			if(context instanceof ManagerActivityLollipop){
+				if(((ManagerActivityLollipop) context).isEnableChatNotifications(chat.getChatId())){
+					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
+				}else{
 					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.VISIBLE);
 				}
-				else{
-					logDebug("Chat with notifications enabled!!");
-					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
-				}
-			}
-			else{
-				logWarning("Chat prefs is NULL");
+			}else{
 				((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
 			}
 
@@ -1064,12 +1053,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatToShow.getChatId()));
 			if(chatPrefs!=null) {
 				logDebug("Chat prefs exists!!!");
-				boolean notificationsEnabled = true;
-				if (chatPrefs.getNotificationsEnabled() != null) {
-					notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-				}
-
-				if (!notificationsEnabled) {
+				if (!isChatRoomEnabled(chatPrefs)) {
 					logDebug("Chat is MUTE");
 					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.VISIBLE);
 				}

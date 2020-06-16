@@ -12,6 +12,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_CALL_UPDATE = "INTENT_CALL_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_SESSION_UPDATE = "INTENT_SESSION_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE";
+    public static final String BROADCAST_ACTION_INTENT_MUTE_CHATROOM = "INTENT_MUTE_CHATROOM";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -24,7 +25,7 @@ public class BroadcastConstants {
     public static final String ACTION_CHANGE_AUDIO_LEVEL = "ACTION_CHANGE_AUDIO_LEVEL";
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
-
+    public static final String ACTION_UPDATE_MUTE_CHATROOM = "ACTION_UPDATE_MUTE_CHATROOM";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
@@ -44,4 +45,7 @@ public class BroadcastConstants {
     public static final String UPDATE_SESSION_STATUS = "UPDATE_SESSION_STATUS";
     public static final String UPDATE_SESSION_TERM_CODE = "UPDATE_SESSION_TERM_CODE";
     public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
+    public static final String MUTE_CHATROOM_ID = "MUTE_CHATROOM_ID";
+    public static final String TYPE_MUTE = "TYPE_MUTE";
+
 }

@@ -109,7 +109,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -189,6 +188,7 @@ import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentL
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
@@ -231,6 +231,7 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -264,6 +265,7 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
@@ -426,6 +428,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
+	private long muteSelectedChat = MEGACHAT_INVALID_HANDLE;
+	private boolean isMuteChange = false;
 
     public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -751,6 +755,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 	View callBadge;
+
+	private MegaPushNotificationSettings push = null;
+	private ChatItemPreferences chatPrefs = null;
 
 	private boolean joiningToChatLink = false;
 	private long idJoinToChatLink = -1;
@@ -1309,6 +1316,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 						break;
 				}
+			}
+		}
+	};
+
+	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
+			if (chatId != muteSelectedChat) {
+				logWarning("Different chat");
+				return;
+			}
+
+			if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHATROOM)) {
+				String typeMute = intent.getStringExtra(TYPE_MUTE);
+				selectMuteOption(chatId, typeMute);
 			}
 		}
 	};
@@ -1965,6 +1991,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
 			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
+
+			IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+			filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHATROOM);
+			localBroadcastManager.registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -4550,6 +4580,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
 
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
@@ -13717,6 +13748,24 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						sttFLol.updateRBScheduler(request.getNumber());
 					}
 				}
+			}else if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+					if (e.getErrorCode() == MegaError.API_ENOENT) {
+						push = MegaPushNotificationSettings.createInstance();
+					} else {
+						push = request.getMegaPushNotificationSettings();
+					}
+					if(isMuteChange) {
+						chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(muteSelectedChat));
+						String typeMute = NOTIFICATIONS_ENABLED;
+						if (chatPrefs != null) {
+							typeMute = chatPrefs.getNotificationsEnabled();
+						}
+						selectMuteOption(muteSelectedChat, typeMute);
+					}else{
+						showMuteIcon(muteSelectedChat);
+					}
+				}
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
@@ -15381,6 +15430,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		viewPagerContacts.setCurrentItem(index);
 	}
 
+	public void setMuteSelectedChat(long muteSelectedChat) {
+		this.muteSelectedChat = muteSelectedChat;
+	}
+
 	public void showChatPanel(MegaChatListItem chat){
 		logDebug("showChatPanel");
 
@@ -16667,6 +16720,26 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		} else {
 			logDebug("Transfer panel not visible");
 		}
+	}
+
+	private void selectMuteOption(long chatId, String typeMute) {
+		if (push != null) {
+			controlMuteNotifications(this, chatId, typeMute, push);
+		} else {
+			isMuteChange = true;
+			megaApi.getPushNotificationSettings(this);
+		}
+	}
+
+	public boolean isEnableChatNotifications(long chatId){
+		if(push != null){
+			return !push.isChatDndEnabled(chatId);
+		}
+
+		muteSelectedChat = chatId;
+		isMuteChange = false;
+		megaApi.getPushNotificationSettings(this);
+		return true;
 	}
 
 	private boolean checkPermissionsCall(){

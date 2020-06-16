@@ -440,11 +440,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         //SET Preferences (if exist)
         if(chatPrefs!=null){
             logDebug("There is individual chat preferences");
-            boolean notificationsEnabled = true;
-            if (chatPrefs.getNotificationsEnabled() != null) {
-                notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-            }
-            notificationsSwitch.setChecked(notificationsEnabled);
+            notificationsSwitch.setChecked(isChatRoomEnabled(chatPrefs));
         }
         else{
             logDebug("NO individual chat preferences");

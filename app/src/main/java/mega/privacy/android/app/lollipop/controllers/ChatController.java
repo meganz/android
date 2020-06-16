@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.text.Html;
 import android.text.Spanned;
 
@@ -65,6 +67,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -348,7 +351,6 @@ public class ChatController {
     }
 
     public void muteChat(long chatHandle, String typeMute){
-        logDebug("Chat handle: " + chatHandle);
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
             chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), typeMute, "");
@@ -358,6 +360,12 @@ public class ChatController {
             chatPrefs.setNotificationsEnabled(typeMute);
             dbH.setNotificationEnabledChatItem(typeMute, Long.toString(chatHandle));
         }
+
+        Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+        intentGeneral.setAction(ACTION_UPDATE_MUTE_CHATROOM);
+        intentGeneral.putExtra(MUTE_CHATROOM_ID, chatHandle);
+        intentGeneral.putExtra(TYPE_MUTE, typeMute);
+        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intentGeneral);
     }
 
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {

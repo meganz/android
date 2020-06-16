@@ -14,7 +14,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
-
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Calendar;
 import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -36,6 +36,7 @@ import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
@@ -45,6 +46,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -632,22 +634,64 @@ public class ChatUtil {
                 getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)),
                 context.getString(R.string.mute_chatroom_notification_option_indefinitely)};
 
-
         String chatHandle = String.valueOf(chatId);
         String typeMuted = MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle);
+
+        if((context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop)context).isEnableChatNotifications(chatId)) ||
+                (context instanceof ChatActivityLollipop && ((ChatActivityLollipop)context).isEnableChatNotifications(chatId))){
+
+            typeMuted = NOTIFICATIONS_ENABLED;
+        }
+
         int itemClicked = getItemClicked(typeMuted);
         dialogBuilder.setSingleChoiceItems(items, itemClicked, (dialog, item) -> {
             ChatController chatC = new ChatController(context);
             chatC.muteChat(chatId, getTypeMute(item));
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showMuteIcon(chatId);
-            }
             dialog.dismiss();
         });
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
         muteDialog = dialogBuilder.create();
         muteDialog.show();
+    }
+
+    public static void controlMuteNotifications(Context context, long chatId, String typeMute, final MegaPushNotificationSettings push) {
+        if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
+            push.enableChat(chatId, true);
+        } else if (typeMute.equals(NOTIFICATIONS_DISABLED)) {
+            push.enableChat(chatId, false);
+        }else {
+            Calendar newCalendar = Calendar.getInstance();
+            newCalendar.setTimeInMillis(System.currentTimeMillis());
+            switch (typeMute) {
+                case NOTIFICATIONS_30_MINUTES:
+                    newCalendar.add(Calendar.MINUTE, 30);
+                    break;
+                case NOTIFICATIONS_1_HOUR:
+                    newCalendar.add(Calendar.HOUR, 1);
+                    break;
+                case NOTIFICATIONS_6_HOURS:
+                    newCalendar.add(Calendar.HOUR, 6);
+                    break;
+                case NOTIFICATIONS_24_HOURS:
+                    newCalendar.add(Calendar.HOUR, 24);
+                    break;
+            }
+            push.setChatDnd(chatId, newCalendar.getTimeInMillis());
+        }
+        MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop)context).showMuteIcon(chatId);
+        }
+    }
+
+    public static boolean isChatRoomEnabled(final ChatItemPreferences chatPrefs){
+        boolean result = true;
+        if (!isTextEmpty(chatPrefs.getNotificationsEnabled())){
+            result = chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED);
+        }
+        return result;
     }
 
 }

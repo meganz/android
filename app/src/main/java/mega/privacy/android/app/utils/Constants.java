@@ -281,12 +281,12 @@ public class Constants {
     public static final int RECENTS_ADAPTER = 2024;
     public static final int LINKS_ADAPTER = 2025;
 
-    public static final String NOTIFICATIONS_ENABLED = "notificationsEnabled";
-    public static final String NOTIFICATIONS_30_MINUTES = "mutedNotifications20minutes";
-    public static final String NOTIFICATIONS_1_HOUR = "mutedNotifications1hour";
-    public static final String NOTIFICATIONS_6_HOURS = "mutedNotifications6hour";
-    public static final String NOTIFICATIONS_24_HOURS = "mutedNotifications24hour";
-    public static final String NOTIFICATIONS_DISABLED = "notificationsDisabled";
+    public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";
+    public static final String NOTIFICATIONS_30_MINUTES = "NOTIFICATIONS_30_MINUTES";
+    public static final String NOTIFICATIONS_1_HOUR = "NOTIFICATIONS_1_HOUR";
+    public static final String NOTIFICATIONS_6_HOURS = "NOTIFICATIONS_6_HOURS";
+    public static final String NOTIFICATIONS_24_HOURS = "NOTIFICATIONS_24_HOURS";
+    public static final String NOTIFICATIONS_DISABLED = "NOTIFICATIONS_DISABLED";
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;

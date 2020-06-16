@@ -104,6 +104,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -130,6 +131,7 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
+	private MegaPushNotificationSettings push = null;
 
 	ContactController cC;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
@@ -695,17 +697,19 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		visibilityStateIcon();
 	}
 
+	public boolean isEnableChatNotifications(long chatId){
+		if(push == null){
+			push = MegaPushNotificationSettings.createInstance();
+		}
+		return push.isChatEnabled(chatId);
+	}
+
 	public void setUpIndividualChatNotifications(){
 		logDebug("setUpIndividualChatNotifications");
 		//SET Preferences (if exist)
 		if(chatPrefs!=null){
 			logDebug("There is individual chat preferences");
-
-			boolean notificationsEnabled = true;
-			if (chatPrefs.getNotificationsEnabled() != ""){
-				notificationsEnabled = chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED);
-			}
-			notificationsSwitch.setChecked(notificationsEnabled);
+			notificationsSwitch.setChecked(isEnableChatNotifications(chatHandle));
 		}
 		else{
 			logDebug("NO individual chat preferences");
