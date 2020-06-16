@@ -2,6 +2,7 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
@@ -176,6 +177,12 @@ public class GetAttrUserListener extends BaseListener {
                     } else {
                         ((CameraUploadsService) context).onGetPrimaryFolderAttribute(request, e);
                     }
+                }
+                break;
+
+            case USER_ATTR_ED25519_PUBLIC_KEY:
+                if (context instanceof AuthenticityCredentialsActivity) {
+                    ((AuthenticityCredentialsActivity) context).setContactCredentials(request, e);
                 }
                 break;
         }

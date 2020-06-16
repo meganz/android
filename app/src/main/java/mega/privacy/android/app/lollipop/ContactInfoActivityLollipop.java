@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
@@ -1290,6 +1291,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				break;
 			}
 			case R.id.chat_contact_properties_verify_credentials_layout:
+				Intent intent = new Intent(this, AuthenticityCredentialsActivity.class);
+				intent.putExtra(EMAIL, user.getEmail());
+				startActivity(intent);
 				break;
 		}
 	}
@@ -1767,6 +1771,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		logDebug("onResume");
 		super.onResume();
 
+		updateVerifyCredentialsLayout();
 		setContactPresenceStatus();
 		requestLastGreen(-1);
 	}

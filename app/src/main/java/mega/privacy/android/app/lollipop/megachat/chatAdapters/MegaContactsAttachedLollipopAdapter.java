@@ -167,6 +167,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		ImageView imageButtonThreeDots;
         RelativeLayout itemLayout;
         String contactMail;
+		ImageView verifiedIcon;
     }
 
     public class ViewHolderContactsList extends ViewHolderContacts{
@@ -205,6 +206,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		    holderList = new ViewHolderContactsList(v);
 		    holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_list_item_layout);
 		    holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
+		    holderList.verifiedIcon = v.findViewById(R.id.verified_icon);
 		    holderList.textViewContactName = v.findViewById(R.id.contact_list_name);
 		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 		    holderList.imageButtonThreeDots = (ImageView) v.findViewById(R.id.contact_list_three_dots);
@@ -233,6 +235,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	    	holderGrid = new ViewHolderContactsGrid(v);
 	    	holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_grid_item_layout);
 		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);
+			holderGrid.verifiedIcon = v.findViewById(R.id.verified_icon);
 		    holderGrid.textViewContactName = v.findViewById(R.id.contact_grid_name);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
@@ -275,9 +278,12 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		holder.imageView.setImageBitmap(null);
 
 		MegaContactDB contact = (MegaContactDB) getItem(position);
-		holder.contactMail = contact.getMail();
 
 		MegaUser user = megaApi.getContact(contact.getMail());
+		holder.verifiedIcon.setVisibility(!isItemChecked(position) && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
+
+		holder.contactMail = contact.getMail();
+
 		if (user != null) {
 			setContactStatus(megaChatApi.getUserOnlineStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
 		} else {
@@ -345,6 +351,10 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		holder.imageView.setImageBitmap(null);
 
 		MegaContactDB contact = (MegaContactDB) getItem(position);
+
+		MegaUser user = megaApi.getContact(contact.getMail());
+		holder.verifiedIcon.setVisibility(!isItemChecked(position) && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
+
 		holder.contactMail = contact.getMail();
 		logDebug("Contact: " + contact.getMail() + ", Handle: " + contact.getHandle());
 

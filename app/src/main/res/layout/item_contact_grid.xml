@@ -29,6 +29,16 @@
 			android:layout_alignParentTop="true"
 			android:layout_marginLeft="7dp"
 			android:layout_marginTop="7dp"/>
+
+		<ImageView
+			android:id="@+id/verified_icon"
+			android:layout_width="24dp"
+			android:layout_height="24dp"
+			android:src="@drawable/ic_verified"
+			android:layout_alignParentEnd="true"
+			android:layout_marginEnd="7dp"
+			android:layout_marginTop="7dp"
+			android:visibility="gone"/>
 	</RelativeLayout>
 
 	<View
@@ -76,8 +86,8 @@
 
 			<ImageView
 				android:id="@+id/contact_grid_drawable_state"
-				android:layout_width="12dp"
-				android:layout_height="12dp"
+				android:layout_width="6dp"
+				android:layout_height="6dp"
 				android:layout_marginTop="1dp"
 				android:layout_marginLeft="4dp"
 				android:layout_gravity="center_vertical"

@@ -466,4 +466,29 @@
         <item name="android:textColor">@color/accentColor</item>
         <item name="android:background">@android:color/transparent</item>
     </style>
+
+    <style name="AccentButton" parent="ButtonStyle">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/background_accent_button</item>
+    </style>
+
+    <style name="CredentialsText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">start</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/mail_my_account</item>
+    </style>
+
+    <style name="ContactCredentialsText" parent="CredentialsText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MyCredentialsText" parent="CredentialsText">
+        <item name="android:textSize">13sp</item>
+    </style>
 </resources>
