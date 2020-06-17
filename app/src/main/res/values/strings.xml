@@ -2779,5 +2779,6 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">This is best done in real life by meeting face to face. If you have another already-verified channel such as verified OTR or PGP, you may also use that.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Your Credentials</string>
     <string name="action_reset" context="Button to reset credentials">Reset</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana's credentials">%s\'s credentials</string>
 
 </resources>

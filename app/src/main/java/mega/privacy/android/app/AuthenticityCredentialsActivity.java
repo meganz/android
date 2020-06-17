@@ -2,9 +2,12 @@ package mega.privacy.android.app;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,10 +34,17 @@ import static mega.privacy.android.app.utils.Util.*;
 public class AuthenticityCredentialsActivity extends PinActivityLollipop {
 
     private static final String CONTACT_CREDENTIALS = "CONTACT_CREDENTIALS";
-    private static final int LENGHT_CREDENTIALS_LIST = 10;
-    private static final int LENGHT_CREDENTIALS_CHARACTERS = 4;
+    private static final int LENGTH_CREDENTIALS_LIST = 10;
+    private static final int LENGTH_CREDENTIALS_CHARACTERS = 4;
 
-    private AuthenticityCredentialsActivity authenticityCredentialsActivity;
+    //Landscape layout params
+    private static final int MARGIN_TOP_NAME = 12;
+    private static final int MARGIN_RIGHT_CONTACT_CREDENTIALS = 188;
+    private static final int MARGIN_TOP_CONTACT_CREDENTIALS = 16;
+    private static final int MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS = 20;
+    private static final int MARGIN_TOP_EXPLANATION = 18;
+    private static final int MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS = 72;
+    private static final int MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS = 123;
 
     private MegaUser contact;
     private String contactCredentials;
@@ -89,11 +99,13 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
             return;
         }
 
-        authenticityCredentialsActivity = this;
+        AuthenticityCredentialsActivity authenticityCredentialsActivity = this;
 
         if (savedInstanceState != null) {
             contactCredentials = savedInstanceState.getString(CONTACT_CREDENTIALS);
         }
+
+        changeStatusBarColor(authenticityCredentialsActivity, getWindow(), R.color.dark_primary_color);
 
         setContentView(R.layout.activity_authenticity_credentials);
 
@@ -115,8 +127,17 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         scrollView = findViewById(R.id.credentials_scrollview);
         new ListenScrollChangesHelper().addViewToListen(scrollView, (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeViewElevation(aB, scrollView.canScrollVertically(-1), getOutMetrics()));
 
+        boolean isPortrait = isScreenInPortrait(authenticityCredentialsActivity);
+
+        if (!isPortrait) {
+            RelativeLayout contactCredentialsLayout = findViewById(R.id.contact_credentials_layout);
+            RelativeLayout.LayoutParams contactCredentialsLayoutParams = (RelativeLayout.LayoutParams) contactCredentialsLayout.getLayoutParams();
+            contactCredentialsLayoutParams.topMargin = px2dp(MARGIN_TOP_NAME, getOutMetrics());
+            contactCredentialsLayout.setLayoutParams(contactCredentialsLayoutParams);
+        }
+
         TextView contactName = findViewById(R.id.contact_credentials_name);
-        contactName.setText(getContactNameDB(contact.getHandle()));
+        contactName.setText(getString(R.string.label_contact_credentials, getContactNameDB(contact.getHandle())));
         TextView contactEmail = findViewById(R.id.contact_credentials_email);
         contactEmail.setText(email);
 
@@ -125,18 +146,64 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         contactCredentials02 = findViewById(R.id.contact_credentials_0_2);
         contactCredentials03 = findViewById(R.id.contact_credentials_0_3);
         contactCredentials04 = findViewById(R.id.contact_credentials_0_4);
-        contactCredentials10 = findViewById(R.id.contact_credentials_1_0);
-        contactCredentials11 = findViewById(R.id.contact_credentials_1_1);
-        contactCredentials12 = findViewById(R.id.contact_credentials_1_2);
-        contactCredentials13 = findViewById(R.id.contact_credentials_1_3);
-        contactCredentials14 = findViewById(R.id.contact_credentials_1_4);
+
+        if (isPortrait) {
+            contactCredentials10 = findViewById(R.id.contact_credentials_1_0);
+            contactCredentials11 = findViewById(R.id.contact_credentials_1_1);
+            contactCredentials12 = findViewById(R.id.contact_credentials_1_2);
+            contactCredentials13 = findViewById(R.id.contact_credentials_1_3);
+            contactCredentials14 = findViewById(R.id.contact_credentials_1_4);
+
+            findViewById(R.id.contact_credentials_row).setVisibility(View.VISIBLE);
+        } else {
+            TableLayout contactCredentialsTable = findViewById(R.id.contact_credentials);
+            RelativeLayout.LayoutParams tabParams = (RelativeLayout.LayoutParams) contactCredentialsTable.getLayoutParams();
+            tabParams.topMargin = px2dp(MARGIN_TOP_CONTACT_CREDENTIALS, getOutMetrics());
+            tabParams.rightMargin = px2dp(MARGIN_RIGHT_CONTACT_CREDENTIALS, getOutMetrics());
+            contactCredentialsTable.setLayoutParams(tabParams);
+
+            contactCredentials10 = findViewById(R.id.contact_credentials_0_5);
+            contactCredentials10.setVisibility(View.VISIBLE);
+            contactCredentialsTable.setColumnStretchable(5, true);
+            contactCredentials11 = findViewById(R.id.contact_credentials_0_6);
+            contactCredentials11.setVisibility(View.VISIBLE);
+            contactCredentialsTable.setColumnStretchable(6, true);
+            contactCredentials12 = findViewById(R.id.contact_credentials_0_7);
+            contactCredentials12.setVisibility(View.VISIBLE);
+            contactCredentialsTable.setColumnStretchable(7, true);
+            contactCredentials13 = findViewById(R.id.contact_credentials_0_8);
+            contactCredentials13.setVisibility(View.VISIBLE);
+            contactCredentialsTable.setColumnStretchable(8, true);
+            contactCredentials14 = findViewById(R.id.contact_credentials_0_9);
+            contactCredentials14.setVisibility(View.VISIBLE);
+            contactCredentialsTable.setColumnStretchable(9, true);
+
+            findViewById(R.id.contact_credentials_row).setVisibility(View.GONE);
+        }
 
         if (isTextEmpty(contactCredentials)) {
             megaApi.getUserCredentials(contact, new GetAttrUserListener(authenticityCredentialsActivity));
         }
 
+        int marginTopBottomButtonAndMyCredentials = px2dp(MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS, getOutMetrics());
+        int marginLeftExplanationAndMyCredentials = px2dp(MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
+        int marginRightExplanationAndMyCredentials = px2dp(MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
+
         credentialsButton = findViewById(R.id.credentials_button);
         updateButtonText();
+
+        if (!isPortrait) {
+            RelativeLayout.LayoutParams buttonParams = (RelativeLayout.LayoutParams) credentialsButton.getLayoutParams();
+            buttonParams.topMargin = buttonParams.bottomMargin = marginTopBottomButtonAndMyCredentials;
+            credentialsButton.setLayoutParams(buttonParams);
+
+            TextView explanation = findViewById(R.id.credentials_explanation);
+            RelativeLayout.LayoutParams explanationParams = (RelativeLayout.LayoutParams) explanation.getLayoutParams();
+            explanationParams.topMargin = px2dp(MARGIN_TOP_EXPLANATION, getOutMetrics());
+            explanationParams.leftMargin = marginLeftExplanationAndMyCredentials;
+            explanationParams.rightMargin = marginRightExplanationAndMyCredentials;
+            explanation.setLayoutParams(explanationParams);
+        }
 
         VerifyCredentialsListener verifyCredentialsListener = new VerifyCredentialsListener(authenticityCredentialsActivity);
         credentialsButton.setOnClickListener(v -> {
@@ -152,11 +219,42 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         myCredentials02 = findViewById(R.id.my_credentials_0_2);
         myCredentials03 = findViewById(R.id.my_credentials_0_3);
         myCredentials04 = findViewById(R.id.my_credentials_0_4);
-        myCredentials10 = findViewById(R.id.my_credentials_1_0);
-        myCredentials11 = findViewById(R.id.my_credentials_1_1);
-        myCredentials12 = findViewById(R.id.my_credentials_1_2);
-        myCredentials13 = findViewById(R.id.my_credentials_1_3);
-        myCredentials14 = findViewById(R.id.my_credentials_1_4);
+
+        if (isPortrait) {
+            myCredentials10 = findViewById(R.id.my_credentials_1_0);
+            myCredentials11 = findViewById(R.id.my_credentials_1_1);
+            myCredentials12 = findViewById(R.id.my_credentials_1_2);
+            myCredentials13 = findViewById(R.id.my_credentials_1_3);
+            myCredentials14 = findViewById(R.id.my_credentials_1_4);
+        } else {
+            RelativeLayout myCredentialsContainer = findViewById(R.id.my_credentials_container);
+            RelativeLayout.LayoutParams myCredentialsParams = (RelativeLayout.LayoutParams) myCredentialsContainer.getLayoutParams();
+            myCredentialsParams.leftMargin = marginLeftExplanationAndMyCredentials;
+            myCredentialsParams.topMargin = myCredentialsParams.bottomMargin = marginTopBottomButtonAndMyCredentials;
+            myCredentialsParams.rightMargin = marginRightExplanationAndMyCredentials;
+            myCredentialsContainer.setLayoutParams(myCredentialsParams);
+
+            TableLayout myCredentialsTable = findViewById(R.id.my_credentials);
+
+            myCredentials10 = findViewById(R.id.my_credentials_0_5);
+            myCredentials10.setVisibility(View.VISIBLE);
+            myCredentialsTable.setColumnStretchable(5, true);
+            myCredentials11 = findViewById(R.id.my_credentials_0_6);
+            myCredentials11.setVisibility(View.VISIBLE);
+            myCredentialsTable.setColumnStretchable(6, true);
+            myCredentials12 = findViewById(R.id.my_credentials_0_7);
+            myCredentials12.setVisibility(View.VISIBLE);
+            myCredentialsTable.setColumnStretchable(7, true);
+            myCredentials13 = findViewById(R.id.my_credentials_0_8);
+            myCredentials13.setVisibility(View.VISIBLE);
+            myCredentialsTable.setColumnStretchable(8, true);
+            myCredentials14 = findViewById(R.id.my_credentials_0_9);
+            myCredentials14.setVisibility(View.VISIBLE);
+            myCredentialsTable.setColumnStretchable(9, true);
+
+            findViewById(R.id.my_credentials_row).setVisibility(View.GONE);
+        }
+
         setMyCredentials();
     }
 
@@ -252,9 +350,9 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         }
 
         int index = 0;
-        for (int i = 0; i < LENGHT_CREDENTIALS_LIST; i++) {
-            credentialsList.add(credentials.substring(index, index + LENGHT_CREDENTIALS_CHARACTERS));
-            index += LENGHT_CREDENTIALS_CHARACTERS;
+        for (int i = 0; i < LENGTH_CREDENTIALS_LIST; i++) {
+            credentialsList.add(credentials.substring(index, index + LENGTH_CREDENTIALS_CHARACTERS));
+            index += LENGTH_CREDENTIALS_CHARACTERS;
         }
 
         return credentialsList;

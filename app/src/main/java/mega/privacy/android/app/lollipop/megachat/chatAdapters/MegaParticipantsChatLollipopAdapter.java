@@ -93,6 +93,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			super(v);
 		}
     	RoundedImageView imageView;
+    	ImageView verifiedIcon;
 		MarqueeTextView textViewContent;
 		RelativeLayout threeDotsLayout;
 		ImageView imageButtonThreeDots;
@@ -134,6 +135,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList = new ViewHolderParticipantsList(v);
 			holderList.itemLayout = v.findViewById(R.id.participant_list_item_layout);
 			holderList.imageView = v.findViewById(R.id.participant_list_thumbnail);
+			holderList.verifiedIcon = v.findViewById(R.id.verified_icon);
 			holderList.textViewContactName = v.findViewById(R.id.participant_list_name);
 			holderList.textViewContent = v.findViewById(R.id.participant_list_content);
 			holderList.threeDotsLayout = v.findViewById(R.id.participant_list_three_dots_layout);
@@ -183,6 +185,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			((ViewHolderParticipantsList)holder).imageView.setImageBitmap(null);
 
 			MegaChatParticipant participant = (MegaChatParticipant) getItem(position);
+			MegaUser contact = megaApi.getContact(participant.getEmail());
+			holderList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
+
 			((ViewHolderParticipantsList)holder).contactMail = participant.getEmail();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());
 			((ViewHolderParticipantsList)holder).userHandle = userHandleEncoded;
@@ -240,7 +245,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				if (((ViewHolderParticipantsList)holder).contactMail != null) {
 					logDebug("The participant is contact!!");
 
-					MegaUser contact = megaApi.getContact(((ViewHolderParticipantsList)holder).contactMail);
 					if(contact!=null){
 						File avatar = buildAvatarFile(context,((ViewHolderParticipantsList)holder).contactMail + ".jpg");
 						Bitmap bitmap = null;
