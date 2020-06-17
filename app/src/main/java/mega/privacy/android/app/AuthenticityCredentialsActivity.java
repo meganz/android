@@ -95,7 +95,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
 
         contact = megaApi.getContact(email);
         if (contact == null) {
-            logError("Cannot init view, contactis null");
+            logError("Cannot init view, contact is null");
             return;
         }
 
@@ -274,10 +274,20 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Updates the text of the button depending on if the contact' credentials are verified or not.
+     */
     private void updateButtonText() {
         credentialsButton.setText(megaApi.areCredentialsVerified(contact) ? R.string.action_reset : R.string.general_verify);
     }
 
+    /**
+     * Finishes the verify or reset action of credentials when the request finishes.
+     * If everything went well, updates the text of the button. Otherwise, shows an error message.
+     *
+     * @param request   MegaRequest that contains the results of the request
+     * @param e         MegaError that contains the error result of the request
+     */
     public void finishVerifyCredentialsAction(MegaRequest request, MegaError e) {
         if (request.getNodeHandle() != contact.getHandle()) return;
 
@@ -294,6 +304,9 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         showSnackbar(MegaApiJava.getTranslatedErrorString(e));
     }
 
+    /**
+     * Sets the credentials of the current logged in account in the view.
+     */
     private void setMyCredentials() {
         ArrayList<String> myCredentialsList = getCredentialsList(megaApi.getMyCredentials());
         if (myCredentialsList.size() != 10) {
@@ -313,6 +326,11 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         myCredentials14.setText(myCredentialsList.get(9));
     }
 
+    /**
+     * Sets the credentials of the contact in question in the view.
+     *
+     * @param contactCredentials    String that contains the contact's credentials
+     */
     private void setContactCredentials(String contactCredentials) {
         ArrayList<String> contactCredentialsList = getCredentialsList(contactCredentials);
         if (contactCredentialsList.size() != 10) {
@@ -332,6 +350,13 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         contactCredentials14.setText(contactCredentialsList.get(9));
     }
 
+    /**
+     * Sets the contact's credentials after the request for ask for them finishes.
+     * If everything went well, sets contact's credentials in the view. Otherwise, shows an error message.
+     *
+     * @param request   MegaRequest that contains the results of the request
+     * @param e         MegaError that contains the error result of the request
+     */
     public void setContactCredentials(MegaRequest request, MegaError e) {
         if (e.getErrorCode() == MegaError.API_OK && request.getFlag()) {
             setContactCredentials(request.getPassword());
@@ -341,6 +366,12 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         showSnackbar(MegaApiJava.getTranslatedErrorString(e));
     }
 
+    /**
+     * Divides in 10 equal parts the credentials string to show it in the view.
+     *
+     * @param credentials   String that contains the credentials
+     * @return An ArrayList of Strings containing the credentials divided in 10.
+     */
     private ArrayList<String> getCredentialsList(String credentials) {
         ArrayList<String> credentialsList = new ArrayList<>();
 
@@ -358,7 +389,12 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         return credentialsList;
     }
 
-    public void showSnackbar(String s) {
+    /**
+     * Shows a Snackbar.
+     *
+     * @param s String that contains the message to show in the Snackbar.
+     */
+    private void showSnackbar(String s) {
         showSnackbar(authenticityCredentialsLayout, s);
     }
 }

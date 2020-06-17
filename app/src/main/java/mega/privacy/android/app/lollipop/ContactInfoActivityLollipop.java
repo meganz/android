@@ -2512,6 +2512,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		waitingForCall = true;
 	}
 
+	/**
+	 * Updates the "Verify credentials" view.
+	 */
 	public void updateVerifyCredentialsLayout() {
 		if (user != null) {
 			verifyCredentialsLayout.setVisibility(View.VISIBLE);
