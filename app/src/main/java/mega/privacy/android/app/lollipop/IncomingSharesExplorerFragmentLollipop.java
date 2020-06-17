@@ -238,10 +238,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			return;
 		}
 		if (recyclerView.canScrollVertically(-1)){
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(true
+					, FileExplorerActivityLollipop.INCOMING_FRAGMENT);
 		}
 		else {
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(false
+					, FileExplorerActivityLollipop.INCOMING_FRAGMENT);
 		}
 	}
 

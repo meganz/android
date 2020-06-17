@@ -261,10 +261,12 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 
 		if (recyclerView.canScrollVertically(-1)){
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(true
+					, FileExplorerActivityLollipop.CLOUD_FRAGMENT);
 		}
 		else {
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(false
+					, FileExplorerActivityLollipop.CLOUD_FRAGMENT);
 		}
 	}
 
