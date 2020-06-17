@@ -1333,17 +1333,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null)
 				return;
-
-			long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
-			if (chatId != muteSelectedChat) {
-				logWarning("Different chat");
-				return;
-			}
-
-			if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHATROOM)) {
-				String typeMute = intent.getStringExtra(TYPE_MUTE);
-				selectMuteOption(chatId, typeMute);
-			}
 		}
 	};
 
@@ -2001,7 +1990,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
 
 			IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-			filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHATROOM);
+			filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
 			localBroadcastManager.registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));

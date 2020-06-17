@@ -124,6 +124,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
@@ -131,7 +132,6 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
-	private MegaPushNotificationSettings push = null;
 
 	ContactController cC;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
@@ -166,11 +166,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	LinearLayout notificationsLayout;
 	SwitchCompat notificationsSwitch;
 	TextView notificationsTitle;
+	private TextView notificationsSubTitle;
 	View dividerNotificationsLayout;
 
 	ChatSettings chatSettings = null;
-	ChatItemPreferences chatPrefs = null;
+	private ChatItemPreferences chatPrefs = null;
 	boolean generalChatNotifications = true;
+	private MegaPushNotificationSettings push = null;
 
 	boolean startVideo = false;
 
@@ -233,6 +235,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     boolean moveToRubbish;
     long parentHandle;
 	private String nickname;
+	private String newMuteOption = null;
 
 	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
@@ -266,6 +269,31 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				checkNickname(user.getHandle());
 				updateAvatar();
 			}
+
+		}
+	};
+
+	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			if(intent.getAction() == ACTION_UPDATE_PUSH_NOTIFICATION_SETTING){
+				setUpIndividualChatNotifications();
+			}else {
+				long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
+				if (chatId != MEGACHAT_INVALID_HANDLE && chatId != chatHandle) {
+					logWarning("Different chat");
+					return;
+				}
+
+				if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
+					newMuteOption = intent.getStringExtra(TYPE_MUTE);
+					megaApi.setPushNotificationSettings(push, ContactInfoActivityLollipop.this);
+				}
+			}
+
 
 		}
 	};
@@ -400,11 +428,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			notificationsLayout = findViewById(R.id.chat_contact_properties_notifications_layout);
 			notificationsLayout.setVisibility(View.VISIBLE);
-
+			notificationsLayout.setOnClickListener(this);
 			notificationsTitle = findViewById(R.id.chat_contact_properties_notifications_text);
+			notificationsSubTitle = findViewById(R.id.chat_contact_properties_notifications_muted_text);
+			notificationsSubTitle.setVisibility(View.GONE);
 
 			notificationsSwitch = findViewById(R.id.chat_contact_properties_switch);
-			notificationsSwitch.setOnClickListener(this);
+			notificationsSwitch.setClickable(false);
 
 			dividerNotificationsLayout = findViewById(R.id.divider_notifications_layout);
 
@@ -446,7 +476,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			chatHandle = extras.getLong("handle",-1);
 			userEmailExtra = extras.getString(NAME);
 			if (chatHandle != -1) {
-
 				logDebug("From chat!!");
 				fromContacts = false;
 				chat = megaChatApi.getChatRoom(chatHandle);
@@ -455,7 +484,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 				user = megaApi.getContact(userHandleEncoded);
-				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
+				initializeNotificationSettings(chatHandle);
 
 				if (user != null) {
 					checkNickname(user.getHandle());
@@ -489,7 +518,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 						sharedFilesLayout.setVisibility(View.GONE);
 						dividerSharedFilesLayout.setVisibility(View.GONE);
 					} else {
-						chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
+						initializeNotificationSettings(chatHandle);
 					}
 				} else {
 					notificationsLayout.setVisibility(View.GONE);
@@ -586,8 +615,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 				} else {
 					logDebug("General notifications OFF");
-					boolean notificationsEnabled = false;
-					notificationsSwitch.setChecked(notificationsEnabled);
+					notificationsSwitch.setChecked(false);
+					notificationsSubTitle.setVisibility(View.GONE);
 
 					notificationsLayout.setVisibility(View.VISIBLE);
 					dividerNotificationsLayout.setVisibility(View.VISIBLE);
@@ -611,6 +640,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+
+		IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+		filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+		filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
+		LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 	}
 
 	private void visibilityStateIcon() {
@@ -697,27 +731,56 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		visibilityStateIcon();
 	}
 
-	public boolean isEnableChatNotifications(long chatId){
-		if(push == null){
-			push = MegaPushNotificationSettings.createInstance();
-		}
-		return push.isChatEnabled(chatId);
-	}
-
 	public void setUpIndividualChatNotifications(){
-		logDebug("setUpIndividualChatNotifications");
-		//SET Preferences (if exist)
-		if(chatPrefs!=null){
-			logDebug("There is individual chat preferences");
-			notificationsSwitch.setChecked(isEnableChatNotifications(chatHandle));
+		if(push == null){
+			push = MegaApplication.getInstance().getPushNotificationSetting();
 		}
-		else{
-			logDebug("NO individual chat preferences");
-			notificationsSwitch.setChecked(true);
+		if(push == null){
+			if(chatPrefs == null || chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
+				notificationsSwitch.setChecked(true);
+				notificationsSubTitle.setVisibility(View.GONE);
+			}else{
+				notificationsSwitch.setChecked(false);
+				notificationsSubTitle.setVisibility(View.GONE);
+			}
+		}else{
+			push = MegaPushNotificationSettings.createInstance();
+			updateSwitchButton();
 		}
 
 		notificationsLayout.setVisibility(View.VISIBLE);
 		dividerNotificationsLayout.setVisibility(View.VISIBLE);
+	}
+
+	private void updateSwitchButton(){
+		if(push.isChatDndEnabled(chatHandle)){
+			notificationsSwitch.setChecked(false);
+			long timestampMute = push.getChatDnd(chatHandle);
+			if(timestampMute == 0){
+				notificationsSubTitle.setVisibility(View.GONE);
+			}else{
+				notificationsSubTitle.setText(mutedChatNotification(timestampMute));
+				notificationsSubTitle.setVisibility(View.VISIBLE);
+			}
+
+			if(chatPrefs == null) {
+				chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), NOTIFICATIONS_DISABLED, "");
+				dbH.setChatItemPreferences(chatPrefs);
+			}
+		}else{
+			notificationsSwitch.setChecked(true);
+			notificationsSubTitle.setVisibility(View.GONE);
+			if(chatPrefs != null) {
+				if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
+					chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
+					dbH.setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatHandle));
+				}
+			}else{
+				chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), NOTIFICATIONS_ENABLED, "");
+				dbH.setChatItemPreferences(chatPrefs);
+			}
+
+		}
 	}
 
 	@Override
@@ -1230,35 +1293,17 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				sharedFolderClicked();
 				break;
 			}
-			case R.id.chat_contact_properties_switch:{
-				logDebug("Change notification switch");
-
+			case R.id.chat_contact_properties_notifications_layout:
 				if(!generalChatNotifications){
 					notificationsSwitch.setChecked(false);
+					notificationsSubTitle.setVisibility(View.GONE);
 					showSnackbar(SNACKBAR_TYPE, "The chat notifications are disabled, go to settings to set up them", -1);
 				}
 				else{
-					boolean enabled = notificationsSwitch.isChecked();
-
-					ChatController chatC = new ChatController(this);
-					String typeMute =  enabled ? NOTIFICATIONS_ENABLED: NOTIFICATIONS_DISABLED;
-					chatC.muteChat(chatHandle, typeMute);
-
-					if(chatPrefs!=null){
-						chatPrefs.setNotificationsEnabled(typeMute);
-					}
-					else{
-						if(chat!=null){
-							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-						}
-					}
-
-					if(enabled){
-						setUpIndividualChatNotifications();
-					}
+					createMuteChatRoomAlertDialog(this, chatHandle, push);
 				}
 				break;
-			}
+
 			case R.id.chat_contact_properties_chat_files_shared_layout:{
 				Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
 				if(chat!=null){
@@ -1559,11 +1604,19 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	@SuppressLint("NewApi")
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
 		logDebug("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
-
-		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-
+		if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+			if (e.getErrorCode() == MegaError.API_OK) {
+				if(newMuteOption != null) {
+					ChatController chatC = new ChatController(this);
+					chatC.muteChat(chatHandle, newMuteOption);
+					newMuteOption = null;
+					updateSwitchButton();
+				}
+			} else {
+				logError("Chat notification settings cannot be updated");
+			}
+		}else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
 			logDebug("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK) {
 				File avatar = buildAvatarFile(this, request.getEmail() + ".jpg");
@@ -1580,7 +1633,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 							if (imBitmap != null && !imBitmap.isRecycled()) {
 								Palette palette = Palette.from(imBitmap).generate();
-								Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
+								Palette.Swatch swatch = palette.getDarkVibrantSwatch();
 								imageLayout.setBackgroundColor(swatch.getBodyTextColor());
 							}
 						}
@@ -1740,6 +1793,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
+
 	}
 
 	@Override
@@ -2254,6 +2309,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
         });
     }
+    private void initializeNotificationSettings(long chatHandle){
+		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
+	}
     
     private void rename(MegaNode document, String newName) {
         if (newName.equals(document.getName())) {

@@ -2778,4 +2778,7 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
 
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="chat_notifications_muted_tomorrow" context="String that appears when we show the date until which a specific chat is silenced, this date is on the next day.">Mute until tomorrow %1$s</string>
+
 </resources>

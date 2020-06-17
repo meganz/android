@@ -75,6 +75,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
+import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -155,6 +156,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static boolean isLoggingRunning = false;
 
 	MegaChatApiAndroid megaChatApi = null;
+	private MegaPushNotificationSettings push = null;
+
 
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
@@ -245,7 +248,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (e.getErrorCode() == MegaError.API_OK) {
+				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+					if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+						if (e.getErrorCode() == MegaError.API_ENOENT) {
+							push = MegaPushNotificationSettings.createInstance();
+						} else {
+							push = request.getMegaPushNotificationSettings();
+						}
+						Intent intent = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+						intent.setAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+						LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
+					}
+				}else if (e.getErrorCode() == MegaError.API_OK) {
 					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
 						if (megaApi != null && request.getEmail() != null) {
 							MegaUser user = megaApi.getContact(request.getEmail());
@@ -508,6 +522,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
+		push = getPushNotificationSetting();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
 
@@ -656,6 +671,14 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logDebug("megaApi.getPaymentMethods SEND");
 			askForPaymentMethods();
 		}
+	}
+
+	public MegaPushNotificationSettings getPushNotificationSetting(){
+		if (push == null) {
+			megaApi.getPushNotificationSettings(null);
+		}
+
+		return push;
 	}
 	
 	public MegaApiAndroid getMegaApiFolder(){

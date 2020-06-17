@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatMessage;
 
@@ -211,6 +213,32 @@ public class TimeUtils implements Comparator<Calendar> {
         Date date = cal.getTime();
         String formattedDate = df.format(date);
         return formattedDate;
+    }
+
+    public static String mutedChatNotification(long timestamp) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timestamp);
+
+        Calendar calToday = Calendar.getInstance();
+        calToday.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar calTomorrow = Calendar.getInstance();
+        calTomorrow.add(Calendar.DATE, +1);
+
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+        java.text.DateFormat df;
+        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
+        df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
+
+        TimeZone tz = cal.getTimeZone();
+        df.setTimeZone(tz);
+        Date date = cal.getTime();
+        String formattedDate = df.format(date);
+        if (tc.compare(cal, calToday) == 0) {
+            return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_today, formattedDate);
+        }
+
+        return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_tomorrow, formattedDate);
     }
 
     public static String lastGreenDate (Context context, int minutesAgo){

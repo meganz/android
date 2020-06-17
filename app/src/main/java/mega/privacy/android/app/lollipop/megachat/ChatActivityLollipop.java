@@ -604,17 +604,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null)
                 return;
-
-            long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
-            if (chatId != getCurrentChatid()) {
-                logWarning("Different chat");
-                return;
-            }
-
-            if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHATROOM)) {
-               String typeMute = intent.getStringExtra(TYPE_MUTE);
-               selectMuteOption(chatId, typeMute);
-            }
         }
     };
 
@@ -728,7 +717,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-        filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHATROOM);
+        filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
@@ -2245,7 +2234,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
             }
             case R.id.cab_menu_mute_chat:
-                createMuteChatRoomAlertDialog(this, chatRoom.getChatId());
+//                createMuteChatRoomAlertDialog(this, chatRoom.getChatId());
                 break;
         }
         return super.onOptionsItemSelected(item);

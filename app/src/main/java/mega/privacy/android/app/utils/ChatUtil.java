@@ -14,6 +14,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +35,8 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -48,6 +50,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPushNotificationSettings;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -619,7 +622,7 @@ public class ChatUtil {
      * @param context The context of Activity.
      * @param chatId  The chat ID.
      */
-    public static void createMuteChatRoomAlertDialog(Context context, long chatId) {
+    public static void createMuteChatRoomAlertDialog(Context context, long chatId, final MegaPushNotificationSettings push) {
         if (chatId == MEGACHAT_INVALID_HANDLE)
             return;
 
@@ -636,17 +639,9 @@ public class ChatUtil {
 
         String chatHandle = String.valueOf(chatId);
         String typeMuted = MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle);
-
-        if((context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop)context).isEnableChatNotifications(chatId)) ||
-                (context instanceof ChatActivityLollipop && ((ChatActivityLollipop)context).isEnableChatNotifications(chatId))){
-
-            typeMuted = NOTIFICATIONS_ENABLED;
-        }
-
         int itemClicked = getItemClicked(typeMuted);
         dialogBuilder.setSingleChoiceItems(items, itemClicked, (dialog, item) -> {
-            ChatController chatC = new ChatController(context);
-            chatC.muteChat(chatId, getTypeMute(item));
+            controlMuteNotifications(context, chatId, getTypeMute(item), push);
             dialog.dismiss();
         });
 
@@ -679,10 +674,18 @@ public class ChatUtil {
             }
             push.setChatDnd(chatId, newCalendar.getTimeInMillis());
         }
-        MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);
 
-        if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop)context).showMuteIcon(chatId);
+        Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+        intentGeneral.setAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
+        intentGeneral.putExtra(MUTE_CHATROOM_ID, chatId);
+        intentGeneral.putExtra(TYPE_MUTE, typeMute);
+        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intentGeneral);
+
+        if(!(context instanceof ContactInfoActivityLollipop)){
+            MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).showMuteIcon(chatId);
+            }
         }
     }
 

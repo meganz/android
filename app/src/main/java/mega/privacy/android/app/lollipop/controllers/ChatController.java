@@ -350,22 +350,16 @@ public class ChatController {
         }
     }
 
-    public void muteChat(long chatHandle, String typeMute){
+    public void muteChat(long chatHandle, String typeMute) {
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-        if(chatPrefs==null){
+        if (chatPrefs == null) {
             chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), typeMute, "");
             dbH.setChatItemPreferences(chatPrefs);
-        }
-        else{
+
+        } else if (chatPrefs.getNotificationsEnabled() != typeMute) {
             chatPrefs.setNotificationsEnabled(typeMute);
             dbH.setNotificationEnabledChatItem(typeMute, Long.toString(chatHandle));
         }
-
-        Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-        intentGeneral.setAction(ACTION_UPDATE_MUTE_CHATROOM);
-        intentGeneral.putExtra(MUTE_CHATROOM_ID, chatHandle);
-        intentGeneral.putExtra(TYPE_MUTE, typeMute);
-        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intentGeneral);
     }
 
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {

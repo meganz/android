@@ -25,7 +25,8 @@ public class BroadcastConstants {
     public static final String ACTION_CHANGE_AUDIO_LEVEL = "ACTION_CHANGE_AUDIO_LEVEL";
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
-    public static final String ACTION_UPDATE_MUTE_CHATROOM = "ACTION_UPDATE_MUTE_CHATROOM";
+    public static final String ACTION_UPDATE_MUTE_CHAT_OPTION = "ACTION_UPDATE_MUTE_CHAT_OPTION";
+    public static final String ACTION_UPDATE_PUSH_NOTIFICATION_SETTING = "ACTION_UPDATE_PUSH_NOTIFICATION_SETTING";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
