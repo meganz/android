@@ -9,6 +9,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -136,7 +138,14 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
                     api.getAccountDetails(null);
                 } else if (state == MegaApiJava.STORAGE_STATE_PAYWALL) {
+                    if (megaApplication.getCurrentActivity() instanceof ManagerActivityLollipop) {
+                        UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) megaApplication.getCurrentActivity()).getUpgradeAccountFragment();
+                        if (upAFL != null && upAFL.isVisible()) {
+                            break;
+                        }
+                    }
                     Intent intent = new Intent(megaApplication.getApplicationContext(), OverDiskQuotaPaywallActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     megaApplication.startActivity(intent);
                 } else {
                     megaApplication.setStorageState(state);

@@ -216,7 +216,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					}
 				}
 				Intent intent = new Intent(getApplicationContext(), OverDiskQuotaPaywallActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				return;
 			}
