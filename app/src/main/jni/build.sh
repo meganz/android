@@ -4,15 +4,14 @@ set -e
 ##################################################
 ### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
 ##################################################
-NDK_ROOT32=${HOME}/android-ndk32
-NDK_ROOT64=${HOME}/android-ndk64
+if [ -z "$NDK_ROOT" ]; then
+    NDK_ROOT=${HOME}/android-ndk
+fi
 ##################################################
 
-NDK_BUILD32=${NDK_ROOT32}/ndk-build
-NDK_BUILD64=${NDK_ROOT64}/ndk-build
+NDK_BUILD=${NDK_ROOT}/ndk-build
 JNI_PATH=`pwd`
-CC32=`${NDK_ROOT32}/ndk-which gcc`
-CC64=`${NDK_ROOT64}/ndk-which gcc`
+CC=`${NDK_ROOT}/ndk-which gcc`
 LIBDIR=${JNI_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${JNI_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
@@ -147,13 +146,8 @@ function createMEGAchatBindings
     popd &>> ${LOG_FILE}
 }
 
-if [ ! -d "${NDK_ROOT32}" ]; then
-    echo "* NDK_ROOT for 32 bits not set. Please download ndk 14 and create a link at ${HOME}/android-ndk32 and try again."
-    exit 1
-fi
-
-if [ ! -d "${NDK_ROOT64}" ]; then
-    echo "* NDK_ROOT for 64 bits not set. Please download ndk 16 and create a link at ${HOME}/android-ndk64 and try again."
+if [ ! -d "${NDK_ROOT}" ]; then
+    echo "* NDK_ROOT not set. Please download ndk 16 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
     exit 1
 fi
 
@@ -264,7 +258,8 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${SODIUM_DOWNLOAD_URL} ${SODIUM}/${SODIUM_SOURCE_FILE} ${SODIUM_SHA1} ${SODIUM}
     ln -sf ${SODIUM_SOURCE_FOLDER} ${SODIUM}/${SODIUM}
     pushd ${SODIUM}/${SODIUM} &>> ${LOG_FILE}
-    export ANDROID_NDK_HOME=${NDK_ROOT64}
+    export ANDROID_NDK_HOME=${NDK_ROOT}
+    export NDK_PLATFORM=${APP_PLATFORM}
     ./autogen.sh &>> ${LOG_FILE}
     echo "#include <limits.h>" >>  src/libsodium/include/sodium/export.h
     sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
@@ -294,7 +289,7 @@ echo "* Setting up Crypto++"
 if [ ! -f ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready ]; then
     mkdir -p ${CRYPTOPP}/${CRYPTOPP}
     downloadCheckAndUnpack ${CRYPTOPP_DOWNLOAD_URL} ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE} ${CRYPTOPP_SHA1} ${CRYPTOPP}/${CRYPTOPP}
-    cp ${NDK_ROOT64}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
+    cp ${NDK_ROOT}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
     touch ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready
 fi
 echo "* Crypto++ is ready"
@@ -396,22 +391,22 @@ echo "* All dependencies are prepared!"
 rm -rf ../tmpLibs
 mkdir ../tmpLibs
 echo "* Running ndk-build x86"
-${NDK_BUILD32} -j8 APP_ABI=x86
+${NDK_BUILD} -j8 APP_ABI=x86
 cp -R ../libs/x86 ../tmpLibs/
 echo "* ndk-build finished for x86"
 
 echo "* Running ndk-build arm 32bits"
-${NDK_BUILD32} -j8 APP_ABI=armeabi-v7a
+${NDK_BUILD} -j8 APP_ABI=armeabi-v7a
 cp -R ../libs/armeabi-v7a ../tmpLibs/
 echo "* ndk-build finished for arm 32bits"
 
 echo "* Running ndk-build x86_64"
-${NDK_BUILD64} -j8 APP_ABI=x86_64
+${NDK_BUILD} -j8 APP_ABI=x86_64
 cp -R ../libs/x86_64 ../tmpLibs/
 echo "* ndk-build finished for x86_64"
 
 echo "* Running ndk-build arm 64bits"
-${NDK_BUILD64} -j8 APP_ABI=arm64-v8a
+${NDK_BUILD} -j8 APP_ABI=arm64-v8a
 echo "* ndk-build finished for arm 64bits"
 mv ../tmpLibs/* ../libs/
 rmdir ../tmpLibs/
