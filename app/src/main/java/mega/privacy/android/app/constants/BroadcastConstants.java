@@ -40,6 +40,9 @@ public class BroadcastConstants {
     public static final String UPDATE_CALL_ID = "UPDATE_CALL_ID";
     public static final String TYPE_CHANGE_COMPOSITION = "TYPE_CHANGE_COMPOSITION";
     public static final String UPDATE_CALL_STATUS = "UPDATE_CALL_STATUS";
+    public static final String UPDATE_CALL_TERM_CODE = "UPDATE_CALL_TERM_CODE";
+    public static final String UPDATE_CALL_IGNORE = "UPDATE_CALL_IGNORE";
+    public static final String UPDATE_CALL_LOCAL_TERM_CODE = "UPDATE_CALL_LOCAL_TERM_CODE";
     public static final String UPDATE_PEER_ID = "UPDATE_PEER_ID";
     public static final String UPDATE_CLIENT_ID = "UPDATE_CLIENT_ID";
     public static final String UPDATE_SESSION_STATUS = "UPDATE_SESSION_STATUS";

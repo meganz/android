@@ -1776,15 +1776,20 @@ public class ChatController {
                 }
 
                 for (MegaNode document : dlFiles.keySet()) {
-                    numberOfNodesToDownload++;
                     String path = dlFiles.get(document);
                     String targetPath = targets.get(document.getHandle());
+
+                    if (isTextEmpty(path)) {
+                        continue;
+                    }
+
+                    numberOfNodesToDownload++;
 
                     File destDir = new File(path);
                     File destFile;
                     destDir.mkdirs();
                     if (destDir.isDirectory()) {
-                        destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+                        destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName(), destDir.getAbsolutePath() + SEPARATOR));
                     } else {
                         destFile = destDir;
                     }

@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">共有アイテム</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">共有フォルダ</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">ゴミ箱</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">知り合い</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">受信</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">送信</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">リンク</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">共有フォルダ受信</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">受信共有のオーナーは</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">共有を残す</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">共有を削除</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">リンクを外す</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">このリンクは公開されなくなりました。</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">このリンクは公開されなくなりました。</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">このリンクは公開されなくなりました。</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">これらリンクは公開されなくなりました。</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">名前を変更</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">リンク開設</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開く</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">日付</string>
     <string name="sortby_creation_date" context="category in sort by action">作成時刻</string>
     <string name="sortby_modification_date" context="category in sort by action">編集日付</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">リンク作成日</string>
     <string name="sortby_date_newest" context="sort files by date newest first">新しいものから</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">古いものから</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">ロギングが有効にしました。</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">ロギングが無効にしました。</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">必要な権限を拒否したため、ログは有効になっていません</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">ファイルの場所を開く</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">このプロセスに予想以上時間がかかっています。お待ちください。</string>
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">情報を表示</string>
 
-    <string name="context_link_removal_error" context="error message">リンクの削除に失敗しました。後でもう一度お試しください。</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">リンクの削除に失敗しました。後でもう一度お試しください。</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">一部のリンクを削除できませんでした。後でもう一度お試しください。</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">リンクを削除しました。</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">リンクを削除しました。</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">リンクのアクションに失敗しました。後でもう一度お試しください。</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">メールアドレスを書く</string>
@@ -1827,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B][/B][A]受信共有フォルダ[/A]はありません[B]。[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B][/B][A]送信共有フォルダ[/A]はありません[B]。[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B][/B][A]公開リンク[/A][B]はありません[/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">送信済みリクエスト</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">受信リクエスト</string>
@@ -2316,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]さんはあなたを連絡先としてブロックしました。[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">通知[A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">削除されたアカウント</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]アカウント[/B][A]%s[/A][B]は削除されました。[/B]</string>
@@ -2435,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">カメラを有効にする</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">あなたのカメラへのアクセスを許可して、ドキュメントのスキャン、写真の撮影、ビデオ通話を行います。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">通話を有効にする</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">アドレス帳へのアクセスを許可する</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">アドレス帳へのアクセスを有効にする</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGAのあなたのアドレス帳から連絡先を簡単に見つけます。</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGAはこのデータを他の目的に使用せず、あなたの同意なしにあなたの連絡先とやり取りすることは絶対にございません。</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
@@ -2725,6 +2742,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">おそらく、MEGAアカウントで他のサービスと同じパスワードを使用しており、それらのサービスの少なくとも1つがデータ侵害を受けていると思われます。</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">あなたのパスワードが漏えいし、悪意のあるアクターがあなたのアカウント（あなたのMEGAアカウントを含むがこれに限定されない）にログインするために使用されています。</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">ニックネームを設定</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">ニックネームを編集</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">ニックネームが追加されました</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">ニックネームを削除しました</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">ニックネームを追加しようとしたときにエラーが発生しました</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">ニックネーム</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">再接続中</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">戻りました。</string>
 
@@ -2734,6 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">このファイルを元に戻すために必要な権限がありません。続行するために、復元されたデータを使用して新しいファイルを作成できます。続行しますか？</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">バージョンは新しいファイルとして正常に作成されました。</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">%1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">これらの%1$d個のフォルダの共有を停止してもよろしいですか？</string>
+
     <string name="download_location" context="Download location label">ダウンロード先</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">常にこの場所に保存しますか？</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">以下から添付&#8230;</string>
 </resources>
