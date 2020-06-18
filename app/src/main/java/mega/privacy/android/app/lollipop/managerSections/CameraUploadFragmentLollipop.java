@@ -384,7 +384,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					logDebug("Send files to chat");
 					// For adapterGrid, please go to MegaPhotoSyncGridTitleAdapterLollipop
 					NodeController nC = new NodeController(context);
-					ArrayList<Long> handleList = new ArrayList();
+					ArrayList<Long> handleList = new ArrayList<>();
 					for (PhotoSyncHolder holder : documentsList) {
 						handleList.add(holder.handle);
 					}
