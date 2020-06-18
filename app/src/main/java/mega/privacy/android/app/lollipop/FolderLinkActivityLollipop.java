@@ -96,7 +96,7 @@ import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener{
+public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener{
 
 	public static ImageView imageDrag;
 	
