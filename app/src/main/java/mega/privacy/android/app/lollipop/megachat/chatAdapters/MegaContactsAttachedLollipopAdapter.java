@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
@@ -305,7 +306,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 		}
 
-		holder.textViewContactName.setText(contact.getName());
+		holder.textViewContactName.setText(getContactNameDB(contact));
 
 		createDefaultAvatar(holder, contact);
 
@@ -347,20 +348,19 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void onBindViewHolderList(ViewHolderContactsList holder, int position){
-		logDebug("onBindViewHolderList");
 		holder.imageView.setImageBitmap(null);
 
 		MegaContactDB contact = (MegaContactDB) getItem(position);
 
 		MegaUser user = megaApi.getContact(contact.getMail());
-		holder.verifiedIcon.setVisibility(!isItemChecked(position) && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
+		boolean isNotChecked = !multipleSelect || !isItemChecked(position);
+		holder.verifiedIcon.setVisibility(isNotChecked && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
 
 		holder.contactMail = contact.getMail();
-		logDebug("Contact: " + contact.getMail() + ", Handle: " + contact.getHandle());
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
 		setContactStatus(megaChatApi.getUserOnlineStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
-		holder.textViewContactName.setText(contact.getName());
+		holder.textViewContactName.setText(getContactNameDB(contact));
 
 		if (!multipleSelect) {
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -441,8 +441,8 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void createDefaultAvatar(ViewHolderContacts holder, MegaContactDB contact){
-		int color = getColorAvatar(contact.getHandle());
-		String fullName = contact.getName();
+		int color = getColorAvatar(Long.parseLong(contact.getHandle()));
+		String fullName = getContactNameDB(contact);
 
 		if (holder instanceof ViewHolderContactsList){
 			Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
@@ -772,5 +772,12 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 	public void setListFragment(RecyclerView listFragment) {
 		this.listFragment = listFragment;
+	}
+
+	public void updateContact(MegaContactDB contactDB, int position) {
+		if (position >= 0 && position < getItemCount()) {
+			contacts.set(position, contactDB);
+			notifyItemChanged(position);
+		}
 	}
 }

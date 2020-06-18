@@ -84,28 +84,26 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
 
         if (getIntent() == null || getIntent().getExtras() == null) {
             logError("Cannot init view, Intent is null");
-            return;
+            finish();
         }
 
         String email = getIntent().getExtras().getString(EMAIL);
         if (isTextEmpty(email)) {
             logError("Cannot init view, contact' email is empty");
-            return;
+            finish();
         }
 
         contact = megaApi.getContact(email);
         if (contact == null) {
             logError("Cannot init view, contact is null");
-            return;
+            finish();
         }
-
-        AuthenticityCredentialsActivity authenticityCredentialsActivity = this;
 
         if (savedInstanceState != null) {
             contactCredentials = savedInstanceState.getString(CONTACT_CREDENTIALS);
         }
 
-        changeStatusBarColor(authenticityCredentialsActivity, getWindow(), R.color.dark_primary_color);
+        changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
 
         setContentView(R.layout.activity_authenticity_credentials);
 
@@ -114,7 +112,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         aB = getSupportActionBar();
         if (aB == null) {
             logError("Cannot init view, ActionBar is null");
-            return;
+            finish();
         }
 
         aB.setElevation(0);
@@ -127,7 +125,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         scrollView = findViewById(R.id.credentials_scrollview);
         new ListenScrollChangesHelper().addViewToListen(scrollView, (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeViewElevation(aB, scrollView.canScrollVertically(-1), getOutMetrics()));
 
-        boolean isPortrait = isScreenInPortrait(authenticityCredentialsActivity);
+        boolean isPortrait = isScreenInPortrait(this);
 
         if (!isPortrait) {
             RelativeLayout contactCredentialsLayout = findViewById(R.id.contact_credentials_layout);
@@ -182,7 +180,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         }
 
         if (isTextEmpty(contactCredentials)) {
-            megaApi.getUserCredentials(contact, new GetAttrUserListener(authenticityCredentialsActivity));
+            megaApi.getUserCredentials(contact, new GetAttrUserListener(this));
         }
 
         int marginTopBottomButtonAndMyCredentials = px2dp(MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS, getOutMetrics());
@@ -205,7 +203,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
             explanation.setLayoutParams(explanationParams);
         }
 
-        VerifyCredentialsListener verifyCredentialsListener = new VerifyCredentialsListener(authenticityCredentialsActivity);
+        VerifyCredentialsListener verifyCredentialsListener = new VerifyCredentialsListener(this);
         credentialsButton.setOnClickListener(v -> {
             if (megaApi.areCredentialsVerified(contact)) {
                 megaApi.resetCredentials(contact, verifyCredentialsListener);

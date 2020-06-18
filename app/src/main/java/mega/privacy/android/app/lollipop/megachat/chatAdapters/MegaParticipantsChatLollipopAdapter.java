@@ -186,7 +186,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			MegaChatParticipant participant = (MegaChatParticipant) getItem(position);
 			MegaUser contact = megaApi.getContact(participant.getEmail());
-			holderList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
+			((ViewHolderParticipantsList)holder).verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
 
 			((ViewHolderParticipantsList)holder).contactMail = participant.getEmail();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());

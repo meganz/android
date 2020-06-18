@@ -88,6 +88,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -160,12 +161,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
-    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+    /**
+     * Broadcast to update a contact in adapter due to a change.
+     * Currently the changes contemplated are: nickname and credentials.
+     */
+    private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) return;
-            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-            updateAdapter(userHandle);
+            if (intent == null || intent.getAction() == null) return;
+
+            if (intent.getAction().equals(ACTION_UPDATE_NICKNAME) || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+                updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
+            }
         }
     };
 
@@ -398,8 +405,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 megaChatApi.signalPresenceActivity();
             }
 
-            LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
-                    new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+            IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+            contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+            contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+            LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
             //Set participants
             participants = new ArrayList<>();
@@ -501,8 +510,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
     }
 
     private String checkParticipantName(long handle, int position) {
