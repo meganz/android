@@ -14,8 +14,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaStringMap;
 
-import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -143,40 +143,21 @@ public class GetAttrUserListener extends BaseListener {
                 break;
 
             case USER_ATTR_CAMERA_UPLOADS_FOLDER:
-                boolean isSecondary = request.getFlag();
-
                 if (e.getErrorCode() == MegaError.API_OK) {
+                    long[] handles = getCUHandles(request);
                     synchronized (this) {
-                        long handleInUserAttr = request.getNodeHandle();
-                        if (isNodeInRubbishOrDeleted(handleInUserAttr)) {
-                            initCUFolderFromScratch(context, isSecondary);
-                        } else {
-                            boolean shouldCUStop = compareAndUpdateLocalFolderAttribute(handleInUserAttr, isSecondary);
-                            //stop CU if destination has changed
-                            if (shouldCUStop && CameraUploadsService.isServiceRunning) {
-                                JobUtil.stopRunningCameraUploadService(context);
-                            }
-
-                            //notify manager activity to update UI
-                            if (!(context instanceof MegaApplication)) {
-                                forceUpdateCameraUploadFolderIcon(isSecondary, handleInUserAttr);
-                            }
-                        }
+                        handle(handles[0], false, e);
+                        handle(handles[1], true, e);
                     }
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    initCUFolderFromScratch(context, isSecondary);
-                } else {
-                    String targetFolder = isSecondary ? SECONDARY_UPLOADS_ENGLISH : CAMERA_UPLOADS_ENGLISH;
-                    logError("Error getting: " + targetFolder + " " + e.getErrorString() );
-                }
-
-                if (context instanceof CameraUploadsService) {
-                    // The unique process run within shoudRun method in CameraUploadsService
-                    if (isSecondary) {
-                        ((CameraUploadsService) context).onGetSecondaryFolderAttribute(request, e);
-                    } else {
-                        ((CameraUploadsService) context).onGetPrimaryFolderAttribute(request, e);
+                    // only when both CU and MU are not set, will return API_ENOENT
+                    initCUFolderFromScratch(context, false);
+                    if (context instanceof CameraUploadsService) {
+                        // The unique process run within shoudRun method in CameraUploadsService
+                        ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e, true);
                     }
+                } else {
+                    logError("Error getting USER_ATTR_CAMERA_UPLOADS_FOLDER " + e.getErrorString());
                 }
                 break;
 
@@ -185,6 +166,62 @@ public class GetAttrUserListener extends BaseListener {
                     ((AuthenticityCredentialsActivity) context).setContactCredentials(request, e);
                 }
                 break;
+        }
+    }
+
+    /**
+     * Get CU and MU folders handle from MegaRequest object.
+     *
+     * @param request MegaRequest object which contains CU and MU folders handle.
+     * @return An array with CU folder handle at the first element, and MU folder handle at the second element.
+     */
+    private long[] getCUHandles(MegaRequest request) {
+        long primaryHandle = INVALID_HANDLE, secondaryHandle = INVALID_HANDLE;
+        MegaStringMap map = request.getMegaStringMap();
+        if (map != null) {
+            String h = map.get("h");
+            if (h != null) {
+                primaryHandle = MegaApiJava.base64ToHandle(h);
+            }
+            String sh = map.get("sh");
+            if (sh != null) {
+                secondaryHandle = MegaApiJava.base64ToHandle(sh);
+            }
+        } else {
+            logError("MegaStringMap is null.");
+        }
+        return new long[]{primaryHandle, secondaryHandle};
+    }
+
+    /**
+     * Process CU or MU folder handle after get them from CU attributes.
+     *
+     * @param handle Folder handle.
+     * @param isSecondary Is the handle CU handle or MU handle.
+     * @param e MegaError object.
+     */
+    private void handle(long handle, boolean isSecondary, MegaError e) {
+        if (isNodeInRubbishOrDeleted(handle)) {
+            initCUFolderFromScratch(context, isSecondary);
+        } else {
+            boolean shouldCUStop = compareAndUpdateLocalFolderAttribute(handle, isSecondary);
+            //stop CU if destination has changed
+            if (shouldCUStop && CameraUploadsService.isServiceRunning) {
+                JobUtil.stopRunningCameraUploadService(context);
+            }
+
+            //notify manager activity to update UI
+            if (!(context instanceof MegaApplication)) {
+                forceUpdateCameraUploadFolderIcon(isSecondary, handle);
+            }
+        }
+        if (context instanceof CameraUploadsService) {
+            // The unique process run within shoudRun method in CameraUploadsService
+            if (isSecondary) {
+                ((CameraUploadsService) context).onGetSecondaryFolderAttribute(handle, e);
+            } else {
+                ((CameraUploadsService) context).onGetPrimaryFolderAttribute(handle, e, false);
+            }
         }
     }
 }
