@@ -162,6 +162,12 @@ public class GetAttrUserListener extends BaseListener {
         }
     }
 
+    /**
+     * Get CU and MU folders handle from MegaRequest object.
+     *
+     * @param request MegaRequest object which contains CU and MU folders handle.
+     * @return An array with CU folder handle at the first element, and MU folder handle at the second element.
+     */
     private long[] getCUHandles(MegaRequest request) {
         long primaryHandle = INVALID_HANDLE, secondaryHandle = INVALID_HANDLE;
         MegaStringMap map = request.getMegaStringMap();
@@ -180,6 +186,13 @@ public class GetAttrUserListener extends BaseListener {
         return new long[]{primaryHandle, secondaryHandle};
     }
 
+    /**
+     * Process CU or MU folder handle after get them from CU attributes.
+     *
+     * @param handle Folder handle.
+     * @param isSecondary Is the handle CU handle or MU handle.
+     * @param e MegaError object.
+     */
     private void handle(long handle, boolean isSecondary, MegaError e) {
         if (isNodeInRubbishOrDeleted(handle)) {
             initCUFolderFromScratch(context, isSecondary);

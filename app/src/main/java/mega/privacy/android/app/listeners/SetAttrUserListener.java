@@ -85,7 +85,7 @@ public class SetAttrUserListener extends BaseListener {
                     if (prefs == null) return;
 
                     long primaryHandle = request.getNodeHandle();
-                    long secondonaryHandle = request.getParentHandle();
+                    long secondaryHandle = request.getParentHandle();
                     if(primaryHandle != INVALID_HANDLE){
                         resetPrimaryTimeline();
                         dBH.setCamSyncHandle(primaryHandle);
@@ -98,11 +98,11 @@ public class SetAttrUserListener extends BaseListener {
                             JobUtil.startCameraUploadServiceIgnoreAttr(context);
                         }
                     }
-                    if (secondonaryHandle != INVALID_HANDLE) {
+                    if (secondaryHandle != INVALID_HANDLE) {
                         resetSecondaryTimeline();
-                        dBH.setSecondaryFolderHandle(secondonaryHandle);
-                        prefs.setMegaHandleSecondaryFolder(String.valueOf(secondonaryHandle));
-                        forceUpdateCameraUploadFolderIcon(true, secondonaryHandle);
+                        dBH.setSecondaryFolderHandle(secondaryHandle);
+                        prefs.setMegaHandleSecondaryFolder(String.valueOf(secondaryHandle));
+                        forceUpdateCameraUploadFolderIcon(true, secondaryHandle);
                         //make sure to start the process once secondary is enabled
                         if (context instanceof CameraUploadsService) {
                             ((CameraUploadsService) context).onSetFolderAttribute();
@@ -118,8 +118,8 @@ public class SetAttrUserListener extends BaseListener {
                             if (primaryHandle != INVALID_HANDLE) {
                                 settingsFragment.setCUDestinationFolder(false, primaryHandle);
                             }
-                            if (secondonaryHandle != INVALID_HANDLE) {
-                                settingsFragment.setCUDestinationFolder(true, secondonaryHandle);
+                            if (secondaryHandle != INVALID_HANDLE) {
+                                settingsFragment.setCUDestinationFolder(true, secondaryHandle);
                             }
                         }
                     }

@@ -7493,7 +7493,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setToolbarTitle();
 	}
 
+    /**
+     * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,
+     * need to check CU and MU folders' status.
+     *
+     * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
+     * @param updatedNodes Nodes which have changed.
+     */
     private void checkCameraUploadFolder(boolean shouldDisable, ArrayList<MegaNode> updatedNodes) {
+        // Get CU and MU folder hanlde from local setting.
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
 
@@ -7502,6 +7510,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             for (MegaNode node : updatedNodes) {
                 handles.add(node.getHandle());
             }
+            // If CU and MU folder don't change then return.
             if (!handles.contains(primaryHandle) && !handles.contains(secondaryHandle)) {
                 logDebug("Updated nodes don't include CU/MU, return.");
                 return;
@@ -7514,29 +7523,36 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
         }
 
+        // Check if CU and MU folder are moved to rubbish bin.
         boolean isPrimaryFolderInRubbish = isNodeInRubbish(primaryHandle);
         boolean isSecondaryFolderInRubbish = isSecondaryEnabled && isNodeInRubbish(secondaryHandle);
 
+        // If only MU folder is in rubbish bin.
         if (isSecondaryFolderInRubbish && !isPrimaryFolderInRubbish) {
             logDebug("MU folder is deleted, backup settings and disable MU.");
             if (shouldDisable) {
+                // Back up timestamps and disabled MU upload.
                 backupTimestampsAndFolderHandle();
                 disableMediaUploadProcess();
                 if (getSettingsFragment() != null) {
                     sttFLol.disableMediaUploadUIProcess();
                 }
             } else {
+                // Just stop the upload process.
                 stopRunningCameraUploadService(app);
             }
         } else if (isPrimaryFolderInRubbish) {
+            // If CU folder is in rubbish bin.
             logDebug("CU folder is deleted, backup settings and disable CU.");
             if (shouldDisable) {
+                // Disable both CU and MU.
                 backupTimestampsAndFolderHandle();
                 disableCameraUploadSettingProcess(false);
                 if (getSettingsFragment() != null) {
                     sttFLol.disableCameraUploadUIProcess();
                 }
             } else {
+                // Just stop the upload process.
                 stopRunningCameraUploadService(app);
             }
         }

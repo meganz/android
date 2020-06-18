@@ -90,8 +90,8 @@ import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
-    public static final int  LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
-    public static final int  LOCAL_FOLDER_REMINDER_SECONDARY = 1909;
+    private static final int  LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
+    private static final int  LOCAL_FOLDER_REMINDER_SECONDARY = 1909;
     private static final String OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "overquotanotification";
     private static final String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private static final String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
@@ -832,7 +832,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             uploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
         }
         long uploadNodeHandle = uploadNode.getHandle();
-        logDebug("Upload to: " + uploadNode.getHandle());
+        logDebug("Upload to: " + uploadNodeHandle);
         int type = isVideo ? SyncRecord.TYPE_VIDEO : SyncRecord.TYPE_PHOTO;
 
         while (mediaList.size() > 0) {
@@ -965,8 +965,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (!checkPrimaryLocalFolder()) {
             localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable,LOCAL_FOLDER_REMINDER_PRIMARY);
             disableCameraUploadSettingProcess();
-            dbH.setCamSyncLocalPath("");
-            dbH.setSecondaryFolderPath(INVAILD_PATH);
+            dbH.setCamSyncLocalPath(INVALID_PATH);
+            dbH.setSecondaryFolderPath(INVALID_PATH);
             //refresh settings fragment UI
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
             return SHOULD_RUN_STATE_FAILED;
@@ -978,7 +978,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable,LOCAL_FOLDER_REMINDER_SECONDARY);
             // disable media upload only
             disableMediaUploadProcess();
-            dbH.setSecondaryFolderPath(INVAILD_PATH);
+            dbH.setSecondaryFolderPath(INVALID_PATH);
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
@@ -1022,6 +1022,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         return checkTargetFolders();
     }
 
+    /**
+     * When local folder is unavailable, CU cannot launch, need to show a notification to let the user know.
+     *
+     * @param resId The content text of the notification. Here is the string's res id.
+     * @param notiId Notification id, can cancel the notification by the same id when need.
+     */
     private void localFolderUnavailableNotification(int resId, int notiId) {
         boolean isShowing = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1037,6 +1043,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
+    /**
+     * Check the availability of primary local folder.
+     * If it's a path in internal storage, just check its existence.
+     * If it's a path in SD card, check the corresponding DocumentFile's existence.
+     *
+     * @return true, if primary local folder is available. false， when it's unavailable.
+     */
     private boolean checkPrimaryLocalFolder() {
         // check primary local folder
         if (Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard())) {
@@ -1052,12 +1065,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
+    /**
+     * Check the availability of secondary local folder.
+     *
+     * @return true, if primary secondary folder is available. false， when it's unavailable.
+     */
     private boolean checkSecondaryLocalFolder() {
         // check secondary local folder if media upload is enabled
         if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
             String path = prefs.getLocalPathSecondaryFolder();
             // First time enable media upload, haven't set local path.
-            if(INVAILD_PATH.equals(path)) {
+            if(INVALID_PATH.equals(path)) {
                 return true;
             } else {
                 return path != null && new File(path).exists();
@@ -1067,7 +1085,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         return true;
     }
 
+    /**
+     * Before CU process launches, check CU and MU folder.
+     *
+     * @return 0, if both folders are alright, CU will start normally.
+     *         TARGET_FOLDER_NOT_EXIST, CU or MU folder is deleted, will create new folder. CU process will launch after the creation completes.
+     *         SETTING_USER_ATTRIBUTE, set CU attributes with valid hanle. CU process will launch after the setting completes.
+     */
     private int checkTargetFolders() {
+        // To see if secondary sync is enabled.
         if (prefs.getSecondaryMediaFolderEnabled() == null) {
             logDebug("Secondary upload setting not defined, so not enabled");
             dbH.setSecondaryUploadEnabled(false);
@@ -1083,44 +1109,60 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             secondaryEnabled = false;
         }
 
-        long primaryToSet =INVALID_HANDLE, secondaryToSet = INVALID_HANDLE;
+        long primaryToSet = INVALID_HANDLE;
+        // If CU folder in local setting is deleted, then need to reset.
         boolean needToSetPrimary = isNodeInRubbishOrDeleted(cameraUploadHandle);
-        boolean needToSetSecondary = false;
+
         if (needToSetPrimary) {
+            // Try to find a folder which name is "Camera Uploads" from root.
             cameraUploadHandle = findDefaultFolder(getString(R.string.section_photo_sync));
+            // Cannot find a folder with the name, create one.
             if (cameraUploadHandle == INVALID_HANDLE) {
+                // Flag, prevent to create duplicate folder.
                 if(!isCreatingPrimary) {
                     logDebug("Must create CU folder.");
                     isCreatingPrimary = true;
+                    // Create a folder with name "Camera Uploads" at root.
                     megaApi.createFolder(getString(R.string.section_photo_sync), megaApi.getRootNode(), createFolderListener);
                 }
                 if(!secondaryEnabled) {
                     return TARGET_FOLDER_NOT_EXIST;
                 }
             } else {
+                // Found, prepare to set the folder as CU folder.
                 primaryToSet = cameraUploadHandle;
             }
         }
 
+        long secondaryToSet = INVALID_HANDLE;
+        boolean needToSetSecondary = false;
+        // Only check MU folder when secondary upload is enabled.
         if (secondaryEnabled) {
             logDebug("the secondary uploads are enabled");
+            // If MU folder in local setting is deleted, then need to reset.
             needToSetSecondary = isNodeInRubbishOrDeleted(secondaryUploadHandle);
             if (needToSetSecondary) {
+                // Try to find a folder which name is "Media Uploads" from root.
                 secondaryUploadHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
+                // Cannot find a folder with the name, create one.
                 if (secondaryUploadHandle == INVALID_HANDLE) {
+                    // Flag, prevent to create duplicate folder.
                     if(!isCreatingSecondary) {
                         logDebug("Must create MU folder.");
                         isCreatingSecondary = true;
+                        // Create a folder with name "Media Uploads" at root.
                         megaApi.createFolder(getString(R.string.section_secondary_media_uploads), megaApi.getRootNode(), createFolderListener);
                     }
                     return TARGET_FOLDER_NOT_EXIST;
                 } else {
+                    // Found, prepare to set the folder as MU folder.
                     secondaryToSet = secondaryUploadHandle;
                 }
             }
         } else {
             logDebug("Secondary NOT Enabled");
         }
+
         if (needToSetPrimary || needToSetSecondary) {
             megaApi.setCameraUploadsFolders(primaryToSet, secondaryToSet, setAttrUserListener);
             return SETTING_USER_ATTRIBUTE;
@@ -1368,6 +1410,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
+    /**
+     * Callback when getting CU folder handle from CU attributes completes.
+     *
+     * @param handle CU folder hanlde stored in CU atrributes.
+     * @param e Used to get error code to see if the request is successful.
+     * @param shouldStart If should start CU process.
+     */
     public void onGetPrimaryFolderAttribute(long handle, MegaError e, boolean shouldStart) {
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             isPrimaryHandleSynced = true;
@@ -1381,11 +1430,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
+    /**
+     * Callback when getting MU folder handle from CU attributes completes.
+     *
+     * @param handle MU folder hanlde stored in CU atrributes.
+     * @param e Used to get error code to see if the request is successful.
+     */
     public void onGetSecondaryFolderAttribute(long handle,MegaError e) {
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             isSecondaryHandleSynced = true;
             if(handle != secondaryUploadHandle) secondaryUploadHandle = handle;
-            // start to upload.
+            // Start to upload. Unlike onGetPrimaryFolderAttribute needs to wait for getting MU folder handle completes.
             startWorkerThread();
         } else {
             logWarning("Get secondary handle faild, finish process.");
