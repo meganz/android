@@ -146,6 +146,16 @@
                             android:text="@string/title_properties_chat_notifications_contact"
                             android:textSize="16dp" />
 
+                        <TextView
+                            android:id="@+id/chat_group_contact_properties_notifications_muted_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/chat_group_contact_properties_notifications_title"
+                            android:layout_gravity="left|center_vertical"
+                            android:textColor="@color/black_40_alpha"
+                            android:layout_weight="5"
+                            android:textSize="14sp" />
+
                     </RelativeLayout>
 
                     <androidx.appcompat.widget.SwitchCompat
@@ -155,6 +165,7 @@
                         android:layout_marginRight="16dp"
                         android:layout_gravity="right|center_vertical"
                         android:layout_weight="1"
+                        android:clickable="false"
                         android:gravity="right" />
                 </LinearLayout>
 

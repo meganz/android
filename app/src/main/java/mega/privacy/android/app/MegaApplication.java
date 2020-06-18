@@ -248,13 +248,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS && push == null) {
 					if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-						if (e.getErrorCode() == MegaError.API_ENOENT) {
-							push = MegaPushNotificationSettings.createInstance();
-						} else {
+						if (e.getErrorCode() == MegaError.API_OK) {
 							push = request.getMegaPushNotificationSettings();
 						}
+						push = MegaPushNotificationSettings.createInstance();
+
 						Intent intent = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
 						intent.setAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
 						LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
@@ -673,7 +673,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
-	public MegaPushNotificationSettings getPushNotificationSetting(){
+	public MegaPushNotificationSettings getPushNotificationSetting() {
 		if (push == null) {
 			megaApi.getPushNotificationSettings(null);
 		}

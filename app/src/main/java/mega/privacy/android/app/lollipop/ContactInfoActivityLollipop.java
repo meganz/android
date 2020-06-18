@@ -173,8 +173,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private ChatItemPreferences chatPrefs = null;
 	boolean generalChatNotifications = true;
 	private MegaPushNotificationSettings push = null;
+    private String newMuteOption = null;
 
-	boolean startVideo = false;
+    boolean startVideo = false;
 
 	RelativeLayout sharedFoldersLayout;
 	TextView sharedFoldersText;
@@ -235,7 +236,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     boolean moveToRubbish;
     long parentHandle;
 	private String nickname;
-	private String newMuteOption = null;
 
 	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
@@ -279,11 +279,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			if(intent.getAction() == ACTION_UPDATE_PUSH_NOTIFICATION_SETTING){
-				setUpIndividualChatNotifications();
+			if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+				if(push == null) {
+					setUpIndividualChatNotifications();
+				}
 			}else {
 				long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
-				if (chatId != MEGACHAT_INVALID_HANDLE && chatId != chatHandle) {
+				if (chatId == MEGACHAT_INVALID_HANDLE || chatId != chatHandle) {
 					logWarning("Different chat");
 					return;
 				}
@@ -293,8 +295,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					megaApi.setPushNotificationSettings(push, ContactInfoActivityLollipop.this);
 				}
 			}
-
-
 		}
 	};
 
@@ -744,7 +744,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				notificationsSubTitle.setVisibility(View.GONE);
 			}
 		}else{
-			push = MegaPushNotificationSettings.createInstance();
 			updateSwitchButton();
 		}
 
@@ -1298,8 +1297,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					notificationsSwitch.setChecked(false);
 					notificationsSubTitle.setVisibility(View.GONE);
 					showSnackbar(SNACKBAR_TYPE, "The chat notifications are disabled, go to settings to set up them", -1);
-				}
-				else{
+				} else{
 					createMuteChatRoomAlertDialog(this, chatHandle, push);
 				}
 				break;
@@ -2310,7 +2308,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         });
     }
     private void initializeNotificationSettings(long chatHandle){
-		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
+		chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
 	}
     
     private void rename(MegaNode document, String newName) {

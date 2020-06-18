@@ -101,7 +101,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	ChatController cC;
 
 	DatabaseHandler dbH = null;
-	ChatItemPreferences chatPrefs = null;
+	private ChatItemPreferences chatPrefs = null;
 
 	int adapterType;
 
@@ -283,7 +283,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			setLastMessage(position, holder);
 
-			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 			if(context instanceof ManagerActivityLollipop){
 				if(((ManagerActivityLollipop) context).isEnableChatNotifications(chat.getChatId())){
 					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
@@ -293,6 +292,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}else{
 				((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
 			}
+			chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
+
 
 			if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
 
@@ -1036,37 +1037,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				((ViewHolderNormalChatList)holder).circlePendingMessages.setVisibility(View.GONE);
 			}
-		}
-		else{
-			logWarning("Holder is NULL: " + position);
-			notifyItemChanged(position);
-		}
-	}
-
-	public void showMuteIcon(int position){
-		logDebug("position: " + position);
-		holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
-
-		if(holder!=null){
-			MegaChatListItem chatToShow = chats.get(position);
-
-			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatToShow.getChatId()));
-			if(chatPrefs!=null) {
-				logDebug("Chat prefs exists!!!");
-				if (!isChatRoomEnabled(chatPrefs)) {
-					logDebug("Chat is MUTE");
-					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.VISIBLE);
-				}
-				else{
-					logDebug("Chat with notifications enabled!!");
-					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
-				}
-			}
-			else{
-				logWarning("Chat prefs is NULL");
-				((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
-			}
-			notifyItemChanged(position);
 		}
 		else{
 			logWarning("Holder is NULL: " + position);

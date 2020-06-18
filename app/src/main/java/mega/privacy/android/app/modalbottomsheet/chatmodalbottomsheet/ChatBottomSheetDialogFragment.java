@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -41,10 +42,6 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
     private ChatController chatC;
     private MegaChatListItem chat = null;
     private long chatId;
-
-    private boolean notificationsEnabled;
-    private ChatItemPreferences chatPrefs;
-
     private RoundedImageView chatImageView;
 
     @Override
@@ -190,21 +187,21 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), iconStateChatPanel);
             }
 
-            chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-            if (chatPrefs != null) {
-                notificationsEnabled = isChatRoomEnabled(chatPrefs);
-                if (!notificationsEnabled) {
-                    optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
-                    optionMuteChatText.setText(getString(R.string.general_unmute));
-                }
-            } else {
+            if (((ManagerActivityLollipop)context).isEnableChatNotifications(chat.getChatId())) {
+                optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
+                optionMuteChatText.setText(getString(R.string.general_mute));
+            }else{
+                optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
+                optionMuteChatText.setText(getString(R.string.general_unmute));
+            }
+            ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
+            if(chatPrefs == null) {
                 MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
                 if (chatRoom != null) {
                     titleMailContactChatPanel.setText(chatRoom.getPeerEmail(0));
                     addAvatarChatPanel(chatRoom.getPeerEmail(0), chat);
                 }
             }
-
             if (chat.isArchived()) {
                 archiveChatText.setText(getString(R.string.unarchive_chat_option));
                 archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
@@ -280,8 +277,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
             case R.id.chat_list_mute_chat_layout:
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).setMuteSelectedChat(chat.getChatId());
-//                    createMuteChatRoomAlertDialog(context, chat.getChatId());
+                    createMuteChatRoomAlertDialog(context, chat.getChatId(), MegaApplication.getInstance().getPushNotificationSetting());
                 }
                 break;
 

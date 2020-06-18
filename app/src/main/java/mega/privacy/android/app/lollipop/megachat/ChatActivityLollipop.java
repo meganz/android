@@ -456,6 +456,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private MegaPushNotificationSettings push = null;
     private ChatItemPreferences chatPrefs = null;
+    private String newMuteOption = null;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -604,6 +605,23 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null)
                 return;
+
+            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+                if(push == null){
+                    push = MegaApplication.getInstance().getPushNotificationSetting();
+                }
+            }else {
+                long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
+                if (chatId == MEGACHAT_INVALID_HANDLE || chatId != chatRoom.getChatId()) {
+                    logWarning("Different chat");
+                    return;
+                }
+
+                if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
+                    newMuteOption = intent.getStringExtra(TYPE_MUTE);
+                    megaApi.setPushNotificationSettings(push, ChatActivityLollipop.this);
+                }
+            }
         }
     };
 
@@ -717,6 +735,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+        filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
         filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 
@@ -1310,10 +1329,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void initializeInputText() {
         hideKeyboard();
         setChatSubtitle();
-
-        ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
-        if (prefs != null) {
-            String written = prefs.getWrittenText();
+        chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+        if(push == null){
+            push = MegaApplication.getInstance().getPushNotificationSetting();
+        }
+        if (chatPrefs != null) {
+            String written = chatPrefs.getWrittenText();
             if (!TextUtils.isEmpty(written)) {
                 textChat.setText(written);
                 sendIcon.setVisibility(View.VISIBLE);
@@ -1327,8 +1348,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
             }
         } else {
-            prefs = new ChatItemPreferences(Long.toString(idChat), NOTIFICATIONS_ENABLED, "");
-            dbH.setChatItemPreferences(prefs);
+            String typeMute = NOTIFICATIONS_ENABLED;
+            if(push != null){
+                if(push.isChatDndEnabled(chatRoom.getChatId())){
+                    typeMute = NOTIFICATIONS_DISABLED;
+                }
+            }
+            chatPrefs = new ChatItemPreferences(Long.toString(idChat), typeMute, "");
+            dbH.setChatItemPreferences(chatPrefs);
         }
         refreshTextInput();
     }
@@ -2234,17 +2261,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
             }
             case R.id.cab_menu_mute_chat:
-//                createMuteChatRoomAlertDialog(this, chatRoom.getChatId());
+                createMuteChatRoomAlertDialog(this, chatRoom.getChatId(), push);
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public boolean isEnableChatNotifications(long chatId){
-        if(push == null){
-            push = MegaPushNotificationSettings.createInstance();
-        }
-        return push.isChatEnabled(chatId);
     }
 
     /*
@@ -7510,14 +7530,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         return;
     }
 
-    private void selectMuteOption(long chatId, String typeMute) {
-        if (push != null) {
-            controlMuteNotifications(this, chatId, typeMute, push);
-        } else {
-            megaApi.getPushNotificationSettings(this);
-        }
-    }
-
     public String getPeerFullName(long userHandle){
         return chatRoom.getPeerFullnameByHandle(userHandle);
     }
@@ -7626,21 +7638,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     logDebug("Attribute USER_ATTR_GEOLOCATION disabled");
                     MegaApplication.setEnabledGeoLocation(false);
                 }
-            }
-        }else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-            if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
-                if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-                    if (e.getErrorCode() == MegaError.API_ENOENT) {
-                        push = MegaPushNotificationSettings.createInstance();
-                    } else {
-                        push = request.getMegaPushNotificationSettings();
+            }else if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    if(newMuteOption != null) {
+                        ChatController chatC = new ChatController(this);
+                        chatC.muteChat(chatRoom.getChatId(), newMuteOption);
+                        newMuteOption = null;
                     }
-                    chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatRoom.getChatId()));
-                    String typeMute = NOTIFICATIONS_ENABLED;
-                    if (chatPrefs != null) {
-                        typeMute = chatPrefs.getNotificationsEnabled();
-                    }
-                    selectMuteOption(chatRoom.getChatId(), typeMute);
+                } else {
+                    logError("Chat notification settings cannot be updated");
                 }
             }
         }

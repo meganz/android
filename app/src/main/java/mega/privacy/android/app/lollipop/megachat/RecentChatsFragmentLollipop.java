@@ -1749,8 +1749,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 case R.id.cab_menu_mute:
                 case R.id.cab_menu_unmute:
                     if (context instanceof ManagerActivityLollipop) {
-                        ((ManagerActivityLollipop) context).setMuteSelectedChat(chats.get(0).getChatId());
-//                        createMuteChatRoomAlertDialog(context, chats.get(0).getChatId());
+                        createMuteChatRoomAlertDialog(context, chats.get(0).getChatId(), MegaApplication.getInstance().getPushNotificationSetting());
                     }
                     break;
 
@@ -1856,11 +1855,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
 
-                    if(selected.size() == 1){
+                    if(selected.size() == 1 && context instanceof ManagerActivityLollipop){
                         MegaChatListItem chat = selected.get(0);
                         if (chat != null) {
-                            String chatHandle = String.valueOf(chat.getChatId());
-                            if (!dbH.areNotificationsEnabled(chatHandle).equals(NOTIFICATIONS_ENABLED)) {
+                            if (((ManagerActivityLollipop)context).isEnableChatNotifications(chat.getChatId())) {
                                 showUnmute = true;
                                 showMute = false;
                             }else{

@@ -275,7 +275,6 @@
                     android:layout_gravity="left|center_vertical"
                     android:textColor="@color/black_40_alpha"
                     android:layout_weight="5"
-                    android:text="Mute until tomorrow 20:14"
                     android:textSize="14sp" />
 
             </RelativeLayout>

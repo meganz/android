@@ -619,7 +619,6 @@ public class ChatUtil {
     /**
      * Method to display a dialog to mute a specific chat room.
      *
-     * @param context The context of Activity.
      * @param chatId  The chat ID.
      */
     public static void createMuteChatRoomAlertDialog(Context context, long chatId, final MegaPushNotificationSettings push) {
@@ -641,7 +640,7 @@ public class ChatUtil {
         String typeMuted = MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle);
         int itemClicked = getItemClicked(typeMuted);
         dialogBuilder.setSingleChoiceItems(items, itemClicked, (dialog, item) -> {
-            controlMuteNotifications(context, chatId, getTypeMute(item), push);
+            controlMuteNotifications(chatId, getTypeMute(item), push);
             dialog.dismiss();
         });
 
@@ -650,7 +649,10 @@ public class ChatUtil {
         muteDialog.show();
     }
 
-    public static void controlMuteNotifications(Context context, long chatId, String typeMute, final MegaPushNotificationSettings push) {
+    public static void controlMuteNotifications(long chatId, String typeMute, final MegaPushNotificationSettings push) {
+        if(push == null)
+            return;
+
         if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
             push.enableChat(chatId, true);
         } else if (typeMute.equals(NOTIFICATIONS_DISABLED)) {
@@ -680,21 +682,6 @@ public class ChatUtil {
         intentGeneral.putExtra(MUTE_CHATROOM_ID, chatId);
         intentGeneral.putExtra(TYPE_MUTE, typeMute);
         LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intentGeneral);
-
-        if(!(context instanceof ContactInfoActivityLollipop)){
-            MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showMuteIcon(chatId);
-            }
-        }
-    }
-
-    public static boolean isChatRoomEnabled(final ChatItemPreferences chatPrefs){
-        boolean result = true;
-        if (!isTextEmpty(chatPrefs.getNotificationsEnabled())){
-            result = chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED);
-        }
-        return result;
     }
 
 }
