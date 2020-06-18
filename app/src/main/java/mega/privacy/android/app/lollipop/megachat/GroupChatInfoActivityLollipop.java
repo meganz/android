@@ -587,6 +587,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 int pos = participants.indexOf(participant);
                 String fullName = checkParticipantName(contactHandle, pos);
                 participants.get(pos).setFullName(fullName);
+                pos = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR ? pos + 1 : pos;
                 adapter.updateParticipant(pos, participants);
                 break;
             }

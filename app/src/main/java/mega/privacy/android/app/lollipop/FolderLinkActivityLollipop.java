@@ -86,53 +86,18 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
-import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
-import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
-import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
-import static mega.privacy.android.app.utils.Constants.SCROLL_TO_POSITION;
-import static mega.privacy.android.app.utils.Constants.SEPARATOR;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.UPDATE_IMAGE_DRAG;
-import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
-import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
-import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
-import static mega.privacy.android.app.utils.FileUtils.showSnackBarWhenDownloading;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
-import static mega.privacy.android.app.utils.PreviewUtils.getBitmapForCache;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromCache;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
-import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
-import static mega.privacy.android.app.utils.Util.askMe;
-import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
-import static mega.privacy.android.app.utils.Util.getScaleH;
-import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.scaleHeightPx;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
-public class FolderLinkActivityLollipop extends DownloadableActivity implements
-		MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
+public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener{
+
 	public static ImageView imageDrag;
 	
 	FolderLinkActivityLollipop folderLinkActivity = this;
@@ -872,7 +837,11 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements
 				for (MegaNode document : dlFiles.keySet()) {
 					String path = dlFiles.get(document);
                     String targetPath = targets.get(document.getHandle());
-					logDebug("path of the file: "+path);
+
+					if (isTextEmpty(path)) {
+						continue;
+					}
+
 					numberOfNodesToDownload++;
 
 					if(availableFreeSpace < document.getSize()){
@@ -884,12 +853,9 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements
 					File destFile;
 					destDir.mkdirs();
 
-					if (destDir.isDirectory()){
-						destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-						logDebug("destDir is Directory. destFile: " + destFile.getAbsolutePath());
-					}
-					else{
-						logDebug("destDir is File");
+					if (destDir.isDirectory()) {
+						destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName(), destDir.getAbsolutePath() + SEPARATOR));
+					} else {
 						destFile = destDir;
 					}
 

@@ -979,10 +979,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null) return;
+			if (intent == null)
+				return;
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
 			if (getContactsFragment() != null) {
 				cFLol.updateContact(userHandle);
+			}
+
+			if(getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0){
+				inSFLol.updateNicknames(userHandle);
+			}
+			if(getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0){
+				outSFLol.updateNicknames(userHandle);
 			}
 		}
 	};
@@ -2298,7 +2306,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //				mainFabButtonChat.setVisibility(View.GONE);
 //				fabButtonsLayout.startAnimation(collectionFABLayoutOut);
 				fabButtonsLayout.setVisibility(View.GONE);
-				fabButton.setVisibility(View.VISIBLE);
+				fabButton.show();
 			}
 
 			@Override
@@ -2471,6 +2479,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("Offline mode: Do not init, chat already initialized");
 				}
 			}
+
+			return;
         }
 
 		transfersOverViewLayout = findViewById(R.id.transfers_overview_item_layout);
@@ -6479,6 +6489,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					upgradeAccountMenuItem.setVisible(true);
 					importLinkMenuItem.setVisible(true);
 					addMenuItem.setEnabled(true);
+					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
 					if (getTabItemCloud() == CLOUD_TAB) {
@@ -15410,14 +15421,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			secondFabButtonChat.setClickable(true);
 			thirdFabButtonChat.setClickable(true);
 			isFabOpen = true;
-			fabButton.setVisibility(View.GONE);
+			fabButton.hide();
 			fabButtonsLayout.setVisibility(View.VISIBLE);
 			logDebug("Open COLLECTION FAB");
 		}
 	}
 
 	public void hideFabButton(){
-		fabButton.setVisibility(View.GONE);
+		fabButton.hide();
 	}
 
 	public void showFabButton(){
@@ -15431,11 +15442,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case CLOUD_DRIVE:{
 				logDebug("Cloud Drive SECTION");
 				lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-				fabButton.setVisibility(View.VISIBLE);
+				fabButton.show();
 				break;
 			}
 			case RUBBISH_BIN:{
-				fabButton.setVisibility(View.GONE);
+				fabButton.hide();
 				break;
 			}
 			case SHARED_ITEMS:{
@@ -15448,7 +15459,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (isIncomingAdded()) {
 							if (deepBrowserTreeIncoming <= 0) {
 								logDebug("showFabButton: fabButton GONE");
-								fabButton.setVisibility(View.GONE);
+								fabButton.hide();
 							}
 							else {
 								//Check the folder's permissions
@@ -15462,17 +15473,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 										case MegaShare.ACCESS_READWRITE:
 										case MegaShare.ACCESS_FULL: {
 											lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-											fabButton.setVisibility(View.VISIBLE);
+											fabButton.show();
 											break;
 										}
 										case MegaShare.ACCESS_READ: {
-											fabButton.setVisibility(View.GONE);
+											fabButton.hide();
 											break;
 										}
 									}
 								}
 								else {
-									fabButton.setVisibility(View.GONE);
+									fabButton.hide();
 								}
 							}
 						}
@@ -15482,11 +15493,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						logDebug("showFabButton: OUTGOING TAB");
 						if (isOutgoingAdded()) {
 							if (deepBrowserTreeOutgoing <= 0) {
-								fabButton.setVisibility(View.GONE);
+								fabButton.hide();
 							}
 							else {
 								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-								fabButton.setVisibility(View.VISIBLE);
+								fabButton.show();
 							}
 						}
 						break;
@@ -15503,7 +15514,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						break;
 
 					default: {
-						fabButton.setVisibility(View.GONE);
+						fabButton.hide();
 						break;
 					}
 				}
@@ -15515,11 +15526,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					case 0:
 					case 1:{
 						lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-						fabButton.setVisibility(View.VISIBLE);
+						fabButton.show();
 						break;
 					}
 					default:{
-						fabButton.setVisibility(View.GONE);
+						fabButton.hide();
 						break;
 					}
 				}
@@ -15529,25 +15540,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if(megaChatApi!=null){
 					fabButton.setImageDrawable(mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-					fabButton.setVisibility(View.VISIBLE);
+					fabButton.show();
 				}
 				else{
-					fabButton.setVisibility(View.GONE);
+					fabButton.hide();
 				}
 				break;
 			}
 			case SEARCH: {
 				if (shouldShowFabWhenSearch()){
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-					fabButton.setVisibility(View.VISIBLE);
+					fabButton.show();
 				} else {
-					fabButton.setVisibility(View.GONE);
+					fabButton.hide();
 				}
 				break;
 			}
 			default:{
 				logDebug("Default GONE fabButton");
-				fabButton.setVisibility(View.GONE);
+				fabButton.hide();
 				break;
 			}
 		}
