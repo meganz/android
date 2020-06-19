@@ -20,6 +20,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.TimeUtils.*
+import java.util.concurrent.TimeUnit
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
 
@@ -105,7 +106,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
                     email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         }
 
-        var text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning), getHumanizedTimestamp(deadlineTs))
+        var text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning),
+                getHumanizedTime(deadlineTs - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())))
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")

@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -386,22 +387,25 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     /**
-     * Converts a milliseconds timestamp into a humanized format string.
-     * @param timestamp Timestamp to get the formatted string.
+     * Converts seconds time into a humanized format string.
+     * - If time is greater than a DAY, the formatted string will be "X day(s)".
+     * - If time is lower than a DAY and greater than a HOUR, the formatted string will be "Xh Ym".
+     * - If time is lower than a HOUR and greater than a MINUTE, the formatted string will be "Xm Ys".
+     * - If time is lower than a MINUTE, the formatted string will be "Xs".
+     *
+     * @param time Time in seconds to get the formatted string.
      * @return The humanized format string.
      */
-    public static String getHumanizedTimestamp(long timestamp) {
+    public static String getHumanizedTime(long time) {
         Context context = MegaApplication.getInstance().getApplicationContext();
-        if (timestamp <= 0) {
+        if (time <= 0) {
             return context.getString(R.string.label_time_in_seconds, 0);
         }
 
-        long ts_seconds = timestamp / 1000;
-
-        long days = ts_seconds / (24 * 3600);
-        long hours = ts_seconds / 3600;
-        long minutes = (ts_seconds % 3600) / 60;
-        long seconds = ts_seconds % 60;
+        long days = TimeUnit.SECONDS.toDays(time);
+        long hours = TimeUnit.SECONDS.toHours(time) - TimeUnit.DAYS.toHours(days);
+        long minutes = TimeUnit.SECONDS.toMinutes(time) - (TimeUnit.DAYS.toMinutes(days) + TimeUnit.HOURS.toMinutes(hours));
+        long seconds = TimeUnit.SECONDS.toSeconds(time) - (TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes));
 
         if (days > 0) {
             return context.getResources().getQuantityString(R.plurals.label_time_in_days_full, (int)days, (int)days);
@@ -414,5 +418,19 @@ public class TimeUtils implements Comparator<Calendar> {
         } else {
             return context.getString(R.string.label_time_in_seconds, seconds);
         }
+    }
+
+    /**
+     * Converts milliseconds time into a humanized format string.
+     * - If time is greater than a DAY, the formatted string will be "X day(s)".
+     * - If time is lower than a DAY and greater than a HOUR, the formatted string will be "Xh Ym".
+     * - If time is lower than a HOUR and greater than a MINUTE, the formatted string will be "Xm Ys".
+     * - If time is lower than a MINUTE, the formatted string will be "Xs".
+     *
+     * @param time Time in milliseconds to get the formatted string.
+     * @return The humanized format string.
+     */
+    public static String getHumanizedTimeMs(long time) {
+        return getHumanizedTime(TimeUnit.MILLISECONDS.toSeconds(time));
     }
 }
