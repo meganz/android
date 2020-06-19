@@ -11311,12 +11311,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				return;
 			} else if(ACTION_SHOW_UPGRADE_ACCOUNT.equals(intent.getAction())) {
 				navigateToUpgradeAccount();
+				return;
 			} else if (ACTION_SHOW_TRANSFERS.equals(intent.getAction())){
 				logDebug("Intent show transfers");
 
 				drawerItem = DrawerItem.TRANSFERS;
 				indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
 				selectDrawerItemLollipop(drawerItem);
+				return;
 			}
 
 		}
