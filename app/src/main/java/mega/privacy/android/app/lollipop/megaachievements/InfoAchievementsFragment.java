@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAchievementsListener;
 import nz.mega.sdk.MegaAchievementsDetails;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
@@ -26,7 +27,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
-public class InfoAchievementsFragment extends Fragment implements AchievementsFetcher.DataCallback {
+public class InfoAchievementsFragment extends Fragment implements GetAchievementsListener.DataCallback {
 	ActionBar actionBar;
 
 	ImageView icon;

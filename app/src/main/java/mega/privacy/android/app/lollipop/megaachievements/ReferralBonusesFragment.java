@@ -1,9 +1,9 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -22,22 +23,24 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.listeners.GetAchievementsListener;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class ReferralBonusesFragment extends Fragment implements OnClickListener
-		, AchievementsFetcher.DataCallback{
+		, GetAchievementsListener.DataCallback{
 	RelativeLayout parentRelativeLayout;
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	MegaReferralBonusesAdapter adapter;
 	
 	DisplayMetrics outMetrics;
-	float density;
 
 	MegaApiAndroid megaApi;
+
+	private Activity mActivity;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -52,11 +55,6 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
-
-		Display display = getActivity().getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
-		density = getResources().getDisplayMetrics().density;
 
 		boolean enabledAchievements = megaApi.isAchievementsEnabled();
 		logDebug("The achievements are: " + enabledAchievements);
@@ -77,9 +75,15 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		mActivity = getActivity();
+
 		// Activity actionbar has been created which might be accessed by UpdateUI().
-		((AppCompatActivity) getActivity()).getSupportActionBar()
-				.setTitle(getString(R.string.title_referral_bonuses));
+		if (mActivity != null) {
+			ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
+			if (actionBar != null) {
+				actionBar.setTitle(getString(R.string.title_referral_bonuses));
+			}
+		}
 
 		// The root view has been created, fill it with the data when data ready
 		if (sFetcher != null) {
@@ -108,7 +112,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 		if (context == null || sFetcher == null) return;
 
 		ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
-		if (bonuses.size() == 0 || context == null) return;
+		if (bonuses.size() == 0) return;
 
 		if (adapter == null) {
 			adapter = new MegaReferralBonusesAdapter(context, this, bonuses, recyclerView);

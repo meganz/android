@@ -1,10 +1,9 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,9 +15,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,25 +26,19 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.listeners.GetAchievementsListener;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
-import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.scaleHeightPx;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Util.*;
 
-public class AchievementsFragment extends Fragment implements OnClickListener
-		, AchievementsFetcher.DataCallback {
+public class AchievementsFragment extends BaseFragment implements OnClickListener
+		, GetAchievementsListener.DataCallback {
 	private LinearLayout parentLinearLayout;
-
-	private DisplayMetrics outMetrics;
-	float density;
 
 	private MegaApiAndroid megaApi;
 
@@ -141,6 +134,8 @@ public class AchievementsFragment extends Fragment implements OnClickListener
 
 	private Button inviteFriendsButton;
 
+	private Activity mActivity;
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		logDebug("onCreate");
@@ -154,11 +149,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
-
-		Display display = getActivity().getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
-		density = getResources().getDisplayMetrics().density;
 
 		boolean enabledAchievements = megaApi.isAchievementsEnabled();
 		logDebug("The achievements are: " + enabledAchievements);
@@ -358,13 +348,19 @@ public class AchievementsFragment extends Fragment implements OnClickListener
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		mActivity = getActivity();
+
 		// The root view has been created, fill it with the data when data ready
 		if (sFetcher != null) {
 			sFetcher.setDataCallback(this);
 		}
 
-		((AppCompatActivity)getActivity()).getSupportActionBar()
-				.setTitle(getString(R.string.achievements_title));
+		if (mActivity != null) {
+			ActionBar actionBar = ((AppCompatActivity)mActivity).getSupportActionBar();
+			if (actionBar != null) {
+				actionBar.setTitle(getString(R.string.achievements_title));
+			}
+		}
 	}
 
 	@Override

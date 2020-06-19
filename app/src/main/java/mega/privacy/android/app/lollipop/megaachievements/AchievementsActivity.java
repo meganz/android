@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -28,15 +30,9 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
-import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.hideKeyboard;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class AchievementsActivity extends PinActivityLollipop {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
@@ -48,7 +44,8 @@ public class AchievementsActivity extends PinActivityLollipop {
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
-    public static AchievementsFetcher sFetcher;
+    @SuppressLint("StaticFieldLeak")
+    public static GetAchievementsListener sFetcher;
     private androidx.appcompat.app.AlertDialog successDialog;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +104,7 @@ public class AchievementsActivity extends PinActivityLollipop {
             ft.add(R.id.fragment_container_achievements, new AchievementsFragment(), TAG_ACHIEVEMENTS);
             ft.commitNow();
 
-            sFetcher = new AchievementsFetcher();
+            sFetcher = new GetAchievementsListener();
             sFetcher.setRequestCallback(() -> {
                 showSnackbar(getString(R.string.cancel_subscription_error));
             });

@@ -1,25 +1,20 @@
-package mega.privacy.android.app.lollipop.megaachievements;
+package mega.privacy.android.app.listeners;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.lollipop.megaachievements.ReferralBonus;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 
-/**
- * Fetch achievements data from server
- * Provide data to relevant UI
- */
-public class AchievementsFetcher implements MegaRequestListenerInterface {
-    private MegaApiJava mMegaApi;
+public class GetAchievementsListener extends BaseListener {
     boolean mFetching;
 
     private MegaAchievementsDetails mMegaAchievements;
@@ -30,22 +25,11 @@ public class AchievementsFetcher implements MegaRequestListenerInterface {
     public synchronized void fetch() {
         if (mFetching) return;
         mFetching = true;
-
-        if (mMegaApi == null) {
-            mMegaApi = MegaApplication.getInstance().getMegaApi();
-        }
-
-        mMegaApi.getAccountAchievements(this);
+        MegaApplication.getInstance().getMegaApi().getAccountAchievements(this);
     }
 
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
+    public GetAchievementsListener() {
+        super(MegaApplication.getInstance());
     }
 
     @Override
@@ -74,7 +58,7 @@ public class AchievementsFetcher implements MegaRequestListenerInterface {
     }
 
     // Fragments that require the achievements data should implement this interface and register as callback
-    interface DataCallback {
+    public interface DataCallback {
         void onAchievementsReceived();
     }
 
@@ -87,7 +71,7 @@ public class AchievementsFetcher implements MegaRequestListenerInterface {
         }
     }
 
-    interface RequestCallback {
+    public interface RequestCallback {
         void onRequestError();
     }
 

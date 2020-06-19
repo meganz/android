@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -12,23 +13,24 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
-import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
 public class InviteFriendsFragment extends Fragment implements OnClickListener
-		, AchievementsFetcher.DataCallback{
+		, GetAchievementsListener.DataCallback{
 	int height;
 
 	Button inviteContactsBtn;
@@ -38,6 +40,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
 	float density;
 
 	MegaApiAndroid megaApi;
+
+	private Activity mActivity;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -57,6 +61,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
+
 
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
@@ -80,9 +85,15 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		mActivity = getActivity();
 		// Activity actionbar has been created which might be accessed by UpdateUI().
-		((AppCompatActivity) getActivity()).getSupportActionBar()
-				.setTitle(getString(R.string.title_referral_bonuses));
+		if (mActivity != null) {
+			ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
+			if (actionBar != null) {
+				actionBar.setTitle(getString(R.string.title_referral_bonuses));
+			}
+		}
+
 		// The root view has been created, fill it with the data when data ready
 		if (sFetcher != null) {
 			sFetcher.setDataCallback(this);
@@ -95,14 +106,18 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
 		    logDebug("To InviteContactActivity.");
             Intent intent = new Intent(getContext(), InviteContactActivity.class);
             intent.putExtra(InviteContactActivity.KEY_FROM, true);
-            getActivity().startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
+            if (mActivity != null) {
+				mActivity.startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
+			}
         }
 	}
 
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 
-		((AchievementsActivity) getActivity()).showFragment(ACHIEVEMENTS_FRAGMENT, -1);
+		if (mActivity != null) {
+			((AchievementsActivity)mActivity).showFragment(ACHIEVEMENTS_FRAGMENT, -1);
+		}
 		return 0;
 	}
 
