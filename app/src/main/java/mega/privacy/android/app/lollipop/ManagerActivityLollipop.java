@@ -3877,6 +3877,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					megaApi.setAvatar(path, this);
 				} else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
 					logDebug("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+					drawerItem = DrawerItem.TRANSFERS;
+					indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+					selectDrawerItemLollipop(drawerItem);
 
                     String text = getString(R.string.cam_sync_cancel_sync);
 
