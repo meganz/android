@@ -335,4 +335,13 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 		setFinalEmptyView(textToShow);
 	}
+
+	/**
+	 * Method to update an item when a nickname is added, updated or removed from a contact.
+	 *
+	 * @param contactHandle Contact ID.
+	 */
+	public void updateNicknames(long contactHandle) {
+		adapter.updateItem(contactHandle);
+	}
 }

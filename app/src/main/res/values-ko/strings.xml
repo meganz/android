@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">공유된 항목</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">공유된 폴더</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">휴지통</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">연락처</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">들어옴</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">나감</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">링크</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">들어오는 공유</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">다음과의 들어오는 공유</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">공유 떠나기</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">공유 제거</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">링크 제거</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">이 링크는 더 이상 공개되지 않습니다.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">이 링크는 더 이상 공개되지 않습니다.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">이 링크는 더 이상 공개되지 않습니다.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">이 링크들은 더 이상 공개적으로 이용할 수 없습니다.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">이름 바꾸기</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">링크 열기</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">열기</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">날짜</string>
     <string name="sortby_creation_date" context="category in sort by action">생성일</string>
     <string name="sortby_modification_date" context="category in sort by action">수정일</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">링크 생성일</string>
     <string name="sortby_date_newest" context="sort files by date newest first">최신</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">오래된 순</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">로그가 활성화 되었습니다.</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">로그가 비활성화 되었습니다.</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">당신이 필요한 권한을 거부했기 때문에 기록을 활성화할 수 없습니다</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">위치 열기</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">정보 보기</string>
 
-    <string name="context_link_removal_error" context="error message">링크 제거 실패. 나중에 다시 시도하세요.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">링크 제거 실패. 나중에 다시 시도하세요.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">일부 링크의 제거를 실패하였습니다. 나중에 다시 시도하세요.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">링크가 성공적으로 제거되었습니다.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">링크를 성공적으로 제거하였습니다.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">링크 행동 실패. 나중에 다시 시도하세요.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">이용자의 이메일을 쓰세요</string>
@@ -1827,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[A]나가는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B][/B][A]공개 링크[/A][B] 없음[/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">보낸 요청</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">받은 요청</string>
@@ -2316,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s님이 [/A][B]당신을 연락처에서 차단하였습니다.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">알림 [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">계정 삭제됨</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]계정이[/B] [B]삭제되었습니다.[/B]</string>
@@ -2435,7 +2452,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">카메라 활성화</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">문서 스캔, 사진 촬영 그리고 영상 통화를 하려면 당신의 카메라에 대한 접근을 허용하세요.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">통화 활성화</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">주소록 접근 허용</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">주소록에 대한 접근 허용</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA에서 당신의 주소록에 있는 지인들을 쉽게 찾으세요.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호 작용하지 않을 것입니다.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
@@ -2725,6 +2742,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">MEGA와 다른 서비스들에서 같은 비밀번호를 이용하고 있고, 다른 서비스들 중 한 곳에서 데이터 유출이 발생했을 가능성이 있습니다.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">당신의 비밀번호가 유출되어서 MEGA 계정뿐만 아니라 당신의 계정에 접속하려는 나쁜 사람들에게 이용되고 있습니다.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">별명 설정</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">별명 수정</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">별명 추가됨</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">별명 제거됨</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">별명을 추가하던 중 오류 발생</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">별명</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">다시 연결중</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">돌아왔습니다.</string>
 
@@ -2734,6 +2758,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">이 파일을 되돌릴 권한이 없습니다. 계속하려면 되돌린 데이터로 새 파일을 만들 수 있습니다. 계속하시겠습니까?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">기록으로 새 파일을 성공적으로 생성하였습니다.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">%1$s에</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">%1$d개의 폴더에서 모든 공유를 정지하시겠습니까?</string>
+
     <string name="download_location" context="Download location label">다운로드 위치</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">항상 이 위치에 저장할까요?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">다음에서 첨부&#8230;</string>
 </resources>

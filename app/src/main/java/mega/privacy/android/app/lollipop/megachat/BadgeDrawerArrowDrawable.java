@@ -84,7 +84,6 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
         final Rect textBounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), textBounds);
-        textPaint.setTextSize(25);
         canvas.drawText(text, x1, y1 + (float)(textBounds.height() / 2.5), textPaint);
     }
 
