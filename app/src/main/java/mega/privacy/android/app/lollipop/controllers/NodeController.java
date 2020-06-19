@@ -61,6 +61,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeController {
@@ -197,6 +198,15 @@ public class NodeController {
         logDebug("checkIfNodeIsMineAndSelectChatsToSendNode");
         ArrayList<MegaNode> nodes = new ArrayList<>();
         nodes.add(node);
+        checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
+    }
+
+    public void checkIfHandlesAreMineAndSelectChatsToSendNodes(ArrayList<Long> handles) {
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+        for (long handle : handles) {
+            nodes.add(megaApi.getNodeByHandle(handle));
+        }
+
         checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
     }
 
@@ -783,10 +793,14 @@ public class NodeController {
                     String path = dlFiles.get(document);
                     String targetPath = targets.get(document.getHandle());
 
+                    if (isTextEmpty(path)) {
+                        continue;
+                    }
+
                     File destDir = new File(path);
                     File destFile;
                     if (destDir.isDirectory()) {
-                        destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+                        destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName(), destDir.getAbsolutePath() + SEPARATOR));
                     } else {
                         destFile = destDir;
                     }

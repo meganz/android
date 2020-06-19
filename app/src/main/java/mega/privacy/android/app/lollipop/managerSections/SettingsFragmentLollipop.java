@@ -2,11 +2,9 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +14,6 @@ import android.provider.Settings;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -90,7 +87,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
-	Handler handler = new Handler();
+    Handler handler = new Handler();
 
 	PreferenceCategory qrCodeCategory;
 	SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
@@ -762,12 +759,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	private void checkMediaUploadsPath() {
 		localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 
-		if (isTextEmpty(localSecondaryFolderPath) || localSecondaryFolderPath.equals(Long.toString(INVALID_HANDLE)) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
+		if (isTextEmpty(localSecondaryFolderPath) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
 			logWarning("Secondary ON: invalid localSecondaryFolderPath");
 			localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 			Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 			if (!isFileAvailable(new File(localSecondaryFolderPath))) {
-				dbH.setSecondaryFolderPath(Long.toString(INVALID_HANDLE));
+				dbH.setSecondaryFolderPath(INVALID_PATH);
 			}
 		} else if (isExternalSDCardMU) {
 			Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
@@ -1184,7 +1181,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				long possibleSecondaryFolderHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
 				if ((setSecondaryFolderHandle == INVALID_HANDLE || isNodeInRubbishOrDeleted(setSecondaryFolderHandle)) &&
 						possibleSecondaryFolderHandle != INVALID_HANDLE) {
-					megaApi.setCameraUploadsFolderSecondary(possibleSecondaryFolderHandle, setAttrUserListener);
+					megaApi.setCameraUploadsFolders(INVALID_HANDLE, possibleSecondaryFolderHandle, setAttrUserListener);
 				}
 
                 restoreSecondaryTimestampsAndSyncRecordProcess();
@@ -1210,6 +1207,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				cameraUploadCategory.addPreference(megaSecondaryFolder);
 			}
 			else{
+                resetMUTimestampsAndCache();
 				dbH.setSecondaryUploadEnabled(false);
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
 				cameraUploadCategory.removePreference(localSecondaryFolder);
@@ -1523,7 +1521,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	/**
 	 * Refresh the Camera Uploads service settings depending on the service status.
 	 */
-    private void refreshCameraUploadsSettings() {
+    public void refreshCameraUploadsSettings() {
 		logDebug("refreshCameraUploadsSettings");
         boolean cuEnabled = false;
         if (prefs != null) {
@@ -1603,7 +1601,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			}
 
 			if (handle != INVALID_HANDLE) {
-				megaApi.setCameraUploadsFolderSecondary(handle, setAttrUserListener);
+				megaApi.setCameraUploadsFolders(INVALID_HANDLE,handle, setAttrUserListener);
 			} else {
 				logError("Error choosing the Mega folder to sync the Camera");
 			}
@@ -1618,29 +1616,13 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             }
 
 			if (handle != INVALID_HANDLE) {
-				megaApi.setCameraUploadsFolder(handle, setAttrUserListener);
+			    //set primary only
+				megaApi.setCameraUploadsFolders(handle, INVALID_HANDLE,setAttrUserListener);
 			} else {
 				logError("Error choosing the Mega folder to sync the Camera");
 			}
 		}
 	}
-
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				switch (intent.getAction()) {
-					case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
-						cameraUpload = intent.getBooleanExtra(CAMERA_UPLOADS_STATUS, false);
-						refreshCameraUploadsSettings();
-						break;
-					case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
-						taskGetSizeOffline();
-						break;
-				}
-			}
-		}
-	};
 
 	public synchronized void setCUDestinationFolder(boolean isSecondary, long handle) {
 		MegaNode targetNode = megaApi.getNodeByHandle(handle);
@@ -1665,11 +1647,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		logDebug("onResume");
 
 		refreshAccountInfo();
-
-		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
-		LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
 
 	    prefs=dbH.getPreferences();
 
@@ -1702,7 +1679,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	@Override
 	public void onPause(){
 		super.onPause();
-		LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
 	}
 
 	private void refreshAccountInfo(){
@@ -2252,9 +2228,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	 */
 	public void disableMediaUploadUIProcess() {
 		logDebug("changes to sec folder only");
-		secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
-		cameraUploadCategory.removePreference(localSecondaryFolder);
-		cameraUploadCategory.removePreference(megaSecondaryFolder);
+        secondaryUpload = false;
+        secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
+        cameraUploadCategory.removePreference(localSecondaryFolder);
+        cameraUploadCategory.removePreference(megaSecondaryFolder);
 	}
 
 	/**

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -230,7 +231,7 @@ public class CameraUploadUtil {
      */
     public static void disableCameraUploadSettingProcess(boolean clearCamsyncRecords) {
         resetCUTimestampsAndCache(clearCamsyncRecords);
-        new Handler().postDelayed(() -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (dbH.shouldClearCamsyncRecords()) {
                 dbH.deleteAllSyncRecords(TYPE_ANY);
                 dbH.saveShouldClearCamsyncRecords(false);
@@ -289,7 +290,7 @@ public class CameraUploadUtil {
         // Find previous camera upload folder, whose name is "Camera Uploads" in English
         long primaryHandle = findDefaultFolder(CAMERA_UPLOADS_ENGLISH);
         if (primaryHandle != INVALID_HANDLE) {
-            api.setCameraUploadsFolder(primaryHandle, new SetAttrUserListener(context));
+            api.setCameraUploadsFolders(primaryHandle, INVALID_HANDLE, new SetAttrUserListener(context));
             // if current device language is not English, rename this folder as "Camera Uploads" in other language
             if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(primaryHandle), context.getString(R.string.section_photo_sync), new RenameListener(context));
@@ -303,8 +304,7 @@ public class CameraUploadUtil {
         long secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS_ENGLISH);
         if (secondaryHandle != INVALID_HANDLE) {
             // if current device language is not English, rename this folder as "Media Uploads" in other language
-            api.setCameraUploadsFolderSecondary(secondaryHandle, new SetAttrUserListener(context));
-            Log.d("dfdf", "here is the secondaryHandle: " + secondaryHandle);
+            api.setCameraUploadsFolders(INVALID_HANDLE, secondaryHandle, new SetAttrUserListener(context));
             if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(secondaryHandle), context.getString(R.string.section_secondary_media_uploads), new RenameListener(context));
             }

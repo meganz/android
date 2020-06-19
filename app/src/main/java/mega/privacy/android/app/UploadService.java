@@ -366,6 +366,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
         Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
         intent.setAction(ACTION_SHOW_TRANSFERS);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -477,6 +478,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 break;
         }
 
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification;
 
@@ -976,6 +978,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		String message = getString(R.string.overquota_alert_title);
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		if(isOverquota==1){
 			intent.setAction(ACTION_OVERQUOTA_STORAGE);
 		}

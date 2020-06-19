@@ -60,7 +60,6 @@ import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -167,7 +166,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private ImageView avatarBigCameraGroupCallMicro;
     private RoundedImageView avatarBigCameraGroupCallImage;
     private EmojiTextView avatarBigCameraGroupCallInitialLetter;
-    private AppRTCAudioManager rtcAudioManager = null;
     private Animation shake;
     private LinearLayout linearFAB;
     private RelativeLayout relativeCall;
@@ -475,6 +473,26 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     };
 
+    private BroadcastReceiver proximitySensorReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null)
+                return;
+
+            boolean isNear = intent.getBooleanExtra(UPDATE_PROXIMITY_SENSOR_STATUS, false);
+            boolean realStatus = MegaApplication.getVideoStatus(chatId);
+            if (!realStatus) {
+                inTemporaryState = false;
+            } else if (isNear) {
+                inTemporaryState = true;
+                megaChatApi.disableVideo(chatId, ChatCallActivity.this);
+            } else {
+                inTemporaryState = false;
+                megaChatApi.enableVideo(chatId, ChatCallActivity.this);
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
@@ -733,6 +751,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         filterSession.addAction(ACTION_CHANGE_AUDIO_LEVEL);
         filterSession.addAction(ACTION_CHANGE_NETWORK_QUALITY);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+
+        IntentFilter filterProximitySensor = new IntentFilter(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
+        LocalBroadcastManager.getInstance(this).registerReceiver(proximitySensorReceiver, filterProximitySensor);
     }
 
     private void setAvatarLayout() {
@@ -971,9 +992,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onPause() {
         super.onPause();
-        if(rtcAudioManager!=null){
-            rtcAudioManager.unregisterProximitySensor();
-        }
+        application.unregisterProximitySensor();
     }
 
     @Override
@@ -982,9 +1001,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         super.onResume();
         stopService(new Intent(this, IncomingCallService.class));
         restoreHeightAndWidth();
-        if (rtcAudioManager != null) {
-            rtcAudioManager.startProximitySensor();
-        }
+        application.startProximitySensor();
 
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -1013,9 +1030,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     public void onDestroy() {
-        if(rtcAudioManager!=null){
-           rtcAudioManager.unregisterProximitySensor();
-        }
+        application.unregisterProximitySensor();
         clearHandlers();
         activateChrono(false, callInProgressChrono, callChat);
         restoreHeightAndWidth();
@@ -1038,6 +1053,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(proximitySensorReceiver);
 
         super.onDestroy();
     }
@@ -1157,19 +1173,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         infoUsersBar.setAlpha(1);
         infoUsersBar.setVisibility(View.VISIBLE);
         infoUsersBar.animate().alpha(0).setDuration(INFO_ANIMATION);
-    }
-
-    private void stopSpeakerAudioManger() {
-        if (rtcAudioManager == null)
-            return;
-        logDebug("stopSpeakerAudioManger");
-
-        try {
-            rtcAudioManager.stop();
-            rtcAudioManager = null;
-        } catch (Exception e) {
-            logError("Exception stopping speaker audio manager", e);
-        }
     }
 
     private void sendSignalPresence() {
@@ -1797,31 +1800,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         updateUI();
     }
 
-    private void createAppRTCAudioManager(boolean isSpeakerOn){
-        rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
-        rtcAudioManager.setOnProximitySensorListener(isNear -> {
-            boolean realStatus = application.getVideoStatus(callChat.getChatid());
-            if(!realStatus){
-                inTemporaryState = false;
-            }else if(isNear){
-                inTemporaryState = true;
-                megaChatApi.disableVideo(chatId, ChatCallActivity.this);
-            }else{
-                inTemporaryState = false;
-                megaChatApi.enableVideo(chatId, ChatCallActivity.this);
-            }
-
-        });
-    }
-
+    /**
+     * Method for updating speaker status, ON or OFF.
+     */
     private void updateLocalSpeakerStatus() {
         if (getCall() == null || !statusCallInProgress(callChat.getStatus())) return;
         boolean isSpeakerOn = application.getSpeakerStatus(callChat.getChatid());
-        if(rtcAudioManager == null){
-            createAppRTCAudioManager(isSpeakerOn);
-        }else{
-            rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
-        }
+        application.createRTCAudioManager(isSpeakerOn);
+        application.setAudioManagerValues(callChat.getStatus());
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1830,9 +1816,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
         }
-        application.setAudioManagerValues(callChat.getStatus());
     }
-
 
     private void optionsRemoteCameraFragmentFS(boolean isNecessaryCreate) {
         if (isNecessaryCreate) {
@@ -2492,7 +2476,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void checkTerminatingCall() {
         clearHandlers();
         application.removeChatAudioManager();
-        stopSpeakerAudioManger();
+        application.removeRTCAudioManager();
         MegaApplication.setSpeakerStatus(chatId, false);
         finishActivity();
     }

@@ -1944,9 +1944,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			int stringMessageID;
-            if (getPrimaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+            if (getPrimaryFolderHandle() == handle) {
                 stringMessageID = R.string.confirmation_move_cu_folder_to_rubbish;
-            } else if (getSecondaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+            } else if (getSecondaryFolderHandle() == handle) {
                 stringMessageID = R.string.confirmation_move_mu_folder_to_rubbish;
             } else {
                 stringMessageID = R.string.confirmation_move_to_rubbish;

@@ -691,6 +691,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading files of media folders</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Uploads</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload's primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload's secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->

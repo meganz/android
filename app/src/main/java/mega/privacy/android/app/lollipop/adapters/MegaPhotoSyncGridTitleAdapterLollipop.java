@@ -216,6 +216,15 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     break;
 
                 }
+                case R.id.cab_menu_send_to_chat: {
+                    logDebug("Send files to chat");
+                    NodeController nC = new NodeController(context);
+                    nC.checkIfNodesAreMineAndSelectChatsToSendNodes(
+                            (ArrayList<MegaNode>) documents);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+                }
                 case R.id.cab_menu_trash:{
                     ArrayList<Long> handleList = new ArrayList<Long>();
                     for (int i=0;i<documents.size();i++){
@@ -290,7 +299,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             boolean showLink = false;
             boolean showTrash = false;
             boolean showRemoveLink = false;
-
+            boolean showSendToChat = false;
 
             // Link
             if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
@@ -311,6 +320,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 showTrash = true;
                 showMove = true;
                 showCopy = true;
+                showSendToChat = true;
 
                 for(int i=0; i<selected.size();i++)	{
                     if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -357,6 +367,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 }else{
                     menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 }
+            }
+
+            if (showSendToChat) {
+                menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+                menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
             }
 
             menu.findItem(R.id.cab_menu_download).setVisible(showDownload);

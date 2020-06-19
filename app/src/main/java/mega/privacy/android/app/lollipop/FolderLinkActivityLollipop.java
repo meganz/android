@@ -97,6 +97,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FolderLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener{
@@ -890,7 +891,11 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				for (MegaNode document : dlFiles.keySet()) {
 					String path = dlFiles.get(document);
                     String targetPath = targets.get(document.getHandle());
-					logDebug("path of the file: "+path);
+
+					if (isTextEmpty(path)) {
+						continue;
+					}
+
 					numberOfNodesToDownload++;
 
 					if(availableFreeSpace < document.getSize()){
@@ -902,12 +907,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					File destFile;
 					destDir.mkdirs();
 
-					if (destDir.isDirectory()){
-						destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-						logDebug("destDir is Directory. destFile: " + destFile.getAbsolutePath());
-					}
-					else{
-						logDebug("destDir is File");
+					if (destDir.isDirectory()) {
+						destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName(), destDir.getAbsolutePath() + SEPARATOR));
+					} else {
 						destFile = destDir;
 					}
 
