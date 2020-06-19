@@ -506,6 +506,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
                         if (isOnline(context)) {
                             showEmptyChatScreen();
+                            ((ManagerActivityLollipop) context).showFabButton();
                         } else {
                             showNoConnectionScreen();
                         }
@@ -530,6 +531,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                         listView.setVisibility(View.VISIBLE);
                         emptyLayout.setVisibility(View.GONE);
+
+                        ((ManagerActivityLollipop) context).showFabButton();
                     }
                 } else {
                     logDebug("Show chat screen connecting...");
@@ -579,6 +582,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     fastScroller.setRecyclerView(listView);
                     visibilityFastScroller();
                     adapterList.setPositionClicked(-1);
+
+                    ((ManagerActivityLollipop) context).showFabButton();
                 }
             } else {
                 logDebug("Show chat screen connecting...");
