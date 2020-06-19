@@ -1059,9 +1059,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Uri uri = Uri.parse(prefs.getUriExternalSDCard());
             DocumentFile file = DocumentFile.fromTreeUri(this, uri);
             if (file == null) {
-                logError("Local folder on sd card is unavailabe.");
+                logError("Local folder on sd card is unavailable.");
                 return false;
             }
+
             return file.exists();
         } else {
             return new File(localPath).exists();
@@ -1070,18 +1071,31 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     /**
      * Check the availability of secondary local folder.
+     * If it's a path in internal storage, just check its existence.
+     * If it's a path in SD card, check the corresponding DocumentFile's existence.
      *
-     * @return true, if primary secondary folder is available. false， when it's unavailable.
+     * @return true, if secondary local folder is available. false， when it's unavailable.
      */
     private boolean checkSecondaryLocalFolder() {
         // check secondary local folder if media upload is enabled
         if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-            String path = prefs.getLocalPathSecondaryFolder();
-            // First time enable media upload, haven't set local path.
-            if(INVALID_PATH.equals(path)) {
-                return true;
+            if (dbH.getMediaFolderExternalSdCard()) {
+                Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+                DocumentFile file = DocumentFile.fromTreeUri(this, uri);
+                if (file == null) {
+                    logError("Local media folder on sd card is unavailable.");
+                    return false;
+                }
+
+                return file.exists();
             } else {
-                return path != null && new File(path).exists();
+                String path = prefs.getLocalPathSecondaryFolder();
+                // First time enable media upload, haven't set local path.
+                if (INVALID_PATH.equals(path)) {
+                    return true;
+                } else {
+                    return path != null && new File(path).exists();
+                }
             }
         }
         // if not enable secondary
