@@ -134,8 +134,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 	private Button inviteFriendsButton;
 
-	private Activity mActivity;
-
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		logDebug("onCreate");
@@ -348,15 +346,15 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mActivity = getActivity();
 
 		// The root view has been created, fill it with the data when data ready
 		if (sFetcher != null) {
 			sFetcher.setDataCallback(this);
 		}
 
-		if (mActivity != null) {
-			ActionBar actionBar = ((AppCompatActivity)mActivity).getSupportActionBar();
+		Activity activity = getActivity();
+		if (activity != null) {
+			ActionBar actionBar = ((AppCompatActivity)activity).getSupportActionBar();
 			if (actionBar != null) {
 				actionBar.setTitle(getString(R.string.achievements_title));
 			}

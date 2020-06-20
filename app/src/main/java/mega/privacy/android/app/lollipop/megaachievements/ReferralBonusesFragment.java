@@ -40,8 +40,6 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 	MegaApiAndroid megaApi;
 
-	private Activity mActivity;
-
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		logDebug("onCreate");
@@ -75,11 +73,11 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mActivity = getActivity();
+		Activity activity = getActivity();
 
 		// Activity actionbar has been created which might be accessed by UpdateUI().
-		if (mActivity != null) {
-			ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
+		if (activity != null) {
+			ActionBar actionBar = ((AppCompatActivity) activity).getSupportActionBar();
 			if (actionBar != null) {
 				actionBar.setTitle(getString(R.string.title_referral_bonuses));
 			}
