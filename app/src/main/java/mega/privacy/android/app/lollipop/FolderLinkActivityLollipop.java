@@ -97,6 +97,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener{
+	private static final String TAG_DECRYPT = "decrypt";
 
 	public static ImageView imageDrag;
 	
@@ -669,7 +670,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				.setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
 				.setMessage(getString(R.string.message_decryption_key))
 				.setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
-				.build().show(getSupportFragmentManager(), "decrypt");
+				.build().show(getSupportFragmentManager(), TAG_DECRYPT);
 	}
 
 	@Override

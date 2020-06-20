@@ -28,18 +28,14 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
-import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
-import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.Util.matchRegexs;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenPasswordLinkActivity extends PinActivityLollipop
 		implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
-	
+	private static final String TAG_DECRYPT = "decrypt";
+
 	MegaApiAndroid megaApi;
 
 	Toolbar tB;
@@ -103,7 +99,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 		builder.setListener(this).setTitle(getString(R.string.hint_set_password_protection_dialog))
 				.setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
 				.setErrorMessage(R.string.invalid_link_password).setKey(mKey).setShownPassword(true)
-				.build().show(getSupportFragmentManager(), "decrypt");
+				.build().show(getSupportFragmentManager(), TAG_DECRYPT);
 	}
 
 	private void decrypt(){

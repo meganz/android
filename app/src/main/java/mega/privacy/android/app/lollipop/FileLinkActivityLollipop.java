@@ -56,42 +56,16 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.ACTION_IMPORT_LINK_FETCH_NODES;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL;
-import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
-import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
-import static mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING;
-import static mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
-import static mega.privacy.android.app.utils.Constants.SEPARATOR;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.URL_FILE_LINK;
-import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
-import static mega.privacy.android.app.utils.PreviewUtils.getBitmapForCache;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromCache;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
-import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
-import static mega.privacy.android.app.utils.Util.getScaleH;
-import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FileLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
-	
+	private static final String TAG_DECRYPT = "decrypt";
+
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -299,7 +273,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				.setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
 				.setMessage(getString(R.string.message_decryption_key))
 				.setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
-				.build().show(getSupportFragmentManager(), "decrypt");
+				.build().show(getSupportFragmentManager(), TAG_DECRYPT);
 	}
 
 	private void decrypt() {
