@@ -133,6 +133,8 @@ public class Util {
 
 	public static HashMap<String, String> countryCodeDisplay;
 
+	private static long lastClickTime;
+
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
         String nodeOriginalFingerprint = node.getOriginalFingerprint();
@@ -1788,5 +1790,16 @@ public class Util {
 		} else {
 			textInputLayout.setEndIconMode(END_ICON_NONE);
 		}
+	}
+
+	public static boolean isFastDoubleClick() {
+		long time = System.currentTimeMillis();
+		long timeD = time - lastClickTime;
+		if (0 < timeD && timeD < 500) {
+			return true;
+		}
+
+		lastClickTime = time;
+		return false;
 	}
 }

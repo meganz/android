@@ -74,7 +74,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -109,7 +108,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -146,7 +144,6 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -10262,13 +10259,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setPinDialog.show();
 	}
 
-	public void chooseAddContactDialog(boolean isMegaContact){
+	public void chooseAddContactDialog(boolean isMegaContact) {
 		logDebug("chooseAddContactDialog");
-		if(isMegaContact){
-			if(megaApi!=null && megaApi.getRootNode()!=null){
-				Intent in = new Intent(this, AddContactActivityLollipop.class);
-				in.putExtra("contactType", CONTACT_TYPE_MEGA);
-				startActivityForResult(in, REQUEST_CREATE_CHAT);
+		if (isMegaContact) {
+			if (megaApi != null && megaApi.getRootNode() != null) {
+				Intent intent = new Intent(this, AddContactActivityLollipop.class);
+				intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+				startActivityForResult(intent, REQUEST_CREATE_CHAT);
 			}
 			else{
 				logWarning("Online but not megaApi");
