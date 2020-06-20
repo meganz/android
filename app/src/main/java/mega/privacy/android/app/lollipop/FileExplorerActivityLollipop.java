@@ -149,11 +149,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private static final int CHAT_TAB = 2;
 	private static final int SHOW_TABS = 3;
 	private boolean isChatFirst;
-	private boolean mIsShowTabs;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
-
 	private AppBarLayout abL;
 	private Toolbar tB;
 	private ActionBar aB;
@@ -737,7 +735,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void setView(int tab, boolean isChatFirst, int tabToRemove) {
 		switch (tab) {
 			case CLOUD_TAB:{
-				mIsShowTabs = false;
 				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 				if(cDriveExplorer==null){
 					cDriveExplorer = new CloudDriveExplorerFragmentLollipop();
@@ -753,7 +750,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				break;
 			}
 			case SHOW_TABS:{
-				mIsShowTabs = true;
 				if (mTabsAdapterExplorer == null){
 					tabLayoutExplorer.setVisibility(View.VISIBLE);
 					viewPagerExplorer.setVisibility(View.VISIBLE);
@@ -855,7 +851,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void changeActionBarElevation(boolean whitElevation, int fragmentIndex) {
-		if (mIsShowTabs && !isCurrentFragment(fragmentIndex)) return;
+		if (!isCurrentFragment(fragmentIndex)) return;
 
 		if (whitElevation) {
 			abL.setElevation(px2dp(4, outMetrics));
@@ -865,6 +861,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	private boolean isCurrentFragment(int index) {
+		if (tabShown == NO_TABS) return true;  // only one fragment
+
 		// No need to care ImportFilesFragment as it would never be shown in SHOW_TABS mode
 		switch(index) {
 			case CLOUD_FRAGMENT:

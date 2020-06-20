@@ -234,17 +234,10 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	@Override
 	public void checkScroll() {
-		if (recyclerView == null) {
-			return;
-		}
-		if (recyclerView.canScrollVertically(-1)){
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(true
-					, FileExplorerActivityLollipop.INCOMING_FRAGMENT);
-		}
-		else {
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(false
-					, FileExplorerActivityLollipop.INCOMING_FRAGMENT);
-		}
+		if (recyclerView == null) return;
+
+		((FileExplorerActivityLollipop) context).changeActionBarElevation(
+				recyclerView.canScrollVertically(-1), FileExplorerActivityLollipop.INCOMING_FRAGMENT);
 	}
 
 	@Override

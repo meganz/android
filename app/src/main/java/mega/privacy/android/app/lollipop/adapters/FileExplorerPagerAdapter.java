@@ -74,8 +74,7 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
             return mChatFragment;
         }
 
-        mChatFragment = ChatExplorerFragment.newInstance();
-        return mChatFragment;
+        return mChatFragment = ChatExplorerFragment.newInstance();
     }
 
     private Fragment getIncomingFragment () {
@@ -83,8 +82,7 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
             return mIncomingFragment;
         }
 
-        mIncomingFragment = IncomingSharesExplorerFragmentLollipop.newInstance();
-        return mIncomingFragment;
+        return mIncomingFragment = IncomingSharesExplorerFragmentLollipop.newInstance();
     }
 
     private Fragment getCloudFragment () {
@@ -92,8 +90,7 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
             return mCloudFragment;
         }
 
-        mCloudFragment = CloudDriveExplorerFragmentLollipop.newInstance();
-        return mCloudFragment;
+        return mCloudFragment = CloudDriveExplorerFragmentLollipop.newInstance();
     }
 
     @Override

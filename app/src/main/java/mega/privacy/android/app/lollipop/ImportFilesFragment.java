@@ -78,16 +78,10 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
     }
 
     public void changeActionBarElevation () {
-        if (scrollView != null) {
-            if (scrollView.canScrollVertically(-1)) {
-                ((FileExplorerActivityLollipop) context).changeActionBarElevation(true
-                        , FileExplorerActivityLollipop.IMPORT_FRAGMENT);
-            }
-            else {
-                ((FileExplorerActivityLollipop) context).changeActionBarElevation(false
-                        , FileExplorerActivityLollipop.IMPORT_FRAGMENT);
-            }
-        }
+        if (scrollView == null) return;
+
+        ((FileExplorerActivityLollipop) context).changeActionBarElevation(scrollView.canScrollVertically(-1)
+                , FileExplorerActivityLollipop.IMPORT_FRAGMENT);
     }
 
     @Override
