@@ -52,5 +52,18 @@
         android:gravity="center"
         android:maxWidth="60dp"
         android:singleLine="true"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/invite_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chip_layout"
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/invite_more"
+        android:textColor="@color/accentColor"
+        android:textSize="14sp"
+        android:visibility="gone"/>
 </RelativeLayout>

@@ -119,6 +119,7 @@
                             android:text="@string/general_allow"
                             android:textSize="14sp" />
                     </RelativeLayout>
+
                     <RelativeLayout
                         android:id="@+id/contacts_list_layout"
                         android:layout_width="match_parent"
@@ -126,22 +127,10 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/contacts_list"
-                            android:layout_width="match_parent"
-                            android:layout_height="88dp"/>
-
-                        <TextView
-                            android:id="@+id/more_contacts"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_below="@id/contacts_list"
-                            android:ellipsize="end"
-                            android:text="@string/invite_more"
-                            android:textColor="@color/accentColor"
-                            android:paddingBottom="12dp"
-                            android:paddingLeft="22dp"
-                            android:paddingRight="22dp"
-                            android:textSize="14sp" />
+                            android:layout_height="88dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_centerVertical="true" />
                     </RelativeLayout>
                 </FrameLayout>
             </LinearLayout>
