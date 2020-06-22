@@ -9,6 +9,11 @@ if [ -z "$NDK_ROOT" ]; then
 fi
 ##################################################
 
+if [ ! -d "${NDK_ROOT}" ]; then
+    echo "* NDK_ROOT not set. Please download ndk 16 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
+    exit 1
+fi
+
 NDK_BUILD=${NDK_ROOT}/ndk-build
 JNI_PATH=`pwd`
 CC=`${NDK_ROOT}/ndk-which gcc`
@@ -145,11 +150,6 @@ function createMEGAchatBindings
     cmake -P genDbSchema.cmake
     popd &>> ${LOG_FILE}
 }
-
-if [ ! -d "${NDK_ROOT}" ]; then
-    echo "* NDK_ROOT not set. Please download ndk 16 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
-    exit 1
-fi
 
 if (( $# != 1 )); then
     echo "Usage: $0 <all | bindings | clean | clean_mega>";
@@ -355,7 +355,7 @@ echo "* libwebsockets is ready"
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm.a | cut -d " " -f 1`
-    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "2d0e9cff4e691d9da4747315f0775be25d62b0bd" ]; then
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "d876e79e728f58c8c9387f02914591f61ccf5066" ]; then
         echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!wixgSaZZ!6zRMV_d8ogouBaEidHzGws1KvLrBwBiKEm0VIVgXEPk"
         echo "and uncompress it in megachat/webrtc"
         exit 1
