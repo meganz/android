@@ -84,6 +84,15 @@
                                 android:src="@drawable/ic_private_chat"
                                 android:tint="@color/white"
                                 android:visibility="gone" />
+                            <ImageView
+                                android:id="@+id/mute_icon_toolbar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_mute_white"
+                                android:tint="@color/white"
+                                android:visibility="gone" />
                         </LinearLayout>
                     </RelativeLayout>
 

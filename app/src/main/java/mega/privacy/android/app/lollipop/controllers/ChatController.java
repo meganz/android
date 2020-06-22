@@ -360,6 +360,11 @@ public class ChatController {
             chatPrefs.setNotificationsEnabled(typeMute);
             dbH.setNotificationEnabledChatItem(typeMute, Long.toString(chatHandle));
         }
+
+        String text = getMutedPeriodString(typeMute);
+        if(text != null) {
+            showSnackbar(context, context.getString(R.string.success_muting_a_chat, text));
+        }
     }
 
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {

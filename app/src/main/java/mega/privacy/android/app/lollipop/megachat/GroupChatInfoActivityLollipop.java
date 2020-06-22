@@ -130,6 +130,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     RelativeLayout infoTextContainerLayout;
     ImageView editImageView;
     LinearLayout notificationsLayout;
+    private RelativeLayout notificationsSwitchLayout;
     SwitchCompat notificationsSwitch;
     TextView notificationsTitle;
     private TextView notificationsSubTitle;
@@ -184,6 +185,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
                 if(push == null) {
                     setUpIndividualChatNotifications();
+                }else{
+                    push = app.getPushNotificationSetting();
                 }
             }else {
                 long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
@@ -194,7 +197,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
                     newMuteOption = intent.getStringExtra(TYPE_MUTE);
-                    megaApi.setPushNotificationSettings(push, GroupChatInfoActivityLollipop.this);
+                    push = app.getPushNotificationSetting();
+                    if(push != null) {
+                        megaApi.setPushNotificationSettings(push, GroupChatInfoActivityLollipop.this);
+                    }
                 }
             }
         }
@@ -314,10 +320,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             //Notifications Layout
             notificationsLayout = findViewById(R.id.chat_group_contact_properties_notifications_layout);
             notificationsLayout.setVisibility(View.VISIBLE);
-            notificationsLayout.setOnClickListener(this);
             notificationsTitle = findViewById(R.id.chat_group_contact_properties_notifications_title);
             notificationsSubTitle = findViewById(R.id.chat_group_contact_properties_notifications_muted_text);
             notificationsSubTitle.setVisibility(View.GONE);
+            notificationsSwitchLayout = findViewById(R.id.chat_group_contact_properties_layout);
+            notificationsSwitchLayout.setOnClickListener(this);
             notificationsSwitch = findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setClickable(false);
 
@@ -971,15 +978,16 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 chatC.archiveChat(chat);
                 break;
             }
-            case R.id.chat_group_contact_properties_notifications_layout:{
+            case R.id.chat_group_contact_properties_layout:{
                 logDebug("Click on switch notifications");
                 if(!generalChatNotifications){
                     notificationsSwitch.setChecked(false);
                     showSnackbar("The chat notifications are disabled, go to settings to set up them");
+                } else if (notificationsSwitch.isChecked()) {
+                    createMuteChatRoomAlertDialog(GroupChatInfoActivityLollipop.this, chatHandle);
                 } else {
-                    createMuteChatRoomAlertDialog(this, chatHandle, push);
+                    app.controlMuteNotifications(chatHandle, NOTIFICATIONS_ENABLED);
                 }
-
                 break;
 
             }
@@ -1583,8 +1591,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }else if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 if(newMuteOption != null) {
-                    ChatController chatC = new ChatController(this);
-                    chatC.muteChat(chatHandle, newMuteOption);
+                    if(request.getMegaPushNotificationSettings() != null){
+                        push = request.getMegaPushNotificationSettings().copy();
+                    }else{
+                        push = MegaPushNotificationSettings.createInstance();
+                    }
+                    app.setPushNotificationSetting(push);
+                    muteChat(this, chatHandle, newMuteOption);
                     newMuteOption = null;
                     updateSwitchButton();
                 }

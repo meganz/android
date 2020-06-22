@@ -34,6 +34,7 @@ import android.util.Log;
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -156,8 +157,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static boolean isLoggingRunning = false;
 
 	MegaChatApiAndroid megaChatApi = null;
-	private MegaPushNotificationSettings push = null;
-
+	private MegaPushNotificationSettings push;
 
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
@@ -248,12 +248,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS && push == null) {
+				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
 					if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-						if (e.getErrorCode() == MegaError.API_OK) {
-							push = request.getMegaPushNotificationSettings();
+						if(request.getMegaPushNotificationSettings() != null){
+							push = request.getMegaPushNotificationSettings().copy();
+						}else{
+							push = MegaPushNotificationSettings.createInstance();
 						}
-						push = MegaPushNotificationSettings.createInstance();
 
 						Intent intent = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
 						intent.setAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
@@ -522,7 +523,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-		push = getPushNotificationSetting();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
 
@@ -552,6 +552,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
 
+
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
@@ -571,6 +572,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
                 }
             }
         };
+
 		LocalBroadcastManager.getInstance(this).registerReceiver(logoutReceiver, new IntentFilter(ACTION_LOG_OUT));
 		EmojiManager.install(new TwitterEmojiProvider());
 
@@ -607,6 +609,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         clearPublicCache(this);
 
 		ContextUtils.initialize(getApplicationContext());
+
 	}
 
 
@@ -675,10 +678,51 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public MegaPushNotificationSettings getPushNotificationSetting() {
 		if (push == null) {
-			megaApi.getPushNotificationSettings(null);
+			if(megaApi == null){
+				getMegaApi();
+			}
+			if(megaApi!=null) {
+				megaApi.getPushNotificationSettings(null);
+			}
 		}
 
 		return push;
+	}
+
+	public void setPushNotificationSetting(MegaPushNotificationSettings newPush){
+		push = newPush;
+	}
+
+	public void controlMuteNotifications(long chatId, String typeMute) {
+		if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
+			push.enableChat(chatId, true);
+		} else if (typeMute.equals(NOTIFICATIONS_DISABLED)) {
+			push.enableChat(chatId, false);
+		}else {
+			Calendar newCalendar = Calendar.getInstance();
+			newCalendar.setTimeInMillis(System.currentTimeMillis());
+			switch (typeMute) {
+				case NOTIFICATIONS_30_MINUTES:
+					newCalendar.add(Calendar.MINUTE, 30);
+					break;
+				case NOTIFICATIONS_1_HOUR:
+					newCalendar.add(Calendar.HOUR, 1);
+					break;
+				case NOTIFICATIONS_6_HOURS:
+					newCalendar.add(Calendar.HOUR, 6);
+					break;
+				case NOTIFICATIONS_24_HOURS:
+					newCalendar.add(Calendar.HOUR, 24);
+					break;
+			}
+			push.setChatDnd(chatId, newCalendar.getTimeInMillis());
+		}
+
+		Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+		intentGeneral.setAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
+		intentGeneral.putExtra(MUTE_CHATROOM_ID, chatId);
+		intentGeneral.putExtra(TYPE_MUTE, typeMute);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intentGeneral);
 	}
 	
 	public MegaApiAndroid getMegaApiFolder(){

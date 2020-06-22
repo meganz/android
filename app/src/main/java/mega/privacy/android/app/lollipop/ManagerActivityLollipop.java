@@ -1334,9 +1334,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 return;
 
             if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
-                if(push == null){
-                    push = MegaApplication.getInstance().getPushNotificationSetting();
-                }
+				push = app.getPushNotificationSetting();
             }else {
                 long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
                 if (chatId == MEGACHAT_INVALID_HANDLE) {
@@ -1346,8 +1344,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
                 if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
                     newMuteOption = intent.getStringExtra(TYPE_MUTE);
-                    newMuteOptionChat = chatId;
-					megaApi.setPushNotificationSettings(push, ManagerActivityLollipop.this);
+					newMuteOptionChat = chatId;
+					push = app.getPushNotificationSetting();
+					if(push != null) {
+						megaApi.setPushNotificationSettings(push, ManagerActivityLollipop.this);
+					}
                 }
             }
         }
@@ -1363,6 +1364,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             mBillingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
         }
     }
+
+    public MegaPushNotificationSettings getPushNotification(){
+    	return push;
+	}
 
 	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
 		if (list == null || list.isEmpty()) {
@@ -2034,6 +2039,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logDebug("retryChatPendingConnections()");
 			megaChatApi.retryPendingConnections(false, null);
 		}
+
+		app.getPushNotificationSetting();
 
 		transfersInProgress = new ArrayList<Integer>();
 
@@ -6033,9 +6040,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public boolean isEnableChatNotifications(long chatId){
 		if(push == null){
-			push = MegaApplication.getInstance().getPushNotificationSetting();
+			push = app.getPushNotificationSetting();
 		}
-
 		ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatId));
 		if(push == null){
 			return dbH.areNotificationsEnabled(Long.toString(chatId)).equals(NOTIFICATIONS_ENABLED);
@@ -6058,6 +6064,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_ENABLED, "");
 			dbH.setChatItemPreferences(chatPrefs);
 		}
+
 		return true;
 	}
 
@@ -13598,10 +13605,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
 				if (e.getErrorCode() == MegaError.API_OK) {
 					if (newMuteOption != null && newMuteOptionChat != MEGACHAT_INVALID_HANDLE) {
-						ChatController chatC = new ChatController(this);
-						chatC.muteChat(newMuteOptionChat, newMuteOption);
+						if(request.getMegaPushNotificationSettings() != null){
+							push = request.getMegaPushNotificationSettings().copy();
+						}else{
+							push = MegaPushNotificationSettings.createInstance();
+						}
+						app.setPushNotificationSetting(push);
+						muteChat(this, newMuteOptionChat, newMuteOption);
 						showMuteIcon(newMuteOptionChat);
-
 						newMuteOption = null;
 						newMuteOptionChat = MEGACHAT_INVALID_HANDLE;
 					}

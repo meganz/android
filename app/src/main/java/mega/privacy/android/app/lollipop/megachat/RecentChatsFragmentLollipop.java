@@ -1749,7 +1749,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 case R.id.cab_menu_mute:
                 case R.id.cab_menu_unmute:
                     if (context instanceof ManagerActivityLollipop) {
-                        createMuteChatRoomAlertDialog(context, chats.get(0).getChatId(), MegaApplication.getInstance().getPushNotificationSetting());
+                        createMuteChatRoomAlertDialog(context, chats.get(0).getChatId());
                     }
                     break;
 

@@ -320,9 +320,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     Chronometer subtitleChronoCall;
     LinearLayout participantsLayout;
     TextView participantsText;
-    ImageView iconStateToolbar;
-
-    ImageView privateIconToolbar;
+    private ImageView iconStateToolbar;
+    private ImageView privateIconToolbar;
+    private ImageView muteIconToolbar;
 
     float density;
     DisplayMetrics outMetrics;
@@ -607,8 +607,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
 
             if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+                push = app.getPushNotificationSetting();
                 if(push == null){
-                    push = MegaApplication.getInstance().getPushNotificationSetting();
+                    muteIconToolbar.setVisibility(isEnableChatNotifications(idChat) ? View.GONE : View.VISIBLE);
                 }
             }else {
                 long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
@@ -619,7 +620,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
                     newMuteOption = intent.getStringExtra(TYPE_MUTE);
-                    megaApi.setPushNotificationSettings(push, ChatActivityLollipop.this);
+                    push = app.getPushNotificationSetting();
+                    if(push != null) {
+                        megaApi.setPushNotificationSettings(push, ChatActivityLollipop.this);
+                    }
                 }
             }
         }
@@ -769,6 +773,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
         privateIconToolbar = tB.findViewById(R.id.private_icon_toolbar);
+        muteIconToolbar = tB.findViewById(R.id.mute_icon_toolbar);
 
         individualSubtitleToobar = tB.findViewById(R.id.individual_subtitle_toolbar);
         groupalSubtitleToolbar = tB.findViewById(R.id.groupal_subtitle_toolbar);
@@ -801,6 +806,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         participantsLayout.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
+        muteIconToolbar.setVisibility(View.GONE);
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
         updateNavigationToolbarIcon();
 
@@ -1331,7 +1337,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         setChatSubtitle();
         chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
         if(push == null){
-            push = MegaApplication.getInstance().getPushNotificationSetting();
+            push = app.getPushNotificationSetting();
         }
         if (chatPrefs != null) {
             String written = chatPrefs.getWrittenText();
@@ -1472,6 +1478,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         titleToolbar.setText(chatRoom.getTitle());
         setChatSubtitle();
         privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
+        muteIconToolbar.setVisibility(isEnableChatNotifications(idChat) ? View.GONE : View.VISIBLE);
         isOpeningChat = true;
 
         String textToShowB = getString(R.string.chat_loading_messages);
@@ -2261,7 +2268,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
             }
             case R.id.cab_menu_mute_chat:
-                createMuteChatRoomAlertDialog(this, chatRoom.getChatId(), push);
+                createMuteChatRoomAlertDialog(ChatActivityLollipop.this, chatRoom.getChatId());
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -7641,8 +7648,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }else if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
                 if (e.getErrorCode() == MegaError.API_OK) {
                     if(newMuteOption != null) {
-                        ChatController chatC = new ChatController(this);
-                        chatC.muteChat(chatRoom.getChatId(), newMuteOption);
+                        if(request.getMegaPushNotificationSettings() != null){
+                            push = request.getMegaPushNotificationSettings().copy();
+                        }else{
+                            push = MegaPushNotificationSettings.createInstance();
+                        }
+                        app.setPushNotificationSetting(push);
+                        muteChat(this, chatRoom.getChatId(), newMuteOption);
+                        muteIconToolbar.setVisibility(newMuteOption.equals(NOTIFICATIONS_ENABLED) ? View.GONE : View.VISIBLE);
                         newMuteOption = null;
                     }
                 } else {
@@ -8173,6 +8186,35 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
             }
         }
+    }
+
+    public boolean isEnableChatNotifications(long chatId){
+        if(push == null){
+            push = app.getPushNotificationSetting();
+        }
+
+        if(push == null){
+            return dbH.areNotificationsEnabled(Long.toString(chatId)).equals(NOTIFICATIONS_ENABLED);
+        }
+
+        if(push.isChatDndEnabled(chatId)){
+            if(chatPrefs == null) {
+                chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_DISABLED, "");
+                dbH.setChatItemPreferences(chatPrefs);
+            }
+            return false;
+        }
+
+        if(chatPrefs != null) {
+            if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
+                chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
+                dbH.setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatId));
+            }
+        }else{
+            chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_ENABLED, "");
+            dbH.setChatItemPreferences(chatPrefs);
+        }
+        return true;
     }
 
 

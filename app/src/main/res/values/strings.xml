@@ -1180,8 +1180,9 @@
     <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications</string>
 
     <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
-    <string name="mute_chatroom_notification_option_off" context="">Off</string>
-    <string name="mute_chatroom_notification_option_indefinitely" context="">Until I turn it on again</string>
+    <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
+    <string name="mute_chatroom_notification_option_indefinitely" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are permanently disabled.">Until I turn it on again</string>
+    <string name="success_muting_a_chat" context="Message when a chat has been muted successfully.">Chat notifications will be muted for %s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Message sound</string>

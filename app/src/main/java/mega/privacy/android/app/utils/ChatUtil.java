@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -36,7 +39,7 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -621,7 +624,7 @@ public class ChatUtil {
      *
      * @param chatId  The chat ID.
      */
-    public static void createMuteChatRoomAlertDialog(Context context, long chatId, final MegaPushNotificationSettings push) {
+    public static void createMuteChatRoomAlertDialog(Context context, long chatId) {
         if (chatId == MEGACHAT_INVALID_HANDLE)
             return;
 
@@ -638,50 +641,44 @@ public class ChatUtil {
 
         String chatHandle = String.valueOf(chatId);
         String typeMuted = MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle);
-        int itemClicked = getItemClicked(typeMuted);
-        dialogBuilder.setSingleChoiceItems(items, itemClicked, (dialog, item) -> {
-            controlMuteNotifications(chatId, getTypeMute(item), push);
-            dialog.dismiss();
+        AtomicReference<Integer> itemClicked = new AtomicReference<>(getItemClicked(typeMuted));
+        dialogBuilder.setSingleChoiceItems(items, itemClicked.get(), (dialog, item) -> {
+            itemClicked.set(item);
         });
 
-        dialogBuilder.setPositiveButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
+        dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
+                (dialog, which) -> {
+                    MegaApplication.getInstance().controlMuteNotifications(chatId, getTypeMute(itemClicked.get()));
+                    dialog.dismiss();
+                });
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
         muteDialog = dialogBuilder.create();
         muteDialog.show();
     }
 
-    public static void controlMuteNotifications(long chatId, String typeMute, final MegaPushNotificationSettings push) {
-        if(push == null)
-            return;
+    public static void muteChat(Context context, long chatId, String muteOption){
+        ChatController chatC = new ChatController(context);
+        chatC.muteChat(chatId, muteOption);
+    }
 
-        if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
-            push.enableChat(chatId, true);
-        } else if (typeMute.equals(NOTIFICATIONS_DISABLED)) {
-            push.enableChat(chatId, false);
-        }else {
-            Calendar newCalendar = Calendar.getInstance();
-            newCalendar.setTimeInMillis(System.currentTimeMillis());
-            switch (typeMute) {
-                case NOTIFICATIONS_30_MINUTES:
-                    newCalendar.add(Calendar.MINUTE, 30);
-                    break;
-                case NOTIFICATIONS_1_HOUR:
-                    newCalendar.add(Calendar.HOUR, 1);
-                    break;
-                case NOTIFICATIONS_6_HOURS:
-                    newCalendar.add(Calendar.HOUR, 6);
-                    break;
-                case NOTIFICATIONS_24_HOURS:
-                    newCalendar.add(Calendar.HOUR, 24);
-                    break;
-            }
-            push.setChatDnd(chatId, newCalendar.getTimeInMillis());
+
+    public static String getMutedPeriodString(String typeMute){
+        Context context = MegaApplication.getInstance().getBaseContext();
+        switch (typeMute) {
+            case NOTIFICATIONS_ENABLED:
+                break;
+            case NOTIFICATIONS_30_MINUTES:
+                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30));
+            case NOTIFICATIONS_1_HOUR:
+                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1));
+            case NOTIFICATIONS_6_HOURS:
+                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6));
+            case NOTIFICATIONS_24_HOURS:
+                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
+            case NOTIFICATIONS_DISABLED:
+               break;
         }
-
-        Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-        intentGeneral.setAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
-        intentGeneral.putExtra(MUTE_CHATROOM_ID, chatId);
-        intentGeneral.putExtra(TYPE_MUTE, typeMute);
-        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intentGeneral);
+        return null;
     }
 
 }
