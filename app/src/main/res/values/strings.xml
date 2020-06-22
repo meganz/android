@@ -1857,6 +1857,8 @@
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
 
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">The link you are trying to open is not a valid MEGA link.</string>
+
     <string name="processing_link" context="Message shown when a link is being processing">Processing link&#8230;</string>
 
     <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Your password is easily guessed. Try making your password longer. Combine uppercase and lowercase letters. Add special characters. Do not use names or dictionary words.</string>
