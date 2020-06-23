@@ -1229,7 +1229,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
 
-					if(fullNameTitle.trim().length()<=0){
+					if(isTextEmpty(fullNameTitle)){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 							logDebug("Call for nonContactHandle: " + chat.getLastMessageHandle());
 							fullNameTitle = context.getString(R.string.unknown_name_label);
@@ -1278,24 +1278,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						else{
 							logDebug("By other");
 							String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-							if(fullNameAction.trim().length()<=0){
+							if(isTextEmpty(fullNameAction)){
+                                if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                    logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
+                                    fullNameAction = context.getString(R.string.unknown_name_label);
+                                    ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                    ((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
-								if(fullNameAction.isEmpty()){
-									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-										logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-										fullNameAction = context.getString(R.string.unknown_name_label);
-										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-										((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
-
-										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
-										megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-									}
-									else{
-										logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
-									}
-								}
+                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
+                                    megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+                                }
+                                else{
+                                    logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
+                                }
 							}
 
 							if(chat.getLastMessageSender() == chat.getLastMessageHandle()){
@@ -1356,23 +1353,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							else{
 								logDebug("The participant was removed");
 								String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-								if(fullNameAction.trim().length()<=0){
-									if(fullNameAction.isEmpty()){
-										if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-											logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-											fullNameAction = context.getString(R.string.unknown_name_label);
-											((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-											((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+								if(isTextEmpty(fullNameAction)){
+                                    if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                        logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
+                                        fullNameAction = context.getString(R.string.unknown_name_label);
+                                        ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                        ((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
-											ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
-											megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-										}
-										else{
-											logDebug("Name already asked and no name received: handle" + chat.getLastMessageSender());
-										}
-									}
+                                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
+                                        megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                        megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                        megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+                                    }
+                                    else{
+                                        logDebug("Name already asked and no name received: handle" + chat.getLastMessageSender());
+                                    }
 								}
 
 								textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(fullNameTitle), toCDATA(fullNameAction));
@@ -1456,23 +1451,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 						String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 
-						if(fullNameAction.trim().length()<=0){
-							if(fullNameAction.isEmpty()){
-								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-									logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-									fullNameAction = context.getString(R.string.unknown_name_label);
-									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-									((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+						if(isTextEmpty(fullNameAction)){
+                            if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
+                                fullNameAction = context.getString(R.string.unknown_name_label);
+                                ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                ((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
-									ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
-									megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-									megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-									megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-								}
-								else{
-									logDebug("Name already asked and no name received: handle" + chat.getLastMessageSender());
-								}
-							}
+                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
+                                megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+                            }
+                            else{
+                                logDebug("Name already asked and no name received: handle" + chat.getLastMessageSender());
+                            }
 						}
 						String myFullName = megaChatApi.getMyFullname();
 						if(myFullName==null){
@@ -1504,7 +1497,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
 
-					if(fullNameTitle.trim().length()<=0){
+					if(isTextEmpty(fullNameTitle)){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 							logDebug("Call for nonContactHandle: " + chat.getLastMessageHandle());
 							fullNameTitle = context.getString(R.string.unknown_name_label);
@@ -1550,24 +1543,22 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						logDebug("By other");
 						String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-						if(fullNameAction.trim().length()<=0){
-							if(fullNameAction.isEmpty()){
-								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-									logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-									fullNameAction = context.getString(R.string.unknown_name_label);
-									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-									((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+						if(isTextEmpty(fullNameAction)){
+                            if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
+                                fullNameAction = context.getString(R.string.unknown_name_label);
+                                ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                ((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
-									ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
+                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
 
-									megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-									megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-									megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-								}
-								else{
-									logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
-								}
-							}
+                                megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                                megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+                            }
+                            else{
+                                logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
+                            }
 						}
 
 						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
@@ -1615,24 +1606,22 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-					if(fullNameAction.trim().length()<=0){
-						if(fullNameAction.isEmpty()){
-							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-								logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-								fullNameAction = context.getString(R.string.unknown_name_label);
-								((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-								((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+					if(isTextEmpty(fullNameAction)){
+                        if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                            logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
+                            fullNameAction = context.getString(R.string.unknown_name_label);
+                            ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                            ((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
-								ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
 
-								megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-								megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-								megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-							}
-							else{
-								logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
-							}
-						}
+                            megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                            megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                            megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+                        }
+                        else{
+                            logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
+                        }
 					}
 
 					textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(fullNameAction));
@@ -1943,24 +1932,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
-							if(fullNameAction.trim().length()<=0){
-
-//					megaChatApi.getUserFirstname();
-								if(fullNameAction.isEmpty()){
-									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = context.getString(R.string.unknown_name_label);
-										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
-										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
-										megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserEmail(lastMsgSender, listener);
-									}
-									else{
-										logWarning("Name already asked and no name received: " + lastMsgSender);
-									}
-								}
+							if(isTextEmpty(fullNameAction)){
+                                if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                    logDebug("Call for nonContactName: " + lastMsgSender);
+                                    fullNameAction = context.getString(R.string.unknown_name_label);
+                                    ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                    ((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
+                                    megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserEmail(lastMsgSender, listener);
+                                }
+                                else{
+                                    logWarning("Name already asked and no name received: " + lastMsgSender);
+                                }
 							}
 
 							((ViewHolderNormalChatList)holder).textViewContent.setText(fullNameAction+": ");
@@ -2021,24 +2006,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
-							if(fullNameAction.trim().length()<=0){
-
-//					megaChatApi.getUserFirstname();
-								if(fullNameAction.isEmpty()){
-									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = context.getString(R.string.unknown_name_label);
-										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
-										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
-										megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserEmail(lastMsgSender, listener);
-									}
-									else{
-										logWarning("Name already asked and no name received: " + lastMsgSender);
-									}
-								}
+							if(isTextEmpty(fullNameAction)){
+                                if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                    logDebug("Call for nonContactName: " + lastMsgSender);
+                                    fullNameAction = context.getString(R.string.unknown_name_label);
+                                    ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                    ((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
+                                    megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserEmail(lastMsgSender, listener);
+                                }
+                                else{
+                                    logWarning("Name already asked and no name received: " + lastMsgSender);
+                                }
 							}
 
 							Spannable name = new SpannableString(fullNameAction+": ");
@@ -2099,24 +2080,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
-							if(fullNameAction.trim().length()<=0){
-
-//					megaChatApi.getUserFirstname();
-								if(fullNameAction.isEmpty()){
-									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = context.getString(R.string.unknown_name_label);
-										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
-										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
-										megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-										megaChatApi.getUserEmail(lastMsgSender, listener);
-									}
-									else{
-										logWarning("Name already asked and no name received: " + lastMsgSender);
-									}
-								}
+							if(isTextEmpty(fullNameAction)){
+                                if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                    logDebug("Call for nonContactName: " + lastMsgSender);
+                                    fullNameAction = context.getString(R.string.unknown_name_label);
+                                    ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                    ((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
+                                    megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                    megaChatApi.getUserEmail(lastMsgSender, listener);
+                                }
+                                else{
+                                    logWarning("Name already asked and no name received: " + lastMsgSender);
+                                }
 							}
 
 							Spannable name = new SpannableString(fullNameAction+": ");
@@ -2173,7 +2150,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
-					if (fullNameAction.trim().length() <= 0 && fullNameAction.isEmpty() && !(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
+					if (isTextEmpty(fullNameAction) && !(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
 						fullNameAction = context.getString(R.string.unknown_name_label);
 						((ViewHolderNormalChatList) holder).nameRequestedAction = true;
 						((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
@@ -2261,26 +2238,22 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
-						if(fullNameAction.trim().length()<=0){
+						if(isTextEmpty(fullNameAction)){
+                            if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                                logDebug("Call for nonContactHandle: " + lastMsgSender);
+                                fullNameAction = context.getString(R.string.unknown_name_label);
+                                ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                                ((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-//					megaChatApi.getUserFirstname();
-							if(fullNameAction.isEmpty()){
-								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-									logDebug("Call for nonContactHandle: " + lastMsgSender);
-									fullNameAction = context.getString(R.string.unknown_name_label);
-									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-									((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chat.isPreview());
 
-									ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chat.isPreview());
-
-									megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-									megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-									megaChatApi.getUserEmail(lastMsgSender, listener);
-								}
-								else{
-									logWarning("Name already asked and no name received: handle " + lastMsgSender);
-								}
-							}
+                                megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+                                megaChatApi.getUserEmail(lastMsgSender, listener);
+                            }
+                            else{
+                                logWarning("Name already asked and no name received: handle " + lastMsgSender);
+                            }
 						}
 
 						Spannable name = new SpannableString(fullNameAction + ": ");
@@ -2364,22 +2337,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		else{
 			MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 			fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-			if(fullNameAction.trim().length()<=0){
-				if(fullNameAction.isEmpty()){
-					if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-						logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-						fullNameAction = context.getString(R.string.unknown_name_label);
-						((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-						((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
-						ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
-						megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-						megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-						megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-					}
-					else{
-						logWarning("Name already asked and no name received: " + chat.getLastMessageSender());
-					}
-				}
+			if(isTextEmpty(fullNameAction)){
+                if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+                    logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
+                    fullNameAction = context.getString(R.string.unknown_name_label);
+                    ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+                    ((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
+                    megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                    megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+                    megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+                }
+                else{
+                    logWarning("Name already asked and no name received: " + chat.getLastMessageSender());
+                }
 			}
 		}
 		return fullNameAction;
