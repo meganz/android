@@ -61,6 +61,13 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public static String EXTRA_NODE_HANDLE = "node_handle";
     public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
 
+    // Bug #14988: disableLocalCamera() may hasn't completely released the camera resource as
+    // the megaChatApi.disableVideo() is async call. A simply way to solve the issue is
+    // setErrorCallback for CodeScanner. If error occurs, retry in 300ms. Retry 5 times max.
+    private static final int START_PREVIEW_RETRY = 5;
+    private static final int START_PREVIEW_DELAY = 300;
+    private int mStartPreviewRetried = 0;
+
     private ActionBar aB;
 
     private Context context;
@@ -170,6 +177,17 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                         invite(result);
                     }
                 });
+            }
+        });
+        codeScanner.setErrorCallback(error -> {
+            logWarning("Start preview error:" + error.getMessage() + ", retry:"
+                    + (mStartPreviewRetried + 1));
+            if (mStartPreviewRetried++ < START_PREVIEW_RETRY) {
+                handler.postDelayed(() -> {
+                    codeScanner.startPreview();
+                }, START_PREVIEW_DELAY);
+            } else {
+                logError("Start preview failed");
             }
         });
         codeScannerView.setOnClickListener(new View.OnClickListener() {
