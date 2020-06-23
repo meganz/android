@@ -98,6 +98,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         }
 
         private RoundedImageView imageView;
+        private ImageView verifiedIcon;
         private MarqueeTextView textViewContent;
         private EmojiTextView textViewContactName;
         private RelativeLayout threeDotsLayout;
@@ -231,6 +232,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 holderList.itemLayout = v.findViewById(R.id.participant_list_item_layout);
                 holderList.imageView = v.findViewById(R.id.participant_list_thumbnail);
+                holderList.verifiedIcon = v.findViewById(R.id.verified_icon);
                 holderList.textViewContactName = v.findViewById(R.id.participant_list_name);
                 holderList.textViewContent = v.findViewById(R.id.participant_list_content);
                 holderList.threeDotsLayout = v.findViewById(R.id.participant_list_three_dots_layout);
@@ -370,6 +372,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 MegaChatParticipant participant = getParticipant(position);
                 if (participant == null) return;
 
+                MegaUser contact = megaApi.getContact(participant.getEmail());
+                holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
+
                 holderParticipantsList.currentPosition = position;
                 holderParticipantsList.imageView.setImageBitmap(null);
 
@@ -401,7 +406,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 } else {
                     String nameFileHandle = holderParticipantsList.userHandle;
                     String nameFileEmail = holderParticipantsList.contactMail;
-                    MegaUser contact = null;
                     Bitmap bitmap;
                     
                     if (holderParticipantsList.contactMail == null) {
@@ -410,7 +414,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         holderParticipantsList.itemLayout.setOnClickListener(null);
                         bitmap = getAvatarBitmap(nameFileHandle);
                     } else {
-                        contact = megaApi.getContact(holderParticipantsList.contactMail);
                         bitmap = getUserAvatar(nameFileHandle, nameFileEmail);
                     }
                     

@@ -23,9 +23,9 @@ import org.webrtc.ThreadUtils;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import mega.privacy.android.app.interfaces.OnProximitySensorListener;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
@@ -87,7 +87,7 @@ public class AppRTCAudioManager {
             speakerElements(false);
         }
         start(null);
-        if(apprtcContext instanceof ChatCallActivity) {
+        if(apprtcContext instanceof MegaApplication) {
             startProximitySensor();
         }else{
             registerProximitySensor();
@@ -130,7 +130,7 @@ public class AppRTCAudioManager {
                 logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-                if ((apprtcContext instanceof ChatCallActivity && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof MegaApplication && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Disabling the speakerphone");
                     defaultAudioDevice = AudioDevice.EARPIECE;
                     updateSpeakerDeviceState();
@@ -139,7 +139,7 @@ public class AppRTCAudioManager {
                 logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if ((apprtcContext instanceof ChatCallActivity && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof MegaApplication && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Enabling the speakerphone");
                     defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
                     updateSpeakerDeviceState();
@@ -245,7 +245,7 @@ public class AppRTCAudioManager {
             Log.e(TAG, "Audio focus request failed");
         }
 
-        if (apprtcContext instanceof ChatCallActivity || apprtcContext instanceof ChatActivityLollipop) {
+        if (apprtcContext instanceof MegaApplication || apprtcContext instanceof ChatActivityLollipop) {
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
             // best possible VoIP performance.

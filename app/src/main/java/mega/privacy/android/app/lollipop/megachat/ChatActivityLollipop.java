@@ -178,6 +178,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
@@ -540,9 +541,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) return;
-            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-            if (userHandle != 0) {
+            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_NICKNAME)) return;
+
+            if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) != INVALID_HANDLE) {
                 updateNicknameInChat();
             }
         }
@@ -688,7 +689,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
-        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+
+        IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+        contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
         IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);

@@ -1,10 +1,14 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,9 +54,12 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
 
@@ -86,6 +93,17 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	DisplayMetrics outMetrics;
 
 	private ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
+
+	private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null) return;
+
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME) || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+				updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
+			}
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,26 +154,13 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			}
 		}
 
-		if(message!=null){
+		if (message != null) {
 			contacts = new ArrayList<>();
 
-			long userCount  = message.getMessage().getUsersCount();
-			for(int i=0; i<userCount;i++) {
-				String name = "";
-				name = message.getMessage().getUserName(i);
-				if (name.trim().isEmpty()) {
-					name = message.getMessage().getUserEmail(i);
-				}
-				String email = message.getMessage().getUserEmail(i);
-				long handle = message.getMessage().getUserHandle(i);
-				logDebug("Contact Handle: " + handle);
-				String handleString = megaApi.userHandleToBase64(handle);
-
-				MegaContactDB contactDB = new MegaContactDB(handleString, email, name, "");
-				contacts.add(contactDB);
+			for (int i = 0; i < message.getMessage().getUsersCount(); i++) {
+				contacts.add(dbH.findContactByEmail(message.getMessage().getUserEmail(i)));
 			}
-		}
-		else{
+		} else {
 			finish();
 		}
 
@@ -240,6 +245,11 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		adapter.setMultipleSelect(false);
 
 		listView.setAdapter(adapter);
+
+		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+		LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 
 	@Override
@@ -261,6 +271,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     	{
     		megaApi.removeRequestListener(this);
     	}
+
+    	LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
     }
 
 	public void showOptionsPanel(String email){
@@ -488,6 +500,21 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+	}
+
+	private void updateAdapter(long handleReceived) {
+		if (contacts == null || contacts.isEmpty()) return;
+
+		for (int i = 0; i < contacts.size(); i++) {
+			String email = contacts.get(i).getMail();
+			MegaUser user = megaApi.getContact(email);
+			long handleUser = user.getHandle();
+			if (handleUser == handleReceived) {
+				contacts.get(i).setNickname(getNicknameContact(email));
+				adapter.updateContact(contacts.get(i), i);
+				break;
+			}
+		}
 	}
 }
 

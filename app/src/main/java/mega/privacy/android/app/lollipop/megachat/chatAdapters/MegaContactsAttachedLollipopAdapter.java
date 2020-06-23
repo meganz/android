@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
@@ -167,6 +168,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		ImageView imageButtonThreeDots;
         RelativeLayout itemLayout;
         String contactMail;
+		ImageView verifiedIcon;
     }
 
     public class ViewHolderContactsList extends ViewHolderContacts{
@@ -205,6 +207,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		    holderList = new ViewHolderContactsList(v);
 		    holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_list_item_layout);
 		    holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
+		    holderList.verifiedIcon = v.findViewById(R.id.verified_icon);
 		    holderList.textViewContactName = v.findViewById(R.id.contact_list_name);
 		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 		    holderList.imageButtonThreeDots = (ImageView) v.findViewById(R.id.contact_list_three_dots);
@@ -233,6 +236,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	    	holderGrid = new ViewHolderContactsGrid(v);
 	    	holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_grid_item_layout);
 		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);
+			holderGrid.verifiedIcon = v.findViewById(R.id.verified_icon);
 		    holderGrid.textViewContactName = v.findViewById(R.id.contact_grid_name);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
@@ -275,9 +279,13 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		holder.imageView.setImageBitmap(null);
 
 		MegaContactDB contact = (MegaContactDB) getItem(position);
-		holder.contactMail = contact.getMail();
 
 		setContactStatus(getUserStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
+
+		MegaUser user = megaApi.getContact(contact.getMail());
+		holder.verifiedIcon.setVisibility(!isItemChecked(position) && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
+
+		holder.contactMail = contact.getMail();
 
 		if (!multipleSelect) {
 
@@ -293,7 +301,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 		}
 
-		holder.textViewContactName.setText(contact.getName());
+		holder.textViewContactName.setText(getContactNameDB(contact));
 
 		createDefaultAvatar(holder, contact);
 
@@ -335,16 +343,20 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void onBindViewHolderList(ViewHolderContactsList holder, int position){
-		logDebug("onBindViewHolderList");
 		holder.imageView.setImageBitmap(null);
 
 		MegaContactDB contact = (MegaContactDB) getItem(position);
+
+		MegaUser user = megaApi.getContact(contact.getMail());
+		boolean isNotChecked = !multipleSelect || !isItemChecked(position);
+		holder.verifiedIcon.setVisibility(isNotChecked && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
+
 		holder.contactMail = contact.getMail();
-		logDebug("Contact: " + contact.getMail() + ", Handle: " + contact.getHandle());
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
+
 		setContactStatus(getUserStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
-		holder.textViewContactName.setText(contact.getName());
+		holder.textViewContactName.setText(getContactNameDB(contact));
 
 		if (!multipleSelect) {
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -425,8 +437,8 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void createDefaultAvatar(ViewHolderContacts holder, MegaContactDB contact){
-		int color = getColorAvatar(contact.getHandle());
-		String fullName = contact.getName();
+		int color = getColorAvatar(Long.parseLong(contact.getHandle()));
+		String fullName = getContactNameDB(contact);
 
 		if (holder instanceof ViewHolderContactsList){
 			Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
@@ -756,5 +768,12 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 	public void setListFragment(RecyclerView listFragment) {
 		this.listFragment = listFragment;
+	}
+
+	public void updateContact(MegaContactDB contactDB, int position) {
+		if (position >= 0 && position < getItemCount()) {
+			contacts.set(position, contactDB);
+			notifyItemChanged(position);
+		}
 	}
 }
