@@ -475,8 +475,8 @@ public class Constants {
     public static final String SEPARATOR = File.separator;
 
     public static final String[] MEGA_REGEXS = {
-            "^https://mega\\.co\\.nz",
-            "^https://mega\\.nz",
+            "^https://mega\\.co\\.nz.+$",
+            "^https://mega\\.nz.+$",
     };
 
     public static final String[] FILE_LINK_REGEXS = {
