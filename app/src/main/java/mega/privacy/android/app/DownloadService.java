@@ -377,6 +377,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
             targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
+            MegaApplication.getTransfersManagement().setTargetPaths(targetPaths);
             targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
         }
 
@@ -1382,9 +1383,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(!isVoiceClip) transfersCount--;
 
 			AndroidCompletedTransfer completedTransfer = null;
+			String path = transfer.getPath();
+			String targetPath = targetPaths.get(path);
 
 			if (!transfer.isFolderTransfer()) {
 				completedTransfer = new AndroidCompletedTransfer(transfer, error);
+				if (!isTextEmpty(targetPath)) {
+					completedTransfer.setPath(targetPath);
+				}
+
 				launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
 					MegaApplication.getTransfersManagement().setFailedTransfers(true);
@@ -1395,7 +1402,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 			}
 
-            String path = transfer.getPath();
             if (canceled) {
 				if((lock != null) && (lock.isHeld()))
 					try{ lock.release(); } catch(Exception ex) {}
@@ -1426,11 +1432,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						resultTransfersVoiceClip(transfer.getNodeHandle(), SUCCESSFUL_VOICE_CLIP_TRANSFER);
 					}
 
-                    String targetPath = targetPaths.get(path);
                     String uri = targetUris.get(path);
                     //need to move downloaded file to a location on sd card.
                     if (targetPath != null) {
-                        File source = new File(path);
+						File source = new File(path);
                         try {
                             SDCardOperator sdCardOperator = new SDCardOperator(this);
                             if (uri != null) {
@@ -1440,9 +1445,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                             }
                             //new path, after moving to target location.
 							path = sdCardOperator.move(targetPath, source);
-							if (completedTransfer != null) {
-								completedTransfer.setPath(path);
-							}
                             File newFile = new File(path);
                             if(!newFile.exists() || newFile.length() != source.length()) {
                                 logError("Error moving file to the sd card path");
@@ -1751,6 +1753,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
                     if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
                         targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
+						MegaApplication.getTransfersManagement().setTargetPaths(targetPaths);
                         targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
                     }
                     logDebug("Public node download launched");

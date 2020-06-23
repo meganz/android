@@ -81,6 +81,7 @@ public class TransfersBaseFragment extends BaseFragment {
             emptyImage.setVisibility(View.VISIBLE);
             emptyText.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
+            checkScroll();
         } else {
             emptyImage.setVisibility(View.GONE);
             emptyText.setVisibility(View.GONE);

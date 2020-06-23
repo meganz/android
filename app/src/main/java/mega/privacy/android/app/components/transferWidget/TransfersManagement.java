@@ -4,6 +4,9 @@ import android.content.Intent;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -19,6 +22,8 @@ public class TransfersManagement {
     private boolean failedTransfers;
     private boolean transferOverQuotaNotificationShown;
     private boolean isTransferOverQuotaBannerShown;
+
+    private Map<String,String> targetPaths = new HashMap<>();
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
@@ -135,5 +140,13 @@ public class TransfersManagement {
      */
     public static void launchTransferUpdateIntent(int transferType) {
         LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
+    }
+
+    public void setTargetPaths(Map<String, String> targetPaths) {
+        this.targetPaths = targetPaths;
+    }
+
+    public Map<String, String> getTargetPaths() {
+        return targetPaths;
     }
 }

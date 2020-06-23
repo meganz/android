@@ -190,8 +190,6 @@ public class Constants {
     public static final String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
     public static final String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
     public static final String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
-    public static final String ACTION_CHILD_UPLOADED_OK = "ACTION_CHILD_UPLOADED_OK";
-    public static final String ACTION_CHILD_UPLOADED_FAILED = "ACTION_CHILD_UPLOADED_FAILED";
     public static final String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
     public static final String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
     public static final String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";

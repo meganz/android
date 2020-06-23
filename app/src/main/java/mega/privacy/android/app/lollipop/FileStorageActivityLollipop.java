@@ -508,8 +508,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD;
 		} else if (pickFolderString.equals(PickFolderType.CU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.CU_FOLDER;
+			dbH.setCameraFolderExternalSDCard(false);
 		} else if (pickFolderString.equals(PickFolderType.MU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.MU_FOLDER;
+			dbH.setMediaFolderExternalSdCard(false);
 		} else if (pickFolderString.equals(PickFolderType.DOWNLOAD_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.DOWNLOAD_FOLDER;
 		}
@@ -1013,13 +1015,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
-		boolean isRoot = hasSDCard && rootLevelLayout.getVisibility() == View.VISIBLE;
-		if (!isRoot) {
-			if (mode.equals(Mode.PICK_FOLDER)) {
-				isRoot = !hasSDCard && path.equals(root);
-			} else {
-				isRoot = path.equals(root);
-			}
+		boolean isRoot;
+		if (hasSDCard && !mode.equals(Mode.BROWSE_FILES)) {
+			isRoot = rootLevelLayout.getVisibility() == View.VISIBLE;
+		} else {
+			isRoot = path.equals(root);
 		}
 
 		if (isRoot) {

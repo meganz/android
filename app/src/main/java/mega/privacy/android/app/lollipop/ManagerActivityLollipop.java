@@ -111,6 +111,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -248,6 +249,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -2524,13 +2526,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				if (position == PENDING_TAB && isTransfersInProgressAdded()) {
 					tFLol.setGetMoreQuotaViewVisibility();
-				} else if (position == COMPLETED_TAB) {
-					//Update the fragment when all in progress transfers have been cancelled
-					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
-
-					if (isTransfersCompletedAdded()) {
-						completedTFLol.setGetMoreQuotaViewVisibility();
-					}
+				} else if (position == COMPLETED_TAB && isTransfersCompletedAdded()) {
+					completedTFLol.setGetMoreQuotaViewVisibility();
 				}
 			}
 
@@ -15011,7 +15008,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 */
 	public void addCompletedTransfer(MegaTransfer transfer, MegaError e){
 		if (isTransfersCompletedAdded()) {
-			completedTFLol.transferFinish(new AndroidCompletedTransfer(transfer, e));
+			AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, e);
+			TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+			if (transfersManagement != null) {
+				Map<String, String> targetPaths = transfersManagement.getTargetPaths();
+				String targetPath = targetPaths.get(transfer.getPath());
+				if (!isTextEmpty(targetPath)) {
+					completedTransfer.setPath(targetPath);
+				}
+			}
+
+			completedTFLol.transferFinish(completedTransfer);
 		}
 	}
 
@@ -15050,18 +15057,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		//workaround - can not get folder transfer children detail except using global listener
-        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
-            Intent intent = new Intent(this,UploadService.class);
-            if (e.getErrorCode() == MegaError.API_OK) {
-                intent.setAction(ACTION_CHILD_UPLOADED_OK);
-                startService(intent);
-            }else{
-                intent.setAction(ACTION_CHILD_UPLOADED_FAILED);
-                startService(intent);
-            }
-        }
-
 		if(transferCallback<transfer.getNotificationNumber()) {
 
 			transferCallback = transfer.getNotificationNumber();
@@ -15087,9 +15082,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					logDebug("The transferInProgress is EMPTY");
 				}
 
-				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-					addCompletedTransfer(transfer, e);
-				}
+				addCompletedTransfer(transfer, e);
 
 				int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 
@@ -16594,12 +16587,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param transfer	the transfer to retry
 	 */
 	public void retryTransfer(AndroidCompletedTransfer transfer) {
-		removeCompletedTransfer(transfer);
-
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
-			ArrayList<Long> handleList = new ArrayList<>();
-			handleList.add(Long.parseLong(transfer.getNodeHandle()));
-			nC.prepareForDownload(handleList, false);
+			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
+			if (node == null) {
+				logWarning("Node is null, not able to retry");
+				return;
+			}
+
+			long[] handleList = new long[1];
+			handleList[0] = node.getHandle();
+			nC.checkSizeBeforeDownload(transfer.getPath(), null, node.getSize(), handleList, false);
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 			String originalPath = transfer.getOriginalPath();
 			int lastSeparator = originalPath.lastIndexOf(SEPARATOR);
@@ -16614,6 +16611,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			UploadServiceTask uploadServiceTask = new UploadServiceTask(parentFolder, paths, transfer.getParentHandle());
 			uploadServiceTask.start();
 		}
+
+		removeCompletedTransfer(transfer);
 	}
 
 	/**

@@ -167,6 +167,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
                 holder.imageView.setImageResource(R.drawable.ic_folder_list);
             } else {
                 holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+                ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
             }
 
             holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
