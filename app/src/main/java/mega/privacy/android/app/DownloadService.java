@@ -1381,9 +1381,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!isVoiceClip) transfersCount--;
 
-			if(!transfer.isFolderTransfer()){
-				dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
-                launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
+			AndroidCompletedTransfer completedTransfer = null;
+
+			if (!transfer.isFolderTransfer()) {
+				completedTransfer = new AndroidCompletedTransfer(transfer, error);
+				launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
 					MegaApplication.getTransfersManagement().setFailedTransfers(true);
 				}
@@ -1437,7 +1439,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                             }
                             //new path, after moving to target location.
-                            path = sdCardOperator.move(targetPath, source);
+							path = sdCardOperator.move(targetPath, source);
+							if (completedTransfer != null) {
+								completedTransfer.setPath(path);
+							}
                             File newFile = new File(path);
                             if(!newFile.exists() || newFile.length() != source.length()) {
                                 logError("Error moving file to the sd card path");
@@ -1544,6 +1549,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 				}
 			}
+
+			if (completedTransfer != null) {
+				dbH.setCompletedTransfer(completedTransfer);
+			}
+
 			if(isVoiceClip) return;
 
 			if (megaApi.getNumPendingDownloads() == 0 && transfersCount==0){

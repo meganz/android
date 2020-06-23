@@ -556,7 +556,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		String sdCardRoot = sdCardOperator.getSDCardRoot();
-		if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
+		if (mode.equals(Mode.PICK_FILE) || sdCardOperator.canWriteWithFile(sdCardRoot)) {
 			sdRoot = sdCardRoot;
 		} else if (isBasedOnFileStorage()) {
 			try {
@@ -1013,9 +1013,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
-		if ((hasSDCard && rootLevelLayout.getVisibility() == View.VISIBLE) || !hasSDCard && path.equals(root)) {
-				super.onBackPressed();
-		// Go one level higher otherwise
+		boolean isRoot = hasSDCard && rootLevelLayout.getVisibility() == View.VISIBLE;
+		if (!isRoot) {
+			if (mode.equals(Mode.PICK_FOLDER)) {
+				isRoot = !hasSDCard && path.equals(root);
+			} else {
+				isRoot = path.equals(root);
+			}
+		}
+
+		if (isRoot) {
+			super.onBackPressed();
+			// Go one level higher otherwise
 		} else if (hasSDCard && ((pickingFromSDCard && path.equals(new File(sdRoot)) || !pickingFromSDCard && path.equals(root)))) {
 			showRootWithSDView(true);
 		} else {
