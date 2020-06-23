@@ -187,6 +187,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	/*private view holder class*/
     class ViewHolderShareList extends RecyclerView.ViewHolder implements View.OnClickListener{
     	RoundedImageView imageView;
+    	ImageView verifiedIcon;
 		EmojiTextView textViewContactName;
         TextView textViewPermissions;
         RelativeLayout threeDotsLayout;
@@ -237,6 +238,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		holder.itemLayout.setOnClickListener(this);
 		holder.itemLayout.setOnLongClickListener(this);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.shared_folder_contact_thumbnail);
+		holder.verifiedIcon = v.findViewById(R.id.verified_icon);
 
 		holder.textViewContactName = v.findViewById(R.id.shared_folder_contact_name);
 		holder.textViewContactName.setTypeEllipsize(TextUtils.TruncateAt.MIDDLE);
@@ -269,6 +271,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		if (share.getUser() != null){
 			holder.contactMail = share.getUser();
 			MegaUser contact = megaApi.getContact(holder.contactMail);
+			holder.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
 
 			if(contact!=null){
 				holder.textViewContactName.setText(getMegaUserNameDB(contact));

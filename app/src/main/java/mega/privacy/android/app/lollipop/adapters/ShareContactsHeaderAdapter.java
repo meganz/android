@@ -31,6 +31,7 @@ import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -120,6 +121,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         TextView emailTextView;
         public String mail;
         public RoundedImageView avatar;
+        ImageView verifiedIcon;
         ImageView contactStateIcon;
         int currentPosition;
 
@@ -167,6 +169,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
         holder.emailTextView = rowView.findViewById(R.id.contact_mail);
         holder.avatar = rowView.findViewById(R.id.contact_avatar);
+        holder.verifiedIcon = rowView.findViewById(R.id.verified_icon);
         holder.contactStateIcon = rowView.findViewById(R.id.contact_state);
 
         return holder;
@@ -180,6 +183,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         holder.currentPosition = position;
 
         holder.itemProgress.setVisibility(View.GONE);
+        holder.verifiedIcon.setVisibility(View.GONE);
 
         if (contact.isMegaContact()){
             if (contact.isHeader()){
@@ -195,6 +199,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 String name;
                 String mail = ((AddContactActivityLollipop) mContext).getShareContactMail(contact);
                 holder.mail = mail;
+
+                MegaUser user = megaApi.getContact(mail);
+                holder.verifiedIcon.setVisibility(user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
+
                 if (contact.getMegaContactAdapter().getFullName() != null) {
                     name = contact.getMegaContactAdapter().getFullName();
                 }

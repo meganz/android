@@ -2803,4 +2803,13 @@
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
     <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
     <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verify credentials</string>
+    <string name="label_not_verified" context="Action indicating something was not verified yet.">Not verified</string>
+    <string name="label_verified" context="Action indicating something was verified.">Verified</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Authenticity Credentials</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">This is best done in real life by meeting face to face. If you have another already-verified channel such as verified OTR or PGP, you may also use that.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Your Credentials</string>
+    <string name="action_reset" context="Button to reset credentials">Reset</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana's credentials">%s\'s credentials</string>
 </resources>
