@@ -438,6 +438,7 @@ public class AppRTCAudioManager {
         if (resultRequestFocus != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             logDebug("Audio focus request failed");
         }
+
         if(apprtcContext instanceof MegaApplication){
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for

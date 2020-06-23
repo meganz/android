@@ -241,8 +241,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						megaApi.getMyChatFilesFolder(listener);
 					}
 					//Ask for MU and CU folder when App in init state
-					megaApi.getCameraUploadsFolder(listener);
-					megaApi.getCameraUploadsFolderSecondary(listener);
+                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -447,9 +446,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 							logError("Calls not found");
 							return;
 						}
-
-						logDebug("Call status is "+callStatusToString(callStatus));
-
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
 							createRTCAudioManager(false, callStatus);
 						}
