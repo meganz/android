@@ -470,26 +470,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         infoUsersBar.setVisibility(View.GONE);
     }
 
-    private BroadcastReceiver proximitySensorReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null)
-                return;
-
-            boolean isNear = intent.getBooleanExtra(UPDATE_PROXIMITY_SENSOR_STATUS, false);
-            boolean realStatus = MegaApplication.getVideoStatus(chatId);
-            if (!realStatus) {
-                inTemporaryState = false;
-            } else if (isNear) {
-                inTemporaryState = true;
-                megaChatApi.disableVideo(chatId, ChatCallActivity.this);
-            } else {
-                inTemporaryState = false;
-                megaChatApi.enableVideo(chatId, ChatCallActivity.this);
-            }
-        }
-    };
-
     /**
      * Method for controlling changes in the call.
      */
@@ -641,6 +621,26 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         updateSubtitleNumberOfVideos();
                     }
                 }
+            }
+        }
+    };
+
+    private BroadcastReceiver proximitySensorReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null)
+                return;
+
+            boolean isNear = intent.getBooleanExtra(UPDATE_PROXIMITY_SENSOR_STATUS, false);
+            boolean realStatus = MegaApplication.getVideoStatus(chatId);
+            if (!realStatus) {
+                inTemporaryState = false;
+            } else if (isNear) {
+                inTemporaryState = true;
+                megaChatApi.disableVideo(chatId, ChatCallActivity.this);
+            } else {
+                inTemporaryState = false;
+                megaChatApi.enableVideo(chatId, ChatCallActivity.this);
             }
         }
     };

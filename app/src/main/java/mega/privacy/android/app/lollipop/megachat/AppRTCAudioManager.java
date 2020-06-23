@@ -26,8 +26,6 @@ import java.util.Set;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**

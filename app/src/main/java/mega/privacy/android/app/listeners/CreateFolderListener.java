@@ -43,11 +43,19 @@ public class CreateFolderListener extends BaseListener {
         MegaNode node = api.getNodeByHandle(handle);
         String name = request.getName();
 
-        if (extraAction == ExtraAction.INIT_CU && e.getErrorCode() == MegaError.API_OK) {
+        if (extraAction == ExtraAction.INIT_CU) {
             if (name.equals(context.getString(R.string.section_photo_sync))) {
-                api.setCameraUploadsFolder(handle, new SetAttrUserListener(context));
+                CameraUploadsService.isCreatingPrimary = false;
+                //set primary only
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
+                }
             } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
-                api.setCameraUploadsFolderSecondary(handle, new SetAttrUserListener(context));
+                CameraUploadsService.isCreatingSecondary = false;
+                //set secondary only
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
+                }
             }
         }
 

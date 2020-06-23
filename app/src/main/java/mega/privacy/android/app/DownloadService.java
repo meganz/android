@@ -366,21 +366,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         currentDir = getDir(currentDocument, intent);
         currentDir.mkdirs();
-        if (currentDir.isDirectory()){
-			logDebug("currentDir is Directory");
-            currentFile = new File(currentDir, megaApi.escapeFsIncompatible(currentDocument.getName()));
-        }
-        else{
-			logDebug("currentDir is File");
-            currentFile = currentDir;
-        }
+		if (currentDir.isDirectory()) {
+			currentFile = new File(currentDir, megaApi.escapeFsIncompatible(currentDocument.getName(), currentDir.getAbsolutePath() + SEPARATOR));
+		} else {
+			currentFile = currentDir;
+		}
+
         if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
             targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
             targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
         }
 
-		logDebug("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
-        if(!checkCurrentFile(currentDocument)){
+		if(!checkCurrentFile(currentDocument)){
 			logDebug("checkCurrentFile == false");
 
 			alreadyDownloaded++;
@@ -1808,16 +1805,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else {
 				MegaNode node = request.getPublicMegaNode();
 
-				if(node!=null){
-					if (currentDir.isDirectory()){
-						currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName()));
-						logDebug("node.getName(): " + node.getName());
-
-					}
-					else{
+				if (node != null) {
+					if (currentDir.isDirectory()) {
+						currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName(), currentDir.getAbsolutePath() + SEPARATOR));
+					} else {
 						currentFile = currentDir;
-						logDebug("CURREN");
 					}
+
                     if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
                         targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
                         targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));

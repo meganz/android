@@ -49,6 +49,7 @@ import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
@@ -248,8 +249,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						megaApi.getMyChatFilesFolder(listener);
 					}
 					//Ask for MU and CU folder when App in init state
-					megaApi.getCameraUploadsFolder(listener);
-					megaApi.getCameraUploadsFolderSecondary(listener);
+                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -459,7 +459,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						}
 
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-							createChatAudioManager();
+                            createChatAudioManager();
 							setAudioManagerValues(callStatus);
 						}
 
@@ -1448,47 +1448,57 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
      *
      * @param isSpeakerOn the speaker status.
      */
-	public void createRTCAudioManager(boolean isSpeakerOn) {
-		if (rtcAudioManager != null) {
-			rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
-			return;
-		}
-		logDebug("Creating RTC Audio Manager...");
-		rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
-		startProximitySensor();
-		rtcAudioManager.setOnProximitySensorListener(isNear -> {
-			Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
-			intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
-			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-		});
-	}
+    public void createRTCAudioManager(boolean isSpeakerOn) {
+        if (rtcAudioManager != null) {
+            logDebug("Updating RTC Audio Manager values...");
+            rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
+            return;
+        }
+
+        logDebug("Creating RTC Audio Manager...");
+        rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
+        startProximitySensor();
+        rtcAudioManager.setOnProximitySensorListener(isNear -> {
+            Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
+            intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        });
+    }
+
 
     /**
      * Remove the AppRTCAudioManager.
      */
-	public void removeRTCAudioManager() {
-		if (rtcAudioManager == null)
-			return;
+    public void removeRTCAudioManager() {
+        if (rtcAudioManager == null)
+            return;
 
-		unregisterProximitySensor();
-		rtcAudioManager.stop();
-		rtcAudioManager = null;
-	}
+        try {
+            logDebug("Removing RTC Audio Manager...");
+            unregisterProximitySensor();
+            rtcAudioManager.stop();
+            rtcAudioManager = null;
+        } catch (Exception e) {
+            logError("Exception stopping speaker audio manager", e);
+        }
+    }
 
     /**
      * Activate the proximity sensor.
      */
     public void startProximitySensor() {
         if (rtcAudioManager != null) {
+            logDebug("Starting proximity sensor...");
             rtcAudioManager.startProximitySensor();
         }
     }
 
     /**
-     * Disables the proximity sensor
+     * Deactivates the proximity sensor
      */
     public void unregisterProximitySensor() {
         if (rtcAudioManager != null) {
+            logDebug("Stopping proximity sensor...");
             rtcAudioManager.unregisterProximitySensor();
         }
     }
@@ -1500,17 +1510,27 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		if (chatAudioManager != null)
 			return;
 
+        logDebug("Creating Chat Audio Manager...");
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
 	}
 
+    /**
+     * Remove the ChatAudioManager.
+     */
 	public void removeChatAudioManager() {
 		if (chatAudioManager == null)
 			return;
 
+        logDebug("Removing Chat Audio Manager...");
 		chatAudioManager.stopAudioSignals();
 		chatAudioManager = null;
 	}
 
+    /**
+     * Update the values of the ChatAudioManager depending on the call status.
+     *
+     * @param callStatus The current call status.
+     */
 	public void setAudioManagerValues(int callStatus){
 		if(chatAudioManager != null) {
 			MegaHandleList listCallsRequest = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
