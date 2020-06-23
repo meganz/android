@@ -770,10 +770,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				notificationsSubTitle.setVisibility(View.VISIBLE);
 			}
 
-			if(chatPrefs == null) {
-				chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), NOTIFICATIONS_DISABLED, "");
-				dbH.setChatItemPreferences(chatPrefs);
-			}
 		}else{
 			notificationsSwitch.setChecked(true);
 			notificationsSubTitle.setVisibility(View.GONE);

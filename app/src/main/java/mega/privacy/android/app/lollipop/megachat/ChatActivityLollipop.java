@@ -1354,14 +1354,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
             }
         } else {
-            String typeMute = NOTIFICATIONS_ENABLED;
-            if(push != null){
-                if(push.isChatDndEnabled(chatRoom.getChatId())){
-                    typeMute = NOTIFICATIONS_DISABLED;
-                }
+            if(push != null && !push.isChatDndEnabled(chatRoom.getChatId())){
+                chatPrefs = new ChatItemPreferences(Long.toString(idChat), NOTIFICATIONS_ENABLED, "");
+                dbH.setChatItemPreferences(chatPrefs);
             }
-            chatPrefs = new ChatItemPreferences(Long.toString(idChat), typeMute, "");
-            dbH.setChatItemPreferences(chatPrefs);
         }
         refreshTextInput();
     }
@@ -8198,10 +8194,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
         if(push.isChatDndEnabled(chatId)){
-            if(chatPrefs == null) {
-                chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_DISABLED, "");
-                dbH.setChatItemPreferences(chatPrefs);
-            }
             return false;
         }
 

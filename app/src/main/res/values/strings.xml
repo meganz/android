@@ -1181,8 +1181,18 @@
 
     <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
-    <string name="mute_chatroom_notification_option_indefinitely" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are permanently disabled.">Until I turn it on again</string>
-    <string name="success_muting_a_chat" context="Message when a chat has been muted successfully.">Chat notifications will be muted for %s</string>
+    <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until 7 a.m.">Until tomorrow morning</string>
+    <string name="mute_chatroom_notification_option_until_this_evening" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until 7 p.m.">Until this evening</string>
+
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
+    <string name="success_muting_a_chat_until_this_evening" context="Message when a chat has been muted, until this evening, successfully. For example: Chat notifications will be muted until 7 p.m.">Chat notifications will be muted until %1$s P.M.</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 7 a.m.">Chat notifications will be muted until %1$s at %2$s A.M.</string>
+
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
+
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="chat_notifications_muted_tomorrow" context="String that appears when we show the date until which a specific chat is silenced, this date is on the next day.">Mute until tomorrow %1$s</string>
+
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Message sound</string>
@@ -2494,6 +2504,7 @@
 
     <string name="label_today" context="label today">Today</string>
     <string name="label_yesterday" context="label yesterday">Yesterday</string>
+    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
 
@@ -2779,7 +2790,5 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
 
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
-    <string name="chat_notifications_muted_tomorrow" context="String that appears when we show the date until which a specific chat is silenced, this date is on the next day.">Mute until tomorrow %1$s</string>
 
 </resources>

@@ -6048,10 +6048,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		if(push.isChatDndEnabled(chatId)){
-			if(chatPrefs == null) {
-				chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_DISABLED, "");
-				dbH.setChatItemPreferences(chatPrefs);
-			}
 			return false;
 		}
 

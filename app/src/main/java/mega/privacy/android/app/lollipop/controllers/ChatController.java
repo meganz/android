@@ -77,6 +77,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -361,9 +362,15 @@ public class ChatController {
             dbH.setNotificationEnabledChatItem(typeMute, Long.toString(chatHandle));
         }
 
-        String text = getMutedPeriodString(typeMute);
-        if(text != null) {
-            showSnackbar(context, context.getString(R.string.success_muting_a_chat, text));
+        if(typeMute.equals(NOTIFICATIONS_ENABLED)) {
+            showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+        }else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)){
+            showSnackbar(context, getCorrectStringDependingOnCalendar(context, typeMute));
+        }else {
+            String text = getMutedPeriodString(typeMute);
+            if (text != null) {
+                showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+            }
         }
     }
 

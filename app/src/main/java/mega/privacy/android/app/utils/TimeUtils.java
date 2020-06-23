@@ -16,6 +16,7 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatMessage;
 
 import static android.text.format.DateFormat.getBestDateTimePattern;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -215,6 +216,32 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
+    public static Calendar getCalendarSpecificTime(String typeTime) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, 7);
+
+        if(typeTime.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING)){
+            calendar.set(Calendar.AM_PM, Calendar.PM);
+        }else{
+            calendar.set(Calendar.AM_PM, Calendar.AM);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return calendar;
+    }
+
+    public static boolean isUntilThisEvening(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        if(hour <= 18 && hour >= 4) {
+           return true;
+        }
+        return false;
+    }
+
     public static String mutedChatNotification(long timestamp) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(timestamp);
@@ -383,5 +410,17 @@ public class TimeUtils implements Comparator<Calendar> {
         }
 
         return null;
+    }
+
+    public static String getCorrectStringDependingOnCalendar(Context context, String typeMuted) {
+        Calendar calendar = getCalendarSpecificTime(typeMuted);
+        TimeZone tz = calendar.getTimeZone();
+        java.text.DateFormat df = new SimpleDateFormat("h", Locale.getDefault());
+        df.setTimeZone(tz);
+        String time = df.format(calendar.getTime());
+
+        return typeMuted.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) ?
+                context.getString(R.string.success_muting_a_chat_until_this_evening, time) :
+                context.getString(R.string.success_muting_a_chat_until_tomorrow_morning, context.getString(R.string.label_tomorrow), time);
     }
 }

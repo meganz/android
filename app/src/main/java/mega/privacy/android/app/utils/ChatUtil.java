@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -19,13 +20,21 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -51,9 +60,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPushNotificationSettings;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -64,6 +71,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
+    private static final int INITIAL_OPTION = 5;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -593,14 +601,12 @@ public class ChatUtil {
                 return 3;
             case NOTIFICATIONS_24_HOURS:
                 return 4;
-            case NOTIFICATIONS_DISABLED:
-                return 5;
             default:
                 return 0;
         }
     }
 
-    private static String getTypeMute(int itemClicked){
+    private static String getTypeMute(int itemClicked, boolean isThisEvening){
         switch (itemClicked){
             case 0 :
                 return NOTIFICATIONS_ENABLED;
@@ -613,7 +619,7 @@ public class ChatUtil {
             case 4:
                 return NOTIFICATIONS_24_HOURS;
             case 5:
-                return NOTIFICATIONS_DISABLED;
+                return (isThisEvening ? NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING : NOTIFICATIONS_DISABLED_UNTIL_TOMORROW);
             default:
                 return NOTIFICATIONS_ENABLED;
         }
@@ -631,42 +637,69 @@ public class ChatUtil {
         final android.app.AlertDialog muteDialog;
         android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         dialogBuilder.setTitle(context.getString(R.string.title_dialog_mute_chatroom_notifications));
-        CharSequence[] items = {
-                context.getString(R.string.mute_chatroom_notification_option_off),
-                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)),
-                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)),
-                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)),
-                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)),
-                context.getString(R.string.mute_chatroom_notification_option_indefinitely)};
 
         String chatHandle = String.valueOf(chatId);
         String typeMuted = MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle);
-        AtomicReference<Integer> itemClicked = new AtomicReference<>(getItemClicked(typeMuted));
-        dialogBuilder.setSingleChoiceItems(items, itemClicked.get(), (dialog, item) -> {
+        int initialOption;
+        String optionUntil;
+        boolean isUntilThisEvening = isUntilThisEvening();
+
+        if (typeMuted.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMuted.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
+            initialOption = INITIAL_OPTION;
+            optionUntil = typeMuted.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) ? context.getString(R.string.mute_chatroom_notification_option_until_this_evening) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
+        } else {
+            initialOption = getItemClicked(typeMuted);
+            optionUntil = isUntilThisEvening ? context.getString(R.string.mute_chatroom_notification_option_until_this_evening) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
+        }
+
+        AtomicReference<Integer> itemClicked = new AtomicReference<>(initialOption);
+
+        ArrayList<String> stringsArray = new ArrayList<>();
+        stringsArray.add(0, context.getString(R.string.mute_chatroom_notification_option_off));
+        stringsArray.add(1, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
+        stringsArray.add(2, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
+        stringsArray.add(3, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
+        stringsArray.add(4, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
+        stringsArray.add(5, optionUntil);
+
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
+        ListView listView = new ListView(context);
+        listView.setAdapter(itemsAdapter);
+
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, itemClicked.get(), (dialog, item) -> {
             itemClicked.set(item);
+            if (itemClicked.get() != INITIAL_OPTION) {
+                String newString = isUntilThisEvening ? context.getString(R.string.mute_chatroom_notification_option_until_this_evening) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
+                if (!newString.equals(itemsAdapter.getItem(INITIAL_OPTION))) {
+                    itemsAdapter.remove(itemsAdapter.getItem(INITIAL_OPTION));
+                    itemsAdapter.insert(newString, INITIAL_OPTION);
+                    itemsAdapter.notifyDataSetChanged();
+                }
+            }
         });
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
-                    MegaApplication.getInstance().controlMuteNotifications(chatId, getTypeMute(itemClicked.get()));
+                    if (itemClicked.get() != initialOption) {
+                        MegaApplication.getInstance().controlMuteNotifications(chatId, getTypeMute(itemClicked.get(), isUntilThisEvening));
+                    }
                     dialog.dismiss();
                 });
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
+
+
         muteDialog = dialogBuilder.create();
         muteDialog.show();
     }
 
-    public static void muteChat(Context context, long chatId, String muteOption){
+    public static void muteChat(Context context, long chatId, String muteOption) {
         ChatController chatC = new ChatController(context);
         chatC.muteChat(chatId, muteOption);
     }
 
-
-    public static String getMutedPeriodString(String typeMute){
+    public static String getMutedPeriodString(String typeMute) {
         Context context = MegaApplication.getInstance().getBaseContext();
         switch (typeMute) {
-            case NOTIFICATIONS_ENABLED:
-                break;
             case NOTIFICATIONS_30_MINUTES:
                 return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30));
             case NOTIFICATIONS_1_HOUR:
@@ -675,10 +708,7 @@ public class ChatUtil {
                 return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6));
             case NOTIFICATIONS_24_HOURS:
                 return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
-            case NOTIFICATIONS_DISABLED:
-               break;
         }
         return null;
     }
-
 }

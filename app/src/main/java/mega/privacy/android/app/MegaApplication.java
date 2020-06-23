@@ -696,9 +696,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	public void controlMuteNotifications(long chatId, String typeMute) {
 		if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
 			push.enableChat(chatId, true);
-		} else if (typeMute.equals(NOTIFICATIONS_DISABLED)) {
-			push.enableChat(chatId, false);
-		}else {
+		} else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
+			push.setChatDnd(chatId, getCalendarSpecificTime(typeMute).getTimeInMillis());
+		} else {
 			Calendar newCalendar = Calendar.getInstance();
 			newCalendar.setTimeInMillis(System.currentTimeMillis());
 			switch (typeMute) {
@@ -713,6 +713,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					break;
 				case NOTIFICATIONS_24_HOURS:
 					newCalendar.add(Calendar.HOUR, 24);
+					break;
+				case NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING:
+					getCalendarSpecificTime(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING);
+					break;
+				case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW:
 					break;
 			}
 			push.setChatDnd(chatId, newCalendar.getTimeInMillis());
