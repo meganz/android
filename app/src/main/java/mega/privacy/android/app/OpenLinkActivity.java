@@ -8,7 +8,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
+import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -33,6 +35,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
+	private static final String REQUIRES_TRANSFER_SESSION = "fm/";
+
 	private DatabaseHandler dbH = null;
 
 	private String urlConfirmationLink = null;
@@ -45,12 +49,14 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	private boolean isLoggedIn;
 	private boolean needsRefreshSession;
 
+	private String url;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
-		String url = intent.getDataString();
+		url = intent.getDataString();
 		logDebug("Original url: " + url);
 
 		setContentView(R.layout.activity_open_link);
@@ -151,12 +157,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 						initResult = megaChatApi.initAnonymous();
 					}
 
-					if(initResult!= MegaChatApi.INIT_ERROR){
-						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-						openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
-						openChatLinkIntent.setData(Uri.parse(url));
-						startActivity(openChatLinkIntent);
-						finish();
+					if(initResult != MegaChatApi.INIT_ERROR){
+						megaChatApi.connect(new ConnectListener(this));
 					}
 					else{
 						logError("Open chat url:initAnonymous:INIT_ERROR");
@@ -397,10 +399,30 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		// Browser open the link which does not require app to handle
 		logDebug("Browser open link: " + url);
+		checkIfRequiresTransferSession(url);
+	}
+
+	public void finishAfterConnect() {
+		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+		openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
+		openChatLinkIntent.setData(Uri.parse(url));
+		startActivity(openChatLinkIntent);
+		finish();
+	}
+
+	private void checkIfRequiresTransferSession(String url) {
+		if (url.contains(REQUIRES_TRANSFER_SESSION)) {
+			int start = url.indexOf(REQUIRES_TRANSFER_SESSION);
+			if (start != -1) {
+				String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
+				megaApi.getSessionTransferURL(path, new SessionTransferURLListener(this));
+				return;
+			}
+		}
 		openWebLink(url);
 	}
 
-	private void openWebLink(String url) {
+	public void openWebLink(String url) {
 		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 		openIntent.setData(Uri.parse(url));
 		startActivity(openIntent);

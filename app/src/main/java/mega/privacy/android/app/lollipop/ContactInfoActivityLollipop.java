@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
@@ -113,15 +114,17 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
+import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
@@ -170,6 +173,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	boolean generalChatNotifications = true;
 
 	boolean startVideo = false;
+
+	private RelativeLayout verifyCredentialsLayout;
+	private TextView verifiedText;
+	private ImageView verifiedImage;
 
 	RelativeLayout sharedFoldersLayout;
 	TextView sharedFoldersText;
@@ -257,13 +264,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null) return;
-			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-			if (user != null && userHandle == user.getHandle()) {
+			if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_NICKNAME) || user == null) return;
+
+			if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) == user.getHandle()) {
 				checkNickname(user.getHandle());
 				updateAvatar();
 			}
-
 		}
 	};
 
@@ -405,6 +411,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			dividerNotificationsLayout = findViewById(R.id.divider_notifications_layout);
 
+			//Verify credentials layout
+			verifyCredentialsLayout = findViewById(R.id.chat_contact_properties_verify_credentials_layout);
+			verifyCredentialsLayout.setOnClickListener(this);
+			verifiedText = findViewById(R.id.chat_contact_properties_verify_credentials_info);
+			verifiedImage = findViewById(R.id.chat_contact_properties_verify_credentials_info_icon);
+
 			//Shared folders layout
 			sharedFoldersLayout = findViewById(R.id.chat_contact_properties_shared_folders_layout);
 			sharedFoldersLayout.setOnClickListener(this);
@@ -458,8 +470,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					checkNickname(user.getHandle());
 				} else {
 					String fullName = "";
-					if (!isTextEmpty(chat.getTitle())) {
-						fullName = chat.getTitle();
+					if (!isTextEmpty(getTitleChat(chat))) {
+						fullName = getTitleChat(chat);
 					} else if (userEmailExtra != null) {
 						fullName = userEmailExtra;
 					}
@@ -500,6 +512,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
 				}
 			}
+
+			updateVerifyCredentialsLayout();
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
@@ -606,8 +620,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
 	}
 
 	private void visibilityStateIcon() {
@@ -1276,6 +1291,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				}
 				break;
 			}
+			case R.id.chat_contact_properties_verify_credentials_layout:
+				Intent intent = new Intent(this, AuthenticityCredentialsActivity.class);
+				intent.putExtra(EMAIL, user.getEmail());
+				startActivity(intent);
+				break;
 		}
 	}
 
@@ -1752,6 +1772,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		logDebug("onResume");
 		super.onResume();
 
+		updateVerifyCredentialsLayout();
 		setContactPresenceStatus();
 		requestLastGreen(-1);
 	}
@@ -1795,7 +1816,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_clear_chat,chat.getTitle());
+		String message= getResources().getString(R.string.confirmation_clear_chat, getTitleChat(chat));
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -2490,5 +2511,24 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	public void setWaitingForCall() {
 		waitingForCall = true;
+	}
+
+	/**
+	 * Updates the "Verify credentials" view.
+	 */
+	public void updateVerifyCredentialsLayout() {
+		if (user != null) {
+			verifyCredentialsLayout.setVisibility(View.VISIBLE);
+
+			if (megaApi.areCredentialsVerified(user)) {
+				verifiedText.setText(R.string.label_verified);
+				verifiedImage.setVisibility(View.VISIBLE);
+			} else {
+				verifiedText.setText(R.string.label_not_verified);
+				verifiedImage.setVisibility(View.GONE);
+			}
+		} else {
+			verifyCredentialsLayout.setVisibility(View.GONE);
+		}
 	}
 }

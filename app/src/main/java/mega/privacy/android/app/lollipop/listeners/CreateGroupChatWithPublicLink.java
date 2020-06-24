@@ -72,7 +72,7 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                        intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
                        intent.putExtra("CHAT_ID", request.getChatHandle());
                        intent.putExtra("PUBLIC_LINK", e.getErrorCode());
-                       intent.putExtra("CHAT_LINK", request.getText());
+                       intent.putExtra(CHAT_LINK_EXTRA, request.getText());
                        context.startActivity(intent);
                    }
                    else if(context instanceof FileExplorerActivityLollipop){

@@ -112,6 +112,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -122,6 +123,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
@@ -343,12 +345,14 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         }
     };
 
-    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) return;
-            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-            updateAdapter(userHandle);
+            if (intent == null || intent.getAction() == null) return;
+
+            if (intent.getAction().equals(ACTION_UPDATE_NICKNAME) || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+                updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
+            }
         }
     };
 
@@ -902,8 +906,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+        IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+        contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+        contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+        LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
@@ -1941,7 +1947,15 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
+			int stringMessageID;
+            if (getPrimaryFolderHandle() == handle) {
+                stringMessageID = R.string.confirmation_move_cu_folder_to_rubbish;
+            } else if (getSecondaryFolderHandle() == handle) {
+                stringMessageID = R.string.confirmation_move_mu_folder_to_rubbish;
+            } else {
+                stringMessageID = R.string.confirmation_move_to_rubbish;
+            }
+			String message= getResources().getString(stringMessageID);
 			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
@@ -2838,7 +2852,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (drawableLeave != null) drawableLeave.setColorFilter(null);
         if (drawableCopy != null) drawableCopy.setColorFilter(null);
         if (drawableChat != null) drawableChat.setColorFilter(null);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
     }
 

@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -379,6 +380,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 					break;
 				}
+				case R.id.cab_menu_send_to_chat:{
+					logDebug("Send files to chat");
+					// For adapterGrid, please go to MegaPhotoSyncGridTitleAdapterLollipop
+					NodeController nC = new NodeController(context);
+					ArrayList<Long> handleList = new ArrayList();
+					for (PhotoSyncHolder holder : documentsList) {
+						handleList.add(holder.handle);
+					}
+					nC.checkIfHandlesAreMineAndSelectChatsToSendNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 
@@ -463,6 +477,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			boolean showLink = false;
 			boolean showTrash = false;
 			boolean showRemoveLink = false;
+			boolean showSendToChat = false;
 
 			if(adapterList!=null) {
 				logDebug("LIST onPrepareActionMode");
@@ -490,6 +505,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					showTrash = true;
 					showMove = true;
 					showCopy = true;
+					showSendToChat = true;
 
 					for(int i=0; i<selected.size();i++)	{
 						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).handle), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -536,16 +552,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					}
 				}
-				menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-				menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-				menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-				menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-				menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-				menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-
-				menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
-
 			}
 			else if(adapterGrid!=null){
 				logDebug("GRID onPrepareActionMode");
@@ -570,6 +576,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					showTrash = true;
 					showMove = true;
 					showCopy = true;
+					showSendToChat = true;
+
 					for(int i=0; i<selected.size();i++)	{
 						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).getHandle()), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 							showTrash = false;
@@ -627,12 +635,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+
+			if (showSendToChat) {
+				menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
+			}
 
 			return false;
 		}
@@ -899,7 +911,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1098,7 +1110,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1511,7 +1523,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 
 		if (isEnabled){
-			resetCUTimeStampsAndCache();
+			resetCUTimestampsAndCache();
             dbH.setCamSyncEnabled(false);
 			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
             stopRunningCameraUploadService(context);
@@ -1524,7 +1536,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                     !TextUtils.isEmpty(prefs.getCamSyncFileUpload()) &&
                     !TextUtils.isEmpty(prefs.getCamSyncWifi())
             ) {
-                resetCUTimeStampsAndCache();
+                resetCUTimestampsAndCache();
                 dbH.setCamSyncEnabled(true);
                 dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
                 
@@ -1548,7 +1560,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     logDebug("AlertDialog");
-                    resetCUTimeStampsAndCache();
+                    resetCUTimestampsAndCache();
                     dbH.setCamSyncEnabled(true);
                     dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
                     File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -2008,7 +2020,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (photosyncHandle == -1){
 				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
-					if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					if ((context.getString(R.string.section_photo_sync).compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
 						dbH.setCamSyncHandle(photosyncHandle);
 						if (listView != null){
@@ -2666,16 +2678,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public ArrayList<PhotoSyncHolder> getNodesArray() {
 		return nodesArray;
 	}
-    
-    private void resetCUTimeStampsAndCache(){
-        dbH.setCamSyncTimeStamp(0);
-        dbH.setCamVideoSyncTimeStamp(0);
-        dbH.setSecSyncTimeStamp(0);
-        dbH.setSecVideoSyncTimeStamp(0);
-        dbH.saveShouldClearCamsyncRecords(true);
-        purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-    }
-    
+
     private void saveCompressionSettings(){
         dbH.setCameraUploadVideoQuality(MEDIUM);
         dbH.setConversionOnCharging(true);

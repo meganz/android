@@ -88,6 +88,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -160,12 +161,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
-    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+    /**
+     * Broadcast to update a contact in adapter due to a change.
+     * Currently the changes contemplated are: nickname and credentials.
+     */
+    private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) return;
-            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-            updateAdapter(userHandle);
+            if (intent == null || intent.getAction() == null) return;
+
+            if (intent.getAction().equals(ACTION_UPDATE_NICKNAME) || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+                updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
+            }
         }
     };
 
@@ -275,7 +282,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
 
             }
-            infoTitleChatText.setText(chat.getTitle());
+            infoTitleChatText.setText(getTitleChat(chat));
 
             editImageView = findViewById(R.id.chat_group_contact_properties_edit_icon);
             editImageView.setOnClickListener(this);
@@ -398,8 +405,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 megaChatApi.signalPresenceActivity();
             }
 
-            LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
-                    new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+            IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+            contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+            contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+            LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
             //Set participants
             participants = new ArrayList<>();
@@ -501,8 +510,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
     }
 
     private String checkParticipantName(long handle, int position) {
@@ -856,7 +865,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void createGroupChatAvatar(){
         logDebug("createGroupChatAvatar()");
-        avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), chat.getTitle(), AVATAR_SIZE, true));
+        avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), getTitleChat(chat), AVATAR_SIZE, true));
     }
 
     public void showParticipantsPanel(MegaChatParticipant participant){
@@ -1039,9 +1048,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        int maxAllowed = getMaxAllowed(chat.getTitle());
+        int maxAllowed = getMaxAllowed(getTitleChat(chat));
         input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxAllowed)});
-        input.setText(chat.getTitle());
+        input.setText(getTitleChat(chat));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -1211,7 +1220,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         } else if (request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
             long chatHandle = request.getChatHandle();
             MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
-            String chatTitle = chat.getTitle();
+            String chatTitle = getTitleChat(chat);
 
             if (chatTitle == null) {
                 chatTitle = "";
@@ -1546,7 +1555,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
                 logDebug("Change status: CHANGE_TYPE_TITLE");
-                infoTitleChatText.setText(chat.getTitle());
+                infoTitleChatText.setText(getTitleChat(chat));
                 createGroupChatAvatar();
             }
             else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
@@ -1730,8 +1739,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             peers.addPeer(chat.getPeerHandle(i), chat.getPeerPrivilege(i));
         }
 
-        CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chat.getTitle());
-        megaChatApi.createPublicChat(peers, chat.getTitle(), listener);
+        CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, getTitleChat(chat));
+        megaChatApi.createPublicChat(peers, getTitleChat(chat), listener);
     }
 
 

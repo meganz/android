@@ -54,6 +54,7 @@ public class Constants {
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
+
     public static final String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
     public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
     public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
@@ -444,6 +445,11 @@ public class Constants {
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
+    public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
+
+    public static final int INVALID_POSITION = -1;
+    public static final int INVALID_ID = -1;
+    public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";

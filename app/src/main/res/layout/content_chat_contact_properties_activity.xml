@@ -323,6 +323,76 @@
             android:layout_marginLeft="72dp"
             android:background="@color/divider_upgrade_account" />
 
+        <!-- VERIFY CREDENTIALS LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/chat_contact_properties_verify_credentials_layout"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_gravity="start|center_vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/chat_contact_properties_verify_credentials_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_credentials" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_toEndOf="@id/chat_contact_properties_verify_credentials_icon"
+                android:layout_centerVertical="true">
+
+                <TextView
+                    android:id="@+id/chat_contact_properties_verify_credentials"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_verify_credentials"
+                    android:textSize="16sp"
+                    android:textColor="@color/name_my_account"/>
+
+                <RelativeLayout
+                    android:id="@+id/chat_contact_properties_verify_credentials_info_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:layout_below="@+id/chat_contact_properties_verify_credentials">
+
+                    <ImageView
+                        android:id="@+id/chat_contact_properties_verify_credentials_info_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_verified"/>
+
+                    <TextView
+                        android:id="@+id/chat_contact_properties_verify_credentials_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/chat_contact_properties_verify_credentials_info_icon"
+                        android:text="@string/label_not_verified"
+                        android:layout_centerVertical="true"
+                        android:textSize="14sp"
+                        android:textColor="@color/emoji_icons"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/divider_verify_credentials_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/divider_upgrade_account" />
+
+        </RelativeLayout>
+
         <!-- SHARED FILES LAYOUT -->
 
         <RelativeLayout
