@@ -470,9 +470,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
 				intent.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER);
 				intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
-				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+				sendBroadcast(intent);
 			}
-			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
 			megaApi.resetTotalDownloads();
 			errorEBloqued = 0;
@@ -1569,7 +1569,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
 		intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
 		intent.putExtra(EXTRA_RESULT_TRANSFER, result);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	private void alterDocument(Uri uri, String fileName) {
@@ -1631,7 +1631,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(isVoiceClipType(transfer.getAppData())) return;
 
 			if(!transfer.isFolderTransfer()){
-				LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
+				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 				updateProgressNotification();
 			}
 
@@ -1672,7 +1672,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
 				transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
 				transfersManagement.setTransferOverQuotaTimestamp();
-				LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).setAction(ACTION_TRANSFER_OVER_QUOTA));
+				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).setAction(ACTION_TRANSFER_OVER_QUOTA));
 			}
 		} else if (!transfersManagement.isTransferOverQuotaNotificationShown()){
 			transfersManagement.setTransferOverQuotaNotificationShown(true);

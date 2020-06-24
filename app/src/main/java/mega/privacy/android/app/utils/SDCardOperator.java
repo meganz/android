@@ -258,6 +258,7 @@ public class SDCardOperator {
             // user uninstall the sd card. but default download location is still on the sd card
             if (isSDCardPath) {
                 logDebug("select new path as download location.");
+                new Handler().postDelayed(() -> Toast.makeText(MegaApplication.getInstance(), R.string.old_sdcard_unavailable, Toast.LENGTH_LONG).show(), 1000);
                 return null;
             }
         }

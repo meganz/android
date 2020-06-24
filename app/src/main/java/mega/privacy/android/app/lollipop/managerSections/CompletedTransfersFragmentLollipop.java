@@ -14,7 +14,9 @@ import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
 
 import static mega.privacy.android.app.DatabaseHandler.MAX_TRANSFERS;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
@@ -103,7 +105,9 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 	public void transferRemoved(AndroidCompletedTransfer transfer) {
 		for (int i = 0; i < tL.size(); i++) {
 			AndroidCompletedTransfer completedTransfer = tL.get(i);
-			if (completedTransfer != null && completedTransfer.getId() == transfer.getId()) {
+			if (completedTransfer == null) continue;
+
+			if (areTheSameTransfer(transfer, completedTransfer)) {
 				tL.remove(i);
 				adapter.removeItemData(i);
 				break;
@@ -113,6 +117,29 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 		setEmptyView(tL.size());
         managerActivity.supportInvalidateOptionsMenu();
 	}
+
+	/**
+	 * Compares both transfers received and checks if are the same.
+	 *
+	 * @param transfer1	first AndroidCompletedTransfer to compare and check.
+	 * @param transfer2	second AndroidCompletedTransfer to compare and check.
+	 * @return True if both transfers are the same, false otherwise.
+	 */
+	private boolean areTheSameTransfer(AndroidCompletedTransfer transfer1, AndroidCompletedTransfer transfer2) {
+        return transfer1.getId() == transfer2.getId()
+                || (isValidHandle(transfer1) && isValidHandle(transfer2) && transfer1.getNodeHandle().equals(transfer2.getNodeHandle()))
+                || (transfer1.getError().equals(transfer2.getError()) && transfer1.getFileName().equals(transfer2.getFileName()) && transfer1.getSize().equals(transfer2.getSize()));
+    }
+
+	/**
+	 * Checks if a transfer has a valid handle.
+	 *
+	 * @param transfer	AndroidCompletedTransfer to check.
+	 * @return True if the transfer has a valid handle, false otherwise.
+	 */
+	private boolean isValidHandle(AndroidCompletedTransfer transfer) {
+	    return !isTextEmpty(transfer.getNodeHandle()) && !transfer.getNodeHandle().equals(Long.toString(INVALID_HANDLE));
+    }
 
 	/**
 	 * Removes all completed transfers.

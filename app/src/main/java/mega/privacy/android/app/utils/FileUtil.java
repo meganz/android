@@ -90,7 +90,8 @@ public class FileUtil {
     }
 
     public static boolean isLocalFile(MegaNode node, MegaApiAndroid megaApi, String localPath) {
-        return localPath != null && (isOnMegaDownloads(node) || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))));
+        String fingerprintNode = megaApi.getFingerprint(node);
+        return localPath != null && (isOnMegaDownloads(node) || (fingerprintNode != null && fingerprintNode.equals(megaApi.getFingerprint(localPath))));
     }
 
     public static boolean setLocalIntentParams(Context context, MegaNode node, Intent intent, String localPath, boolean isText) {

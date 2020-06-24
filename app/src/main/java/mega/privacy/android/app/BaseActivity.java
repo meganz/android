@@ -115,28 +115,28 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         checkMegaObjects();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(sslErrorReceiver,
+        registerReceiver(sslErrorReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
+        registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
 
         IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
         filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
+        registerReceiver(accountBlockedReceiver, filter);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
+        registerReceiver(businessExpiredReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
+        registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
+        registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
         IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
         filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
-        LocalBroadcastManager.getInstance(this).registerReceiver(transferOverQuotaReceiver, filterTransfers);
+        registerReceiver(transferOverQuotaReceiver, filterTransfers);
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -194,13 +194,17 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         logDebug("onDestroy");
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferOverQuotaReceiver);
+        unregisterReceiver(sslErrorReceiver);
+        unregisterReceiver(signalPresenceReceiver);
+        unregisterReceiver(accountBlockedReceiver);
+        unregisterReceiver(businessExpiredReceiver);
+        unregisterReceiver(takenDownFilesReceiver);
+        unregisterReceiver(transferFinishedReceiver);
+        unregisterReceiver(transferOverQuotaReceiver);
+
+        if (transferGeneralOverQuotaWarning != null) {
+            transferGeneralOverQuotaWarning.dismiss();
+        }
 
         super.onDestroy();
     }

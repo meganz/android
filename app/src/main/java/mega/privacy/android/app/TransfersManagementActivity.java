@@ -37,7 +37,7 @@ public class TransfersManagementActivity extends PinActivityLollipop {
      * Registers the transfers BroadcastReceiver.
      */
     protected void registerTransfersReceiver() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(transfersUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
+        registerReceiver(transfersUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
     }
 
     /**
@@ -120,6 +120,6 @@ public class TransfersManagementActivity extends PinActivityLollipop {
     protected void onDestroy() {
         super.onDestroy();
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(transfersUpdateReceiver);
+        unregisterReceiver(transfersUpdateReceiver);
     }
 }

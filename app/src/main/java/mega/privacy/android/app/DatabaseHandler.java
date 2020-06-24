@@ -1791,7 +1791,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
 	private void deleteOldestTransfer() {
 		ArrayList<AndroidCompletedTransfer> completedTransfers = getCompletedTransfers();
-		deleteTransfer(completedTransfers.get(0).getId());
+		if (!completedTransfers.isEmpty()) {
+			deleteTransfer(completedTransfers.get(0).getId());
+		}
 	}
 
 	/**
@@ -1815,26 +1817,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (cursor != null && cursor.moveToFirst()) {
-			id = Integer.parseInt(cursor.getString(0));
-			String filename = decrypt(cursor.getString(1));
-			String type =  decrypt(cursor.getString(2));
-			int typeInt = Integer.parseInt(type);
-			String state = decrypt(cursor.getString(3));
-			int stateInt = Integer.parseInt(state);
-			String size = decrypt(cursor.getString(4));
-			String nodeHandle = decrypt(cursor.getString(5));
-			String path = decrypt(cursor.getString(6));
-			boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
-			long timeStamp = Long.parseLong(decrypt(cursor.getString(8)));
-			String error = decrypt(cursor.getString(9));
-			String originalPath = decrypt(cursor.getString(10));
-			long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
-
-			AndroidCompletedTransfer transfer = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
+			AndroidCompletedTransfer transfer = extractAndroidCompletedTransfer(cursor);
 			cursor.close();
 			return transfer;
 		}
+
 		return null;
+	}
+
+	/**
+	 * Extracts a completed transfer of a row.
+	 *
+	 * @param cursor	Cursor from which the data should be extracted.
+	 * @return The extracted completed transfer.
+	 */
+	private AndroidCompletedTransfer extractAndroidCompletedTransfer(Cursor cursor) {
+		int id = Integer.parseInt(cursor.getString(0));
+		String filename = decrypt(cursor.getString(1));
+		String type = decrypt(cursor.getString(2));
+		int typeInt = Integer.parseInt(type);
+		String state = decrypt(cursor.getString(3));
+		int stateInt = Integer.parseInt(state);
+		String size = decrypt(cursor.getString(4));
+		String nodeHandle = decrypt(cursor.getString(5));
+		String path = decrypt(cursor.getString(6));
+		boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
+		long timeStamp = Long.parseLong(decrypt(cursor.getString(8)));
+		String error = decrypt(cursor.getString(9));
+		String originalPath = decrypt(cursor.getString(10));
+		long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
+
+		return new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
 	}
 
 	public void setCompletedTransfer(AndroidCompletedTransfer transfer){
@@ -1891,36 +1904,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @param selectQuery   the query which selects specific completed transfers
      * @return The list with the completed transfers.
      */
-	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(String selectQuery){
-		ArrayList<AndroidCompletedTransfer> cTs = new ArrayList<AndroidCompletedTransfer> ();
+	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(String selectQuery) {
+		ArrayList<AndroidCompletedTransfer> cTs = new ArrayList<AndroidCompletedTransfer>();
 
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		try {
-			if (cursor.moveToLast()){
-
-				do {
-					int id = Integer.parseInt(cursor.getString(0));
-					String filename = decrypt(cursor.getString(1));
-					String type =  decrypt(cursor.getString(2));
-					int typeInt = Integer.parseInt(type);
-					String state = decrypt(cursor.getString(3));
-					int stateInt = Integer.parseInt(state);
-					String size = decrypt(cursor.getString(4));
-					String nodeHandle = decrypt(cursor.getString(5));
-					String path = decrypt(cursor.getString(6));
-					boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
-					long timeStamp = Long.parseLong(decrypt(cursor.getString(8)));
-					String error = decrypt(cursor.getString(9));
-					String originalPath = decrypt(cursor.getString(10));
-					long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
-
-					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
-					cTs.add(cT);
-				} while (cursor.moveToPrevious());
-			}
-
-		} finally {
-			try { cursor.close(); } catch (Exception ignore) {}
+		if (cursor != null && cursor.moveToLast()) {
+			do {
+				cTs.add(extractAndroidCompletedTransfer(cursor));
+			} while (cursor.moveToPrevious());
+			cursor.close();
 		}
 
 		return cTs;

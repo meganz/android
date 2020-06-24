@@ -139,7 +139,6 @@ import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.transferWidget.TransferWidget;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -420,6 +419,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private boolean isTransferOverQuotaWarningShown;
 	private AlertDialog transferOverQuotaWarning;
+	private AlertDialog confirmationTransfersDialog;
 
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
@@ -797,6 +797,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (intent.getAction() != null && intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA) && drawerItem == DrawerItem.TRANSFERS && isActivityInForeground()) {
 				showTransfersTransferOverQuotaWarning();
+			}
+
+			if (MegaApplication.getTransfersManagement().thereAreFailedTransfers() && drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB && !retryTransfers.isVisible()) {
+				retryTransfers.setVisible(true);
 			}
 		}
 	};
@@ -4650,6 +4654,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         if(reconnectDialog != null) {
             reconnectDialog.cancel();
         }
+
+        if (confirmationTransfersDialog != null) {
+            confirmationTransfersDialog.dismiss();
+        }
+
     	super.onDestroy();
 	}
 
@@ -14975,8 +14984,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 					supportInvalidateOptionsMenu();
 				})
-				.setNegativeButton(R.string.general_cancel, null)
-				.show();
+				.setNegativeButton(R.string.general_cancel, null);
+
+		confirmationTransfersDialog = builder.create();
+		setConfirmationTransfersDialogNotCancellableAndShow();
 	}
 
 	/**
@@ -14988,8 +14999,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(R.string.cancel_transfer_confirmation)
 				.setPositiveButton(R.string.context_delete, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
-				.setNegativeButton(R.string.general_cancel, null)
-				.show();
+				.setNegativeButton(R.string.general_cancel, null);
+
+		confirmationTransfersDialog = builder.create();
+        setConfirmationTransfersDialogNotCancellableAndShow();
 	}
 
 	/**
@@ -15005,9 +15018,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
 					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
 				})
-				.setPositiveButton(R.string.general_cancel, null)
-				.show();
+				.setPositiveButton(R.string.general_cancel, null);
+
+		confirmationTransfersDialog = builder.create();
+        setConfirmationTransfersDialogNotCancellableAndShow();
 	}
+
+    private void setConfirmationTransfersDialogNotCancellableAndShow() {
+        if (confirmationTransfersDialog != null) {
+            confirmationTransfersDialog.setCancelable(false);
+            confirmationTransfersDialog.setCanceledOnTouchOutside(false);
+            confirmationTransfersDialog.show();
+        }
+    }
 
 	/**
 	 * Add a completed transfer to the Completed tab in Transfers section.

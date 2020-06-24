@@ -1026,6 +1026,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			super.onBackPressed();
 			// Go one level higher otherwise
 		} else if (hasSDCard && ((pickingFromSDCard && path.equals(new File(sdRoot)) || !pickingFromSDCard && path.equals(root)))) {
+			path = null;
 			showRootWithSDView(true);
 		} else {
 			changeFolder(path.getParentFile());
