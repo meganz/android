@@ -80,6 +80,7 @@ public class ThumbnailUtilsLollipop {
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
 	public static Boolean isDeviceMemoryLow = false;
+	public static final int THUMB_ROUND_PIXEL = 5;
 
 	static HashMap<Long, ThumbnailDownloadListenerListBrowser> listenersList = new HashMap<Long, ThumbnailDownloadListenerListBrowser>();
 	static HashMap<Long, ThumbnailDownloadListenerGridBrowser> listenersGrid = new HashMap<Long, ThumbnailDownloadListenerGridBrowser>();
@@ -1741,5 +1742,50 @@ public class ThumbnailUtilsLollipop {
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 
 		return thumbnailCache.get(document.getHandle());
+	}
+
+	private static void setThumbLayoutParamsForList(Context context, ImageView imageView) {
+		RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)imageView.getLayoutParams();
+		params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
+		params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
+		int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
+		params1.setMargins(left,0,0,0);
+
+		imageView.setLayoutParams(params1);
+	}
+
+	public static void getThumbAndSetViewForList(Context context, MegaNode node, RecyclerView.ViewHolder holder,
+										  MegaApiAndroid megaApi, RecyclerView.Adapter adapter, ImageView imageView) {
+		Bitmap thumb;
+		setThumbLayoutParamsForList(context, imageView);
+
+		if ((thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node)) == null &&
+				((thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context)) == null)) {
+			try {
+				thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, adapter);
+			} catch (Exception e) {
+			}// Too many AsyncTasks
+		}
+
+		if (thumb != null) {
+			imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+		}
+	}
+
+	public static void getThumbAndSetViewOrCreateForList(Context context, MegaNode node, RecyclerView.ViewHolder holder,
+												 MegaApiAndroid megaApi, RecyclerView.Adapter adapter, ImageView imageView) {
+		Bitmap thumb;
+		if ((thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node)) != null ||
+				(thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context)) != null) {
+			setThumbLayoutParamsForList(context, imageView);
+			imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+		} else {
+			logDebug("NOT thumbnail");
+			imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+			try {
+				ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, adapter);
+			} catch (Exception e) {
+			} // Too many AsyncTasks
+		}
 	}
 }
