@@ -283,29 +283,19 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
     @Override
     public void checkScroll() {
-         if (context instanceof FileExplorerActivityLollipop) {
-            boolean addLayoutVisible = (addLayout.getVisibility() == View.VISIBLE);
+        if (listView == null) return;
 
-            if (listView.canScrollVertically(-1)) {
-                if (addLayoutVisible) {
-                    addLayout.setElevation(px2dp(4, outMetrics));
-                }
-                ((FileExplorerActivityLollipop) context).changeActionBarElevation(!addLayoutVisible
-                        , FileExplorerActivityLollipop.CHAT_FRAGMENT);
-            } else {
-                if (addLayoutVisible) {
-                    addLayout.setElevation(0);
-                }
-                ((FileExplorerActivityLollipop) context).changeActionBarElevation(false
-                        , FileExplorerActivityLollipop.CHAT_FRAGMENT);
+        boolean canScroll = listView.canScrollVertically(-1);
+        boolean addLayoutVisible = (addLayout != null && addLayout.getVisibility() == View.VISIBLE);
+
+        if (context instanceof FileExplorerActivityLollipop) {
+            if (addLayoutVisible) {
+                addLayout.setElevation(canScroll ? px2dp(4, outMetrics) : 0);
             }
-        }
-        else if (context instanceof ChatExplorerActivity && addLayout != null && addLayout.getVisibility() == View.VISIBLE) {
-            if (listView.canScrollVertically(-1)) {
-                addLayout.setElevation(px2dp(4, outMetrics));
-            } else {
-                addLayout.setElevation(0);
-            }
+            ((FileExplorerActivityLollipop) context).changeActionBarElevation(
+                    canScroll && !addLayoutVisible, FileExplorerActivityLollipop.CHAT_FRAGMENT);
+        } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
+            addLayout.setElevation(canScroll ? px2dp(4, outMetrics) : 0);
         }
     }
 
