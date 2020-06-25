@@ -454,8 +454,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
-    private MegaPushNotificationSettings push = null;
-    private ChatItemPreferences chatPrefs = null;
     private String newMuteOption = null;
 
     @Override
@@ -607,10 +605,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
 
             if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
-                push = app.getPushNotificationSetting();
-                if(push == null){
-                    muteIconToolbar.setVisibility(isEnableChatNotifications(idChat) ? View.GONE : View.VISIBLE);
-                }
+                muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
+
             }else {
                 long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
                 if (chatId == MEGACHAT_INVALID_HANDLE || chatId != chatRoom.getChatId()) {
@@ -620,9 +616,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
                     newMuteOption = intent.getStringExtra(TYPE_MUTE);
-                    push = app.getPushNotificationSetting();
-                    if(push != null) {
-                        megaApi.setPushNotificationSettings(push, ChatActivityLollipop.this);
+                    MegaPushNotificationSettings megaPushNotificationSettings = app.getPushNotificationSetting();
+                    if(megaPushNotificationSettings != null) {
+                        megaApi.setPushNotificationSettings(megaPushNotificationSettings, ChatActivityLollipop.this);
                     }
                 }
             }
@@ -1335,10 +1331,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void initializeInputText() {
         hideKeyboard();
         setChatSubtitle();
-        chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
-        if(push == null){
-            push = app.getPushNotificationSetting();
-        }
+        ChatItemPreferences chatPrefs = getChatItemPreferences(idChat);
+        MegaPushNotificationSettings megaPushNotificationSettings = app.getPushNotificationSetting();
         if (chatPrefs != null) {
             String written = chatPrefs.getWrittenText();
             if (!TextUtils.isEmpty(written)) {
@@ -1354,7 +1348,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
             }
         } else {
-            if(push != null && !push.isChatDndEnabled(chatRoom.getChatId())){
+            if(megaPushNotificationSettings != null && !megaPushNotificationSettings.isChatDndEnabled(chatRoom.getChatId())){
                 chatPrefs = new ChatItemPreferences(Long.toString(idChat), NOTIFICATIONS_ENABLED, "");
                 dbH.setChatItemPreferences(chatPrefs);
             }
@@ -1474,7 +1468,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         titleToolbar.setText(chatRoom.getTitle());
         setChatSubtitle();
         privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
-        muteIconToolbar.setVisibility(isEnableChatNotifications(idChat) ? View.GONE : View.VISIBLE);
+        muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
         isOpeningChat = true;
 
         String textToShowB = getString(R.string.chat_loading_messages);
@@ -7644,12 +7638,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }else if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
                 if (e.getErrorCode() == MegaError.API_OK) {
                     if(newMuteOption != null) {
+                        MegaPushNotificationSettings megaPushNotificationSettings;
                         if(request.getMegaPushNotificationSettings() != null){
-                            push = request.getMegaPushNotificationSettings().copy();
+                            megaPushNotificationSettings = request.getMegaPushNotificationSettings().copy();
                         }else{
-                            push = MegaPushNotificationSettings.createInstance();
+                            megaPushNotificationSettings = MegaPushNotificationSettings.createInstance();
                         }
-                        app.setPushNotificationSetting(push);
+                        app.setPushNotificationSetting(megaPushNotificationSettings);
                         muteChat(this, chatRoom.getChatId(), newMuteOption);
                         muteIconToolbar.setVisibility(newMuteOption.equals(NOTIFICATIONS_ENABLED) ? View.GONE : View.VISIBLE);
                         newMuteOption = null;
@@ -8183,32 +8178,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         }
     }
-
-    public boolean isEnableChatNotifications(long chatId){
-        if(push == null){
-            push = app.getPushNotificationSetting();
-        }
-
-        if(push == null){
-            return dbH.areNotificationsEnabled(Long.toString(chatId)).equals(NOTIFICATIONS_ENABLED);
-        }
-
-        if(push.isChatDndEnabled(chatId)){
-            return false;
-        }
-
-        if(chatPrefs != null) {
-            if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
-                chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
-                dbH.setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatId));
-            }
-        }else{
-            chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_ENABLED, "");
-            dbH.setChatItemPreferences(chatPrefs);
-        }
-        return true;
-    }
-
 
     public void uploadPictureOrVoiceClip(String path){
         if(path == null) return;

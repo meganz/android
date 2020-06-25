@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -51,6 +52,7 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
@@ -60,6 +62,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -550,6 +553,36 @@ public class ChatUtil {
         return option;
     }
 
+    public static String getGeneralNotification(){
+        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
+        if(pushNotificationSettings != null) {
+            if(!pushNotificationSettings.isGlobalChatsDndEnabled()){
+                ChatSettings chatSettings = MegaApplication.getInstance().getDbH().getChatSettings();
+                if(chatSettings != null){
+                    if(chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
+                        chatSettings.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
+                        MegaApplication.getInstance().getDbH().setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
+                    }
+                }else{
+                    chatSettings = new ChatSettings();
+                    chatSettings.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
+                    MegaApplication.getInstance().getDbH().setChatSettings(chatSettings);
+                }
+                return NOTIFICATIONS_ENABLED;
+            }
+
+            ChatSettings chatSettings = MegaApplication.getInstance().getDbH().getChatSettings();
+            if(chatSettings != null || !chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
+                return chatSettings.getNotificationsEnabled();
+            }
+        }
+        ChatSettings chatSettings = MegaApplication.getInstance().getDbH().getChatSettings();
+        if(chatSettings != null){
+            return chatSettings.getNotificationsEnabled();
+        }
+        return null;
+    }
+
     /**
      * Method for displaying a dialog to mute all chat notifications.
      *
@@ -560,33 +593,45 @@ public class ChatUtil {
         android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
         dialogBuilder.setCustomTitle(view);
-        CharSequence[] items = {
-                context.getString(R.string.mute_chatroom_notification_option_off),
-                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 10, 10)),
-                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)),
-                getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24))};
 
+        boolean isUntilThisEvening = isUntilThisEvening();
+        String typeMuted = getGeneralNotification();
 
-        int itemClicked = 0;
-//        if (!MegaApplication.getInstance().getDbH().areNotificationsEnabled(chatHandle)) {
-//            itemClicked = NOTIFICATIONS_30_MINUTES;
-//        }
+        int initialOption = getItemClicked(typeMuted);
+        String optionUntil = isUntilThisEvening ? context.getString(R.string.mute_chatroom_notification_option_until_this_evening) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
 
-        dialogBuilder.setSingleChoiceItems(items, itemClicked, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                switch (item) {
-                    case 0:
-                        dialog.dismiss();
-                        break;
+        AtomicReference<Integer> itemClicked = new AtomicReference<>(initialOption);
+        ArrayList<String> stringsArray = new ArrayList<>();
+        stringsArray.add(0, context.getString(R.string.mute_chatroom_notification_option_off));
+        stringsArray.add(1, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
+        stringsArray.add(2, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
+        stringsArray.add(3, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
+        stringsArray.add(4, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
+        stringsArray.add(5, optionUntil);
 
-                    default:
-                        dialog.dismiss();
-                        break;
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
+        ListView listView = new ListView(context);
+        listView.setAdapter(itemsAdapter);
+
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, itemClicked.get(), (dialog, item) -> {
+            itemClicked.set(item);
+            if (itemClicked.get() != INITIAL_OPTION) {
+                String newString = isUntilThisEvening ? context.getString(R.string.mute_chatroom_notification_option_until_this_evening) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
+                if (!newString.equals(itemsAdapter.getItem(INITIAL_OPTION))) {
+                    itemsAdapter.remove(itemsAdapter.getItem(INITIAL_OPTION));
+                    itemsAdapter.insert(newString, INITIAL_OPTION);
+                    itemsAdapter.notifyDataSetChanged();
                 }
             }
         });
-
-        dialogBuilder.setPositiveButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
+        dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
+                (dialog, which) -> {
+                    if (itemClicked.get() != initialOption) {
+                        MegaApplication.getInstance().controlMuteNotifications(context, getTypeMute(itemClicked.get(), isUntilThisEvening));
+                    }
+                    dialog.dismiss();
+                });
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
         muteDialog = dialogBuilder.create();
         muteDialog.show();
     }
@@ -681,7 +726,7 @@ public class ChatUtil {
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() != initialOption) {
-                        MegaApplication.getInstance().controlMuteNotifications(chatId, getTypeMute(itemClicked.get(), isUntilThisEvening));
+                        MegaApplication.getInstance().controlMuteNotificationsChat(chatId, getTypeMute(itemClicked.get(), isUntilThisEvening));
                     }
                     dialog.dismiss();
                 });
@@ -697,6 +742,12 @@ public class ChatUtil {
         chatC.muteChat(chatId, muteOption);
     }
 
+    public static void muteChats(Context context, String muteOption) {
+        ChatController chatC = new ChatController(context);
+        chatC.muteChats(muteOption);
+    }
+
+
     public static String getMutedPeriodString(String typeMute) {
         Context context = MegaApplication.getInstance().getBaseContext();
         switch (typeMute) {
@@ -710,5 +761,80 @@ public class ChatUtil {
                 return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
         }
         return null;
+    }
+
+
+    public static ChatItemPreferences getChatItemPreferences(long chatHandle){
+        return MegaApplication.getInstance().getDbH().findChatPreferencesByHandle(Long.toString(chatHandle));
+    }
+
+    public static void checkSpecificChatNotifications(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle){
+
+        if(MegaApplication.getInstance().getPushNotificationSetting() == null){
+            ChatItemPreferences chatPrefs = getChatItemPreferences(chatHandle);
+            if(chatPrefs == null || chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
+                notificationsSwitch.setChecked(true);
+                notificationsSubTitle.setVisibility(View.GONE);
+            }else{
+                notificationsSwitch.setChecked(false);
+                notificationsSubTitle.setVisibility(View.GONE);
+            }
+        }else{
+            updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle);
+        }
+    }
+
+    public static void updateSwitchButton(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle){
+        MegaPushNotificationSettings push = MegaApplication.getInstance().getPushNotificationSetting();
+        if(push.isChatDndEnabled(chatHandle)){
+            notificationsSwitch.setChecked(false);
+            long timestampMute = push.getChatDnd(chatHandle);
+            if(timestampMute == 0){
+                notificationsSubTitle.setVisibility(View.GONE);
+            }else{
+                notificationsSubTitle.setText(mutedChatNotification(timestampMute));
+                notificationsSubTitle.setVisibility(View.VISIBLE);
+            }
+
+        }else{
+            notificationsSwitch.setChecked(true);
+            notificationsSubTitle.setVisibility(View.GONE);
+            ChatItemPreferences chatPrefs = getChatItemPreferences(chatHandle);
+            if(chatPrefs != null) {
+                if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
+                    chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
+                    MegaApplication.getInstance().getDbH().setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatHandle));
+                }
+            }else{
+                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), NOTIFICATIONS_ENABLED, "");
+                MegaApplication.getInstance().getDbH().setChatItemPreferences(chatPrefs);
+            }
+        }
+    }
+
+
+    public static boolean isEnableChatNotifications(long chatId){
+
+        MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
+
+        if(megaPushNotificationSettings == null){
+            return MegaApplication.getInstance().getDbH().areNotificationsEnabled(Long.toString(chatId)).equals(NOTIFICATIONS_ENABLED);
+        }
+
+        if(megaPushNotificationSettings.isChatDndEnabled(chatId)){
+            return false;
+        }
+
+        ChatItemPreferences chatPrefs = getChatItemPreferences(chatId);
+        if(chatPrefs != null) {
+            if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
+                chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
+                MegaApplication.getInstance().getDbH().setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatId));
+            }
+        }else{
+            chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_ENABLED, "");
+            MegaApplication.getInstance().getDbH().setChatItemPreferences(chatPrefs);
+        }
+        return true;
     }
 }

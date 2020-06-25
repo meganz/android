@@ -54,7 +54,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -283,15 +282,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			setLastMessage(position, holder);
 
-			if(context instanceof ManagerActivityLollipop){
-				if(((ManagerActivityLollipop) context).isEnableChatNotifications(chat.getChatId())){
-					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
-				}else{
-					((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.VISIBLE);
-				}
-			}else{
-				((ViewHolderNormalChatList)holder).muteIcon.setVisibility(View.GONE);
-			}
+			checkMuteIcon(position, ((ViewHolderNormalChatList)holder), chat);
 			chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
 
 
@@ -393,6 +384,48 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				((ViewHolderArchivedChatList)holder).textViewArchived.setText(context.getString(R.string.archived_chats_title_section));
 			}
+		}
+	}
+
+	/**
+	 * Method to get the holder.
+	 *
+	 * @param position Position in the adapter.
+	 * @return The ViewHolderNormalChatList in this position.
+	 */
+	private ViewHolderNormalChatList getHolder(int position) {
+		return (ViewHolderNormalChatList) listFragment.findViewHolderForAdapterPosition(position);
+	}
+
+	private void checkMuteIcon(int position, ViewHolderNormalChatList holder, final MegaChatListItem chat) {
+		if (holder == null) {
+			holder = getHolder(position);
+		}
+		if (holder == null)
+			return;
+
+		if (!(context instanceof ManagerActivityLollipop)) {
+			holder.muteIcon.setVisibility(View.GONE);
+			return;
+		}
+		holder.muteIcon.setVisibility(isEnableChatNotifications(chat.getChatId()) ? View.GONE : View.VISIBLE);
+	}
+
+	/**
+	 * Method for updating the UI when the Dnd changes.
+	 *
+	 * @param position The position in adapter.
+	 */
+	public void updateMuteIcon(int position) {
+		MegaChatListItem chat = getChatAt(position);
+		if (chat == null)
+			return;
+
+		ViewHolderNormalChatList holder = getHolder(position);
+		if (holder != null) {
+			checkMuteIcon(position, holder, chat);
+		} else {
+			notifyItemChanged(position);
 		}
 	}
 

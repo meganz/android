@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import static mega.privacy.android.app.utils.Constants.*;
+
 public class ChatSettings {
 
     String notificationsEnabled = "";
@@ -15,7 +17,7 @@ public class ChatSettings {
     }
 
     public ChatSettings() {
-        this.notificationsEnabled = true+"";
+        this.notificationsEnabled = NOTIFICATIONS_ENABLED;
         this.notificationsSound = "";
         this.vibrationEnabled = true+"";
         this.sendOriginalAttachments = false+"";

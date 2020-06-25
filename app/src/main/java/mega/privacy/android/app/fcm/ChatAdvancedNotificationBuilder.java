@@ -1167,37 +1167,18 @@ public final class ChatAdvancedNotificationBuilder {
             }
 
             logDebug("Generate chat notification for: " + chats.size() + " chats");
+            for (int i = 0; i < chats.size(); i++) {
+                if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
 
-            boolean showNotif = false;
-
-            if (MegaApplication.getOpenChatId() != lastChatId) {
-
-                MegaHandleList handleListUnread = request.getMegaHandleListByChat(lastChatId);
-
-                showNotif = shouldShowChatNotification(lastChatId, handleListUnread, beep);
-
-                if (!showNotif) {
-                    logDebug("Muted chat - do not show notification");
-                }
-            }
-
-            logDebug("Generate chat notification for: " + chats.size() + " chats");
-            if (showNotif) {
-                for (int i = 0; i < chats.size(); i++) {
-                    if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
-
-                        MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
-                        showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
-                        if (beep) {
-                            beep = false;
-                        }
-
-                    } else {
-                        logDebug("Do not show notification - opened chat");
+                    MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
+                    showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
+                    if (beep) {
+                        beep = false;
                     }
+
+                } else {
+                    logDebug("Do not show notification - opened chat");
                 }
-            } else {
-                logDebug("Mute for the last chat");
             }
         }
         else{
@@ -1241,39 +1222,22 @@ public final class ChatAdvancedNotificationBuilder {
 
             logDebug("Generate chat notification for: " + chats.size() + " chats");
 
-            boolean showNotif = false;
+            for (int i = 0; i < chats.size(); i++) {
+                if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
 
-            if (MegaApplication.getOpenChatId() != lastChatId) {
-
-                MegaHandleList handleListUnread = request.getMegaHandleListByChat(lastChatId);
-
-                showNotif = shouldShowChatNotification(lastChatId, handleListUnread, beep);
-
-                if (!showNotif) {
-                    logDebug("Muted chat - do not show notification");
-                }
-            }
-
-            if (showNotif) {
-                for (int i = 0; i < chats.size(); i++) {
-                    if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
-
-                        MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
-                        showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
-                        if (beep) {
-                            beep = false;
-                        }
-
-                    } else {
-                        logDebug("Do not show notification - opened chat");
+                    MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
+                    showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
+                    if (beep) {
+                        beep = false;
                     }
-                }
 
-                Notification summary = buildSummary(GROUP_KEY, request.getFlag());
-                notificationManager.notify(NOTIFICATION_SUMMARY_CHAT, summary);
-            } else {
-                logDebug("Mute for the last chat");
+                } else {
+                    logDebug("Do not show notification - opened chat");
+                }
             }
+
+            Notification summary = buildSummary(GROUP_KEY, request.getFlag());
+            notificationManager.notify(NOTIFICATION_SUMMARY_CHAT, summary);
         }
     }
 
@@ -1319,20 +1283,10 @@ public final class ChatAdvancedNotificationBuilder {
             ChatSettings chatSettings = dbH.getChatSettings();
 
             if (chatSettings != null) {
-
-                if (chatSettings.getNotificationsEnabled()==null){
+                if (chatSettings.getNotificationsEnabled()==null || chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
                     logDebug("getNotificationsEnabled NULL --> Notifications ON");
                     checkNotificationsSoundPreN(request, beep, lastChatId);
                 }
-                else{
-                    if (STRING_TRUE.equals(chatSettings.getNotificationsEnabled())) {
-                        logDebug("Notifications ON for all chats");
-                        checkNotificationsSoundPreN(request, beep, lastChatId);
-                    } else {
-                        logDebug("Notifications OFF");
-                    }
-                }
-
             } else {
                 logDebug("Notifications DEFAULT ON");
 
@@ -1391,22 +1345,14 @@ public final class ChatAdvancedNotificationBuilder {
 
             ChatSettings chatSettings = dbH.getChatSettings();
             if (chatSettings != null) {
-                if (chatSettings.getNotificationsEnabled()==null){
+                if (chatSettings.getNotificationsEnabled()==null || chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
                     logDebug("getNotificationsEnabled NULL --> Notifications ON");
 
                     return checkNotificationsSound(chatid, handleListUnread, beep);
                 }
-                else{
-                    if (STRING_TRUE.equals(chatSettings.getNotificationsEnabled())) {
-                        logDebug("Notifications ON for all chats");
 
-                        return checkNotificationsSound(chatid, handleListUnread, beep);
-                    } else {
-                        logDebug("Notifications OFF");
-                        return false;
-                    }
-                }
-
+                logDebug("Notifications OFF");
+                return false;
             } else {
                 logDebug("Notifications DEFAULT ON");
 
@@ -1417,37 +1363,6 @@ public final class ChatAdvancedNotificationBuilder {
         }
         else{
             sendBundledNotification(null, STRING_FALSE, chatid, handleListUnread);
-            return true;
-        }
-    }
-
-    public boolean shouldShowChatNotification(long chatid, MegaHandleList handleListUnread, boolean beep){
-        logDebug("Chat ID: " + chatid + ", Beep: " + beep);
-
-        if(beep){
-
-            ChatSettings chatSettings = dbH.getChatSettings();
-            if (chatSettings != null) {
-                if (chatSettings.getNotificationsEnabled()==null){
-                    logDebug("getNotificationsEnabled NULL --> Notifications ON");
-                    return true;
-                }
-                else{
-                    if (STRING_TRUE.equals(chatSettings.getNotificationsEnabled())) {
-                        logDebug("Notifications ON for all chats");
-                        return true;
-                    } else {
-                        logDebug("Notifications OFF");
-                        return false;
-                    }
-                }
-
-            } else {
-                logDebug("Notifications DEFAULT ON");
-                return true;
-            }
-        }
-        else{
             return true;
         }
     }

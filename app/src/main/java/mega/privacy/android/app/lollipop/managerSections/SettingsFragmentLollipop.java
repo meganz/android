@@ -605,7 +605,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		}
 
 		if (chatSettings == null) {
-			dbH.setNotificationEnabledChat(true + "");
+			dbH.setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
 			dbH.setVibrationEnabledChat(true + "");
 		}
 

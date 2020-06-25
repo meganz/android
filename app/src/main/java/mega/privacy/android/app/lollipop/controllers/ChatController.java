@@ -47,6 +47,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -360,6 +361,30 @@ public class ChatController {
         } else if (chatPrefs.getNotificationsEnabled() != typeMute) {
             chatPrefs.setNotificationsEnabled(typeMute);
             dbH.setNotificationEnabledChatItem(typeMute, Long.toString(chatHandle));
+        }
+
+        if(typeMute.equals(NOTIFICATIONS_ENABLED)) {
+            showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+        }else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)){
+            showSnackbar(context, getCorrectStringDependingOnCalendar(context, typeMute));
+        }else {
+            String text = getMutedPeriodString(typeMute);
+            if (text != null) {
+                showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+            }
+        }
+    }
+
+    public void muteChats(String typeMute){
+        ChatSettings chatSettings = dbH.getChatSettings();
+        if (chatSettings == null) {
+            chatSettings = new ChatSettings();
+            chatSettings.setNotificationsEnabled(typeMute);
+            dbH.setChatSettings(chatSettings);
+
+        } else if (chatSettings.getNotificationsEnabled() != typeMute) {
+            chatSettings.setNotificationsEnabled(typeMute);
+            dbH.setNotificationEnabledChat(typeMute);
         }
 
         if(typeMute.equals(NOTIFICATIONS_ENABLED)) {

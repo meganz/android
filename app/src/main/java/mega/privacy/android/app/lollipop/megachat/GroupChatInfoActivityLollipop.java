@@ -116,10 +116,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     float scaleH;
     float scaleText;
     DatabaseHandler dbH = null;
-    ChatItemPreferences chatPrefs = null;
-    ChatSettings chatSettings = null;
-    boolean generalChatNotifications = true;
-    private MegaPushNotificationSettings push = null;
     private String newMuteOption = null;
 
     CoordinatorLayout fragmentContainer;
@@ -183,11 +179,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 return;
 
             if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
-                if(push == null) {
-                    setUpIndividualChatNotifications();
-                }else{
-                    push = app.getPushNotificationSetting();
-                }
+                checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
             }else {
                 long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
                 if (chatId == MEGACHAT_INVALID_HANDLE || chatId != chatHandle) {
@@ -197,9 +189,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
                     newMuteOption = intent.getStringExtra(TYPE_MUTE);
-                    push = app.getPushNotificationSetting();
-                    if(push != null) {
-                        megaApi.setPushNotificationSettings(push, GroupChatInfoActivityLollipop.this);
+                    MegaPushNotificationSettings megaPushNotificationSettings = app.getPushNotificationSetting();
+                    if(megaPushNotificationSettings != null) {
+                        megaApi.setPushNotificationSettings(megaPushNotificationSettings, GroupChatInfoActivityLollipop.this);
                     }
                 }
             }
@@ -265,7 +257,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-            chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
             setContentView(R.layout.activity_group_chat_properties);
 
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -409,29 +400,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
                 }
 
-                chatSettings = dbH.getChatSettings();
-
-                if(chatSettings==null){
-                    logDebug("Chat settings null - notifications ON");
-                    setUpIndividualChatNotifications();
-                }
-                else {
-                    logDebug("There is chat settings");
-                    if (chatSettings.getNotificationsEnabled() == null) {
-                        generalChatNotifications = true;
-
-                    } else {
-                        generalChatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
-
-                    }
-
-                    if (generalChatNotifications) {
-                        setUpIndividualChatNotifications();
-                    } else {
-                        logDebug("General notifications OFF");
-                        notificationsSwitch.setChecked(false);
-                    }
-                }
+                checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
             }
 
             if (megaChatApi.isSignalActivityRequired()) {
@@ -454,7 +423,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             updatePreviewers();
         }
     }
-
 
     public void updatePreviewers(){
         logDebug("updatePreviewers");
@@ -479,50 +447,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void setUpIndividualChatNotifications(){
-        logDebug("setUpIndividualChatNotifications");
-        if(push == null){
-            push = MegaApplication.getInstance().getPushNotificationSetting();
-        }
-        if(push == null){
-            if(chatPrefs == null || chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
-                notificationsSwitch.setChecked(true);
-                notificationsSubTitle.setVisibility(View.GONE);
-            }else{
-                notificationsSwitch.setChecked(false);
-                notificationsSubTitle.setVisibility(View.GONE);
-            }
-        }else{
-            updateSwitchButton();
-        }
-    }
-
-    private void updateSwitchButton(){
-        if(push.isChatDndEnabled(chatHandle)){
-            notificationsSwitch.setChecked(false);
-            long timestampMute = push.getChatDnd(chatHandle);
-            if(timestampMute == 0){
-                notificationsSubTitle.setVisibility(View.GONE);
-            }else{
-                notificationsSubTitle.setText(mutedChatNotification(timestampMute));
-                notificationsSubTitle.setVisibility(View.VISIBLE);
-            }
-
-        }else{
-            notificationsSwitch.setChecked(true);
-            notificationsSubTitle.setVisibility(View.GONE);
-            if(chatPrefs != null) {
-                if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
-                    chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
-                    dbH.setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatHandle));
-                }
-            }else{
-                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), NOTIFICATIONS_ENABLED, "");
-                dbH.setChatItemPreferences(chatPrefs);
-            }
-
-        }
-    }
 
     public void setChatPermissions(){
         logDebug("setChatPermissions");
@@ -976,13 +900,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             case R.id.chat_group_contact_properties_layout:{
                 logDebug("Click on switch notifications");
-                if(!generalChatNotifications){
-                    notificationsSwitch.setChecked(false);
-                    showSnackbar("The chat notifications are disabled, go to settings to set up them");
-                } else if (notificationsSwitch.isChecked()) {
+                if (notificationsSwitch.isChecked()) {
                     createMuteChatRoomAlertDialog(GroupChatInfoActivityLollipop.this, chatHandle);
                 } else {
-                    app.controlMuteNotifications(chatHandle, NOTIFICATIONS_ENABLED);
+                    app.controlMuteNotificationsChat(chatHandle, NOTIFICATIONS_ENABLED);
                 }
                 break;
 
@@ -1587,15 +1508,16 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }else if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 if(newMuteOption != null) {
-                    if(request.getMegaPushNotificationSettings() != null){
-                        push = request.getMegaPushNotificationSettings().copy();
-                    }else{
-                        push = MegaPushNotificationSettings.createInstance();
+                    MegaPushNotificationSettings megaPushNotificationSettings;
+                    if (request.getMegaPushNotificationSettings() != null) {
+                        megaPushNotificationSettings = request.getMegaPushNotificationSettings().copy();
+                    } else {
+                        megaPushNotificationSettings = MegaPushNotificationSettings.createInstance();
                     }
-                    app.setPushNotificationSetting(push);
+                    app.setPushNotificationSetting(megaPushNotificationSettings);
                     muteChat(this, chatHandle, newMuteOption);
                     newMuteOption = null;
-                    updateSwitchButton();
+                    updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle);
                 }
             } else {
                 logError("Chat notification settings cannot be updated");

@@ -187,7 +187,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), iconStateChatPanel);
             }
 
-            if (((ManagerActivityLollipop)context).isEnableChatNotifications(chat.getChatId())) {
+            if (isEnableChatNotifications(chat.getChatId())) {
                 optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
                 optionMuteChatText.setText(getString(R.string.general_mute));
             }else{

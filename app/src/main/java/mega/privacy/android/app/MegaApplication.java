@@ -30,6 +30,7 @@ import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.View;
 
 import org.webrtc.ContextUtils;
 
@@ -282,6 +283,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 								logWarning("User is NULL");
 							}
 						}
+					}
+				}
+			}else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
+				if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
+					if (e.getErrorCode() == MegaError.API_OK) {
+						if(request.getMegaPushNotificationSettings() != null){
+							push = request.getMegaPushNotificationSettings().copy();
+						}else{
+							push = MegaPushNotificationSettings.createInstance();
+						}
+					} else {
+						logError("Chat notification settings cannot be updated");
 					}
 				}
 			}
@@ -693,7 +706,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		push = newPush;
 	}
 
-	public void controlMuteNotifications(long chatId, String typeMute) {
+	public void controlMuteNotificationsChat(long chatId, String typeMute) {
 		if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
 			push.enableChat(chatId, true);
 		} else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
@@ -728,6 +741,44 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		intentGeneral.putExtra(MUTE_CHATROOM_ID, chatId);
 		intentGeneral.putExtra(TYPE_MUTE, typeMute);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intentGeneral);
+	}
+
+	public void controlMuteNotifications(Context context, String typeMute) {
+		if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
+			push.enableChats(true);
+		} else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
+			push.setGlobalChatsDnd(getCalendarSpecificTime(typeMute).getTimeInMillis());
+		} else {
+			Calendar newCalendar = Calendar.getInstance();
+			newCalendar.setTimeInMillis(System.currentTimeMillis());
+			switch (typeMute) {
+				case NOTIFICATIONS_30_MINUTES:
+					newCalendar.add(Calendar.MINUTE, 30);
+					break;
+				case NOTIFICATIONS_1_HOUR:
+					newCalendar.add(Calendar.HOUR, 1);
+					break;
+				case NOTIFICATIONS_6_HOURS:
+					newCalendar.add(Calendar.HOUR, 6);
+					break;
+				case NOTIFICATIONS_24_HOURS:
+					newCalendar.add(Calendar.HOUR, 24);
+					break;
+				case NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING:
+					getCalendarSpecificTime(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING);
+					break;
+				case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW:
+					break;
+			}
+
+			push.setGlobalChatsDnd(newCalendar.getTimeInMillis());
+		}
+		megaApi.setPushNotificationSettings(push, null);
+		muteChats(context, typeMute);
+//		Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+//		intentGeneral.setAction(ACTION_UPDATE_MUTE_CHATS_OPTION);
+//		intentGeneral.putExtra(TYPE_MUTE, typeMute);
+//		LocalBroadcastManager.getInstance(this).sendBroadcast(intentGeneral);
 	}
 	
 	public MegaApiAndroid getMegaApiFolder(){

@@ -576,7 +576,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         adapterList.setChats(chats);
                     }
 
-                    fastScroller.setRecyclerView(listView);
                     visibilityFastScroller();
                     adapterList.setPositionClicked(-1);
                 }
@@ -1391,6 +1390,19 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 //        }
     }
 
+    public void notifyPushChanged(){
+        if (adapterList == null || adapterList.getItemCount() == 0) {
+            setChats();
+        } else if (chats != null && !chats.isEmpty()) {
+            for (MegaChatListItem chat : chats) {
+                int pos = chats.indexOf(chat);
+                if (pos != INVALID_POSITION) {
+                    adapterList.updateMuteIcon(pos);
+                }
+            }
+        }
+    }
+
     public void showMuteIcon(long chatId) {
         logDebug("Chat ID: " + chatId);
         clearSelections();
@@ -1403,10 +1415,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (chat.getChatId() == chatId) {
                     int pos = chats.indexOf(chat);
                     if (pos != INVALID_POSITION) {
-                        adapterList.notifyItemChanged(pos);
-                    } else {
-                        setChats();
+                        adapterList.updateMuteIcon(pos);
                     }
+                    break;
                 }
             }
         }
@@ -1858,7 +1869,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if(selected.size() == 1 && context instanceof ManagerActivityLollipop){
                         MegaChatListItem chat = selected.get(0);
                         if (chat != null) {
-                            if (((ManagerActivityLollipop)context).isEnableChatNotifications(chat.getChatId())) {
+                            if (isEnableChatNotifications(chat.getChatId())) {
                                 showUnmute = true;
                                 showMute = false;
                             }else{
