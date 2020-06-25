@@ -1,8 +1,5 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +25,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
-import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.INVALID_TYPE;
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -39,8 +37,6 @@ import static mega.privacy.android.app.utils.Util.*;
 public class AchievementsFragment extends BaseFragment implements OnClickListener
 		, GetAchievementsListener.DataCallback {
 	private LinearLayout parentLinearLayout;
-
-	private MegaApiAndroid megaApi;
 
 	private RelativeLayout referralBonusesLayout;
 
@@ -135,16 +131,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	private Button inviteFriendsButton;
 
 	@Override
-	public void onCreate (Bundle savedInstanceState){
-		logDebug("onCreate");
-		if (megaApi == null){
-			megaApi = MegaApplication.getInstance().getMegaApi();
-		}
-
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 
@@ -163,13 +149,9 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 		titleReferralBonuses = (TextView) v.findViewById(R.id.title_referral_bonuses);
 
-		int orientation = getResources().getConfiguration().orientation;
+		boolean isPortrait = Util.isScreenInPortrait(MegaApplication.getInstance());
 
-		if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-			titleReferralBonuses.setMaxWidth(scaleWidthPx(250, outMetrics));
-		}else{
-			titleReferralBonuses.setMaxWidth(scaleWidthPx(190, outMetrics));
-		}
+		titleReferralBonuses.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
 		figuresReferralBonusesLayout = (LinearLayout) v.findViewById(R.id.figures_referral_bonuses_layout);
 		figuresReferralBonusesLayout.setVisibility(View.GONE);
@@ -180,11 +162,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         registrationLayout.setOnClickListener(this);
 
 		titleRegistration = (TextView) v.findViewById(R.id.title_registration);
-		if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-			titleRegistration.setMaxWidth(scaleWidthPx(250, outMetrics));
-		}else{
-			titleRegistration.setMaxWidth(scaleWidthPx(190, outMetrics));
-		}
+		titleRegistration.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
 		figuresRegistrationLayout = (LinearLayout) v.findViewById(R.id.figures_registration_layout);
 
@@ -192,11 +170,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         installAppLayout.setOnClickListener(this);
 
 		titleInstallApp = (TextView) v.findViewById(R.id.title_install_app);
-		if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-			titleInstallApp.setMaxWidth(scaleWidthPx(250, outMetrics));
-		}else{
-			titleInstallApp.setMaxWidth(scaleWidthPx(190, outMetrics));
-		}
+		titleInstallApp.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
 		figuresInstallAppLayout = (LinearLayout) v.findViewById(R.id.figures_install_app_layout);
 		figuresInstallAppLayout.setVisibility(View.GONE);
@@ -206,11 +180,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         if(megaApi.smsAllowedState() == 2) {
             addPhoneLayout.setOnClickListener(this);
             titleAddPhone = v.findViewById(R.id.title_add_phone);
-            if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-                titleAddPhone.setMaxWidth(scaleWidthPx(250, outMetrics));
-            }else{
-                titleAddPhone.setMaxWidth(scaleWidthPx(190, outMetrics));
-            }
+			titleAddPhone.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
         } else {
             v.findViewById(R.id.separator_add_phone).setVisibility(View.GONE);
             addPhoneLayout.setVisibility(View.GONE);
@@ -223,11 +193,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         installDesktopLayout.setOnClickListener(this);
 
 		titleInstallDesktop = (TextView) v.findViewById(R.id.title_install_desktop);
-		if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-			titleInstallDesktop.setMaxWidth(scaleWidthPx(250, outMetrics));
-		}else{
-			titleInstallDesktop.setMaxWidth(scaleWidthPx(190, outMetrics));
-		}
+		titleInstallDesktop.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
 		figuresInstallDesktopLayout = (LinearLayout) v.findViewById(R.id.figures_install_desktop_layout);
 		figuresInstallDesktopLayout.setVisibility(View.GONE);
@@ -347,34 +313,30 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		// The root view has been created, fill it with the data when data ready
-		if (sFetcher != null) {
-			sFetcher.setDataCallback(this);
-		}
-
-		Activity activity = getActivity();
-		if (activity != null) {
-			ActionBar actionBar = ((AppCompatActivity)activity).getSupportActionBar();
+		if (mActivity != null) {
+			ActionBar actionBar = ((AppCompatActivity)mActivity).getSupportActionBar();
 			if (actionBar != null) {
 				actionBar.setTitle(getString(R.string.achievements_title));
 			}
+		}
+
+		// The root view has been created, fill it with the data when data ready
+		if (sFetcher != null) {
+			sFetcher.setDataCallback(this);
 		}
 	}
 
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
-		AchievementsActivity activity = (AchievementsActivity) getActivity();
+		AchievementsActivity activity = (AchievementsActivity) mActivity;
 		if (activity == null) return;
 
 		switch (v.getId()) {
 			case R.id.referral_bonuses_layout:{
 				logDebug("Go to section Referral bonuses");
-				if (transferReferrals > 0 || storageReferrals > 0) {
-					activity.showFragment(BONUSES_FRAGMENT, -1);
-				} else {
-					activity.showFragment(INVITE_FRIENDS_FRAGMENT, -1);
-				}
+				activity.showFragment((transferReferrals > 0 || storageReferrals > 0)
+						? BONUSES_FRAGMENT : INVITE_FRIENDS_FRAGMENT, INVALID_TYPE);
 				break;
 			}
 			case R.id.install_app_layout:{
@@ -409,7 +371,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		logDebug("updateValues");
 		if (sFetcher == null) return;
 
-		Context context = getContext();
 		MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
 		ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
 
@@ -446,12 +407,11 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 			logDebug("Check if referrals are expired");
 			int expiredNumber = 0;
-			if(bonuses !=null){
-				for(int i = 0; i<bonuses.size(); i++){
-					ReferralBonus referralBonus = bonuses.get(i);
-					if(referralBonus.getDaysLeft()<0){
-						expiredNumber++;
-					}
+
+			for (int i = 0; i < bonuses.size(); i++) {
+				ReferralBonus referralBonus = bonuses.get(i);
+				if (referralBonus.getDaysLeft() < 0) {
+					expiredNumber++;
 				}
 			}
 

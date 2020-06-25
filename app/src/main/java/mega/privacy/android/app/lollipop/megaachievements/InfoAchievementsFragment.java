@@ -12,22 +12,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import java.util.Calendar;
 import java.util.Date;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import nz.mega.sdk.MegaAchievementsDetails;
 
-import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
-import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
-public class InfoAchievementsFragment extends Fragment implements GetAchievementsListener.DataCallback {
+public class InfoAchievementsFragment extends BaseFragment implements GetAchievementsListener.DataCallback {
 	ActionBar actionBar;
 
 	ImageView icon;
@@ -76,7 +74,9 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
 	}
 
 	private void updateBarTitle() {
-		actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+		if (mActivity == null) return;
+		actionBar = ((AppCompatActivity)mActivity).getSupportActionBar();
+
 		if (actionBar == null) return;
 		String title = "";
 

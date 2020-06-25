@@ -36,6 +36,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class AchievementsActivity extends PinActivityLollipop {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
+    static final int INVALID_TYPE = -1;
 
     FrameLayout fragmentContainer;
     Toolbar tB;

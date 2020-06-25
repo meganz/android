@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
@@ -24,6 +25,8 @@ public class BaseFragment extends Fragment {
 
     protected DisplayMetrics outMetrics;
 
+    protected Activity mActivity;
+
     public BaseFragment() {
         app = MegaApplication.getInstance();
         if (app != null) {
@@ -39,6 +42,7 @@ public class BaseFragment extends Fragment {
         super.onAttach(context);
 
         this.context = context;
+        mActivity = getActivity();
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
