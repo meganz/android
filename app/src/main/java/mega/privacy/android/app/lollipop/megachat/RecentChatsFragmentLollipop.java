@@ -322,7 +322,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         logDebug("onCreateView");
-
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -1531,6 +1530,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
         if(explanationDialog != null) {
             explanationDialog.cancel();
+        }
+        if(adapter != null) {
+            adapter.dismissDialog();
         }
     }
 

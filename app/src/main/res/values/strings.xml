@@ -2548,7 +2548,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Invite contact now?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Discover your contacts on MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
