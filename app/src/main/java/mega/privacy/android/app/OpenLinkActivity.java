@@ -8,6 +8,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -48,12 +49,14 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	private boolean isLoggedIn;
 	private boolean needsRefreshSession;
 
+	private String url;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
-		String url = intent.getDataString();
+		url = intent.getDataString();
 		logDebug("Original url: " + url);
 
 		setContentView(R.layout.activity_open_link);
@@ -71,6 +74,13 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		isLoggedIn = dbH != null && dbH.getCredentials() != null;
 		needsRefreshSession = megaApi.getRootNode() == null;
+
+		// If is not a MEGA link, is not a supported link
+		if (!matchRegexs(url, MEGA_REGEXS)) {
+			logDebug("The link is not a MEGA link: " + url);
+			setError(getString(R.string.open_link_not_valid_link));
+			return;
+		}
 
 		// Email verification link
 		if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
@@ -147,12 +157,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 						initResult = megaChatApi.initAnonymous();
 					}
 
-					if(initResult!= MegaChatApi.INIT_ERROR){
-						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-						openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
-						openChatLinkIntent.setData(Uri.parse(url));
-						startActivity(openChatLinkIntent);
-						finish();
+					if(initResult != MegaChatApi.INIT_ERROR){
+						megaChatApi.connect(new ConnectListener(this));
 					}
 					else{
 						logError("Open chat url:initAnonymous:INIT_ERROR");
@@ -394,6 +400,14 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		// Browser open the link which does not require app to handle
 		logDebug("Browser open link: " + url);
 		checkIfRequiresTransferSession(url);
+	}
+
+	public void finishAfterConnect() {
+		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+		openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
+		openChatLinkIntent.setData(Uri.parse(url));
+		startActivity(openChatLinkIntent);
+		finish();
 	}
 
 	private void checkIfRequiresTransferSession(String url) {
