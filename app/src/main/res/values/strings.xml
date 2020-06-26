@@ -558,6 +558,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please enter the decryption key for the link</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Invalid decryption key</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -1856,6 +1857,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">Storage quota exceeded</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Invalid link password</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">The link you are trying to open is not a valid MEGA link.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Processing link&#8230;</string>
 
@@ -2790,4 +2794,13 @@
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
     <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
     <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verify credentials</string>
+    <string name="label_not_verified" context="Action indicating something was not verified yet.">Not verified</string>
+    <string name="label_verified" context="Action indicating something was verified.">Verified</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Authenticity Credentials</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">This is best done in real life by meeting face to face. If you have another already-verified channel such as verified OTR or PGP, you may also use that.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Your Credentials</string>
+    <string name="action_reset" context="Button to reset credentials">Reset</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana's credentials">%s\'s credentials</string>
 </resources>

@@ -178,9 +178,9 @@ public class ContactUtil {
     }
 
     public static void notifyNicknameUpdate(Context context, long userHandle) {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_NICKNAME);
-        intent.putExtra(EXTRA_USER_HANDLE, userHandle);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
+                .setAction(ACTION_UPDATE_NICKNAME)
+                .putExtra(EXTRA_USER_HANDLE, userHandle));
     }
 
     private static String getNewNickname(MegaStringMap map, String key) {
