@@ -4,18 +4,24 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.StaticLayout;
+import android.text.TextUtils;
+import android.text.style.ImageSpan;
+import android.util.AttributeSet;
+import android.view.KeyEvent;
 import androidx.annotation.CallSuper;
 import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.appcompat.widget.AppCompatTextView;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
-import android.util.AttributeSet;
-import android.view.KeyEvent;
 import mega.privacy.android.app.R;
 
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.converterShortCodes;
 
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface {
 
@@ -24,6 +30,17 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     private int textViewMaxWidth = 0;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
     private boolean necessaryShortCode = true;
+
+    private float lineSpacingMultiplier = 1.0f;
+    private float lineAdditionalVerticalPadding = 0.0f;
+
+    private boolean showTrailingIcon = false;
+    @DrawableRes
+    private int trailingIcon;
+    private int trailingIconPaddingLeft = 0;
+
+    private CharSequence latestRawText;
+    private BufferType latestBufferType;
 
     public EmojiTextView(final Context context) {
         this(context, null);
@@ -61,21 +78,155 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
     @Override
     public void setText(CharSequence rawText, BufferType type) {
+        latestRawText = rawText;
+        latestBufferType = type;
+
         CharSequence text = rawText == null ? "" : rawText;
-        if(isNeccessaryShortCode()){
+        if (isNeccessaryShortCode()) {
             text = converterShortCodes(text.toString());
         }
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+        SpannableStringBuilder emojiProcessedText = new SpannableStringBuilder(text);
         Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-        EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
+        EmojiManager.getInstance()
+            .replaceWithImages(getContext(), emojiProcessedText, emojiSize, defaultEmojiSize);
 
-        if(mContext == null || (mContext instanceof ContextWrapper && ((ContextWrapper) mContext).getBaseContext() == null) || (textViewMaxWidth == 0)){
-            super.setText(spannableStringBuilder, type);
-        }else{
-            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, typeEllipsize);
-            super.setText(textF, type);
+        if (mContext == null || (mContext instanceof ContextWrapper
+            && ((ContextWrapper) mContext).getBaseContext() == null) || (textViewMaxWidth == 0)) {
+            super.setText(emojiProcessedText, type);
+            return;
         }
+
+        int maxLines = getMaxLines();
+        Drawable iconDrawable = null;
+        if (showTrailingIcon) {
+            iconDrawable = getResources().getDrawable(trailingIcon);
+        }
+        if (iconDrawable == null || maxLines == -1) {
+            CharSequence ellipsizedText = TextUtils.ellipsize(emojiProcessedText, getPaint(),
+                textViewMaxWidth, typeEllipsize);
+            super.setText(ellipsizedText, type);
+            return;
+        }
+
+        PaddingSpan padding = new PaddingSpan(trailingIconPaddingLeft);
+        iconDrawable.setBounds(0, 0, iconDrawable.getIntrinsicWidth(),
+            iconDrawable.getIntrinsicHeight());
+        ImageSpan icon = new ImageSpan(iconDrawable, ImageSpan.ALIGN_BASELINE);
+
+        // trim it, because trailing whitespace break the trailing icon position
+        int lastNonWhitespaceOffset = emojiProcessedText.length();
+        while (lastNonWhitespaceOffset > 0 && Character.isWhitespace(
+            emojiProcessedText.charAt(lastNonWhitespaceOffset - 1))) {
+            lastNonWhitespaceOffset--;
+        }
+        CharSequence workingText =
+            lastNonWhitespaceOffset == emojiProcessedText.length() ? emojiProcessedText
+                : emojiProcessedText.subSequence(0, lastNonWhitespaceOffset);
+
+        boolean ellipsized = false;
+        Layout originLayout = createWorkingLayout(workingText);
+        if (originLayout.getLineCount() > maxLines) {
+            ellipsized = true;
+            // a Unicode character may need two chars to represent, e.g. emoji,
+            // but Layout already takes care of it, so it's safe to truncate at line end.
+            workingText = workingText.subSequence(0, originLayout.getLineEnd(maxLines - 1));
+        }
+
+        // it may not fit into two lines after appending padding and icon, so we need truncate more
+        // chars in this case.
+        // and emojiProcessedText may fit into one line, but after appending padding and
+        // icon it may not fit, we don't want only the icon in the second line, so we need
+        // add line break manually in this case.
+        boolean needManualLineBreak = false;
+        while (true) {
+            SpannableStringBuilder trialText =
+                buildFinalText(workingText, ellipsized, padding, icon);
+            Layout trialLayout = createWorkingLayout(trialText);
+            if (trialLayout.getLineCount() <= maxLines) {
+                // it fits, good
+                needManualLineBreak =
+                    !ellipsized && trialLayout.getLineCount() > originLayout.getLineCount();
+                break;
+            }
+
+            ellipsized = true;
+            // we need truncate at least one character, then trim trailing whitespace,
+            // because we don't want ellipsize after whitespace.
+            // and because the last character may takes two chars, we need to take care of it.
+            int textEnd = workingText.length() - 1;
+            if (!Character.isLetter(workingText.charAt(textEnd))) {
+                textEnd--;
+            }
+            while (textEnd > 0 && Character.isWhitespace(workingText.charAt(textEnd - 1))) {
+                textEnd--;
+            }
+            workingText = workingText.subSequence(0, textEnd);
+        }
+
+        if (needManualLineBreak) {
+            // if we can find whitespace, then break at here,
+            // if not, e.g. the text is Chinese, we just break before the last character,
+            // and because the last character may takes two chars, we need to take care of it.
+            int breakPos = workingText.length() - 1;
+            if (!Character.isLetter(breakPos)) {
+                breakPos--;
+            }
+            for (int i = workingText.length() - 1; i >= 0; i--) {
+                if (Character.isWhitespace(workingText.charAt(i))) {
+                    // keep the whitespace in the first line
+                    breakPos = i + 1;
+                    break;
+                }
+            }
+            workingText = new SpannableStringBuilder(workingText.subSequence(0, breakPos))
+                .append('\n')
+                .append(workingText.subSequence(breakPos, workingText.length()));
+        }
+
+        super.setText(buildFinalText(workingText, ellipsized, padding, icon), type);
+    }
+
+    private SpannableStringBuilder buildFinalText(CharSequence workingText, boolean ellipsized,
+        PaddingSpan padding, ImageSpan icon) {
+        SpannableStringBuilder finalText = new SpannableStringBuilder(workingText);
+        // the two whitespace are placeholder chars for padding and icon span
+        finalText.append(ellipsized ? "...  " : "  ");
+        finalText.setSpan(padding, finalText.length() - 2, finalText.length() - 1,
+            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        finalText.setSpan(icon, finalText.length() - 1, finalText.length(),
+            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        return finalText;
+    }
+
+    private Layout createWorkingLayout(CharSequence workingText) {
+        return new StaticLayout(workingText, getPaint(),
+            textViewMaxWidth, Layout.Alignment.ALIGN_NORMAL,
+            lineSpacingMultiplier, lineAdditionalVerticalPadding, false);
+    }
+
+    /**
+     * Below 2 functions add support for showing an icon drawable at the end of text.
+     * If the text is too long, it will be ellipsized before appending the icon.
+     */
+    public void setTrailingIcon(@DrawableRes int trailingIcon, int paddingLeft) {
+        this.trailingIcon = trailingIcon;
+        trailingIconPaddingLeft = paddingLeft;
+    }
+
+    public void updateMaxWidthAndIconVisibility(int maxWidth, boolean showTrailingIcon) {
+        this.showTrailingIcon = showTrailingIcon;
+        textViewMaxWidth = maxWidth;
+        if (latestRawText != null && latestBufferType != null) {
+            setText(latestRawText, latestBufferType);
+        }
+    }
+
+    @Override
+    public void setLineSpacing(float add, float mult) {
+        this.lineAdditionalVerticalPadding = add;
+        this.lineSpacingMultiplier = mult;
+        super.setLineSpacing(add, mult);
     }
 
     public boolean isNeccessaryShortCode() {
