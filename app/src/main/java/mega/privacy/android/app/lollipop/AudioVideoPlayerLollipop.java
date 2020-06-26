@@ -577,6 +577,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         previousButton.setOnTouchListener(this);
         nextButton = (ImageButton) findViewById(R.id.exo_next);
         nextButton.setOnTouchListener(this);
+        ImageButton pauseButton = findViewById(R.id.exo_pause);
+        pauseButton.setOnTouchListener(this);
+        ImageButton playButton = findViewById(R.id.exo_play);
+        playButton.setOnTouchListener(this);
         playList = (ImageButton) findViewById(R.id.exo_play_list);
         playList.setVisibility(View.GONE);
         playList.setOnClickListener(this);
@@ -3374,6 +3378,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     protected void onPause() {
         super.onPause();
         logDebug("onPause");
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
     }
 
     @Override
@@ -4077,13 +4082,19 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     public boolean onTouch(View v, MotionEvent event) {
 
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                if (loop && player != null){
+            case MotionEvent.ACTION_DOWN:
+                if (v.getId() == R.id.exo_play) {
+                    getAudioFocus(mAudioManager, audioFocusListener, request, focusType, streamType);
+
+                } else if (v.getId() == R.id.exo_pause) {
+                    abandonAudioFocus(audioFocusListener, mAudioManager, request);
+
+                }else if (loop && player != null){
                     player.setRepeatMode(Player.REPEAT_MODE_OFF);
                 }
                 break;
-            }
-            case MotionEvent.ACTION_UP: {
+
+            case MotionEvent.ACTION_UP:
                 if (creatingPlaylist && player != null){
                     if (v.getId() == R.id.exo_next) {
                         currentWindowIndex++;
@@ -4091,7 +4102,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     setPlaylist(currentWindowIndex, 0);
                 }
                 break;
-            }
+
         }
         return false;
     }

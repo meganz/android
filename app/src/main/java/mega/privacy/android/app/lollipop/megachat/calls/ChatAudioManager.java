@@ -84,7 +84,7 @@ public class ChatAudioManager {
         if (audioManager == null)
             return;
 
-        audioFocusListener= new AudioFocusListener(myContext);
+        audioFocusListener = new AudioFocusListener(myContext);
         focusType = AudioManager.AUDIOFOCUS_GAIN;
         streamType = AudioManager.STREAM_VOICE_CALL;
         request = getRequest(audioFocusListener, focusType);
@@ -124,7 +124,7 @@ public class ChatAudioManager {
         if (ringtoneUri == null)
             return;
 
-        audioFocusListener= new AudioFocusListener(myContext);
+        audioFocusListener = new AudioFocusListener(myContext);
         focusType = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
         streamType = AudioManager.STREAM_MUSIC;
         request = getRequest(audioFocusListener, focusType);
@@ -179,12 +179,13 @@ public class ChatAudioManager {
     }
 
     public void stopAudioSignals() {
-        if (audioManager != null) {
-            abandonAudioFocus(audioFocusListener, audioManager, request);
-        }
         logDebug("Stop sound and vibration");
         stopSound();
         stopVibration();
+
+        if (audioManager != null) {
+            abandonAudioFocus(audioFocusListener, audioManager, request);
+        }
     }
 
     private void stopSound() {

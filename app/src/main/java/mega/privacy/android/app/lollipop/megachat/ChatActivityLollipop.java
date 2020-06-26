@@ -7378,6 +7378,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         destroyAudioRecorderElements();
         if(adapter!=null) {
+            adapter.stopAllReproductionsInProgress();
             adapter.destroyVoiceElemnts();
         }
 
@@ -8004,6 +8005,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         super.onPause();
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
+
+        destroyAudioRecorderElements();
+        if(adapter!=null) {
+            adapter.stopAllReproductionsInProgress();
+            adapter.destroyVoiceElemnts();
+        }
         hideKeyboard();
         activityVisible = false;
         MegaApplication.setOpenChatId(-1);
