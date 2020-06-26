@@ -335,11 +335,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private GetMediaFilesTask getMediaFilesTask;
     private long [] nodeHandles;
 
-    private static final int FOCUS_TYPE = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
-    private static final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
-    private AudioFocusRequest request = null;
-    private AudioManager mAudioManager = null;
-    private AudioFocusListener audioFocusListener = null;
+    private static final int focusType = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
+    private static final int streamType = AudioManager.STREAM_MUSIC;
+    private AudioFocusRequest request;
+    private AudioManager mAudioManager;
+    private AudioFocusListener audioFocusListener;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -3865,8 +3865,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     private void startPlayback() {
         audioFocusListener = new AudioFocusListener(this);
-        request = getRequest(audioFocusListener, FOCUS_TYPE);
-        if (getAudioFocus(mAudioManager, audioFocusListener, request, FOCUS_TYPE, STREAM_TYPE) && player != null) {
+        request = getRequest(audioFocusListener, focusType);
+        if (getAudioFocus(mAudioManager, audioFocusListener, request, focusType, streamType) && player != null) {
             player.setPlayWhenReady(true);
         }
     }

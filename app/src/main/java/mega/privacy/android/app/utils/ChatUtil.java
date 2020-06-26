@@ -496,7 +496,7 @@ public class ChatUtil {
     }
 
     /**
-     * Method for obtaining the AudioFocusRequest when get the focus acudio.
+     * Method for obtaining the AudioFocusRequest when get the focus audio.
      *
      * @param listener  The listener.
      * @param focusType Type of focus.
