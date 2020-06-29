@@ -52,8 +52,8 @@ public class ContactsFilter {
             while (iterator.hasNext()) {
                 // phone number or email
                 String contactInfo = iterator.next();
-                if (megaContact.getEmail().equals(contactInfo) ||
-                        (megaContact.getNormalizedPhoneNumber() != null && megaContact.getNormalizedPhoneNumber().equals(Util.normalizePhoneNumberByNetwork(context, contactInfo)))) {
+                String normalizedPhoneNumber = megaContact.getNormalizedPhoneNumber();
+                if (megaContact.getEmail().equals(contactInfo) || (normalizedPhoneNumber != null && normalizedPhoneNumber.equals(Util.normalizePhoneNumberByNetwork(context, contactInfo)))) {
                     iterator.remove();
                 }
             }
