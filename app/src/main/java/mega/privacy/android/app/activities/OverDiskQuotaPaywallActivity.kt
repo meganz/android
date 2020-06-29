@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Html
 import android.text.Spanned
 import android.view.View
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
 
     private var broadcastManager: LocalBroadcastManager? = null
+    private var timer: CountDownTimer? = null
 
     private var scrollContentLayout: ScrollView? = null
     private var overDiskQuotaPaywallText: TextView? = null
@@ -32,6 +34,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     private var dismissButton: Button? = null
     private var upgradeButton: Button? = null
     private var proPlanNeeded: Int? = 0
+
+    private var deadlineTs: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +111,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         val warningsTs = megaApi.overquotaWarningsTs
         val files = megaApi.numNodes
         val size = app.myAccountInfo.usedFormatted
-        val deadlineTs = megaApi.overquotaDeadlineTs
+        deadlineTs = megaApi.overquotaDeadlineTs
 
         if (warningsTs == null || warningsTs.size() == 0) {
             overDiskQuotaPaywallText?.text = getString(R.string.over_disk_quota_paywall_text_no_warning_dates_info,
@@ -130,17 +134,39 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
                     email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         }
 
+        updateDeletionWarningText()
+    }
+
+    /**
+     * Updates the deletion warning text of the ODQ Paywall warning dialog depending on the remaining time.
+     * Uses a @see CountDownTimer to update the remaining time.
+     */
+    private fun updateDeletionWarningText() {
         var text: String?
-        text = when {
-            deadlineTs > 0 -> {
-                String.format(getString(R.string.over_disk_quota_paywall_deletion_warning),
-                        getHumanizedTime(deadlineTs - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())))
-            }
+        val time = TimeUnit.SECONDS.toMillis(deadlineTs) - System.currentTimeMillis()
+
+        when {
             deadlineTs < 0 -> {
-                String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_data))
+                text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_data))
+            }
+            TimeUnit.MILLISECONDS.toSeconds(time) <= 0 -> {
+                text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_time_left))
             }
             else -> {
-                String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_time_left))
+                text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning), getHumanizedTimeMs(time))
+
+                if (timer == null) {
+                    timer = object: CountDownTimer(time, 1000) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            updateDeletionWarningText()
+                        }
+
+                        override fun onFinish() {
+                            updateDeletionWarningText()
+                            timer = null
+                        }
+                    }.start()
+                }
             }
         }
 
