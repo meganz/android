@@ -1485,7 +1485,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
 		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 		        //create default chat summary channel
-                ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
+				ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
 		        //to system channel settings page
                 Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());

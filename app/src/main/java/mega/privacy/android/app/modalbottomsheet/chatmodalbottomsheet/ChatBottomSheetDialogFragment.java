@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -43,6 +44,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
     private MegaChatListItem chat = null;
     private long chatId;
     private RoundedImageView chatImageView;
+    private TextView optionMuteChatText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +90,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         LinearLayout optionClearHistory = contentView.findViewById(R.id.chat_list_clear_history_chat_layout);
         LinearLayout optionMuteChat = contentView.findViewById(R.id.chat_list_mute_chat_layout);
         ImageView optionMuteChatIcon = contentView.findViewById(R.id.chat_list_mute_chat_image);
-        TextView optionMuteChatText = contentView.findViewById(R.id.chat_list_mute_chat_text);
+        optionMuteChatText = contentView.findViewById(R.id.chat_list_mute_chat_text);
         LinearLayout optionArchiveChat = contentView.findViewById(R.id.chat_list_archive_chat_layout);
         TextView archiveChatText = contentView.findViewById(R.id.chat_list_archive_chat_text);
         ImageView archiveChatIcon = contentView.findViewById(R.id.file_archive_chat_image);
@@ -277,7 +279,11 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
             case R.id.chat_list_mute_chat_layout:
                 if (context instanceof ManagerActivityLollipop) {
-                    createMuteChatRoomAlertDialog(context, chat.getChatId());
+                    if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
+                        createMuteNotificationsChatAlertDialog((Activity) context, chat.getChatId());
+                    } else {
+                        MegaApplication.getInstance().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chat.getChatId());
+                    }
                 }
                 break;
 

@@ -113,4 +113,5 @@ public class SettingsConstants {
     public static final String KEY_CHAT_NOTIFICATIONS = "settings_chat_notifications";
     public static final String KEY_CHAT_SOUND = "settings_chat_sound";
     public static final String KEY_CHAT_VIBRATE = "settings_chat_vibrate";
+    public static final String KEY_CHAT_DND = "settings_chat_dnd";
 }

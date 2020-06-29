@@ -6767,6 +6767,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case CHAT:
 					if (searchExpand) {
 						openSearchView();
+
 					} else {
 						doNotDisturbMenuItem.setVisible(true);
 						inviteMenuItem.setVisible(true);
@@ -7049,7 +7050,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case R.id.action_menu_do_not_disturb:
 				if (drawerItem == DrawerItem.CHAT){
-					createMuteChatAlertDialog(this);
+					if(getGeneralNotification().equals(NOTIFICATIONS_ENABLED)) {
+						createMuteNotificationsChatAlertDialog(this, MEGACHAT_INVALID_HANDLE);
+					}else{
+						showSnackbar(MUTE_NOTIFICATIONS_SNACKBAR_TYPE, null, -1);
+					}
 				}
 				return true;
 

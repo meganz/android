@@ -1758,9 +1758,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     break;
                 }
                 case R.id.cab_menu_mute:
+                    if (context instanceof ManagerActivityLollipop) {
+                        createMuteNotificationsChatAlertDialog((Activity) context, chats.get(0).getChatId());
+                    }
+                    break;
+
                 case R.id.cab_menu_unmute:
                     if (context instanceof ManagerActivityLollipop) {
-                        createMuteChatRoomAlertDialog(context, chats.get(0).getChatId());
+                        MegaApplication.getInstance().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chats.get(0).getChatId());
                     }
                     break;
 
@@ -1866,18 +1871,15 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
 
-                    if(selected.size() == 1 && context instanceof ManagerActivityLollipop){
-                        MegaChatListItem chat = selected.get(0);
-                        if (chat != null) {
-                            if (isEnableChatNotifications(chat.getChatId())) {
-                                showUnmute = true;
-                                showMute = false;
-                            }else{
-                                showMute = true;
-                                showUnmute = false;
-                            }
+                    if (selected.size() == 1 && context instanceof ManagerActivityLollipop && selected.get(0) != null) {
+                        if (isEnableChatNotifications(selected.get(0).getChatId())) {
+                            showUnmute = true;
+                            showMute = false;
+                        } else {
+                            showMute = true;
+                            showUnmute = false;
                         }
-                    }else{
+                    } else {
                         showMute = false;
                         showUnmute = false;
                     }

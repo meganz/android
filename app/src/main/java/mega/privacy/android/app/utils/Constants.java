@@ -286,6 +286,8 @@ public class Constants {
     public static final String NOTIFICATIONS_1_HOUR = "NOTIFICATIONS_1_HOUR";
     public static final String NOTIFICATIONS_6_HOURS = "NOTIFICATIONS_6_HOURS";
     public static final String NOTIFICATIONS_24_HOURS = "NOTIFICATIONS_24_HOURS";
+    public static final String NOTIFICATIONS_DISABLED_X_TIME = "NOTIFICATIONS_DISABLED_X_TIME";
+    public static final String NOTIFICATIONS_DISABLED = "NOTIFICATIONS_DISABLED";
     public static final String NOTIFICATIONS_DISABLED_UNTIL_TOMORROW = "NOTIFICATIONS_DISABLED_UNTIL_TOMORROW";
     public static final String NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING = "NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING";
 
@@ -415,6 +417,7 @@ public class Constants {
 
     public static final int SNACKBAR_TYPE = 0;
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
+    public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 
     public static final int INFO_ANIMATION = 3000;

@@ -1215,9 +1215,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 			case R.id.chat_contact_properties_layout:
 				if (notificationsSwitch.isChecked()) {
-					createMuteChatRoomAlertDialog(ContactInfoActivityLollipop.this, chatHandle);
+					createMuteNotificationsChatAlertDialog(this, chatHandle);
 				} else {
-					app.controlMuteNotificationsChat(chatHandle, NOTIFICATIONS_ENABLED);
+					app.controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
 				}
 				break;
 

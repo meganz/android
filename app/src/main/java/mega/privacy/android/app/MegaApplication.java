@@ -293,6 +293,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						}else{
 							push = MegaPushNotificationSettings.createInstance();
 						}
+						Intent intent = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+						intent.setAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+						LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
+
 					} else {
 						logError("Chat notification settings cannot be updated");
 					}
@@ -706,45 +710,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		push = newPush;
 	}
 
-	public void controlMuteNotificationsChat(long chatId, String typeMute) {
-		if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
-			push.enableChat(chatId, true);
-		} else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
-			push.setChatDnd(chatId, getCalendarSpecificTime(typeMute).getTimeInMillis());
-		} else {
-			Calendar newCalendar = Calendar.getInstance();
-			newCalendar.setTimeInMillis(System.currentTimeMillis());
-			switch (typeMute) {
-				case NOTIFICATIONS_30_MINUTES:
-					newCalendar.add(Calendar.MINUTE, 30);
-					break;
-				case NOTIFICATIONS_1_HOUR:
-					newCalendar.add(Calendar.HOUR, 1);
-					break;
-				case NOTIFICATIONS_6_HOURS:
-					newCalendar.add(Calendar.HOUR, 6);
-					break;
-				case NOTIFICATIONS_24_HOURS:
-					newCalendar.add(Calendar.HOUR, 24);
-					break;
-				case NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING:
-					getCalendarSpecificTime(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING);
-					break;
-				case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW:
-					break;
-			}
-			push.setChatDnd(chatId, newCalendar.getTimeInMillis());
-		}
-
-		Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-		intentGeneral.setAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
-		intentGeneral.putExtra(MUTE_CHATROOM_ID, chatId);
-		intentGeneral.putExtra(TYPE_MUTE, typeMute);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intentGeneral);
-	}
-
-	public void controlMuteNotifications(Context context, String typeMute) {
-		if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
+	public void controlMuteNotifications(Context context, String typeMute, long chatId) {
+		if(typeMute.equals(NOTIFICATIONS_DISABLED)){
+			push.enableChats(false);
+		}else if (typeMute.equals(NOTIFICATIONS_ENABLED)) {
 			push.enableChats(true);
 		} else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
 			push.setGlobalChatsDnd(getCalendarSpecificTime(typeMute).getTimeInMillis());
@@ -770,15 +739,19 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW:
 					break;
 			}
-
 			push.setGlobalChatsDnd(newCalendar.getTimeInMillis());
 		}
-		megaApi.setPushNotificationSettings(push, null);
-		muteChats(context, typeMute);
-//		Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-//		intentGeneral.setAction(ACTION_UPDATE_MUTE_CHATS_OPTION);
-//		intentGeneral.putExtra(TYPE_MUTE, typeMute);
-//		LocalBroadcastManager.getInstance(this).sendBroadcast(intentGeneral);
+
+		if(chatId == MEGACHAT_INVALID_HANDLE) {
+			megaApi.setPushNotificationSettings(push, null);
+			muteChat(context, chatId, typeMute);
+		}else{
+			Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+			intentGeneral.setAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
+			intentGeneral.putExtra(MUTE_CHATROOM_ID, chatId);
+			intentGeneral.putExtra(TYPE_MUTE, typeMute);
+			LocalBroadcastManager.getInstance(this).sendBroadcast(intentGeneral);
+		}
 	}
 	
 	public MegaApiAndroid getMegaApiFolder(){

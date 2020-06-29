@@ -83,6 +83,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -352,51 +353,49 @@ public class ChatController {
         }
     }
 
-    public void muteChat(long chatHandle, String typeMute) {
-        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-        if (chatPrefs == null) {
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), typeMute, "");
-            dbH.setChatItemPreferences(chatPrefs);
+    /**
+     * Method to silence notifications for all chats or for a specific chat.
+     *
+     * @param chatHandle Chat ID.
+     * @param option     The selected mute option.
+     */
+    public void muteChat(long chatHandle, String option) {
+        if (chatHandle == MEGACHAT_INVALID_HANDLE) {
+            ChatSettings chatSettings = dbH.getChatSettings();
+            if (chatSettings == null) {
+                chatSettings = new ChatSettings();
+                chatSettings.setNotificationsEnabled(option);
+                dbH.setChatSettings(chatSettings);
 
-        } else if (chatPrefs.getNotificationsEnabled() != typeMute) {
-            chatPrefs.setNotificationsEnabled(typeMute);
-            dbH.setNotificationEnabledChatItem(typeMute, Long.toString(chatHandle));
-        }
+            } else if (!chatSettings.getNotificationsEnabled().equals(option)) {
+                chatSettings.setNotificationsEnabled(option);
+                dbH.setNotificationEnabledChat(option);
+            }
+        } else {
+            ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
+            if (chatPrefs == null) {
+                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), option, "");
+                dbH.setChatItemPreferences(chatPrefs);
 
-        if(typeMute.equals(NOTIFICATIONS_ENABLED)) {
-            showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
-        }else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)){
-            showSnackbar(context, getCorrectStringDependingOnCalendar(context, typeMute));
-        }else {
-            String text = getMutedPeriodString(typeMute);
-            if (text != null) {
-                showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+            } else if (!chatPrefs.getNotificationsEnabled().equals(option)) {
+                chatPrefs.setNotificationsEnabled(option);
+                dbH.setNotificationEnabledChatItem(option, Long.toString(chatHandle));
             }
         }
-    }
 
-    public void muteChats(String typeMute){
-        ChatSettings chatSettings = dbH.getChatSettings();
-        if (chatSettings == null) {
-            chatSettings = new ChatSettings();
-            chatSettings.setNotificationsEnabled(typeMute);
-            dbH.setChatSettings(chatSettings);
-
-        } else if (chatSettings.getNotificationsEnabled() != typeMute) {
-            chatSettings.setNotificationsEnabled(typeMute);
-            dbH.setNotificationEnabledChat(typeMute);
-        }
-
-        if(typeMute.equals(NOTIFICATIONS_ENABLED)) {
-            showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
-        }else if (typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || typeMute.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)){
-            showSnackbar(context, getCorrectStringDependingOnCalendar(context, typeMute));
-        }else {
-            String text = getMutedPeriodString(typeMute);
-            if (text != null) {
-                showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+        if (chatHandle != MEGACHAT_INVALID_HANDLE || context instanceof ManagerActivityLollipop) {
+            if (option.equals(NOTIFICATIONS_ENABLED)) {
+                showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+            } else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
+                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+            } else {
+                String text = getMutedPeriodString(option);
+                if (text != null) {
+                    showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+                }
             }
         }
+
     }
 
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {

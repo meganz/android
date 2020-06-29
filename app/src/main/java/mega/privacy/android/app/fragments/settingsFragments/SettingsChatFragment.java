@@ -6,24 +6,28 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
-
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class SettingsChatFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     ChatSettings chatSettings;
 
-    SwitchPreferenceCompat chatNotificationsSwitch;
-    Preference chatSoundPreference;
-    SwitchPreferenceCompat chatVibrateSwitch;
-
-    boolean chatVibration;
+    private SwitchPreferenceCompat chatNotificationsSwitch;
+    private Preference chatSoundPreference;
+    private SwitchPreferenceCompat chatVibrateSwitch;
+    private SwitchPreferenceCompat chatDndSwitch;
 
     public SettingsChatFragment () {
         super();
@@ -31,114 +35,120 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         chatSettings = dbH.getChatSettings();
     }
 
+    public void updateSwitch(){
+        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
+        String option = NOTIFICATIONS_ENABLED;
+        if(pushNotificationSettings != null){
+            if(pushNotificationSettings.isGlobalChatsDndEnabled()){
+                long timestampMute = pushNotificationSettings.getGlobalChatsDnd();
+                if(timestampMute == 0){
+                    option = NOTIFICATIONS_DISABLED;
+                }else{
+                    option = NOTIFICATIONS_DISABLED_X_TIME;
+                }
+            }else{
+                option = NOTIFICATIONS_ENABLED;
+            }
+        }
+
+        if(option.equals(NOTIFICATIONS_DISABLED)){
+            chatDndSwitch.setVisible(false);
+            chatVibrateSwitch.setVisible(false);
+            chatSoundPreference.setVisible(false);
+            return;
+        }
+
+        if(option.equals(NOTIFICATIONS_ENABLED)){
+            chatNotificationsSwitch.setChecked(true);
+        }else{
+            chatNotificationsSwitch.setChecked(false);
+        }
+
+        chatVibrateSwitch.setVisible(true);
+        if(option.equals(NOTIFICATIONS_ENABLED) && (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled()))){
+            dbH.setVibrationEnabledChat(true+"");
+            chatVibrateSwitch.setChecked(true);
+        }else{
+            dbH.setVibrationEnabledChat(false+"");
+            chatVibrateSwitch.setChecked(false);
+        }
+
+        chatSoundPreference.setVisible(true);
+        if (isTextEmpty(chatSettings.getNotificationsSound())) {
+            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
+            chatSoundPreference.setSummary(defaultSound == null ? getString(R.string.settings_chat_silent_sound_not) : defaultSound.getTitle(context));
+        } else if (chatSettings.getNotificationsSound().equals("-1")) {
+            chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
+        } else {
+            String soundString = chatSettings.getNotificationsSound();
+            if (soundString.equals("true")) {
+                Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
+                chatSoundPreference.setSummary(defaultSound2.getTitle(context));
+                dbH.setNotificationSoundChat(defaultSoundUri2.toString());
+
+            } else {
+                Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
+                if (sound != null) {
+                    chatSoundPreference.setSummary(sound.getTitle(context));
+                } else {
+                    logWarning("Sound is null");
+                }
+            }
+        }
+
+        chatDndSwitch.setVisible(true);
+        if(option.equals(NOTIFICATIONS_ENABLED)){
+            chatDndSwitch.setChecked(false);
+            chatDndSwitch.setSummary(getString(R.string.mute_chatroom_notification_option_off));
+            dbH.setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
+        }else{
+            chatDndSwitch.setChecked(true);
+            long timestampMute = pushNotificationSettings.getGlobalChatsDnd();
+            chatDndSwitch.setSummary(mutedChatNotification(timestampMute));
+        }
+
+        getPreferenceScreen().addPreference(chatSoundPreference);
+        getPreferenceScreen().addPreference(chatVibrateSwitch);
+    }
+
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences_chat);
 
-        chatSoundPreference = findPreference(KEY_CHAT_SOUND);
-        chatSoundPreference.setOnPreferenceClickListener(this);
-
-        chatNotificationsSwitch = (SwitchPreferenceCompat) findPreference(KEY_CHAT_NOTIFICATIONS);
+        chatNotificationsSwitch = findPreference(KEY_CHAT_NOTIFICATIONS);
         chatNotificationsSwitch.setOnPreferenceClickListener(this);
 
-        chatVibrateSwitch = (SwitchPreferenceCompat) findPreference(KEY_CHAT_VIBRATE);
+        chatSoundPreference = findPreference(KEY_CHAT_SOUND);
+        chatSoundPreference.setVisible(false);
+        chatSoundPreference.setOnPreferenceClickListener(this);
+
+        chatVibrateSwitch = findPreference(KEY_CHAT_VIBRATE);
+        chatVibrateSwitch.setVisible(false);
         chatVibrateSwitch.setOnPreferenceClickListener(this);
 
+        chatDndSwitch = findPreference(KEY_CHAT_DND);
+        chatDndSwitch.setVisible(false);
+        chatDndSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 
-        if(chatSettings==null){
-            logDebug("Chat settings is NULL");
-            dbH.setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
-            dbH.setVibrationEnabledChat(true+"");
-            dbH.setNotificationSoundChat("");
-            chatVibration = true;
-
-            chatNotificationsSwitch.setChecked(true);
-            chatVibrateSwitch.setChecked(chatVibration);
-
-            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
-            chatSoundPreference.setSummary(defaultSound.getTitle(context));
-        }
-        else{
-            logDebug("There is chat settings");
-            if (chatSettings.getNotificationsEnabled() == null || chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
-                dbH.setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
-                chatNotificationsSwitch.setChecked(true);
-            }
-            else{
-                chatNotificationsSwitch.setChecked(false);
-            }
-
-            if (chatSettings.getVibrationEnabled() == null){
-                dbH.setVibrationEnabledChat(true+"");
-                chatVibration = true;
-                chatVibrateSwitch.setChecked(chatVibration);
-            }
-            else{
-                chatVibration = Boolean.parseBoolean(chatSettings.getVibrationEnabled());
-                chatVibrateSwitch.setChecked(chatVibration);
-            }
-
-//            Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//            Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
-//            chatSoundPreference.setSummary(defaultSound2.getTitle(context));
-//            log("---Notification sound: "+defaultSound2.getTitle(context));
-
-            if (chatSettings.getNotificationsSound() == null){
-                logDebug("Notification sound is NULL");
-                Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-                Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
-                chatSoundPreference.setSummary(defaultSound.getTitle(context));
-            }
-            else if(chatSettings.getNotificationsSound().equals("-1")){
-                chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
-            }
-            else{
-                if(chatSettings.getNotificationsSound().equals("")){
-                    logDebug("Notification sound is EMPTY");
-                    Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-                    Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
-                    if (defaultSound == null) {
-//                        None Mode could not be fetched as default sound in some devices such as Huawei's devices, set Silent as title
-                        logWarning("defaultSound == null");
-                        chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
-                    }
-                    else {
-                        chatSoundPreference.setSummary(defaultSound.getTitle(context));
-                    }
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean switched = ((SwitchPreferenceCompat) preference).isChecked();
+                if(switched){
+                    MegaApplication.getInstance().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
+                }else{
+                    createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), MEGACHAT_INVALID_HANDLE);
                 }
-                else{
-                    String soundString = chatSettings.getNotificationsSound();
-                    logDebug("Sound stored in DB: " + soundString);
-                    Uri uri = Uri.parse(soundString);
-                    logDebug("Uri: " + uri);
-
-                    if(soundString.equals("true")){
-
-                        Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                        Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
-                        chatSoundPreference.setSummary(defaultSound2.getTitle(context));
-                        logDebug("Notification sound: " + defaultSound2.getTitle(context));
-                        dbH.setNotificationSoundChat(defaultSoundUri2.toString());
-                    }
-                    else{
-                        Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
-                        if(sound==null){
-                            logWarning("Sound is null");
-                            chatSoundPreference.setSummary("None");
-                        }
-                        else{
-                            String titleSound = sound.getTitle(context);
-                            logDebug("Notification sound: " + titleSound);
-                            chatSoundPreference.setSummary(titleSound);
-                        }
-                    }
-
-                }
+                return false;
             }
-        }
 
-        setChatPreferences();
+        });
+
+        chatNotificationsSwitch.setChecked(getGeneralNotification().equals(NOTIFICATIONS_ENABLED) ? true : false);
+
+        updateSwitch();
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
@@ -151,40 +161,27 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
+        switch (preference.getKey()){
+            case KEY_CHAT_NOTIFICATIONS:
+                MegaApplication.getInstance().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, MEGACHAT_INVALID_HANDLE);
+                break;
 
-        if (preference.getKey().compareTo(KEY_CHAT_NOTIFICATIONS) == 0){
-            logDebug("KEY_CHAT_NOTIFICATIONS");
-           //Create alert dialog
-//            chatNotifications = !chatNotifications;
-            setChatPreferences();
-        }
-        else if (preference.getKey().compareTo(KEY_CHAT_VIBRATE) == 0){
-            logDebug("KEY_CHAT_VIBRATE");
-            chatVibration = !chatVibration;
-            if (chatVibration){
-                dbH.setVibrationEnabledChat(true+"");
-            }
-            else{
-                dbH.setVibrationEnabledChat(false+"");
-            }
-        }
-        else if (preference.getKey().compareTo(KEY_CHAT_SOUND) == 0){
-            logDebug("KEY_CHAT_SOUND");
+            case KEY_CHAT_VIBRATE:
+                if(chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled())){
+                    dbH.setVibrationEnabledChat(false+"");
+                    chatSettings.setVibrationEnabled(false+"");
+                }else{
+                    dbH.setVibrationEnabledChat(true+"");
+                    chatSettings.setVibrationEnabled(true+"");
+                }
+                break;
 
-            ((ChatPreferencesActivity) context).changeSound(chatSettings.getNotificationsSound());
+            case KEY_CHAT_SOUND:
+                ((ChatPreferencesActivity) context).changeSound(chatSettings.getNotificationsSound());
+                break;
         }
+
         return true;
-    }
-
-    public void setChatPreferences(){
-        if (chatSettings == null){
-            dbH.setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
-        }
-        else{
-            dbH.setNotificationEnabledChat(chatSettings.getNotificationsEnabled());
-        }
-        getPreferenceScreen().addPreference(chatSoundPreference);
-        getPreferenceScreen().addPreference(chatVibrateSwitch);
     }
 
     public void setNotificationSound (Uri uri){

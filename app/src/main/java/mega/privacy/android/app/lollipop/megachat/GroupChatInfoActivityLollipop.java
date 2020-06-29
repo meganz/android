@@ -901,9 +901,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             case R.id.chat_group_contact_properties_layout:{
                 logDebug("Click on switch notifications");
                 if (notificationsSwitch.isChecked()) {
-                    createMuteChatRoomAlertDialog(GroupChatInfoActivityLollipop.this, chatHandle);
+                    createMuteNotificationsChatAlertDialog(this, chatHandle);
                 } else {
-                    app.controlMuteNotificationsChat(chatHandle, NOTIFICATIONS_ENABLED);
+                    app.controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
                 }
                 break;
 

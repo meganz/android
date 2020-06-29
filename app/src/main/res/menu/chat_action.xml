@@ -57,7 +57,13 @@
     <item
         android:id="@+id/cab_menu_mute_chat"
         android:orderInCategory="130"
-        android:title="@string/title_dialog_mute_chatroom_notifications"
+        android:title="@string/general_mute"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_unmute_chat"
+        android:orderInCategory="130"
+        android:title="@string/general_unmute"
         MEGA:showAsAction="never" />
 
 </menu>

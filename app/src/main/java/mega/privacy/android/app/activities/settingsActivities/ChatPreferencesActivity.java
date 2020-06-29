@@ -1,14 +1,17 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
-
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -16,16 +19,32 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
     private SettingsChatFragment sttChat;
 
+    private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
+
+            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+                sttChat.updateSwitch();
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
 
-        aB.setTitle(getString(R.string.section_chat).toUpperCase());
+        aB.setTitle(getString(R.string.title_properties_chat_notifications_contact).toUpperCase());
 
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
+
+        IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
+        filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
     }
 
     public void changeSound(String soundString) {
@@ -49,7 +68,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(soundString));
         }
 
-
         this.startActivityForResult(intent, SELECT_NOTIFICATION_SOUND);
     }
 
@@ -70,5 +88,11 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, intent);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
     }
 }

@@ -1187,12 +1187,13 @@
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
     <string name="success_muting_a_chat_until_this_evening" context="Message when a chat has been muted, until this evening, successfully. For example: Chat notifications will be muted until 7 p.m.">Chat notifications will be muted until %1$s P.M.</string>
     <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 7 a.m.">Chat notifications will be muted until %1$s at %2$s A.M.</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
+    <string name="unmute_button_snackbar" context="Text of a button to unmute the general chat notifications">Unmute</string>
 
     <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
     <string name="chat_notifications_muted_tomorrow" context="String that appears when we show the date until which a specific chat is silenced, this date is on the next day.">Mute until tomorrow %1$s</string>
-
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Message sound</string>
