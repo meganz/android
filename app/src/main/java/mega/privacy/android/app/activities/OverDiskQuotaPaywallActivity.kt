@@ -97,6 +97,10 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         }
     }
 
+    /**
+     * Update the strings of the ODQ Paywall warning dialog with all the info needed.
+     * NOTE: call this method any time the related info is updated.
+     */
     private fun updateStrings() {
 
         val email = megaApi.myEmail
@@ -158,6 +162,10 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         deletionWarningText?.text = result
     }
 
+    /**
+     * Gets the PRO plan needed to be displayed in the ODQ Paywall warning depending on the storage
+     * space used by the user.
+     */
     private fun getProPlanNeeded(): String {
         val plans = app.myAccountInfo.pricing ?: return "PRO"
 
