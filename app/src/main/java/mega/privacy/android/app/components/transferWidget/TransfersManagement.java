@@ -92,13 +92,14 @@ public class TransfersManagement {
 
     /**
      * Checks if the transfers widget has to be shown.
-     * If the widget does not have to be shown means that the user is in transfer over quota
+     * If the widget does not have to be shown means that:
+     * the user is in transfer over quota, there is not any upload transfer in progress
      * and they already opened the transfers section by clicking the widget.
      *
      * @return True if the widget does not have to be shown, false otherwise
      */
     public boolean hasNotToBeShowDueToTransferOverQuota() {
-        return hasNotToBeShowDueToTransferOverQuota;
+        return hasNotToBeShowDueToTransferOverQuota && MegaApplication.getInstance().getMegaApi().getNumPendingUploads() <= 0;
     }
 
     public void setIsOnTransfersSection(boolean isOnTransfersSection) {

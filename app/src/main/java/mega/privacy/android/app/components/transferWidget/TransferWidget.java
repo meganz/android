@@ -104,7 +104,7 @@ public class TransferWidget {
     public void updateState() {
         if (megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)) {
             setPausedTransfers();
-        } else if (isOnTransferOverQuota()){
+        } else if (isOnTransferOverQuota() && megaApi.getNumPendingUploads() <= 0){
             setOverQuotaTransfers();
         } else {
             setProgressTransfers();
@@ -119,6 +119,9 @@ public class TransferWidget {
         if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
             status.setVisibility(VISIBLE);
             status.setImageDrawable(getDrawable(R.drawable.ic_transfers_error));
+        } else if (isOnTransferOverQuota()) {
+            status.setVisibility(VISIBLE);
+            status.setImageDrawable(getDrawable(R.drawable.ic_transfers_overquota));
         } else {
             status.setVisibility(GONE);
         }
