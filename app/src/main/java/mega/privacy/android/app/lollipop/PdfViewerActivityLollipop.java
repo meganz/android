@@ -1561,8 +1561,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 break;
             }
             case R.id.pdf_viewer_share: {
-                if (type == OFFLINE_ADAPTER || type == ZIP_ADAPTER) {
+                if (type == ZIP_ADAPTER) {
                     shareFile(this, new File(uri.toString()));
+                } else if (type == OFFLINE_ADAPTER) {
+                    shareWithUri(this, "pdf", uri);
                 } else if (type == FILE_LINK_ADAPTER) {
                     shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));
                 } else {

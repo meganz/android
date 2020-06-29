@@ -558,6 +558,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please enter the decryption key for the link</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Invalid decryption key</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -1863,6 +1864,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">Storage quota exceeded</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Invalid link password</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">The link you are trying to open is not a valid MEGA link.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Processing link&#8230;</string>
 

@@ -7022,7 +7022,6 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
             this.startActivity(intentOpenChat);
-            finish();
         }
     }
 

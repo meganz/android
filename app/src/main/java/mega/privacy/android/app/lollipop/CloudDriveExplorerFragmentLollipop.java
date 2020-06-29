@@ -56,7 +56,8 @@ import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements OnClickListener{
+public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
+		OnClickListener, CheckScrollInterface {
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -253,16 +254,14 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		handler.removeCallbacksAndMessages(null);
 	}
 
+	@Override
 	public void checkScroll () {
 		if (recyclerView == null) {
 			return;
 		}
-		if (recyclerView.canScrollVertically(-1)){
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-		}
-		else {
-			((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
-		}
+
+		((FileExplorerActivityLollipop) context).changeActionBarElevation(
+				recyclerView.canScrollVertically(-1), FileExplorerActivityLollipop.CLOUD_FRAGMENT);
 	}
 
 	@Override
