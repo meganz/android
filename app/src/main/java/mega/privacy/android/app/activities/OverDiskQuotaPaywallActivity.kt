@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
 
+    private var broadcastManager: LocalBroadcastManager? = null
+
     private var scrollContentLayout: ScrollView? = null
     private var overDiskQuotaPaywallText: TextView? = null
     private var deletionWarningText: TextView? = null
@@ -34,7 +36,10 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(updateUserDataReceiver,
+        broadcastManager = LocalBroadcastManager.getInstance(this)
+        broadcastManager?.registerReceiver(updateAccountDetailsReceiver,
+                IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS))
+        broadcastManager?.registerReceiver(updateUserDataReceiver,
                 IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA))
 
         megaApi.getUserData(GetUserDataListener(this))
@@ -56,6 +61,12 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         upgradeButton?.setOnClickListener(this)
     }
 
+    override fun onDestroy() {
+        broadcastManager?.unregisterReceiver(updateAccountDetailsReceiver)
+        broadcastManager?.unregisterReceiver(updateUserDataReceiver)
+        super.onDestroy()
+    }
+
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.dismiss_button -> {
@@ -74,6 +85,12 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         }
     }
 
+    private val updateAccountDetailsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            updateStrings()
+        }
+    }
+
     private val updateUserDataReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             updateStrings()
@@ -88,7 +105,10 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         val size = app.myAccountInfo.usedFormatted
         val deadlineTs = megaApi.overquotaDeadlineTs
 
-        if (warningsTs.size() == 1) {
+        if (warningsTs == null || warningsTs.size() == 0) {
+            overDiskQuotaPaywallText?.text = getString(R.string.over_disk_quota_paywall_text_no_warning_dates_info,
+                    email, files.toString(), size, getProPlanNeeded())
+        }else if (warningsTs.size() == 1) {
             overDiskQuotaPaywallText?.text = resources.getQuantityString(R.plurals.over_disk_quota_paywall_text, 1,
                     email, formatDate(this, warningsTs.get(0), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         } else {
@@ -106,8 +126,20 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
                     email, dates, formatDate(this, warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false), files, size, getProPlanNeeded())
         }
 
-        var text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning),
-                getHumanizedTime(deadlineTs - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())))
+        var text: String?
+        text = when {
+            deadlineTs > 0 -> {
+                String.format(getString(R.string.over_disk_quota_paywall_deletion_warning),
+                        getHumanizedTime(deadlineTs - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())))
+            }
+            deadlineTs < 0 -> {
+                String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_data))
+            }
+            else -> {
+                String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_time_left))
+            }
+        }
+
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")
@@ -127,7 +159,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     }
 
     private fun getProPlanNeeded(): String {
-        val plans = app.myAccountInfo.pricing
+        val plans = app.myAccountInfo.pricing ?: return "PRO"
 
         val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
 
