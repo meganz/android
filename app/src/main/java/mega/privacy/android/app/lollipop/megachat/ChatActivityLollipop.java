@@ -540,10 +540,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_NICKNAME)) return;
+            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_USER_NAME)) return;
 
             if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) != INVALID_HANDLE) {
-                updateNicknameInChat();
+                updateUserNameInChat();
             }
         }
     };
@@ -693,7 +693,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
-        contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+        contactUpdateFilter.addAction(ACTION_UPDATE_USER_NAME);
         LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
@@ -1354,11 +1354,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void updateNicknameInChat() {
+    public void updateUserNameInChat() {
         if (chatRoom.isGroup()) {
             setChatSubtitle();
         }
         if (adapter != null) {
+            chatRoom = megaChatApi.getChatRoom(idChat);
+            adapter.updateChatRoom(chatRoom);
             adapter.notifyDataSetChanged();
         }
     }

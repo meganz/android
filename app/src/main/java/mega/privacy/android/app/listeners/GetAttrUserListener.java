@@ -30,9 +30,15 @@ public class GetAttrUserListener extends BaseListener {
      * If so, the rest of the actions in onRequestFinish() can be ignored.
      */
     private boolean onlyDBUpdate;
+    private long userHandle = -1;
 
     public GetAttrUserListener(Context context) {
         super(context);
+    }
+
+    public GetAttrUserListener(Context context, long userHandle) {
+        super(context);
+        this.userHandle = userHandle;
     }
 
     /**
@@ -116,12 +122,14 @@ public class GetAttrUserListener extends BaseListener {
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateFirstName(context, request.getText(), request.getEmail());
+                    notifyFirstOrLastNameUpdate(context, userHandle);
                 }
                 break;
 
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateLastName(context, request.getText(), request.getEmail());
+                    notifyFirstOrLastNameUpdate(context, userHandle);
                 }
                 break;
 

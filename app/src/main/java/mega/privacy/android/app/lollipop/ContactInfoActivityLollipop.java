@@ -264,7 +264,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_NICKNAME) || user == null) return;
+			if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_USER_NAME) || user == null) return;
 
 			if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) == user.getHandle()) {
 				checkNickname(user.getHandle());
@@ -621,7 +621,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
 		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
-		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_USER_NAME);
 		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
 	}
 
