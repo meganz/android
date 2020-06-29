@@ -698,7 +698,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        megaApi.startUpload(path,parent,file.getFileName(),lastModified / 1000,this);
+                        megaApi.startUpload(path, parent, CU_UPLOAD, file.getFileName(), lastModified / 1000, this);
                     }
                 } else {
                     dbH.deleteSyncRecordByPath(path,isSec);

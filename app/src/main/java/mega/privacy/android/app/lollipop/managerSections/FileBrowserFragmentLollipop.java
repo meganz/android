@@ -1540,7 +1540,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	public void setTransferOverQuotaBannerVisibility() {
     	if (MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()) {
     		transferOverQuotaBanner.setVisibility(View.VISIBLE);
-    		transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())));
+    		transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay() * 1000)));
 			createAndShowCountDownTimer(R.string.current_text_depleted_transfer_overquota, transferOverQuotaBanner, transferOverQuotaBannerText);
 		} else {
     		transferOverQuotaBanner.setVisibility(View.GONE);

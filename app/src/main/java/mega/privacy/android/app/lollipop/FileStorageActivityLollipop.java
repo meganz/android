@@ -533,8 +533,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		if (path == null) {
-			path = buildExternalStorageFile(DOWNLOAD_DIR);
+			path = buildDefaultDownloadDir(this);
 		}
+
+		path.mkdirs();
 
 		checkPath();
 	}
@@ -969,19 +971,28 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			File f = adapter.getItem(position).getFile();
 
 			if (isFileAvailable(f)) {
-				String type = MimeTypeList.typeForName(f.getName()).getType();
-
 				Intent intent = new Intent(Intent.ACTION_VIEW);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-					intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f), type);
-				} else {
-					intent.setDataAndType(Uri.fromFile(f), type);
-				}
 				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				Uri uri;
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					uri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, f);
+				} else {
+					uri = Uri.fromFile(f);
+				}
+
+				if (uri != null) {
+					intent.setDataAndType(uri, MimeTypeList.typeForName(f.getName()).getType());
+				} else {
+					logWarning("The file cannot be opened, uri is null");
+					return;
+				}
 
 				if (isIntentAvailable(this, intent)) {
 					startActivity(intent);
 				}
+			} else {
+				showSnackbar(viewContainer, getString(R.string.corrupt_video_dialog_text));
 			}
 		}
 	}

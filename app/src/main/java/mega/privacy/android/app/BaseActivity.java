@@ -764,7 +764,7 @@ public class BaseActivity extends AppCompatActivity {
 
         TextView text = dialogView.findViewById(R.id.text_transfer_overquota);
         final int stringResource = MegaApplication.getTransfersManagement().isCurrentTransferOverQuota() ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota;
-        text.setText(getString(stringResource, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())));
+        text.setText(getString(stringResource, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay() * 1000)));
 
         Button dismissButton = dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
         dismissButton.setOnClickListener(v -> transferGeneralOverQuotaWarning.dismiss());

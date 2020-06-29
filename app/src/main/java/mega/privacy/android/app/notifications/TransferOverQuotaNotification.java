@@ -57,7 +57,7 @@ public class TransferOverQuotaNotification {
         PendingIntent clickPendingIntent = PendingIntent.getService(app.getApplicationContext(), 0, clickIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         RemoteViews customView = new RemoteViews(app.getPackageName(), R.layout.notification_transfer_over_quota);
-        customView.setTextViewText(R.id.content_text, app.getString(R.string.current_text_depleted_transfer_overquota, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())));
+        customView.setTextViewText(R.id.content_text, app.getString(R.string.current_text_depleted_transfer_overquota, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay() * 1000)));
         String dismissButtonText = app.getString(isLoggedIn ? R.string.general_dismiss : R.string.login_text);
         customView.setTextViewText(R.id.dismiss_button, dismissButtonText);
         customView.setOnClickPendingIntent(R.id.dismiss_button, dismissIntent);

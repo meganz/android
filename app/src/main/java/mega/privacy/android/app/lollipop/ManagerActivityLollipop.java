@@ -16713,7 +16713,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		int messageResource = R.string.warning_transfer_over_quota;
 
 		transferOverQuotaWarning = builder.setTitle(R.string.label_transfer_over_quota)
-				.setMessage(getString(messageResource, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay())))
+				.setMessage(getString(messageResource, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay() * 1000)))
 				.setPositiveButton(R.string.my_account_upgrade_pro, (dialog, which) -> { navigateToUpgradeAccount();
 				})
 				.setNegativeButton(R.string.general_dismiss, null)

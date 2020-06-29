@@ -1881,8 +1881,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @return The list with the completed transfers.
      */
 	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(){
-		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " ORDER BY " + KEY_TRANSFER_TIMESTAMP + " DESC";
-		return getCompletedTransfers(selectQuery);
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS;
+		ArrayList<AndroidCompletedTransfer> transfers =  getCompletedTransfers(selectQuery);
+		Collections.sort(transfers, (transfer1, transfer2) -> Long.compare(transfer1.getTimeStamp(), transfer2.getTimeStamp()));
+		Collections.reverse(transfers);
+
+		return transfers;
 	}
 
     /**

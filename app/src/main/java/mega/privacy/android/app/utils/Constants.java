@@ -379,6 +379,7 @@ public class Constants {
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+    public static final String CU_UPLOAD = "CU_UPLOAD";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";

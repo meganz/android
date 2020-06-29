@@ -415,24 +415,22 @@ public class TimeUtils implements Comparator<Calendar> {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                long bandwidthOverquotaDelay = megaApi.getBandwidthOverquotaDelay();
-                String textToShow = context.getString(stringResource, formatTimeDDHHMMSS(bandwidthOverquotaDelay));
+                String textToShow = context.getString(stringResource, formatTimeDDHHMMSS(millisUntilFinished));
 
-                if (bandwidthOverquotaDelay > 0) {
-                    if (textView == null) {
-                        alertDialog.setMessage(textToShow);
-                    } else {
-                        textView.setText(textToShow);
-                    }
-                } else if (alertDialog != null) {
-                    alertDialog.dismiss();
-                } else if (v != null) {
-                    v.setVisibility(View.GONE);
+                if (textView == null) {
+                    alertDialog.setMessage(textToShow);
+                } else {
+                    textView.setText(textToShow);
                 }
             }
 
             @Override
             public void onFinish() {
+                if (alertDialog != null) {
+                    alertDialog.dismiss();
+                } else if (v != null) {
+                    v.setVisibility(View.GONE);
+                }
             }
         }.start();
     }
