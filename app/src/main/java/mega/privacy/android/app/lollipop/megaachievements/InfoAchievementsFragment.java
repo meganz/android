@@ -74,7 +74,6 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 	}
 
 	private void updateBarTitle() {
-		if (mActivity == null) return;
 		actionBar = ((AppCompatActivity)mActivity).getSupportActionBar();
 
 		if (actionBar == null) return;
@@ -103,7 +102,6 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 	private void updateUI() {
 		if (sFetcher == null) return;
 		MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
-		Context context = getContext();
 
 		if (details == null || context == null) return;
 

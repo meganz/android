@@ -44,9 +44,11 @@ public class BaseFragment extends Fragment {
         this.context = context;
         mActivity = getActivity();
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
+        if (mActivity != null) {
+            Display display = mActivity.getWindowManager().getDefaultDisplay();
+            outMetrics = new DisplayMetrics();
+            display.getMetrics(outMetrics);
+        }
     }
 
     public DisplayMetrics getOutMetrics() {

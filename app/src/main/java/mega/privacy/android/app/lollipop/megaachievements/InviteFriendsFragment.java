@@ -70,7 +70,7 @@ public class InviteFriendsFragment extends BaseFragment implements OnClickListen
 	public void onClick(View v) {
 		if(v.getId() == R.id.invite_contacts_button) {
 		    logDebug("To InviteContactActivity.");
-            Intent intent = new Intent(getContext(), InviteContactActivity.class);
+            Intent intent = new Intent(context, InviteContactActivity.class);
             intent.putExtra(InviteContactActivity.KEY_FROM, true);
             if (mActivity != null) {
 				mActivity.startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);

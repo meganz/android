@@ -130,10 +130,13 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 	private Button inviteFriendsButton;
 
+	private AchievementsActivity mActivity;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 
+		mActivity = (AchievementsActivity)super.mActivity;
 		boolean enabledAchievements = megaApi.isAchievementsEnabled();
 		logDebug("The achievements are: " + enabledAchievements);
 
@@ -314,7 +317,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		super.onActivityCreated(savedInstanceState);
 
 		if (mActivity != null) {
-			ActionBar actionBar = ((AppCompatActivity)mActivity).getSupportActionBar();
+			ActionBar actionBar = mActivity.getSupportActionBar();
 			if (actionBar != null) {
 				actionBar.setTitle(getString(R.string.achievements_title));
 			}
@@ -329,39 +332,37 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
-		AchievementsActivity activity = (AchievementsActivity) mActivity;
-		if (activity == null) return;
 
 		switch (v.getId()) {
 			case R.id.referral_bonuses_layout:{
 				logDebug("Go to section Referral bonuses");
-				activity.showFragment((transferReferrals > 0 || storageReferrals > 0)
+				mActivity.showFragment((transferReferrals > 0 || storageReferrals > 0)
 						? BONUSES_FRAGMENT : INVITE_FRIENDS_FRAGMENT, INVALID_TYPE);
 				break;
 			}
 			case R.id.install_app_layout:{
 				logDebug("Go to info app install");
-				activity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
+				mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
 				break;
 			}
             case R.id.add_phone_layout:{
                 logDebug("Go to info add phone");
-                activity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+				mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
                 break;
             }
 			case R.id.registration_layout:{
 				logDebug("Go to info registration");
-				activity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
+				mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
 				break;
 			}
 			case R.id.install_desktop_layout:{
 				logDebug("Go to info desktop install");
-				activity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
+				mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 				break;
 			}
 			case R.id.invite_button:{
 				logDebug("Invite friends");
-				activity.showFragment(INVITE_FRIENDS_FRAGMENT, -1);
+				mActivity.showFragment(INVITE_FRIENDS_FRAGMENT, -1);
 				break;
 			}
 		}
