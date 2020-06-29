@@ -7914,6 +7914,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		selectDrawerItemLollipop(drawerItem);
+
+        // Hide fragment (required to check if show ODQ Paywall)
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.hide(upAFL);
+        ft.commitNow();
 	}
 
 	public void backToDrawerItem(int item) {
