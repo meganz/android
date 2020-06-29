@@ -178,7 +178,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         proLiteLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_layout);
         proLiteLayout.setOnClickListener(this);
         titleProLite = (TextView) v.findViewById(R.id.choose_account_prolite_title_text);
-        titleProLite.setText(getString(R.string.prolite_account).toUpperCase());
+        titleProLite.setText(getString(R.string.lite_account).toUpperCase());
         monthSectionProLite = (TextView) v.findViewById(R.id.month_lite);
         storageSectionProLite = (TextView) v.findViewById(R.id.storage_lite);
         bandwidthSectionProLite = (TextView) v.findViewById(R.id.bandwidth_lite);

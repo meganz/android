@@ -167,7 +167,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
      * space used by the user.
      */
     private fun getProPlanNeeded(): String {
-        val plans = app.myAccountInfo.pricing ?: return "PRO"
+        val plans = app.myAccountInfo.pricing ?: return getString(R.string.pro_account)
 
         val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
 
@@ -175,15 +175,15 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
             if (plans.getGBStorage(i) > app.myAccountInfo.usedStorage / gb) {
                 proPlanNeeded = plans.getProLevel(i)
                 return when(plans.getProLevel(i)) {
-                    1 -> "PRO I"
-                    2 -> "PRO II"
-                    3 -> "PRO III"
-                    4 -> "PRO Lite"
-                    else -> "PRO"
+                    1 -> getString(R.string.pro1_account)
+                    2 -> getString(R.string.pro2_account)
+                    3 -> getString(R.string.pro3_account)
+                    4 -> getString(R.string.prolite_account)
+                    else -> getString(R.string.pro_account)
                 }
             }
         }
 
-        return "PRO"
+        return getString(R.string.pro_account)
     }
 }
