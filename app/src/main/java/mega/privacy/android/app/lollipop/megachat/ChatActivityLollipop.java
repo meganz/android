@@ -8354,12 +8354,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         activateChrono(false, callInProgressChrono, call);
         activateChrono(false, subtitleChronoCall, call);
 
-        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
+        if (callInProgressLayout != null) {
             callInProgressLayout.setVisibility(View.GONE);
             callInProgressLayout.setOnClickListener(null);
             setSubtitleVisibility();
         }
-        returnCallOnHoldButton.setVisibility(View.GONE);
+        if(returnCallOnHoldButton != null) {
+            returnCallOnHoldButton.setVisibility(View.GONE);
+        }
     }
 
     /**
