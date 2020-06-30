@@ -4,13 +4,13 @@ package mega.privacy.android.app;
 import java.io.File;
 
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -52,7 +52,7 @@ public class AndroidCompletedTransfer {
         this.nodeHandle = transfer.getNodeHandle() + "";
         this.path = getTransferPath(transfer);
         this.timeStamp = System.currentTimeMillis();
-        this.error = MegaApiJava.getTranslatedErrorString(error);
+        this.error = getTranslatedErrorString(error);
         this.originalPath = transfer.getPath();
         this.parentHandle = transfer.getParentHandle();
     }
