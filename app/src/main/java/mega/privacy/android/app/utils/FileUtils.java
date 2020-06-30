@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.webkit.MimeTypeMap;
+
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
@@ -636,6 +638,21 @@ public class FileUtils {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    /**
+     * Share a file via its Uri.
+     *
+     * @param context Current context.
+     * @param extention The file's extention, for example, pdf, jpg. Use to infer the mimetype.
+     * @param uri The file's Uri.
+     */
+    public static void shareWithUri(Context context, String extention, Uri uri) {
+        Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+        shareIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extention) + "/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }

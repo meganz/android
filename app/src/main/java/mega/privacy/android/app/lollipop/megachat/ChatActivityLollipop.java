@@ -6928,7 +6928,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
             this.startActivity(intentOpenChat);
-            finish();
         }
     }
 
