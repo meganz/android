@@ -144,7 +144,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                         }
                     }
                     Intent intent = new Intent(megaApplication.getApplicationContext(), OverDiskQuotaPaywallActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     megaApplication.startActivity(intent);
                 } else {
                     megaApplication.setStorageState(state);
