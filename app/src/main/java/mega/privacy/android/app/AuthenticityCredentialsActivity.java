@@ -20,7 +20,6 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.VerifyCredentialsListener;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
@@ -28,6 +27,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -299,7 +299,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
             return;
         }
 
-        showSnackbar(MegaApiJava.getTranslatedErrorString(e));
+        showSnackbar(getTranslatedErrorString(e));
     }
 
     /**
@@ -361,7 +361,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
             return;
         }
 
-        showSnackbar(MegaApiJava.getTranslatedErrorString(e));
+        showSnackbar(getTranslatedErrorString(e));
     }
 
     /**
