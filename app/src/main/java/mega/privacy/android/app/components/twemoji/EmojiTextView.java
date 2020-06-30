@@ -92,7 +92,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             .replaceWithImages(getContext(), emojiProcessedText, emojiSize, defaultEmojiSize);
 
         if (mContext == null || (mContext instanceof ContextWrapper
-            && ((ContextWrapper) mContext).getBaseContext() == null) || (textViewMaxWidth == 0)) {
+            && ((ContextWrapper) mContext).getBaseContext() == null) || textViewMaxWidth == 0) {
             super.setText(emojiProcessedText, type);
             return;
         }
@@ -109,12 +109,16 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             return;
         }
 
+        // TextUtils.ellipsize doesn't take care of line break, so we can't use it to get a proper
+        // ellipsized text with it, we have to ellipsize the text manually.
+
         PaddingSpan padding = new PaddingSpan(trailingIconPaddingLeft);
         iconDrawable.setBounds(0, 0, iconDrawable.getIntrinsicWidth(),
             iconDrawable.getIntrinsicHeight());
         ImageSpan icon = new ImageSpan(iconDrawable, ImageSpan.ALIGN_BASELINE);
 
-        // trim it, because trailing whitespace break the trailing icon position
+        // trim it, because trailing whitespace causes extra space between the trailing icon and
+        // non-whitespace character in the name, if the name could fit into two lines.
         int lastNonWhitespaceOffset = emojiProcessedText.length();
         while (lastNonWhitespaceOffset > 0 && Character.isWhitespace(
             emojiProcessedText.charAt(lastNonWhitespaceOffset - 1))) {
@@ -124,10 +128,10 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             lastNonWhitespaceOffset == emojiProcessedText.length() ? emojiProcessedText
                 : emojiProcessedText.subSequence(0, lastNonWhitespaceOffset);
 
-        boolean ellipsized = false;
+        boolean isEllipsizeNecessary = false;
         Layout originLayout = createWorkingLayout(workingText);
         if (originLayout.getLineCount() > maxLines) {
-            ellipsized = true;
+            isEllipsizeNecessary = true;
             // a Unicode character may need two chars to represent, e.g. emoji,
             // but Layout already takes care of it, so it's safe to truncate at line end.
             workingText = workingText.subSequence(0, originLayout.getLineEnd(maxLines - 1));
@@ -141,16 +145,17 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         boolean needManualLineBreak = false;
         while (true) {
             SpannableStringBuilder trialText =
-                buildFinalText(workingText, ellipsized, padding, icon);
+                buildFinalText(workingText, isEllipsizeNecessary, padding, icon);
             Layout trialLayout = createWorkingLayout(trialText);
             if (trialLayout.getLineCount() <= maxLines) {
                 // it fits, good
                 needManualLineBreak =
-                    !ellipsized && trialLayout.getLineCount() > originLayout.getLineCount();
+                    !isEllipsizeNecessary
+                        && trialLayout.getLineCount() > originLayout.getLineCount();
                 break;
             }
 
-            ellipsized = true;
+            isEllipsizeNecessary = true;
             // we need truncate at least one character, then trim trailing whitespace,
             // because we don't want ellipsize after whitespace.
             // and because the last character may takes two chars, we need to take care of it.
@@ -184,7 +189,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
                 .append(workingText.subSequence(breakPos, workingText.length()));
         }
 
-        super.setText(buildFinalText(workingText, ellipsized, padding, icon), type);
+        super.setText(buildFinalText(workingText, isEllipsizeNecessary, padding, icon), type);
     }
 
     private SpannableStringBuilder buildFinalText(CharSequence workingText, boolean ellipsized,
@@ -206,14 +211,29 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     }
 
     /**
-     * Below 2 functions add support for showing an icon drawable at the end of text.
-     * If the text is too long, it will be ellipsized before appending the icon.
+     * Set a trailing icon drawable and its left padding. This can show an icon drawable at the
+     * end of text. If the text is too long, it will be ellipsized before appending the icon.
+     *
+     * To control visibility, check {@link #updateMaxWidthAndIconVisibility(int, boolean)}
+     *
+     * @param trailingIcon icon drawable res id
+     * @param paddingLeft left padding, in px
      */
     public void setTrailingIcon(@DrawableRes int trailingIcon, int paddingLeft) {
         this.trailingIcon = trailingIcon;
         trailingIconPaddingLeft = paddingLeft;
     }
 
+    /**
+     * Control whether this icon should be visible, and also update the max width of the whole text.
+     *
+     * In ContactInfoActivityLollipop, we will display the icon and allow bigger max width if the
+     * tool bar is expanded, and hide the icon and set a smaller max width if the tool bar is
+     * collapsed.
+     *
+     * @param maxWidth max width of the whole text
+     * @param showTrailingIcon whether show the icon or not
+     */
     public void updateMaxWidthAndIconVisibility(int maxWidth, boolean showTrailingIcon) {
         this.showTrailingIcon = showTrailingIcon;
         textViewMaxWidth = maxWidth;
