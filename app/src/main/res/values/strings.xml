@@ -2278,6 +2278,7 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable Encrypted Key Rotation</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">Key rotation is disabled for conversations with more than 100 participants.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Unable to convert this chat to private because the participants limit was exceeded.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] created a chat link.[/B]</string>
@@ -2508,6 +2509,7 @@
 
     <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">Unable to start a call because the participants limit was exceeded.</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Unable to join this call as it has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">Unable to join this call as the group has reached the maximum number of participants.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>

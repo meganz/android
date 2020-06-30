@@ -46,6 +46,7 @@ import static nz.mega.sdk.MegaChatApi.*;
 
 public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<MegaParticipantsChatLollipopAdapter.ViewHolderParticipants> implements OnClickListener {
 
+    private static final int MAX_PARTICIPANTS_CHANGE_TO_PRIVATE = 100;
     private static final int HEADER_POSITION = 0;
     private static final int ADD_PARTICIPANTS_POSITION = 1;
     private static final int COUNT_HEADER_POSITION = 1;
@@ -143,6 +144,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private LinearLayout chatLinkLayout;
         private View chatLinkSeparator;
         private LinearLayout privateLayout;
+        private TextView privateTitle;
+        private TextView privateText;
         private View privateSeparator;
         private RelativeLayout sharedFilesLayout;
         private RelativeLayout clearChatLayout;
@@ -194,6 +197,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 //Private chat
                 holderHeader.privateLayout = v.findViewById(R.id.chat_group_contact_properties_private_layout);
+                holderHeader.privateTitle = v.findViewById(R.id.chat_group_contact_properties_private);
+                holderHeader.privateText = v.findViewById(R.id.chat_group_contact_properties_private_text);
                 holderHeader.privateSeparator = v.findViewById(R.id.divider_private_layout);
 
                 //Chat Shared Files Layout
@@ -314,8 +319,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                         if (getChat().isPublic()) {
                             holderHeader.privateLayout.setVisibility(View.VISIBLE);
-                            holderHeader.privateLayout.setOnClickListener(this);
                             holderHeader.privateSeparator.setVisibility(View.VISIBLE);
+
+                            if (participantsCount <= MAX_PARTICIPANTS_CHANGE_TO_PRIVATE) {
+                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.accentColor));
+                                holderHeader.privateText.setText(R.string.make_chat_private_option_text);
+                                holderHeader.privateLayout.setOnClickListener(this);
+                            } else {
+                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.emoji_icons));
+                                holderHeader.privateText.setText(R.string.make_chat_private_not_available_text);
+                                holderHeader.privateLayout.setOnClickListener(null);
+                            }
                         } else {
                             logDebug("Private getChat()");
                             holderHeader.privateLayout.setVisibility(View.GONE);

@@ -389,11 +389,15 @@ public class CallUtil {
      *
      * @param context   current Context
      * @param call      MegaChatCall to check
+     * @param chat      MegaChatRoom to check
      * @return True if cannot joint to call, false otherwise
      */
-    public static boolean canNotJoinCall(Context context, MegaChatCall call) {
+    public static boolean canNotJoinCall(Context context, MegaChatCall call, MegaChatRoom chat) {
         if (call == null || call.getNumParticipants(MegaChatCall.ANY_FLAG) >= MAX_PARTICIPANTS_IN_CALL) {
             showSnackbar(context, context.getString(R.string.call_error_too_many_participants));
+            return true;
+        } else if (canNotStartCall(context, chat, true)) {
+            showSnackbar(context, context.getString(R.string.call_error_too_many_participants_join));
             return true;
         }
 
@@ -409,8 +413,23 @@ public class CallUtil {
      * @return True if cannot start a call, false otherwise
      */
     public static boolean canNotStartCall(Context context, MegaChatRoom chat) {
+        return canNotStartCall(context, chat, false);
+    }
+
+    /**
+     * Checks if it cannot start a call because has reached the maximum number of participants.
+     * If so, shows a snackbar with a warning.
+     *
+     * @param context   current Context
+     * @param chat      MegaChatRoom to check
+     * @param joining   true if it is related to a join request, false otherwise
+     * @return True if cannot start a call, false otherwise
+     */
+    public static boolean canNotStartCall(Context context, MegaChatRoom chat, boolean joining) {
         if (chat == null || (chat.isPublic() && chat.getPeerCount() + 1 > MAX_PARTICIPANTS_IN_CALL)) {
-            showSnackbar(context, context.getString(R.string.call_error_too_many_participants_start));
+            if (!joining) {
+                showSnackbar(context, context.getString(R.string.call_error_too_many_participants_start));
+            }
             return true;
         }
 

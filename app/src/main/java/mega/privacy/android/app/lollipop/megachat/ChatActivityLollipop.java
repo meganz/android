@@ -2628,7 +2628,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
             }
 
-            if (canNotJoinCall(this, callInThisChat)) return;
+            if (canNotJoinCall(this, callInThisChat, chatRoom)) return;
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                 logDebug("The call in this chat is Ring in");
