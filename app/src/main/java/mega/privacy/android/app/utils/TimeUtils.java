@@ -135,7 +135,7 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      Gets a date formatted string from a timestamp.
      * @param context   Current context.
-     * @param timestamp Timestamp to get the date formatted string.
+     * @param timestamp Timestamp in seconds to get the date formatted string.
      * @return The date formatted string.
      */
     public static String formatDate(Context context, long timestamp){
@@ -145,7 +145,7 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Gets a date formatted string from a timestamp.
      * @param context   Current context.
-     * @param timestamp Timestamp to get the date formatted string.
+     * @param timestamp Timestamp in seconds to get the date formatted string.
      * @param format    Date format.
      * @return The date formatted string.
      */
@@ -156,7 +156,7 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Gets a date formatted string from a timestamp.
      * @param context   Current context.
-     * @param timestamp Timestamp to get the date formatted string.
+     * @param timestamp Timestamp in seconds to get the date formatted string.
      * @param format    Date format.
      * @param humanized Use humanized date format (i.e. today, yesterday or week day).
      * @return The date formatted string.
@@ -174,7 +174,7 @@ public class TimeUtils implements Comparator<Calendar> {
                 df = new SimpleDateFormat("d MMM", locale);
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
-                df = new SimpleDateFormat("MMM d, YYYY", locale);
+                df = new SimpleDateFormat("MMM d, yyyy", locale);
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
                 df = new SimpleDateFormat(getBestDateTimePattern (locale, "YYYY-MM-dd HH:mm"), locale);

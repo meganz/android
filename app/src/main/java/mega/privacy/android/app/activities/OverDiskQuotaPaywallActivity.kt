@@ -13,7 +13,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -25,7 +24,6 @@ import java.util.concurrent.TimeUnit
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
 
-    private var broadcastManager: LocalBroadcastManager? = null
     private var timer: CountDownTimer? = null
 
     private var scrollContentLayout: ScrollView? = null
@@ -40,10 +38,9 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        broadcastManager = LocalBroadcastManager.getInstance(this)
-        broadcastManager?.registerReceiver(updateAccountDetailsReceiver,
+        registerReceiver(updateAccountDetailsReceiver,
                 IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS))
-        broadcastManager?.registerReceiver(updateUserDataReceiver,
+        registerReceiver(updateUserDataReceiver,
                 IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA))
 
         megaApi.getUserData(GetUserDataListener(this))
@@ -66,8 +63,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     }
 
     override fun onDestroy() {
-        broadcastManager?.unregisterReceiver(updateAccountDetailsReceiver)
-        broadcastManager?.unregisterReceiver(updateUserDataReceiver)
+        unregisterReceiver(updateAccountDetailsReceiver)
+        unregisterReceiver(updateUserDataReceiver)
         super.onDestroy()
     }
 
@@ -81,8 +78,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
                 logInfo("Starting upgrade process after Over Disk Quota Paywall")
 
                 val intent: Intent? = Intent(applicationContext, ManagerActivityLollipop::class.java)
-                intent?.putExtra("upgradeAccount", true)
-                intent?.putExtra("accountType", proPlanNeeded)
+                        .putExtra("upgradeAccount", true)
+                        .putExtra("accountType", proPlanNeeded)
                 startActivity(intent)
                 finish()
             }
