@@ -298,10 +298,14 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
 		}
 
-		shareIcon.setVisible(showShareOption(adapterType, isFolderLink, imageHandles.get(positionG)));
+		if(adapterType != OFFLINE_ADAPTER) {
+            shareIcon.setVisible(showShareOption(adapterType, isFolderLink, imageHandles.get(positionG)));
+        }
 
 		if (adapterType == OFFLINE_ADAPTER){
 			getlinkIcon.setVisible(false);
+			// In offline section, share should be always showing.
+            shareIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 			removelinkIcon.setVisible(false);

@@ -380,6 +380,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 					break;
 				}
+				case R.id.cab_menu_send_to_chat:{
+					logDebug("Send files to chat");
+					// For adapterGrid, please go to MegaPhotoSyncGridTitleAdapterLollipop
+					NodeController nC = new NodeController(context);
+					ArrayList<Long> handleList = new ArrayList();
+					for (PhotoSyncHolder holder : documentsList) {
+						handleList.add(holder.handle);
+					}
+					nC.checkIfHandlesAreMineAndSelectChatsToSendNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 
@@ -464,6 +477,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			boolean showLink = false;
 			boolean showTrash = false;
 			boolean showRemoveLink = false;
+			boolean showSendToChat = false;
 
 			if(adapterList!=null) {
 				logDebug("LIST onPrepareActionMode");
@@ -491,6 +505,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					showTrash = true;
 					showMove = true;
 					showCopy = true;
+					showSendToChat = true;
 
 					for(int i=0; i<selected.size();i++)	{
 						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).handle), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -537,16 +552,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					}
 				}
-				menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-				menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-				menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-				menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-				menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-				menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-
-				menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
-
 			}
 			else if(adapterGrid!=null){
 				logDebug("GRID onPrepareActionMode");
@@ -571,6 +576,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					showTrash = true;
 					showMove = true;
 					showCopy = true;
+					showSendToChat = true;
+
 					for(int i=0; i<selected.size();i++)	{
 						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).getHandle()), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 							showTrash = false;
@@ -628,12 +635,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+
+			if (showSendToChat) {
+				menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
+			}
 
 			return false;
 		}
