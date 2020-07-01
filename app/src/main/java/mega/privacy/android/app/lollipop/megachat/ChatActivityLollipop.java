@@ -607,21 +607,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
                 muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
-
-            }else {
-                long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
-                if (chatId == MEGACHAT_INVALID_HANDLE || chatId != chatRoom.getChatId()) {
-                    logWarning("Different chat");
-                    return;
-                }
-
-                if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
-                    newMuteOption = intent.getStringExtra(TYPE_MUTE);
-                    MegaPushNotificationSettings megaPushNotificationSettings = app.getPushNotificationSetting();
-                    if(megaPushNotificationSettings != null) {
-                        megaApi.setPushNotificationSettings(megaPushNotificationSettings, ChatActivityLollipop.this);
-                    }
-                }
             }
         }
     };
@@ -737,7 +722,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
         filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-        filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
@@ -7649,23 +7633,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 else{
                     logDebug("Attribute USER_ATTR_GEOLOCATION disabled");
                     MegaApplication.setEnabledGeoLocation(false);
-                }
-            }else if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    if(newMuteOption != null) {
-                        MegaPushNotificationSettings megaPushNotificationSettings;
-                        if(request.getMegaPushNotificationSettings() != null){
-                            megaPushNotificationSettings = request.getMegaPushNotificationSettings().copy();
-                        }else{
-                            megaPushNotificationSettings = MegaPushNotificationSettings.createInstance();
-                        }
-                        app.setPushNotificationSetting(megaPushNotificationSettings);
-                        muteChat(this, chatRoom.getChatId(), newMuteOption);
-                        muteIconToolbar.setVisibility(newMuteOption.equals(NOTIFICATIONS_ENABLED) ? View.GONE : View.VISIBLE);
-                        newMuteOption = null;
-                    }
-                } else {
-                    logError("Chat notification settings cannot be updated");
                 }
             }
         }

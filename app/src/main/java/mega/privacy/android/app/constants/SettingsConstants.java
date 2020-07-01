@@ -19,7 +19,6 @@ public class SettingsConstants {
 
     public static final String CATEGORY_PIN_LOCK = "settings_pin_lock";
     public static final String CATEGORY_CHAT_ENABLED = "settings_chat";
-    public static final String CATEGORY_CHAT_NOTIFICATIONS = "settings_notifications_chat";
     public static final String CATEGORY_STORAGE = "settings_storage";
     public static final String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
     public static final String CATEGORY_ADVANCED_FEATURES = "advanced_features";

@@ -277,20 +277,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
 				checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
-			} else {
-				long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
-				if (chatId == MEGACHAT_INVALID_HANDLE || chatId != chatHandle) {
-					logWarning("Different chat");
-					return;
-				}
-
-				if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
-					newMuteOption = intent.getStringExtra(TYPE_MUTE);
-					MegaPushNotificationSettings megaPushNotificationSettings = app.getPushNotificationSetting();
-					if (megaPushNotificationSettings != null) {
-						megaApi.setPushNotificationSettings(megaPushNotificationSettings, ContactInfoActivityLollipop.this);
-					}
-				}
 			}
 		}
 	};
@@ -615,7 +601,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
 		filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-		filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
 		LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 	}
 
@@ -1522,25 +1507,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
-			if (e.getErrorCode() == MegaError.API_OK) {
-				if (newMuteOption != null) {
-					MegaPushNotificationSettings megaPushNotificationSettings;
-					if (request.getMegaPushNotificationSettings() != null) {
-						megaPushNotificationSettings = request.getMegaPushNotificationSettings().copy();
-					} else {
-						megaPushNotificationSettings = MegaPushNotificationSettings.createInstance();
-					}
-					app.setPushNotificationSetting(megaPushNotificationSettings);
-
-					muteChat(this, chatHandle, newMuteOption);
-					newMuteOption = null;
-					updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle);
-				}
-			} else {
-				logError("Chat notification settings cannot be updated");
-			}
-		}else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
+		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
 			logDebug("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK) {
 				File avatar = buildAvatarFile(this, request.getEmail() + ".jpg");

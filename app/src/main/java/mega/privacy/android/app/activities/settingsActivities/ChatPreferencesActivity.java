@@ -9,8 +9,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
+
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -33,15 +35,12 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
-
         super.onCreate(savedInstanceState);
 
         aB.setTitle(getString(R.string.title_properties_chat_notifications_contact).toUpperCase());
 
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
-
         IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
         filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);

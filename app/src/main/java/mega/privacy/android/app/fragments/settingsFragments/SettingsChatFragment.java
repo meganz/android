@@ -35,8 +35,48 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         chatSettings = dbH.getChatSettings();
     }
 
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        addPreferencesFromResource(R.xml.preferences_chat);
+
+        chatNotificationsSwitch = findPreference(KEY_CHAT_NOTIFICATIONS);
+        chatNotificationsSwitch.setOnPreferenceClickListener(this);
+
+        chatSoundPreference = findPreference(KEY_CHAT_SOUND);
+        chatSoundPreference.setVisible(false);
+        chatSoundPreference.setOnPreferenceClickListener(this);
+
+        chatVibrateSwitch = findPreference(KEY_CHAT_VIBRATE);
+        chatVibrateSwitch.setVisible(false);
+        chatVibrateSwitch.setOnPreferenceClickListener(this);
+
+        chatDndSwitch = findPreference(KEY_CHAT_DND);
+        chatDndSwitch.setVisible(false);
+        chatDndSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
+            boolean switched = ((SwitchPreferenceCompat) preference).isChecked();
+            if(switched){
+                MegaApplication.getInstance().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
+            }else{
+                createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), MEGACHAT_INVALID_HANDLE);
+            }
+            return false;
+        });
+
+        chatNotificationsSwitch.setChecked(getGeneralNotification().equals(NOTIFICATIONS_ENABLED) ? true : false);
+
+        updateSwitch();
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+    }
+
+    /**
+     * Method to update the UI items when the Push notification Settings change.
+     */
     public void updateSwitch(){
         MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
+
         String option = NOTIFICATIONS_ENABLED;
         if(pushNotificationSettings != null){
             if(pushNotificationSettings.isGlobalChatsDndEnabled()){
@@ -78,7 +118,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
             Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
             chatSoundPreference.setSummary(defaultSound == null ? getString(R.string.settings_chat_silent_sound_not) : defaultSound.getTitle(context));
-        } else if (chatSettings.getNotificationsSound().equals("-1")) {
+        } else if (chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
             chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
         } else {
             String soundString = chatSettings.getNotificationsSound();
@@ -111,48 +151,6 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
 
         getPreferenceScreen().addPreference(chatSoundPreference);
         getPreferenceScreen().addPreference(chatVibrateSwitch);
-    }
-
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.preferences_chat);
-
-        chatNotificationsSwitch = findPreference(KEY_CHAT_NOTIFICATIONS);
-        chatNotificationsSwitch.setOnPreferenceClickListener(this);
-
-        chatSoundPreference = findPreference(KEY_CHAT_SOUND);
-        chatSoundPreference.setVisible(false);
-        chatSoundPreference.setOnPreferenceClickListener(this);
-
-        chatVibrateSwitch = findPreference(KEY_CHAT_VIBRATE);
-        chatVibrateSwitch.setVisible(false);
-        chatVibrateSwitch.setOnPreferenceClickListener(this);
-
-        chatDndSwitch = findPreference(KEY_CHAT_DND);
-        chatDndSwitch.setVisible(false);
-        chatDndSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean switched = ((SwitchPreferenceCompat) preference).isChecked();
-                if(switched){
-                    MegaApplication.getInstance().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
-                }else{
-                    createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), MEGACHAT_INVALID_HANDLE);
-                }
-                return false;
-            }
-
-        });
-
-        chatNotificationsSwitch.setChecked(getGeneralNotification().equals(NOTIFICATIONS_ENABLED) ? true : false);
-
-        updateSwitch();
-
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
     }
 
     @Override

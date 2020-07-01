@@ -80,6 +80,7 @@ import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
+import static mega.privacy.android.app.utils.ChatUtil.getGeneralNotification;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -106,7 +107,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	PreferenceScreen preferenceScreen;
 	PreferenceCategory pinLockCategory;
 	PreferenceCategory chatEnabledCategory;
-	PreferenceCategory chatNotificationsCategory;
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
 	PreferenceCategory advancedFeaturesCategory;
@@ -223,7 +223,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		cameraUploadCategory = (PreferenceCategory) findPreference(CATEGORY_CAMERA_UPLOAD);
 		pinLockCategory = (PreferenceCategory) findPreference(CATEGORY_PIN_LOCK);
 		chatEnabledCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_ENABLED);
-		chatNotificationsCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_NOTIFICATIONS);
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
@@ -265,8 +264,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		nestedNotificationsChat = findPreference(KEY_CHAT_NESTED_NOTIFICATIONS);
 		nestedNotificationsChat.setOnPreferenceClickListener(this);
+		nestedNotificationsChat.setOnPreferenceChangeListener(this);
+		updateNotifChat();
 
-		nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
+        nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
 		nestedDownloadLocation.setOnPreferenceClickListener(this);
 
 		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
@@ -966,7 +967,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 	public void setOnlineOptions(boolean isOnline){
 		chatEnabledCategory.setEnabled(isOnline);
-		chatNotificationsCategory.setEnabled(isOnline);
+		nestedNotificationsChat.setEnabled(isOnline);
 		autoawayChatCategory.setEnabled(isOnline);
 		persistenceChatCategory.setEnabled(isOnline);
 		cameraUploadCategory.setEnabled(isOnline);
@@ -1140,6 +1141,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
 			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+
+		} else if (preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0) {
+			updateNotifChat();
 		}
 		return true;
 	}
@@ -1483,20 +1487,20 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
-		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-		        //create default chat summary channel
-				ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
-		        //to system channel settings page
-                Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
-                intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
-                // change the setting of chat summary channel
-                intent.putExtra(Settings.EXTRA_CHANNEL_ID, NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2);
-                startActivity(intent);
-            } else {
+//		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//		        //create default chat summary channel
+//				ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
+//		        //to system channel settings page
+//                Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+//                intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+//                // change the setting of chat summary channel
+//                intent.putExtra(Settings.EXTRA_CHANNEL_ID, NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2);
+//                startActivity(intent);
+//            } else {
                 //Intent to new activity Chat Settings
                 Intent i = new Intent(context, ChatPreferencesActivity.class);
                 startActivity(i);
-            }
+//            }
 		} else if (preference.getKey().equals(KEY_STORAGE_DOWNLOAD)) {
 			startActivity(new Intent(context, DownloadPreferencesActivity.class));
 		} else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
@@ -1660,8 +1664,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             boolean isChecked = autoPlaySwitch.isChecked();
 			logDebug("Is auto play checked " + isChecked);
             dbH.setAutoPlayEnabled(String.valueOf(isChecked));
-
         }
+
 		return true;
 	}
 
@@ -1973,6 +1977,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		startActivity(intent);
 	}
 
+	public void updateNotifChat(){
+		nestedNotificationsChat.setSummary(getGeneralNotification().equals(NOTIFICATIONS_ENABLED) ? getString(R.string.mute_chat_notification_option_on) : getString(R.string.mute_chatroom_notification_option_off));
+	}
+
 	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){
 		logDebug("updatePresenceConfigChat: " + cancelled);
 
@@ -2154,7 +2162,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	public void hidePreferencesChat(){
 		logDebug("hidePreferencesChat");
 
-		getPreferenceScreen().removePreference(chatNotificationsCategory);
+		getPreferenceScreen().removePreference(nestedNotificationsChat);
 		getPreferenceScreen().removePreference(autoawayChatCategory);
 		getPreferenceScreen().removePreference(persistenceChatCategory);
 		chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);

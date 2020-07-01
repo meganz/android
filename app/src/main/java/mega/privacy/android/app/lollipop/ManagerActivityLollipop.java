@@ -1336,21 +1336,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (rChatFL != null && rChatFL.isVisible()) {
 					rChatFL.notifyPushChanged();
 				}
-            }else {
-                long chatId = intent.getLongExtra(MUTE_CHATROOM_ID, MEGACHAT_INVALID_HANDLE);
-                if (chatId == MEGACHAT_INVALID_HANDLE) {
-                    logWarning("Different chat");
-                    return;
-                }
-
-                if (intent.getAction().equals(ACTION_UPDATE_MUTE_CHAT_OPTION)) {
-                    newMuteOption = intent.getStringExtra(TYPE_MUTE);
-					newMuteOptionChat = chatId;
-					MegaPushNotificationSettings megaPushNotificationSettings = app.getPushNotificationSetting();
-					if(megaPushNotificationSettings != null) {
-						megaApi.setPushNotificationSettings(megaPushNotificationSettings, ManagerActivityLollipop.this);
-					}
-                }
+				if(getSettingsFragment() != null){
+					sttFLol.updateNotifChat();
+				}
             }
         }
     };
@@ -2010,7 +1998,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
             IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
             filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-            filterMuteChatRoom.addAction(ACTION_UPDATE_MUTE_CHAT_OPTION);
             LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
@@ -4137,13 +4124,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		else{
 			logError("Error, chat id is -1");
-		}
-	}
-
-	public void showMuteIcon(long chatId){
-		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-		if (rChatFL != null && rChatFL.isVisible()) {
-			rChatFL.showMuteIcon(chatId);
 		}
 	}
 
@@ -13574,26 +13554,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 				}
 			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
-				if (e.getErrorCode() == MegaError.API_OK) {
-					if (newMuteOption != null && newMuteOptionChat != MEGACHAT_INVALID_HANDLE) {
-						MegaPushNotificationSettings megaPushNotificationSettings;
-						if(request.getMegaPushNotificationSettings() != null){
-							megaPushNotificationSettings = request.getMegaPushNotificationSettings().copy();
-						}else{
-							megaPushNotificationSettings = MegaPushNotificationSettings.createInstance();
-						}
-						app.setPushNotificationSetting(megaPushNotificationSettings);
-						muteChat(this, newMuteOptionChat, newMuteOption);
-						showMuteIcon(newMuteOptionChat);
-						newMuteOption = null;
-						newMuteOptionChat = MEGACHAT_INVALID_HANDLE;
-					}
-				} else {
-					logError("Chat notification settings cannot be updated");
-				}
 
-			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
