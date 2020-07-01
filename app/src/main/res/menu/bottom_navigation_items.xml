@@ -12,18 +12,17 @@
 		android:title="@string/section_photo_sync"/>
 
 	<item
+		android:id="@+id/bottom_navigation_item_homepage"
+		android:icon="@drawable/ic_homepage"
+		android:title="@string/section_homepage"/>
+
+	<item
 		android:id="@+id/bottom_navigation_item_chat"
 		android:icon="@drawable/ic_chat"
-		android:title="@string/section_chat"/>
+		android:title="@string/section_chat" />
 
 	<item
 		android:id="@+id/bottom_navigation_item_shared_items"
 		android:icon="@drawable/ic_shared"
-		android:title="@string/title_shared_items"/>
-
-	<item
-		android:id="@+id/bottom_navigation_item_offline"
-		android:icon="@drawable/ic_saved"
-		android:title="@string/section_saved_for_offline_new"/>
-
+		android:title="@string/title_shared_items" />
 </menu>
