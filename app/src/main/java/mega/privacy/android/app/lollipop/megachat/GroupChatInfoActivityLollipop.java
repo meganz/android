@@ -258,9 +258,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             long peerHandle = chat.getPeerHandle(i);
-            String fullName = chatC.getParticipantFullName(peerHandle);
-            String participantEmail = chatC.getParticipantEmail(peerHandle);
-            MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege);
+            MegaChatParticipant participant = new MegaChatParticipant(peerHandle, peerPrivilege);
             participants.add(participant);
 
             int userStatus = getUserStatus(peerHandle);
@@ -1289,6 +1287,16 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     /**
+     * Updates a participant in the participants' list.
+     *
+     * @param position      position of the participant in the list
+     * @param participant   MegaChatParticipant to update
+     */
+    public void updateParticipant(int position, MegaChatParticipant participant) {
+        participants.set(position, participant);
+    }
+
+    /**
      * Checks if a participant has attributes.
      * If so, the mail and full name do not have to be empty.
      *
@@ -1332,5 +1340,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public boolean isChatMuted() {
         return chatMuted;
+    }
+
+    public ChatController getChatC() {
+        return chatC;
     }
 }

@@ -40,6 +40,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaChatApi.*;
@@ -69,6 +70,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     private long chatId;
     private boolean isPreview;
 
+    private ChatController chatC;
+
     public MegaParticipantsChatLollipopAdapter(GroupChatInfoActivityLollipop groupChatInfoActivity, ArrayList<MegaChatParticipant> participants, RecyclerView listView) {
         this.groupChatInfoActivity = groupChatInfoActivity;
         this.participants = participants;
@@ -82,6 +85,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         Display display = groupChatInfoActivity.getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        chatC = groupChatInfoActivity.getChatC();
     }
 
     /*private view holder class*/
@@ -386,13 +391,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 MegaChatParticipant participant = getParticipant(position);
                 if (participant == null) return;
 
-                MegaUser contact = megaApi.getContact(participant.getEmail());
-                holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
-
                 holderParticipantsList.currentPosition = position;
                 holderParticipantsList.imageView.setImageBitmap(null);
 
                 checkParticipant(position, participant);
+
+                MegaUser contact = participant.isEmpty() ? null : megaApi.getContact(participant.getEmail());
+                holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
+
                 holderParticipantsList.contactMail = participant.getEmail();
                 holderParticipantsList.userHandle = MegaApiAndroid.userHandleToBase64(participant.getHandle());
                 holderParticipantsList.fullName = participant.getFullName();
@@ -478,6 +484,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
      * @return True if the current chat is not a preview and if the user is moderator, false otherwise.
      */
     private boolean isNotPreviewAndLastParticipantModerator() {
+        if (participants.isEmpty()) {
+            return false;
+        }
+
         return !isPreview && participants.get(participants.size() - 1).getPrivilege() == MegaChatRoom.PRIV_MODERATOR;
     }
 
@@ -653,6 +663,27 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
      * @param participant   the participant to check.
      */
     private void checkParticipant(int position, MegaChatParticipant participant) {
+        if (participant.isEmpty()) {
+            long handle = participant.getHandle();
+
+            String fullName = chatC.getParticipantFullName(handle);
+            if (!isTextEmpty(fullName)) {
+                participant.setFullName(fullName);
+            }
+
+            String email = chatC.getParticipantEmail(handle);
+            if (!isTextEmpty(email)) {
+                participant.setEmail(email);
+            }
+
+            if (groupChatInfoActivity.hasParticipantAttributes(participant)) {
+                participant.setEmpty(false);
+                int arrayPosition = getParticipantPositionInArray(position);
+                groupChatInfoActivity.updateParticipant(arrayPosition, participant);
+                participants.set(position, participant);
+            }
+        }
+
         if (!groupChatInfoActivity.hasParticipantAttributes(participant)) {
             groupChatInfoActivity.addParticipantRequest(position, participant);
         }
