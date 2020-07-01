@@ -196,7 +196,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         PaddingSpan padding, ImageSpan icon) {
         SpannableStringBuilder finalText = new SpannableStringBuilder(workingText);
         // the two whitespace are placeholder chars for padding and icon span
-        finalText.append(ellipsized ? "...  " : "  ");
+        finalText.append(ellipsized ? "\u2026  " : "  ");
         finalText.setSpan(padding, finalText.length() - 2, finalText.length() - 1,
             Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         finalText.setSpan(icon, finalText.length() - 1, finalText.length(),
