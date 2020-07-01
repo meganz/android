@@ -283,10 +283,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         checkInitialCallStatus();
-        if (checkPermissions()) {
-            showInitialFABConfiguration();
-        }
-
+        showInitialFABConfiguration();
         checkCallOnHold();
         updateAnotherCallOnHoldBar(callChat.getChatid());
     }
@@ -496,10 +493,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
 
             updateCall(callIdReceived);
-
             if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-                logDebug("The call status is "+callStatusToString(callStatus));
+                logDebug("The call status is "+callStatusToString(callStatus)+".  Call id "+callChat);
                 if (callStatus != INVALID_CALL_STATUS) {
                     switch (callStatus) {
                         case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM:
@@ -1336,7 +1332,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private boolean checkPermissions() {
-        logDebug("Camera && Audio");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
             if (!hasCameraPermission) {
@@ -1348,7 +1343,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
                 return false;
             }
-            return true;
         }
         return true;
     }
@@ -1360,6 +1354,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (getCall() == null)
             return;
 
+        if(!checkPermissions()){
+            rejectFAB.hide();
+            answerCallFAB.hide();
+            microFAB.hide();
+            videoFAB.hide();
+            hangFAB.show();
+            onHoldFAB.hide();
+            return;
+        }
         logDebug("Call Status "+callStatusToString(callChat.getStatus()));
 
         if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
@@ -2057,32 +2060,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        logDebug("onRequestPermissionsResult");
-
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case REQUEST_CAMERA: {
-                logDebug("REQUEST_CAMERA");
+            case REQUEST_CAMERA:
+            case RECORD_AUDIO:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (checkPermissions()) {
-                        showInitialFABConfiguration();
-                    }
+                    showInitialFABConfiguration();
                 } else {
-                    rejectFAB.show();
+                    hangFAB.show();
                 }
                 break;
-            }
-            case RECORD_AUDIO: {
-                logDebug("RECORD_AUDIO");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (checkPermissions()) {
-                        showInitialFABConfiguration();
-                    }
-                } else {
-                    rejectFAB.show();
-                }
-                break;
-            }
         }
     }
 
@@ -2455,7 +2442,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             cameraFragmentPeerSelected.showMuteIcon(peerSelected.getPeerId(), peerSelected.getClientId());
         }
     }
-
     private void clearHandlers() {
         logDebug("clearHandlers");
         if (handlerArrow1 != null) {

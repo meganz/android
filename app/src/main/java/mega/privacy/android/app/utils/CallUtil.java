@@ -205,6 +205,9 @@ public class CallUtil {
         }
 
         MegaChatCall call = megaChatApi.getChatCall(chatId);
+        if(call == null)
+            return;
+
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
             logDebug("Displayed the Reconnecting call layout");
             activateChrono(false, callInProgressChrono, null);
