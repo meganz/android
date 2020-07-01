@@ -16467,7 +16467,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     }
 
-    private void showAddPhoneNumberInMenu(){
+    public void showAddPhoneNumberInMenu(){
 	    if(megaApi == null){
 	        return;
         }
