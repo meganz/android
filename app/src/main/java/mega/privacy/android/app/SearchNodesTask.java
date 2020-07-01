@@ -158,9 +158,9 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                         }
                         break;
                     }
-                    case SAVED_FOR_OFFLINE: {
-                        break;
-                    }
+//                    case SAVED_FOR_OFFLINE: {
+//                        break;
+//                    }
                     case RUBBISH_BIN: {
                         parentHandle = managerA.getParentHandleRubbish();
                         if (parentHandle == INVALID_HANDLE) {
