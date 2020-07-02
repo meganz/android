@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
-import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
@@ -54,7 +53,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatAudioManager;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -84,6 +82,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuaotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -211,17 +210,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				MegaError e) {
 			logDebug("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
-			// If receive the API_EPAYWALL error at any request should display the ODQ Paywall
 			if (e.getErrorCode() == MegaError.API_EPAYWALL) {
-				if (getCurrentActivity() instanceof ManagerActivityLollipop) {
-					UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) getCurrentActivity()).getUpgradeAccountFragment();
-					if (upAFL != null && upAFL.isVisible()) {
-						return;
-					}
-				}
-				Intent intent = new Intent(getApplicationContext(), OverDiskQuotaPaywallActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
+				showOverDiskQuaotaPaywallWarning();
 				return;
 			}
 

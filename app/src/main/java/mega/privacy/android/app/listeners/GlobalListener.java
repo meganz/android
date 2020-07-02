@@ -7,10 +7,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -20,6 +17,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuaotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
@@ -137,15 +135,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
                     api.getAccountDetails(null);
                 } else if (state == MegaApiJava.STORAGE_STATE_PAYWALL) {
-                    if (megaApplication.getCurrentActivity() instanceof ManagerActivityLollipop) {
-                        UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) megaApplication.getCurrentActivity()).getUpgradeAccountFragment();
-                        if (upAFL != null && upAFL.isVisible()) {
-                            break;
-                        }
-                    }
-                    Intent intent = new Intent(megaApplication.getApplicationContext(), OverDiskQuotaPaywallActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    megaApplication.startActivity(intent);
+                    megaApplication.setStorageState(state);
+                    showOverDiskQuaotaPaywallWarning();
                 } else {
                     megaApplication.setStorageState(state);
 
