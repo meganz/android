@@ -8008,8 +8008,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         destroyAudioRecorderElements();
         if(adapter!=null) {
-            adapter.stopAllReproductionsInProgress();
-            adapter.destroyVoiceElemnts();
+            adapter.pausePlaybackInProgress();
         }
         hideKeyboard();
         activityVisible = false;
