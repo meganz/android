@@ -79,7 +79,6 @@ import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;

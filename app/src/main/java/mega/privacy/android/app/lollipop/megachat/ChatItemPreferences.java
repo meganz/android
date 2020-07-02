@@ -4,12 +4,10 @@ package mega.privacy.android.app.lollipop.megachat;
 public class ChatItemPreferences {
 
     String chatHandle = "";
-    String typeMuteNotifications = "";
     String writtenText = "";
 
-    public ChatItemPreferences(String chatHandle, String typeMuteNotifications, String writtenText) {
+    public ChatItemPreferences(String chatHandle, String writtenText) {
         this.chatHandle = chatHandle;
-        this.typeMuteNotifications = typeMuteNotifications;
         this.writtenText = writtenText;
     }
 
@@ -19,14 +17,6 @@ public class ChatItemPreferences {
 
     public void setChatHandle(String chatHandle) {
         this.chatHandle = chatHandle;
-    }
-
-    public String getNotificationsEnabled() {
-        return typeMuteNotifications;
-    }
-
-    public void setNotificationsEnabled(String typeMuteNotifications) {
-        this.typeMuteNotifications = typeMuteNotifications;
     }
 
     public String getWrittenText() {

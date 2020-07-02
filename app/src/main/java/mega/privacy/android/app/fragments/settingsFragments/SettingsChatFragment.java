@@ -142,7 +142,6 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         if(option.equals(NOTIFICATIONS_ENABLED)){
             chatDndSwitch.setChecked(false);
             chatDndSwitch.setSummary(getString(R.string.mute_chatroom_notification_option_off));
-            dbH.setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
         }else{
             chatDndSwitch.setChecked(true);
             long timestampMute = pushNotificationSettings.getGlobalChatsDnd();

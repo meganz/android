@@ -41,7 +41,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -558,29 +557,22 @@ public class ChatUtil {
         if (pushNotificationSettings != null) {
             if (!pushNotificationSettings.isGlobalChatsDndEnabled() || pushNotificationSettings.getGlobalChatsDnd() == -1) {
                 ChatSettings chatSettings = MegaApplication.getInstance().getDbH().getChatSettings();
-                if (chatSettings != null) {
-                    if (chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
-                        chatSettings.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
-                        MegaApplication.getInstance().getDbH().setNotificationEnabledChat(NOTIFICATIONS_ENABLED);
-                    }
-                } else {
+                if (chatSettings == null) {
                     chatSettings = new ChatSettings();
                     MegaApplication.getInstance().getDbH().setChatSettings(chatSettings);
                 }
 
                 return NOTIFICATIONS_ENABLED;
             }
-            if (pushNotificationSettings.getGlobalChatsDnd() == 0) {
-                ChatSettings chatSettings = MegaApplication.getInstance().getDbH().getChatSettings();
-                if (chatSettings != null || !chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_DISABLED)) {
-                    chatSettings.setNotificationsEnabled(NOTIFICATIONS_DISABLED);
-                }
 
+            if (pushNotificationSettings.getGlobalChatsDnd() == 0) {
                 return NOTIFICATIONS_DISABLED;
             }
+
+            return NOTIFICATIONS_DISABLED_X_TIME;
         }
 
-        return NOTIFICATIONS_DISABLED_X_TIME;
+        return NOTIFICATIONS_ENABLED;
     }
 
     /**
@@ -705,16 +697,6 @@ public class ChatUtil {
     }
 
     /**
-     * Method for getting the ChatItemPreferences's from a specific chat.
-     *
-     * @param chatHandle Chat ID.
-     * @return The ChatItemPreferences.
-     */
-    public static ChatItemPreferences getChatItemPreferences(long chatHandle) {
-        return MegaApplication.getInstance().getDbH().findChatPreferencesByHandle(Long.toString(chatHandle));
-    }
-
-    /**
      * Method to mute a specific chat or general noifications chat for a specific period of time.
      * @param context Context of Activity.
      * @param chatId Chat ID.
@@ -733,26 +715,7 @@ public class ChatUtil {
      */
     public static boolean isEnableChatNotifications(long chatId) {
         MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
-        if (megaPushNotificationSettings == null) {
-            return MegaApplication.getInstance().getDbH().areNotificationsEnabled(Long.toString(chatId)).equals(NOTIFICATIONS_ENABLED);
-        }
-
-        if (megaPushNotificationSettings.isChatDndEnabled(chatId)) {
-            return false;
-        }
-
-        ChatItemPreferences chatPrefs = getChatItemPreferences(chatId);
-        if (chatPrefs != null) {
-            if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
-                chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
-                MegaApplication.getInstance().getDbH().setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatId));
-            }
-        } else {
-            chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_ENABLED, "");
-            MegaApplication.getInstance().getDbH().setChatItemPreferences(chatPrefs);
-        }
-
-        return true;
+        return megaPushNotificationSettings == null || !megaPushNotificationSettings.isChatDndEnabled(chatId);
     }
 
     /**
@@ -763,17 +726,7 @@ public class ChatUtil {
      * @param notificationsSubTitle The TextView with the info.
      */
     public static void checkSpecificChatNotifications(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
-
-        if (MegaApplication.getInstance().getPushNotificationSetting() == null) {
-            ChatItemPreferences chatPrefs = getChatItemPreferences(chatHandle);
-            if (chatPrefs == null || chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
-                notificationsSwitch.setChecked(true);
-                notificationsSubTitle.setVisibility(View.GONE);
-            } else {
-                notificationsSwitch.setChecked(false);
-                notificationsSubTitle.setVisibility(View.GONE);
-            }
-        } else {
+        if (MegaApplication.getInstance().getPushNotificationSetting() != null) {
             updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle);
         }
     }
@@ -787,6 +740,9 @@ public class ChatUtil {
      */
     public static void updateSwitchButton(long chatId, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
         MegaPushNotificationSettings push = MegaApplication.getInstance().getPushNotificationSetting();
+        if(push == null)
+            return;
+
         if (push.isChatDndEnabled(chatId)) {
             notificationsSwitch.setChecked(false);
             long timestampMute = push.getChatDnd(chatId);
@@ -800,16 +756,6 @@ public class ChatUtil {
         } else {
             notificationsSwitch.setChecked(true);
             notificationsSubTitle.setVisibility(View.GONE);
-            ChatItemPreferences chatPrefs = getChatItemPreferences(chatId);
-            if (chatPrefs != null) {
-                if (!chatPrefs.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)) {
-                    chatPrefs.setNotificationsEnabled(NOTIFICATIONS_ENABLED);
-                    MegaApplication.getInstance().getDbH().setNotificationEnabledChatItem(NOTIFICATIONS_ENABLED, Long.toString(chatId));
-                }
-            } else {
-                chatPrefs = new ChatItemPreferences(Long.toString(chatId), NOTIFICATIONS_ENABLED, "");
-                MegaApplication.getInstance().getDbH().setChatItemPreferences(chatPrefs);
-            }
         }
     }
 }

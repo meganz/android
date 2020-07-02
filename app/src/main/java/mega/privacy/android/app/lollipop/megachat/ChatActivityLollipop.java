@@ -1316,8 +1316,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void initializeInputText() {
         hideKeyboard();
         setChatSubtitle();
-        ChatItemPreferences chatPrefs = getChatItemPreferences(idChat);
-        MegaPushNotificationSettings megaPushNotificationSettings = app.getPushNotificationSetting();
+        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+
         if (chatPrefs != null) {
             String written = chatPrefs.getWrittenText();
             if (!TextUtils.isEmpty(written)) {
@@ -1333,10 +1333,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
             }
         } else {
-            if(megaPushNotificationSettings != null && !megaPushNotificationSettings.isChatDndEnabled(chatRoom.getChatId())){
-                chatPrefs = new ChatItemPreferences(Long.toString(idChat), NOTIFICATIONS_ENABLED, "");
-                dbH.setChatItemPreferences(chatPrefs);
-            }
+            chatPrefs = new ChatItemPreferences(Long.toString(idChat), "");
+            dbH.setChatItemPreferences(chatPrefs);
         }
         refreshTextInput();
     }

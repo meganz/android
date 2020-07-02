@@ -188,7 +188,6 @@ import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentL
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;

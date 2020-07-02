@@ -32,7 +32,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 57;
+	private static final int DATABASE_VERSION = 56;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -347,7 +347,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CONTACTS_TABLE);
 
 		String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " TEXT, " +
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " BOOLEAN, " +
 				KEY_CHAT_ITEM_RINGTONE+ " TEXT, "+KEY_CHAT_ITEM_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_ITEM_WRITTEN_TEXT+ " TEXT"+")";
 		db.execSQL(CREATE_CHAT_ITEM_TABLE);
 
@@ -357,7 +357,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_NONCONTACT_TABLE);
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " TEXT, " + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "
 				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN" + ")";
 		db.execSQL(CREATE_CHAT_TABLE);
 
@@ -583,9 +583,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if(oldVersion <= 22) {
+			String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " BOOLEAN, " +
+					KEY_CHAT_ITEM_RINGTONE + " TEXT, " + KEY_CHAT_ITEM_SOUND_NOTIFICATIONS + " TEXT" + ")";
+			db.execSQL(CREATE_CHAT_ITEM_TABLE);
+
 			String CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NON_CONTACTS + "("
 					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_NONCONTACT_HANDLE + " TEXT, " + KEY_NONCONTACT_FULLNAME + " TEXT"+")";
 			db.execSQL(CREATE_NONCONTACT_TABLE);
+
+			String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
+					KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
+			db.execSQL(CREATE_CHAT_TABLE);
 		}
 
 		if (oldVersion <= 23){
@@ -782,19 +792,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 55) {
 			db.execSQL("ALTER TABLE " + TABLE_CONTACTS + " ADD COLUMN " + KEY_CONTACT_NICKNAME + " TEXT;");
 		}
-
-		if(oldVersion <= 57){
-			String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " TEXT, " +
-					KEY_CHAT_ITEM_RINGTONE + " TEXT, " + KEY_CHAT_ITEM_SOUND_NOTIFICATIONS + " TEXT" + ")";
-			db.execSQL(CREATE_CHAT_ITEM_TABLE);
-			String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " TEXT, " +
-					KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
-			db.execSQL(CREATE_CHAT_TABLE);
-		}
-
-
 	}
 
 //	public MegaOffline encrypt(MegaOffline off){
@@ -1536,12 +1533,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			int id = Integer.parseInt(cursor.getString(0));
 			String enabled = decrypt(cursor.getString(1));
-			String notificationsEnabled = decrypt(cursor.getString(2));
 			String notificationSound = decrypt(cursor.getString(3));
 			String vibrationEnabled = decrypt(cursor.getString(4));
 			String chatStatus = decrypt(cursor.getString(5));
 			String sendOriginalAttachments = decrypt(cursor.getString(6));
-			chatSettings = new ChatSettings(notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
+			chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
 		}
 		cursor.close();
 
@@ -1559,11 +1555,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
-			String notificationsEnabled = decrypt(cursor.getString(1));
 			String notificationSound = decrypt(cursor.getString(2));
 			String vibrationEnabled = decrypt(cursor.getString(3));
 			String sendOriginalAttachments = decrypt(cursor.getString(4));
-			chatSettings = new ChatSettings(notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
+			chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
 		}
 		cursor.close();
 
@@ -1592,7 +1587,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(chatSettings.getNotificationsEnabled()));
+		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, "");
 		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
 		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
 		values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(chatSettings.getSendOriginalAttachments()));
@@ -1612,23 +1607,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 			values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(originalAttachments));
-			db.insert(TABLE_CHAT_SETTINGS, null, values);
-		}
-		cursor.close();
-	}
-
-	public void setNotificationEnabledChat(String enabled){
-
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_NOTIFICATIONS_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-			values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(enabled));
 			db.insert(TABLE_CHAT_SETTINGS, null, values);
 		}
 		cursor.close();
@@ -1669,7 +1647,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setChatItemPreferences(ChatItemPreferences chatPrefs){
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_HANDLE, encrypt(chatPrefs.getChatHandle()));
-		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsEnabled()));
+		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, "");
 		values.put(KEY_CHAT_ITEM_RINGTONE, "");
 		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, "");
 		values.put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(chatPrefs.getWrittenText()));
@@ -1682,28 +1660,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(text));
-		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
-	}
-
-//	public int setRingtoneChatItem(String ringtone, String handle){
-//		log("setRingtoneChatItem: "+ringtone+" "+handle);
-//
-//		ContentValues values = new ContentValues();
-//		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(ringtone));
-//		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
-//	}
-//
-//	public int setNotificationSoundChatItem(String sound, String handle){
-//		log("setNotificationSoundChatItem: "+sound+" "+handle);
-//
-//		ContentValues values = new ContentValues();
-//		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(sound));
-//		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
-//	}
-
-	public int setNotificationEnabledChatItem(String enabled, String handle){
-		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(enabled));
 		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
 	}
 
@@ -1720,11 +1676,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 				int id = Integer.parseInt(cursor.getString(0));
 				String chatHandle = decrypt(cursor.getString(1));
-				String notificationsEnabled = decrypt(cursor.getString(2));
-                logDebug("notificationsEnabled: " + notificationsEnabled);
 				String writtenText = decrypt(cursor.getString(5));
 
-				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, writtenText);
+				prefs = new ChatItemPreferences(chatHandle, writtenText);
 				cursor.close();
 				return prefs;
 			}

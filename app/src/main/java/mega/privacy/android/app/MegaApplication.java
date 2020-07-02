@@ -871,6 +871,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 			megaApi.addGlobalListener(new GlobalListener());
 			megaChatApi = getMegaChatApi();
+			push = getPushNotificationSetting();
 
 			String language = Locale.getDefault().toString();
 			boolean languageString = megaApi.setLanguage(language);

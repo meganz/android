@@ -51,7 +51,6 @@ import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -100,7 +99,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	ChatController cC;
 
 	DatabaseHandler dbH = null;
-	private ChatItemPreferences chatPrefs = null;
 
 	int adapterType;
 
@@ -283,8 +281,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			setLastMessage(position, holder);
 
 			checkMuteIcon(position, ((ViewHolderNormalChatList)holder), chat);
-			chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
-
 
 			if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
 

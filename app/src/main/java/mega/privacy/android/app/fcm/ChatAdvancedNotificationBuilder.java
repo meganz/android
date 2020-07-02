@@ -31,7 +31,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1272,12 +1271,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         if(beep){
             ChatSettings chatSettings = dbH.getChatSettings();
-
             if (chatSettings != null) {
-                if (chatSettings.getNotificationsEnabled()==null || chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
-                    logDebug("getNotificationsEnabled NULL --> Notifications ON");
-                    checkNotificationsSoundPreN(request, beep, lastChatId);
-                }
+                checkNotificationsSoundPreN(request, beep, lastChatId);
             } else {
                 logDebug("Notifications DEFAULT ON");
 
@@ -1336,21 +1331,13 @@ public final class ChatAdvancedNotificationBuilder {
 
             ChatSettings chatSettings = dbH.getChatSettings();
             if (chatSettings != null) {
-                if (chatSettings.getNotificationsEnabled()==null || chatSettings.getNotificationsEnabled().equals(NOTIFICATIONS_ENABLED)){
-                    logDebug("getNotificationsEnabled NULL --> Notifications ON");
-
-                    return checkNotificationsSound(chatid, handleListUnread, beep);
-                }
-
-                logDebug("Notifications OFF");
-                return false;
-            } else {
-                logDebug("Notifications DEFAULT ON");
-
-                Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                sendBundledNotification(defaultSoundUri2, STRING_TRUE, chatid, handleListUnread);
-                return true;
+                return checkNotificationsSound(chatid, handleListUnread, beep);
             }
+
+            logDebug("Notifications DEFAULT ON");
+            Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            sendBundledNotification(defaultSoundUri2, STRING_TRUE, chatid, handleListUnread);
+            return true;
         }
         else{
             sendBundledNotification(null, STRING_FALSE, chatid, handleListUnread);

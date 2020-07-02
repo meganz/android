@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -360,29 +359,6 @@ public class ChatController {
      * @param option     The selected mute option.
      */
     public void muteChat(long chatHandle, String option) {
-        if (chatHandle == MEGACHAT_INVALID_HANDLE) {
-            ChatSettings chatSettings = dbH.getChatSettings();
-            if (chatSettings == null) {
-                chatSettings = new ChatSettings();
-                chatSettings.setNotificationsEnabled(option);
-                dbH.setChatSettings(chatSettings);
-
-            } else if (!chatSettings.getNotificationsEnabled().equals(option)) {
-                chatSettings.setNotificationsEnabled(option);
-                dbH.setNotificationEnabledChat(option);
-            }
-        } else {
-            ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-            if (chatPrefs == null) {
-                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), option, "");
-                dbH.setChatItemPreferences(chatPrefs);
-
-            } else if (!chatPrefs.getNotificationsEnabled().equals(option)) {
-                chatPrefs.setNotificationsEnabled(option);
-                dbH.setNotificationEnabledChatItem(option, Long.toString(chatHandle));
-            }
-        }
-
         if (chatHandle != MEGACHAT_INVALID_HANDLE || context instanceof ManagerActivityLollipop) {
             if (option.equals(NOTIFICATIONS_ENABLED)) {
                 showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));

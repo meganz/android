@@ -1,34 +1,21 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import static mega.privacy.android.app.utils.Constants.*;
-
 public class ChatSettings {
 
-    String notificationsEnabled = "";
-    String notificationsSound = "";
-    String vibrationEnabled = "";
-    String sendOriginalAttachments = "";
+    String notificationsSound;
+    String vibrationEnabled;
+    String sendOriginalAttachments;
 
-    public ChatSettings(String notificationsEnabled, String notificationsSound, String vibrationEnabled, String sendOriginalAttachments) {
-        this.notificationsEnabled = notificationsEnabled;
+    public ChatSettings(String notificationsSound, String vibrationEnabled, String sendOriginalAttachments) {
         this.notificationsSound = notificationsSound;
         this.vibrationEnabled = vibrationEnabled;
         this.sendOriginalAttachments = sendOriginalAttachments;
     }
 
     public ChatSettings() {
-        this.notificationsEnabled = NOTIFICATIONS_ENABLED;
         this.notificationsSound = "";
         this.vibrationEnabled = true+"";
         this.sendOriginalAttachments = false+"";
-    }
-
-    public String getNotificationsEnabled() {
-        return notificationsEnabled;
-    }
-
-    public void setNotificationsEnabled(String notificationsEnabled) {
-        this.notificationsEnabled = notificationsEnabled;
     }
 
     public String getNotificationsSound() {
