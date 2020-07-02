@@ -30,7 +30,7 @@ public class GetAttrUserListener extends BaseListener {
      * If so, the rest of the actions in onRequestFinish() can be ignored.
      */
     private boolean onlyDBUpdate;
-    private long userHandle = -1;
+    private long userHandle = INVALID_HANDLE;
 
     public GetAttrUserListener(Context context) {
         super(context);
