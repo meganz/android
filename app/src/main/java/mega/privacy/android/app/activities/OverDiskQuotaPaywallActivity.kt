@@ -74,6 +74,10 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         when (v!!.id) {
             R.id.dismiss_button -> {
                 logInfo("Over Disk Quota Paywall warning dismissed")
+                if (isTaskRoot) {
+                    val intent = Intent(applicationContext, ManagerActivityLollipop::class.java)
+                    startActivity(intent)
+                }
                 finish()
             }
             R.id.upgrade_button -> {
