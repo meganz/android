@@ -178,15 +178,13 @@ public class ContactUtil {
     }
 
     public static void notifyNicknameUpdate(Context context, long userHandle) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
-                .setAction(ACTION_UPDATE_USER_NAME)
-                .putExtra(EXTRA_USER_HANDLE, userHandle));
+        notifyFirstOrLastNameUpdate(context, userHandle);
     }
 
     public static void notifyFirstOrLastNameUpdate(Context context, long userHandle) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
-                .setAction(ACTION_UPDATE_USER_NAME)
-                .putExtra(EXTRA_USER_HANDLE, userHandle));
+        Intent intent = new Intent(ACTION_UPDATE_USER_NAME)
+            .putExtra(EXTRA_USER_HANDLE, userHandle);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     private static String getNewNickname(MegaStringMap map, String key) {
