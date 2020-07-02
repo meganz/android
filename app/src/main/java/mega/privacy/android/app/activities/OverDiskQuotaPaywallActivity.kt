@@ -14,6 +14,8 @@ import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
+import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PinActivityLollipop
@@ -77,9 +79,9 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
             R.id.upgrade_button -> {
                 logInfo("Starting upgrade process after Over Disk Quota Paywall")
 
-                val intent: Intent? = Intent(applicationContext, ManagerActivityLollipop::class.java)
-                        .putExtra("upgradeAccount", true)
-                        .putExtra("accountType", proPlanNeeded)
+                val intent = Intent(applicationContext, ManagerActivityLollipop::class.java)
+                        .putExtra(EXTRA_UPGRADE_ACCOUNT, true)
+                        .putExtra(EXTRA_ACCOUNT_TYPE, proPlanNeeded)
                 startActivity(intent)
                 finish()
             }

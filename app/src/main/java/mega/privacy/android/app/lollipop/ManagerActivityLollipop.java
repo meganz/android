@@ -239,6 +239,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -1747,7 +1748,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		outState.putSerializable("drawerItem", drawerItem);
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
-		outState.putBoolean("firstLogin", firstLogin);
+		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -1904,7 +1905,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
 			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			searchDate = savedInstanceState.getLongArray("searchDate");
-			firstLogin = savedInstanceState.getBoolean("firstLogin");
+			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
@@ -3087,22 +3088,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
 	        	Intent intent = getIntent();
 	        	if (intent != null){
-	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
-					newAccount = getIntent().getBooleanExtra("newAccount", false);
+	        		boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
+					newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
 					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
-					firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
+					firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
 
                     //reset flag to fix incorrect view loaded when orientation changes
-                    getIntent().removeExtra("newAccount");
-                    getIntent().removeExtra("upgradeAccount");
-					getIntent().removeExtra("firstLogin");
+                    getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
+                    getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
+					getIntent().removeExtra(EXTRA_FIRST_LOGIN);
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
-						int accountType = getIntent().getIntExtra("accountType", 0);
+						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						switch (accountType){
 							case FREE:{
-								if (firstLogin) {
+								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 									logDebug("First login. Go to Camera Uploads configuration.");
 									drawerItem = DrawerItem.CAMERA_UPLOADS;
 								} else {
@@ -3149,7 +3150,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 	        		}
 	        		else{
-						if (firstLogin){
+						if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 							logDebug("First login. Go to Camera Uploads configuration.");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
@@ -3161,20 +3162,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("DRAWERITEM NOT NULL: " + drawerItem);
 				Intent intentRec = getIntent();
 	        	if (intentRec != null){
-					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
-					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
+					newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
                     newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 					//reset flag to fix incorrect view loaded when orientation changes
-                    getIntent().removeExtra("newAccount");
-                    getIntent().removeExtra("upgradeAccount");
-					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
+                    getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
+                    getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
+					firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
                     if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
-						int accountType = getIntent().getIntExtra("accountType", 0);
+						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						switch (accountType){
 							case FREE:{
-								if (firstLogin) {
+								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 									logDebug("First login. Go to Camera Uploads configuration.");
 									drawerItem = DrawerItem.CAMERA_UPLOADS;
 								} else {
@@ -3223,18 +3224,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					else{
 						if (firstLogin && !joiningToChatLink) {
 							logDebug("Intent firstTimeCam==true");
-							if (prefs != null){
-								if (prefs.getCamSyncEnabled() != null){
-									firstLogin = false;
-								}
-								else{
-									firstLogin = true;
+							if (prefs != null && prefs.getCamSyncEnabled() != null) {
+								firstLogin = false;
+							} else {
+								firstLogin = true;
+								if (app.getStorageState() != STORAGE_STATE_PAYWALL) {
 									drawerItem = DrawerItem.CAMERA_UPLOADS;
 								}
-							}
-							else{
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
 							}
 							setIntent(null);
 						}
@@ -11307,7 +11303,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				isEnable2FADialogShown = false;
 				Intent intent = new Intent(this, TwoFactorAuthenticationActivity.class);
-				intent.putExtra("newAccount", true);
+				intent.putExtra(EXTRA_NEW_ACCOUNT, true);
 				startActivity(intent);
 				break;
 			}
