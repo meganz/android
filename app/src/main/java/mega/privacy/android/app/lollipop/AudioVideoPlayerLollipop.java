@@ -4095,7 +4095,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 break;
 
             case MotionEvent.ACTION_UP:
-                if (creatingPlaylist && player != null){
+                if(v.getId() != R.id.exo_play && v.getId() != R.id.exo_pause && creatingPlaylist && player != null) {
                     if (v.getId() == R.id.exo_next) {
                         currentWindowIndex++;
                     }
