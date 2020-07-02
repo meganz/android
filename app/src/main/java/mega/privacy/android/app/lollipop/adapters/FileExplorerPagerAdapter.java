@@ -1,13 +1,13 @@
 package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 
@@ -19,6 +19,10 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
     private Context context;
     private boolean chatFirst;
     private boolean tabRemoved;
+
+    private Fragment mChatFragment;
+    private Fragment mCloudFragment;
+    private Fragment mIncomingFragment;
 
     public FileExplorerPagerAdapter(FragmentManager fm, Context context, boolean chatFirst) {
         super(fm);
@@ -38,26 +42,26 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
         if(chatFirst){
             switch (position){
                 case 0:{
-                    return getChatFragment(0);
+                    return getChatFragment();
                 }
                 case 1: {
-                    return getCloudFragment(1);
+                    return getCloudFragment();
                 }
                 case 2:{
-                    return getIncomingFragment(2);
+                    return getIncomingFragment();
                 }
             }
         }
         else{
             switch (position){
                 case 0: {
-                    return getCloudFragment(0);
+                    return getCloudFragment();
                 }
                 case 1:{
-                    return getIncomingFragment(1);
+                    return getIncomingFragment();
                 }
                 case 2:{
-                    return getChatFragment(2);
+                    return getChatFragment();
                 }
             }
         }
@@ -65,29 +69,28 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
         return null;
     }
 
-    private Fragment getChatFragment (int tab) {
-        ChatExplorerFragment ceF = (ChatExplorerFragment) ((FileExplorerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(((FileExplorerActivityLollipop) context).getFragmentTag(R.id.explorer_tabs_pager, tab));
-        if (ceF != null) {
-            return ceF;
+    private Fragment getChatFragment () {
+        if (mChatFragment != null) {
+            return mChatFragment;
         }
 
-        return ChatExplorerFragment.newInstance();
+        return mChatFragment = ChatExplorerFragment.newInstance();
     }
 
-    private Fragment getIncomingFragment (int tab) {
-        IncomingSharesExplorerFragmentLollipop isF = (IncomingSharesExplorerFragmentLollipop) ((FileExplorerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(((FileExplorerActivityLollipop) context).getFragmentTag(R.id.explorer_tabs_pager, tab));
-        if (isF != null) {
-            return isF;
+    private Fragment getIncomingFragment () {
+        if (mIncomingFragment != null) {
+            return mIncomingFragment;
         }
-        return IncomingSharesExplorerFragmentLollipop.newInstance();
+
+        return mIncomingFragment = IncomingSharesExplorerFragmentLollipop.newInstance();
     }
 
-    private Fragment getCloudFragment (int tab) {
-        CloudDriveExplorerFragmentLollipop cdF = (CloudDriveExplorerFragmentLollipop) ((FileExplorerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(((FileExplorerActivityLollipop) context).getFragmentTag(R.id.explorer_tabs_pager, tab));
-        if (cdF != null) {
-            return cdF;
+    private Fragment getCloudFragment () {
+        if (mCloudFragment != null) {
+            return mCloudFragment;
         }
-        return CloudDriveExplorerFragmentLollipop.newInstance();
+
+        return mCloudFragment = CloudDriveExplorerFragmentLollipop.newInstance();
     }
 
     @Override

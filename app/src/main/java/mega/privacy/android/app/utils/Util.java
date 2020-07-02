@@ -49,6 +49,7 @@ import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,11 +86,9 @@ import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -134,6 +133,9 @@ public class Util {
 	public static HashMap<String, String> countryCodeDisplay;
 
 	private static long lastClickTime;
+
+	// 150ms, a smaller value may cause the keyboard to fail to open
+	private final static int SHOW_IM_DELAY = 150;
 
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
@@ -1715,12 +1717,17 @@ public class Util {
 	}
 
     public static void showKeyboardDelayed(final View view) {
+		if (view == null) return;
+
 		Handler handler = new Handler();
         handler.postDelayed(() -> {
-			InputMethodManager imm =
-					(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-		}, 50);
+			// The view needs to request the focus or the keyboard may not pops up
+			if (view.requestFocus()) {
+				InputMethodManager imm = (InputMethodManager)
+						MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, SHOW_IM_DELAY);
     }
 
     public static Spanned getSpannedHtmlText(String string) {
@@ -1801,5 +1808,21 @@ public class Util {
 
 		lastClickTime = time;
 		return false;
+
+	/**
+	 * Changes the elevation of the the ActionBar passed as parameter.
+	 *
+	 * @param aB				ActionBar in which the elevation has to be applied.
+	 * @param withElevation	true if should apply elevation, false otherwise.
+	 * @param outMetrics	DisplayMetrics of the current device.
+	 */
+	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
+		float elevation = px2dp(4, outMetrics);
+
+		if (withElevation) {
+			aB.setElevation(elevation);
+		} else {
+			aB.setElevation(0);
+		}
 	}
 }
