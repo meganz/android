@@ -1403,26 +1403,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
-    public void showMuteIcon(long chatId) {
-        logDebug("Chat ID: " + chatId);
-        clearSelections();
-        hideMultipleSelect();
-
-        if (adapterList == null || adapterList.getItemCount() == 0) {
-            setChats();
-        } else if (chats != null && !chats.isEmpty()) {
-            for (MegaChatListItem chat : chats) {
-                if (chat.getChatId() == chatId) {
-                    int pos = chats.indexOf(chat);
-                    if (pos != INVALID_POSITION) {
-                        adapterList.updateMuteIcon(pos);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
     public void refreshNode(MegaChatListItem item) {
         logDebug("Chat ID: " + item.getChatId());
 

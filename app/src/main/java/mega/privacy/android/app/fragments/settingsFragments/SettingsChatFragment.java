@@ -146,7 +146,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         }else{
             chatDndSwitch.setChecked(true);
             long timestampMute = pushNotificationSettings.getGlobalChatsDnd();
-            chatDndSwitch.setSummary(mutedChatNotification(timestampMute));
+            chatDndSwitch.setSummary(getCorrectStringDependingOnOptionSelected(timestampMute));
         }
 
         getPreferenceScreen().addPreference(chatSoundPreference);

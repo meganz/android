@@ -883,16 +883,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 chatC.archiveChat(chat);
                 break;
             }
-            case R.id.chat_group_contact_properties_layout:{
-                logDebug("Click on switch notifications");
+            case R.id.chat_group_contact_properties_layout:
                 if (notificationsSwitch.isChecked()) {
                     createMuteNotificationsChatAlertDialog(this, chatHandle);
                 } else {
                     app.controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
                 }
                 break;
-
-            }
             case R.id.chat_group_contact_properties_chat_link_layout: {
                 megaChatApi.queryChatLink(chatHandle, groupChatInfoActivity);
                 break;

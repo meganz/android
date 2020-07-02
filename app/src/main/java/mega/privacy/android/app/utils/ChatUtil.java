@@ -64,7 +64,6 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
-    private static final int INITIAL_OPTION = 5;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -529,20 +528,6 @@ public class ChatUtil {
         return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
     }
 
-    public static String setSubtitleChatPreferences(){
-        MegaPushNotificationSettings push = MegaApplication.getInstance().getPushNotificationSetting();
-        if(push.isGlobalChatsDndEnabled()){
-            long timestampMute = push.getGlobalChatsDnd();
-            if(timestampMute == 0){
-                return null;
-            }
-
-            return mutedChatNotification(timestampMute);
-        }
-
-        return null;
-    }
-
     /**
      * Method for the treatment of plurals in the strings
      *
@@ -808,7 +793,7 @@ public class ChatUtil {
             if (timestampMute == 0) {
                 notificationsSubTitle.setVisibility(View.GONE);
             } else {
-                notificationsSubTitle.setText(mutedChatNotification(timestampMute));
+                notificationsSubTitle.setText(getCorrectStringDependingOnOptionSelected(timestampMute));
                 notificationsSubTitle.setVisibility(View.VISIBLE);
             }
 

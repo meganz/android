@@ -1485,22 +1485,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				logDebug("Change persistence chat to true");
 				megaChatApi.setPresencePersist(true);
 			}
-		}
-		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
-//		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//		        //create default chat summary channel
-//				ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
-//		        //to system channel settings page
-//                Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
-//                intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
-//                // change the setting of chat summary channel
-//                intent.putExtra(Settings.EXTRA_CHANNEL_ID, NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2);
-//                startActivity(intent);
-//            } else {
-                //Intent to new activity Chat Settings
-                Intent i = new Intent(context, ChatPreferencesActivity.class);
-                startActivity(i);
-//            }
+
+		} else if (preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0) {
+			Intent i = new Intent(context, ChatPreferencesActivity.class);
+			startActivity(i);
+
 		} else if (preference.getKey().equals(KEY_STORAGE_DOWNLOAD)) {
 			startActivity(new Intent(context, DownloadPreferencesActivity.class));
 		} else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){

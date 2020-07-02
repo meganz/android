@@ -100,9 +100,6 @@ public final class ChatAdvancedNotificationBuilder {
         dbH = DatabaseHandler.getDbHandler(context);
         this.megaApi = megaApi;
         this.megaChatApi = megaChatApi;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChatSummaryChannel(context);
-        }
     }
 
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, MegaHandleList unreadHandleList) {
@@ -1172,10 +1169,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                     MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
                     showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
-                    if (beep) {
-                        beep = false;
-                    }
-
+                    beep = false;
                 } else {
                     logDebug("Do not show notification - opened chat");
                 }
@@ -1227,10 +1221,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                     MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
                     showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
-                    if (beep) {
-                        beep = false;
-                    }
-
+                    beep = false;
                 } else {
                     logDebug("Do not show notification - opened chat");
                 }

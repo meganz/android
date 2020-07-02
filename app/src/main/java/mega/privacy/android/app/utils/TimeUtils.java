@@ -216,58 +216,6 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static Calendar getCalendarSpecificTime(String typeTime) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.HOUR, 7);
-
-        if(typeTime.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING)){
-            calendar.set(Calendar.AM_PM, Calendar.PM);
-        }else{
-            calendar.set(Calendar.AM_PM, Calendar.AM);
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-        return calendar;
-    }
-
-    public static boolean isUntilThisEvening(){
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        if(hour <= 18 && hour >= 4) {
-           return true;
-        }
-        return false;
-    }
-
-    public static String mutedChatNotification(long timestamp) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestamp);
-
-        Calendar calToday = Calendar.getInstance();
-        calToday.setTimeInMillis(System.currentTimeMillis());
-
-        Calendar calTomorrow = Calendar.getInstance();
-        calTomorrow.add(Calendar.DATE, +1);
-
-        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
-        java.text.DateFormat df;
-        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
-        df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
-
-        TimeZone tz = cal.getTimeZone();
-        df.setTimeZone(tz);
-        Date date = cal.getTime();
-        String formattedDate = df.format(date);
-        if (tc.compare(cal, calToday) == 0) {
-            return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_today, formattedDate);
-        }
-
-        return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_tomorrow, formattedDate);
-    }
-
     public static String lastGreenDate (Context context, int minutesAgo){
 //        minutesAgo = 1442;
         Calendar calGreen = Calendar.getInstance();
@@ -412,15 +360,87 @@ public class TimeUtils implements Comparator<Calendar> {
         return null;
     }
 
-    public static String getCorrectStringDependingOnCalendar(Context context, String typeMuted) {
-        Calendar calendar = getCalendarSpecificTime(typeMuted);
+    /**
+     * Method for obtaining the appropriate String depending on the current time.
+     *
+     * @param context Activity context.
+     * @param option  Selected mute type.
+     * @return The right string.
+     */
+    public static String getCorrectStringDependingOnCalendar(Context context, String option) {
+        Calendar calendar = getCalendarSpecificTime(option);
         TimeZone tz = calendar.getTimeZone();
         java.text.DateFormat df = new SimpleDateFormat("h", Locale.getDefault());
         df.setTimeZone(tz);
         String time = df.format(calendar.getTime());
 
-        return typeMuted.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) ?
+        return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) ?
                 context.getString(R.string.success_muting_a_chat_until_this_evening, time) :
                 context.getString(R.string.success_muting_a_chat_until_tomorrow_morning, context.getString(R.string.label_tomorrow), time);
+    }
+
+    /**
+     * Method for obtaining the appropriate String depending on the option selected.
+     *
+     * @param timestamp The time it's muted.
+     * @return The right string
+     */
+    public static String getCorrectStringDependingOnOptionSelected(long timestamp) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timestamp);
+
+        Calendar calToday = Calendar.getInstance();
+        calToday.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar calTomorrow = Calendar.getInstance();
+        calTomorrow.add(Calendar.DATE, +1);
+
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+        java.text.DateFormat df;
+        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
+        df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
+
+        TimeZone tz = cal.getTimeZone();
+        df.setTimeZone(tz);
+        Date date = cal.getTime();
+        String formattedDate = df.format(date);
+        if (tc.compare(cal, calToday) == 0) {
+            return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_today, formattedDate);
+        }
+
+        return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_tomorrow, formattedDate);
+    }
+
+    /**
+     * Method for obtaining a calendar depending on the type of silencing chosen.
+     * @param option Selected mute type.
+     * @return The Calendar.
+     */
+    public static Calendar getCalendarSpecificTime(String option) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, 7);
+
+        if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING)){
+            calendar.set(Calendar.AM_PM, Calendar.PM);
+        }else{
+            calendar.set(Calendar.AM_PM, Calendar.AM);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return calendar;
+    }
+
+    /**
+     * Method to know if the silencing should be until this evening.
+     *
+     * @return True if it is. False it is not.
+     */
+    public static boolean isUntilThisEvening() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        return hour <= 18 && hour >= 4;
     }
 }
