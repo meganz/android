@@ -2553,7 +2553,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Invite contact now?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Discover your contacts on MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
@@ -2583,7 +2583,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Invite more&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Invite more</string>
 
     <string name="title_tour_one" context="Title of first tour screen">You hold the keys</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
