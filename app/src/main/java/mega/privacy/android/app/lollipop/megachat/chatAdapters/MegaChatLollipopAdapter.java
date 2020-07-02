@@ -1692,30 +1692,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         MegaChatMessage nextMessage = messages.get(position).getMessage();
-        if (nextMessage.getType() == MegaChatMessage.TYPE_CALL_STARTED ||
-                (nextMessage.getType() == MegaChatMessage.TYPE_CALL_ENDED &&
-                        nextMessage.getCode() != END_CALL_REASON_CANCELLED &&
-                        nextMessage.getCode() != END_CALL_REASON_NO_ANSWER) ||
-                nextMessage.getType() == MegaChatMessage.TYPE_TRUNCATE ||
-                nextMessage.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS ||
-                nextMessage.getType() == MegaChatMessage.TYPE_PRIV_CHANGE ||
-                nextMessage.getType() == MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE ||
-                nextMessage.getType() == MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE ||
-                nextMessage.getType() == MegaChatMessage.TYPE_SET_PRIVATE_MODE) {
+        int typeMessage = nextMessage.getType();
+        int codeMessage = nextMessage.getCode();
 
-            ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
-            ((ChatActivityLollipop) context).lastIdMsgSeen = nextMessage.getMsgId();
-            return;
+        if (typeMessage >= MegaChatMessage.TYPE_LOWEST_MANAGEMENT && typeMessage <= MegaChatMessage.TYPE_SET_PRIVATE_MODE) {
+            if (typeMessage != MegaChatMessage.TYPE_CALL_ENDED || (codeMessage != END_CALL_REASON_CANCELLED && codeMessage != END_CALL_REASON_NO_ANSWER)) {
+                ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+                ((ChatActivityLollipop) context).lastIdMsgSeen = nextMessage.getMsgId();
+                return;
+            }
         }
 
         logDebug("Last message ID match!");
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).newMessagesLayout.getLayoutParams();
-        long userHandle;
-        if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS || message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) {
-            userHandle = message.getHandleOfAction();
-        } else {
-            userHandle = message.getUserHandle();
-        }
+        long userHandle = (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS || message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) ? message.getHandleOfAction() : message.getUserHandle();
 
         params.addRule(RelativeLayout.BELOW, userHandle == myUserHandle ? R.id.message_chat_own_message_layout : R.id.message_chat_contact_message_layout);
         ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
