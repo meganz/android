@@ -108,7 +108,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -153,7 +152,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
-
 	private AppBarLayout abL;
 	private Toolbar tB;
 	private ActionBar aB;
@@ -779,6 +777,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						supportInvalidateOptionsMenu();
 						changeTitle();
 
+						checkFragmentScroll(position);
+
 						if (!multiselect) {
 							return;
 						}
@@ -787,28 +787,26 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 							clearQuerySearch();
 							collapseSearchView();
 						}
-						cDriveExplorer = getCloudExplorerFragment();
-						iSharesExplorer = getIncomingExplorerFragment();
+
 						if (position == 0) {
 							if (iSharesExplorer != null ) {
 								iSharesExplorer.hideMultipleSelect();
-							}
-							if (cDriveExplorer != null) {
-								cDriveExplorer.checkScroll();
 							}
 						}
 						else if (position == 1) {
 							if (cDriveExplorer != null) {
 								cDriveExplorer.hideMultipleSelect();
 							}
-							if (iSharesExplorer != null) {
-								iSharesExplorer.checkScroll();
-							}
 						}
 					}
 				});
 			}
 		}
+	}
+
+	private void checkFragmentScroll(int position) {
+		CheckScrollInterface fragment = (CheckScrollInterface)mTabsAdapterExplorer.getItem(position);
+		fragment.checkScroll();
 	}
 
 	public void chooseFragment (int fragment) {
@@ -852,17 +850,25 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	public void changeActionBarElevation(boolean whitElevation) {
-		chatExplorer = getChatExplorerFragment();
-		if (chatExplorer == null || chatExplorer.isHidden()) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				if (whitElevation) {
-					abL.setElevation(px2dp(4, outMetrics));
-				}
-				else {
-					abL.setElevation(0);
-				}
-			}
+	public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
+		if (!isCurrentFragment(fragmentIndex)) return;
+
+		abL.setElevation(elevate ? px2dp(4, outMetrics) : 0);
+	}
+
+	private boolean isCurrentFragment(int index) {
+		if (tabShown == NO_TABS) return true;  // only one fragment
+
+		// No need to care ImportFilesFragment as it would never be shown in SHOW_TABS mode
+		switch(index) {
+			case CLOUD_FRAGMENT:
+				return tabShown == CLOUD_TAB;
+			case CHAT_FRAGMENT:
+				return tabShown == CHAT_TAB;
+			case INCOMING_FRAGMENT:
+				return tabShown == INCOMING_TAB;
+			default:
+				return false;
 		}
 	}
 

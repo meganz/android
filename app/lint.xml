@@ -3,7 +3,6 @@
     <issue id="ImpliedQuantity">
         <ignore path="res/values-fr/strings.xml" />
         <ignore path="res/values-ru/strings.xml" />
-        <ignore path="res/values-uk/strings.xml" />
     </issue>
     <issue id="NewApi" severity="error" />
 </lint>
