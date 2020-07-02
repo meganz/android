@@ -2375,9 +2375,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
-		accountInfoFrame = findViewById(R.id.navigation_drawer_account_view);
-        accountInfoFrame.setOnClickListener(this);
-
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
         nVDisplayName.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
 
@@ -3484,7 +3481,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
-        if(!firstTimeAfterInstallation) {
+        // For Android devices which have Android below 6, no need to go to request permission fragment.
+        if(!firstTimeAfterInstallation || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             tB.setVisibility(View.VISIBLE);
             abL.setVisibility(View.VISIBLE);
 
