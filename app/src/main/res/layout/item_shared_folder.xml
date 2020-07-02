@@ -23,6 +23,15 @@
             rounded:corner_radius="20dp" />
     </RelativeLayout>
 
+    <ImageView
+        android:id="@+id/verified_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_verified"
+        android:layout_marginStart="42dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"/>
+
     <RelativeLayout
         android:id="@+id/shared_folder_three_dots_layout"
         android:layout_width="wrap_content"

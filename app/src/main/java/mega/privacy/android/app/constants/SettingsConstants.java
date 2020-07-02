@@ -2,6 +2,7 @@ package mega.privacy.android.app.constants;
 
 public class SettingsConstants {
     public static final String ACTION_REFRESH_CAMERA_UPLOADS_SETTING = "ACTION_REFRESH_CAMERA_UPLOADS_SETTING";
+    public static final String ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING = "ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING";
     public static final String ACTION_REFRESH_CLEAR_OFFLINE_SETTING = "ACTION_REFRESH_CLEAR_OFFLINE_SETTING";
     public static final int COMPRESSION_QUEUE_SIZE_MIN = 100;
     public static final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
@@ -91,6 +92,8 @@ public class SettingsConstants {
 
     public static final String KEY_RECOVERY_KEY= "settings_recovery_key";
     public static final String KEY_CHANGE_PASSWORD= "settings_change_password";
+
+    public static final String INVALID_PATH = "";
 
     public static final String CAMERA_UPLOADS_STATUS = "CAMERA_UPLOADS_STATUS";
 

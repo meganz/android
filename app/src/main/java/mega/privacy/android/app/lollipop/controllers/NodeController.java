@@ -202,6 +202,15 @@ public class NodeController {
         checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
     }
 
+    public void checkIfHandlesAreMineAndSelectChatsToSendNodes(ArrayList<Long> handles) {
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+        for (long handle : handles) {
+            nodes.add(megaApi.getNodeByHandle(handle));
+        }
+
+        checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
+    }
+
     public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
         logDebug("checkIfNodesAreMineAndSelectChatsToSendNodes");
 

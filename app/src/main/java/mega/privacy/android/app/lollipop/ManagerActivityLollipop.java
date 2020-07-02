@@ -74,7 +74,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -145,7 +144,6 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -242,6 +240,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -980,21 +979,29 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     };
 
-	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null)
+			if (intent == null || intent.getAction() == null)
 				return;
-			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-			if (getContactsFragment() != null) {
-				cFLol.updateContact(userHandle);
-			}
 
-			if(getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0){
-				inSFLol.updateNicknames(userHandle);
-			}
-			if(getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0){
-				outSFLol.updateNicknames(userHandle);
+
+			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE);
+
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)) {
+				if (getContactsFragment() != null) {
+					cFLol.updateContact(userHandle);
+				}
+
+				if (getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0) {
+					inSFLol.updateNicknames(userHandle);
+				}
+
+				if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0) {
+					outSFLol.updateNicknames(userHandle);
+				}
+			} else if (intent.getAction().equals(ACTION_UPDATE_CREDENTIALS) && getContactsFragment() != null) {
+				cFLol.updateContact(userHandle);
 			}
 		}
 	};
@@ -1322,13 +1329,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	};
 
-    private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
+	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
 
-            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+			if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
 				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 				if (rChatFL != null && rChatFL.isVisible()) {
 					rChatFL.notifyPushChanged();
@@ -1336,6 +1343,32 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if(getSettingsFragment() != null){
 					sttFLol.updateNotifChat();
 				}
+			}
+		}
+	};
+
+    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && intent.getAction() != null) {
+                switch (intent.getAction()) {
+                    case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
+                        if (getSettingsFragment() != null) {
+                            sttFLol.refreshCameraUploadsSettings();
+                        }
+                        break;
+                    case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
+                        // disable UI elements of media upload omly
+                        if (getSettingsFragment() != null) {
+                            sttFLol.disableMediaUploadUIProcess();
+                        }
+                        break;
+                    case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
+                        if (getSettingsFragment() != null) {
+                            sttFLol.taskGetSizeOffline();
+                        }
+                        break;
+                }
             }
         }
     };
@@ -1963,8 +1996,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
 		if (localBroadcastManager != null) {
-			localBroadcastManager.registerReceiver(nicknameReceiver,
-					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+			IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+			contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+			localBroadcastManager.registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
 			localBroadcastManager.registerReceiver(receiverUpdatePosition,
 					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
@@ -1998,6 +2033,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+        filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+        filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
+        filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+        registerReceiver(updateCUSettingsReceiver, filter);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -3870,6 +3911,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					megaApi.setAvatar(path, this);
 				} else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
 					logDebug("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+					drawerItem = DrawerItem.TRANSFERS;
+					indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+					selectDrawerItemLollipop(drawerItem);
 
                     String text = getString(R.string.cam_sync_cancel_sync);
 
@@ -4567,7 +4611,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
 		isStorageStatusDialogShown = false;
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
@@ -4580,7 +4624,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
 
-		unregisterReceiver(cameraUploadLauncherReceiver);
+        unregisterReceiver(cameraUploadLauncherReceiver);
+        unregisterReceiver(updateCUSettingsReceiver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();
@@ -5997,7 +6042,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					bottomNavigationCurrentItem = CHAT_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-				showFabButton();
 				break;
 			}
     	}
@@ -7498,40 +7542,74 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			refreshSearch();
 		}
 
-        checkCameraUploadFolder();
+        checkCameraUploadFolder(true,null);
 		refreshRubbishBin();
 		setToolbarTitle();
 	}
 
-    private void checkCameraUploadFolder() {
-    	if (!CameraUploadsService.uploadingInProgress) return;
-
+    /**
+     * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,
+     * need to check CU and MU folders' status.
+     *
+     * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
+     * @param updatedNodes Nodes which have changed.
+     */
+    private void checkCameraUploadFolder(boolean shouldDisable, ArrayList<MegaNode> updatedNodes) {
+        // Get CU and MU folder hanlde from local setting.
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
-		MegaPreferences prefs = dbH.getPreferences();
-		boolean isSecondaryEnabled = false;
-		if(prefs != null) {
-			isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-		}
+
+        if (updatedNodes != null) {
+            List<Long> handles = new ArrayList<>();
+            for (MegaNode node : updatedNodes) {
+                handles.add(node.getHandle());
+            }
+            // If CU and MU folder don't change then return.
+            if (!handles.contains(primaryHandle) && !handles.contains(secondaryHandle)) {
+                logDebug("Updated nodes don't include CU/MU, return.");
+                return;
+            }
+        }
+
+        MegaPreferences prefs = dbH.getPreferences();
+        boolean isSecondaryEnabled = false;
+        if (prefs != null) {
+            isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+        }
+
+        // Check if CU and MU folder are moved to rubbish bin.
         boolean isPrimaryFolderInRubbish = isNodeInRubbish(primaryHandle);
         boolean isSecondaryFolderInRubbish = isSecondaryEnabled && isNodeInRubbish(secondaryHandle);
 
+        // If only MU folder is in rubbish bin.
         if (isSecondaryFolderInRubbish && !isPrimaryFolderInRubbish) {
-			logDebug("MU folder is deleted, backup settings and disable MU.");
-			backupTimestampsAndFolderHandle();
-			disableMediaUploadProcess();
-			if (getSettingsFragment() != null) {
-				sttFLol.disableMediaUploadUIProcess();
-
-			}
-		} else if (isPrimaryFolderInRubbish) {
-			logDebug("CU folder is deleted, backup settings and disable CU.");
-			backupTimestampsAndFolderHandle();
-			disableCameraUploadSettingProcess(false);
-			if (getSettingsFragment() != null) {
-				sttFLol.disableCameraUploadUIProcess();
-			}
-		}
+            logDebug("MU folder is deleted, backup settings and disable MU.");
+            if (shouldDisable) {
+                // Back up timestamps and disabled MU upload.
+                backupTimestampsAndFolderHandle();
+                disableMediaUploadProcess();
+                if (getSettingsFragment() != null) {
+                    sttFLol.disableMediaUploadUIProcess();
+                }
+            } else {
+                // Just stop the upload process.
+                stopRunningCameraUploadService(app);
+            }
+        } else if (isPrimaryFolderInRubbish) {
+            // If CU folder is in rubbish bin.
+            logDebug("CU folder is deleted, backup settings and disable CU.");
+            if (shouldDisable) {
+                // Disable both CU and MU.
+                backupTimestampsAndFolderHandle();
+                disableCameraUploadSettingProcess(false);
+                if (getSettingsFragment() != null) {
+                    sttFLol.disableCameraUploadUIProcess();
+                }
+            } else {
+                // Just stop the upload process.
+                stopRunningCameraUploadService(app);
+            }
+        }
     }
 
 	public void refreshRubbishBin () {
@@ -8391,9 +8469,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					setMoveToRubbish(true);
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					if (getPrimaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+					if (getPrimaryFolderHandle() == handle ) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
-					} else if (getSecondaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+					} else if (getSecondaryFolderHandle() == handle ) {
 						builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
 					} else {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
@@ -9226,24 +9304,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void showOpenLinkDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this,
+				R.style.AppCompatAlertDialogStyle);
 		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_open_link, null);
-		builder.setView(v);
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
+		builder.setView(v).setPositiveButton(R.string.context_open_link, null)
+				.setNegativeButton(R.string.general_cancel, null);
 
-		TextView title = (TextView) v.findViewById(R.id.link_title);
-
-		openLinkText = (EditText) v.findViewById(R.id.link_text);
+		openLinkText = v.findViewById(R.id.text);
 		openLinkText.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -9263,47 +9337,35 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 
-		openLinkError = (RelativeLayout) v.findViewById(R.id.link_error);
-		openLinkError.setVisibility(View.GONE);
-		openLinkErrorText = (TextView) v.findViewById(R.id.link_error_text);
+		openLinkError = v.findViewById(R.id.error);
+		openLinkErrorText = v.findViewById(R.id.error_text);
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-			title.setText(R.string.action_open_link);
+			builder.setTitle(R.string.action_open_link);
 			openLinkText.setHint(R.string.hint_paste_link);
 		}
 		else if (drawerItem == DrawerItem.CHAT) {
-			title.setText(R.string.action_open_chat_link);
+			builder.setTitle(R.string.action_open_chat_link);
 			openLinkText.setHint(R.string.hint_enter_chat_link);
 		}
-
-		OnClickListener clickListener = new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				switch (v.getId()) {
-					case R.id.link_cancel_button: {
-						dismissOpenLinkDialog();
-						break;
-					}
-					case R.id.link_open_button: {
-						hideKeyboardView(managerActivity, v, 0);
-						openLink(openLinkText.getText().toString());
-						break;
-					}
-				}
-			}
-		};
-
-		Button cancelButton = (Button) v.findViewById(R.id.link_cancel_button);
-		cancelButton.setOnClickListener(clickListener);
-		openLinkOpenButton = (Button) v.findViewById(R.id.link_open_button);
-		openLinkOpenButton.setOnClickListener(clickListener);
 
 		openLinkDialog = builder.create();
 		openLinkDialog.setCanceledOnTouchOutside(false);
 
 		try {
 			openLinkDialog.show();
+			openLinkText.requestFocus();
 			openLinkDialogIsShown = true;
+
+			// Set onClickListeners for buttons after showing the dialog would prevent
+			// the dialog from dismissing automatically on clicking the buttons
+			openLinkOpenButton = openLinkDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+			openLinkOpenButton.setOnClickListener((view) -> {
+				hideKeyboard(managerActivity, 0);
+				openLink(openLinkText.getText().toString());
+			});
+			openLinkDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener((view) ->
+					dismissOpenLinkDialog());
 		}catch (Exception e){}
 	}
 
@@ -11000,13 +11062,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void refreshCloudDrive() {
-		if (rootNode == null) {
-			rootNode = megaApi.getRootNode();
-			if (rootNode == null) {
-				logWarning("Root node is NULL. Maybe user is not logged in");
-				return;
-			}
-		}
+        if (rootNode == null) {
+            rootNode = megaApi.getRootNode();
+        }
+
+        if (rootNode == null) {
+            logWarning("Root node is NULL. Maybe user is not logged in");
+            return;
+        }
 
 		MegaNode parentNode = rootNode;
 
@@ -14782,7 +14845,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		onNodesInboxUpdate();
 
-		checkCameraUploadFolder();
+		checkCameraUploadFolder(false,updatedNodes);
 
 		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFL != null){
