@@ -335,8 +335,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private GetMediaFilesTask getMediaFilesTask;
     private long [] nodeHandles;
 
-    private static final int focusType = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
-    private static final int streamType = AudioManager.STREAM_MUSIC;
     private AudioFocusRequest request;
     private AudioManager mAudioManager;
     private AudioFocusListener audioFocusListener;
@@ -3870,8 +3868,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     private void startPlayback() {
         audioFocusListener = new AudioFocusListener(this);
-        request = getRequest(audioFocusListener, focusType);
-        if (getAudioFocus(mAudioManager, audioFocusListener, request, focusType, streamType) && player != null) {
+        request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
+        if (getAudioFocus(mAudioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT) && player != null) {
             player.setPlayWhenReady(true);
         }
     }
@@ -4084,7 +4082,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (v.getId() == R.id.exo_play) {
-                    getAudioFocus(mAudioManager, audioFocusListener, request, focusType, streamType);
+                    getAudioFocus(mAudioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT);
 
                 } else if (v.getId() == R.id.exo_pause) {
                     abandonAudioFocus(audioFocusListener, mAudioManager, request);

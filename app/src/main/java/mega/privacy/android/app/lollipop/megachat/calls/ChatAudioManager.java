@@ -28,8 +28,6 @@ public class ChatAudioManager {
     private AudioManager audioManager = null;
     private MediaPlayer mediaPlayer = null;
     private Vibrator vibrator = null;
-    private int streamType;
-    private int focusType;
     private AudioFocusRequest request;
     private AudioFocusListener audioFocusListener;
     private ChatAudioManager(Context context) {
@@ -85,8 +83,8 @@ public class ChatAudioManager {
             return;
 
         audioFocusListener = new AudioFocusListener(myContext);
-        focusType = AudioManager.AUDIOFOCUS_GAIN;
-        streamType = AudioManager.STREAM_VOICE_CALL;
+        int focusType = AudioManager.AUDIOFOCUS_GAIN;
+        int streamType = AudioManager.STREAM_VOICE_CALL;
         request = getRequest(audioFocusListener, focusType);
 
         if (getAudioFocus(audioManager, audioFocusListener, request, focusType, streamType)) {
@@ -125,11 +123,9 @@ public class ChatAudioManager {
             return;
 
         audioFocusListener = new AudioFocusListener(myContext);
-        focusType = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
-        streamType = AudioManager.STREAM_MUSIC;
-        request = getRequest(audioFocusListener, focusType);
+        request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
 
-        if (getAudioFocus(audioManager, audioFocusListener, request, focusType, streamType)) {
+        if (getAudioFocus(audioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT)) {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
             mediaPlayer.setLooping(true);

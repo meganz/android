@@ -455,8 +455,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
-    private static final int focusType = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
-    private static final int streamType = AudioManager.STREAM_MUSIC;
     private AudioFocusRequest request;
     private AudioManager mAudioManager;
     private AudioFocusListener audioFocusListener;
@@ -984,8 +982,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 if (!isAllowedToRecord()) return;
                 audioFocusListener = new AudioFocusListener(ChatActivityLollipop.this);
-                request = getRequest(audioFocusListener, focusType);
-                if (getAudioFocus(mAudioManager, audioFocusListener, request, focusType, streamType)) {
+                request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
+                if (getAudioFocus(mAudioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT)) {
                     prepareRecording();
                 }
             }

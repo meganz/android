@@ -60,6 +60,8 @@ public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
+    public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();

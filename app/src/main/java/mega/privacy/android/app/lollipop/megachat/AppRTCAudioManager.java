@@ -26,12 +26,15 @@ import java.util.Set;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
 public class AppRTCAudioManager {
+
     private static final String TAG = "AppRTCAudioManager";
     private final Context apprtcContext;
     // Handles all tasks related to Bluetooth headset devices.
@@ -243,8 +246,8 @@ public class AppRTCAudioManager {
             typeStream = AudioManager.STREAM_VOICE_CALL;
             typeFocus = AudioManager.AUDIOFOCUS_GAIN;
         }else if(apprtcContext instanceof ChatActivityLollipop){
-            typeStream = AudioManager.STREAM_MUSIC;
-            typeFocus = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
+            typeStream = STREAM_MUSIC_DEFAULT;
+            typeFocus = AUDIOFOCUS_DEFAULT;
         }
 
         if (apprtcContext instanceof MegaApplication || apprtcContext instanceof ChatActivityLollipop) {
