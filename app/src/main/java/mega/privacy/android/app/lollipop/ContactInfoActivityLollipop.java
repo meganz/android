@@ -647,7 +647,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			firstLineTextToolbar.setTrailingIcon(contactStateIcon, contactStateIconPaddingLeft);
 			firstLineTextToolbar.updateMaxWidthAndIconVisibility(firstLineTextMaxWidthExpanded, true);
 		} else {
-			firstLineTextToolbar.updateMaxWidthAndIconVisibility(firstLineTextMaxWidthCollapsed, false);
+			firstLineTextToolbar.updateMaxWidthAndIconVisibility(
+					stateToolbar == State.EXPANDED ? firstLineTextMaxWidthExpanded
+							: firstLineTextMaxWidthCollapsed, false);
 		}
 	}
 
@@ -2505,7 +2507,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
 				String formattedDate = lastGreenDate(this, lastGreen);
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
-				firstLineTextToolbar.setPadding(0, px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
 				secondLineTextToolbar.isMarqueeIsNecessary(this);
 				logDebug("Date last green: " + formattedDate);

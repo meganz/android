@@ -104,7 +104,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         }
         if (iconDrawable == null || maxLines == -1) {
             CharSequence ellipsizedText = TextUtils.ellipsize(emojiProcessedText, getPaint(),
-                textViewMaxWidth, typeEllipsize);
+                textViewMaxWidth * maxLines, typeEllipsize);
             super.setText(ellipsizedText, type);
             return;
         }
@@ -148,7 +148,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
                 buildFinalText(workingText, isEllipsizeNecessary, padding, icon);
             Layout trialLayout = createWorkingLayout(trialText);
             if (trialLayout.getLineCount() <= maxLines) {
-                // it fits, good
                 needManualLineBreak =
                     !isEllipsizeNecessary
                         && trialLayout.getLineCount() > originLayout.getLineCount();
