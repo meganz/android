@@ -537,12 +537,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     };
 
-    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver userNameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_USER_NAME)) return;
+            if (intent == null || intent.getAction() == null
+                || intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) == INVALID_HANDLE) {
+                return;
+            }
 
-            if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) != INVALID_HANDLE) {
+            if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+                || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+                || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
                 updateUserNameInChat();
             }
         }
@@ -693,8 +698,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
-        contactUpdateFilter.addAction(ACTION_UPDATE_USER_NAME);
-        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
+        contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+        contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+        contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
+        LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, contactUpdateFilter);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
@@ -7370,7 +7377,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceclipDownloadedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);

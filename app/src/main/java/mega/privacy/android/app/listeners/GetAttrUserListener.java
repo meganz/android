@@ -15,6 +15,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
@@ -30,15 +31,9 @@ public class GetAttrUserListener extends BaseListener {
      * If so, the rest of the actions in onRequestFinish() can be ignored.
      */
     private boolean onlyDBUpdate;
-    private long userHandle = INVALID_HANDLE;
 
     public GetAttrUserListener(Context context) {
         super(context);
-    }
-
-    public GetAttrUserListener(Context context, long userHandle) {
-        super(context);
-        this.userHandle = userHandle;
     }
 
     /**
@@ -122,14 +117,20 @@ public class GetAttrUserListener extends BaseListener {
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateFirstName(context, request.getText(), request.getEmail());
-                    notifyFirstOrLastNameUpdate(context, userHandle);
+                    MegaUser user = api.getContact(request.getEmail());
+                    if (user != null) {
+                        notifyFirstNameUpdate(context, user.getHandle());
+                    }
                 }
                 break;
 
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateLastName(context, request.getText(), request.getEmail());
-                    notifyFirstOrLastNameUpdate(context, userHandle);
+                    MegaUser user = api.getContact(request.getEmail());
+                    if (user != null) {
+                        notifyLastNameUpdate(context, user.getHandle());
+                    }
                 }
                 break;
 
