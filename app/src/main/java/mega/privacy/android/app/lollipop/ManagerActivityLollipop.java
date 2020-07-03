@@ -46,11 +46,14 @@ import com.google.android.material.navigation.NavigationView.OnNavigationItemSel
 import com.google.android.material.tabs.TabLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
@@ -376,7 +379,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	Handler handler;
 	DisplayMetrics outMetrics;
     float scaleText;
-    FrameLayout fragmentContainer;
+	FragmentContainerView fragmentContainer;
 //	boolean tranfersPaused = false;
 	public Toolbar tB;
     ActionBar aB;
@@ -1871,6 +1874,41 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		super.onStart();
 	}
 
+	@Override
+	protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+//		NavHostFragment fragment = obtainHomepageNavHost();
+//
+//		DrawerItem drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
+//		if (drawerItem == DrawerItem.HOMEPAGE) {
+//			attachHomepageFragment(fragment);
+//		} else {
+//			detachHomepageFragment(fragment);
+//		}
+	}
+
+//	private void attachHomepageFragment(NavHostFragment fragment) {
+//    	getSupportFragmentManager().beginTransaction().attach(fragment).commitNow();
+//	}
+//
+//	private void detachHomepageFragment(NavHostFragment fragment) {
+//		getSupportFragmentManager().beginTransaction().detach(fragment).commitNow();
+//	}
+
+	private NavHostFragment obtainHomepageNavHost() {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		String tag = FragmentTag.HOMEPAGE.getTag();
+		NavHostFragment navHostFragment = (NavHostFragment) fragmentManager.findFragmentByTag(tag);
+
+		if (navHostFragment != null) return navHostFragment;
+
+		navHostFragment = NavHostFragment.create(R.navigation.homepage);
+//		fragmentManager.beginTransaction().add(R.id.fragment_container, navHostFragment, tag)
+//				.commitNow();
+
+		return navHostFragment;
+	}
+
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
@@ -1959,8 +1997,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				businessCUF = savedInstanceState.getString(BUSINESS_CU_FRAGMENT);
 				businessCUFirstTime = savedInstanceState.getBoolean(BUSINESS_CU_FIRST_TIME, false);
 			}
-		}
-		else{
+		} else {
 			logDebug("Bundle is NULL");
 			parentHandleBrowser = -1;
 			parentHandleRubbish = -1;
@@ -1975,6 +2012,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			deepBrowserTreeOutgoing = 0;
 			deepBrowserTreeLinks = 0;
 			this.setPathNavigationOffline("/");
+
+//			obtainHomepageNavHost();
 		}
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -2390,7 +2429,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		businessLabel = findViewById(R.id.business_label);
 		businessLabel.setVisibility(View.GONE);
 
-        fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
+        fragmentContainer = findViewById(R.id.fragment_container);
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
         usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         //TABS section Contacts
@@ -3087,7 +3126,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			setNotificationsTitleSection();
 
 			if (drawerItem == null) {
-	        	drawerItem = DrawerItem.CLOUD_DRIVE;
+//	        	drawerItem = DrawerItem.CLOUD_DRIVE;
+	        	drawerItem = DrawerItem.HOMEPAGE;
 	        	Intent intent = getIntent();
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
@@ -5780,6 +5820,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     	logDebug("Selected DrawerItem: " + item.name());
 
+    	// Homepage may hide the Appbar before
+		abL.setVisibility(View.VISIBLE);
+
     	drawerItem = item;
 		((MegaApplication)getApplication()).setRecentChatVisible(false);
 		resetActionBar(aB);
@@ -5790,6 +5833,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
 			removeFragment(rChatFL);
 		}
+
+//		if (item != DrawerItem.HOMEPAGE) {
+//			detachHomepageFragment(obtainHomepageNavHost());
+//		}
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -5834,8 +5881,27 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
+//				drawerItem = DrawerItem.HOMEPAGE;
+//				attachHomepageFragment(obtainHomepageNavHost());
+//				obtainHomepageNavHost();
+
+				FragmentManager fragmentManager = getSupportFragmentManager();
+				String tag = FragmentTag.HOMEPAGE.getTag();
+				NavHostFragment navHostFragment = (NavHostFragment) fragmentManager.findFragmentByTag(tag);
+
+				if (navHostFragment == null) {
+					navHostFragment = NavHostFragment.create(R.navigation.homepage);
+				} else {
+					refreshFragment(tag);
+				}
+				fragmentManager.beginTransaction()
+						.replace(R.id.fragment_container, navHostFragment, tag)
+						.setPrimaryNavigationFragment(navHostFragment)
+						.commitNow();
+
 				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
-				drawerItem = DrawerItem.HOMEPAGE;
+				abL.setVisibility(View.GONE);
+
 				break;
 			}
 //    		case SAVED_FOR_OFFLINE:{
