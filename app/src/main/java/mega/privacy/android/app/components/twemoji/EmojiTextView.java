@@ -109,16 +109,43 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             return;
         }
 
-        // TextUtils.ellipsize doesn't take care of line break, so we can't use it to get a proper
-        // ellipsized text with it, we have to ellipsize the text manually.
+        setTextByManuallyEllipsize(iconDrawable, emojiProcessedText, maxLines, type);
+    }
+
+    /**
+     * TextUtils.ellipsize doesn't take care of line break, so we can't use it to get a proper
+     * ellipsized text with it, we have to ellipsize the text manually.
+     *
+     * We need trim it, because trailing whitespace causes extra space between the trailing
+     * icon and non-whitespace character in the name, if the name could fit into two lines.
+     *
+     * A Unicode character may need two chars to represent, e.g. emoji,
+     * but Layout already takes care of it, so it's safe to truncate at line end.
+     *
+     * It may not fit into two lines after appending padding and icon, so we need truncate more
+     * chars in this case.
+     * And emojiProcessedText may fit into one line, but after appending padding and
+     * icon it may not fit, we don't want only the icon in the second line, so we need
+     * add line break manually in this case.
+     *
+     * We need truncate at least one character, then trim trailing whitespace,
+     * because we don't want ellipsize after whitespace.
+     * And because the last character may takes two chars, we need to take care of it.
+     *
+     * If we can find whitespace, then break at here,
+     * if not, e.g. the text is Chinese, we just break before the last character,
+     * and because the last character may takes two chars, we need to take care of it.
+     *
+     * Keep the whitespace in the first line
+     */
+    private void setTextByManuallyEllipsize(Drawable iconDrawable,
+        SpannableStringBuilder emojiProcessedText, int maxLines, BufferType type) {
 
         PaddingSpan padding = new PaddingSpan(trailingIconPaddingLeft);
         iconDrawable.setBounds(0, 0, iconDrawable.getIntrinsicWidth(),
             iconDrawable.getIntrinsicHeight());
         ImageSpan icon = new ImageSpan(iconDrawable, ImageSpan.ALIGN_BASELINE);
 
-        // trim it, because trailing whitespace causes extra space between the trailing icon and
-        // non-whitespace character in the name, if the name could fit into two lines.
         int lastNonWhitespaceOffset = emojiProcessedText.length();
         while (lastNonWhitespaceOffset > 0 && Character.isWhitespace(
             emojiProcessedText.charAt(lastNonWhitespaceOffset - 1))) {
@@ -132,16 +159,9 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         Layout originLayout = createWorkingLayout(workingText);
         if (originLayout.getLineCount() > maxLines) {
             isEllipsizeNecessary = true;
-            // a Unicode character may need two chars to represent, e.g. emoji,
-            // but Layout already takes care of it, so it's safe to truncate at line end.
             workingText = workingText.subSequence(0, originLayout.getLineEnd(maxLines - 1));
         }
 
-        // it may not fit into two lines after appending padding and icon, so we need truncate more
-        // chars in this case.
-        // and emojiProcessedText may fit into one line, but after appending padding and
-        // icon it may not fit, we don't want only the icon in the second line, so we need
-        // add line break manually in this case.
         boolean needManualLineBreak = false;
         while (true) {
             SpannableStringBuilder trialText =
@@ -155,9 +175,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             }
 
             isEllipsizeNecessary = true;
-            // we need truncate at least one character, then trim trailing whitespace,
-            // because we don't want ellipsize after whitespace.
-            // and because the last character may takes two chars, we need to take care of it.
             int textEnd = workingText.length() - 1;
             if (!Character.isLetter(workingText.charAt(textEnd))) {
                 textEnd--;
@@ -169,16 +186,12 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         }
 
         if (needManualLineBreak) {
-            // if we can find whitespace, then break at here,
-            // if not, e.g. the text is Chinese, we just break before the last character,
-            // and because the last character may takes two chars, we need to take care of it.
             int breakPos = workingText.length() - 1;
             if (!Character.isLetter(breakPos)) {
                 breakPos--;
             }
             for (int i = workingText.length() - 1; i >= 0; i--) {
                 if (Character.isWhitespace(workingText.charAt(i))) {
-                    // keep the whitespace in the first line
                     breakPos = i + 1;
                     break;
                 }
@@ -191,10 +204,13 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         super.setText(buildFinalText(workingText, isEllipsizeNecessary, padding, icon), type);
     }
 
+    /**
+     * Build the final text by set padding and icon span. The two whitespace are placeholder chars
+     * for padding and icon span
+     */
     private SpannableStringBuilder buildFinalText(CharSequence workingText, boolean ellipsized,
         PaddingSpan padding, ImageSpan icon) {
         SpannableStringBuilder finalText = new SpannableStringBuilder(workingText);
-        // the two whitespace are placeholder chars for padding and icon span
         finalText.append(ellipsized ? "\u2026  " : "  ");
         finalText.setSpan(padding, finalText.length() - 2, finalText.length() - 1,
             Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
