@@ -163,15 +163,18 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             //fetch photos from gallery
             new FetchPhotosTask(fileStorageFragment).execute();
 
-           checkAdapterItems(this);
+           checkAdapterItems(this, false);
         }
             return v;
     }
 
-    private static void checkAdapterItems(ChatFileStorageFragment context){
+    private static void checkAdapterItems(ChatFileStorageFragment context, boolean fileLoaded) {
         context.sendIcon.setVisibility(View.GONE);
         if (context.adapter.getItemCount() == 0){
             context.recyclerView.setVisibility(View.GONE);
+            if (fileLoaded) {
+                context.emptyTextView.setText(R.string.file_storage_empty_folder);
+            }
             context.emptyTextView.setVisibility(View.VISIBLE);
             return;
         }
@@ -224,7 +227,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         if(adapter == null) return;
 
         adapter.setNodes(mPhotoUris);
-        checkAdapterItems(this);
+        checkAdapterItems(this, true);
 
     }
 
@@ -353,7 +356,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                     context.adapter.notifyDataSetChanged();
                 }
 
-                checkAdapterItems(context);
+                checkAdapterItems(context, true);
 
             }
         }

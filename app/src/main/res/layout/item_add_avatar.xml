@@ -21,23 +21,16 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             rounded:corner_radius="20dp"/>
-        <TextView
-            android:id="@+id/contact_list_initial_letter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="invisible"
-            android:gravity="center_horizontal|center_vertical"/>
         <ImageView
             android:id="@+id/add_icon_chip"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignRight="@+id/add_rounded_avatar"
+            android:layout_alignEnd="@+id/add_rounded_avatar"
             android:layout_alignBottom="@+id/add_rounded_avatar"
-            android:layout_marginRight="-3dp"
+            android:layout_marginEnd="-3dp"
             android:layout_marginBottom="-3dp"
             android:contentDescription="@null"
-            android:paddingLeft="24dp"
+            android:paddingStart="24dp"
             android:paddingTop="24dp"
             android:src="@drawable/ic_add_avatar"/>
     </RelativeLayout>
@@ -52,5 +45,18 @@
         android:gravity="center"
         android:maxWidth="60dp"
         android:singleLine="true"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/invite_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chip_layout"
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/invite_more"
+        android:textColor="@color/accentColor"
+        android:textSize="14sp"
+        android:visibility="gone"/>
 </RelativeLayout>
