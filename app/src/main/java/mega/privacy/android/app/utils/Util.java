@@ -115,6 +115,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class Util {
 
@@ -1289,6 +1290,11 @@ public class Util {
 	}
 
 	public static boolean canVoluntaryVerifyPhoneNumber() {
+		// If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
+		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+			return false;
+		}
+
         MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
 	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
 	    boolean allowVerify = api.smsAllowedState() == 2;
