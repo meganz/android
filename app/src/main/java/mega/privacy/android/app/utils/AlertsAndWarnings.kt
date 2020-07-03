@@ -14,8 +14,8 @@ class AlertsAndWarnings {
          * the user is upgrading to PRO (i.e. in any place of the checkout process).
          */
         @JvmStatic
-        fun showOverDiskQuaotaPaywallWarning() {
-            showOverDiskQuaotaPaywallWarning(false)
+        fun showOverDiskQuotaPaywallWarning() {
+            showOverDiskQuotaPaywallWarning(false)
         }
 
         /**
@@ -25,7 +25,7 @@ class AlertsAndWarnings {
          * @param loginFinished Indicates if the login process has already finished.
          */
         @JvmStatic
-        fun showOverDiskQuaotaPaywallWarning(loginFinished: Boolean) {
+        fun showOverDiskQuotaPaywallWarning(loginFinished: Boolean) {
             val app = MegaApplication.getInstance()
 
             // If app is doing login, the ODQ will be displayed at login finish

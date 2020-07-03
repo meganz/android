@@ -82,7 +82,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuaotaPaywallWarning;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -211,7 +211,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logDebug("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
 			if (e.getErrorCode() == MegaError.API_EPAYWALL) {
-				showOverDiskQuaotaPaywallWarning();
+				showOverDiskQuotaPaywallWarning();
 				return;
 			}
 

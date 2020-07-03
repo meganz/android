@@ -80,7 +80,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuaotaPaywallWarning;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1935,7 +1935,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
-                        showOverDiskQuaotaPaywallWarning(true);
+                        showOverDiskQuotaPaywallWarning(true);
                     } else {
                         loginActivityLollipop.startActivity(intent);
                     }
