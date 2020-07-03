@@ -126,6 +126,7 @@ public class SetAttrUserListener extends BaseListener {
                 } else {
                     showSnackbar(context, context.getString(R.string.error_unable_to_setup_cloud_folder));
                     logError("Exception happens when set user attribute" + e.toString());
+                    JobUtil.stopRunningCameraUploadService(context);
                 }
                 break;
         }

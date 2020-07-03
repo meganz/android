@@ -156,6 +156,7 @@ public class GetAttrUserListener extends BaseListener {
                         ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e, true);
                     }
                 } else {
+                    JobUtil.stopRunningCameraUploadService(context);
                     logError("Error getting USER_ATTR_CAMERA_UPLOADS_FOLDER " + e.getErrorString());
                 }
                 break;
