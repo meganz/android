@@ -102,7 +102,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         if (showTrailingIcon) {
             iconDrawable = getResources().getDrawable(trailingIcon);
         }
-        if (iconDrawable == null || maxLines == -1) {
+        if (maxLines == -1 || maxLines == 1) {
             CharSequence ellipsizedText = TextUtils.ellipsize(emojiProcessedText, getPaint(),
                 textViewMaxWidth * maxLines, typeEllipsize);
             super.setText(ellipsizedText, type);
@@ -141,10 +141,14 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     private void setTextByManuallyEllipsize(Drawable iconDrawable,
         SpannableStringBuilder emojiProcessedText, int maxLines, BufferType type) {
 
-        PaddingSpan padding = new PaddingSpan(trailingIconPaddingLeft);
-        iconDrawable.setBounds(0, 0, iconDrawable.getIntrinsicWidth(),
-            iconDrawable.getIntrinsicHeight());
-        ImageSpan icon = new ImageSpan(iconDrawable, ImageSpan.ALIGN_BASELINE);
+        PaddingSpan padding = null;
+        ImageSpan icon = null;
+        if (iconDrawable != null) {
+            padding = new PaddingSpan(trailingIconPaddingLeft);
+            iconDrawable.setBounds(0, 0, iconDrawable.getIntrinsicWidth(),
+                iconDrawable.getIntrinsicHeight());
+            icon = new ImageSpan(iconDrawable, ImageSpan.ALIGN_BASELINE);
+        }
 
         int lastNonWhitespaceOffset = emojiProcessedText.length();
         while (lastNonWhitespaceOffset > 0 && Character.isWhitespace(
@@ -169,7 +173,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             Layout trialLayout = createWorkingLayout(trialText);
             if (trialLayout.getLineCount() <= maxLines) {
                 needManualLineBreak =
-                    !isEllipsizeNecessary
+                    !isEllipsizeNecessary && iconDrawable != null
                         && trialLayout.getLineCount() > originLayout.getLineCount();
                 break;
             }
@@ -211,11 +215,15 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     private SpannableStringBuilder buildFinalText(CharSequence workingText, boolean ellipsized,
         PaddingSpan padding, ImageSpan icon) {
         SpannableStringBuilder finalText = new SpannableStringBuilder(workingText);
-        finalText.append(ellipsized ? "\u2026  " : "  ");
-        finalText.setSpan(padding, finalText.length() - 2, finalText.length() - 1,
-            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        finalText.setSpan(icon, finalText.length() - 1, finalText.length(),
-            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        if (padding != null && icon != null) {
+            finalText.append(ellipsized ? "\u2026  " : "  ");
+            finalText.setSpan(padding, finalText.length() - 2, finalText.length() - 1,
+                Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+            finalText.setSpan(icon, finalText.length() - 1, finalText.length(),
+                Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        } else if (ellipsized) {
+            finalText.append("\u2026");
+        }
         return finalText;
     }
 
