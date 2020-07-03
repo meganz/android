@@ -2207,9 +2207,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 return;
             }
             MegaContactAdapter deleteContact = addedContactsMEGA.get(position);
-            if (deleteContact.getMegaUser() != null || deleteContact.getMegaContactDB() != null) {
-                addMEGAFilteredContact(deleteContact);
-            }
             addedContactsMEGA.remove(deleteContact);
             setSendInvitationVisibility();
             adapterMEGAContacts.setContacts(addedContactsMEGA);
@@ -2743,7 +2740,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         for (int i = 0; i < queryContactMEGA.size(); i++) {
                             if (getMegaContactMail(queryContactMEGA.get(i)).equals(email)) {
                                 addContactMEGA(queryContactMEGA.get(i));
-                                filteredContactMEGA.remove(queryContactMEGA.get(i));
                                 queryContactMEGA.remove(i);
                                 adapterMEGA.setContacts(queryContactMEGA);
                                 break;
@@ -2754,8 +2750,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         for (int i = 0; i < filteredContactMEGA.size(); i++) {
                             if (getMegaContactMail(filteredContactMEGA.get(i)).equals(email)) {
                                 addContactMEGA(filteredContactMEGA.get(i));
-                                filteredContactMEGA.remove(i);
-                                adapterMEGA.setContacts(filteredContactMEGA);
                                 break;
                             }
                         }
