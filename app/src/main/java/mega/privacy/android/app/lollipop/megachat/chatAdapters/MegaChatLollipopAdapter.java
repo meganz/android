@@ -924,7 +924,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             int colors[] = {0x70000000, 0x00000000};
             GradientDrawable shape = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, colors);
-            ;
             shape.setShape(GradientDrawable.RECTANGLE);
             shape.setCornerRadii(new float[]{radius, 0, radius, 0, radius, radius, radius, radius});
 
