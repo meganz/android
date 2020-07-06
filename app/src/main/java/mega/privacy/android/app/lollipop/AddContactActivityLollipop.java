@@ -2244,9 +2244,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
             if (deleteContact.isPhoneContact()) {
                 addFilteredContact(deleteContact.getPhoneContactInfo());
-            }
-            else if (deleteContact.isMegaContact()) {
-                addMEGAFilteredContact(deleteContact.getMegaContactAdapter());
+            } else if (deleteContact.isMegaContact()) {
+                int filteredPosition = filteredContactsShare.indexOf(deleteContact);
+                if (filteredPosition != -1) {
+                    filteredContactsShare.get(filteredPosition).getMegaContactAdapter().setSelected(false);
+                    adapterShareHeader.setContacts(filteredContactsShare);
+                }
             }
 
             addedContactsShare.remove(deleteContact);
@@ -2879,24 +2882,23 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 return;
             }
 
-            if (contact.isMegaContact()) {
-                if (filteredContactMEGA.size() == 1) {
-                    filteredContactsShare.remove(0);
-                }
-                filteredContactMEGA.remove(contact.getMegaContactAdapter());
-            }
-            else if (contact.isPhoneContact()) {
+            if (contact.isPhoneContact()) {
                 filteredContactsPhone.remove(contact.getPhoneContactInfo());
                 if (filteredContactsPhone.size() == 0) {
                     filteredContactsShare.remove(filteredContactsShare.size() - 2);
                 }
+                filteredContactsShare.remove(contact);
+            } else if (contact.isMegaContact()) {
+                int contactIndex = filteredContactsShare.indexOf(contact);
+                if (contactIndex != -1) {
+                    filteredContactsShare.get(contactIndex).getMegaContactAdapter().setSelected(true);
+                }
             }
-            filteredContactsShare.remove(contact);
+
             if (inputString != null && !inputString.equals("")) {
                 filterContactsTask = new FilterContactsTask();
                 filterContactsTask.execute();
-            }
-            else {
+            } else {
                 adapterShareHeader.setContacts(filteredContactsShare);
             }
 
