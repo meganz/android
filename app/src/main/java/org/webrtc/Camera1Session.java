@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
 
+import static mega.privacy.android.app.utils.CallUtil.disableLocalCamera;
+
 @SuppressWarnings("deprecation")
 class Camera1Session implements CameraSession {
   private static final String TAG = "Camera1Session";
@@ -204,6 +206,7 @@ class Camera1Session implements CameraSession {
           errorMessage = "Camera error: " + error;
         }
         Logging.e(TAG, errorMessage);
+        disableLocalCamera();
         stopInternal();
         if (error == android.hardware.Camera.CAMERA_ERROR_EVICTED) {
           events.onCameraDisconnected(Camera1Session.this);
