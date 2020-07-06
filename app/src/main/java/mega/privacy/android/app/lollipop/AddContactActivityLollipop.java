@@ -3145,6 +3145,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         newChatLinkButton.setVisibility(View.VISIBLE);
         filteredContactMEGA.clear();
         filteredContactMEGA.addAll(visibleContactsMEGA);
+
+        for (int i = 0; i < filteredContactMEGA.size(); i++) {
+            filteredContactMEGA.get(i).setSelected(false);
+        }
+
         setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
         addedContactsMEGA.clear();
         setRecyclersVisibility();
