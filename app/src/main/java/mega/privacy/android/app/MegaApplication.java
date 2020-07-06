@@ -48,6 +48,7 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.listeners.GlobalTransferListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
@@ -766,6 +767,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			requestListener = new BackgroundRequestListener();
 			logDebug("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
+			megaApi.addTransferListener(new GlobalTransferListener());
 
 			megaApi.addGlobalListener(new GlobalListener());
 			megaChatApi = getMegaChatApi();
