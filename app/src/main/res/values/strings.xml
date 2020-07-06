@@ -2797,4 +2797,6 @@
     <string name="action_reset" context="Button to reset credentials">Reset</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana's credentials">%s\'s credentials</string>
 
+    <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Joining&#8230;</string>
+    <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Leaving&#8230;</string>
 </resources>

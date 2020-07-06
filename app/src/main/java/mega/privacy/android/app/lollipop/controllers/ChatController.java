@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,7 +23,6 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -65,6 +63,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -108,7 +108,10 @@ public class ChatController {
             megaChatApi.leaveChat(chat.getChatId(), (ManagerActivityLollipop) context);
         }
         else if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.leaveChat(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
+            context.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_LEFT_CHAT)
+                    .setAction(ACTION_LEFT_CHAT)
+                    .putExtra(CHAT_ID, chat.getChatId()));
+            ((GroupChatInfoActivityLollipop) context).finish();
         }
         else if(context instanceof ChatActivityLollipop){
             megaChatApi.leaveChat(chat.getChatId(), (ChatActivityLollipop) context);

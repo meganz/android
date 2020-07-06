@@ -680,7 +680,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 participant.setEmpty(false);
                 int arrayPosition = getParticipantPositionInArray(position);
                 groupChatInfoActivity.updateParticipant(arrayPosition, participant);
-                participants.set(position, participant);
+                participants.set(arrayPosition, participant);
             }
         }
 
