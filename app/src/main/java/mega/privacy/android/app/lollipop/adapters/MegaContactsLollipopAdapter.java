@@ -374,7 +374,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		if (contact.isSelected()) {
 			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+			holder.imageView.setImageResource(R.drawable.ic_select_folder);
 		} else {
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
 			Bitmap bitmap = null;
 			if (isFileAvailable(avatar)) {
@@ -395,7 +397,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			} else {
 				megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
 			}
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
 		}
 	}
 
