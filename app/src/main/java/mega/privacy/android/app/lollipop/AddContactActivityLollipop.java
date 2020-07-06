@@ -2209,9 +2209,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             MegaContactAdapter deleteContact = addedContactsMEGA.get(position);
             addedContactsMEGA.remove(deleteContact);
 
-            MegaContactAdapter contact = filteredContactMEGA.get(position);
-            contact.setSelected(false);
-            adapterMEGA.setContacts(filteredContactMEGA);
+            int filteredPosition = filteredContactMEGA.indexOf(deleteContact);
+            if (filteredPosition != -1) {
+                filteredContactMEGA.get(filteredPosition).setSelected(false);
+                adapterMEGA.setContacts(filteredContactMEGA);
+            }
 
             setSendInvitationVisibility();
             adapterMEGAContacts.setContacts(addedContactsMEGA);
