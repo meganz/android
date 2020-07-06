@@ -51,6 +51,7 @@ public class CreateFolderListener extends BaseListener {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
                 } else {
+                    logWarning("Create CU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
                     JobUtil.stopRunningCameraUploadService(context);
                 }
             } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
@@ -59,6 +60,7 @@ public class CreateFolderListener extends BaseListener {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
                 } else {
+                    logWarning("Create MU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
                     JobUtil.stopRunningCameraUploadService(context);
                 }
             }
