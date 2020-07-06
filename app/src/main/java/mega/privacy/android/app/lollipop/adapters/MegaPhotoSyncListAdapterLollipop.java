@@ -36,6 +36,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownDialogHandler.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -342,41 +343,9 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
                 holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
                 if (node.hasThumbnail()) {
-                    thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-                    if (thumb != null) {
-                        holder.imageView.setImageBitmap(thumb);
-                    } else {
-                        thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-                        if (thumb != null) {
-                            holder.imageView.setImageBitmap(thumb);
-                        } else {
-                            try {
-                                thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
-                            } catch (Exception e) {
-                                logError("Exception happens: " + e.toString());
-                            } //Too many AsyncTasks
-
-                            if (thumb != null) {
-                                holder.imageView.setImageBitmap(thumb);
-                            }
-                        }
-                    }
+                  getThumbAndSetView(holder, node);
                 } else {
-                    thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-                    if (thumb != null) {
-                        holder.imageView.setImageBitmap(thumb);
-                    } else {
-                        thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-                        if (thumb != null) {
-                            holder.imageView.setImageBitmap(thumb);
-                        } else {
-                            try {
-                                ThumbnailUtilsLollipop.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);
-                            } catch (Exception e) {
-                                logError("Exception happens: " + e.toString());
-                            } //Too many AsyncTasks
-                        }
-                    }
+                   getThumbAndSetViewOrCreate(holder, node);
                 }
 
                 if (node.isTakenDown()) {
@@ -396,6 +365,37 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
         }
         reSelectUnhandledNode();
     }
+
+	private void getThumbAndSetView(ViewHolderPhotoSyncList holder, MegaNode node) {
+		Bitmap thumb;
+		if ((thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node)) == null &&
+				((thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context)) == null)) {
+			try {
+				thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
+			} catch (Exception e) {
+				logError("Exception happens: " + e.toString());
+			}// Too many AsyncTasks
+		}
+
+		if (thumb != null) {
+			holder.imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+		}
+	}
+
+	private void getThumbAndSetViewOrCreate(ViewHolderPhotoSyncList holder, MegaNode node) {
+		Bitmap thumb;
+		if ((thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node)) != null ||
+				((thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context)) != null)) {
+			holder.imageView.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
+			return;
+		}
+
+		try {
+			ThumbnailUtilsLollipop.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);
+		} catch (Exception e) {
+			logError("Exception happens: " + e.toString());
+		} //Too many AsyncTasks
+	}
 
 	@Override
 	public int getItemViewType(int position) {
