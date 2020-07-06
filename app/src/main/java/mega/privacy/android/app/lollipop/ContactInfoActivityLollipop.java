@@ -644,9 +644,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				|| userStatus == MegaChatApi.STATUS_AWAY
 				|| userStatus == MegaChatApi.STATUS_BUSY
 				|| userStatus == MegaChatApi.STATUS_OFFLINE)) {
+			firstLineTextToolbar.setMaxLines(2);
 			firstLineTextToolbar.setTrailingIcon(contactStateIcon, contactStateIconPaddingLeft);
 			firstLineTextToolbar.updateMaxWidthAndIconVisibility(firstLineTextMaxWidthExpanded, true);
 		} else {
+			firstLineTextToolbar.setMaxLines(stateToolbar == State.EXPANDED ? 2 : 1);
 			firstLineTextToolbar.updateMaxWidthAndIconVisibility(
 					stateToolbar == State.EXPANDED ? firstLineTextMaxWidthExpanded
 							: firstLineTextMaxWidthCollapsed, false);

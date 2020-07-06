@@ -119,7 +119,8 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
      * ellipsized text with it, we have to ellipsize the text manually.
      *
      * We need trim it, because trailing whitespace causes extra space between the trailing
-     * icon and non-whitespace character in the name, if the name could fit into two lines.
+     * icon and non-whitespace character in the name, if the name could fit into two lines,
+     * also leading whitespace could bother line break.
      *
      * A Unicode character may need two chars to represent, e.g. emoji,
      * but Layout already takes care of it, so it's safe to truncate at line end.
@@ -157,14 +158,27 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             icon = new ImageSpan(iconDrawable, ImageSpan.ALIGN_BASELINE);
         }
 
+        int firstNonWhitespaceOffset = 0;
+        while (firstNonWhitespaceOffset < emojiProcessedText.length()
+            && Character.isWhitespace(emojiProcessedText.charAt(firstNonWhitespaceOffset))) {
+            firstNonWhitespaceOffset++;
+        }
         int lastNonWhitespaceOffset = emojiProcessedText.length();
-        while (lastNonWhitespaceOffset > 0 && Character.isWhitespace(
-            emojiProcessedText.charAt(lastNonWhitespaceOffset - 1))) {
+        while (lastNonWhitespaceOffset > firstNonWhitespaceOffset
+            && Character.isWhitespace(emojiProcessedText.charAt(lastNonWhitespaceOffset - 1))) {
             lastNonWhitespaceOffset--;
         }
-        CharSequence workingText =
-            lastNonWhitespaceOffset == emojiProcessedText.length() ? emojiProcessedText
-                : emojiProcessedText.subSequence(0, lastNonWhitespaceOffset);
+        if (firstNonWhitespaceOffset >= lastNonWhitespaceOffset) {
+            return;
+        }
+        CharSequence workingText;
+        if (firstNonWhitespaceOffset == 0
+            && lastNonWhitespaceOffset == emojiProcessedText.length()) {
+            workingText = emojiProcessedText;
+        } else {
+            workingText = emojiProcessedText.subSequence(firstNonWhitespaceOffset,
+                lastNonWhitespaceOffset);
+        }
 
         boolean isEllipsizeNecessary = false;
         Layout originLayout = createWorkingLayout(workingText);
