@@ -8,14 +8,15 @@ public class MegaContactAdapter {
     MegaContactDB megaContactDB;
     MegaUser megaUser;
     String fullName;
-
     String lastGreen;
+    private Boolean isSelected;
 
     public MegaContactAdapter(MegaContactDB megaContactDB, MegaUser megaUser, String fullName) {
         this.megaContactDB = megaContactDB;
         this.megaUser = megaUser;
         this.fullName = fullName;
         this.lastGreen = "";
+        this.isSelected = false;
     }
 
     public MegaContactDB getMegaContactDB() {
@@ -50,4 +51,11 @@ public class MegaContactAdapter {
         this.lastGreen = lastGreen;
     }
 
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
 }

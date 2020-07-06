@@ -2208,6 +2208,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             MegaContactAdapter deleteContact = addedContactsMEGA.get(position);
             addedContactsMEGA.remove(deleteContact);
+
+            MegaContactAdapter contact = filteredContactMEGA.get(position);
+            contact.setSelected(false);
+            adapterMEGA.setContacts(filteredContactMEGA);
+
             setSendInvitationVisibility();
             adapterMEGAContacts.setContacts(addedContactsMEGA);
             if (addedContactsMEGA.size() == 0){
@@ -2740,6 +2745,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         for (int i = 0; i < queryContactMEGA.size(); i++) {
                             if (getMegaContactMail(queryContactMEGA.get(i)).equals(email)) {
                                 addContactMEGA(queryContactMEGA.get(i));
+                                filteredContactMEGA.get(i).setSelected(true);
                                 queryContactMEGA.remove(i);
                                 adapterMEGA.setContacts(queryContactMEGA);
                                 break;
@@ -2748,8 +2754,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                     else {
                         for (int i = 0; i < filteredContactMEGA.size(); i++) {
-                            if (getMegaContactMail(filteredContactMEGA.get(i)).equals(email)) {
-                                addContactMEGA(filteredContactMEGA.get(i));
+                            MegaContactAdapter contact = filteredContactMEGA.get(i);
+                            if (getMegaContactMail(contact).equals(email)) {
+                                contact.setSelected(true);
+                                addContactMEGA(contact);
+                                adapterMEGA.setContacts(filteredContactMEGA);
                                 break;
                             }
                         }
