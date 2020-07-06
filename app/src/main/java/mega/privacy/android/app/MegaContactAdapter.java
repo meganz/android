@@ -9,7 +9,7 @@ public class MegaContactAdapter {
     MegaUser megaUser;
     String fullName;
     String lastGreen;
-    private Boolean isSelected;
+    private boolean isSelected;
 
     public MegaContactAdapter(MegaContactDB megaContactDB, MegaUser megaUser, String fullName) {
         this.megaContactDB = megaContactDB;
