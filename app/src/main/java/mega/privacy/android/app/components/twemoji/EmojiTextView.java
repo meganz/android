@@ -113,6 +113,8 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     }
 
     /**
+     * Manually ellipsize and display the text.
+     *
      * TextUtils.ellipsize doesn't take care of line break, so we can't use it to get a proper
      * ellipsized text with it, we have to ellipsize the text manually.
      *
@@ -137,6 +139,11 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
      * and because the last character may takes two chars, we need to take care of it.
      *
      * Keep the whitespace in the first line
+     *
+     * @param iconDrawable the icon drawable
+     * @param emojiProcessedText the text after emoji processing
+     * @param maxLines the maxLines
+     * @param type the buffer type param of setText
      */
     private void setTextByManuallyEllipsize(Drawable iconDrawable,
         SpannableStringBuilder emojiProcessedText, int maxLines, BufferType type) {
