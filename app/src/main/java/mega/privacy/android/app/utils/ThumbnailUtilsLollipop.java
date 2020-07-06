@@ -1762,6 +1762,7 @@ public class ThumbnailUtilsLollipop {
 			try {
 				thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, adapter);
 			} catch (Exception e) {
+				logWarning(e.getMessage());
 			}// Too many AsyncTasks
 		}
 
@@ -1783,6 +1784,7 @@ public class ThumbnailUtilsLollipop {
 			try {
 				ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, adapter);
 			} catch (Exception e) {
+				logWarning(e.getMessage());
 			} // Too many AsyncTasks
 		}
 	}
