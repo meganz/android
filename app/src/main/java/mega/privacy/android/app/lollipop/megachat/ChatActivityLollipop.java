@@ -8867,6 +8867,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         this.positionNewMessagesLayout = positionNewMessagesLayout;
     }
 
+    /**
+     * Initializes the joining or leaving UI depending on the action received.
+     *
+     * @param action    String which indicates if the UI to set is the joining or leaving state.
+     */
     private void setJoiningOrLeaving(String action) {
         joiningOrLeaving = true;
         joiningOrLeavingAction = action;
