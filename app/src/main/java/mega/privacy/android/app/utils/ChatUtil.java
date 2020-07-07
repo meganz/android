@@ -16,6 +16,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +44,7 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -63,6 +68,9 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
+    private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
+    public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -495,6 +503,59 @@ public class ChatUtil {
         if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
             contactStateText.setText(lastGreen);
             contactStateText.isMarqueeIsNecessary(context);
+        }
+    }
+
+    /**
+     * Method for obtaining the AudioFocusRequest when get the focus audio.
+     *
+     * @param listener  The listener.
+     * @param focusType Type of focus.
+     * @return The AudioFocusRequest.
+     */
+    public static AudioFocusRequest getRequest(AudioFocusListener listener, int focusType) {
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            AudioAttributes mAudioAttributes =
+                    new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build();
+            return new AudioFocusRequest.Builder(focusType)
+                    .setAudioAttributes(mAudioAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setWillPauseWhenDucked(true)
+                    .setOnAudioFocusChangeListener(listener)
+                    .build();
+        }
+
+        return null;
+    }
+
+    /**
+     * Knowing if permits have been successfully got.
+     *
+     * @return True, if it has been successful. False, if not.
+     */
+    public static boolean getAudioFocus(AudioManager mAudioManager, AudioFocusListener listener, AudioFocusRequest request, int focusType, int streamType) {
+        int focusRequest;
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            focusRequest = mAudioManager.requestAudioFocus(request);
+        } else {
+            focusRequest = mAudioManager.requestAudioFocus(listener, streamType, focusType);
+        }
+        return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
+    /**
+     * Method for leaving the audio focus.
+     */
+    public static void abandonAudioFocus(AudioFocusListener listener, AudioManager mAudioManager, AudioFocusRequest request) {
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            if(request != null) {
+                mAudioManager.abandonAudioFocusRequest(request);
+            }
+        } else {
+            mAudioManager.abandonAudioFocus(listener);
         }
     }
 
