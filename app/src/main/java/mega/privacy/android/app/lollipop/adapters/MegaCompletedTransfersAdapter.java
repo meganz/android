@@ -29,6 +29,8 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
@@ -135,7 +137,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
 				params2.setMargins(0, -12, -12, 0);
 				holder.iconDownloadUploadView.setLayoutParams(params2);
-				holder.imageView.setImageBitmap(thumb);
+				holder.imageView.setImageBitmap(getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
 			}
 		}
 
