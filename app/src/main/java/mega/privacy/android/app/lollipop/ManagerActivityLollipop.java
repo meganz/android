@@ -10250,13 +10250,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setPinDialog.show();
 	}
 
-	public void chooseAddContactDialog(boolean isMegaContact){
+	public void chooseAddContactDialog(boolean isMegaContact) {
 		logDebug("chooseAddContactDialog");
-		if(isMegaContact){
-			if(megaApi!=null && megaApi.getRootNode()!=null){
-				Intent in = new Intent(this, AddContactActivityLollipop.class);
-				in.putExtra("contactType", CONTACT_TYPE_MEGA);
-				startActivityForResult(in, REQUEST_CREATE_CHAT);
+		if (isMegaContact) {
+			if (megaApi != null && megaApi.getRootNode() != null) {
+				Intent intent = new Intent(this, AddContactActivityLollipop.class);
+				intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+				startActivityForResult(intent, REQUEST_CREATE_CHAT);
 			}
 			else{
 				logWarning("Online but not megaApi");

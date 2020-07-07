@@ -40,12 +40,14 @@ import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
 public class AppRTCAudioManager {
+
     private static final String TAG = "AppRTCAudioManager";
     private final Context apprtcContext;
     // Handles all tasks related to Bluetooth headset devices.
@@ -424,33 +426,41 @@ public class AppRTCAudioManager {
             }
         };
 
-        int resultRequestFocus = AudioManager.AUDIOFOCUS_REQUEST_FAILED;
-
-        if (apprtcContext instanceof MegaApplication) {
-            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-                resultRequestFocus = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_RING, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
-            } else {
-                resultRequestFocus = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
-            }
-        } else if (apprtcContext instanceof ChatActivityLollipop) {
-            resultRequestFocus = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
-        }
-        if (resultRequestFocus != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            logDebug("Audio focus request failed");
-        }
-
+        int typeStream = -1;
+        int typeFocus = -1;
         if(apprtcContext instanceof MegaApplication){
+            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+                typeStream = AudioManager.STREAM_RING;
+                typeFocus = AUDIOFOCUS_DEFAULT;
+            }else{
+                typeStream = AudioManager.STREAM_VOICE_CALL;
+                typeFocus = AudioManager.AUDIOFOCUS_GAIN;
+            }
+        }else if(apprtcContext instanceof ChatActivityLollipop){
+            typeStream = STREAM_MUSIC_DEFAULT;
+            typeFocus = AUDIOFOCUS_DEFAULT;
+        }
+
+        if (apprtcContext instanceof MegaApplication || apprtcContext instanceof ChatActivityLollipop) {
+            // Request audio playout focus (without ducking) and install listener for changes in focus.
+            int result = audioManager.requestAudioFocus(audioFocusChangeListener, typeStream, typeFocus);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                logDebug("Audio focus request granted for VOICE_CALL streams");
+            } else {
+                logError("Audio focus request failed");
+            }
+
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
             // best possible VoIP performance.
             // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
-            if(typeStatus ==  MegaChatCall.CALL_STATUS_RING_IN){
-                audioManager.setMode(AudioManager.MODE_NORMAL);
-            }else if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if (apprtcContext instanceof MegaApplication && (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) && typeStatus != MegaChatCall.CALL_STATUS_RING_IN) {
+                logDebug("Mode communication");
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            }else{
+                logDebug("Mode normal");
+                audioManager.setMode(AudioManager.MODE_NORMAL);
             }
-        }else if(apprtcContext instanceof ChatActivityLollipop && (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)){
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         }
 
         // Always disable microphone mute during a WebRTC call.
