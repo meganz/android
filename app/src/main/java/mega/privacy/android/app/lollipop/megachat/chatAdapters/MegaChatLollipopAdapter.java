@@ -111,6 +111,9 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatMessage.END_CALL_REASON_CANCELLED;
+import static nz.mega.sdk.MegaChatMessage.END_CALL_REASON_NO_ANSWER;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener, RotatableAdapter {
 
@@ -1698,56 +1701,45 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        ownMessageParams.setMargins(scaleWidthPx(11, outMetrics), scaleHeightPx(-14, outMetrics), scaleWidthPx(62, outMetrics), scaleHeightPx(16, outMetrics));
 //        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLayoutParams(ownMessageParams);
 
-        if (((ChatActivityLollipop) context).getLastIdMsgSeen() != -1) {
 
-            if (((ChatActivityLollipop) context).getLastIdMsgSeen() == message.getMsgId()) {
-
-                logDebug("Last message ID match!");
-
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).newMessagesLayout.getLayoutParams();
-
-                if ((message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE)) {
-                    if (message.getHandleOfAction() == myUserHandle) {
-                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
-                        ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
-                    } else {
-                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
-                        ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
-                    }
-
-                } else {
-                    if (message.getUserHandle() == megaChatApi.getMyUserHandle()) {
-                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
-                        ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
-                    } else {
-                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
-                        ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
-                    }
-                }
-
-                String numberString;
-                long unreadMessages = Math.abs(((ChatActivityLollipop) context).getGeneralUnreadCount());
-                if (((ChatActivityLollipop) context).getGeneralUnreadCount() < 0) {
-                    numberString = "+" + unreadMessages;
-                } else {
-                    numberString = unreadMessages + "";
-                }
-
-                String contentUnreadText = context.getResources().getQuantityString(R.plurals.number_unread_messages, (int) unreadMessages, numberString);
-                ((ViewHolderMessageChat) holder).newMessagesText.setText(contentUnreadText);
-
-                ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.VISIBLE);
-//                ((ChatActivityLollipop)context).showJumpMessage();
-                ((ChatActivityLollipop) context).setNewVisibility(true);
-
-                logDebug("Set positionNewMessagesLayout: "+position);
-                ((ChatActivityLollipop) context).setPositionNewMessagesLayout(position);
-            } else {
-                ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
-            }
-        } else {
+        ChatActivityLollipop activity = (ChatActivityLollipop) context;
+        long unreadCount = Math.abs(activity.getGeneralUnreadCount());
+        if (unreadCount == 0 || activity.getLastIdMsgSeen() == MEGACHAT_INVALID_HANDLE || activity.getLastIdMsgSeen() != message.getMsgId()) {
             ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+            return;
         }
+
+        MegaChatMessage nextMessage = messages.get(position).getMessage();
+        int typeMessage = nextMessage.getType();
+        int codeMessage = nextMessage.getCode();
+
+        if (typeMessage >= MegaChatMessage.TYPE_LOWEST_MANAGEMENT && typeMessage <= MegaChatMessage.TYPE_SET_PRIVATE_MODE
+                && (typeMessage != MegaChatMessage.TYPE_CALL_ENDED || (codeMessage != END_CALL_REASON_CANCELLED && codeMessage != END_CALL_REASON_NO_ANSWER))) {
+            ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+            ((ChatActivityLollipop) context).setLastIdMsgSeen(nextMessage.getMsgId());
+            return;
+        }
+
+        logDebug("Last message ID match!");
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).newMessagesLayout.getLayoutParams();
+        long userHandle = (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS || message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) ? message.getHandleOfAction() : message.getUserHandle();
+
+        params.addRule(RelativeLayout.BELOW, userHandle == myUserHandle ? R.id.message_chat_own_message_layout : R.id.message_chat_contact_message_layout);
+        ((ViewHolderMessageChat) holder).newMessagesLayout.setLayoutParams(params);
+
+        String numberString;
+        long unreadMessages = Math.abs(((ChatActivityLollipop) context).getGeneralUnreadCount());
+        if (((ChatActivityLollipop) context).getGeneralUnreadCount() < 0) {
+            numberString = "+" + unreadMessages;
+        } else {
+            numberString = unreadMessages + "";
+        }
+
+        String contentUnreadText = context.getResources().getQuantityString(R.plurals.number_unread_messages, (int) unreadMessages, numberString);
+        ((ViewHolderMessageChat) holder).newMessagesText.setText(contentUnreadText);
+        ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.VISIBLE);
+        ((ChatActivityLollipop) context).setNewVisibility(true);
+        ((ChatActivityLollipop) context).setPositionNewMessagesLayout(position);
     }
 
     public boolean isKnownMessage(int messageType){
@@ -1869,7 +1861,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         break;
                     }
-                    case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+                    case END_CALL_REASON_NO_ANSWER:{
 
                         ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
@@ -1895,7 +1887,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         break;
                     }
-                    case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+                    case END_CALL_REASON_CANCELLED:{
 
                         ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
 
@@ -2034,7 +2026,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         break;
                     }
-                    case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+                    case END_CALL_REASON_NO_ANSWER:{
                         ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
 
                         textToShow = String.format(context.getString(R.string.call_missed_messages));
@@ -2059,7 +2051,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         break;
                     }
-                    case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+                    case END_CALL_REASON_CANCELLED:{
 
                         ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
 
@@ -7239,13 +7231,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         switch (v.getId()) {
             case R.id.content_own_message_voice_clip_play_pause:
-            case R.id.content_contact_message_voice_clip_play_pause:{
+            case R.id.content_contact_message_voice_clip_play_pause:
                 if(!(((ChatActivityLollipop)context).isRecordingNow())){
-                    logDebug("PAUSE/PLAY");
                     playOrPauseVoiceClip(currentPositionInAdapter, holder);
                 }
                 break;
-            }
 
             case R.id.content_own_message_voice_clip_not_available:
             case R.id.content_contact_message_voice_clip_not_available:{
@@ -7447,9 +7437,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Play or pause a voice clip
      */
     private void playOrPauseVoiceClip(int positionInAdapter, ViewHolderMessageChat holder){
-        logDebug("position = " + positionInAdapter);
-        AndroidMegaChatMessage currentMessage = getMessageAt(positionInAdapter);
-        if(currentMessage==null || currentMessage.getMessage()==null || currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP || messagesPlaying==null || messagesPlaying.isEmpty()) return;
+        AndroidMegaChatMessage currentMessage = getMessageAtPosition(positionInAdapter-1);
+        if (currentMessage == null || currentMessage.getMessage() == null ||
+                currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP ||
+                messagesPlaying == null || messagesPlaying.isEmpty())
+            return;
+
         for(MessageVoiceClip m: messagesPlaying){
             if(m.getIdMessage() == currentMessage.getMessage().getMsgId()){
                 if(m.getMediaPlayer().isPlaying()){
