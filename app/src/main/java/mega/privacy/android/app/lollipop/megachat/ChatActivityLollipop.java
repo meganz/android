@@ -270,7 +270,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     boolean retryHistory = false;
 
     public long lastIdMsgSeen = -1;
-    public long generalUnreadCount = -1;
+    public long generalUnreadCount;
     boolean lastSeenReceived = false;
     int positionToScroll = -1;
     public int positionNewMessagesLayout = -1;
@@ -1246,7 +1246,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         if(lastIdMsgSeen != -1){
                             isTurn = true;
                         }
-                        generalUnreadCount = savedInstanceState.getLong("generalUnreadCount",-1);
+                        generalUnreadCount = savedInstanceState.getLong("generalUnreadCount",0);
 
                         boolean isPlaying = savedInstanceState.getBoolean(PLAYING, false);
                         if (isPlaying) {
@@ -1502,7 +1502,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (unreadCount == 0) {
             if(!isTurn) {
                 lastIdMsgSeen = -1;
-                generalUnreadCount = -1;
+                generalUnreadCount = 0;
                 stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                 numberToLoad=NUMBER_MESSAGES_TO_LOAD;
             }else{
@@ -3633,7 +3633,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         positionNewMessagesLayout = -1;
         lastIdMsgSeen = -1;
-        generalUnreadCount = -1;
+        generalUnreadCount = 0;
         lastSeenReceived = true;
         newVisibility = false;
 
@@ -5850,7 +5850,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
         if (unread == 0) {
             lastIdMsgSeen = -1;
-            generalUnreadCount = -1;
+            generalUnreadCount = 0;
             lastSeenReceived = true;
             logDebug("loadMessages unread is 0");
         } else {
