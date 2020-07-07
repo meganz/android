@@ -7219,13 +7219,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         switch (v.getId()) {
             case R.id.content_own_message_voice_clip_play_pause:
-            case R.id.content_contact_message_voice_clip_play_pause:{
+            case R.id.content_contact_message_voice_clip_play_pause:
                 if(!(((ChatActivityLollipop)context).isRecordingNow())){
-                    logDebug("PAUSE/PLAY");
                     playOrPauseVoiceClip(currentPositionInAdapter, holder);
                 }
                 break;
-            }
 
             case R.id.content_own_message_voice_clip_not_available:
             case R.id.content_contact_message_voice_clip_not_available:{
@@ -7427,9 +7425,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Play or pause a voice clip
      */
     private void playOrPauseVoiceClip(int positionInAdapter, ViewHolderMessageChat holder){
-        logDebug("position = " + positionInAdapter);
-        AndroidMegaChatMessage currentMessage = getMessageAt(positionInAdapter);
-        if(currentMessage==null || currentMessage.getMessage()==null || currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP || messagesPlaying==null || messagesPlaying.isEmpty()) return;
+        AndroidMegaChatMessage currentMessage = getMessageAtPosition(positionInAdapter-1);
+        if (currentMessage == null || currentMessage.getMessage() == null ||
+                currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP ||
+                messagesPlaying == null || messagesPlaying.isEmpty())
+            return;
+
         for(MessageVoiceClip m: messagesPlaying){
             if(m.getIdMessage() == currentMessage.getMessage().getMsgId()){
                 if(m.getMediaPlayer().isPlaying()){
