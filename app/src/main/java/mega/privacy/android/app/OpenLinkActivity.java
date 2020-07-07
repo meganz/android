@@ -75,6 +75,13 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		isLoggedIn = dbH != null && dbH.getCredentials() != null;
 		needsRefreshSession = megaApi.getRootNode() == null;
 
+		// If is not a MEGA link, is not a supported link
+		if (!matchRegexs(url, MEGA_REGEXS)) {
+			logDebug("The link is not a MEGA link: " + url);
+			setError(getString(R.string.open_link_not_valid_link));
+			return;
+		}
+
 		// Email verification link
 		if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
 			logDebug("Open email verification link");
