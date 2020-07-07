@@ -109,6 +109,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatMessage.END_CALL_REASON_CANCELLED;
 import static nz.mega.sdk.MegaChatMessage.END_CALL_REASON_NO_ANSWER;
 
@@ -1686,7 +1687,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ChatActivityLollipop activity = (ChatActivityLollipop) context;
         long unreadCount = Math.abs(activity.generalUnreadCount);
-        if (unreadCount == 0 || activity.lastIdMsgSeen == -1 || activity.lastIdMsgSeen != message.getMsgId()) {
+        if (unreadCount == 0 || activity.lastIdMsgSeen == MEGACHAT_INVALID_HANDLE || activity.lastIdMsgSeen != message.getMsgId()) {
             ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
             return;
         }
@@ -1695,12 +1696,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         int typeMessage = nextMessage.getType();
         int codeMessage = nextMessage.getCode();
 
-        if (typeMessage >= MegaChatMessage.TYPE_LOWEST_MANAGEMENT && typeMessage <= MegaChatMessage.TYPE_SET_PRIVATE_MODE) {
-            if (typeMessage != MegaChatMessage.TYPE_CALL_ENDED || (codeMessage != END_CALL_REASON_CANCELLED && codeMessage != END_CALL_REASON_NO_ANSWER)) {
-                ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
-                ((ChatActivityLollipop) context).lastIdMsgSeen = nextMessage.getMsgId();
-                return;
-            }
+        if (typeMessage >= MegaChatMessage.TYPE_LOWEST_MANAGEMENT && typeMessage <= MegaChatMessage.TYPE_SET_PRIVATE_MODE
+                && (typeMessage != MegaChatMessage.TYPE_CALL_ENDED || (codeMessage != END_CALL_REASON_CANCELLED && codeMessage != END_CALL_REASON_NO_ANSWER))) {
+            ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+            ((ChatActivityLollipop) context).lastIdMsgSeen = nextMessage.getMsgId();
+            return;
         }
 
         logDebug("Last message ID match!");
