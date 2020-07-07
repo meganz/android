@@ -156,7 +156,8 @@ public class GetAttrUserListener extends BaseListener {
                         ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e, true);
                     }
                 } else {
-                    logError("Error getting USER_ATTR_CAMERA_UPLOADS_FOLDER " + e.getErrorString());
+                    logWarning("Get CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    JobUtil.stopRunningCameraUploadService(context);
                 }
                 break;
         }
