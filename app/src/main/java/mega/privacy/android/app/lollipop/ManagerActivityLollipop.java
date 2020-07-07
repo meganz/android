@@ -2411,9 +2411,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
-		accountInfoFrame = findViewById(R.id.navigation_drawer_account_view);
-        accountInfoFrame.setOnClickListener(this);
-
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
         nVDisplayName.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
 
@@ -3532,7 +3529,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
-        if(!firstTimeAfterInstallation) {
+        // For Android devices which have Android below 6, no need to go to request permission fragment.
+        if(!firstTimeAfterInstallation || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             tB.setVisibility(View.VISIBLE);
             abL.setVisibility(View.VISIBLE);
 
@@ -6077,7 +6075,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					bottomNavigationCurrentItem = CHAT_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-				showFabButton();
 				break;
 			}
     	}
@@ -10337,13 +10334,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		setPinDialog.show();
 	}
 
-	public void chooseAddContactDialog(boolean isMegaContact){
+	public void chooseAddContactDialog(boolean isMegaContact) {
 		logDebug("chooseAddContactDialog");
-		if(isMegaContact){
-			if(megaApi!=null && megaApi.getRootNode()!=null){
-				Intent in = new Intent(this, AddContactActivityLollipop.class);
-				in.putExtra("contactType", CONTACT_TYPE_MEGA);
-				startActivityForResult(in, REQUEST_CREATE_CHAT);
+		if (isMegaContact) {
+			if (megaApi != null && megaApi.getRootNode() != null) {
+				Intent intent = new Intent(this, AddContactActivityLollipop.class);
+				intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+				startActivityForResult(intent, REQUEST_CREATE_CHAT);
 			}
 			else{
 				logWarning("Online but not megaApi");

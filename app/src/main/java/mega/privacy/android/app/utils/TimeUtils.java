@@ -153,11 +153,11 @@ public class TimeUtils implements Comparator<Calendar> {
                 df = new SimpleDateFormat("d MMM");
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
-                df = new SimpleDateFormat("MMM d, YYYY");
+                df = new SimpleDateFormat("MMM d, yyyy");
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
                 Locale locale = context.getResources().getConfiguration().locale;
-                df = new SimpleDateFormat(getBestDateTimePattern (locale, "YYYY-MM-dd HH:mm"), locale);
+                df = new SimpleDateFormat(getBestDateTimePattern (locale, "yyyy-MM-dd HH:mm"), locale);
                 break;
             default:
                 df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());

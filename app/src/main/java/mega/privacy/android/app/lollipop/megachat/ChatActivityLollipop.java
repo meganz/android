@@ -18,6 +18,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -117,6 +119,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
@@ -245,7 +248,6 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
 
     private final static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     private final static int TYPE_MESSAGE_NEW_MESSAGE = 1;
-
     private int currentRecordButtonState = 0;
     private String mOutputFilePath;
     private int keyboardHeight;
@@ -452,6 +454,10 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
 
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
+
+    private AudioFocusRequest request;
+    private AudioManager mAudioManager;
+    private AudioFocusListener audioFocusListener;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -711,7 +717,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         registerTransfersReceiver();
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         setContentView(R.layout.activity_chat);
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -965,7 +971,6 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
             }
         });
 
-
         /*
          *Events of the recording
          */
@@ -978,7 +983,11 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
                     return;
                 }
                 if (!isAllowedToRecord()) return;
-                prepareRecording();
+                audioFocusListener = new AudioFocusListener(ChatActivityLollipop.this);
+                request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
+                if (getAudioFocus(mAudioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT)) {
+                    prepareRecording();
+                }
             }
 
             @Override
@@ -2269,11 +2278,12 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
     /*
      *Prepare recording
      */
-    public void prepareRecording() {
+    private void prepareRecording() {
         logDebug("prepareRecording");
         recordView.playSound(TYPE_START_RECORD);
         stopReproductions();
     }
+
 
     /*
      * Start recording
@@ -2351,6 +2361,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
     }
 
     private void destroyAudioRecorderElements(){
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
         handlerVisualizer.removeCallbacks(updateVisualizer);
 
         hideRecordingLayout();
@@ -2367,7 +2378,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
     /*
      * Cancel recording and reset the audio recorder
      */
-    private void cancelRecording() {
+    public void cancelRecording() {
         if (!isRecordingNow() || myAudioRecorder == null)
             return;
 
@@ -2378,6 +2389,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
             myAudioRecorder.stop();
             myAudioRecorder.reset();
             myAudioRecorder = null;
+            abandonAudioFocus(audioFocusListener, mAudioManager, request);
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
@@ -2404,6 +2416,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         try {
             myAudioRecorder.stop();
             recordView.playSound(TYPE_END_RECORD);
+            abandonAudioFocus(audioFocusListener, mAudioManager, request);
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
@@ -2416,7 +2429,6 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
     /*
      *Hide chat options while recording
      */
-
     private void hideChatOptions(){
         logDebug("hideChatOptions");
         textChat.setVisibility(View.INVISIBLE);
@@ -7405,6 +7417,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
 
         destroyAudioRecorderElements();
         if(adapter!=null) {
+            adapter.stopAllReproductionsInProgress();
             adapter.destroyVoiceElemnts();
         }
 
@@ -8031,6 +8044,11 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         super.onPause();
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
+
+        destroyAudioRecorderElements();
+        if(adapter!=null) {
+            adapter.pausePlaybackInProgress();
+        }
         hideKeyboard();
         activityVisible = false;
         MegaApplication.setOpenChatId(-1);
@@ -8693,6 +8711,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         if(rtcAudioManager == null) return;
         activateSpeaker();
         rtcAudioManager.unregisterProximitySensor();
+        destroySpeakerAudioManger();
     }
 
     private void destroySpeakerAudioManger(){
