@@ -68,7 +68,6 @@ import mega.privacy.android.app.components.DividerItemDecorationV2;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -77,6 +76,7 @@ import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -240,194 +240,112 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
         toCloudDrive();
     }
 
+
+	/**
+	 * Get handles for selected nodes.
+	 *
+	 * @return handles for selected nodes.
+	 */
+	private ArrayList<Long> getDocumentHandles(List<PhotoSyncHolder> documents) {
+		ArrayList<Long> handles = new ArrayList<>();
+
+		for (PhotoSyncHolder holder : documents){
+			handles.add(holder.handle);
+		}
+
+		return handles;
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-			List<PhotoSyncHolder> documentsList = null;
-			List<MegaNode> documentsGrid = null;
-
-			if(adapterList!=null){
-				documentsList = adapterList.getSelectedDocuments();
+			if (adapterList == null) {
+				return false;
 			}
-			else if(adapterGrid != null){
-				documentsGrid = adapterGrid.getSelectedDocuments();
+			List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
+			if (documents.isEmpty()) {
+				return false;
 			}
 
-			switch(item.getItemId()){
-				case R.id.cab_menu_download:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
+			clearSelections();
 
-					if(adapterList!=null){
-						for (int i=0;i<documentsList.size();i++){
-							handleList.add(documentsList.get(i).handle);
-						}
-					}
-					else if(adapterGrid != null){
-						for (int i=0;i<documentsGrid.size();i++){
-							handleList.add(documentsGrid.get(i).getHandle());
-						}
-					}
-
-					clearSelections();
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, false);
+			switch (item.getItemId()) {
+				case R.id.cab_menu_download:
+					new NodeController(context)
+							.prepareForDownload(getDocumentHandles(documents), false);
 					break;
-				}
-				case R.id.cab_menu_copy:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-
-					if(adapterList!=null){
-						for (int i=0;i<documentsList.size();i++){
-							handleList.add(documentsList.get(i).handle);
-						}
-					}
-					else if(adapterGrid != null){
-						for (int i=0;i<documentsGrid.size();i++){
-							handleList.add(documentsGrid.get(i).getHandle());
-						}
-					}
-					clearSelections();
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToCopyNodes(handleList);
+				case R.id.cab_menu_copy:
+					new NodeController(context)
+							.chooseLocationToCopyNodes(getDocumentHandles(documents));
 					break;
-				}
-				case R.id.cab_menu_move:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-
-					if(adapterList!=null){
-						for (int i=0;i<documentsList.size();i++){
-							handleList.add(documentsList.get(i).handle);
-						}
-					}
-					else if(adapterGrid != null){
-						for (int i=0;i<documentsGrid.size();i++){
-							handleList.add(documentsGrid.get(i).getHandle());
-						}
-					}
-
-					clearSelections();
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToMoveNodes(handleList);
+				case R.id.cab_menu_move:
+					new NodeController(context)
+							.chooseLocationToMoveNodes(getDocumentHandles(documents));
 					break;
-				}
-				case R.id.cab_menu_share_link:{
+				case R.id.cab_menu_share_out:
+					List<MegaNode> nodes = new ArrayList<>();
+					for (PhotoSyncHolder holder : documents) {
+						if (holder == null) {
+							continue;
+						}
+						MegaNode node = megaApi.getNodeByHandle(holder.handle);
+						if (node != null) {
+							nodes.add(node);
+						}
+					}
+					MegaNodeUtil.shareNodes(context, nodes);
+					break;
+				case R.id.cab_menu_share_link:
+				case R.id.cab_menu_edit_link:
 					logDebug("Public link option");
-					clearSelections();
-					if(adapterList!=null){
-						if (documentsList.size()==1){
-							//MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
-							//NodeController nC = new NodeController(context);
-							//nC.exportLink(n);
-							if(documentsList.get(0)==null){
-								logWarning("The selected node is NULL");
-								break;
-							}
-							((ManagerActivityLollipop) context).showGetLinkActivity(documentsList.get(0).handle);
-						}
+					if (documents.size() == 1
+							&& documents.get(0).handle != MegaApiJava.INVALID_HANDLE) {
+						((ManagerActivityLollipop) context)
+								.showGetLinkActivity(documents.get(0).handle);
 					}
-					else if(adapterGrid != null){
-						if (documentsGrid.size()==1){
-
-							if(documentsGrid.get(0)==null){
-								logWarning("The selected node is NULL");
-								break;
-							}
-							((ManagerActivityLollipop) context).showGetLinkActivity(documentsGrid.get(0).getHandle());
-
-							//MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
-							//NodeController nC = new NodeController(context);
-							//nC.exportLink(n);
-						}
-					}
-
 					break;
-				}
-
-				case R.id.cab_menu_share_link_remove:{
-
+				case R.id.cab_menu_remove_link:
 					logDebug("Remove public link option");
-
-					clearSelections();
-					if(adapterList!=null){
-						if (documentsList.size()==1){
-							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
-							//NodeController nC = new NodeController(context);
-							//nC.removeLink(n);
-
-							if(documentsList.get(0)==null){
-								logWarning("The selected node is NULL");
-								break;
-							}
-							((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(n);
+					if (documents.size() == 1) {
+						MegaNode node = megaApi.getNodeByHandle(documents.get(0).handle);
+						if (node != null) {
+							((ManagerActivityLollipop) context)
+									.showConfirmationRemovePublicLink(node);
 						}
 					}
-					else if(adapterGrid != null){
-						if (documentsGrid.size()==1){
-							MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
-							//NodeController nC = new NodeController(context);
-							//nC.removeLink(n);
-
-							if(documentsGrid.get(0)==null){
-								logWarning("The selected node is NULL");
-								break;
-							}
-							((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(n);
-
-						}
-					}
-
 					break;
-				}
-				case R.id.cab_menu_send_to_chat:{
+				case R.id.cab_menu_send_to_chat:
 					logDebug("Send files to chat");
-					// For adapterGrid, please go to MegaPhotoSyncGridTitleAdapterLollipop
-					NodeController nC = new NodeController(context);
-					ArrayList<Long> handleList = new ArrayList();
-					for (PhotoSyncHolder holder : documentsList) {
-						handleList.add(holder.handle);
-					}
-					nC.checkIfHandlesAreMineAndSelectChatsToSendNodes(handleList);
-					clearSelections();
-					hideMultipleSelect();
+					new NodeController(context).checkIfHandlesAreMineAndSelectChatsToSendNodes(
+							getDocumentHandles(documents));
 					break;
-				}
-				case R.id.cab_menu_trash:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-
-					if(adapterList!=null){
-						for (int i=0;i<documentsList.size();i++){
-							handleList.add(documentsList.get(i).handle);
-						}
-					}
-					else if(adapterGrid != null){
-						for (int i=0;i<documentsGrid.size();i++){
-							handleList.add(documentsGrid.get(i).getHandle());
-						}
-					}
-					clearSelections();
-					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+				case R.id.cab_menu_trash:
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(
+							getDocumentHandles(documents));
 					break;
-				}
-				case R.id.cab_menu_select_all:{
+				case R.id.cab_menu_select_all:
 					selectAll();
-
 					break;
-				}
-				case R.id.cab_menu_unselect_all:{
-					clearSelections();
+				case R.id.cab_menu_clear_selection:
 					break;
-				}
 			}
-			return false;
+			return true;
 		}
 
+		/**
+		 * this fragment only handle actions for list view, actions for grid view are handled
+		 * at {@link MegaPhotoSyncGridTitleAdapterLollipop}.
+		 */
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			if (adapterList == null) {
+				return false;
+			}
+
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_browser_action, menu);
-			((ManagerActivityLollipop)context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
+			inflater.inflate(R.menu.cloud_storage_action, menu);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			if (type == TYPE_CAMERA) {
 				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			}
@@ -442,213 +360,89 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (type == TYPE_CAMERA) {
 				((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 			}
-			if(((ManagerActivityLollipop)context).isListCameraUploads()){
-				if(adapterList!=null){
+			if (((ManagerActivityLollipop) context).isListCameraUploads()) {
+				if (adapterList != null) {
 					adapterList.setMultipleSelect(false);
-				}
-			}
-			else{
-				if(adapterGrid!=null){
-					adapterGrid.setMultipleSelect(false);
 				}
 			}
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				final Window window = ((ManagerActivityLollipop) context).getWindow();
 				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(0);
-					}
-				}, 350);
+				handler.postDelayed(() -> window.setStatusBarColor(0), 350);
 			}
 			checkScroll();
 			((ManagerActivityLollipop) context).setDrawerLockMode(false);
 		}
 
+		/**
+		 * this fragment only handle actions for list view, actions for grid view are handled
+		 * at {@link MegaPhotoSyncGridTitleAdapterLollipop}.
+		 */
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			logDebug("onPrepareActionMode");
-			boolean showDownload = false;
-			boolean showRename = false;
-			boolean showCopy = false;
-			boolean showMove = false;
-			boolean showLink = false;
-			boolean showTrash = false;
-			boolean showRemoveLink = false;
-			boolean showSendToChat = false;
 
-			if(adapterList!=null) {
-				logDebug("LIST onPrepareActionMode");
+			if (adapterList == null) {
+				return false;
+			}
+			List<PhotoSyncHolder> selected = adapterList.getSelectedDocuments();
+			if (selected.isEmpty()) {
+				return false;
+			}
 
-				List<PhotoSyncHolder> selected = adapterList.getSelectedDocuments();
+			CloudStorageOptionControlUtil.Control control =
+					new CloudStorageOptionControlUtil.Control();
 
-				// Link
-				if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).handle), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+			if (selected.size() == 1) {
+				MegaNode node = megaApi.getNodeByHandle(selected.get(0).handle);
+				if (node != null && megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode()
+						== MegaError.API_OK) {
+					if (node.isExported()) {
+						control.manageLink().setVisible(true)
+								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					if(megaApi.getNodeByHandle(selected.get(0).handle).isExported()){
-						//Node has public link
-						showRemoveLink=true;
-						showLink=false;
-
-					}
-					else{
-						showRemoveLink=false;
-						showLink=true;
-					}
-
-				}
-
-				if (selected.size() > 0) {
-					showDownload = true;
-					showTrash = true;
-					showMove = true;
-					showCopy = true;
-					showSendToChat = true;
-
-					for(int i=0; i<selected.size();i++)	{
-						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).handle), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-							showTrash = false;
-							showMove = false;
-							break;
-						}
-					}
-
-					if(selected.size() >= nodes.size()){
-						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-					}
-					else{
-						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-					}
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-
-				}
-
-				if(showCopy){
-					menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-
-				if(showDownload){
-					menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-				if(showLink){
-					menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-				if(showRemoveLink){
-					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-				if(showMove){
-					if(selected.size()==1){
-						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					}else{
-						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+						control.removeLink().setVisible(true);
+					} else {
+						control.getLink().setVisible(true)
+								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					}
 				}
 			}
-			else if(adapterGrid!=null){
-				logDebug("GRID onPrepareActionMode");
-				List<MegaNode> selected = adapterGrid.getSelectedDocuments();
 
-				// Link
-				if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).getHandle()), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-					if(megaApi.getNodeByHandle(selected.get(0).getHandle()).isExported()){
-						//Node has public link
-						showRemoveLink=true;
-						showLink=false;
+			menu.findItem(R.id.cab_menu_send_to_chat)
+					.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+							R.color.white));
 
-					}
-					else{
-						showRemoveLink=false;
-						showLink=true;
-					}
+			control.sendToChat().setVisible(true)
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			control.shareOut().setVisible(true)
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			boolean showTrash = true;
+			for (PhotoSyncHolder holder : selected) {
+				MegaNode node = megaApi.getNodeByHandle(holder.handle);
+				if (node == null || megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode()
+						!= MegaError.API_OK) {
+					showTrash = false;
+					break;
 				}
-
-				if (selected.size() > 0) {
-					showDownload = true;
-					showTrash = true;
-					showMove = true;
-					showCopy = true;
-					showSendToChat = true;
-
-					for(int i=0; i<selected.size();i++)	{
-						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).getHandle()), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-							showTrash = false;
-							showMove = false;
-							break;
-						}
-					}
-
-					if(selected.size() == nodes.size()){
-						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-					}
-					else{
-						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-					}
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-				}
-
-				if(showCopy){
-					menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-
-				if(showDownload){
-					menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-
-				if(showLink){
-					menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-				if(showRemoveLink){
-					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-
-				if(showMove){
-					if(selected.size()==1){
-						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					}else{
-						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-					}
-				}
-
-
 			}
-			else{
-				logWarning("NULL adapters");
+			control.trash().setVisible(showTrash);
+
+			control.move().setVisible(true);
+			control.copy().setVisible(true);
+			if (selected.size() > 1) {
+				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
-			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+			control.selectAll().setVisible(selected.size() != adapterList.getItemCount());
 
-			if (showSendToChat) {
-				menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
-				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
-			}
+			CloudStorageOptionControlUtil.applyControl(menu, control);
 
-			return false;
+			return true;
 		}
-
 	}
 
 	//int TYPE_CAMERA= 0;

@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -238,6 +239,63 @@ public class MegaNodeUtil {
     }
 
     /**
+     * Share multiple nodes out of MEGA app.
+     *
+     * If a folder is involved, we will share links of all nodes.
+     *
+     * Other apps can't handle the mixture of link and file, so if there is any file that is not
+     * downloaded, we will share links of all files.
+     *
+     * @param context the context where nodes are shared
+     * @param nodes nodes to share
+     */
+    public static void shareNodes(Context context, List<MegaNode> nodes) {
+        if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
+            return;
+        }
+        List<File> downloadedFiles = new ArrayList<>();
+        boolean allDownloadedFiles = true;
+        for (MegaNode node : nodes) {
+            String path = getLocalFile(context, node.getName(), node.getSize());
+            if (node.isFolder() || isTextEmpty(path)) {
+                allDownloadedFiles = false;
+                break;
+            } else {
+                downloadedFiles.add(new File(path));
+            }
+        }
+        if (allDownloadedFiles) {
+            shareFiles(context, downloadedFiles);
+            return;
+        }
+
+        int notExportedNodes = 0;
+        StringBuilder links = new StringBuilder();
+        for (MegaNode node : nodes) {
+            if (!node.isExported()) {
+                notExportedNodes++;
+            } else {
+                links.append(node.getPublicLink())
+                    .append("\n\n");
+            }
+        }
+        if (notExportedNodes == 0) {
+            startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
+                links.toString());
+            return;
+        }
+
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
+            new Intent(android.content.Intent.ACTION_SEND));
+        for (MegaNode node : nodes) {
+            if (!node.isExported()) {
+                megaApi.exportNode(node, exportListener);
+            }
+        }
+    }
+
+    /**
      * Shares a link.
      *
      * @param context   current Context.
@@ -273,6 +331,30 @@ public class MegaNodeUtil {
 
         if (node == null) {
             logError(error + "Node == NULL");
+            return false;
+        } else if (!isOnline(context)) {
+            logError(error + "No network connection");
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if there is any error before continues any action.
+     *
+     * @param context   current Context.
+     * @param message   action being taken.
+     * @param nodes      nodes involved in the action.
+     * @return True if there is not any error, false otherwise.
+     */
+    private static boolean shouldContinueWithoutError(Context context, String message,
+        List<MegaNode> nodes) {
+        String error = "Error " + message + ". ";
+
+        if (nodes == null || nodes.isEmpty()) {
+            logError(error + "no nodes");
             return false;
         } else if (!isOnline(context)) {
             logError(error + "No network connection");

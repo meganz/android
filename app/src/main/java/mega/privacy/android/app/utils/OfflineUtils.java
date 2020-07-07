@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -657,6 +658,40 @@ public class OfflineUtils {
             }
         } else {
             shareFile(context, getOfflineFile(context, offline));
+        }
+    }
+
+    /**
+     * Shares multiple offline nodes. If any node is a folder and the app has network connection,
+     * then share links, otherwise share files.
+     *
+     * @param context the current Context
+     * @param offlineNodes offline nodes to share
+     */
+    public static void shareOfflineNodes(Context context, List<MegaOffline> offlineNodes) {
+        boolean allFiles = true;
+        for (MegaOffline offlineNode : offlineNodes) {
+            if (offlineNode.isFolder()) {
+                allFiles = false;
+                break;
+            }
+        }
+        if (allFiles) {
+            List<File> files = new ArrayList<>();
+            for (MegaOffline offlineNode : offlineNodes) {
+                files.add(getOfflineFile(context, offlineNode));
+            }
+            shareFiles(context, files);
+        } else if (isOnline(context)) {
+            List<MegaNode> nodes = new ArrayList<>();
+            for (MegaOffline offlineNode : offlineNodes) {
+                MegaNode node = MegaApplication.getInstance().getMegaApi()
+                    .getNodeByHandle(Long.parseLong(offlineNode.getHandle()));
+                if (node != null) {
+                    nodes.add(node);
+                }
+            }
+            shareNodes(context, nodes);
         }
     }
 }
