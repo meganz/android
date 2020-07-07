@@ -39,6 +39,7 @@ captures
 *.ipr
 *.iws
 /.idea/codeStyles/Project.xml
+/.idea/codeStyles/codeStyleConfig.xml
 /.idea/caches/build_file_checksums.ser
 
 ## Google API key files
