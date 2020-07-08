@@ -177,7 +177,7 @@ public class TimeUtils implements Comparator<Calendar> {
                 df = new SimpleDateFormat("MMM d, yyyy", locale);
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
-                df = new SimpleDateFormat(getBestDateTimePattern (locale, "YYYY-MM-dd HH:mm"), locale);
+                df = new SimpleDateFormat(getBestDateTimePattern (locale, "yyyy-MM-dd HH:mm"), locale);
                 break;
             case DATE_LONG_FORMAT:
             default:

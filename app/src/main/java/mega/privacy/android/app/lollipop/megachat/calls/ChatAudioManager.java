@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -13,10 +14,12 @@ import android.os.Vibrator;
 import java.io.IOException;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatAudioManager {
@@ -25,7 +28,8 @@ public class ChatAudioManager {
     private AudioManager audioManager = null;
     private MediaPlayer mediaPlayer = null;
     private Vibrator vibrator = null;
-
+    private AudioFocusRequest request;
+    private AudioFocusListener audioFocusListener;
     private ChatAudioManager(Context context) {
         myContext = context;
         initializeAudioManager();
@@ -71,50 +75,74 @@ public class ChatAudioManager {
     }
 
     private void outgoingCallSound() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
-        initializeAudioManager();
-        if (audioManager == null) return;
-        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0);
-        Resources res = myContext.getResources();
-        AssetFileDescriptor afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call);
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
-        mediaPlayer.setLooping(true);
-        try {
-            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            logDebug("Preparing mediaPlayer");
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-            logError("Error preparing mediaPlayer", e);
+        if (mediaPlayer != null && mediaPlayer.isPlaying())
             return;
-        }
 
-        logDebug("Start outgoing call sound");
-        mediaPlayer.start();
+        initializeAudioManager();
+        if (audioManager == null)
+            return;
+
+        audioFocusListener = new AudioFocusListener(myContext);
+        int focusType = AudioManager.AUDIOFOCUS_GAIN;
+        int streamType = AudioManager.STREAM_VOICE_CALL;
+        request = getRequest(audioFocusListener, focusType);
+
+        if (getAudioFocus(audioManager, audioFocusListener, request, focusType, streamType)) {
+            audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0);
+            Resources res = myContext.getResources();
+            AssetFileDescriptor afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call);
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+            mediaPlayer.setLooping(true);
+
+            try {
+                mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                logDebug("Preparing mediaPlayer");
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+                logError("Error preparing mediaPlayer", e);
+                return;
+            }
+
+            logDebug("Start outgoing call sound");
+            mediaPlayer.start();
+        }
     }
 
     private void incomingCallSound() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
-        initializeAudioManager();
-        if (audioManager == null) return;
-        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-        if (ringtoneUri == null) return;
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
-        mediaPlayer.setLooping(true);
-
-        try {
-            mediaPlayer.setDataSource(myContext, ringtoneUri);
-            logDebug("Preparing mediaPlayer");
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-            logError("Error preparing mediaPlayer", e);
+        if (mediaPlayer != null && mediaPlayer.isPlaying())
             return;
+
+        initializeAudioManager();
+        if (audioManager == null)
+            return;
+
+        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        if (ringtoneUri == null)
+            return;
+
+        audioFocusListener = new AudioFocusListener(myContext);
+        request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
+
+        if (getAudioFocus(audioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT)) {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
+            mediaPlayer.setLooping(true);
+
+            try {
+                mediaPlayer.setDataSource(myContext, ringtoneUri);
+                logDebug("Preparing mediaPlayer");
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+                logError("Error preparing mediaPlayer", e);
+                return;
+            }
+
+            logDebug("Start incoming call sound");
+            mediaPlayer.start();
         }
-        logDebug("Start incoming call sound");
-        mediaPlayer.start();
     }
 
     private void checkVibration() {
@@ -147,13 +175,13 @@ public class ChatAudioManager {
     }
 
     public void stopAudioSignals() {
-        if (audioManager != null) {
-            audioManager = null;
-        }
-
         logDebug("Stop sound and vibration");
         stopSound();
         stopVibration();
+
+        if (audioManager != null) {
+            abandonAudioFocus(audioFocusListener, audioManager, request);
+        }
     }
 
     private void stopSound() {

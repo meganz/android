@@ -133,6 +133,8 @@ public class Util {
 
 	public static HashMap<String, String> countryCodeDisplay;
 
+	private static long lastClickTime;
+
 	// 150ms, a smaller value may cause the keyboard to fail to open
 	private final static int SHOW_IM_DELAY = 150;
 
@@ -1801,6 +1803,17 @@ public class Util {
 		} else {
 			textInputLayout.setEndIconMode(END_ICON_NONE);
 		}
+	}
+
+	public static boolean isFastDoubleClick() {
+		long time = System.currentTimeMillis();
+		long timeD = time - lastClickTime;
+		if (0 <= timeD && timeD < 500) {
+			return true;
+		}
+
+		lastClickTime = time;
+		return false;
 	}
 
 	/**
