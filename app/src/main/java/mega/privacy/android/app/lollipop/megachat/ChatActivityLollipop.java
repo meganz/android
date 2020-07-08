@@ -173,6 +173,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -4739,6 +4740,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 String url = null;
                                 if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
                                     url = meta.getRichPreview().getUrl();
+
+                                    if (!isTextEmpty(url) && requiresTransferSession(this, url)) {
+                                        return;
+                                    }
                                 } else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
                                     url = m.getMessage().getContent();
                                     MegaChatGeolocation location = meta.getGeolocation();
