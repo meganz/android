@@ -26,12 +26,15 @@ import java.util.Set;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
 public class AppRTCAudioManager {
+
     private static final String TAG = "AppRTCAudioManager";
     private final Context apprtcContext;
     // Handles all tasks related to Bluetooth headset devices.
@@ -237,23 +240,36 @@ public class AppRTCAudioManager {
             }
         };
 
-        // Request audio playout focus (without ducking) and install listener for changes in focus.
-        int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            Log.d(TAG, "Audio focus request granted for VOICE_CALL streams");
-        } else {
-            Log.e(TAG, "Audio focus request failed");
+        int typeStream = -1;
+        int typeFocus = -1;
+        if(apprtcContext instanceof MegaApplication){
+            typeStream = AudioManager.STREAM_VOICE_CALL;
+            typeFocus = AudioManager.AUDIOFOCUS_GAIN;
+        }else if(apprtcContext instanceof ChatActivityLollipop){
+            typeStream = STREAM_MUSIC_DEFAULT;
+            typeFocus = AUDIOFOCUS_DEFAULT;
         }
 
         if (apprtcContext instanceof MegaApplication || apprtcContext instanceof ChatActivityLollipop) {
+            // Request audio playout focus (without ducking) and install listener for changes in focus.
+            int result = audioManager.requestAudioFocus(audioFocusChangeListener, typeStream, typeFocus);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                logDebug("Audio focus request granted for VOICE_CALL streams");
+            } else {
+                logError("Audio focus request failed");
+            }
+
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
             // best possible VoIP performance.
             // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (apprtcContext instanceof MegaApplication && (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
                 logDebug("Mode communication");
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            }
+            }else{
+                logDebug("Mode normal");
+                audioManager.setMode(AudioManager.MODE_NORMAL);
+           }
         }
 
         // Always disable microphone mute during a WebRTC call.
