@@ -141,7 +141,6 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        clearReferences();
         checkMegaObjects();
         isPaused = true;
         super.onPause();
@@ -150,8 +149,6 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        app.setCurrentActivity(this);
 
         setAppFontSize(this);
 
@@ -164,8 +161,6 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 
-        clearReferences();
-
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
@@ -174,15 +169,6 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
 
         super.onDestroy();
-    }
-
-    /**
-     * Clear reference(s) to the Activity
-     */
-    private void clearReferences() {
-        if (this.equals(app.getCurrentActivity())) {
-            app.setCurrentActivity(null);
-        }
     }
 
     /**

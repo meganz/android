@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -17,8 +18,11 @@ import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 import androidx.emoji.text.EmojiCompat;
@@ -99,7 +103,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
 	final String TAG = "MegaApplication";
 
@@ -120,6 +124,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	// The current App Activity
 	private Activity currentActivity = null;
+
+	// Attributes to detect if app changes between background and foreground
+	private int activityReferences = 0;
+	private boolean isActivityChangingConfigurations = false;
 
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
@@ -192,6 +200,54 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	public static void smsVerifyShowed(boolean isShowed) {
 	    isVerifySMSShowed = isShowed;
     }
+
+	@Override
+	public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+
+	}
+
+	@Override
+	public void onActivityStarted(@NonNull Activity activity) {
+		currentActivity = activity;
+    	if (++activityReferences == 1 && !isActivityChangingConfigurations) {
+			logInfo("App enters foreground");
+			if (storageState == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+			}
+		}
+	}
+
+	@Override
+	public void onActivityResumed(@NonNull Activity activity) {
+		if (!activity.equals(currentActivity)) {
+			currentActivity = activity;
+		}
+	}
+
+	@Override
+	public void onActivityPaused(@NonNull Activity activity) {
+    	if (activity.equals(currentActivity)) {
+    		currentActivity = null;
+		}
+	}
+
+	@Override
+	public void onActivityStopped(@NonNull Activity activity) {
+		isActivityChangingConfigurations = activity.isChangingConfigurations();
+		if (--activityReferences == 0 && !isActivityChangingConfigurations) {
+			logInfo("App enters background");
+		}
+	}
+
+	@Override
+	public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+
+	}
+
+	@Override
+	public void onActivityDestroyed(@NonNull Activity activity) {
+
+	}
 
 	class BackgroundRequestListener implements MegaRequestListenerInterface
 	{
@@ -498,6 +554,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
@@ -505,7 +562,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				handleUncaughtException(thread, e);
 			}
 		});
-        isVerifySMSShowed = false;
+
+		registerActivityLifecycleCallbacks(this);
+
+		isVerifySMSShowed = false;
 		singleApplicationInstance = this;
 
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
@@ -1626,9 +1686,5 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public Activity getCurrentActivity() {
 		return currentActivity;
-	}
-
-	public void setCurrentActivity(Activity currentActivity) {
-		this.currentActivity = currentActivity;
 	}
 }

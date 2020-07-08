@@ -1,7 +1,6 @@
 package mega.privacy.android.app.listeners
 
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaApiJava
