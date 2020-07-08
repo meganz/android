@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -90,7 +92,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 //      counterSave
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
-        TextView optionOfflineText = contentView.findViewById(R.id.option_offline_text);
+        SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
 //      counterShares
         LinearLayout optionLink = contentView.findViewById(R.id.option_link_layout);
         TextView optionLinkText = contentView.findViewById(R.id.option_link_text);
@@ -231,11 +233,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionRemoveLink.setVisibility(View.GONE);
                     counterShares--;
                     optionClearShares.setVisibility(View.GONE);
-                    if (availableOffline(context, node)) {
-                        optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    } else {
-                        optionOfflineText.setText(getString(R.string.save_for_offline));
-                    }
+                    offlineSwitch.setChecked(availableOffline(context, node));
 
                     optionSendChat.setVisibility(View.VISIBLE);
 
@@ -322,11 +320,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionRemoveLink.setVisibility(View.GONE);
                 }
 
-                if (availableOffline(context, node)) {
-                    optionOfflineText.setText(getString(R.string.context_delete_offline));
-                } else {
-                    optionOfflineText.setText(getString(R.string.save_for_offline));
-                }
+                offlineSwitch.setChecked(availableOffline(context, node));
                 optionInfo.setVisibility(View.VISIBLE);
                 optionRubbishBin.setVisibility(View.VISIBLE);
                 optionLink.setVisibility(View.VISIBLE);
@@ -425,11 +419,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 }
 
                 optionDownload.setVisibility(View.VISIBLE);
-                if (availableOffline(context, node)) {
-                    optionOfflineText.setText(getString(R.string.context_delete_offline));
-                } else {
-                    optionOfflineText.setText(getString(R.string.save_for_offline));
-                }
+
+                offlineSwitch.setChecked(availableOffline(context, node));
                 optionInfo.setVisibility(View.VISIBLE);
                 optionRubbishBin.setVisibility(View.VISIBLE);
                 optionLink.setVisibility(View.VISIBLE);
@@ -476,11 +467,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     counterOpen--;
                     optionOpenFolder.setVisibility(View.GONE);
                     optionDownload.setVisibility(View.VISIBLE);
-                    if (availableOffline(context, node)) {
-                        optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    } else {
-                        optionOfflineText.setText(getString(R.string.save_for_offline));
-                    }
+                    offlineSwitch.setChecked(availableOffline(context, node));
                     optionInfo.setVisibility(View.VISIBLE);
                     counterRemove--;
                     optionRemove.setVisibility(View.GONE);
@@ -619,11 +606,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     }
 
                     optionDownload.setVisibility(View.VISIBLE);
-                    if (availableOffline(context, node)) {
-                        optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    } else {
-                        optionOfflineText.setText(getString(R.string.save_for_offline));
-                    }
+                    offlineSwitch.setChecked(availableOffline(context, node));
                     optionInfo.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
                     optionMove.setVisibility(View.VISIBLE);
@@ -677,11 +660,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionClearShares.setVisibility(View.GONE);
                     }
 
-                    if (availableOffline(context, node)) {
-                        optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    } else {
-                        optionOfflineText.setText(getString(R.string.save_for_offline));
-                    }
+                    offlineSwitch.setChecked(availableOffline(context, node));
                     optionInfo.setVisibility(View.VISIBLE);
                     optionRubbishBin.setVisibility(View.VISIBLE);
                     optionLink.setVisibility(View.VISIBLE);
@@ -732,11 +711,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     int accessLevel = megaApi.getAccess(node);
                     logDebug("Node: " + node.getName() + " " + accessLevel);
                     optionDownload.setVisibility(View.VISIBLE);
-                    if (availableOffline(context, node)) {
-                        optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    } else {
-                        optionOfflineText.setText(getString(R.string.save_for_offline));
-                    }
+                    offlineSwitch.setChecked(availableOffline(context, node));
                     optionInfo.setVisibility(View.VISIBLE);
                     counterRemove--;
                     optionRemove.setVisibility(View.GONE);
@@ -858,11 +833,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     }
 
                     optionDownload.setVisibility(View.VISIBLE);
-                    if (availableOffline(context, node)) {
-                        optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    } else {
-                        optionOfflineText.setText(getString(R.string.save_for_offline));
-                    }
+
+                    offlineSwitch.setChecked(availableOffline(context, node));
                     optionInfo.setVisibility(View.VISIBLE);
                     optionLink.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
@@ -887,6 +859,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         separatorShares.setVisibility(counterShares <= 0 ? View.GONE : View.VISIBLE);
         separatorModify.setVisibility(counterModify <= 0 ? View.GONE : View.VISIBLE);
         separatorOpen.setVisibility(counterOpen <= 0 || counterRemove <= 0 ? View.GONE : View.VISIBLE);
+
+        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -924,6 +898,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 nC.prepareForDownload(handleList, false);
                 break;
 
+            case R.id.file_properties_switch:
             case R.id.option_offline_layout:
                 if (availableOffline(context, node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());

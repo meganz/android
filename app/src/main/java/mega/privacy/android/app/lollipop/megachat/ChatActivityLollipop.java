@@ -270,7 +270,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
     boolean retryHistory = false;
 
     public long lastIdMsgSeen = -1;
-    public long generalUnreadCount = -1;
+    public long generalUnreadCount;
     boolean lastSeenReceived = false;
     int positionToScroll = -1;
     public int positionNewMessagesLayout = -1;
@@ -543,13 +543,18 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         }
     };
 
-    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver userNameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_NICKNAME)) return;
+            if (intent == null || intent.getAction() == null
+                || intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) == INVALID_HANDLE) {
+                return;
+            }
 
-            if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) != INVALID_HANDLE) {
-                updateNicknameInChat();
+            if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+                || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+                || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
+                updateUserNameInChat();
             }
         }
     };
@@ -700,7 +705,9 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
         contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
-        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
+        contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+        contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
+        LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, contactUpdateFilter);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
@@ -1250,7 +1257,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
                         if(lastIdMsgSeen != -1){
                             isTurn = true;
                         }
-                        generalUnreadCount = savedInstanceState.getLong("generalUnreadCount",-1);
+                        generalUnreadCount = savedInstanceState.getLong("generalUnreadCount",0);
 
                         boolean isPlaying = savedInstanceState.getBoolean(PLAYING, false);
                         if (isPlaying) {
@@ -1367,11 +1374,13 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         }
     }
 
-    public void updateNicknameInChat() {
+    public void updateUserNameInChat() {
         if (chatRoom.isGroup()) {
             setChatSubtitle();
         }
         if (adapter != null) {
+            chatRoom = megaChatApi.getChatRoom(idChat);
+            adapter.updateChatRoom(chatRoom);
             adapter.notifyDataSetChanged();
         }
     }
@@ -1506,7 +1515,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         if (unreadCount == 0) {
             if(!isTurn) {
                 lastIdMsgSeen = -1;
-                generalUnreadCount = -1;
+                generalUnreadCount = 0;
                 stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                 numberToLoad=NUMBER_MESSAGES_TO_LOAD;
             }else{
@@ -3675,7 +3684,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
 
         positionNewMessagesLayout = -1;
         lastIdMsgSeen = -1;
-        generalUnreadCount = -1;
+        generalUnreadCount = 0;
         lastSeenReceived = true;
         newVisibility = false;
 
@@ -5892,7 +5901,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
         if (unread == 0) {
             lastIdMsgSeen = -1;
-            generalUnreadCount = -1;
+            generalUnreadCount = 0;
             lastSeenReceived = true;
             logDebug("loadMessages unread is 0");
         } else {
@@ -7423,7 +7432,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceclipDownloadedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
