@@ -341,7 +341,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	 *
 	 * @param contactHandle Contact ID.
 	 */
-	public void updateNicknames(long contactHandle) {
+	public void updateContact(long contactHandle) {
 		adapter.updateItem(contactHandle);
 	}
 }
