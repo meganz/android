@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -30,7 +31,6 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -214,7 +214,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 	RelativeLayout versionsLayout;
 	Button versionsButton;
 	View separatorVersions;
-	SwitchCompat offlineSwitch;
+    SwitchMaterial offlineSwitch;
 
 	TextView sizeTextView;
 	TextView sizeTitleTextView;
@@ -350,7 +350,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null) return;
 
-            if (intent.getAction().equals(ACTION_UPDATE_NICKNAME) || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+            if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+                || intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+                || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
+                || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
                 updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
             }
         }
@@ -602,7 +605,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
         availableOfflineLayout.setVisibility(View.VISIBLE);
         availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
-        offlineSwitch = (SwitchCompat) findViewById(R.id.file_properties_switch);
+        offlineSwitch = (SwitchMaterial) findViewById(R.id.file_properties_switch);
 
         //Share with Layout
         sharedLayout = (RelativeLayout) findViewById(R.id.file_properties_shared_layout);
@@ -898,6 +901,8 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
         contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+        contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+        contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
         LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
@@ -1625,13 +1630,11 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 		//Choose the button offlineSwitch
         if (availableOffline(this, node)) {
             availableOfflineBoolean = true;
-            availableOfflineView.setText(R.string.context_delete_offline);
             offlineSwitch.setChecked(true);
             return;
         }
 
         availableOfflineBoolean = false;
-        availableOfflineView.setText(R.string.save_for_offline);
         offlineSwitch.setChecked(false);
 	}
 
@@ -1699,7 +1702,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                         isRemoveOffline = true;
                         handle = node.getHandle();
 						availableOfflineBoolean = false;
-                        availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(handle);
                         removeOffline(mOffDelete, dbH, this);
@@ -1710,7 +1712,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                         isRemoveOffline = false;
                         handle = -1;
 						availableOfflineBoolean = true;
-                        availableOfflineView.setText(R.string.context_delete_offline);
 						offlineSwitch.setChecked(true);
 
 						File destination = getOfflineParentFile(this, from, node, megaApi);
@@ -1733,7 +1734,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                     logDebug("Not owner");
 					if (!isChecked){
 						availableOfflineBoolean = false;
-                        availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(node.getHandle());
                         removeOffline(mOffDelete, dbH, this);
@@ -1741,7 +1741,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 					}
 					else{
 						availableOfflineBoolean = true;
-                        availableOfflineView.setText(R.string.context_delete_offline);
 						offlineSwitch.setChecked(true);
 
 						supportInvalidateOptionsMenu();

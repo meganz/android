@@ -262,12 +262,19 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	};
 
-	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver userNameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_NICKNAME) || user == null) return;
+			if (intent == null
+					|| intent.getAction() == null
+					|| user == null
+					|| intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) != user.getHandle()) {
+				return;
+			}
 
-			if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) == user.getHandle()) {
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
 				checkNickname(user.getHandle());
 				updateAvatar();
 			}
@@ -622,9 +629,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
-		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
-		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
-		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
+		IntentFilter userNameUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+		userNameUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
+		LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, userNameUpdateFilter);
 	}
 
 	private void visibilityStateIcon() {
@@ -1755,7 +1764,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         }
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
 	}
 
 	@Override

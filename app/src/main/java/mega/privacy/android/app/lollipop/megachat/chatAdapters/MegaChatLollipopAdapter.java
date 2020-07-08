@@ -568,6 +568,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("MyUserHandle: " + myUserHandle);
     }
 
+    public void updateChatRoom(MegaChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+    }
+
     public static class ViewHolderMessageChat extends RecyclerView.ViewHolder{
         public ViewHolderMessageChat(View view) {
             super(view);
