@@ -310,7 +310,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
             android:label="@string/settings_pin_lock"
-            android:windowSoftInputMode="stateVisible"
+            android:windowSoftInputMode="adjustResize|stateVisible"
             android:theme="@style/Theme.Megaactionbar.Secondary">
         </activity>
 
