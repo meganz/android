@@ -13,7 +13,10 @@ import android.widget.TextView;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 
+import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 public class LinksUtil {
 
@@ -24,8 +27,8 @@ public class LinksUtil {
     /**
      * Checks if the link received requires transfer session.
      *
-     * @param url   link to check.
-     * @return A valid path if the link requires transfer session, null otherwise.
+     * @param url   link to check
+     * @return True if the link requires transfer session, false otherwise.
      */
     public static boolean requiresTransferSession(Context context, String url) {
         if (url.contains(REQUIRES_TRANSFER_SESSION)) {
@@ -40,6 +43,17 @@ public class LinksUtil {
         }
 
         return false;
+    }
+
+    /**
+     * Checks if the url is a MEGA link and if it requires transfer session.
+     *
+     * @param context   current Context
+     * @param url       link to check
+     * @return True if the link is a MEGA link and requires transfer session, false otherwise.
+     */
+    public static boolean isMEGALinkAndRequiresTransferSession(Context context, String url) {
+        return !isTextEmpty(url) && matchRegexs(url, MEGA_REGEXS) && requiresTransferSession(context, url);
     }
 
     /**
@@ -63,9 +77,12 @@ public class LinksUtil {
                 String url = span.getURL();
                 if (isTextEmpty(url)) return;
 
-                if (!requiresTransferSession(context, url)) {
+                if (!isMEGALinkAndRequiresTransferSession(context, url)) {
                     Uri uri = Uri.parse(url);
-                    if (uri == null) return;
+                    if (uri == null) {
+                        logWarning("Uri is null. Cannot open the link.");
+                        return;
+                    }
 
                     context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 }
