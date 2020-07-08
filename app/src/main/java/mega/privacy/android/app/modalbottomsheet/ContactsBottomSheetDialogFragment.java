@@ -106,10 +106,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         optionSendContact.setVisibility(View.VISIBLE);
 
         titleNameContactPanel.setText(contact.getFullName());
-
-        ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
-        String sharedNodesDescription = getSubtitleDescription(sharedNodes);
-        titleMailContactPanel.setText(sharedNodesDescription);
+        titleMailContactPanel.setText(getFormattedLastGreen(contact.getLastGreen()));
 
         setImageAvatar(contact.getMegaUser(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
 
@@ -168,5 +165,9 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         super.onSaveInstanceState(outState);
         String email = contact.getMegaUser().getEmail();
         outState.putString(EMAIL, email);
+    }
+
+    private String getFormattedLastGreen(String lastGreen) {
+        return lastGreen.replace("[A]", "").replace("[/A]", "");
     }
 }
