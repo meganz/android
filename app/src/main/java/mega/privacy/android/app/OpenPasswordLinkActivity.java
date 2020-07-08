@@ -2,22 +2,10 @@ package mega.privacy.android.app;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.RelativeLayout;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-
 import mega.privacy.android.app.lollipop.DecryptAlertDialog;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -28,95 +16,80 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 public class OpenPasswordLinkActivity extends PinActivityLollipop
-		implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
+		implements MegaRequestListenerInterface, DecryptAlertDialog.DecryptDialogListener {
 	private static final String TAG_DECRYPT = "decrypt";
 
-	MegaApiAndroid megaApi;
+	private MegaApiAndroid megaApi;
 
-	Toolbar tB;
-    ActionBar aB;
-	DisplayMetrics outMetrics;
-	String url;
-	ProgressDialog statusDialog;
+	private String url;
+	private String key;
 
-	RelativeLayout fragmentContainer;
-	private String mKey;
-
-	@Override
-	public void onDestroy(){
-		if(megaApi != null)
-		{	
-			megaApi.removeRequestListener(this);
-		}
-		
-		super.onDestroy();
-	}
+	private ProgressDialog statusDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
-		
-		Display display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-		
-		MegaApplication app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
-		
-		setContentView(R.layout.activity_open_pass_link);
-		
-		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_file_link);
-		setSupportActionBar(tB);
-		aB = getSupportActionBar();
-		if(aB!=null){
-			//		aB.setLogo(R.drawable.ic_arrow_back_black);
-			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setDisplayShowHomeEnabled(true);
-			aB.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-			aB.setDisplayShowTitleEnabled(false);
-		}
+
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+		statusDialog = new ProgressDialog(this);
+		statusDialog.setMessage(getString(R.string.general_loading));
+
+		megaApi = ((MegaApplication) getApplication()).getMegaApi();
 
 		Intent intent = getIntent();
-		if (intent != null){
+		if (intent != null) {
 			url = intent.getDataString();
 
 			askForPasswordDialog();
 		}
 	}
 
-	public void askForPasswordDialog(){
-		logDebug("askForPasswordDialog");
+	@Override
+	public void onDestroy() {
+		if (megaApi != null) {
+			megaApi.removeRequestListener(this);
+		}
 
-		DecryptAlertDialog.Builder builder = new DecryptAlertDialog.Builder();
-		builder.setListener(this).setTitle(getString(R.string.hint_set_password_protection_dialog))
-				.setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
-				.setErrorMessage(R.string.invalid_link_password).setKey(mKey).setShownPassword(true)
-				.build().show(getSupportFragmentManager(), TAG_DECRYPT);
+		statusDialog.dismiss();
+		super.onDestroy();
 	}
 
-	private void decrypt(){
-		if (TextUtils.isEmpty(mKey)) return;
+	public void askForPasswordDialog() {
+		logDebug("askForPasswordDialog");
 
-		ProgressDialog temp = null;
-		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.general_loading));
-			temp.show();
+		new DecryptAlertDialog.Builder()
+				.setListener(this)
+				.setTitle(getString(R.string.hint_set_password_protection_dialog))
+				.setPosText(R.string.general_decryp)
+				.setNegText(R.string.general_cancel)
+				.setErrorMessage(R.string.invalid_link_password)
+				.setKey(key)
+				.setShownPassword(true)
+				.build()
+				.show(getSupportFragmentManager(), TAG_DECRYPT);
+	}
+
+	private void decrypt() {
+		if (TextUtils.isEmpty(key)) {
+			return;
 		}
-		catch(Exception ex)
-		{ return; }
 
-		statusDialog = temp;
+		statusDialog.show();
 
-		megaApi.decryptPasswordProtectedLink(url, mKey, this);
+		megaApi.decryptPasswordProtectedLink(url, key, this);
 	}
 
 	@Override
@@ -133,18 +106,15 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		logDebug("onRequestFinish: " + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_PASSWORD_LINK){
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
+		if (request.getType() == MegaRequest.TYPE_PASSWORD_LINK) {
+			statusDialog.dismiss();
+
 			if (e.getErrorCode() == MegaError.API_OK) {
 
 				String decryptedLink = request.getText();
 
 				// Folder Download link
-				if (decryptedLink != null && matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
+				if (matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
 					logDebug("Folder link url");
 
 					Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
@@ -153,9 +123,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 					openFolderIntent.setData(Uri.parse(decryptedLink));
 					startActivity(openFolderIntent);
 					finish();
-				}
-
-				else if (decryptedLink != null && matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
+				} else if (matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
 					logDebug("Open link url");
 
 					Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
@@ -165,13 +133,11 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 					startActivity(openFileIntent);
 					finish();
 				}
-			}
-			else{
+			} else {
 				logError("ERROR: " + e.getErrorCode());
 				askForPasswordDialog();
 			}
 		}
-
 	}
 
 	@Override
@@ -181,46 +147,8 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 	}
 
 	@Override
-	public void onClick(View v) {
-
-		switch(v.getId()){
-			case R.id.file_link_button_download:{
-
-				break;
-			}
-			case R.id.file_link_button_import:{
-
-				break;
-			}
-			case R.id.file_link_icon:{
-
-				break;
-			}
-		}
-	}
-
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-	    	// Respond to the action bar's Up/Home button
-		    case android.R.id.home:{
-		    	finish();
-		    	return true;
-		    }
-		}
-		
-		return super.onOptionsItemSelected(item);
-	}
-
-
-	public void showSnackbar(String s){
-		showSnackbar(fragmentContainer, s);
-	}
-
-	@Override
 	public void onDialogPositiveClick(String key) {
-		mKey = key;
+		this.key = key;
 		decrypt();
 	}
 
