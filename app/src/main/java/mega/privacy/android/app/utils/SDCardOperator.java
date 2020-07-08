@@ -54,12 +54,12 @@ public class SDCardOperator {
             super(message);
         }
 
-        SDCardException(String message, Throwable cause) {
+        private SDCardException(String message, Throwable cause) {
             super(message, cause);
         }
     }
 
-    public SDCardOperator(boolean isSDCardDownload) {
+    private SDCardOperator(boolean isSDCardDownload) {
         this.isSDCardDownload = isSDCardDownload;
     }
 
@@ -104,7 +104,7 @@ public class SDCardOperator {
         return sdCardRoot;
     }
 
-    boolean isNewSDCardPath(String path) {
+    private boolean isNewSDCardPath(String path) {
         return !path.startsWith(sdCardRoot);
     }
 

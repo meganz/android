@@ -1093,9 +1093,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 // First time enable media upload, haven't set local path.
                 if (INVALID_PATH.equals(path)) {
                     return true;
-                } else {
-                    return path != null && new File(path).exists();
                 }
+
+                return path != null && new File(path).exists();
             }
         }
         // if not enable secondary

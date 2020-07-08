@@ -130,7 +130,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 		if (transferType == TYPE_DOWNLOAD) {
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
-			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.download_green));
+			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.green_unlocked_rewards));
 			MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 			holder.document = transfer.getNodeHandle();
 
@@ -175,7 +175,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			}
 		} else if (transferType == TYPE_UPLOAD) {
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
-			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.upload_blue));
+			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.business_color));
 			holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
 			holder.currentPath = transfer.getPath();
 

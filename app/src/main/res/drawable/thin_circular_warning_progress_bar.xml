@@ -26,7 +26,7 @@
                 android:shape="ring"
                 android:thicknessRatio="25.0"
                 android:type="sweep">
-                <solid android:color="@color/failed_transfer" />
+                <solid android:color="@color/expired_red" />
             </shape>
         </rotate>
     </item>

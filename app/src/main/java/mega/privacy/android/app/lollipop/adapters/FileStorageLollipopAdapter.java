@@ -104,77 +104,68 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
             holder.textViewFileSize.setText(getSizeString(documentSize));
         }
 
-        if (mode == Mode.PICK_FILE) {
-            if (!document.getFile().canRead()) {
-                setViewAlpha(holder.imageView, .4f);
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        switch (mode) {
+            case PICK_FILE:
+                boolean isReadable = document.getFile().canRead();
+                setViewAlpha(holder.imageView, isReadable ? 1 : .4f);
+                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, isReadable ? android.R.color.black : R.color.text_secondary));
 
-                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                params1.setMargins(36, 0, 0, 0);
-                holder.imageView.setLayoutParams(params1);
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+                params.setMargins(36, 0, 0, 0);
+                holder.imageView.setLayoutParams(params);
 
+                boolean isReadableAndSelected = isReadable && multipleSelect && isItemChecked(position);
+                holder.itemLayout.setBackgroundColor(isReadableAndSelected ? ContextCompat.getColor(context, R.color.new_multiselect_color) : Color.WHITE);
+
+
+                if (document.isFolder()) {
+                    holder.imageView.setImageResource(isReadableAndSelected ? R.drawable.ic_select_folder
+                            : R.drawable.ic_folder_list);
+                    break;
+                }
+
+                //File
+                if (isReadableAndSelected) {
+                    holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                } else {
+                    holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+                    ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
+                }
+
+                break;
+
+            case PICK_FOLDER:
+                holder.itemLayout.setEnabled(isEnabled(position));
+
+                if (document.isFolder()) {
+                    holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                    setViewAlpha(holder.imageView, 1);
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                } else {
+                    holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+                    setViewAlpha(holder.imageView, .4f);
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                }
+                break;
+
+            case BROWSE_FILES:
                 if (document.isFolder()) {
                     holder.imageView.setImageResource(R.drawable.ic_folder_list);
                 } else {
                     holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
                     ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
                 }
-            } else {
-                setViewAlpha(holder.imageView, 1);
+
                 holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-
-                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                params1.setMargins(36, 0, 0, 0);
-                holder.imageView.setLayoutParams(params1);
-
-                if (document.isFolder()) {
-                    if (multipleSelect && isItemChecked(position)) {
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    }
-                } else {
-                    if (multipleSelect && isItemChecked(position)) {
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
-                    }
-                }
-            }
-        } else if (mode == Mode.PICK_FOLDER){
-            if (!isEnabled(position)) {
-                holder.itemLayout.setEnabled(false);
-            } else {
-                holder.itemLayout.setEnabled(true);
-            }
-
-            if (document.isFolder()) {
-                holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                setViewAlpha(holder.imageView, 1);
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-            } else {
-                holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-                setViewAlpha(holder.imageView, .4f);
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-            }
-        } else if (mode == Mode.BROWSE_FILES) {
-            if (document.isFolder()) {
-                holder.imageView.setImageResource(R.drawable.ic_folder_list);
-            } else {
-                holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-                ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
-            }
-
-            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                break;
         }
     }
 
-    // Set new files on folder change
+    /**
+     * Set new files on folder change.
+     *
+     * @param newFiles  List of files
+     */
     public void setFiles(List<FileDocument> newFiles) {
         logDebug("setFiles");
         currentFiles = newFiles;

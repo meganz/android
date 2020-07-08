@@ -91,11 +91,13 @@ public class TransferWidget {
      * @return True if the widget is on a file management section in ManagerActivity, false otherwise.
      */
     private boolean isOnFileManagementManagerSection() {
-        return ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.TRANSFERS
-                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.CONTACTS
-                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.ACCOUNT
-                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.SETTINGS
-                && ManagerActivityLollipop.getDrawerItem() != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS;
+        ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.getDrawerItem();
+
+        return drawerItem != ManagerActivityLollipop.DrawerItem.TRANSFERS
+                && drawerItem != ManagerActivityLollipop.DrawerItem.CONTACTS
+                && drawerItem != ManagerActivityLollipop.DrawerItem.ACCOUNT
+                && drawerItem != ManagerActivityLollipop.DrawerItem.SETTINGS
+                && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS;
     }
 
     /**
@@ -117,12 +119,10 @@ public class TransferWidget {
      */
     private void setProgressTransfers() {
         if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
-            status.setVisibility(VISIBLE);
-            status.setImageDrawable(getDrawable(R.drawable.ic_transfers_error));
+            updateStatus(getDrawable(R.drawable.ic_transfers_error));
         } else if (isOnTransferOverQuota()) {
-            status.setVisibility(VISIBLE);
-            status.setImageDrawable(getDrawable(R.drawable.ic_transfers_overquota));
-        } else {
+            updateStatus(getDrawable(R.drawable.ic_transfers_overquota));
+        } else if (status.getVisibility() != GONE){
             status.setVisibility(GONE);
         }
 
@@ -136,8 +136,7 @@ public class TransferWidget {
         if (isOnTransferOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
-        status.setVisibility(VISIBLE);
-        status.setImageDrawable(getDrawable(R.drawable.ic_transfers_paused));
+        updateStatus(getDrawable(R.drawable.ic_transfers_paused));
     }
 
     /**
@@ -145,8 +144,7 @@ public class TransferWidget {
      */
     private void setOverQuotaTransfers() {
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_over_quota_progress_bar));
-        status.setVisibility(VISIBLE);
-        status.setImageDrawable(getDrawable(R.drawable.ic_transfers_overquota));
+        updateStatus(getDrawable(R.drawable.ic_transfers_overquota));
     }
 
     /**
@@ -156,8 +154,7 @@ public class TransferWidget {
         if (isOnTransferOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_warning_progress_bar));
-        status.setVisibility(VISIBLE);
-        status.setImageDrawable(getDrawable(R.drawable.ic_transfers_error));
+        updateStatus(getDrawable(R.drawable.ic_transfers_error));
     }
 
     /**
@@ -225,5 +222,18 @@ public class TransferWidget {
         long totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
         return (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
+    }
+
+    /**
+     * Updates the status of the widget.
+     *
+     * @param drawable  Drawable to set as status image.
+     */
+    private void updateStatus(Drawable drawable) {
+        if (status.getVisibility() != VISIBLE) {
+            status.setVisibility(VISIBLE);
+        }
+
+        status.setImageDrawable(drawable);
     }
 }

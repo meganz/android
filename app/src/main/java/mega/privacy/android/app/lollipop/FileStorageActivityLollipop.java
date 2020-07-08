@@ -313,11 +313,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 
-        if (mode == Mode.PICK_FOLDER) {
-            newFolderMenuItem.setVisible(true);
-        } else {
-            newFolderMenuItem.setVisible(false);
-        }
+        newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -325,19 +321,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 		logDebug("onPrepareOptionsMenu");
-		if (mode == Mode.PICK_FOLDER) {
-			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			newFolderMenuItem.setVisible(true);
-		} else if (mode == Mode.BROWSE_FILES) {
-			newFolderMenuItem.setVisible(false);
-			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-		} else {
-			newFolderMenuItem.setVisible(false);
-			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-		}
+
+		menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+		menu.findItem(R.id.cab_menu_select_all).setVisible(mode == Mode.PICK_FILE);
+		newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
@@ -479,7 +467,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		prefs = dbH.getPreferences();
 
-		if (mode ==Mode.BROWSE_FILES) {
+		if (mode == Mode.BROWSE_FILES) {
 			if (intent.getExtras() != null) {
 				String extraPath = intent.getExtras().getString(EXTRA_PATH);
 				if (!isTextEmpty(extraPath)) {
@@ -973,13 +961,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			if (isFileAvailable(f)) {
 				Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-				Uri uri;
-
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-					uri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, f);
-				} else {
-					uri = Uri.fromFile(f);
-				}
+				Uri uri = isAndroidNougatOrUpper() ? FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, f)
+						: Uri.fromFile(f);
 
 				if (uri != null) {
 					intent.setDataAndType(uri, MimeTypeList.typeForName(f.getName()).getType());

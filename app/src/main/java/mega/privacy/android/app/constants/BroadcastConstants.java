@@ -55,5 +55,5 @@ public class BroadcastConstants {
     public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";
 
-    public static final int INVALID_VALUE = -1;
+    public static final int EXTRA_BROADCAST_INVALID_VALUE = -1;
 }

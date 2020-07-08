@@ -16750,7 +16750,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
      * @return  A list with the failed and cancelled transfers.
      */
 	public ArrayList<AndroidCompletedTransfer> getFailedAndCancelledTransfers() {
-		return dbH.getFailedORCancelledTransfers();
+		return dbH.getFailedOrCancelledTransfers();
 	}
 
     /**

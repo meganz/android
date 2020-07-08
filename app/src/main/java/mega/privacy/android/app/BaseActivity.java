@@ -336,11 +336,13 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) return;
-
-            if (intent.getAction() != null && intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA) && isActivityInForeground()) {
-                showGeneralTransferOverQuotaWarning();
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA)
+                    || !isActivityInForeground()) {
+                return;
             }
+
+            showGeneralTransferOverQuotaWarning();
         }
     };
 

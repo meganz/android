@@ -1894,7 +1894,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      *
      * @return The list the cancelled or failed transfers.
      */
-	public ArrayList<AndroidCompletedTransfer> getFailedORCancelledTransfers(){
+	public ArrayList<AndroidCompletedTransfer> getFailedOrCancelledTransfers(){
 		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS
 				+ " WHERE " + KEY_TRANSFER_STATE + " = '" +  encrypt(MegaTransfer.STATE_CANCELLED +"")
 				+ "' OR " + KEY_TRANSFER_STATE + " = '" + encrypt(MegaTransfer.STATE_FAILED +"") + "'"

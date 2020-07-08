@@ -175,12 +175,11 @@ public class AndroidCompletedTransfer {
      */
     private String getTransferPath(MegaTransfer transfer) {
         MegaApplication app = MegaApplication.getInstance();
-        MegaApiAndroid megaApi = app.getMegaApi();
 
         switch (type) {
             case MegaTransfer.TYPE_UPLOAD:
                 setIsOfflineFile(false);
-                MegaNode parentNode = megaApi.getNodeByHandle(transfer.getParentHandle());
+                MegaNode parentNode = app.getMegaApi().getNodeByHandle(transfer.getParentHandle());
 
                 if (parentNode != null) {
                     return removeLastFileSeparator(getParentFolderPath(parentNode));

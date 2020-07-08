@@ -154,7 +154,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				break;
 
 			case STATE_FAILED:
-				holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.failed_transfer));
+				holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.expired_red));
 				holder.textViewCompleted.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
                 params1.rightMargin = 0;
 				holder.imageViewCompleted.setImageBitmap(null);

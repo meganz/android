@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.widget.RelativeLayout;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import mega.privacy.android.app.components.transferWidget.TransferWidget;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -95,15 +93,13 @@ public class TransfersManagementActivity extends PinActivityLollipop {
      * @param intent    Intent received in the LocalBroadcast
      */
     protected void updateWidget(Intent intent) {
-        if (intent == null) return;
+        if (intent == null || transfersWidget == null) return;
 
-        if (transfersWidget != null) {
-            int transferType = intent.getIntExtra(TRANSFER_TYPE, INVALID_VALUE);
-            if (transferType == INVALID_VALUE) {
-                transfersWidget.update();
-            } else {
-                transfersWidget.update(transferType);
-            }
+        int transferType = intent.getIntExtra(TRANSFER_TYPE, EXTRA_BROADCAST_INVALID_VALUE);
+        if (transferType == EXTRA_BROADCAST_INVALID_VALUE) {
+            transfersWidget.update();
+        } else {
+            transfersWidget.update(transferType);
         }
     }
 
