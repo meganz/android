@@ -126,7 +126,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private Activity currentActivity = null;
 
 	// Attributes to detect if app changes between background and foreground
+	// Keep the count of number of Activities in the started state
 	private int activityReferences = 0;
+	// Flag to indicate if the current Activity is going through configuration change like orientation switch
 	private boolean isActivityChangingConfigurations = false;
 
 	private static boolean isLoggingIn = false;
