@@ -25,6 +25,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
@@ -99,7 +100,13 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         optionSendContact.setVisibility(View.VISIBLE);
 
         titleNameContactPanel.setText(contact.getFullName());
-        setContactLastGreen(requireContext(), getUserOnlineStatus(contact.getMegaUser().getHandle()), contact.getLastGreen(), titleMailContactPanel);
+
+        String lastGreen = contact.getLastGreen();
+        if (!isTextEmpty(lastGreen)) {
+            setContactLastGreen(requireContext(), getUserOnlineStatus(contact.getMegaUser().getHandle()), lastGreen, titleMailContactPanel);
+        } else {
+            titleMailContactPanel.setVisibility(View.GONE);
+        }
 
         setImageAvatar(contact.getMegaUser(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
 
