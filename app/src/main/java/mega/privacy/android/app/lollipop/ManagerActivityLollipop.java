@@ -988,17 +988,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE);
 
-			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)) {
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
 				if (getContactsFragment() != null) {
 					cFLol.updateContact(userHandle);
 				}
 
-				if (getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0) {
-					inSFLol.updateNicknames(userHandle);
+				if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
+					inSFLol.updateContact(userHandle);
 				}
 
-				if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0) {
-					outSFLol.updateNicknames(userHandle);
+				if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
+					outSFLol.updateContact(userHandle);
 				}
 			} else if (intent.getAction().equals(ACTION_UPDATE_CREDENTIALS) && getContactsFragment() != null) {
 				cFLol.updateContact(userHandle);
@@ -1998,6 +2000,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (localBroadcastManager != null) {
 			IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 			contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 			contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
 			localBroadcastManager.registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
