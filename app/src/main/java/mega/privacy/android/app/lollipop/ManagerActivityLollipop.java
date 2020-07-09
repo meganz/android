@@ -3652,6 +3652,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			app.refreshAccountInfo();
 		}
 
+		updateTransfersWidgetPosition(bNV.getVisibility() == View.GONE);
 		checkTransferOverQuotaOnResume();
 	}
 
@@ -5804,7 +5805,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (fragment != null && fragment.isAdded()) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.remove(fragment);
-			ft.commit();
+			ft.commitAllowingStateLoss();
 		}
 	}
 
@@ -16195,17 +16196,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-		boolean hideBNV;
 		if (hide && bNV.getVisibility() == View.VISIBLE) {
 			params.setMargins(0, 0, 0, 0);
 			fragmentLayout.setLayoutParams(params);
 			bNV.animate().translationY(220).setDuration(400L).withEndAction(() -> bNV.setVisibility(View.GONE)).start();
-			hide = true;
 		} else if (!hide && bNV.getVisibility() == View.GONE) {
 			params.setMargins(0, 0, 0, px2dp(56, outMetrics));
 			bNV.setVisibility(View.VISIBLE);
 			bNV.animate().translationY(0).setDuration(400L).withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
-			hide = false;
 		}
 
 		updateTransfersWidgetPosition(hide);

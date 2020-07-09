@@ -15,11 +15,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class CallListener implements MegaChatCallListenerInterface {
-
-    private MegaApplication megaApplication;
-
     public CallListener() {
-        megaApplication = MegaApplication.getInstance();
     }
 
     @Override
@@ -28,6 +24,8 @@ public class CallListener implements MegaChatCallListenerInterface {
             logWarning("Call null");
             return;
         }
+
+        MegaApplication megaApplication = MegaApplication.getInstance();
 
         Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
         intentGeneral.setAction(ACTION_UPDATE_CALL);
@@ -79,6 +77,8 @@ public class CallListener implements MegaChatCallListenerInterface {
             logWarning("Session null");
             return;
         }
+
+        MegaApplication megaApplication = MegaApplication.getInstance();
 
         Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
         intentGeneral.setAction(ACTION_UPDATE_CALL);

@@ -107,6 +107,8 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		int index = 0;
 		while (li.hasNext()) {
 			MegaTransfer next = (MegaTransfer) li.next();
+			if (next == null) continue;
+
 			if (next.getTag() == tag) {
 				index = li.previousIndex();
 				break;

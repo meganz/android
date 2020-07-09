@@ -79,6 +79,10 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
         holder.itemLayout.setOnClickListener(this);
         holder.itemLayout.setOnLongClickListener(this);
         holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+        params.setMargins(36, 0, 0, 0);
+        holder.imageView.setLayoutParams(params);
+
         holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
         holder.textViewFileName.setOnClickListener(this);
         holder.textViewFileName.setOnLongClickListener(this);
@@ -109,10 +113,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
                 boolean isReadable = document.getFile().canRead();
                 setViewAlpha(holder.imageView, isReadable ? 1 : .4f);
                 holder.textViewFileName.setTextColor(ContextCompat.getColor(context, isReadable ? android.R.color.black : R.color.text_secondary));
-
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                params.setMargins(36, 0, 0, 0);
-                holder.imageView.setLayoutParams(params);
 
                 boolean isReadableAndSelected = isReadable && multipleSelect && isItemChecked(position);
                 holder.itemLayout.setBackgroundColor(isReadableAndSelected ? ContextCompat.getColor(context, R.color.new_multiselect_color) : Color.WHITE);
