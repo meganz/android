@@ -14991,8 +14991,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showConfirmationCancelTransfer(final MegaTransfer mT) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(R.string.cancel_transfer_confirmation)
-				.setPositiveButton(R.string.context_delete, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
-				.setNegativeButton(R.string.general_cancel, null);
+				.setPositiveButton(R.string.general_cancel, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
+				.setNegativeButton(R.string.general_dismiss, null);
 
 		confirmationTransfersDialog = builder.create();
         setConfirmationTransfersDialogNotCancellableAndShow();
@@ -15004,14 +15004,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showConfirmationCancelAllTransfers() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
-				.setNegativeButton(R.string.context_delete, (dialog, which) -> {
+				.setPositiveButton(R.string.general_cancel, (dialog, which) -> {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
 					cancelAllUploads(ManagerActivityLollipop.this);
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
 					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
 				})
-				.setPositiveButton(R.string.general_cancel, null);
+				.setNegativeButton(R.string.general_dismiss, null);
 
 		confirmationTransfersDialog = builder.create();
         setConfirmationTransfersDialogNotCancellableAndShow();
@@ -16728,7 +16728,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
      *
      * @param bNVHidden  true if the bottom navigation view is hidden, false otherwise
      */
-	private void updateTransfersWidgetPosition(boolean bNVHidden) {
+	public void updateTransfersWidgetPosition(boolean bNVHidden) {
 		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
 		if (transfersWidgetLayout.getVisibility() == View.GONE) return;
 

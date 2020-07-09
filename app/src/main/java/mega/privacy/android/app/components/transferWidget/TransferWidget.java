@@ -66,13 +66,18 @@ public class TransferWidget {
     public void update(int transferType) {
         if (!isOnline(context)) return;
 
-        if (context instanceof ManagerActivityLollipop && ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
-            MegaApplication.getTransfersManagement().setFailedTransfers(false);
-        }
+        if (context instanceof ManagerActivityLollipop) {
+            ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.getDrawerItem();
 
-        if (context instanceof ManagerActivityLollipop && !isOnFileManagementManagerSection()) {
-            hide();
-            return;
+            if (drawerItem == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
+                MegaApplication.getTransfersManagement().setFailedTransfers(false);
+            } else if (drawerItem == ManagerActivityLollipop.DrawerItem.INBOX) {
+                ((ManagerActivityLollipop) context).updateTransfersWidgetPosition(true);
+            }
+
+            if (!isOnFileManagementManagerSection()) {
+                return;
+            }
         }
 
         if (getPendingTransfers() > 0) {

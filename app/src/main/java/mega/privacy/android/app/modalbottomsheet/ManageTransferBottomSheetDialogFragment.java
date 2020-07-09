@@ -107,6 +107,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);
                 viewInFolderOption.setVisibility(View.GONE);
+                getLinkOption.setVisibility(View.GONE);
                 break;
 
             default:
