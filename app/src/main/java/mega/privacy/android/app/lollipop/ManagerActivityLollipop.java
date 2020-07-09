@@ -269,6 +269,7 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
@@ -8451,6 +8452,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showGetLinkActivity(long handle){
 		logDebug("Handle: " + handle);
 		MegaNode node = megaApi.getNodeByHandle(handle);
+		if (node == null) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.warning_node_not_exists_in_cloud), MEGACHAT_INVALID_HANDLE);
+			return;
+		}
+
+
 		if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
 			return;
 		}
@@ -14120,6 +14127,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			    if (drawerItem == DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
 					boolean paused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+					refreshFragment(FragmentTag.TRANSFERS.getTag());
+					mTabsAdapterTransfers.notifyDataSetChanged();
+
 					pauseTransfersMenuIcon.setVisible(!paused);
 					playTransfersMenuIcon.setVisible(paused);
 				}
@@ -16652,36 +16662,39 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
-			if (node != null) {
-				MegaNode parentNode = getRootParentNode(node);
-				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
-					parentHandleBrowser = node.getParentHandle();
-					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-					indexCloud = CLOUD_TAB;
-					if (viewPagerCloud != null) {
-						viewPagerCloud.setCurrentItem(indexCloud);
-						if (cloudPageAdapter != null) {
-							cloudPageAdapter.notifyDataSetChanged();
-						}
+			if (node == null) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.warning_folder_not_exists), MEGACHAT_INVALID_HANDLE);
+				return;
+			}
+
+			MegaNode parentNode = getRootParentNode(node);
+			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
+				parentHandleBrowser = node.getParentHandle();
+				refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+				indexCloud = CLOUD_TAB;
+				if (viewPagerCloud != null) {
+					viewPagerCloud.setCurrentItem(indexCloud);
+					if (cloudPageAdapter != null) {
+						cloudPageAdapter.notifyDataSetChanged();
 					}
-					selectDrawerItemLollipop(drawerItem = DrawerItem.CLOUD_DRIVE);
-				} else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
-					parentHandleRubbish = node.getParentHandle();
-					refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
-					selectDrawerItemLollipop(drawerItem = DrawerItem.RUBBISH_BIN);
-				} else if (parentNode.isInShare()) {
-					parentHandleIncoming = node.getParentHandle();
-					deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this);
-					refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-					indexShares = INCOMING_TAB;
-					if (viewPagerShares != null) {
-						viewPagerShares.setCurrentItem(indexShares);
-						if (sharesPageAdapter != null) {
-							sharesPageAdapter.notifyDataSetChanged();
-						}
-					}
-					selectDrawerItemLollipop(drawerItem = DrawerItem.SHARED_ITEMS);
 				}
+				selectDrawerItemLollipop(drawerItem = DrawerItem.CLOUD_DRIVE);
+			} else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
+				parentHandleRubbish = node.getParentHandle();
+				refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
+				selectDrawerItemLollipop(drawerItem = DrawerItem.RUBBISH_BIN);
+			} else if (parentNode.isInShare()) {
+				parentHandleIncoming = node.getParentHandle();
+				deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this);
+				refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+				indexShares = INCOMING_TAB;
+				if (viewPagerShares != null) {
+					viewPagerShares.setCurrentItem(indexShares);
+					if (sharesPageAdapter != null) {
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+				}
+				selectDrawerItemLollipop(drawerItem = DrawerItem.SHARED_ITEMS);
 			}
 		}
 	}

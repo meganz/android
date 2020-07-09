@@ -241,8 +241,8 @@
 
     <!--<string name="cancel_transfer_title">Delete Transfer</string>
     -->
-    <string name="cancel_transfer_confirmation">Delete this transfer?</string>
-    <string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
+    <string name="cancel_transfer_confirmation">Cancel this transfer?</string>
+    <string name="cancel_all_transfer_confirmation">Cancel all transfers?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_recents" context="Label to reference a recents section">Recents</string>
@@ -671,7 +671,7 @@
     <!--
     <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
     -->
-    <string name="menu_cancel_all_transfers" context="menu item">Delete all transfers</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Cancel all transfers</string>
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
 
@@ -2800,6 +2800,9 @@
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action 'upgrate account' to get more transfer quota">Get more transfer quota</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
 
     <string name="label_time_in_days" context="Time in days. The placeholder is for the time value, please adjust the position based on linguistics">%dd</string>
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>

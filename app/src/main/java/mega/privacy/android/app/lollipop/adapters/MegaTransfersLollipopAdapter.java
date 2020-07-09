@@ -197,58 +197,66 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.optionPause.setVisibility(View.VISIBLE);
 		holder.optionPause.setImageResource(R.drawable.ic_pause_grey);
 
-		switch (transferState) {
-			case STATE_PAUSED:
-				holder.progressText.setText(getProgress(transfer));
-				holder.speedText.setText(context.getResources().getString(R.string.transfer_paused));
+		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+			holder.progressText.setText(getProgress(transfer));
+			holder.speedText.setText(context.getResources().getString(R.string.transfer_paused));
+			if (transferState == STATE_PAUSED) {
 				holder.optionPause.setImageResource(R.drawable.ic_play_grey);
-				break;
+			}
+		} else {
+			switch (transferState) {
+				case STATE_PAUSED:
+					holder.progressText.setText(getProgress(transfer));
+					holder.speedText.setText(context.getResources().getString(R.string.transfer_paused));
+					holder.optionPause.setImageResource(R.drawable.ic_play_grey);
+					break;
 
-			case STATE_ACTIVE:
-				holder.progressText.setText(getProgress(transfer));
-				holder.speedText.setText(getSpeedString(transfer.getSpeed()));
-				break;
+				case STATE_ACTIVE:
+					holder.progressText.setText(getProgress(transfer));
+					holder.speedText.setText(getSpeedString(transfer.getSpeed()));
+					break;
 
-			case STATE_COMPLETING:
-			case STATE_RETRYING:
-			case STATE_QUEUED:
-				if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
-						|| (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
-					holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
+				case STATE_COMPLETING:
+				case STATE_RETRYING:
+				case STATE_QUEUED:
+					if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
+							|| (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
+						holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
 
-					if (transferType == TYPE_DOWNLOAD) {
-						holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));
+						if (transferType == TYPE_DOWNLOAD) {
+							holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));
+						} else {
+							holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_storage_over_quota)));
+						}
+
+						holder.speedText.setVisibility(View.GONE);
+					} else if (transferState == STATE_QUEUED) {
+						holder.progressText.setVisibility(View.GONE);
+						holder.speedText.setVisibility(View.GONE);
+						holder.imageViewCompleted.setVisibility(View.VISIBLE);
+						holder.textViewCompleted.setVisibility(View.VISIBLE);
+						holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_queued));
 					} else {
-						holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_storage_over_quota)));
-					}
+						holder.progressText.setText(getProgress(transfer));
 
-					holder.speedText.setVisibility(View.GONE);
-				} else if (transferState == STATE_QUEUED) {
+						if (transferState == STATE_COMPLETING) {
+							holder.speedText.setText(context.getResources().getString(R.string.transfer_completing));
+						} else {
+							holder.speedText.setText(context.getResources().getString(R.string.transfer_retrying));
+						}
+					}
+					break;
+
+				default:
+					logDebug("Default status");
 					holder.progressText.setVisibility(View.GONE);
 					holder.speedText.setVisibility(View.GONE);
 					holder.imageViewCompleted.setVisibility(View.VISIBLE);
 					holder.textViewCompleted.setVisibility(View.VISIBLE);
-					holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_queued));
-				} else {
-					holder.progressText.setText(getProgress(transfer));
-
-					if (transferState == STATE_COMPLETING) {
-						holder.speedText.setText(context.getResources().getString(R.string.transfer_completing));
-					} else {
-						holder.speedText.setText(context.getResources().getString(R.string.transfer_retrying));
-					}
-				}
-				break;
-
-			default:
-				logDebug("Default status");
-				holder.progressText.setVisibility(View.GONE);
-				holder.speedText.setVisibility(View.GONE);
-				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-                holder.textViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
-				holder.optionPause.setVisibility(View.GONE);
-				break;
+					holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
+					holder.optionPause.setVisibility(View.GONE);
+					break;
+			}
 		}
 
 		holder.itemLayout.setBackgroundColor(Color.WHITE);
