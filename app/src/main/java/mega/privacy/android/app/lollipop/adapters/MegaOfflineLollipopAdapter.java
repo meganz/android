@@ -41,6 +41,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -733,7 +734,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			thumb = getRoundedRectBitmap(context, thumb, 2);
 		}
 
-		holder.imageView.setImageBitmap(thumb);
+		holder.imageView.setImageBitmap(
+				ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
 	}
 
 	

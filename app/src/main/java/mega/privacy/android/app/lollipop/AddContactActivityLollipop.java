@@ -2328,6 +2328,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         headerContacts.setVisibility(View.VISIBLE);
                         setEmptyStateVisibility(false);
                     }
+                    recyclerViewList.setVisibility(
+                        adapterMEGA.getItemCount() > 0 ? View.VISIBLE : View.GONE);
                 }
             }
         }
