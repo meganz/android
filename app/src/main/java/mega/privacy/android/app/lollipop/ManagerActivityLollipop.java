@@ -3652,7 +3652,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			app.refreshAccountInfo();
 		}
 
-		updateTransfersWidgetPosition(bNV.getVisibility() == View.GONE);
 		checkTransferOverQuotaOnResume();
 	}
 
@@ -16728,7 +16727,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
      */
 	public void updateTransfersWidgetPosition(boolean bNVHidden) {
 		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
-		if (transfersWidgetLayout.getVisibility() == View.GONE) return;
+		if (transfersWidgetLayout == null) return;
 
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
 
