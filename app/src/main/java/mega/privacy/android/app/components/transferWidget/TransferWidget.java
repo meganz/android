@@ -67,12 +67,8 @@ public class TransferWidget {
         if (!isOnline(context)) return;
 
         if (context instanceof ManagerActivityLollipop) {
-            ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.getDrawerItem();
-
-            if (drawerItem == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
+            if (ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
                 MegaApplication.getTransfersManagement().setFailedTransfers(false);
-            } else if (drawerItem == ManagerActivityLollipop.DrawerItem.INBOX) {
-                ((ManagerActivityLollipop) context).updateTransfersWidgetPosition(true);
             }
 
             if (!isOnFileManagementManagerSection()) {
