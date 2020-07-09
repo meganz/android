@@ -3,34 +3,27 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -76,7 +69,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         items_layout = contentView.findViewById(R.id.items_layout_bottom_sheet_contact);
 
         EmojiTextView titleNameContactPanel = contentView.findViewById(R.id.contact_list_contact_name_text);
-        TextView titleMailContactPanel = contentView.findViewById(R.id.contact_list_contact_mail_text);
+        MarqueeTextView titleMailContactPanel = contentView.findViewById(R.id.contact_list_contact_mail_text);
         RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_contact_list_thumbnail);
 
         LinearLayout optionInfoContact = contentView.findViewById(R.id.contact_list_info_contact_layout);
@@ -106,14 +99,14 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         optionSendContact.setVisibility(View.VISIBLE);
 
         titleNameContactPanel.setText(contact.getFullName());
-        titleMailContactPanel.setText(getFormattedLastGreen(contact.getLastGreen()));
+        setContactLastGreen(requireContext(), getUserOnlineStatus(contact.getMegaUser().getHandle()), contact.getLastGreen(), titleMailContactPanel);
 
         setImageAvatar(contact.getMegaUser(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
 
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);
 
-        setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle()), contactStateIcon);
+        setContactStatus(getUserOnlineStatus(contact.getMegaUser().getHandle()), contactStateIcon);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -167,7 +160,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         outState.putString(EMAIL, email);
     }
 
-    private String getFormattedLastGreen(String lastGreen) {
-        return lastGreen.replace("[A]", "").replace("[/A]", "");
+    private int getUserOnlineStatus(long userhandle) {
+        return megaChatApi.getUserOnlineStatus(userhandle);
     }
 }
