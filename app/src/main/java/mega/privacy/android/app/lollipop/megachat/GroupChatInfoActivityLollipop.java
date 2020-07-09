@@ -413,7 +413,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-            LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+            registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
             //Set participants
             participants = new ArrayList<>();
@@ -516,7 +516,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             megaChatApi.removeChatListener(this);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
+        unregisterReceiver(contactUpdateReceiver);
     }
 
     private String checkParticipantName(long handle, int position) {
@@ -1243,7 +1243,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     logDebug("Chat archived");
                     Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP);
                     intent.putExtra(CHAT_TITLE, chatTitle);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    sendBroadcast(intent);
                     finish();
                 }
                 else{

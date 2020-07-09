@@ -156,7 +156,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	/** the receiver and manager for the broadcast to listen to the pause event */
 	private BroadcastReceiver pauseBroadcastReceiver;
-	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
 
 	@SuppressLint("NewApi")
 	@Override
@@ -199,7 +198,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}, 1000);
 			}
 		};
-		pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
+		registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 
 	}
 
@@ -227,7 +227,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if (fs.length > 1 && fs[1] != null) {
             purgeDirectory(fs[1]);
         }
-        pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
+        unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -486,7 +486,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES);
 		intent.putExtra(NUMBER_FILES, errorEBloqued);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	private File getDir(MegaNode document, Intent intent) {
@@ -1372,8 +1372,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("Node handle: " + transfer.getNodeHandle() + ", Type = " + transfer.getType());
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
-			LocalBroadcastManager.getInstance(getApplicationContext())
-					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
@@ -1489,7 +1488,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 							mediaScanIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						}
-						this.sendBroadcast(mediaScanIntent);
+						sendBroadcast(mediaScanIntent);
 					}
 					catch (Exception e){}
 
@@ -1819,12 +1818,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private void refreshOfflineFragment(){
 		Intent intent = new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	private void refreshSettingsFragment() {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		intent.setAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 }

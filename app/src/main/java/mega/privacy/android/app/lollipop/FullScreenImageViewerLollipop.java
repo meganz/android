@@ -241,8 +241,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			megaApi.removeGlobalListener(this);
 		}
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+		unregisterReceiver(receiver);
+		unregisterReceiver(receiverToFinish);
 
 		super.onDestroy();
 	}
@@ -822,8 +822,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		handler = new Handler();
 		fullScreenImageViewer = this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+		registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1426,7 +1426,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
 		intent.putExtra("handle", handle);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	public void updateScrollPosition(){
@@ -1485,7 +1485,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		intent.putExtra("adapterType", adapterType);
 		intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount );
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	@Override

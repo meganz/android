@@ -624,14 +624,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.showDialog();
         }
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
 		IntentFilter userNameUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
-		LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, userNameUpdateFilter);
+		registerReceiver(userNameReceiver, userNameUpdateFilter);
 	}
 
 	private void visibilityStateIcon() {
@@ -1764,8 +1763,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.recycle();
         }
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
+		unregisterReceiver(manageShareReceiver);
+		unregisterReceiver(userNameReceiver);
 	}
 
 	@Override

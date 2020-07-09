@@ -700,7 +700,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     void update2FASetting () {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS);
         intent.putExtra("enabled", true);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     void pasteClipboard() {

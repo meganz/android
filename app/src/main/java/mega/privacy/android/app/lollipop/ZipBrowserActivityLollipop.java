@@ -222,7 +222,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 
 					Intent intent1 =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
-					LocalBroadcastManager.getInstance(zipBrowserActivityLollipop).sendBroadcast(intent1);
+					sendBroadcast(intent1);
 				}
 			}
 		}
@@ -251,7 +251,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	protected void onDestroy() {
 		super.onDestroy();
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		unregisterReceiver(receiver);
 	}
 
 	@SuppressLint("NewApi") @Override
@@ -277,7 +277,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		currentPath = pathZip;
 		downloadLocationDefaultPath = getDownloadLocation();
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();

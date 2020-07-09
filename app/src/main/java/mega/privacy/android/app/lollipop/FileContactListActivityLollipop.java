@@ -447,15 +447,14 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		cC = new ContactController(this);
 		nC = new NodeController(this);
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
 		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-		LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+		registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 
 	public void checkScroll() {
@@ -499,8 +498,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
     	}
     	handler.removeCallbacksAndMessages(null);
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
+		unregisterReceiver(manageShareReceiver);
+		unregisterReceiver(contactUpdateReceiver);
     }
 	
 	@Override

@@ -387,7 +387,7 @@ public class SorterContentActivity extends TransfersManagementActivity {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER);
         intent.putExtra("cloudOrder", cloudOrder);
         intent.putExtra("order", order);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     private void setFileExplorerOrder(ManagerActivityLollipop.DrawerItem drawerItem, Context context, int order) {

@@ -481,7 +481,7 @@ public class AccountController {
 
         Intent intent = new Intent();
         intent.setAction(ACTION_LOG_OUT);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     static public void logoutConfirmed(Context context){

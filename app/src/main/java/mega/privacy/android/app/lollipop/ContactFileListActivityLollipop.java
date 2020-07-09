@@ -490,7 +490,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 					Intent intent1 = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
-					LocalBroadcastManager.getInstance(contactPropertiesMainActivity).sendBroadcast(intent1);
+					sendBroadcast(intent1);
 				}
 			}
 		}
@@ -540,10 +540,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		contactPropertiesMainActivity = this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
-		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
 		handler = new Handler();
 		dbH = DatabaseHandler.getDbHandler(this);
@@ -766,8 +764,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			megaApi.removeRequestListener(this);
 		}
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+		unregisterReceiver(receiver);
+		unregisterReceiver(manageShareReceiver);
 	}
 
 	@Override

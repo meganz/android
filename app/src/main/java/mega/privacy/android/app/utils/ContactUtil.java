@@ -192,7 +192,7 @@ public class ContactUtil {
     public static void notifyUserNameUpdate(Context context, String action, long userHandle) {
         Intent intent = new Intent(action)
             .putExtra(EXTRA_USER_HANDLE, userHandle);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     private static String getNewNickname(MegaStringMap map, String key) {

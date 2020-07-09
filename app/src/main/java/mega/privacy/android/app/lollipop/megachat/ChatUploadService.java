@@ -134,7 +134,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	/** the receiver and manager for the broadcast to listen to the pause event */
 	private BroadcastReceiver pauseBroadcastReceiver;
-	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
 
 	@SuppressLint("NewApi")
 	@Override
@@ -183,7 +182,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}, 1000);
 			}
 		};
-		pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+		registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
 	@Override
@@ -204,7 +203,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             megaChatApi.saveCurrentState();
         }
 
-		pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
+		unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -969,8 +968,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
-			LocalBroadcastManager.getInstance(getApplicationContext())
-					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {

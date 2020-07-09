@@ -742,7 +742,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
+        registerReceiver(chatCallUpdateReceiver, filterCall);
 
         IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
         filterSession.addAction(ACTION_UPDATE_CALL);
@@ -750,10 +750,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         filterSession.addAction(ACTION_CHANGE_AUDIO_LEVEL);
         filterSession.addAction(ACTION_CHANGE_NETWORK_QUALITY);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+        registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         IntentFilter filterProximitySensor = new IntentFilter(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
-        LocalBroadcastManager.getInstance(this).registerReceiver(proximitySensorReceiver, filterProximitySensor);
+        registerReceiver(proximitySensorReceiver, filterProximitySensor);
     }
 
     private void setAvatarLayout() {
@@ -1051,9 +1051,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             bigRecyclerView.setAdapter(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(proximitySensorReceiver);
+        unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(chatSessionUpdateReceiver);
+        unregisterReceiver(proximitySensorReceiver);
 
         super.onDestroy();
     }

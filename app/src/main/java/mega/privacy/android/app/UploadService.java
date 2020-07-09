@@ -124,7 +124,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
     /** the receiver and manager for the broadcast to listen to the pause event */
     private BroadcastReceiver pauseBroadcastReceiver;
-    private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
 
     @SuppressLint("NewApi")
 	@Override
@@ -173,7 +172,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }, 1000);
             }
         };
-        pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+        registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
 	@Override
@@ -189,7 +188,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             megaChatApi.saveCurrentState();
         }
 
-        pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
+        unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -405,7 +404,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
         intent.putExtra(TRANSFER_TYPE, UPLOAD_TRANSFER);
         intent.putExtra(NUMBER_FILES, totalFileUploads + totalFolderUploads);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     /*
@@ -656,8 +655,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
-			LocalBroadcastManager.getInstance(getApplicationContext())
-					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {

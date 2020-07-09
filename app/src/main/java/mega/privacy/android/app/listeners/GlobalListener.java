@@ -82,7 +82,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
-        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+        megaApplication.sendBroadcast(intent);
 
         api.getPaymentMethods(null);
         api.getAccountDetails(null);
@@ -139,7 +139,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                     Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
                     intent.setAction(ACTION_STORAGE_STATE_CHANGED);
                     intent.putExtra(EXTRA_STORAGE_STATE, state);
-                    LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                    megaApplication.sendBroadcast(intent);
                 }
                 break;
 
@@ -150,7 +150,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 intent.setAction(ACTION_EVENT_ACCOUNT_BLOCKED);
                 intent.putExtra(EVENT_NUMBER, event.getNumber());
                 intent.putExtra(EVENT_TEXT, event.getText());
-                LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                megaApplication.sendBroadcast(intent);
                 break;
 
             case MegaEvent.EVENT_BUSINESS_STATUS:

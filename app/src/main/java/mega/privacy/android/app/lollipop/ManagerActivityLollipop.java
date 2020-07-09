@@ -1309,7 +1309,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 						Intent intent1 =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 						intent1.putExtra("screenPosition", screenPosition);
-						LocalBroadcastManager.getInstance(managerActivity).sendBroadcast(intent1);
+						sendBroadcast(intent1);
 					}
 				}
 			}
@@ -2004,55 +2004,53 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			this.setPathNavigationOffline("/");
 		}
 
-		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-		if (localBroadcastManager != null) {
-			IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
-			contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
-			contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
-			contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
-			contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-			localBroadcastManager.registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+		registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
-			localBroadcastManager.registerReceiver(receiverUpdatePosition,
-					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerReceiver(receiverUpdatePosition,
+				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
-			IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-			filter.addAction(ACTION_STORAGE_STATE_CHANGED);
-			localBroadcastManager.registerReceiver(updateMyAccountReceiver, filter);
+		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+		filter.addAction(ACTION_STORAGE_STATE_CHANGED);
+		registerReceiver(updateMyAccountReceiver, filter);
 
-			localBroadcastManager.registerReceiver(receiverUpdate2FA,
-					new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
+		registerReceiver(receiverUpdate2FA,
+				new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
 
-			localBroadcastManager.registerReceiver(networkReceiver,
-					new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+		registerReceiver(networkReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
-			localBroadcastManager.registerReceiver(receiverCUAttrChanged,
-					new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
+		registerReceiver(receiverCUAttrChanged,
+				new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
 
-			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
-            localBroadcastManager.registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
-            localBroadcastManager.registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
+		registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
+		registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
+		registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 
-            localBroadcastManager.registerReceiver(refreshAddPhoneNumberButtonReceiver,
-                    new IntentFilter(BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
+		registerReceiver(refreshAddPhoneNumberButtonReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
 
-			IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
-			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
+		IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+		filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
+		registerReceiver(chatCallUpdateReceiver, filterCall);
 
-			IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
-			filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
-			localBroadcastManager.registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
-		}
+		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
+		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
+		registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
+
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
 		registerTransfersReceiver();
 
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-        filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-        filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
-        filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
-        registerReceiver(updateCUSettingsReceiver, filter);
+        IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
+		filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+        registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -4634,18 +4632,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 		isStorageStatusDialogShown = false;
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateOrder);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(transferOverQuotaUpdateReceiver);
+		unregisterReceiver(contactUpdateReceiver);
+		unregisterReceiver(receiverUpdatePosition);
+		unregisterReceiver(updateMyAccountReceiver);
+		unregisterReceiver(receiverUpdate2FA);
+		unregisterReceiver(networkReceiver);
+		unregisterReceiver(receiverUpdateOrder);
+		unregisterReceiver(receiverUpdateView);
+		unregisterReceiver(chatArchivedReceiver);
+        unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
+		unregisterReceiver(chatCallUpdateReceiver);
+		unregisterReceiver(receiverCUAttrChanged);
+		unregisterReceiver(transferOverQuotaUpdateReceiver);
 
         unregisterReceiver(cameraUploadLauncherReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
@@ -5166,7 +5164,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if (getApplicationContext() != null) {
 						if(((MegaApplication) getApplication()).getOpenChatId()!=-1){
 							Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG);
-							LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+							sendBroadcast(intent);
 						}
 						else{
 							showConfirmationConnect();
@@ -14120,7 +14118,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			logDebug("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			//force update the pause notification to prevent missed onTransferUpdate
-			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 
 			if (e.getErrorCode() == MegaError.API_OK) {
 			    transfersWidget.updateState();

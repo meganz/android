@@ -255,7 +255,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         pdfViewerActivityLollipop = this;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+        registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         final Intent intent = getIntent();
         if (intent == null){
@@ -2750,7 +2750,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             handler.removeCallbacksAndMessages(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+        unregisterReceiver(receiverToFinish);
 
         super.onDestroy();
     }

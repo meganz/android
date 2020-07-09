@@ -700,26 +700,26 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         chatActivity = this;
         chatC = new ChatController(chatActivity);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
-        LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
+        registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
+        registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
         contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
-        LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, contactUpdateFilter);
+        registerReceiver(userNameReceiver, contactUpdateFilter);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
+        registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
         IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
         filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
+        registerReceiver(chatCallUpdateReceiver, filterCall);
 
         IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+        registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         registerTransfersReceiver();
 
@@ -7430,12 +7430,12 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
             adapter.destroyVoiceElemnts();
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceclipDownloadedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
+        unregisterReceiver(dialogConnectReceiver);
+        unregisterReceiver(voiceclipDownloadedReceiver);
+        unregisterReceiver(userNameReceiver);
+        unregisterReceiver(chatArchivedReceiver);
+        unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(chatSessionUpdateReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
@@ -8630,7 +8630,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         logDebug("Broadcast to ManagerActivity");
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
         intent.putExtra("actionType", START_RECONNECTION);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     public int getDeviceDensity(){
@@ -8782,7 +8782,7 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
     private void sendBroadcastChatArchived(String chatTitle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED);
         intent.putExtra(CHAT_TITLE, chatTitle);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
         closeChat(true);
         finish();
     }

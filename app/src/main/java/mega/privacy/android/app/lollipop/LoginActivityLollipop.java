@@ -141,8 +141,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         app.setIsLoggingRunning(false);
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onAccountUpdateReceiver);
+        unregisterReceiver(updateMyAccountReceiver);
+        unregisterReceiver(onAccountUpdateReceiver);
 
         super.onDestroy();
     }
@@ -208,11 +208,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             megaApi.resumeCreateAccount(sessionTemp, this);
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+        registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 
         IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         filter.addAction(ACTION_ON_ACCOUNT_UPDATE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(onAccountUpdateReceiver, filter);
+        registerReceiver(onAccountUpdateReceiver, filter);
 
         isBackFromLoginPage = false;
         showFragment(visibleFragment);

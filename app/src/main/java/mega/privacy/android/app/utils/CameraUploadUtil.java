@@ -267,7 +267,7 @@ public class CameraUploadUtil {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE);
         intent.putExtra(EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary);
         intent.putExtra(EXTRA_NODE_HANDLE, handle);
-        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
+        MegaApplication.getInstance().sendBroadcast(intent);
     }
 
     /**

@@ -388,7 +388,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 					Intent intent1 =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
-					LocalBroadcastManager.getInstance(folderLinkActivity).sendBroadcast(intent1);
+					sendBroadcast(intent1);
 				}
 			}
 		}
@@ -424,7 +424,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		megaApi = app.getMegaApi();
 		megaApi.httpServerStop();
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		registerTransfersReceiver();
 
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
@@ -684,7 +684,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 //			megaApiFolder.logout();
 		}
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		unregisterReceiver(receiver);
 		handler.removeCallbacksAndMessages(null);
 
 		super.onDestroy();

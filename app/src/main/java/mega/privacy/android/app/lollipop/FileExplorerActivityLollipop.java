@@ -3293,7 +3293,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void updateManagerView () {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_VIEW);
 		intent.putExtra("isList", isList);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	public void collapseSearchView () {

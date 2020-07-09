@@ -906,15 +906,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+        registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
         contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-        LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+        registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
@@ -2275,7 +2274,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                 Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                sendBroadcast(intent);
                 finish();
             } else{
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
@@ -2849,8 +2848,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         if (drawableLeave != null) drawableLeave.setColorFilter(null);
         if (drawableCopy != null) drawableCopy.setColorFilter(null);
         if (drawableChat != null) drawableChat.setColorFilter(null);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+        unregisterReceiver(contactUpdateReceiver);
+        unregisterReceiver(manageShareReceiver);
     }
 
 	@Override

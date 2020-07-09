@@ -140,7 +140,7 @@ public class TransfersManagement {
      * @param transferType  the transfer type.
      */
     public static void launchTransferUpdateIntent(int transferType) {
-        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
+        MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
     }
 
     public void setTargetPaths(Map<String, String> targetPaths) {

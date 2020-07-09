@@ -381,12 +381,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         audioVideoPlayerLollipop = this;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+        registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
         filter.addAction(ACTION_CALL_STATUS_UPDATE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+        registerReceiver(chatCallUpdateReceiver, filter);
 
         downloadLocationDefaultPath = getDownloadLocation();
 
@@ -1454,7 +1454,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     public void updateScrollPosition(){
@@ -1511,7 +1511,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     public void setImageDragVisibility(int visibility){
@@ -3396,9 +3396,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             handler.removeCallbacksAndMessages(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(receiver);
+        unregisterReceiver(receiverToFinish);
+        unregisterReceiver(chatCallUpdateReceiver);
 
         super.onDestroy();
     }
@@ -3597,8 +3597,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 handler.removeCallbacksAndMessages(null);
             }
 
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+            unregisterReceiver(receiver);
+            unregisterReceiver(receiverToFinish);
 
             setImageDragVisibility(View.VISIBLE);
         }

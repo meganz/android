@@ -971,7 +971,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             dbH.setCamSyncLocalPath(INVALID_PATH);
             dbH.setSecondaryFolderPath(INVALID_PATH);
             //refresh settings fragment UI
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
+            sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_PRIMARY);
@@ -982,7 +982,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             // disable media upload only
             disableMediaUploadProcess();
             dbH.setSecondaryFolderPath(INVALID_PATH);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING));
+            sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_SECONDARY);

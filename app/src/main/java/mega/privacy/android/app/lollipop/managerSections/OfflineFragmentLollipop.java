@@ -120,13 +120,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public void onResume(){
 		super.onResume();
 		IntentFilter filter = new IntentFilter(REFRESH_OFFLINE_FILE_LIST);
-		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+		context.registerReceiver(receiver, filter);
 	}
 
 	@Override
 	public void onPause(){
 		super.onPause();
-		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+		context.unregisterReceiver(receiver);
 	}
 
 	@Override
