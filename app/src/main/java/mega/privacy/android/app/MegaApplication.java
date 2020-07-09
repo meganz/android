@@ -755,9 +755,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					newCalendar.add(Calendar.HOUR, 24);
 					break;
 				case NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING:
-					getCalendarSpecificTime(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING);
-					break;
 				case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW:
+					getCalendarSpecificTime(option);
 					break;
 			}
 			long timestamp = newCalendar.getTimeInMillis();
