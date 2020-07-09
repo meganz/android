@@ -82,7 +82,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
-        megaApplication.sendBroadcast(intent);
+        MegaApplication.getInstance().sendBroadcast(intent);
 
         api.getPaymentMethods(null);
         api.getAccountDetails(null);
@@ -125,6 +125,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     @Override
     public void onEvent(MegaApiJava api, MegaEvent event) {
         logDebug("Event received: " + event.getText());
+
+        if (megaApplication == null) {
+            megaApplication = MegaApplication.getInstance();
+        }
 
         switch (event.getType()) {
             case MegaEvent.EVENT_STORAGE:

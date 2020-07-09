@@ -116,11 +116,6 @@ public class TransfersManagementActivity extends PinActivityLollipop {
     protected void onDestroy() {
         super.onDestroy();
 
-        try {
-            //If transfersUpdateReceiver is not registered, it throws an IllegalArgumentException
-            unregisterReceiver(transfersUpdateReceiver);
-        } catch (IllegalArgumentException e) {
-            logWarning("IllegalArgumentException unregistering transfersUpdateReceiver", e);
-        }
+        unregisterReceiver(transfersUpdateReceiver);
     }
 }

@@ -838,4 +838,14 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void unregisterReceiver(BroadcastReceiver receiver) {
+        try {
+            //If the receiver is not registered, it throws an IllegalArgumentException
+            super.unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            logWarning("IllegalArgumentException unregistering transfersUpdateReceiver", e);
+        }
+    }
 }
