@@ -26,7 +26,7 @@
     </style>
 
     <!-- Base application theme. -->
-    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.Megaactionbar" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
         <!-- colorPrimary is used for the default action bar background -->

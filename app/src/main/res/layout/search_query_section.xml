@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/search_query_section"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    card_view:cardCornerRadius="@dimen/search_view_corner_radius"
+    card_view:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/left_action"
+            android:layout_width="@dimen/square_button_size"
+            android:layout_height="@dimen/square_button_size"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/search_bar_left_icon_left_margin"
+            android:alpha="1"
+            android:background="@drawable/oval_btn_selector"
+            android:clickable="true"
+            android:padding="@dimen/square_button_padding"
+            android:src="@drawable/ic_arrow_back_black"
+            android:focusable="true" />
+
+        <FrameLayout
+            android:id="@+id/search_input_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@+id/left_action">
+            <com.example.kotlintest.SearchInputView
+                android:id="@+id/search_bar_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:alpha="1"
+                android:background="@color/transparent"
+                android:ellipsize="end"
+                android:hint="@string/search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="textNoSuggestions"
+                android:longClickable="false"
+                android:maxLines="1"
+                android:minHeight="@dimen/square_button_size"
+                android:textSize="@dimen/search_bar_text_size" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/clear_btn"
+            android:layout_width="@dimen/square_button_size"
+            android:layout_height="@dimen/square_button_size"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:alpha="1"
+            android:background="@drawable/oval_btn_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/square_button_padding" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

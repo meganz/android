@@ -396,7 +396,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	MegaNode parentNodeManager;
 
 	boolean firstNavigationLevel = true;
-    DrawerLayout drawerLayout;
+    public DrawerLayout drawerLayout;
     ArrayList<MegaUser> contacts = new ArrayList<>();
     ArrayList<MegaUser> visibleContacts = new ArrayList<>();
 
@@ -5899,6 +5899,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
 				abL.setVisibility(View.GONE);
+				showFabButton();
 
 				break;
 			}
