@@ -239,7 +239,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_leave_chat"
+                    android:src="@drawable/ic_r_leave_chat"
                     android:visibility="visible" />
 
                 <TextView
@@ -250,7 +250,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_leave"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/login_warning"
                     android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>
