@@ -2210,7 +2210,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             addedContactsMEGA.remove(deleteContact);
 
             int filteredPosition = filteredContactMEGA.indexOf(deleteContact);
-            if (filteredPosition != -1) {
+            if (filteredPosition != INVALID_POSITION) {
                 filteredContactMEGA.get(filteredPosition).setSelected(false);
                 adapterMEGA.setContacts(filteredContactMEGA);
             }
@@ -2246,7 +2246,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 addFilteredContact(deleteContact.getPhoneContactInfo());
             } else if (deleteContact.isMegaContact()) {
                 int filteredPosition = filteredContactsShare.indexOf(deleteContact);
-                if (filteredPosition != -1) {
+                if (filteredPosition != INVALID_POSITION) {
                     filteredContactsShare.get(filteredPosition).getMegaContactAdapter().setSelected(false);
                     adapterShareHeader.setContacts(filteredContactsShare);
                 }
@@ -2889,9 +2889,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
                 filteredContactsShare.remove(contact);
             } else if (contact.isMegaContact()) {
-                int contactIndex = filteredContactsShare.indexOf(contact);
-                if (contactIndex != -1) {
-                    filteredContactsShare.get(contactIndex).getMegaContactAdapter().setSelected(true);
+                int contactPosition = filteredContactsShare.indexOf(contact);
+                if (contactPosition != INVALID_POSITION) {
+                    filteredContactsShare.get(contactPosition).getMegaContactAdapter().setSelected(true);
                 }
             }
 
