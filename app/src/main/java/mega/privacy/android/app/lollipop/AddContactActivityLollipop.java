@@ -1962,14 +1962,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                 }
                 else if (!createNewGroup && !createNewChatLink) {
-                    aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
+                    aB.setTitle(getString(R.string.title_new_group).toUpperCase());
                 }
                 else if ((createNewGroup || createNewChatLink) && !onNewGroup) {
                     if (onlyCreateGroup) {
                         aB.setTitle(getString(R.string.title_new_group));
                     }
                     else {
-                        aB.setTitle(getString(R.string.group_chat_start_conversation_label));
+                        aB.setTitle(getString(R.string.title_new_group));
                     }
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
