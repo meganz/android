@@ -377,25 +377,11 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holder.imageView.setImageResource(R.drawable.ic_select_folder);
 		} else {
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
-			Bitmap bitmap = null;
-			if (isFileAvailable(avatar)) {
-				if (avatar.length() > 0) {
-					BitmapFactory.Options bOpts = new BitmapFactory.Options();
-					bOpts.inPurgeable = true;
-					bOpts.inInputShareable = true;
-					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-					if (bitmap == null) {
-						avatar.delete();
-						megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
-					} else {
-						holder.imageView.setImageBitmap(bitmap);
-					}
-				} else {
-					megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
-				}
+			Bitmap bitmap = getImageAvatar(holder.contactMail);
+			if (bitmap != null) {
+				holder.imageView.setImageBitmap(bitmap);
 			} else {
-				megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+				megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
 			}
 		}
 	}
