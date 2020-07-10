@@ -34,6 +34,8 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
@@ -42,6 +44,9 @@ import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -1825,5 +1830,19 @@ public class Util {
 		} else {
 			aB.setElevation(0);
 		}
+	}
+
+	/**
+	 * Gets a reference to a given drawable and prepares it for use with tinting through.
+	 *
+	 * @param resId the resource id for the given drawable
+	 * @return a wrapped drawable ready fo use
+	 * with {@link DrawableCompat}'s tinting methods
+	 * @throws Resources.NotFoundException
+	 */
+	public static Drawable getWrappedDrawable(Context context, @DrawableRes int resId)
+			throws Resources.NotFoundException {
+		return DrawableCompat.wrap(ResourcesCompat.getDrawable(context.getResources(),
+				resId, null));
 	}
 }

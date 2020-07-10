@@ -213,4 +213,6 @@
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
 
+    <color name="pressed_color">#E7E7E7</color>
+    <color name="transparent">#00000000</color>
 </resources>
