@@ -53,7 +53,8 @@ import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.listeners.BaseListener;
+import mega.privacy.android.app.listeners.GetUserDataListener;
+import mega.privacy.android.app.listeners.ResetPhoneNumberListener;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -64,7 +65,6 @@ import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -83,7 +83,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, GetUserDataListener.OnUserDataUpdateCallback, ResetPhoneNumberListener.OnResetPhoneNumberCallback {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -754,40 +754,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         removePhoneNumberDialogShowing = true;
     }
 
-	private void resetPhoneNumber() {
-        megaApi.resetSmsVerifiedPhoneNumber(new BaseListener(context) {
-
-            @Override
-            public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-                if(request.getType() != MegaRequest.TYPE_RESET_SMS_VERIFIED_NUMBER) return;
-                // Reset phone number successfully.
-                if(e.getErrorCode() == MegaError.API_OK) {
-                    // Have to getUserData to refresh, otherwise, phone number remains previous value.
-                    megaApi.getUserData(new BaseListener(context) {
-
-                        @Override
-                        public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-                            if(request.getType() != MegaRequest.TYPE_GET_USER_DATA) return;
-                            addPhoneNumber.setClickable(true);
-                            if(e.getErrorCode() == MegaError.API_OK) {
-                                if (canVoluntaryVerifyPhoneNumber()) {
-                                    addPhoneNumber.setText(R.string.add_phone_number_label);
-                                    addPhoneNumber.setVisibility(View.VISIBLE);
-                                    if(context instanceof ManagerActivityLollipop) {
-                                        ((ManagerActivityLollipop)context).showAddPhoneNumberInMenu();
-                                    }
-                                }
-                            } else {
-                                logWarning("Get user datat for updating phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
-                            }
-                        }
-                    });
-                } else {
-                    addPhoneNumber.setClickable(true);
-                    logWarning("Rest phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
-                }
-            }
-        });
+    private void resetPhoneNumber() {
+        megaApi.resetSmsVerifiedPhoneNumber(new ResetPhoneNumberListener(context, this));
     }
 
     @Override
@@ -1030,7 +998,35 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	class QRBackgroundTask extends AsyncTask<String, Void, Void> {
+    @Override
+    public void onUserDataUpdate(MegaError e) {
+        addPhoneNumber.setClickable(true);
+        if (e.getErrorCode() == MegaError.API_OK) {
+            if (canVoluntaryVerifyPhoneNumber()) {
+                addPhoneNumber.setText(R.string.add_phone_number_label);
+                addPhoneNumber.setVisibility(View.VISIBLE);
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).showAddPhoneNumberInMenu();
+                }
+            }
+        } else {
+            logWarning("Get user data for updating phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
+        }
+    }
+
+    @Override
+    public void onResetPhoneNumber(MegaError e) {
+        // Reset phone number successfully.
+        if (e.getErrorCode() == MegaError.API_OK) {
+            // Have to getUserData to refresh, otherwise, phone number remains previous value.
+            megaApi.getUserData(new GetUserDataListener(context, this));
+        } else {
+            addPhoneNumber.setClickable(true);
+            logWarning("Reset phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
+        }
+    }
+
+    class QRBackgroundTask extends AsyncTask<String, Void, Void> {
 
 
 		@Override
