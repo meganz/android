@@ -992,7 +992,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private void setPhoneAdapterContacts (ArrayList<PhoneContactInfo> contacts) {
         if(queryPermissions && filteredContactsPhone!=null){
             if (filteredContactsPhone.size() == 0){
-                headerContacts.setVisibility(View.GONE);
+                showHeader(false);
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
@@ -1043,7 +1043,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if(adapterPhone!=null){
             if (adapterPhone.getItemCount() == 0){
-                headerContacts.setVisibility(View.GONE);
+                showHeader(false);
                 if (contactType == CONTACT_TYPE_BOTH) {
                     if (adapterMEGA != null) {
                         if (adapterMEGA.getItemCount() == 0) {
@@ -1059,7 +1059,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
             else{
-                headerContacts.setVisibility(View.VISIBLE);
+                showHeader(true);
                 setEmptyStateVisibility(false);
             }
         }
@@ -1099,12 +1099,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     result = Html.fromHtml(textToShow);
                 }
                 emptyTextView.setText(result);
-                headerContacts.setVisibility(View.GONE);
+                showHeader(false);
                 recyclerViewList.setVisibility(View.GONE);
                 setEmptyStateVisibility(true);
             }
             else {
-                headerContacts.setVisibility(View.VISIBLE);
+                showHeader(true);
                 recyclerViewList.setVisibility(View.VISIBLE);
                 setEmptyStateVisibility(false);
             }
@@ -1702,7 +1702,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 newChatLinkButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(linearLayoutManager);
-            headerContacts.setVisibility(View.VISIBLE);
+            showHeader(true);
             textHeader.setText(getString(R.string.section_contacts));
             recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
         }
@@ -1712,7 +1712,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 scanQRButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(linearLayoutManager);
-            headerContacts.setVisibility(View.VISIBLE);
+            showHeader(true);
             textHeader.setText(getString(R.string.contacts_phone));
             recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
         }
@@ -1723,7 +1723,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             recyclerViewList.setLayoutManager(stickyLayoutManager);
             recyclerViewList.addItemDecoration(new HeaderItemDecoration(this, outMetrics));
-            headerContacts.setVisibility(View.GONE);
+            showHeader(false);
         }
 
         containerContacts = (RelativeLayout) findViewById(R.id.container_list_contacts);
@@ -2113,7 +2113,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         setTitleAB();
         if (adapterMEGA != null){
             if (adapterMEGA.getItemCount() == 1){
-                headerContacts.setVisibility(View.GONE);
+                showHeader(false);
                 setEmptyStateVisibility(true);
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
@@ -2174,7 +2174,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if(adapterPhone!=null){
             if (adapterPhone.getItemCount() == 0){
-                headerContacts.setVisibility(View.GONE);
+                showHeader(false);
                 setEmptyStateVisibility(true);
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
@@ -2330,7 +2330,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         linearLayoutManager.scrollToPosition(index);
                     }
                     if (adapterMEGA.getItemCount() != 0) {
-                        headerContacts.setVisibility(View.VISIBLE);
+                        showHeader(true);
                         setEmptyStateVisibility(false);
                     }
                     recyclerViewList.setVisibility(
@@ -2396,7 +2396,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
                 if(adapterPhone!=null){
                     if (adapterPhone.getItemCount() != 0){
-                        headerContacts.setVisibility(View.VISIBLE);
+                        showHeader(true);
                         setEmptyStateVisibility(false);
                     }
                 }
@@ -3461,6 +3461,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         int filteredPosition = list.indexOf(contact);
         if (filteredPosition != INVALID_POSITION) {
             filteredContactMEGA.get(filteredPosition).setSelected(isSelected);
+        }
+    }
+
+    private void showHeader(boolean isVisible) {
+        if (!comesFromChat && isVisible) {
+            headerContacts.setVisibility(View.VISIBLE);
+        } else {
+            headerContacts.setVisibility(View.GONE);
         }
     }
 
