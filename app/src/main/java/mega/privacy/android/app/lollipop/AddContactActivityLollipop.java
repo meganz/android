@@ -2097,10 +2097,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         hideKeyboard(addContactActivityLollipop, 0);
 
-        if (addedContactsMEGA.contains(contact)){
-            showSnackbar(getString(R.string.contact_not_added));
-        }
-        else {
+        if (addedContactsMEGA.contains(contact)) {
+            int contactPosition = addedContactsMEGA.indexOf(contact);
+            deleteContact(contactPosition);
+            return;
+        } else {
             addedContactsMEGA.add(contact);
         }
         adapterMEGAContacts.setContacts(addedContactsMEGA);
