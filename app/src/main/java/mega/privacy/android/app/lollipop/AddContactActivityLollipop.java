@@ -573,7 +573,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         if (contactToAddMail != null && contactToAddMail.equals(mail)){
                             if (!addedContactsMEGA.contains(contact)) {
                                 addedContactsMEGA.add(contact);
-                                filteredContactMEGA.remove(contact);
+                                int filteredPosition = filteredContactMEGA.indexOf(contact);
+                                if (filteredPosition != INVALID_POSITION) {
+                                    filteredContactMEGA.get(filteredPosition).setSelected(true);
+                                }
                             }
                             break;
                         }
