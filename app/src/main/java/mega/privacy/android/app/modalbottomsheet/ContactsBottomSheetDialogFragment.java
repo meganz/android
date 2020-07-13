@@ -101,10 +101,11 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
         titleNameContactPanel.setText(contact.getFullName());
 
-        String lastGreen = contact.getLastGreen();
-        if (!isTextEmpty(lastGreen)) {
-            setContactLastGreen(requireContext(), getUserOnlineStatus(contact.getMegaUser().getHandle()), lastGreen, titleMailContactPanel);
-        } else {
+        int contactStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
+        setContactStatus(contactStatus, contactStateIcon, titleMailContactPanel);
+        setContactLastGreen(requireContext(), contactStatus, contact.getLastGreen(), titleMailContactPanel);
+
+        if (isTextEmpty(titleMailContactPanel.getText().toString())) {
             titleMailContactPanel.setVisibility(View.GONE);
         }
 
@@ -112,8 +113,6 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);
-
-        setContactStatus(getUserOnlineStatus(contact.getMegaUser().getHandle()), contactStateIcon);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -165,9 +164,5 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         super.onSaveInstanceState(outState);
         String email = contact.getMegaUser().getEmail();
         outState.putString(EMAIL, email);
-    }
-
-    private int getUserOnlineStatus(long userhandle) {
-        return megaChatApi.getUserOnlineStatus(userhandle);
     }
 }
