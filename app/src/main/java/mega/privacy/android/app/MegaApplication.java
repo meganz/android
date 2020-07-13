@@ -31,6 +31,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
@@ -594,6 +595,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         clearPublicCache(this);
 
 		ContextUtils.initialize(getApplicationContext());
+
+		Fresco.initialize(this);
 	}
 
 
