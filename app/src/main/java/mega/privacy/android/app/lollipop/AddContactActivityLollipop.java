@@ -573,10 +573,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         if (contactToAddMail != null && contactToAddMail.equals(mail)){
                             if (!addedContactsMEGA.contains(contact)) {
                                 addedContactsMEGA.add(contact);
-                                int filteredPosition = filteredContactMEGA.indexOf(contact);
-                                if (filteredPosition != INVALID_POSITION) {
-                                    filteredContactMEGA.get(filteredPosition).setSelected(true);
-                                }
+                                markFilteredContactAsSelected(contact, true);
                             }
                             break;
                         }
@@ -651,8 +648,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             if (!addedContactsShare.contains(contact)) {
                                 addedContactsShare.add(contact);
                                 filteredContactsShare.remove(contact);
-                                if (contact.isMegaContact()){
-                                    filteredContactMEGA.remove(contact.getMegaContactAdapter());
+                                if (contact.isMegaContact()) {
+                                    markFilteredContactAsSelected(contact.getMegaContactAdapter(), false);
                                 }
                                 else {
                                     filteredContactsPhone.remove(contact.getPhoneContactInfo());
@@ -2212,11 +2209,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             MegaContactAdapter deleteContact = addedContactsMEGA.get(position);
             addedContactsMEGA.remove(deleteContact);
 
-            int filteredPosition = filteredContactMEGA.indexOf(deleteContact);
-            if (filteredPosition != INVALID_POSITION) {
-                filteredContactMEGA.get(filteredPosition).setSelected(false);
-                adapterMEGA.setContacts(filteredContactMEGA);
-            }
+            markFilteredContactAsSelected(deleteContact, false);
+            adapterMEGA.setContacts(filteredContactMEGA);
 
             setSendInvitationVisibility();
             adapterMEGAContacts.setContacts(addedContactsMEGA);
@@ -2751,9 +2745,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                     if (inputString != null && !inputString.equals("")) {
                         for (int i = 0; i < queryContactMEGA.size(); i++) {
-                            if (getMegaContactMail(queryContactMEGA.get(i)).equals(email)) {
-                                addContactMEGA(queryContactMEGA.get(i));
-                                filteredContactMEGA.get(i).setSelected(true);
+                            MegaContactAdapter contact = queryContactMEGA.get(i);
+                            if (getMegaContactMail(contact).equals(email)) {
+                                addContactMEGA(contact);
+                                markFilteredContactAsSelected(contact,true);
                                 queryContactMEGA.remove(i);
                                 adapterMEGA.setContacts(queryContactMEGA);
                                 break;
@@ -3461,6 +3456,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     fastScroller.setVisibility(View.VISIBLE);
                 }
             }
+        }
+    }
+
+    private void markFilteredContactAsSelected(MegaContactAdapter contact, boolean isSelected) {
+        int filteredPosition = filteredContactMEGA.indexOf(contact);
+        if (filteredPosition != INVALID_POSITION) {
+            filteredContactMEGA.get(filteredPosition).setSelected(isSelected);
         }
     }
 
