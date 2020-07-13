@@ -322,18 +322,24 @@ public class FileUtils {
         final String[] projection = {data};
         final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";
         final String[] selectionArgs = {fileName, String.valueOf(fileSize)};
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
-                selectionArgs, null);
-
-        String path = checkFileInStorage(cursor, data);
-        if (path == null) {
-            cursor = context.getContentResolver().query(
-                    MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
+        String path;
+        try {
+            Cursor cursor = context.getContentResolver().query(
+                    MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
                     selectionArgs, null);
-            path = checkFileInStorage(cursor, data);
-        }
 
+            path = checkFileInStorage(cursor, data);
+            if (path == null) {
+                cursor = context.getContentResolver().query(
+                        MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
+                        selectionArgs, null);
+                path = checkFileInStorage(cursor, data);
+            }
+        } catch (SecurityException e) {
+            // Workaround: HUAWEI devices cannot execute the query without storage permission.
+            logError("Haven't granted the permission.", e);
+            return null;
+        }
         return path;
     }
 
