@@ -336,7 +336,7 @@ public class FileUtils {
                 path = checkFileInStorage(cursor, data);
             }
         } catch (SecurityException e) {
-            // Workaround: HUAWEI devices cannot execute the query without storage permission.
+            // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
             logError("Haven't granted the permission.", e);
             return null;
         }
