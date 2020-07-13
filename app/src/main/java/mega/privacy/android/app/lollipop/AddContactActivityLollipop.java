@@ -3160,7 +3160,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private void returnToAddContacts() {
         onNewGroup = false;
         setTitleAB();
-        textHeader.setText(getString(R.string.contacts_mega));
         setRecyclersVisibility();
         addContactsLayout.setVisibility(View.VISIBLE);
         if (addedContactsMEGA.size() == 0) {
