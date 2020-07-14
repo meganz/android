@@ -2789,4 +2789,7 @@
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana's credentials">%s\'s credentials</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
 </resources>

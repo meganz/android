@@ -1008,20 +1008,27 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context).showAddPhoneNumberInMenu();
                 }
+                showSnackbar(context, getString(R.string.remove_phone_number_success));
             }
         } else {
+            // Allow to retry when refresh data failed.
+            addPhoneNumber.setClickable(true);
+            showSnackbar(context, getString(R.string.remove_phone_number_fail));
             logWarning("Get user data for updating phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
         }
     }
 
     @Override
     public void onResetPhoneNumber(MegaError e) {
-        // Reset phone number successfully.
-        if (e.getErrorCode() == MegaError.API_OK) {
+        // The account has reset the phone number, but user data hasn't refreshed successfully, try to refresh again.
+        boolean needRefresh = e.getErrorCode() == MegaError.API_ENOENT && ERR_NOT_FOUND.equals(e.getErrorString());
+        // Reset phone number successfully or need to refresh user data again.
+        if (e.getErrorCode() == MegaError.API_OK || needRefresh) {
             // Have to getUserData to refresh, otherwise, phone number remains previous value.
             megaApi.getUserData(new GetUserDataListener(context, this));
         } else {
             addPhoneNumber.setClickable(true);
+            showSnackbar(context, getString(R.string.remove_phone_number_fail));
             logWarning("Reset phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
         }
     }
