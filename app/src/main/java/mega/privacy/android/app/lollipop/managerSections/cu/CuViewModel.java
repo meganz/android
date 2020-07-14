@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections.cu;
 
 import android.util.Pair;
+import androidx.collection.LongSparseArray;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -50,6 +51,7 @@ class CuViewModel extends BaseRxViewModel {
   private final Subject<Object> creatingThumbnailFinished = PublishSubject.create();
 
   private boolean selecting;
+  private final LongSparseArray<MegaNode> selectedNodes = new LongSparseArray<>(5);
 
   public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler) {
     this.megaApi = megaApi;
@@ -101,6 +103,12 @@ class CuViewModel extends BaseRxViewModel {
       }
 
       nodes.get(position).setSelected(!nodes.get(position).isSelected());
+      if (nodes.get(position).isSelected()) {
+        selectedNodes.put(node.getNode().getHandle(), node.getNode());
+      } else {
+        selectedNodes.remove(node.getNode().getHandle());
+      }
+      selecting = !selectedNodes.isEmpty();
 
       nodeToAnimate.setValue(Pair.create(position, node));
     } else {
@@ -114,6 +122,15 @@ class CuViewModel extends BaseRxViewModel {
       selecting = true;
     }
     onNodeClicked(position, node);
+  }
+
+  public List<MegaNode> getSelectedNodes() {
+    List<MegaNode> nodes = new ArrayList<>();
+    for (int i = 0, n = selectedNodes.size(); i < n; i++) {
+      nodes.add(selectedNodes.valueAt(i));
+    }
+
+    return nodes;
   }
 
   private void loadCuNodes(int orderBy) {
