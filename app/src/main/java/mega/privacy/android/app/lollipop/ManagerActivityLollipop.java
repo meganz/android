@@ -6592,30 +6592,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					rubbishBinMenuItem.setVisible(true);
 
-					if ((drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFragment.getItemCount() > 0)
-							|| (drawerItem == DrawerItem.MEDIA_UPLOADS && getMediaUploadFragment() != null && muFragment.getItemCount() > 0)) {
-						selectMenuItem.setVisible(true);
-						sortByMenuItem.setVisible(true);
-						thumbViewMenuItem.setVisible(true);
-
-						if (firstNavigationLevel) {
-							searchByDate.setVisible(true);
-						}
-
-						if (isListCameraUploads) {
-							thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-							thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-						} else {
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-							thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-							if (isSmallGridCameraUploads) {
-								gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-							} else {
-								gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-							}
-							gridSmallLargeMenuItem.setVisible(true);
-						}
-					}
+					updateCuFragmentOptionsMenu();
 					break;
 
 				case INBOX:
@@ -6799,6 +6776,33 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		logDebug("Call to super onCreateOptionsMenu");
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	public void updateCuFragmentOptionsMenu() {
+		if ((drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFragment.getItemCount() > 0)
+				|| (drawerItem == DrawerItem.MEDIA_UPLOADS && getMediaUploadFragment() != null && muFragment.getItemCount() > 0)) {
+			selectMenuItem.setVisible(true);
+			sortByMenuItem.setVisible(true);
+			thumbViewMenuItem.setVisible(true);
+
+			if (firstNavigationLevel) {
+				searchByDate.setVisible(true);
+			}
+
+			if (isListCameraUploads) {
+				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+				thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
+			} else {
+				thumbViewMenuItem.setTitle(getString(R.string.action_list));
+				thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				if (isSmallGridCameraUploads) {
+					gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
+				} else {
+					gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
+				}
+				gridSmallLargeMenuItem.setVisible(true);
+			}
+		}
 	}
 
 	private void setGridListIcon() {

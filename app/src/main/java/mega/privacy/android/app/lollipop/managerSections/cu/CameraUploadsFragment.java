@@ -106,6 +106,7 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
           nodes.size() >= (smallGrid ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
       binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
       adapter.setNodes(nodes);
+      ((ManagerActivityLollipop) requireActivity()).updateCuFragmentOptionsMenu();
     });
 
     viewModel.nodeToOpen()
