@@ -6882,20 +6882,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 		    		}
 					else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-						// TODO(px):
-						//cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-						//if (cuFL != null){
-						//	long cameraUploadHandle = cuFL.getPhotoSyncHandle();
-						//	MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-						//	if (nps != null){
-						//		ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-						//		cuFL.setNodes(nodes);
-						//		isSearchEnabled=false;
-						//		setToolbarTitle();
-						//		invalidateOptionsMenu();
-						//	}
-						//	return true;
-						//}
+						cuFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+						if (cuFragment != null){
+							cuFragment.reloadNodes(orderCamera);
+							return true;
+						}
 					}else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 						// TODO(px):
 						//muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
@@ -14832,6 +14823,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		checkCameraUploadFolder(false,updatedNodes);
 
 		// TODO(px):
+		cuFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+		if (cuFragment != null) {
+			cuFragment.reloadNodes(orderCamera);
+		}
+
 		//cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		//if (cuFL != null){
 		//	long cameraUploadHandle = cuFL.getPhotoSyncHandle();

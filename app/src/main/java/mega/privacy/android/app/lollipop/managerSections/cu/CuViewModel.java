@@ -20,9 +20,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.arch.BaseRxViewModel;
+import mega.privacy.android.app.listeners.BaseListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
 import static mega.privacy.android.app.utils.LogUtil.logError;
@@ -37,30 +40,30 @@ class CuViewModel extends BaseRxViewModel {
   };
 
   private final MegaApiAndroid megaApi;
-  private final MegaPreferences pref;
+  private final DatabaseHandler dbHandler;
 
   private final MutableLiveData<List<CuNode>> cuNodes = new MutableLiveData<>();
   private final MutableLiveData<Pair<Integer, CuNode>> nodeToOpen = new MutableLiveData<>();
   private final MutableLiveData<Pair<Integer, CuNode>> nodeToAnimate = new MutableLiveData<>();
 
   private final Subject<Pair<Integer, CuNode>> openNodeAction = PublishSubject.create();
+  private final Subject<Object> creatingThumbnailFinished = PublishSubject.create();
 
   private boolean selecting;
 
   public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler) {
     this.megaApi = megaApi;
-    pref = dbHandler.getPreferences();
+    this.dbHandler = dbHandler;
 
-    int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
-    try {
-      orderBy = Integer.parseInt(pref.getPreferredSortCameraUpload());
-    } catch (NumberFormatException ignored) {
-    }
-    loadCuNodes(orderBy);
+    loadCuNodes();
 
     add(openNodeAction.throttleFirst(1, TimeUnit.SECONDS)
         .subscribe(nodeToOpen::setValue,
             throwable -> logError("openNodeAction onError", throwable)));
+
+    add(creatingThumbnailFinished.throttleFirst(1, TimeUnit.SECONDS)
+        .subscribe(ignored -> loadCuNodes(),
+            throwable -> logError("creatingThumbnailFinished onError", throwable)));
   }
 
   public LiveData<List<CuNode>> cuNodes() {
@@ -114,14 +117,32 @@ class CuViewModel extends BaseRxViewModel {
   }
 
   private void loadCuNodes(int orderBy) {
-    add(Single.defer(() -> Single.just(getCuNodes(orderBy)))
-        .subscribeOn(Schedulers.io())
+    loadCuNodes(Single.defer(() -> Single.just(getCuNodes(orderBy))));
+  }
+
+  private void loadCuNodes() {
+    loadCuNodes(Single.defer(() -> {
+      int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
+      MegaPreferences pref = dbHandler.getPreferences();
+      if (pref != null) {
+        try {
+          orderBy = Integer.parseInt(pref.getPreferredSortCameraUpload());
+        } catch (NumberFormatException ignored) {
+        }
+      }
+      return Single.just(orderBy);
+    }).map(this::getCuNodes));
+  }
+
+  private void loadCuNodes(Single<List<CuNode>> source) {
+    add(source.subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(cuNodes::setValue, throwable -> logError("loadCuNodes onError", throwable)));
   }
 
   private List<CuNode> getCuNodes(int orderBy) {
     List<CuNode> nodes = new ArrayList<>();
+    List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
 
     LocalDateTime lastNodeModifyTime = null;
     for (MegaNode node : getCuChildren(orderBy)) {
@@ -139,6 +160,20 @@ class CuViewModel extends BaseRxViewModel {
       nodes.add(new CuNode(node, thumbnail.exists() ? thumbnail : null,
           isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE,
           getDateString(lastNodeModifyTime)));
+      if (!thumbnail.exists()) {
+        nodesWithoutThumbnail.add(node);
+      }
+    }
+
+    for (MegaNode node : nodesWithoutThumbnail) {
+      File thumbFile = new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
+      megaApi.getThumbnail(node, thumbFile.getAbsolutePath(), new BaseListener(getApplication()) {
+        @Override public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+          if (e.getErrorCode() == MegaError.API_OK) {
+            creatingThumbnailFinished.onNext(true);
+          }
+        }
+      });
     }
 
     return nodes;
@@ -146,6 +181,8 @@ class CuViewModel extends BaseRxViewModel {
 
   private List<MegaNode> getCuChildren(int orderBy) {
     long cuHandle = -1;
+
+    MegaPreferences pref = dbHandler.getPreferences();
     if (pref != null && pref.getCamSyncHandle() != null) {
       cuHandle = Long.parseLong(pref.getCamSyncHandle());
     }

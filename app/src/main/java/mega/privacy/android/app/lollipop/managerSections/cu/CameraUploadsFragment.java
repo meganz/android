@@ -56,6 +56,10 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
     viewModel.setOrderBy(orderBy);
   }
 
+  public void reloadNodes(int orderBy) {
+    setOrderBy(orderBy);
+  }
+
   @Nullable @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
