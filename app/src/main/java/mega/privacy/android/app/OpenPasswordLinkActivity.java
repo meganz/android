@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
 import mega.privacy.android.app.listeners.BaseListener;
+import mega.privacy.android.app.listeners.PasswordLinkListener;
 import mega.privacy.android.app.lollipop.DecryptAlertDialog;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -22,7 +23,7 @@ import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
 import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
 public class OpenPasswordLinkActivity extends PinActivityLollipop
@@ -33,50 +34,6 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 
 	private String url;
 	private String key;
-
-	private MegaRequestListenerInterface decryptPasswordProtectedLinkListener =
-			new BaseListener(this) {
-				@Override
-				public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-					logDebug("onRequestFinish: " + request.getRequestString());
-
-					if (progressBar != null) {
-						progressBar.setVisibility(View.GONE);
-					}
-					if (request.getType() == MegaRequest.TYPE_PASSWORD_LINK) {
-						if (e.getErrorCode() == MegaError.API_OK) {
-
-							String decryptedLink = request.getText();
-
-							// Folder Download link
-							if (matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
-								logDebug("Folder link url");
-
-								Intent openFolderIntent = new Intent(OpenPasswordLinkActivity.this,
-										FolderLinkActivityLollipop.class);
-								openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-								openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
-								openFolderIntent.setData(Uri.parse(decryptedLink));
-								startActivity(openFolderIntent);
-								finish();
-							} else if (matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
-								logDebug("Open link url");
-
-								Intent openFileIntent = new Intent(OpenPasswordLinkActivity.this,
-										FileLinkActivityLollipop.class);
-								openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-								openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
-								openFileIntent.setData(Uri.parse(decryptedLink));
-								startActivity(openFileIntent);
-								finish();
-							}
-						} else {
-							logError("ERROR: " + e.getErrorCode());
-							askForPasswordDialog();
-						}
-					}
-				}
-			};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +56,9 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 
 	@Override
 	public void onDestroy() {
-		if (megaApi != null) {
-			megaApi.removeRequestListener(decryptPasswordProtectedLinkListener);
+		if (progressBar != null) {
+			progressBar.setVisibility(View.GONE);
 		}
-
-		progressBar.setVisibility(View.GONE);
 		super.onDestroy();
 	}
 
@@ -128,7 +83,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 		}
 
 		progressBar.setVisibility(View.VISIBLE);
-		megaApi.decryptPasswordProtectedLink(url, key, decryptPasswordProtectedLinkListener);
+		megaApi.decryptPasswordProtectedLink(url, key, new PasswordLinkListener(this));
 	}
 
 	@Override
@@ -140,5 +95,32 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 	@Override
 	public void onDialogNegativeClick() {
 		finish();
+	}
+
+	public void managePasswordLinkRequest(MegaError e, String decryptedLink) {
+		if (progressBar != null) {
+			progressBar.setVisibility(View.GONE);
+		}
+
+		if (e.getErrorCode() == MegaError.API_OK && !isTextEmpty(decryptedLink)) {
+			Intent intent = null;
+
+			if (matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
+				intent = new Intent(OpenPasswordLinkActivity.this, FolderLinkActivityLollipop.class);
+				intent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
+			} else if (matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
+				intent = new Intent(OpenPasswordLinkActivity.this, FileLinkActivityLollipop.class);
+				intent.setAction(ACTION_OPEN_MEGA_LINK);
+			}
+
+			if (intent != null) {
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.setData(Uri.parse(decryptedLink));
+				startActivity(intent);
+				finish();
+			}
+		} else {
+			askForPasswordDialog();
+		}
 	}
 }
