@@ -1,17 +1,23 @@
 package mega.privacy.android.app.lollipop.managerSections.cu;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.CameraUploadsAdapter;
@@ -54,6 +60,10 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
 
   public void setOrderBy(int orderBy) {
     viewModel.setOrderBy(orderBy);
+  }
+
+  public void setSearchDate(long[] searchDate, int orderBy) {
+    viewModel.setSearchDate(searchDate, orderBy);
   }
 
   public void reloadNodes(int orderBy) {
@@ -105,12 +115,45 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
     binding.cuList.setAdapter(adapter);
     binding.scroller.setRecyclerView(binding.cuList);
 
+    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      binding.emptyHintImage.setImageResource(R.drawable.uploads_empty_landscape);
+    } else {
+      binding.emptyHintImage.setImageResource(R.drawable.ic_empty_camera_uploads);
+    }
+
     viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
       boolean showScroller =
           nodes.size() >= (smallGrid ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
       binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
       adapter.setNodes(nodes);
       ((ManagerActivityLollipop) requireActivity()).updateCuFragmentOptionsMenu();
+
+      binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
+      if (nodes.isEmpty()) {
+        binding.cuList.setVisibility(View.GONE);
+        binding.scroller.setVisibility(View.GONE);
+
+        binding.emptyHintImage.setVisibility(viewModel.isSearchMode() ? View.GONE : View.VISIBLE);
+        if (viewModel.isSearchMode()) {
+          binding.emptyHintText.setText(R.string.no_results_found);
+        } else {
+          String textToShow = getString(R.string.context_empty_camera_uploads);
+          try {
+            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+          } catch (Exception ignored) {
+          }
+          Spanned result;
+          if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+          } else {
+            result = Html.fromHtml(textToShow);
+          }
+          binding.emptyHintText.setText(result);
+        }
+      }
     });
 
     viewModel.nodeToOpen()
@@ -123,6 +166,13 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
 
       adapter.showSelectionAnimation(pair.first, pair.second,
           binding.cuList.findViewHolderForLayoutPosition(pair.first));
+    });
+
+    viewModel.actionBarTitle().observe(getViewLifecycleOwner(), title -> {
+      ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+      if (actionBar != null && viewModel.isSearchMode()) {
+        actionBar.setTitle(title);
+      }
     });
   }
 

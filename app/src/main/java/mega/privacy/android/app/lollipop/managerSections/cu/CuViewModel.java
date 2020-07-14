@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.managerSections.cu;
 
+import android.text.TextUtils;
 import android.util.Pair;
 import androidx.collection.LongSparseArray;
 import androidx.lifecycle.LiveData;
@@ -11,12 +12,16 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 import java.io.File;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
@@ -27,6 +32,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
 import static mega.privacy.android.app.utils.LogUtil.logError;
@@ -46,12 +52,24 @@ class CuViewModel extends BaseRxViewModel {
   private final MutableLiveData<List<CuNode>> cuNodes = new MutableLiveData<>();
   private final MutableLiveData<Pair<Integer, CuNode>> nodeToOpen = new MutableLiveData<>();
   private final MutableLiveData<Pair<Integer, CuNode>> nodeToAnimate = new MutableLiveData<>();
+  private final MutableLiveData<String> actionBarTitle = new MutableLiveData<>();
 
   private final Subject<Pair<Integer, CuNode>> openNodeAction = PublishSubject.create();
   private final Subject<Object> creatingThumbnailFinished = PublishSubject.create();
 
+  private final MegaRequestListenerInterface createThumbnailRequest =
+      new BaseListener(getApplication()) {
+        @Override public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+          if (e.getErrorCode() == MegaError.API_OK) {
+            creatingThumbnailFinished.onNext(true);
+          }
+        }
+      };
+
   private boolean selecting;
   private final LongSparseArray<MegaNode> selectedNodes = new LongSparseArray<>(5);
+
+  private long[] searchDate;
 
   public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler) {
     this.megaApi = megaApi;
@@ -60,6 +78,7 @@ class CuViewModel extends BaseRxViewModel {
     loadCuNodes();
 
     add(openNodeAction.throttleFirst(1, TimeUnit.SECONDS)
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(nodeToOpen::setValue,
             throwable -> logError("openNodeAction onError", throwable)));
 
@@ -80,8 +99,21 @@ class CuViewModel extends BaseRxViewModel {
     return nodeToAnimate;
   }
 
+  public LiveData<String> actionBarTitle() {
+    return actionBarTitle;
+  }
+
   public void setOrderBy(int orderBy) {
     loadCuNodes(orderBy);
+  }
+
+  public void setSearchDate(long[] searchDate, int orderBy) {
+    this.searchDate = searchDate;
+    loadCuNodes(orderBy);
+  }
+
+  public boolean isSearchMode() {
+    return searchDate != null;
   }
 
   /**
@@ -154,46 +186,124 @@ class CuViewModel extends BaseRxViewModel {
   private void loadCuNodes(Single<List<CuNode>> source) {
     add(source.subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(cuNodes::setValue, throwable -> logError("loadCuNodes onError", throwable)));
+        .subscribe(nodes -> {
+          cuNodes.setValue(nodes);
+
+          String actionBarTitleWhenSearch = getSearchDateTitle(searchDate);
+          if (!TextUtils.isEmpty(actionBarTitleWhenSearch)) {
+            actionBarTitle.setValue(actionBarTitleWhenSearch);
+          }
+        }, throwable -> logError("loadCuNodes onError", throwable)));
   }
 
   private List<CuNode> getCuNodes(int orderBy) {
     List<CuNode> nodes = new ArrayList<>();
     List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
 
-    LocalDateTime lastNodeModifyTime = null;
-    for (MegaNode node : getCuChildren(orderBy)) {
+    LocalDate lastModifyDate = null;
+    for (MegaNode node : filterNodesByDate(getCuChildren(orderBy), searchDate)) {
       File thumbnail = new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
-      LocalDateTime modifyTime =
-          LocalDateTime.ofInstant(Instant.ofEpochSecond(node.getModificationTime()),
-              ZoneId.systemDefault());
+      LocalDate modifyDate = fromEpoch(node.getModificationTime());
+      String dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate);
 
-      if (lastNodeModifyTime == null
-          || modifyTime.getMonthValue() != lastNodeModifyTime.getMonthValue()
-          || modifyTime.getYear() != lastNodeModifyTime.getYear()) {
-        lastNodeModifyTime = modifyTime;
-        nodes.add(new CuNode(null, null, CuNode.TYPE_TITLE, getDateString(lastNodeModifyTime)));
+      if (lastModifyDate == null
+          || !YearMonth.from(lastModifyDate).equals(YearMonth.from(modifyDate))) {
+        lastModifyDate = modifyDate;
+        nodes.add(new CuNode(null, null, CuNode.TYPE_TITLE, dateString));
       }
+
       nodes.add(new CuNode(node, thumbnail.exists() ? thumbnail : null,
-          isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE,
-          getDateString(lastNodeModifyTime)));
+          isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE, dateString));
+
       if (!thumbnail.exists()) {
         nodesWithoutThumbnail.add(node);
       }
     }
 
     for (MegaNode node : nodesWithoutThumbnail) {
-      File thumbFile = new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
-      megaApi.getThumbnail(node, thumbFile.getAbsolutePath(), new BaseListener(getApplication()) {
-        @Override public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-          if (e.getErrorCode() == MegaError.API_OK) {
-            creatingThumbnailFinished.onNext(true);
-          }
-        }
-      });
+      File thumbnail = new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
+      megaApi.getThumbnail(node, thumbnail.getAbsolutePath(), createThumbnailRequest);
     }
 
     return nodes;
+  }
+
+  /**
+   * Filter nodes by date.
+   *
+   * @param nodes all nodes
+   * @param filter search filter
+   * filter[0] is the search type:
+   * 0 means search for nodes in one day, then filter[1] is the day in millis.
+   * 1 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
+   * 2 means search for nodes between two days, filter[3] and filter[4] are start and end day in
+   * millis.
+   */
+  private List<MegaNode> filterNodesByDate(List<MegaNode> nodes, long[] filter) {
+    if (filter == null) {
+      return nodes;
+    }
+
+    List<MegaNode> result = new ArrayList<>();
+
+    Function<MegaNode, Boolean> filterFunction = null;
+    if (filter[0] == 1) {
+      LocalDate date = fromEpoch(filter[1] / 1000);
+      filterFunction = node -> date.equals(fromEpoch(node.getModificationTime()));
+    } else if (filter[0] == 2) {
+      if (filter[2] == 1) {
+        YearMonth lastMonth = YearMonth.now().minusMonths(1);
+        filterFunction =
+            node -> lastMonth.equals(YearMonth.from(fromEpoch(node.getModificationTime())));
+      } else if (filter[2] == 2) {
+        int lastYear = YearMonth.now().getYear() - 1;
+        filterFunction = node -> fromEpoch(node.getModificationTime()).getYear() == lastYear;
+      }
+    } else if (filter[0] == 3) {
+      LocalDate from = fromEpoch(filter[3] / 1000);
+      LocalDate to = fromEpoch(filter[4] / 1000);
+      filterFunction = node -> {
+        LocalDate modifyDate = fromEpoch(node.getModificationTime());
+        return !modifyDate.isBefore(from) && !modifyDate.isAfter(to);
+      };
+    }
+
+    if (filterFunction == null) {
+      return result;
+    }
+
+    for (MegaNode node : nodes) {
+      if (filterFunction.apply(node)) {
+        result.add(node);
+      }
+    }
+
+    return result;
+  }
+
+  private String getSearchDateTitle(long[] filter) {
+    if (filter == null) {
+      return "";
+    }
+
+    if (filter[0] == 1) {
+      return DateTimeFormatter.ofPattern("d MMM").format(fromEpoch(filter[1] / 1000));
+    } else if (filter[0] == 2) {
+      if (filter[2] == 1) {
+        return DateTimeFormatter.ofPattern("MMM").format(YearMonth.now().minusMonths(1));
+      } else if (filter[2] == 2) {
+        return String.valueOf(YearMonth.now().getYear() - 1);
+      } else {
+        return "";
+      }
+    } else if (filter[0] == 3) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM");
+      LocalDate from = fromEpoch(filter[3] / 1000);
+      LocalDate to = fromEpoch(filter[4] / 1000);
+      return formatter.format(from) + " - " + formatter.format(to);
+    } else {
+      return "";
+    }
   }
 
   private List<MegaNode> getCuChildren(int orderBy) {
@@ -207,8 +317,8 @@ class CuViewModel extends BaseRxViewModel {
         : megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy);
   }
 
-  private String getDateString(LocalDateTime dateTime) {
-    return getApplication().getString(MONTH_NAME[dateTime.getMonthValue() - 1])
-        + " " + dateTime.getYear();
+  private LocalDate fromEpoch(long seconds) {
+    return LocalDate.from(
+        LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
   }
 }
