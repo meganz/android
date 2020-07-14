@@ -291,7 +291,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			menu.findItem(R.id.cab_menu_select_all)
 					.setVisible(adapter.getSelectedOfflineNodes().size() != adapter.getItemCount());
 
-			return false;
+			return true;
 		}
 		
 	}

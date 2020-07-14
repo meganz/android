@@ -365,12 +365,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					adapterList.setMultipleSelect(false);
 				}
 			}
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				final Window window = ((ManagerActivityLollipop) context).getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				handler.postDelayed(() -> window.setStatusBarColor(0), 350);
-			}
+			final Window window = ((ManagerActivityLollipop) context).getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			handler.postDelayed(() -> window.setStatusBarColor(0), 350);
 			checkScroll();
 			((ManagerActivityLollipop) context).setDrawerLockMode(false);
 		}

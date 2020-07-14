@@ -256,8 +256,9 @@ public class MegaNodeUtil {
         List<File> downloadedFiles = new ArrayList<>();
         boolean allDownloadedFiles = true;
         for (MegaNode node : nodes) {
-            String path = getLocalFile(context, node.getName(), node.getSize());
-            if (node.isFolder() || isTextEmpty(path)) {
+            String path = node.isFolder() ? null
+                : getLocalFile(context, node.getName(), node.getSize());
+            if (isTextEmpty(path)) {
                 allDownloadedFiles = false;
                 break;
             } else {

@@ -18,6 +18,10 @@ public class CloudStorageOptionControlUtil {
       this.showAsAction = showAsAction;
     }
 
+    public Option(boolean visible) {
+      this(visible, MenuItem.SHOW_AS_ACTION_NEVER);
+    }
+
     public boolean isVisible() {
       return visible;
     }
@@ -57,21 +61,21 @@ public class CloudStorageOptionControlUtil {
     private final List<Option> options;
 
     public Control() {
-      selectAll = new Option(true, MenuItem.SHOW_AS_ACTION_NEVER);
-      clearSelection = new Option(true, MenuItem.SHOW_AS_ACTION_NEVER);
-      removeLink = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      removeShare = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      rename = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
+      selectAll = new Option(true);
+      clearSelection = new Option(true);
+      removeLink = new Option(false);
+      removeShare = new Option(false);
+      rename = new Option(false);
       saveToDevice = new Option(true, MenuItem.SHOW_AS_ACTION_ALWAYS);
-      getLink = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      manageLink = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      shareFolder = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      sendToChat = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      shareOut = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      move = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      copy = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      leaveShare = new Option(false, MenuItem.SHOW_AS_ACTION_NEVER);
-      trash = new Option(true, MenuItem.SHOW_AS_ACTION_NEVER);
+      getLink = new Option(false);
+      manageLink = new Option(false);
+      shareFolder = new Option(false);
+      sendToChat = new Option(false);
+      shareOut = new Option(false);
+      move = new Option(false);
+      copy = new Option(false);
+      leaveShare = new Option(false);
+      trash = new Option(true);
 
       options = Arrays.asList(
           selectAll, clearSelection, removeLink, removeShare, rename, saveToDevice, getLink,
