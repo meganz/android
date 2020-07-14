@@ -1570,6 +1570,10 @@
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Link removal failed. Please try again later.</item>
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Failed to remove some links. Please try again later.</item>
     </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+    </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
         <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>

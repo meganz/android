@@ -23,6 +23,7 @@ public class ExportListener extends BaseListener {
     private int pendingRemove;
     private int numberError;
 
+    private int numberExport;
     private int pendingExport;
     private StringBuilder exportedLinks;
 
@@ -65,6 +66,7 @@ public class ExportListener extends BaseListener {
         Intent shareIntent) {
         super(context);
 
+        this.numberExport = numberExport;
         this.pendingExport = numberExport;
         this.exportedLinks = exportedLinks;
         this.shareIntent = shareIntent;
@@ -103,12 +105,13 @@ public class ExportListener extends BaseListener {
 
             pendingExport--;
             if (pendingExport == 0) {
-                if (numberError == 0) {
-                    if (shareIntent != null) {
-                        startShareIntent(context, shareIntent, exportedLinks.toString());
-                    }
-                } else {
+                if (numberError < numberExport && shareIntent != null) {
+                    startShareIntent(context, shareIntent, exportedLinks.toString());
+                }
+                if (numberError != 0) {
                     logError(numberError + " errors exporting nodes");
+                    showSnackbar(context, context.getResources()
+                        .getQuantityString(R.plurals.context_link_export_error, numberExport));
                 }
             }
             return;
