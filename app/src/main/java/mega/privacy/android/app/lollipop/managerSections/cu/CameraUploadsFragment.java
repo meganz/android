@@ -15,11 +15,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.CameraUploadsAdapter;
+import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
+import static mega.privacy.android.app.utils.Util.px2dp;
 
-public class CameraUploadsFragment extends Fragment {
+public class CameraUploadsFragment extends Fragment implements CameraUploadsAdapter.Listener {
   public static final int TYPE_CAMERA = 0;
   public static final int TYPE_MEDIA = 1;
 
@@ -33,6 +35,7 @@ public class CameraUploadsFragment extends Fragment {
   private FragmentCameraUploadsBinding binding;
   private CameraUploadsAdapter adapter;
 
+  private MegaApiAndroid megaApi;
   private CuViewModel viewModel;
 
   public static CameraUploadsFragment newInstance(int type) {
@@ -63,9 +66,10 @@ public class CameraUploadsFragment extends Fragment {
   @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
+    megaApi = ((MegaApplication) requireActivity().getApplication()).getMegaApi();
+
     CuViewModelFactory viewModelFactory =
-        new CuViewModelFactory(((MegaApplication) requireActivity().getApplication()).getMegaApi(),
-            DatabaseHandler.getDbHandler(requireContext()));
+        new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(requireContext()));
     viewModel = new ViewModelProvider(requireActivity(), viewModelFactory).get(CuViewModel.class);
 
     boolean smallGrid = ((ManagerActivityLollipop) requireActivity()).isSmallGridCameraUploads;
@@ -79,8 +83,15 @@ public class CameraUploadsFragment extends Fragment {
     requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
     int gridMargin = smallGrid ? MARGIN_SMALL_GRID : MARGIN_LARGE_GRID;
     int gridWidth = displayMetrics.widthPixels / spanCount - gridMargin * 2;
+    int icSelectedWidth = px2dp(smallGrid ? 16 : 23, displayMetrics);
+    int icSelectedMargin = px2dp(smallGrid ? 3 : 7, displayMetrics);
+    int roundCornerRadius = px2dp(4, displayMetrics);
+    int selectedPadding = px2dp(1, displayMetrics);
+    CameraUploadsAdapter.ItemSizeConfig itemSizeConfig = new CameraUploadsAdapter.ItemSizeConfig(
+        smallGrid, gridWidth, gridMargin, icSelectedWidth, icSelectedMargin, roundCornerRadius,
+        selectedPadding);
 
-    adapter = new CameraUploadsAdapter(spanCount, smallGrid, gridWidth, gridMargin);
+    adapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
     layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
       @Override public int getSpanSize(int position) {
         return adapter.getSpanSize(position);
@@ -96,11 +107,35 @@ public class CameraUploadsFragment extends Fragment {
       binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
       adapter.setNodes(nodes);
     });
+
+    viewModel.nodeToOpen()
+        .observe(getViewLifecycleOwner(), pair -> openNode(pair.first, pair.second));
+
+    viewModel.nodeToAnimate().observe(getViewLifecycleOwner(), pair -> {
+      if (pair.first < 0 || pair.first >= adapter.getItemCount()) {
+        return;
+      }
+
+      adapter.showSelectionAnimation(pair.first, pair.second,
+          binding.cuList.findViewHolderForLayoutPosition(pair.first));
+    });
+  }
+
+  private void openNode(int position, CuNode cuNode) {
+    
   }
 
   @Override
   public void onDestroyView() {
     super.onDestroyView();
     binding = null;
+  }
+
+  @Override public void onNodeClicked(int position, CuNode node) {
+    viewModel.onNodeClicked(position, node);
+  }
+
+  @Override public void onNodeLongClicked(int position, CuNode node) {
+    viewModel.onNodeLongClicked(position, node);
   }
 }

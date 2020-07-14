@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="110dp"
     android:layout_height="110dp"
     android:layout_margin="2dp"
@@ -12,5 +13,16 @@
       android:layout_height="match_parent"
       android:scaleType="centerCrop"
       app:placeholderImage="@drawable/ic_image_thumbnail"
+      />
+
+  <ImageView
+      android:id="@+id/ic_selected"
+      android:layout_width="23dp"
+      android:layout_height="23dp"
+      android:layout_marginStart="7dp"
+      android:layout_marginTop="7dp"
+      android:src="@drawable/ic_select_folder"
+      android:visibility="gone"
+      tools:visibility="visible"
       />
 </FrameLayout>

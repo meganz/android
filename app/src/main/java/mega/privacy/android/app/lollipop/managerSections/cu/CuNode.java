@@ -13,6 +13,8 @@ public class CuNode {
   private final int type;
   private final String modifyDate;
 
+  private boolean selected;
+
   public CuNode(MegaNode node, File thumbnail, int type, String modifyDate) {
     this.node = node;
     this.thumbnail = thumbnail;
@@ -34,5 +36,13 @@ public class CuNode {
 
   public String getModifyDate() {
     return modifyDate;
+  }
+
+  public boolean isSelected() {
+    return selected;
+  }
+
+  public void setSelected(boolean selected) {
+    this.selected = selected;
   }
 }
