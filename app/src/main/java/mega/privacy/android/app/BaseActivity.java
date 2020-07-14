@@ -47,6 +47,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -276,7 +277,12 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver transferFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) {
+            if (intent == null || isPaused) {
+                return;
+            }
+
+            if (intent.getBooleanExtra(FILE_EXPLORER_CHAT_UPLOAD, false)) {
+                Util.showSnackbar(baseActivity, MESSAGE_SNACKBAR_TYPE, null, intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE));
                 return;
             }
 
