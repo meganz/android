@@ -30,12 +30,6 @@ public class ResetPhoneNumberListener extends BaseListener {
 
     public interface OnResetPhoneNumberCallback {
 
-        /**
-         * When try to reset an account's phone number, but the account doesn't have a verified phone number.
-         * API returns error code API_ENOENT(-9) and error string "Not found".
-         */
-        String ERR_NOT_FOUND = "Not found";
-
         void onResetPhoneNumber(MegaError e);
     }
 }

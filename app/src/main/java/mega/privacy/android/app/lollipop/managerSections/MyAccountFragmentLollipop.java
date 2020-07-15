@@ -1020,10 +1020,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
     @Override
     public void onResetPhoneNumber(MegaError e) {
-        // The account has reset the phone number, but user data hasn't refreshed successfully, try to refresh again.
-        boolean needRefresh = e.getErrorCode() == MegaError.API_ENOENT && ERR_NOT_FOUND.equals(e.getErrorString());
-        // Reset phone number successfully or need to refresh user data again.
-        if (e.getErrorCode() == MegaError.API_OK || needRefresh) {
+        /*
+          Reset phone number successfully or the account has reset the phone number,
+          but user data hasn't refreshed successfully need to refresh user data again.
+        */
+        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             // Have to getUserData to refresh, otherwise, phone number remains previous value.
             megaApi.getUserData(new GetUserDataListener(context, this));
         } else {
