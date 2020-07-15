@@ -192,8 +192,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	//Toolbar elements
 	private EmojiTextView firstLineTextToolbar;
+	private int firstLineTextMaxWidthExpanded;
+	private int firstLineTextMaxWidthCollapsed;
+	private int contactStateIcon = R.drawable.ic_offline;
+	private int contactStateIconPaddingLeft;
+
 	private MarqueeTextView secondLineTextToolbar;
-	private ImageView contactStateIcon;
 	private State stateToolbar = State.IDLE;
 
 	RelativeLayout clearChatLayout;
@@ -237,7 +241,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
-	private String nickname;
 
 	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
@@ -352,7 +355,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			imageLayout = findViewById(R.id.chat_contact_properties_image_layout);
 
 			collapsingToolbar = findViewById(R.id.collapse_toolbar);
-			contactStateIcon = findViewById(R.id.contact_drawable_state);
 
 			/*TITLE*/
 			firstLineTextToolbar = findViewById(R.id.first_line_toolbar);
@@ -374,8 +376,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				secondLineTextToolbar.setPadding(0,0,0,5);
 			}
 			nameText.setMaxWidthEmojis(width);
-			firstLineTextToolbar.setMaxWidthEmojis(width);
 			secondLineTextToolbar.setMaxWidth(width);
+
+			// left margin 72dp + right margin 36dp
+			firstLineTextMaxWidthExpanded = outMetrics.widthPixels - px2dp(108, outMetrics);
+			firstLineTextMaxWidthCollapsed = width;
+			firstLineTextToolbar.setMaxWidthEmojis(firstLineTextMaxWidthExpanded);
+			contactStateIconPaddingLeft = px2dp(8, outMetrics);
 
 			imageGradient = findViewById(R.id.gradient_view);
 
@@ -638,18 +645,24 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	private void visibilityStateIcon() {
 		if (megaChatApi == null) {
-			contactStateIcon.setVisibility(View.GONE);
+			firstLineTextToolbar.updateMaxWidthAndIconVisibility(firstLineTextMaxWidthCollapsed, false);
 			return;
 		}
 
 		int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
-		if (stateToolbar == State.EXPANDED && (userStatus == MegaChatApi.STATUS_ONLINE || userStatus == MegaChatApi.STATUS_AWAY || userStatus == MegaChatApi.STATUS_BUSY || userStatus == MegaChatApi.STATUS_OFFLINE)) {
-			contactStateIcon.setVisibility(View.VISIBLE);
-			return;
+		if (stateToolbar == State.EXPANDED && (userStatus == MegaChatApi.STATUS_ONLINE
+				|| userStatus == MegaChatApi.STATUS_AWAY
+				|| userStatus == MegaChatApi.STATUS_BUSY
+				|| userStatus == MegaChatApi.STATUS_OFFLINE)) {
+			firstLineTextToolbar.setMaxLines(2);
+			firstLineTextToolbar.setTrailingIcon(contactStateIcon, contactStateIconPaddingLeft);
+			firstLineTextToolbar.updateMaxWidthAndIconVisibility(firstLineTextMaxWidthExpanded, true);
+		} else {
+			firstLineTextToolbar.setMaxLines(stateToolbar == State.EXPANDED ? 2 : 1);
+			firstLineTextToolbar.updateMaxWidthAndIconVisibility(
+					stateToolbar == State.EXPANDED ? firstLineTextMaxWidthExpanded
+							: firstLineTextMaxWidthCollapsed, false);
 		}
-
-		contactStateIcon.setVisibility(View.GONE);
-		return;
 	}
 
 	private void checkNickname(long contactHandle) {
@@ -688,23 +701,23 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				logDebug("This user is connected");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+				contactStateIcon = R.drawable.ic_online;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.online_status));
 			}else if(userStatus == MegaChatApi.STATUS_AWAY){
 				logDebug("This user is away");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+				contactStateIcon = R.drawable.ic_away;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.away_status));
 			} else if(userStatus == MegaChatApi.STATUS_BUSY){
 				logDebug("This user is busy");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+				contactStateIcon = R.drawable.ic_busy;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.busy_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+				contactStateIcon = R.drawable.ic_offline;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
 			}
@@ -1291,7 +1304,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				if (setNicknameText.getText().toString().equals(getString(R.string.add_nickname))) {
 					showConfirmationSetNickname(null);
 				} else if (user != null && !isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment)) {
-					nickname = firstLineTextToolbar.getText().toString();
 					contactNicknameBottomSheetDialogFragment = new ContactNicknameBottomSheetDialogFragment();
 					contactNicknameBottomSheetDialogFragment.show(getSupportFragmentManager(), contactNicknameBottomSheetDialogFragment.getTag());
 				}
@@ -1945,7 +1957,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     }
 
 	public String getNickname() {
-		return nickname;
+		return getNicknameContact(user.getHandle());
 	}
 
 	public void onFileClick(ArrayList<Long> handleList) {
@@ -2500,7 +2512,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
 				String formattedDate = lastGreenDate(this, lastGreen);
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
-				firstLineTextToolbar.setPadding(0, px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
 				secondLineTextToolbar.isMarqueeIsNecessary(this);
 				logDebug("Date last green: " + formattedDate);

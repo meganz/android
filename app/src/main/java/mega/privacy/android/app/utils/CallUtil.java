@@ -315,7 +315,7 @@ public class CallUtil {
         return true;
     }
 
-    private static void disableLocalCamera() {
+    public static void disableLocalCamera() {
         long idCall = isNecessaryDisableLocalCamera();
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (idCall == -1) return;
