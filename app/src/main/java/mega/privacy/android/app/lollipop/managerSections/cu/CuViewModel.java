@@ -39,13 +39,6 @@ import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
 
 class CuViewModel extends BaseRxViewModel {
-  private static final int[] MONTH_NAME = new int[] {
-      R.string.january, R.string.february, R.string.march,
-      R.string.april, R.string.may, R.string.june,
-      R.string.july, R.string.august, R.string.september,
-      R.string.october, R.string.november, R.string.december
-  };
-
   private final MegaApiAndroid megaApi;
   private final DatabaseHandler dbHandler;
 
@@ -71,9 +64,12 @@ class CuViewModel extends BaseRxViewModel {
 
   private long[] searchDate;
 
-  public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler) {
+  private int type;
+
+  public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, int type) {
     this.megaApi = megaApi;
     this.dbHandler = dbHandler;
+    this.type = type;
 
     loadCuNodes();
 
@@ -109,6 +105,11 @@ class CuViewModel extends BaseRxViewModel {
 
   public void setSearchDate(long[] searchDate, int orderBy) {
     this.searchDate = searchDate;
+    loadCuNodes(orderBy);
+  }
+
+  public void setType(int type, int orderBy) {
+    this.type = type;
     loadCuNodes(orderBy);
   }
 
@@ -308,11 +309,40 @@ class CuViewModel extends BaseRxViewModel {
 
   private List<MegaNode> getCuChildren(int orderBy) {
     long cuHandle = -1;
-
     MegaPreferences pref = dbHandler.getPreferences();
-    if (pref != null && pref.getCamSyncHandle() != null) {
-      cuHandle = Long.parseLong(pref.getCamSyncHandle());
+    if (type == CameraUploadsFragment.TYPE_CAMERA) {
+      if (pref != null && pref.getCamSyncHandle() != null) {
+        try {
+          cuHandle = Long.parseLong(pref.getCamSyncHandle());
+        } catch (NumberFormatException ignored) {
+        }
+        if (megaApi.getNodeByHandle(cuHandle) == null) {
+          cuHandle = -1;
+        }
+      }
+
+      if (cuHandle == -1) {
+        for (MegaNode node : megaApi.getChildren(megaApi.getRootNode())) {
+          if (node.isFolder() && TextUtils.equals(
+              getApplication().getString(R.string.section_photo_sync), node.getName())) {
+            cuHandle = node.getHandle();
+            dbHandler.setCamSyncHandle(cuHandle);
+            break;
+          }
+        }
+      }
+    } else {
+      if (pref != null && pref.getMegaHandleSecondaryFolder() != null) {
+        try {
+          cuHandle = Long.parseLong(pref.getMegaHandleSecondaryFolder());
+        } catch (NumberFormatException ignored) {
+        }
+        if (megaApi.getNodeByHandle(cuHandle) == null) {
+          cuHandle = -1;
+        }
+      }
     }
+
     return cuHandle == -1 ? Collections.emptyList()
         : megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy);
   }

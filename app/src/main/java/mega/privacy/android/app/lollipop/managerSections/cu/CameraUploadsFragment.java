@@ -4,7 +4,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
+import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.CameraUploadsAdapter;
-import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
 import static mega.privacy.android.app.utils.Util.px2dp;
 
-public class CameraUploadsFragment extends Fragment implements CameraUploadsAdapter.Listener {
+public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
   public static final int TYPE_CAMERA = 0;
   public static final int TYPE_MEDIA = 1;
 
@@ -41,7 +38,6 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
   private FragmentCameraUploadsBinding binding;
   private CameraUploadsAdapter adapter;
 
-  private MegaApiAndroid megaApi;
   private CuViewModel viewModel;
 
   public static CameraUploadsFragment newInstance(int type) {
@@ -70,6 +66,10 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
     setOrderBy(orderBy);
   }
 
+  public void setType(int type, int orderBy) {
+    viewModel.setType(type, orderBy);
+  }
+
   @Nullable @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
@@ -80,11 +80,15 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
   @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    megaApi = ((MegaApplication) requireActivity().getApplication()).getMegaApi();
+    int type = TYPE_CAMERA;
+    Bundle args = getArguments();
+    if (args != null) {
+      type = getArguments().getInt(ARG_TYPE, TYPE_CAMERA);
+    }
 
     CuViewModelFactory viewModelFactory =
-        new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(requireContext()));
-    viewModel = new ViewModelProvider(requireActivity(), viewModelFactory).get(CuViewModel.class);
+        new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(requireContext()), type);
+    viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
     boolean smallGrid = ((ManagerActivityLollipop) requireActivity()).isSmallGridCameraUploads;
     int spanCount = smallGrid ? SPAN_SMALL_GRID : SPAN_LARGE_GRID;
@@ -93,14 +97,12 @@ public class CameraUploadsFragment extends Fragment implements CameraUploadsAdap
     GridLayoutManager layoutManager = new GridLayoutManager(requireContext(), spanCount);
     binding.cuList.setLayoutManager(layoutManager);
 
-    DisplayMetrics displayMetrics = new DisplayMetrics();
-    requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
     int gridMargin = smallGrid ? MARGIN_SMALL_GRID : MARGIN_LARGE_GRID;
-    int gridWidth = displayMetrics.widthPixels / spanCount - gridMargin * 2;
-    int icSelectedWidth = px2dp(smallGrid ? 16 : 23, displayMetrics);
-    int icSelectedMargin = px2dp(smallGrid ? 3 : 7, displayMetrics);
-    int roundCornerRadius = px2dp(4, displayMetrics);
-    int selectedPadding = px2dp(1, displayMetrics);
+    int gridWidth = outMetrics.widthPixels / spanCount - gridMargin * 2;
+    int icSelectedWidth = px2dp(smallGrid ? 16 : 23, outMetrics);
+    int icSelectedMargin = px2dp(smallGrid ? 3 : 7, outMetrics);
+    int roundCornerRadius = px2dp(4, outMetrics);
+    int selectedPadding = px2dp(1, outMetrics);
     CameraUploadsAdapter.ItemSizeConfig itemSizeConfig = new CameraUploadsAdapter.ItemSizeConfig(
         smallGrid, gridWidth, gridMargin, icSelectedWidth, icSelectedMargin, roundCornerRadius,
         selectedPadding);

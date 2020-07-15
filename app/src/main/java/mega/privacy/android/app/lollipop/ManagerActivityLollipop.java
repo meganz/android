@@ -639,7 +639,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private FortumoFragmentLollipop fFL;
 	private CentiliFragmentLollipop ctFL;
 	private CreditCardFragmentLollipop ccFL;
-	// TODO(px): reduce to 1 fragment
 	private CameraUploadsFragment cuFragment;
 	private CameraUploadsFragment muFragment;
 	private RecentChatsFragmentLollipop rChatFL;
@@ -5851,11 +5850,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
     			break;
     		}
-    		case CAMERA_UPLOADS:{
+    		case CAMERA_UPLOADS: {
 				tB.setVisibility(View.VISIBLE);
-				cuFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+				cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 				if (cuFragment == null) {
-					cuFragment = CameraUploadsFragment.newInstance(CameraUploadFragmentLollipop.TYPE_CAMERA);
+					cuFragment = CameraUploadsFragment.newInstance(
+							CameraUploadsFragment.TYPE_CAMERA);
 				} else {
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 				}
@@ -5872,14 +5873,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
       			break;
     		}
-    		case MEDIA_UPLOADS:{
+    		case MEDIA_UPLOADS: {
 				tB.setVisibility(View.VISIBLE);
 
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-				muFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+				muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 				if (muFragment == null) {
-					muFragment = CameraUploadsFragment.newInstance(CameraUploadsFragment.TYPE_MEDIA);
+					muFragment = CameraUploadsFragment.newInstance(
+							CameraUploadsFragment.TYPE_MEDIA);
 				} else {
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
 				}
@@ -6892,20 +6895,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							return true;
 						}
 					}else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-						// TODO(px):
-						//muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-						//if (muFLol != null){
-						//	long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-						//	MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-						//	if (nps != null){
-						//		ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-						//		muFLol.setNodes(nodes);
-						//		setToolbarTitle();
-						//		isSearchEnabled=false;
-						//		invalidateOptionsMenu();
-						//	}
-						//	return true;
-						//}
+						muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+								.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+						if (muFragment != null) {
+							muFragment.setSearchDate(null, orderCamera);
+							isSearchEnabled = false;
+							setToolbarTitle();
+							invalidateOptionsMenu();
+							return true;
+						}
 					}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 						oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
@@ -11724,7 +11722,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 		}
-		else if(requestCode == ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK){
+		else if(requestCode == ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK) {
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
@@ -11739,24 +11737,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setToolbarTitle();
 			}
 
-			// TODO(px):
-			//muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-			//if (muFLol != null){
-			//	long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-			//	MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-			//	if (nps != null){
-			//		ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-			//		if((searchByDate) != null && (searchDate!=null)){
-			//			ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
-			//			muFLol.setNodes(nodesSearch);
-			//			isSearchEnabled = true;
-			//		}else{
-			//			muFLol.setNodes(nodes);
-			//
-			//		}
-			//	}
-			//}
-
+			muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+			if (muFragment != null && searchDate != null) {
+				muFragment.setSearchDate(searchDate, orderCamera);
+				isSearchEnabled = true;
+				setToolbarTitle();
+			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_FOLDER");
@@ -14820,34 +14807,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			cuFragment.reloadNodes(orderCamera);
 		}
 
-		// TODO(px):
-		//muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-		//if (muFLol != null){
-		//	long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-		//	MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-		//	logDebug("Media Uploads Handle: " + cameraUploadHandle);
-		//	if (nps != null){
-		//		logDebug("nps != null");
-		//		ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-		//		if(firstNavigationLevel){
-		//			muFLol.setNodes(nodes);
-		//		}else{
-		//			if(getIsSearchEnabled()){
-		//				if((searchByDate != null)&&(searchDate !=null)){
-		//					ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
-		//					muFLol.setNodes(nodesSearch);
-		//					isSearchEnabled = true;
-		//				}else{
-		//					muFLol.setNodes(nodes);
-		//				}
-		//			}else{
-		//				muFLol.setNodes(nodes);
-		//
-		//			}
-		//
-		//		}
-		//	}
-		//}
+		muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+		if (muFragment != null) {
+			muFragment.reloadNodes(orderCamera);
+		}
 
 		setToolbarTitle();
 		supportInvalidateOptionsMenu();
@@ -16778,11 +16742,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private CameraUploadsFragment getCameraUploadFragment() {
-		return cuFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+		return cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
 	private CameraUploadsFragment getMediaUploadFragment() {
-		return muFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+		return muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 	}
 
 	private InboxFragmentLollipop getInboxFragment() {
