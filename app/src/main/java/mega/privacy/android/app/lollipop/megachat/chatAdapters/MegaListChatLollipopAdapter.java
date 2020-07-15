@@ -210,28 +210,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(contactHandle);
 
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
-				if (!multipleSelect) {
-					//Multiselect OFF
-					((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 
+				if (isItemChecked(position)) {
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+				} else {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					setUserAvatar(holder, userHandleEncoded);
-				} else {
-					logDebug("Multiselect ON");
-
-					if(this.isItemChecked(position)){
-//					holder.imageButtonThreeDots.setVisibility(View.GONE);
-						((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-						((ViewHolderNormalChatList)holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-					}
-					else{
-						logDebug("NOT selected");
-						((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						setUserAvatar(holder, userHandleEncoded);
-					}
 				}
+
 				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.VISIBLE);
 
@@ -257,23 +244,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				}
 
-				if (!multipleSelect) {
-					//Multiselect OFF
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					createGroupChatAvatar(holder, getTitleChat(chat));
+				if (isItemChecked(position)) {
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
 				} else {
-					logDebug("Multiselect ON");
-
-					if(this.isItemChecked(position)){
-//					holder.imageButtonThreeDots.setVisibility(View.GONE);
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-						((ViewHolderNormalChatList)holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-					}
-					else{
-						logDebug("NOT selected");
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						createGroupChatAvatar(holder, getTitleChat(chat));
-					}
+					Bitmap avatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), getTitleChat(chat), AVATAR_SIZE, true);
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					((ViewHolderNormalChatList) holder).imageView.setImageBitmap(avatar);
 				}
 			}
 
