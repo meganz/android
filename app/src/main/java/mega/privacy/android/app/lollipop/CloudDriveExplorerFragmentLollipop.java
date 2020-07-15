@@ -584,6 +584,10 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 
+			if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+				activateButton(false);
+			}
+
 			setParentHandle(n.getHandle());
 			setNodes(megaApi.getChildren(n, order));
 
@@ -622,12 +626,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 		}
 
-		if (modeCloud == FileExplorerActivityLollipop.SELECT && selectFile) {
-			fabSelect.setVisibility(View.VISIBLE);
-		} else {
-			fabSelect.setVisibility(View.GONE);
-		}
-
 		shouldResetNodes = true;
 	}
 
@@ -644,13 +642,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 
 		if (parentNode != null){
-            if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-                if (selectFile && ((FileExplorerActivityLollipop) context).isMultiselect()) {
-					fabSelect.setVisibility(View.VISIBLE);
-				} else {
-					fabSelect.setVisibility(View.GONE);
-				}
-            }
+			if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+				activateButton(((FileExplorerActivityLollipop) context).isMultiselect());
+			}
 
             setParentHandle(parentNode.getHandle());
             ((FileExplorerActivityLollipop) context).changeTitle();
@@ -822,12 +816,16 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		return recyclerView;
 	}
 
-	private void activateButton(boolean show){
-		optionButton.setEnabled(show);
-		if(show){
-			optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-		}else{
-			optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+	private void activateButton(boolean show) {
+		if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+			fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
+		} else {
+			optionButton.setEnabled(show);
+			if (show) {
+				optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+			} else {
+				optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+			}
 		}
 	}
 
