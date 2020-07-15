@@ -31,8 +31,11 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	@Override
 	public void activateActionMode() {
-		super.activateActionMode();
-		actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
+		if (!adapter.isMultipleSelect()) {
+			super.activateActionMode();
+			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
+					new ActionBarCallBack());
+		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
