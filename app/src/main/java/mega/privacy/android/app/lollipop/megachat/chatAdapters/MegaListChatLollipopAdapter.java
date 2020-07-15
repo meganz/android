@@ -212,12 +212,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
 
-				if (itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					setUserAvatar(holder, userHandleEncoded);
-				} else  {
+				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+				} else {
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					setUserAvatar(holder, userHandleEncoded);
 				}
 
 				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
@@ -246,12 +246,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				}
 
-				if (itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					createGroupChatAvatar(holder, getTitleChat(chat));
-				} else  {
+				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+				} else {
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					createGroupChatAvatar(holder, getTitleChat(chat));
 				}
 			}
 
