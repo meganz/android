@@ -72,9 +72,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
     private ChatController chatC;
 
-    public MegaParticipantsChatLollipopAdapter(GroupChatInfoActivityLollipop groupChatInfoActivity, ArrayList<MegaChatParticipant> participants, RecyclerView listView) {
+    public MegaParticipantsChatLollipopAdapter(GroupChatInfoActivityLollipop groupChatInfoActivity, RecyclerView listView) {
         this.groupChatInfoActivity = groupChatInfoActivity;
-        this.participants = participants;
         this.listFragment = listView;
         this.chatId = groupChatInfoActivity.getChatHandle();
         this.isPreview = groupChatInfoActivity.getChat().isPreview();
@@ -399,11 +398,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 MegaUser contact = participant.isEmpty() ? null : megaApi.getContact(participant.getEmail());
                 holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
 
+                long handle = participant.getHandle();
                 holderParticipantsList.contactMail = participant.getEmail();
-                holderParticipantsList.userHandle = MegaApiAndroid.userHandleToBase64(participant.getHandle());
+                holderParticipantsList.userHandle = MegaApiAndroid.userHandleToBase64(handle);
                 holderParticipantsList.fullName = participant.getFullName();
 
-                int userStatus = getUserStatus(participant.getHandle());
+                int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle);
                 setContactStatus(userStatus, ((ViewHolderParticipantsList) holder).statusImage, ((ViewHolderParticipantsList) holder).textViewContent);
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
@@ -534,10 +534,31 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         }
     }
 
+    /**
+     * Gets the position of the participant in the adapter.
+     * It depends on the user:
+     *
+     * If they is not previewing the chat and they are a moderator there are two more views in the adapter (Header + Add participant views),
+     *      so the position in the adapter is the same as in the array plus 2.
+     *
+     * Otherwise, there is only one more view in the adapter (Header),
+     *      so the position in the adapter is the same as in the array plus 1.
+     *
+     * @param arrayPosition   the position of the participant in the array.
+     * @return The position of the participant in the adapter.
+     */
+    private int getParticipantPositionInAdapter(int arrayPosition) {
+        if (isNotPreviewAndLastParticipantModerator()) {
+            return arrayPosition + COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
+        } else {
+            return arrayPosition + COUNT_HEADER_POSITION;
+        }
+    }
+
     private MegaChatParticipant getParticipant(int position) {
         int positionInArray = getParticipantPositionInArray(position);
 
-        if (positionInArray < 0 || positionInArray > participants.size()) {
+        if (positionInArray < 0 || positionInArray >= participants.size()) {
             return null;
         }
 
@@ -625,23 +646,26 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         notifyDataSetChanged();
     }
 
-    public void updateParticipant(int position, ArrayList<MegaChatParticipant> participants) {
+    /**
+     * Updates a participant in the adapter.
+     *
+     * @param positionInArray      position in
+     * @param participants  list of MegaChatParticipant
+     */
+    public void updateParticipant(int positionInArray, ArrayList<MegaChatParticipant> participants) {
         this.participants = participants;
-        //Taking into account the header position += 1;
-        notifyItemChanged(position + COUNT_HEADER_POSITION);
+        notifyItemChanged(getParticipantPositionInAdapter(positionInArray));
     }
 
     /**
      * Updates a participant due to a change in their status.
      *
-     * @param position  participant's position in the adapter without taking into account the header item
+     * @param positionInArray  participant's position in the array without taking into account the header and add participants items.
      */
-    public void updateContactStatus(int position) {
-        //Taking into account the header position += 1;
-        position += COUNT_HEADER_POSITION;
-
-        if (listFragment.findViewHolderForAdapterPosition(position) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) {
-            notifyItemChanged(position);
+    public void updateContactStatus(int positionInArray) {
+        int positionInAdapter = getParticipantPositionInAdapter(positionInArray);
+        if (listFragment.findViewHolderForAdapterPosition(positionInAdapter) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) {
+            notifyItemChanged(positionInAdapter);
         }
     }
 

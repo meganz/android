@@ -294,12 +294,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         logDebug("Number of participants with me: " + participants.size());
         if (adapter == null) {
-            adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView);
+            adapter = new MegaParticipantsChatLollipopAdapter(this, recyclerView);
             adapter.setHasStableIds(true);
             recyclerView.setAdapter(adapter);
-        } else {
-            adapter.setParticipants(participants);
         }
+
+        adapter.setParticipants(participants);
     }
 
     private void updateAdapter(long contactHandle) {
@@ -308,7 +308,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if (participant.getHandle() == contactHandle) {
                 int pos = participants.indexOf(participant);
                 participants.get(pos).setFullName(chatC.getParticipantFullName(contactHandle));
-                pos = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR ? pos + 1 : pos;
                 adapter.updateParticipant(pos, participants);
                 break;
             }
@@ -732,7 +731,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if (index != -1 && participantToUpdate != null) {
                 participants.set(index, participantToUpdate);
-                adapter.updateParticipant(index + 1, participants);
+                adapter.updateParticipant(index, participants);
             }
 
         } else if (request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
@@ -1023,11 +1022,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (userHandle == megaChatApi.getMyUserHandle()) {
             logDebug("My own status update");
             int position = participants.size() - 1;
-            if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
-                adapter.updateContactStatus(position + 1);
-            } else {
-                adapter.updateContactStatus(position);
-            }
+            adapter.updateContactStatus(position);
         } else {
             logDebug("Status update for the user: " + userHandle);
             int indexToReplace = -1;
@@ -1051,11 +1046,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             if (indexToReplace != -1) {
                 logDebug("Index to replace: " + indexToReplace);
-                if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
-                    adapter.updateContactStatus(indexToReplace + 1);
-                } else {
-                    adapter.updateContactStatus(indexToReplace);
-                }
+                adapter.updateContactStatus(indexToReplace);
             }
         }
     }
@@ -1197,11 +1188,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                     if (participant.getHandle() == userhandle) {
                         participant.setLastGreen(formattedDate);
-                        if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
-                            adapter.updateContactStatus(itrReplace.nextIndex());
-                        } else {
-                            adapter.updateContactStatus(itrReplace.nextIndex() - 1);
-                        }
+                        adapter.updateContactStatus(itrReplace.nextIndex() - 1);
                         break;
                     }
                 }
@@ -1238,27 +1225,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         if (pendingParticipantRequests.isEmpty()) return;
 
-        HashMap<Integer, MegaChatParticipant> copyOfPendingParticipantRequests = new HashMap<>(pendingParticipantRequests);
-        pendingParticipantRequests.clear();
-
-        MegaHandleList handleList = MegaHandleList.createInstance();
-        HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
-        HashMap<Integer, String> participantAvatars = new HashMap<>();
-        int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
-        int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
-
-        for (int i = firstPosition; i <= lastPosition; i++) {
-            MegaChatParticipant participant = copyOfPendingParticipantRequests.get(i);
-            if (participant != null) {
-                participantRequests.put(i, participant);
-                long handle = participant.getHandle();
-                handleList.addMegaHandle(handle);
-                participantAvatars.put(i, MegaApiAndroid.userHandleToBase64(handle));
-            }
-
-            copyOfPendingParticipantRequests.remove(i);
-        }
-
         countDownTimer = new CountDownTimer(TIMEOUT, TIMEOUT) {
 
             @Override
@@ -1267,6 +1233,27 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             @Override
             public void onFinish() {
+                HashMap<Integer, MegaChatParticipant> copyOfPendingParticipantRequests = new HashMap<>(pendingParticipantRequests);
+
+                MegaHandleList handleList = MegaHandleList.createInstance();
+                HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
+                HashMap<Integer, String> participantAvatars = new HashMap<>();
+                int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
+                int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
+
+                for (int i = firstPosition; i <= lastPosition; i++) {
+                    MegaChatParticipant participant = copyOfPendingParticipantRequests.get(i);
+                    if (participant != null) {
+                        participantRequests.put(i, participant);
+                        long handle = participant.getHandle();
+                        handleList.addMegaHandle(handle);
+                        participantAvatars.put(i, MegaApiAndroid.userHandleToBase64(handle));
+                    }
+
+                    pendingParticipantRequests.remove(i);
+                }
+
+                copyOfPendingParticipantRequests.clear();
                 requestUserAttributes(handleList, participantRequests, participantAvatars);
             }
         }.start();
@@ -1320,12 +1307,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                         if (hasParticipantAttributes(participant)) {
                             participants.set(positionInArray, participant);
-                            //- 1 for decrementing the header position already incremented into adapter.updateParticipant() method
-                            adapter.updateParticipant(positionInAdapter - 1, participants);
+                            adapter.updateParticipant(positionInArray, participants);
                         }
-
-                        participantUpdates.remove(positionInAdapter);
-                        break;
                     }
                 }
             }
