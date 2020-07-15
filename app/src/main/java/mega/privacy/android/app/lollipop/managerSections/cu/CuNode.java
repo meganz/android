@@ -15,11 +15,12 @@ public class CuNode {
 
   private boolean selected;
 
-  public CuNode(MegaNode node, File thumbnail, int type, String modifyDate) {
+  public CuNode(MegaNode node, File thumbnail, int type, String modifyDate, boolean selected) {
     this.node = node;
     this.thumbnail = thumbnail;
     this.type = type;
     this.modifyDate = modifyDate;
+    this.selected = selected;
   }
 
   public MegaNode getNode() {

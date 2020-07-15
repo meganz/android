@@ -166,6 +166,40 @@ class CuViewModel extends BaseRxViewModel {
     return nodes;
   }
 
+  public void selectAll() {
+    if (selecting) {
+      List<CuNode> nodes = cuNodes.getValue();
+      if (nodes == null || nodes.isEmpty()) {
+        return;
+      }
+
+      for (CuNode node : nodes) {
+        node.setSelected(true);
+        selectedNodes.put(node.getNode().getHandle(), node.getNode());
+      }
+
+      cuNodes.setValue(nodes);
+    }
+  }
+
+  public void clearSelection() {
+    if (selecting) {
+      selecting = false;
+
+      List<CuNode> nodes = cuNodes.getValue();
+      if (nodes == null || nodes.isEmpty()) {
+        return;
+      }
+
+      for (CuNode node : nodes) {
+        node.setSelected(false);
+      }
+      selectedNodes.clear();
+
+      cuNodes.setValue(nodes);
+    }
+  }
+
   private void loadCuNodes(int orderBy) {
     loadCuNodes(Single.defer(() -> Single.just(getCuNodes(orderBy))));
   }
@@ -210,11 +244,12 @@ class CuViewModel extends BaseRxViewModel {
       if (lastModifyDate == null
           || !YearMonth.from(lastModifyDate).equals(YearMonth.from(modifyDate))) {
         lastModifyDate = modifyDate;
-        nodes.add(new CuNode(null, null, CuNode.TYPE_TITLE, dateString));
+        nodes.add(new CuNode(null, null, CuNode.TYPE_TITLE, dateString, false));
       }
 
       nodes.add(new CuNode(node, thumbnail.exists() ? thumbnail : null,
-          isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE, dateString));
+          isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE, dateString,
+          selectedNodes.containsKey(node.getHandle())));
 
       if (!thumbnail.exists()) {
         nodesWithoutThumbnail.add(node);
