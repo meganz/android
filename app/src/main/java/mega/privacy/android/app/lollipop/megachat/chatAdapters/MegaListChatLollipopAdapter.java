@@ -220,6 +220,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
 				}
 
+				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.VISIBLE);
 
@@ -247,8 +248,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if (itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					Bitmap avatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), getTitleChat(chat), AVATAR_SIZE, true);
-					((ViewHolderNormalChatList) holder).imageView.setImageBitmap(avatar);
+					createGroupChatAvatar(holder, getTitleChat(chat));
 				} else  {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
@@ -524,6 +524,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			((ViewHolderNormalChatList)holder).callInProgressIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_in_progress);
 			((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+
 		}else if(viewType == ITEM_VIEW_TYPE_ARCHIVED_CHATS){
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_archived_chat_option_list, parent, false);
 			holder = new ViewHolderArchivedChatList(v);
