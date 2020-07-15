@@ -9,8 +9,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -35,8 +35,7 @@ public class GetAttrUserListener extends BaseListener {
      */
     private boolean onlyDBUpdate;
 
-    private MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList holder;
-    private MegaParticipantsChatLollipopAdapter adapter;
+    private int holderPosition;
 
     public GetAttrUserListener(Context context) {
         super(context);
@@ -58,17 +57,15 @@ public class GetAttrUserListener extends BaseListener {
     /**
 
      * Constructor to init a request for check the USER_ATTR_AVATAR user's attribute
-     * and update the holder of the adapter, both passed as parameters.
+     * and updates the holder of the adapter.
      *
-     * @param context   current application context
-     * @param holder    item view of the adapter
-     * @param adapter   adapter in which the avatar has to be updated
+     * @param context           current application context
+     * @param holderPosition    position of the holder to update
      */
-    public GetAttrUserListener(Context context, MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList holder, MegaParticipantsChatLollipopAdapter adapter) {
+    public GetAttrUserListener(Context context, int holderPosition) {
         super(context);
 
-        this.holder = holder;
-        this.adapter = adapter;
+        this.holderPosition = holderPosition;
     }
 
     /**
@@ -223,19 +220,8 @@ public class GetAttrUserListener extends BaseListener {
      * @param request   result of the request
      */
     private void updateAvatar(MegaRequest request) {
-        boolean isEmail = EMAIL_ADDRESS.matcher(request.getEmail()).matches();
-
-        if (adapter == null || holder == null
-                || (!isEmail && !holder.getUserHandle().equals(request.getEmail()))
-                || (isEmail && (holder.getContactMail() == null || !holder.getContactMail().equals(request.getEmail())))) {
-            logWarning("Error getting user's avatar");
-            return;
-        }
-
-        Bitmap bitmap = getAvatarBitmap(request.getEmail());
-        if (bitmap != null) {
-            holder.setImageView(bitmap);
-            adapter.notifyItemChanged(holder.getAdapterPosition());
+        if (context instanceof GroupChatInfoActivityLollipop) {
+            ((GroupChatInfoActivityLollipop) context).updateParticipantAvatar(holderPosition, request.getEmail());
         }
     }
 

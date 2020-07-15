@@ -428,7 +428,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     String nameFileEmail = holderParticipantsList.contactMail;
                     Bitmap bitmap;
                     
-                    if (holderParticipantsList.contactMail == null) {
+                    if (isTextEmpty(nameFileEmail)) {
                         holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
                         holderParticipantsList.threeDotsLayout.setOnClickListener(null);
                         holderParticipantsList.itemLayout.setOnClickListener(null);
@@ -439,16 +439,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     
                     if (bitmap != null) {
                         holderParticipantsList.setImageView(bitmap);
-                    } else {
-                        GetAttrUserListener listener = new GetAttrUserListener(groupChatInfoActivity, holderParticipantsList, this);
-                        
-                        if (contact != null) {
-                            megaApi.getUserAvatar(contact, buildAvatarFile(groupChatInfoActivity, nameFileEmail + JPG_EXTENSION).getAbsolutePath(), listener);
-                        } else if (participant.getEmail() != null) {
-                            megaApi.getUserAvatar(participant.getEmail(), buildAvatarFile(groupChatInfoActivity, nameFileEmail + JPG_EXTENSION).getAbsolutePath(), listener);
-                        } else {
-                            megaApi.getUserAvatar(holderParticipantsList.userHandle, buildAvatarFile(groupChatInfoActivity, nameFileHandle + JPG_EXTENSION).getAbsolutePath(), listener);
-                        }
                     }
                 }
 

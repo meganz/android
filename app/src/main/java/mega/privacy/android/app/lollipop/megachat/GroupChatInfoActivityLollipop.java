@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.CountDownTimer;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.util.TypedValue;
@@ -38,6 +41,7 @@ import java.util.ListIterator;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GroupParticipantsDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -48,6 +52,7 @@ import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
@@ -67,8 +72,11 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -78,6 +86,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
+    private static final int TIMEOUT = 300;
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
     private static final int MAX_LENGTH_CHAT_TITLE = 60;
 
@@ -110,6 +119,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private HashMap<Integer, MegaChatParticipant> pendingParticipantRequests = new HashMap<>();
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
+
+    private CountDownTimer countDownTimer;
 
     /**
      * Broadcast to update a contact in adapter due to a change.
@@ -192,16 +203,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     super.onScrolled(recyclerView, dx, dy);
                     changeViewElevation(aB, recyclerView.canScrollVertically(-1), getOutMetrics());
                     if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
-                        checkIfShouldAskForUsersAttributes();
+                        checkIfShouldAskForUsersAttributes(RecyclerView.SCROLL_STATE_IDLE);
                     }
                 }
 
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        checkIfShouldAskForUsersAttributes();
-                    }
+                    checkIfShouldAskForUsersAttributes(newState);
                 }
             });
 
@@ -1215,8 +1224,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     /**
      * If there are participants visibles in the UI without attributes,
      * it launches a request to ask for them.
+     *
+     * @param scrollState   current scroll state of the RecyclerView
      */
-    private void checkIfShouldAskForUsersAttributes() {
+    private void checkIfShouldAskForUsersAttributes(int scrollState) {
+        if (scrollState != RecyclerView.SCROLL_STATE_IDLE) {
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+                countDownTimer = null;
+            }
+            return;
+        }
+
         if (pendingParticipantRequests.isEmpty()) return;
 
         HashMap<Integer, MegaChatParticipant> copyOfPendingParticipantRequests = new HashMap<>(pendingParticipantRequests);
@@ -1224,6 +1243,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         MegaHandleList handleList = MegaHandleList.createInstance();
         HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
+        HashMap<Integer, String> participantAvatars = new HashMap<>();
         int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
 
@@ -1231,13 +1251,25 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             MegaChatParticipant participant = copyOfPendingParticipantRequests.get(i);
             if (participant != null) {
                 participantRequests.put(i, participant);
-                handleList.addMegaHandle(participant.getHandle());
+                long handle = participant.getHandle();
+                handleList.addMegaHandle(handle);
+                participantAvatars.put(i, MegaApiAndroid.userHandleToBase64(handle));
             }
 
             copyOfPendingParticipantRequests.remove(i);
         }
 
-        requestUserAttributes(handleList, participantRequests);
+        countDownTimer = new CountDownTimer(TIMEOUT, TIMEOUT) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                requestUserAttributes(handleList, participantRequests, participantAvatars);
+            }
+        }.start();
     }
 
     /**
@@ -1245,10 +1277,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
      *
      * @param handleList            MegaHandleList in which the participant's handles are stored to ask for their attributes
      * @param participantRequests   HashMap in which the participants and their positions in the adapter are stored
+     * @param participantAvatars    HastMap in which the participants' handles and their positions in the adapter are stored
      */
-    private void requestUserAttributes(MegaHandleList handleList, HashMap<Integer, MegaChatParticipant> participantRequests) {
+    private void requestUserAttributes(MegaHandleList handleList, HashMap<Integer, MegaChatParticipant> participantRequests, HashMap<Integer, String> participantAvatars) {
         if (handleList.size() > 0) {
             megaChatApi.loadUserAttributes(chatHandle, handleList, new GetPeerAttributesListener(this, participantRequests));
+        }
+
+        for (Integer positionInAdapter : participantAvatars.keySet()) {
+            String handle = participantAvatars.get(positionInAdapter);
+            if (!isTextEmpty(handle)) {
+                megaApi.getUserAvatar(handle, buildAvatarFile(this, handle + JPG_EXTENSION).getAbsolutePath(), new GetAttrUserListener(this, positionInAdapter));
+            }
         }
     }
 
@@ -1288,6 +1328,26 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Updates the participant's avatar in the adapter.
+     *
+     * @param positionInAdapter participant's position in the adapter
+     * @param emailOrHandle     participant's email or handle in Base64
+     */
+    public void updateParticipantAvatar (int positionInAdapter, String emailOrHandle) {
+        int positionInArray = adapter.getParticipantPositionInArray(positionInAdapter);
+        boolean isEmail = EMAIL_ADDRESS.matcher(emailOrHandle).matches();
+
+        if (positionInArray >= 0 && positionInArray < participants.size()
+                && ((isEmail && participants.get(positionInArray).getEmail().equals(emailOrHandle)
+                || (participants.get(positionInArray).getHandle() == MegaApiJava.base64ToHandle(emailOrHandle))))) {
+            Bitmap avatar = getAvatarBitmap(emailOrHandle);
+            if (avatar != null) {
+                adapter.notifyItemChanged(positionInAdapter);
             }
         }
     }
