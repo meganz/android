@@ -585,8 +585,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //	private boolean isListCloudDrive = true;
 //	private boolean isListOffline = true;
 //	private boolean isListRubbishBin = true;
-	public boolean isListCameraUploads = false;
-//	public boolean isLargeGridCameraUploads = true;
 	public boolean isSmallGridCameraUploads = false;
 
 	//	private boolean isListInbox = true;
@@ -2113,14 +2111,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (prefs == null){
 			firstTimeAfterInstallation = true;
 			isList=true;
-			isListCameraUploads=false;
 			isSmallGridCameraUploads = false;
 		}
 		else{
-
 			if (prefs.getFirstTime() == null){
 				firstTimeAfterInstallation = true;
-				isListCameraUploads=false;
 			}else{
 				firstTimeAfterInstallation = Boolean.parseBoolean(prefs.getFirstTime());
 			}
@@ -2130,17 +2125,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			else{
 				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
 			}
-			if (prefs.getPreferredViewListCameraUploads() == null){
-				isListCameraUploads = false;
-			}
-			else{
-				isListCameraUploads = Boolean.parseBoolean(prefs.getPreferredViewListCameraUploads());
-			}
 
 			isSmallGridCameraUploads = dbH.isSmallGridCamera();
 		}
 		logDebug("Preferred View List: " + isList);
-		logDebug("Preferred View List for camera uploads: " + isListCameraUploads);
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -6786,25 +6774,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				|| (drawerItem == DrawerItem.MEDIA_UPLOADS && getMediaUploadFragment() != null && muFragment.getItemCount() > 0)) {
 			selectMenuItem.setVisible(true);
 			sortByMenuItem.setVisible(true);
-			thumbViewMenuItem.setVisible(true);
 
 			if (firstNavigationLevel) {
 				searchByDate.setVisible(true);
 			}
 
-			if (isListCameraUploads) {
-				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-				thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
+			if (isSmallGridCameraUploads) {
+				gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 			} else {
-				thumbViewMenuItem.setTitle(getString(R.string.action_list));
-				thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				if (isSmallGridCameraUploads) {
-					gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-				} else {
-					gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-				}
-				gridSmallLargeMenuItem.setVisible(true);
+				gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 			}
+			gridSmallLargeMenuItem.setVisible(true);
 		}
 	}
 
@@ -7253,48 +7233,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("action_grid selected");
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 					logDebug("action_grid_list in CameraUploads");
-	        		isListCameraUploads = !isListCameraUploads;
-	    			dbH.setPreferredViewListCamera(isListCameraUploads);
-					logDebug("dbH.setPreferredViewListCamera: " + isListCameraUploads);
-					if (isListCameraUploads){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					if(!firstLogin) {
+						gridSmallLargeMenuItem.setVisible(true);
+					}else{
 						gridSmallLargeMenuItem.setVisible(false);
-						searchMenuItem.setVisible(true);
 					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstLogin) {
-							gridSmallLargeMenuItem.setVisible(true);
-						}else{
-							gridSmallLargeMenuItem.setVisible(false);
-						}
-						searchMenuItem.setVisible(false);
-
-					}
+					searchMenuItem.setVisible(false);
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	        	}
 	        	else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 					logDebug("action_grid_list in MediaUploads");
-	        		isListCameraUploads = !isListCameraUploads;
-	    			dbH.setPreferredViewListCamera(isListCameraUploads);
-					logDebug("dbH.setPreferredViewListCamera: " + isListCameraUploads);
-
-					if (isListCameraUploads){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					if(!firstLogin) {
+						gridSmallLargeMenuItem.setVisible(true);
+					}else{
 						gridSmallLargeMenuItem.setVisible(false);
-						searchMenuItem.setVisible(true);
 					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstLogin) {
-							gridSmallLargeMenuItem.setVisible(true);
-						}else{
-							gridSmallLargeMenuItem.setVisible(false);
-						}
-						searchMenuItem.setVisible(false);
-
-					}
-
+					searchMenuItem.setVisible(false);
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
         		}
 	        	else{
@@ -15224,8 +15178,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public boolean isListCameraUploads() {
-		return isListCameraUploads;
+		return false;
 	}
+
 	public boolean isSmallGridCameraUploads() {
 		return isSmallGridCameraUploads;
 	}
@@ -15238,10 +15193,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 	public void setFirstLogin(boolean flag){
 		firstLogin = flag;
-	}
-
-	public void setListCameraUploads(boolean isListCameraUploads) {
-		this.isListCameraUploads = isListCameraUploads;
 	}
 
 	public void setOrderCloud(int orderCloud) {
