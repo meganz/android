@@ -77,8 +77,9 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
-	public static final int ITEM_VIEW_TYPE_NORMAL = 0;
-	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
+	public static final int ITEM_VIEW_TYPE_NORMAL_SELECTED = 0;
+	public static final int ITEM_VIEW_TYPE_NORMAL_UNSELECTED = 1;
+	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 2;
 
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
@@ -196,7 +197,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		holder.itemView.setVisibility(View.VISIBLE);
 
-		if(itemType == ITEM_VIEW_TYPE_NORMAL) {
+		if(itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED || itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
 			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
 
@@ -211,12 +212,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
 
-				if (isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-				} else {
+				if (itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					setUserAvatar(holder, userHandleEncoded);
+				} else  {
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
 				}
 
 				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
@@ -244,13 +245,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				}
 
-				if (isItemChecked(position)) {
+				if (itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					Bitmap avatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), getTitleChat(chat), AVATAR_SIZE, true);
+					((ViewHolderNormalChatList) holder).imageView.setImageBitmap(avatar);
+				} else  {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-				} else {
-					Bitmap avatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), getTitleChat(chat), AVATAR_SIZE, true);
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					((ViewHolderNormalChatList) holder).imageView.setImageBitmap(avatar);
 				}
 			}
 
@@ -472,7 +473,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		dbH = DatabaseHandler.getDbHandler(context);
 		View v = null;
 
-		if(viewType == ITEM_VIEW_TYPE_NORMAL) {
+		if(viewType == ITEM_VIEW_TYPE_NORMAL_SELECTED || viewType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 			holder = new ViewHolderNormalChatList(v);
 			holder.itemLayout = v.findViewById(R.id.recent_chat_list_item_layout);
@@ -523,7 +524,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			((ViewHolderNormalChatList)holder).callInProgressIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_in_progress);
 			((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-
 		}else if(viewType == ITEM_VIEW_TYPE_ARCHIVED_CHATS){
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_archived_chat_option_list, parent, false);
 			holder = new ViewHolderArchivedChatList(v);
@@ -608,12 +608,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public int getItemViewType(int position) {
-
-		if(position>=chats.size()){
+		if (position >= chats.size()) {
 			return ITEM_VIEW_TYPE_ARCHIVED_CHATS;
-		}
-		else{
-			return ITEM_VIEW_TYPE_NORMAL;
+		} else if (multipleSelect && isItemChecked(position)) {
+			return ITEM_VIEW_TYPE_NORMAL_SELECTED;
+		} else {
+			return ITEM_VIEW_TYPE_NORMAL_UNSELECTED;
 		}
 	}
 
