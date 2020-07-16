@@ -19,6 +19,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
 class HomepageFragment : Fragment() {
     private lateinit var behavior: HomepageBottomSheetBehavior<*>
+    private var heightPixels = 0
+    private var searchBottom = 0
+    private lateinit var searchInputView: FloatingSearchView
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -30,7 +34,7 @@ class HomepageFragment : Fragment() {
         behavior = HomepageBottomSheetBehavior.from(view.findViewById<View>(R.id.design_bottom_sheet1))
                 as HomepageBottomSheetBehavior<*>
 
-        val searchInputView = view.findViewById<FloatingSearchView>(R.id.searchView)
+        searchInputView = view.findViewById<FloatingSearchView>(R.id.searchView)
         searchInputView.attachNavigationDrawerToMenuButton((activity as ManagerActivityLollipop).drawerLayout!!)
 
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
@@ -49,11 +53,27 @@ class HomepageFragment : Fragment() {
 
         view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
+                Log.i("Alex", "onGlobalLayout")
                 view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+//                heightPixels = resources.displayMetrics.heightPixels
+                searchBottom = searchInputView.bottom
                 val banner = view?.findViewById<View>(R.id.banner)
                 behavior.peekHeight = view!!.height - banner!!.bottom - 20
                 view.findViewById<View>(R.id.design_bottom_sheet1)?.visibility = View.VISIBLE
             }
+        })
+
+        behavior.addBottomSheetCallback(object : HomepageBottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                val layoutParams = bottomSheet.layoutParams
+                if (bottomSheet.height > view.height - searchBottom - 20) {
+                    layoutParams.height = view.height - searchBottom - 20
+                    bottomSheet.layoutParams = layoutParams
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
 
         return view
