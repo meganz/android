@@ -2794,4 +2794,5 @@
     <string name="hello_blank_fragment2">Hello blank fragment 2</string>
 
     <string name="search_hint">Search in MEGA</string>
+    <string name="homepage_bottom_sheet_behavior">mega.privacy.android.app.HomepageBottomSheetBehavior</string>
 </resources>

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_cardview_white_top"
     android:orientation="vertical"
-    app:layout_behavior="@string/bottom_sheet_behavior">
+    app:layout_behavior="@string/homepage_bottom_sheet_behavior">
 
     <!--    <LinearLayout-->
     <!--        android:layout_width="match_parent"-->
@@ -15,12 +15,10 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
-        style="@style/Widget.MaterialComponents.TabLayout.Colored"
+        style="@style/MyCustomTabLayout"
         android:layout_width="300dp"
         android:background="@color/transparent"
-        android:layout_height="?attr/actionBarSize"
-        app:tabIndicatorColor="@color/expired_red"
-        app:tabTextColor="@color/dark_primary_color" />
+        android:layout_height="?attr/actionBarSize" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"

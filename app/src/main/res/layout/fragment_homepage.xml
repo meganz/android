@@ -21,5 +21,5 @@
         <include layout="@layout/homepage_banner" />
     </LinearLayout>
 
-    <include layout="@layout/homepage_bottomsheet" />
+    <include layout="@layout/homepage_bottom_sheet" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

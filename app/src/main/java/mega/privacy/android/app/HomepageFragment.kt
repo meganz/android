@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import mega.privacy.android.app.components.search.FloatingSearchView
@@ -23,8 +24,12 @@ class HomepageFragment : Fragment() {
 //            findNavController().navigate(R.id.action_homepageFragment_to_homepageFragment2)
 //        }
 
+        val behavior = HomepageBottomSheetBehavior.from(view.findViewById<View>(R.id.design_bottom_sheet1))
+                as HomepageBottomSheetBehavior<*>
+
         val searchInputView = view.findViewById<FloatingSearchView>(R.id.searchView)
         searchInputView.attachNavigationDrawerToMenuButton((activity as ManagerActivityLollipop).drawerLayout!!)
+
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
         viewPager.adapter = BottomSheetPagerAdapter(this)
         val tabs = view.findViewById<TabLayout>(R.id.tabs)
@@ -32,6 +37,12 @@ class HomepageFragment : Fragment() {
             tab, _ -> tab.text = "Recent"
         }
         mediator.attach()
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                behavior.invalidateScrollingChild((viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position))
+            }
+        })
         return view
     }
 }
