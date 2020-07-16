@@ -171,7 +171,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
     private fun initDrawables() {
         menuBtnDrawable = DrawerArrowDrawable(context)
-        iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black_24dp)
+        iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)
         iconBackArrow = Util.getWrappedDrawable(context, R.drawable.ic_arrow_back_black)
     }
 
@@ -248,8 +248,8 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
         if (focused) {
             searchInput?.requestFocus()
-            changeMenuDrawable(withAnim = true, isOpen = true)
             Util.showKeyboardDelayed(searchInput)
+            changeMenuDrawable(withAnim = true, isOpen = true)
             if (menuOpen) closeMenu(false)
             searchInput?.apply {
                 isLongClickable = true
@@ -257,10 +257,10 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
             }
             focusChangeListener?.onFocus()
         } else {
+            getHostActivity()?.let { Util.hideKeyboard(it) }
             searchInput?.clearFocus()
             changeMenuDrawable(withAnim = true, isOpen = false)
             clearButton?.visibility = View.GONE
-            getHostActivity()?.let { Util.hideKeyboard(it) }
             searchInput?.isLongClickable = false
             focusChangeListener?.onFocusCleared()
         }

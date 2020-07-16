@@ -79,7 +79,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.exifinterface:exifinterface:1.1.0'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.3.0-alpha01'
     implementation 'com.google.android.gms:play-services-wallet:18.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
@@ -93,7 +93,7 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation "com.squareup.picasso:picasso:2.71828"
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
-    implementation 'com.brandongogetap:stickyheaders:0.5.1'
+    implementation 'com.brandongogetap:stickyheaders:0.6.1'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
