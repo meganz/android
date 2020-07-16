@@ -2830,9 +2830,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method to enable or disable the audio level monitor.
      */
     private void checkAudioLevelMonitor() {
-        if (peersOnCall.size() >= MIN_PEERS_LIST && !megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
-            megaChatApi.enableAudioLevelMonitor(true, chatId);
-        } else if (peersOnCall.size() < MIN_PEERS_LIST && megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
+        if (peersOnCall.size() >= MIN_PEERS_LIST) {
+            if (!megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
+                megaChatApi.enableAudioLevelMonitor(true, chatId);
+            }
+        } else if (megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
             megaChatApi.enableAudioLevelMonitor(false, chatId);
         }
     }
