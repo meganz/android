@@ -166,6 +166,10 @@
         <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
     </style>
 
+    <style name="HomepageBottomTabLayout" parent="MyCustomTabLayout">
+        <item name="tabBackground">@color/transparent</item>
+    </style>
+
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/mail_my_account</item>

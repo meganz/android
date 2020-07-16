@@ -5889,9 +5889,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				if (navHostFragment == null) {
 					navHostFragment = NavHostFragment.create(R.navigation.homepage);
-				} else {
-					refreshFragment(tag);
 				}
+
 				fragmentManager.beginTransaction()
 						.replace(R.id.fragment_container, navHostFragment, tag)
 						.setPrimaryNavigationFragment(navHostFragment)

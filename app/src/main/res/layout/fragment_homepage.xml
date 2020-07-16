@@ -18,8 +18,10 @@
 
         <include layout="@layout/homepage_category" />
 
-        <include layout="@layout/homepage_banner" />
+        <include layout="@layout/homepage_banner"
+            android:id="@+id/banner"/>
     </LinearLayout>
 
-    <include layout="@layout/homepage_bottom_sheet" />
+    <include layout="@layout/homepage_bottom_sheet"
+        android:visibility="gone"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
