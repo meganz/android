@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import nz.mega.sdk.MegaApiJava;
@@ -39,8 +40,9 @@ public class ContactUtil {
     }
 
     public static String getContactNameDB(MegaContactDB contactDB) {
-        if(contactDB == null)
+        if (contactDB == null) {
             return null;
+        }
 
         String nicknameText = contactDB.getNickname();
         if (nicknameText != null) {
@@ -49,10 +51,9 @@ public class ContactUtil {
 
         String firstNameText = contactDB.getName();
         String lastNameText = contactDB.getLastName();
-
         String emailText = contactDB.getMail();
-        String nameResult = buildFullName(firstNameText, lastNameText, emailText);
-        return nameResult;
+
+        return buildFullName(firstNameText, lastNameText, emailText);
     }
 
     public static String getContactNameDB(long contactHandle) {
@@ -66,9 +67,35 @@ public class ContactUtil {
 
     public static String getNicknameContact(long contactHandle) {
         MegaContactDB contactDB = getContactDB(contactHandle);
-        if (contactDB == null) return null;
-        String nicknameText = contactDB.getNickname();
-        return nicknameText;
+        if (contactDB == null)
+            return null;
+
+        return contactDB.getNickname();
+    }
+
+    public static String getNicknameContact(String email) {
+        MegaContactDB contactDB = MegaApplication.getInstance().getDbH().findContactByEmail(email);
+        if (contactDB != null) {
+            return contactDB.getNickname();
+        }
+
+        return null;
+    }
+
+    /**
+     * Method for obtaining the nickname to be displayed in the notifications in the notifications section.
+     *
+     * @param context Context of Activity.
+     * @param email   The user email.
+     * @return The nickname.
+     */
+    public static String getNicknameForNotificationsSection(Context context, String email) {
+        String nickname = getNicknameContact(email);
+        if (nickname != null) {
+            return String.format(context.getString(R.string.section_notification_user_with_nickname), nickname, email);
+        }
+
+        return email;
     }
 
     public static String buildFullName(String name, String lastName, String mail) {
@@ -151,8 +178,20 @@ public class ContactUtil {
     }
 
     public static void notifyNicknameUpdate(Context context, long userHandle) {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_NICKNAME);
-        intent.putExtra(EXTRA_USER_HANDLE, userHandle);
+        notifyUserNameUpdate(context, ACTION_UPDATE_NICKNAME, userHandle);
+    }
+
+    public static void notifyFirstNameUpdate(Context context, long userHandle) {
+        notifyUserNameUpdate(context, ACTION_UPDATE_FIRST_NAME, userHandle);
+    }
+
+    public static void notifyLastNameUpdate(Context context, long userHandle) {
+        notifyUserNameUpdate(context, ACTION_UPDATE_LAST_NAME, userHandle);
+    }
+
+    public static void notifyUserNameUpdate(Context context, String action, long userHandle) {
+        Intent intent = new Intent(action)
+            .putExtra(EXTRA_USER_HANDLE, userHandle);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 

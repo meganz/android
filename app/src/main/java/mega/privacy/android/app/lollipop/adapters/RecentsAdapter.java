@@ -87,7 +87,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             params.setMargins(margin, margin, margin, 0);
 
             this.imageThumbnail.setLayoutParams(params);
-            this.imageThumbnail.setImageBitmap(image);
+            this.imageThumbnail.setImageBitmap(getRoundedBitmap(context, image, THUMB_ROUND_PIXEL));
         }
 
         public ImageView getImageThumbnail() {

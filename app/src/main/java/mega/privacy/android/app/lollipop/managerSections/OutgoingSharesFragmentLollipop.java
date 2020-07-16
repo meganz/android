@@ -31,8 +31,11 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	@Override
 	public void activateActionMode() {
-		super.activateActionMode();
-		actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
+		if (!adapter.isMultipleSelect()) {
+			super.activateActionMode();
+			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
+					new ActionBarCallBack());
+		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
@@ -354,5 +357,14 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		}
 
 		setFinalEmptyView(textToShow);
+	}
+
+	/**
+	 * Method to update an item when a nickname is added, updated or removed from a contact.
+	 *
+	 * @param contactHandle Contact ID.
+	 */
+	public void updateContact(long contactHandle) {
+		adapter.updateItem(contactHandle);
 	}
 }

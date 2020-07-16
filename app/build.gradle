@@ -8,16 +8,16 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 305
-        versionName "3.7.5 (305)"
+        versionCode 314
+        versionName "3.7.6 (314)"
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
     }
 
     sourceSets.main {
         java {
-            srcDirs += 'src/main/jni/mega/sdk/bindings/java/nz/mega/sdk'
-            srcDirs += 'src/main/jni/megachat/sdk/bindings/java/nz/mega/sdk'
+            srcDirs += 'src/main/jni/mega/sdk/bindings/java'
+            srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
             exclude '**/MegaApiSwing.java'
         }
         jni.srcDirs = [] //disable automatic ndk-build

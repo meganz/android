@@ -77,8 +77,9 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
-	public static final int ITEM_VIEW_TYPE_NORMAL = 0;
-	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
+	public static final int ITEM_VIEW_TYPE_NORMAL_SELECTED = 0;
+	public static final int ITEM_VIEW_TYPE_NORMAL_UNSELECTED = 1;
+	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 2;
 
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
@@ -196,7 +197,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		holder.itemView.setVisibility(View.VISIBLE);
 
-		if(itemType == ITEM_VIEW_TYPE_NORMAL) {
+		if(itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED || itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
 			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
 
@@ -210,28 +211,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(contactHandle);
 
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
-				if (!multipleSelect) {
-					//Multiselect OFF
-					((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 
+				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+				} else {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					setUserAvatar(holder, userHandleEncoded);
-				} else {
-					logDebug("Multiselect ON");
-
-					if(this.isItemChecked(position)){
-//					holder.imageButtonThreeDots.setVisibility(View.GONE);
-						((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-						((ViewHolderNormalChatList)holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-					}
-					else{
-						logDebug("NOT selected");
-						((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						setUserAvatar(holder, userHandleEncoded);
-					}
 				}
+
+				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.VISIBLE);
 
@@ -257,23 +246,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				}
 
-				if (!multipleSelect) {
-					//Multiselect OFF
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					createGroupChatAvatar(holder, chat.getTitle());
+				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
 				} else {
-					logDebug("Multiselect ON");
-
-					if(this.isItemChecked(position)){
-//					holder.imageButtonThreeDots.setVisibility(View.GONE);
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-						((ViewHolderNormalChatList)holder).imageView.setImageResource(R.drawable.ic_select_avatar);
-					}
-					else{
-						logDebug("NOT selected");
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						createGroupChatAvatar(holder, chat.getTitle());
-					}
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					createGroupChatAvatar(holder, getTitleChat(chat));
 				}
 			}
 
@@ -495,7 +473,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		dbH = DatabaseHandler.getDbHandler(context);
 		View v = null;
 
-		if(viewType == ITEM_VIEW_TYPE_NORMAL) {
+		if(viewType == ITEM_VIEW_TYPE_NORMAL_SELECTED || viewType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 			holder = new ViewHolderNormalChatList(v);
 			holder.itemLayout = v.findViewById(R.id.recent_chat_list_item_layout);
@@ -631,12 +609,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public int getItemViewType(int position) {
-
-		if(position>=chats.size()){
+		if (position >= chats.size()) {
 			return ITEM_VIEW_TYPE_ARCHIVED_CHATS;
-		}
-		else{
-			return ITEM_VIEW_TYPE_NORMAL;
+		} else if (multipleSelect && isItemChecked(position)) {
+			return ITEM_VIEW_TYPE_NORMAL_SELECTED;
+		} else {
+			return ITEM_VIEW_TYPE_NORMAL_UNSELECTED;
 		}
 	}
 
@@ -973,7 +951,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(holder!=null){
 
 			MegaChatListItem chat = chats.get(position);
-			String title = chat.getTitle();
+			String title = getTitleChat(chat);
 
 			if(title!=null){
 				logDebug("ChatRoom id: "+chat.getChatId());
