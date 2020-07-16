@@ -159,7 +159,6 @@ import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
-import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
@@ -1689,15 +1688,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
                 } else {
-					// TODO(px):
-                    //if(!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])){
-                    //    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-                    //    if(cuFL != null){
-                    //        cuFL.onStoragePermissionRefused();
-                    //    }
-                    //} else {
-                    //    showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
-                    //}
+                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])) {
+                        cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+								.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                        if (cuFragment != null) {
+							cuFragment.onStoragePermissionRefused();
+                        }
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
+                    }
                 }
 
                 break;
@@ -3378,17 +3377,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 sttFLol.enableCameraUpload();
             }
         } else if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
-			// TODO(px):
-            //cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-            //if (cuFL == null) {
-            //    return;
-            //}
-			//
-            //if (businessCUFirstTime) {
-            //    cuFL.cameraOnOffFirstTime();
-            //} else {
-            //    cuFL.cameraOnOff();
-            //}
+            cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+            if (cuFragment == null) {
+                return;
+            }
+
+            if (businessCUFirstTime) {
+				cuFragment.enableCuForBusinessFirstTime();
+            } else {
+				cuFragment.enableCuForBusiness();
+            }
         }
     }
 
@@ -3895,10 +3894,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									if(sttFLol != null  && sttFLol.isResumed()){
 										sttFLol.disableCameraUpload();
 									}
-									// TODO(px):
-									//if(cuFL != null && cuFL.isResumed()){
-									//	cuFL.resetSwitchButtonLabel();
-									//}
+									if (cuFragment != null && cuFragment.isResumed()) {
+										cuFragment.resetSwitchButtonLabel();
+									}
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_no), null);
@@ -6102,13 +6100,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 break;
             }
             case CAMERA_UPLOADS: {
-				// TODO(px):
-				//cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-                //if (cuFL != null) {
-                //    cuFL.checkScroll();
-                //}
+				cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                if (cuFragment != null) {
+					cuFragment.checkScroll();
+                }
                 break;
             }
+			case MEDIA_UPLOADS: {
+				muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+				if (muFragment != null) {
+					muFragment.checkScroll();
+				}
+				break;
+			}
             case INBOX: {
             	iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
                 if (iFLol != null) {
@@ -6158,14 +6164,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (getSearchFragment() != null) {
                     sFLol.checkScroll();
                 }
-                break;
-            }
-            case MEDIA_UPLOADS: {
-				// TODO(px):
-				//muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-                //if (muFLol != null) {
-                //    muFLol.checkScroll();
-                //}
                 break;
             }
             case CHAT: {
@@ -7187,17 +7185,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						break;
 
 					case MEDIA_UPLOADS:
-						// TODO(px):
-						//if (getMediaUploadFragment() != null) {
-						//	muFLol.selectAll();
-						//}
+						if (getMediaUploadFragment() != null) {
+							muFragment.selectAll();
+						}
 						break;
 
 					case CAMERA_UPLOADS:
-						// TODO(px):
-						//if (getCameraUploadFragment() != null) {
-						//	cuFL.selectAll();
-						//}
+						if (getCameraUploadFragment() != null) {
+							cuFragment.selectAll();
+						}
 						break;
 				}
 
@@ -7243,9 +7239,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        	}
 	        	else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 					logDebug("action_grid_list in MediaUploads");
-					if(!firstLogin) {
+					if (!firstLogin) {
 						gridSmallLargeMenuItem.setVisible(true);
-					}else{
+					} else {
 						gridSmallLargeMenuItem.setVisible(false);
 					}
 					searchMenuItem.setVisible(false);
@@ -7821,22 +7817,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     		}
     	}
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			// TODO(px):
-			//cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-			//if (cuFL != null && cuFL.onBackPressed() == 0){
-			//	visibilitySearch(false);
-			//	backToDrawerItem(-1);
-			//	return;
-			//}
+			cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+			if (cuFragment != null && cuFragment.onBackPressed() == 0){
+				visibilitySearch(false);
+				backToDrawerItem(-1);
+				return;
+			}
     	}
 		else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-			// TODO(px):
-			//muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-			//if (muFLol != null && muFLol.onBackPressed() == 0){
-			//	visibilitySearch(false);
-			//	backToDrawerItem(CLOUD_DRIVE_BNV);
-			//	return;
-    		//}
+			muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+			if (muFragment != null && muFragment.onBackPressed() == 0){
+				visibilitySearch(false);
+				backToDrawerItem(CLOUD_DRIVE_BNV);
+				return;
+    		}
     	}
 		else if (drawerItem == DrawerItem.SEARCH){
 			if (getSearchFragment() != null && sFLol.onBackPressed() == 0){

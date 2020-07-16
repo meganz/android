@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.managerSections.cu;
 
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Pair;
 import androidx.collection.LongSparseArray;
@@ -34,8 +35,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.MegaPreferences.MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.RxUtil.logErr;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
 
 class CuViewModel extends BaseRxViewModel {
@@ -75,12 +78,10 @@ class CuViewModel extends BaseRxViewModel {
 
     add(openNodeAction.throttleFirst(1, TimeUnit.SECONDS)
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(nodeToOpen::setValue,
-            throwable -> logError("openNodeAction onError", throwable)));
+        .subscribe(nodeToOpen::setValue, logErr("openNodeAction")));
 
     add(creatingThumbnailFinished.throttleFirst(1, TimeUnit.SECONDS)
-        .subscribe(ignored -> loadCuNodes(),
-            throwable -> logError("creatingThumbnailFinished onError", throwable)));
+        .subscribe(ignored -> loadCuNodes(), logErr("creatingThumbnailFinished")));
   }
 
   public LiveData<List<CuNode>> cuNodes() {
@@ -108,13 +109,12 @@ class CuViewModel extends BaseRxViewModel {
     loadCuNodes(orderBy);
   }
 
-  public void setType(int type, int orderBy) {
-    this.type = type;
-    loadCuNodes(orderBy);
-  }
-
   public boolean isSearchMode() {
     return searchDate != null;
+  }
+
+  public boolean isSelecting() {
+    return selecting;
   }
 
   /**
@@ -200,6 +200,43 @@ class CuViewModel extends BaseRxViewModel {
     }
   }
 
+  public void setCamSyncEnabled(boolean enabled) {
+    add(Single.just(enabled)
+        .observeOn(Schedulers.io())
+        .subscribe(dbHandler::setCamSyncEnabled, logErr("setCamSyncEnabled")));
+  }
+
+  public void enableCuForBusinessFirstTime(boolean enableCellularSync, boolean syncVideo) {
+    add(Single.just(0)
+        .observeOn(Schedulers.io())
+        .subscribe(ignored -> {
+          dbHandler.setCamSyncEnabled(true);
+          File localFile =
+              Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+          dbHandler.setCamSyncLocalPath(localFile.getAbsolutePath());
+          dbHandler.setCameraFolderExternalSDCard(false);
+          dbHandler.setCamSyncWifi(!enableCellularSync);
+          dbHandler.setCamSyncFileUpload(
+              syncVideo ? MegaPreferences.PHOTOS_AND_VIDEOS : MegaPreferences.ONLY_PHOTOS);
+
+          dbHandler.setCameraUploadVideoQuality(MEDIUM);
+          dbHandler.setConversionOnCharging(true);
+          dbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+        }, logErr("enableCuForBusinessFirstTime")));
+  }
+
+  public LiveData<Boolean> camSyncEnabled() {
+    MutableLiveData<Boolean> camSyncEnabled = new MutableLiveData<>();
+
+    add(Single.defer(
+        () -> Single.just(Boolean.parseBoolean(dbHandler.getPreferences().getCamSyncEnabled())))
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(camSyncEnabled::setValue, logErr("camSyncEnabled")));
+
+    return camSyncEnabled;
+  }
+
   private void loadCuNodes(int orderBy) {
     loadCuNodes(Single.defer(() -> Single.just(getCuNodes(orderBy))));
   }
@@ -228,7 +265,7 @@ class CuViewModel extends BaseRxViewModel {
           if (!TextUtils.isEmpty(actionBarTitleWhenSearch)) {
             actionBarTitle.setValue(actionBarTitleWhenSearch);
           }
-        }, throwable -> logError("loadCuNodes onError", throwable)));
+        }, logErr("loadCuNodes")));
   }
 
   private List<CuNode> getCuNodes(int orderBy) {
