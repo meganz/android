@@ -23,6 +23,7 @@ import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK;
 import static mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS;
 import static mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
@@ -98,6 +99,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 	}
 
 	public void managePasswordLinkRequest(MegaError e, String decryptedLink) {
+		logDebug("onRequestFinish");
 		if (progressBar != null) {
 			progressBar.setVisibility(View.GONE);
 		}
@@ -106,9 +108,11 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 			Intent intent = null;
 
 			if (matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
+				logDebug("Folder link url");
 				intent = new Intent(OpenPasswordLinkActivity.this, FolderLinkActivityLollipop.class);
 				intent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 			} else if (matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
+				logDebug("Open link url");
 				intent = new Intent(OpenPasswordLinkActivity.this, FileLinkActivityLollipop.class);
 				intent.setAction(ACTION_OPEN_MEGA_LINK);
 			}
@@ -120,6 +124,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop
 				finish();
 			}
 		} else {
+			logError("ERROR: " + e.getErrorCode());
 			askForPasswordDialog();
 		}
 	}
