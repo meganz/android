@@ -37,7 +37,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
+import static mega.privacy.android.app.utils.FileUtils.buildDefaultDownloadDir;
 import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.RxUtil.logErr;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
 
@@ -198,6 +200,32 @@ class CuViewModel extends BaseRxViewModel {
 
       cuNodes.setValue(nodes);
     }
+  }
+
+  public void setInitialPreferences() {
+    add(Single.just(true)
+        .subscribeOn(Schedulers.io())
+        .subscribe(ignored -> {
+          logDebug("setInitialPreferences");
+
+          dbHandler.setFirstTime(false);
+          dbHandler.setStorageAskAlways(true);
+          File defaultDownloadLocation = buildDefaultDownloadDir(getApplication());
+          defaultDownloadLocation.mkdirs();
+
+          dbHandler.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+          dbHandler.setPinLockEnabled(false);
+          dbHandler.setPinLockCode("");
+
+          ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
+          if (nodeLinks == null || nodeLinks.size() == 0) {
+            logDebug("No public links: showCopyright set true");
+            dbHandler.setShowCopyright(true);
+          } else {
+            logDebug("Already public links: showCopyright set false");
+            dbHandler.setShowCopyright(false);
+          }
+        }, logErr("setInitialPreferences")));
   }
 
   public void setCamSyncEnabled(boolean enabled) {

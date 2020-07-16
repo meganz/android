@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
@@ -270,7 +271,15 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
   @Nullable @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
+
+    CuViewModelFactory viewModelFactory =
+        new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context), type);
+    viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
+
     if (type == TYPE_CAMERA && ((ManagerActivityLollipop) context).getFirstLogin()) {
+      ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+      viewModel.setInitialPreferences();
+
       firstLoginBinding =
           FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
 
@@ -309,10 +318,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
   @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    CuViewModelFactory viewModelFactory =
-        new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context), type);
-    viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
-
     if (binding == null) {
       return;
     }
@@ -323,6 +328,13 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     binding.cuList.setHasFixedSize(true);
     GridLayoutManager layoutManager = new GridLayoutManager(context, spanCount);
     binding.cuList.setLayoutManager(layoutManager);
+    binding.cuList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+        super.onScrolled(recyclerView, dx, dy);
+        checkScroll();
+      }
+    });
 
     int gridMargin = smallGrid ? MARGIN_SMALL_GRID : MARGIN_LARGE_GRID;
     int gridWidth = outMetrics.widthPixels / spanCount - gridMargin * 2;
