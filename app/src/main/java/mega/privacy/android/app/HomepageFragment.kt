@@ -1,10 +1,12 @@
 package mega.privacy.android.app
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
@@ -16,6 +18,7 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
 class HomepageFragment : Fragment() {
+    private lateinit var behavior: HomepageBottomSheetBehavior<*>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -24,7 +27,7 @@ class HomepageFragment : Fragment() {
 //            findNavController().navigate(R.id.action_homepageFragment_to_homepageFragment2)
 //        }
 
-        val behavior = HomepageBottomSheetBehavior.from(view.findViewById<View>(R.id.design_bottom_sheet1))
+        behavior = HomepageBottomSheetBehavior.from(view.findViewById<View>(R.id.design_bottom_sheet1))
                 as HomepageBottomSheetBehavior<*>
 
         val searchInputView = view.findViewById<FloatingSearchView>(R.id.searchView)
@@ -43,6 +46,16 @@ class HomepageFragment : Fragment() {
                 behavior.invalidateScrollingChild((viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position))
             }
         })
+
+        view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val banner = view?.findViewById<View>(R.id.banner)
+                behavior.peekHeight = view!!.height - banner!!.bottom - 20
+                view.findViewById<View>(R.id.design_bottom_sheet1)?.visibility = View.VISIBLE
+            }
+        })
+
         return view
     }
 }
