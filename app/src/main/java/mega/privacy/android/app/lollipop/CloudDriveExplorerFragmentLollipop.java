@@ -747,6 +747,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
+		if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+			activateButton(false);
+		}
 	}
 
 	@Override
