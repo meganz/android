@@ -771,7 +771,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private TextView openLinkErrorText;
 	private Button openLinkOpenButton;
 
-	private boolean isBusinessGraceAlertShown = false;
+	private boolean isBusinessGraceAlertShown;
 	private AlertDialog businessGraceAlert;
 	private boolean isBusinessCUAlertShown;
 	private AlertDialog businessCUAlert;
@@ -3262,18 +3262,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		setContactStatus();
 
-        if (firstTimeAfterInstallation) {
-            //haven't verified phone number
-            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
-                askForSMSVerification();
-            } else {
-                askForAccess();
-            }
-        } else if (firstLogin && !newCreationAccount) {
-            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
-                askForSMSVerification();
-            }
-        }
+		checkInitialScreens();
 
 		if (openLinkDialogIsShown) {
 			showOpenLinkDialog();
@@ -3290,34 +3279,77 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showMKLayout();
 		}
 
-		checkBusinessStatus();
-
 		logDebug("END onCreate");
 	}
 
-    private void checkBusinessStatus() {
+	/**
+	 * Checks which screen should be shown when an user is logins.
+	 * There are three different screens or warnings:
+	 * - Business warning: it takes priority over the other two
+	 * - SMS verification screen: it takes priority over the other one
+	 * - Onboarding permissions screens: it has to be only shown when account is logged in after the installation,
+	 * 		some of the permissions required have not been granted
+	 * 		and the business warnings and SMS verification have not to be shown.
+	 */
+	private void checkInitialScreens() {
+    	if (checkBusinessStatus()) {
+			setBusinessAlertShown(true);
+			return;
+		}
+
+		if (firstTimeAfterInstallation) {
+			//haven't verified phone number
+			if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
+				askForSMSVerification();
+			} else {
+				askForAccess();
+			}
+		} else if (firstLogin && !newCreationAccount) {
+			if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+				askForSMSVerification();
+			}
+		}
+	}
+
+	/**
+	 * Updates the state of the flag indicating if there is a business alert shown.
+	 *
+	 * @param shown	true if there is any business alert shown, false otherwise.
+	 */
+	private void setBusinessAlertShown(boolean shown) {
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo != null) {
+			myAccountInfo.setBusinessAlertShown(shown);
+		}
+	}
+
+    private boolean checkBusinessStatus() {
         if (isBusinessGraceAlertShown) {
             showBusinessGraceAlert();
-            return;
+            return true;
         }
 
         if (isBusinessCUAlertShown) {
         	showBusinessCUAlert();
-        	return;
+        	return true;
 		}
 
-        MyAccountInfo myAccountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
 
         if (myAccountInfo != null && myAccountInfo.shouldShowBusinessAlert()) {
             int status = megaApi.getBusinessStatus();
             if (status == BUSINESS_STATUS_EXPIRED) {
                 myAccountInfo.setShouldShowBusinessAlert(false);
                 startActivity(new Intent(this, BusinessExpiredAlertActivity.class));
+                return true;
             } else if (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD) {
                 myAccountInfo.setShouldShowBusinessAlert(false);
                 showBusinessGraceAlert();
+                return true;
             }
         }
+
+        return false;
     }
 
     private void showBusinessGraceAlert() {
@@ -3332,17 +3364,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         builder.setView(v);
 
         Button dismissButton = v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            	isBusinessGraceAlertShown = false;
-                try {
-                    businessGraceAlert.dismiss();
-                } catch (Exception e) {
-                    logWarning("Exception dismissing businessGraceAlert", e);
-                }
-            }
-        });
+        dismissButton.setOnClickListener(view -> {
+			setBusinessAlertShown(isBusinessGraceAlertShown = false);
+			try {
+				businessGraceAlert.dismiss();
+			} catch (Exception e) {
+				logWarning("Exception dismissing businessGraceAlert", e);
+			}
+		});
 
         businessGraceAlert = builder.create();
         businessGraceAlert.setCanceledOnTouchOutside(false);
@@ -3375,7 +3404,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCU())
 				.setCancelable(false)
-				.setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
+				.setOnDismissListener(dialog -> setBusinessAlertShown(isBusinessCUAlertShown = false));
         businessCUAlert = builder.create();
         businessCUAlert.show();
         isBusinessCUAlertShown = true;
@@ -4742,6 +4771,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
+
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo != null && myAccountInfo.isBusinessAlertShown()) {
+			//The business alerts has priority over SMS verification
+			return;
+		}
+
         if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
             showSMSVerificationDialog();
         }
