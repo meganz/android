@@ -268,22 +268,24 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				return false;
 			}
 
-			clearSelections();
-
 			switch (item.getItemId()) {
 				case R.id.cab_menu_download:
+					clearSelections();
 					new NodeController(context)
 							.prepareForDownload(getDocumentHandles(documents), false);
 					break;
 				case R.id.cab_menu_copy:
+					clearSelections();
 					new NodeController(context)
 							.chooseLocationToCopyNodes(getDocumentHandles(documents));
 					break;
 				case R.id.cab_menu_move:
+					clearSelections();
 					new NodeController(context)
 							.chooseLocationToMoveNodes(getDocumentHandles(documents));
 					break;
 				case R.id.cab_menu_share_out:
+					clearSelections();
 					List<MegaNode> nodes = new ArrayList<>();
 					for (PhotoSyncHolder holder : documents) {
 						if (holder == null) {
@@ -299,6 +301,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				case R.id.cab_menu_share_link:
 				case R.id.cab_menu_edit_link:
 					logDebug("Public link option");
+					clearSelections();
 					if (documents.size() == 1
 							&& documents.get(0).handle != MegaApiJava.INVALID_HANDLE) {
 						((ManagerActivityLollipop) context)
@@ -307,6 +310,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					break;
 				case R.id.cab_menu_remove_link:
 					logDebug("Remove public link option");
+					clearSelections();
 					if (documents.size() == 1) {
 						MegaNode node = megaApi.getNodeByHandle(documents.get(0).handle);
 						if (node != null) {
@@ -317,10 +321,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					break;
 				case R.id.cab_menu_send_to_chat:
 					logDebug("Send files to chat");
+					clearSelections();
 					new NodeController(context).checkIfHandlesAreMineAndSelectChatsToSendNodes(
 							getDocumentHandles(documents));
 					break;
 				case R.id.cab_menu_trash:
+					clearSelections();
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(
 							getDocumentHandles(documents));
 					break;
@@ -328,6 +334,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					selectAll();
 					break;
 				case R.id.cab_menu_clear_selection:
+					clearSelections();
 					break;
 			}
 			return true;
@@ -435,7 +442,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
-			control.selectAll().setVisible(selected.size() != adapterList.getItemCount());
+			control.selectAll().setVisible(selected.size() != nodes.size());
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 

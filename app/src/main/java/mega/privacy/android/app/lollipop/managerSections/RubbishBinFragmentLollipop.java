@@ -217,9 +217,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaNode> documents = adapter.getSelectedNodes();
 
-			clearSelections();
-			hideMultipleSelect();
-
 			switch (item.getItemId()) {
 				case R.id.cab_menu_restore_from_rubbish:
 					if (documents.size() > 1) {
@@ -240,6 +237,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						logDebug("Restore single item");
 						((ManagerActivityLollipop) context).restoreFromRubbish(documents.get(0));
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				case R.id.cab_menu_delete:
 					ArrayList<Long> handleList = new ArrayList<Long>();
@@ -253,6 +252,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					selectAll();
 					break;
 				case R.id.cab_menu_clear_selection:
+					clearSelections();
+					hideMultipleSelect();
 					break;
 			}
 			return true;

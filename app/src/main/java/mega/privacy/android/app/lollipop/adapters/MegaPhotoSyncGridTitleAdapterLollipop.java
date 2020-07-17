@@ -161,27 +161,30 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 return false;
             }
 
-            clearSelections();
-
             switch (item.getItemId()) {
                 case R.id.cab_menu_download:
+                    clearSelections();
                     new NodeController(context)
                         .prepareForDownload(getDocumentHandles(documents), false);
                     break;
                 case R.id.cab_menu_copy:
+                    clearSelections();
                     new NodeController(context)
                         .chooseLocationToCopyNodes(getDocumentHandles(documents));
                     break;
                 case R.id.cab_menu_move:
+                    clearSelections();
                     new NodeController(context)
                         .chooseLocationToMoveNodes(getDocumentHandles(documents));
                     break;
                 case R.id.cab_menu_share_out:
+                    clearSelections();
                     MegaNodeUtil.shareNodes(context, documents);
                     break;
                 case R.id.cab_menu_share_link:
                 case R.id.cab_menu_edit_link:
                     logDebug("Public link option");
+                    clearSelections();
                     if (documents.size() == 1
                         && documents.get(0).getHandle() != MegaApiJava.INVALID_HANDLE) {
                         ((ManagerActivityLollipop) context)
@@ -190,6 +193,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     break;
                 case R.id.cab_menu_remove_link:
                     logDebug("Remove public link option");
+                    clearSelections();
                     if (documents.size() == 1) {
                         ((ManagerActivityLollipop) context)
                             .showConfirmationRemovePublicLink(documents.get(0));
@@ -197,10 +201,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     break;
                 case R.id.cab_menu_send_to_chat:
                     logDebug("Send files to chat");
+                    clearSelections();
                     new NodeController(context).checkIfNodesAreMineAndSelectChatsToSendNodes(
                         (ArrayList<MegaNode>) documents);
                     break;
                 case R.id.cab_menu_trash:
+                    clearSelections();
                     ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(
                         getDocumentHandles(documents));
                     break;
@@ -297,7 +303,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
-            control.selectAll().setVisible(selected.size() != getItemCount());
+            control.selectAll().setVisible(selected.size() != count - countTitles);
 
             CloudStorageOptionControlUtil.applyControl(menu, control);
 
