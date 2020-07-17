@@ -33,8 +33,11 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	@Override
 	public void activateActionMode() {
-		super.activateActionMode();
-		actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
+		if (!adapter.isMultipleSelect()) {
+			super.activateActionMode();
+			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
+					new ActionBarCallBack());
+		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
@@ -341,7 +344,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	 *
 	 * @param contactHandle Contact ID.
 	 */
-	public void updateNicknames(long contactHandle) {
+	public void updateContact(long contactHandle) {
 		adapter.updateItem(contactHandle);
 	}
 }

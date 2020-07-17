@@ -985,17 +985,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE);
 
-			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)) {
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
 				if (getContactsFragment() != null) {
 					cFLol.updateContact(userHandle);
 				}
 
-				if (getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0) {
-					inSFLol.updateNicknames(userHandle);
+				if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
+					inSFLol.updateContact(userHandle);
 				}
 
-				if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0) {
-					outSFLol.updateNicknames(userHandle);
+				if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
+					outSFLol.updateContact(userHandle);
 				}
 			} else if (intent.getAction().equals(ACTION_UPDATE_CREDENTIALS) && getContactsFragment() != null) {
 				cFLol.updateContact(userHandle);
@@ -1977,6 +1979,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (localBroadcastManager != null) {
 			IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 			contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 			contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
 			localBroadcastManager.registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
@@ -2374,9 +2378,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		getProText.setText(getProTextString);
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
-
-		accountInfoFrame = findViewById(R.id.navigation_drawer_account_view);
-        accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
         nVDisplayName.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
@@ -3484,7 +3485,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
-        if(!firstTimeAfterInstallation) {
+        // For Android devices which have Android below 6, no need to go to request permission fragment.
+        if(!firstTimeAfterInstallation || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             tB.setVisibility(View.VISIBLE);
             abL.setVisibility(View.VISIBLE);
 
@@ -6022,7 +6024,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					bottomNavigationCurrentItem = CHAT_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-				showFabButton();
 				break;
 			}
     	}
@@ -10253,13 +10254,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setPinDialog.show();
 	}
 
-	public void chooseAddContactDialog(boolean isMegaContact){
+	public void chooseAddContactDialog(boolean isMegaContact) {
 		logDebug("chooseAddContactDialog");
-		if(isMegaContact){
-			if(megaApi!=null && megaApi.getRootNode()!=null){
-				Intent in = new Intent(this, AddContactActivityLollipop.class);
-				in.putExtra("contactType", CONTACT_TYPE_MEGA);
-				startActivityForResult(in, REQUEST_CREATE_CHAT);
+		if (isMegaContact) {
+			if (megaApi != null && megaApi.getRootNode() != null) {
+				Intent intent = new Intent(this, AddContactActivityLollipop.class);
+				intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+				startActivityForResult(intent, REQUEST_CREATE_CHAT);
 			}
 			else{
 				logWarning("Online but not megaApi");
@@ -16467,7 +16468,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     }
 
-    private void showAddPhoneNumberInMenu(){
+    public void showAddPhoneNumberInMenu(){
 	    if(megaApi == null){
 	        return;
         }
