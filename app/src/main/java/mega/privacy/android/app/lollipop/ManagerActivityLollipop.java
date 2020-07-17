@@ -182,7 +182,7 @@ import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipo
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.cu.CameraUploadsFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;

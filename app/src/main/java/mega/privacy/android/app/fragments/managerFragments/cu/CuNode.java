@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections.cu;
+package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import java.io.File;
 import nz.mega.sdk.MegaNode;

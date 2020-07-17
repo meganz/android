@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections.cu;
+package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -50,7 +50,7 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CameraUploadsAdapter;
+import mega.privacy.android.app.adapters.CameraUploadsAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaNode;
 
@@ -450,7 +450,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     int icSelectedMargin = px2dp(smallGrid ? 3 : 7, outMetrics);
     int roundCornerRadius = px2dp(4, outMetrics);
     int selectedPadding = px2dp(1, outMetrics);
-    CameraUploadsAdapter.ItemSizeConfig itemSizeConfig = new CameraUploadsAdapter.ItemSizeConfig(
+    CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(
         smallGrid, gridWidth, gridMargin, icSelectedWidth, icSelectedMargin, roundCornerRadius,
         selectedPadding);
 
