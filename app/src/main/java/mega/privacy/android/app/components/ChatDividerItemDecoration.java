@@ -10,6 +10,8 @@ import android.view.View;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 
+import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter.*;
+
 public class ChatDividerItemDecoration extends RecyclerView.ItemDecoration {
     DisplayMetrics outMetrics;
     Context context;
@@ -38,7 +40,7 @@ public class ChatDividerItemDecoration extends RecyclerView.ItemDecoration {
             int position = parent.getChildAdapterPosition(child);
             int viewType = parent.getAdapter().getItemViewType(position);
 
-            if (viewType == MegaListChatLollipopAdapter.ITEM_VIEW_TYPE_NORMAL) {
+            if (viewType == ITEM_VIEW_TYPE_NORMAL_SELECTED || viewType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
                 RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 
                 int top = child.getBottom() + params.bottomMargin;
