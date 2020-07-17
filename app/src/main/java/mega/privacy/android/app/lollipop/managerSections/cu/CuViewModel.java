@@ -46,6 +46,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFold
 class CuViewModel extends BaseRxViewModel {
   private final MegaApiAndroid megaApi;
   private final DatabaseHandler dbHandler;
+  private final int type;
 
   private final MutableLiveData<List<CuNode>> cuNodes = new MutableLiveData<>();
   private final MutableLiveData<Pair<Integer, CuNode>> nodeToOpen = new MutableLiveData<>();
@@ -68,8 +69,6 @@ class CuViewModel extends BaseRxViewModel {
   private final LongSparseArray<MegaNode> selectedNodes = new LongSparseArray<>(5);
 
   private long[] searchDate;
-
-  private int type;
 
   public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, int type) {
     this.megaApi = megaApi;
@@ -102,8 +101,8 @@ class CuViewModel extends BaseRxViewModel {
     return actionBarTitle;
   }
 
-  public void setOrderBy(int orderBy) {
-    loadCuNodes(orderBy);
+  public void loadCuNodes(int orderBy) {
+    loadCuNodes(Single.defer(() -> Single.just(getCuNodes(orderBy))));
   }
 
   public void setSearchDate(long[] searchDate, int orderBy) {
@@ -113,6 +112,26 @@ class CuViewModel extends BaseRxViewModel {
 
   public boolean isSearchMode() {
     return searchDate != null;
+  }
+
+  public long[] getSearchResultNodeHandles() {
+    List<CuNode> nodes = cuNodes.getValue();
+    if (!isSearchMode() || nodes == null || nodes.isEmpty()) {
+      return new long[0];
+    }
+
+    List<Long> handleList = new ArrayList<>();
+    for (CuNode node : nodes) {
+      if (node.getNode() != null) {
+        handleList.add(node.getNode().getHandle());
+      }
+    }
+
+    long[] handles = new long[handleList.size()];
+    for (int i = 0, n = handleList.size(); i < n; i++) {
+      handles[i] = handleList.get(i);
+    }
+    return handles;
   }
 
   public boolean isSelecting() {
@@ -133,6 +152,7 @@ class CuViewModel extends BaseRxViewModel {
     if (selecting) {
       List<CuNode> nodes = cuNodes.getValue();
       if (nodes == null || position < 0 || position >= nodes.size()
+          || nodes.get(position).getNode() == null
           || nodes.get(position).getNode().getHandle() != node.getNode().getHandle()) {
         return;
       }
@@ -176,8 +196,10 @@ class CuViewModel extends BaseRxViewModel {
       }
 
       for (CuNode node : nodes) {
-        node.setSelected(true);
-        selectedNodes.put(node.getNode().getHandle(), node.getNode());
+        if (node.getNode() != null) {
+          node.setSelected(true);
+          selectedNodes.put(node.getNode().getHandle(), node.getNode());
+        }
       }
 
       cuNodes.setValue(nodes);
@@ -265,10 +287,6 @@ class CuViewModel extends BaseRxViewModel {
     return camSyncEnabled;
   }
 
-  private void loadCuNodes(int orderBy) {
-    loadCuNodes(Single.defer(() -> Single.just(getCuNodes(orderBy))));
-  }
-
   private void loadCuNodes() {
     loadCuNodes(Single.defer(() -> {
       int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
@@ -301,6 +319,7 @@ class CuViewModel extends BaseRxViewModel {
     List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
 
     LocalDate lastModifyDate = null;
+    int index = 0;
     for (MegaNode node : filterNodesByDate(getCuChildren(orderBy), searchDate)) {
       File thumbnail = new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
       LocalDate modifyDate = fromEpoch(node.getModificationTime());
@@ -309,12 +328,13 @@ class CuViewModel extends BaseRxViewModel {
       if (lastModifyDate == null
           || !YearMonth.from(lastModifyDate).equals(YearMonth.from(modifyDate))) {
         lastModifyDate = modifyDate;
-        nodes.add(new CuNode(null, null, CuNode.TYPE_TITLE, dateString, false));
+        nodes.add(new CuNode(null, -1, null, CuNode.TYPE_TITLE, dateString, false));
       }
 
-      nodes.add(new CuNode(node, thumbnail.exists() ? thumbnail : null,
+      nodes.add(new CuNode(node, index, thumbnail.exists() ? thumbnail : null,
           isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE, dateString,
           selectedNodes.containsKey(node.getHandle())));
+      index++;
 
       if (!thumbnail.exists()) {
         nodesWithoutThumbnail.add(node);

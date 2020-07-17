@@ -9,14 +9,17 @@ public class CuNode {
   public static final int TYPE_VIDEO = 3;
 
   private final MegaNode node;
+  private final int index;
   private final File thumbnail;
   private final int type;
   private final String modifyDate;
 
   private boolean selected;
 
-  public CuNode(MegaNode node, File thumbnail, int type, String modifyDate, boolean selected) {
+  public CuNode(MegaNode node, int index, File thumbnail, int type, String modifyDate,
+      boolean selected) {
     this.node = node;
+    this.index = index;
     this.thumbnail = thumbnail;
     this.type = type;
     this.modifyDate = modifyDate;
@@ -25,6 +28,10 @@ public class CuNode {
 
   public MegaNode getNode() {
     return node;
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   public File getThumbnail() {

@@ -118,7 +118,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
-import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -126,6 +125,7 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.cu.CameraUploadsFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1562,9 +1562,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-            if (CameraUploadFragmentLollipop.imageDrag != null){
-                CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
+            CameraUploadsFragment.setDraggingThumbnailVisibility(visibility);
         }
         else if (adapterType == OFFLINE_ADAPTER) {
             if (OfflineFragmentLollipop.imageDrag != null){
@@ -1623,10 +1621,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-            if (CameraUploadFragmentLollipop.imageDrag != null) {
-                CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
+        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
+            CameraUploadsFragment.getDraggingThumbnailLocationOnScreen(location);
         }
         else if (adapterType == OFFLINE_ADAPTER){
             if (OfflineFragmentLollipop.imageDrag != null){

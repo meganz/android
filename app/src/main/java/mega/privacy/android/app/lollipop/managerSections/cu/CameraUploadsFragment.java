@@ -1,9 +1,15 @@
 package mega.privacy.android.app.lollipop.managerSections.cu;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -20,35 +26,56 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.CameraUploadsAdapter;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.utils.CameraUploadUtil.resetCUTimestampsAndCache;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
+import static mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
+import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.FileUtils.findVideoLocalPath;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.Util.checkFingerprint;
 import static mega.privacy.android.app.utils.Util.px2dp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 
@@ -63,6 +90,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
   private static final int MARGIN_LARGE_GRID = 6;
   private static final int MARGIN_SMALL_GRID = 3;
 
+  @SuppressLint("StaticFieldLeak") private static CameraUploadsFragment sInstanceForDragging;
+
   private int type = TYPE_CAMERA;
 
   private FragmentCameraUploadsFirstLoginBinding firstLoginBinding;
@@ -70,6 +99,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
   private CameraUploadsAdapter adapter;
 
   private CuViewModel viewModel;
+  private long draggingNodeHandle = -1;
 
   public static CameraUploadsFragment newInstance(int type) {
     CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -81,12 +111,43 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     return fragment;
   }
 
+  /**
+   * Get the location on screen of the dragging node thumbnail.
+   *
+   * TODO: we need figure out a better way to implement the drag feature, this kind of static hack
+   * should be avoided.
+   *
+   * @param location out param for location
+   */
+  public static void getDraggingThumbnailLocationOnScreen(int[] location) {
+    CameraUploadsFragment fragment = sInstanceForDragging;
+    if (fragment == null) {
+      return;
+    }
+    int position = fragment.adapter.getNodePosition(fragment.draggingNodeHandle);
+    RecyclerView.ViewHolder viewHolder =
+        fragment.binding.cuList.findViewHolderForLayoutPosition(position);
+    if (viewHolder == null) {
+      return;
+    }
+    int[] res = fragment.adapter.getThumbnailLocationOnScreen(viewHolder);
+    System.arraycopy(res, 0, location, 0, 2);
+  }
+
+  public static void setDraggingThumbnailVisibility(int visibility) {
+    CameraUploadsFragment fragment = sInstanceForDragging;
+    if (fragment == null) {
+      return;
+    }
+    fragment.setDraggingThumbnailVisibility(fragment.draggingNodeHandle, visibility);
+  }
+
   public int getItemCount() {
     return adapter.getItemCount();
   }
 
   public void setOrderBy(int orderBy) {
-    viewModel.setOrderBy(orderBy);
+    reloadNodes(orderBy);
   }
 
   public void setSearchDate(long[] searchDate, int orderBy) {
@@ -94,7 +155,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
   }
 
   public void reloadNodes(int orderBy) {
-    setOrderBy(orderBy);
+    viewModel.loadCuNodes(orderBy);
   }
 
   public void checkScroll() {
@@ -130,6 +191,52 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
   public void onStoragePermissionRefused() {
     showSnackbar(context, getString(R.string.on_refuse_storage_permission));
     toCloudDrive();
+  }
+
+  public void scrollToNode(long handle) {
+    logDebug("scrollToNode, handle " + handle);
+    if (binding != null) {
+      int position = adapter.getNodePosition(handle);
+      logDebug("scrollToNode, handle " + handle + ", position " + position);
+      if (position != -1) {
+        binding.cuList.scrollToPosition(position);
+        notifyThumbnailLocationOnScreen();
+      }
+    }
+  }
+
+  public void hideDraggingThumbnail(long handle) {
+    logDebug("hideDraggingThumbnail: " + handle);
+
+    if (viewModel != null) {
+      setDraggingThumbnailVisibility(draggingNodeHandle, View.VISIBLE);
+      setDraggingThumbnailVisibility(handle, View.GONE);
+      draggingNodeHandle = handle;
+      notifyThumbnailLocationOnScreen();
+    }
+  }
+
+  private void setDraggingThumbnailVisibility(long handle, int visibility) {
+    int position = adapter.getNodePosition(handle);
+    RecyclerView.ViewHolder viewHolder = binding.cuList.findViewHolderForLayoutPosition(position);
+    if (viewHolder == null) {
+      return;
+    }
+    adapter.setThumbnailVisibility(viewHolder, visibility);
+  }
+
+  private void notifyThumbnailLocationOnScreen() {
+    int position = adapter.getNodePosition(draggingNodeHandle);
+    RecyclerView.ViewHolder viewHolder = binding.cuList.findViewHolderForLayoutPosition(position);
+    if (viewHolder == null) {
+      return;
+    }
+    int[] res = adapter.getThumbnailLocationOnScreen(viewHolder);
+    res[0] += res[2] / 2;
+    res[1] += res[3] / 2;
+    Intent intent =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+    intent.putExtra("screenPosition", res);
+    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
   }
 
   private void toCloudDrive() {
@@ -322,7 +429,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
       return;
     }
 
-    boolean smallGrid = ((ManagerActivityLollipop) requireActivity()).isSmallGridCameraUploads;
+    boolean smallGrid = ((ManagerActivityLollipop) context).isSmallGridCameraUploads;
     int spanCount = smallGrid ? SPAN_SMALL_GRID : SPAN_LARGE_GRID;
 
     binding.cuList.setHasFixedSize(true);
@@ -367,7 +474,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
           nodes.size() >= (smallGrid ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
       binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
       adapter.setNodes(nodes);
-      ((ManagerActivityLollipop) requireActivity()).updateCuFragmentOptionsMenu();
+      ((ManagerActivityLollipop) context).updateCuFragmentOptionsMenu();
 
       binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
       if (nodes.isEmpty()) {
@@ -410,7 +517,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     });
 
     viewModel.actionBarTitle().observe(getViewLifecycleOwner(), title -> {
-      ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+      ActionBar actionBar = ((AppCompatActivity) context).getSupportActionBar();
       if (actionBar != null && viewModel.isSearchMode()) {
         actionBar.setTitle(title);
       }
@@ -467,7 +574,136 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
   }
 
+  @Override public void onResume() {
+    super.onResume();
+
+    reloadNodes(((ManagerActivityLollipop) context).orderCamera);
+    sInstanceForDragging = null;
+  }
+
   private void openNode(int position, CuNode cuNode) {
+    if (position < 0 || position >= adapter.getItemCount()) {
+      return;
+    }
+
+    int[] thumbnailLocation = adapter.getThumbnailLocationOnScreen(
+        binding.cuList.findViewHolderForLayoutPosition(position));
+    if (thumbnailLocation == null) {
+      return;
+    }
+
+    MegaNode node = cuNode.getNode();
+    if (node == null) {
+      return;
+    }
+
+    if (MimeTypeThumbnail.typeForName(node.getName()).isImage()) {
+      Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+      putExtras(intent, cuNode.getIndex(), node, thumbnailLocation);
+      launchNodeViewer(intent, node.getHandle());
+    } else if (MimeTypeThumbnail.typeForName(node.getName()).isVideoReproducible()) {
+      String mimeType = MimeTypeThumbnail.typeForName(node.getName()).getType();
+
+      Intent mediaIntent;
+      boolean internalIntent;
+      if (MimeTypeThumbnail.typeForName(node.getName()).isVideoNotSupported()) {
+        mediaIntent = new Intent(Intent.ACTION_VIEW);
+        internalIntent = false;
+      } else {
+        internalIntent = true;
+        mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+      }
+
+      putExtras(mediaIntent, cuNode.getIndex(), node, thumbnailLocation);
+
+      mediaIntent.putExtra("HANDLE", node.getHandle());
+      mediaIntent.putExtra("FILENAME", node.getName());
+
+      String localPath = null;
+      try {
+        localPath = findVideoLocalPath(context, node);
+      } catch (Exception e) {
+        logWarning(e.getMessage());
+      }
+      if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
+        File mediaFile = new File(localPath);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(
+            Environment.getExternalStorageDirectory().getPath())) {
+          mediaIntent.setDataAndType(FileProvider.getUriForFile(context,
+              "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList
+              .typeForName(node.getName()).getType());
+        } else {
+          mediaIntent.setDataAndType(Uri.fromFile(mediaFile),
+              MimeTypeThumbnail.typeForName(node.getName()).getType());
+        }
+        mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      } else {
+        if (megaApi.httpServerIsRunning() == 0) {
+          megaApi.httpServerStart();
+        }
+
+        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+        ActivityManager activityManager
+            = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (activityManager != null) {
+          activityManager.getMemoryInfo(mi);
+        }
+
+        if (mi.totalMem > BUFFER_COMP) {
+          megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
+        } else {
+          megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+        }
+
+        String url = megaApi.httpServerGetLocalLink(node);
+        mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+      }
+      if (internalIntent) {
+        launchNodeViewer(mediaIntent, node.getHandle());
+      } else {
+        if (isIntentAvailable(context, mediaIntent)) {
+          launchNodeViewer(mediaIntent, node.getHandle());
+        } else {
+          ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE,
+              getString(R.string.intent_not_available), -1);
+        }
+      }
+    } else {
+      ArrayList<Long> handleList = new ArrayList<>();
+      handleList.add(node.getHandle());
+      NodeController nC = new NodeController(context);
+      nC.prepareForDownload(handleList, true);
+    }
+  }
+
+  private void putExtras(Intent intent, int index, MegaNode node, int[] thumbnailLocation) {
+    intent.putExtra("position", index);
+    intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCamera);
+
+    MegaNode parentNode = megaApi.getParentNode(node);
+    if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {
+      intent.putExtra("parentNodeHandle", -1);
+    } else {
+      intent.putExtra("parentNodeHandle", parentNode.getHandle());
+    }
+
+    if (viewModel.isSearchMode()) {
+      intent.putExtra("adapterType", SEARCH_BY_ADAPTER);
+      intent.putExtra("handlesNodesSearch", viewModel.getSearchResultNodeHandles());
+    } else {
+      intent.putExtra("adapterType", PHOTO_SYNC_ADAPTER);
+    }
+
+    logDebug("openNode screenPosition " + Arrays.toString(thumbnailLocation));
+    intent.putExtra("screenPosition", thumbnailLocation);
+  }
+
+  private void launchNodeViewer(Intent intent, long handle) {
+    context.startActivity(intent);
+    requireActivity().overridePendingTransition(0, 0);
+    sInstanceForDragging = this;
+    draggingNodeHandle = handle;
   }
 
   @Override

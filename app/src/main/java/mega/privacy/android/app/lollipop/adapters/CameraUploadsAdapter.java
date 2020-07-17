@@ -20,6 +20,7 @@ import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding;
 import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding;
 import mega.privacy.android.app.lollipop.managerSections.cu.CuNode;
+import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
 
@@ -86,8 +87,48 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CameraUploadsAdap
     }
   }
 
+  public int[] getThumbnailLocationOnScreen(RecyclerView.ViewHolder holder) {
+    View thumbnail = null;
+    if (holder instanceof CuImageViewHolder) {
+      thumbnail = ((CuImageViewHolder) holder).binding.thumbnail;
+    } else if (holder instanceof CuVideoViewHolder) {
+      thumbnail = ((CuVideoViewHolder) holder).binding.thumbnail;
+    }
+
+    if (thumbnail == null) {
+      return null;
+    }
+
+    int[] topLeft = new int[2];
+    thumbnail.getLocationOnScreen(topLeft);
+
+    return new int[] {
+        topLeft[0], topLeft[1], thumbnail.getWidth(), thumbnail.getHeight()
+    };
+  }
+
+  public void setThumbnailVisibility(RecyclerView.ViewHolder holder, int visibility) {
+    if (holder instanceof CuImageViewHolder) {
+      ((CuImageViewHolder) holder).binding.thumbnail.setVisibility(visibility);
+    } else if (holder instanceof CuVideoViewHolder) {
+      ((CuVideoViewHolder) holder).binding.thumbnail.setVisibility(visibility);
+    }
+  }
+
+  public int getNodePosition(long handle) {
+    for (int i = 0, n = nodes.size(); i < n; i++) {
+      MegaNode node = nodes.get(i).getNode();
+      if (node != null && node.getHandle() == handle) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
   public void showSelectionAnimation(int position, CuNode node, RecyclerView.ViewHolder holder) {
     if (holder == null || position < 0 || position >= nodes.size()
+        || nodes.get(position).getNode() == null
         || nodes.get(position).getNode().getHandle() != node.getNode().getHandle()) {
       return;
     }
@@ -167,7 +208,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CameraUploadsAdap
     }
 
     void bind(int position, CuNode node, Listener listener) {
-      if (handleClick()) {
+      if (handleClick() && node.getNode() != null) {
         itemView.setOnClickListener(v -> listener.onNodeClicked(position, node));
         itemView.setOnLongClickListener(v -> {
           listener.onNodeLongClicked(position, node);
@@ -279,7 +320,11 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CameraUploadsAdap
         binding.videoDuration.setVisibility(View.GONE);
       } else {
         binding.videoDuration.setVisibility(View.VISIBLE);
-        binding.videoDuration.setText(getVideoDuration(node.getNode().getDuration()));
+        if (node.getNode() != null) {
+          binding.videoDuration.setText(getVideoDuration(node.getNode().getDuration()));
+        } else {
+          binding.videoDuration.setVisibility(View.GONE);
+        }
       }
       binding.videoInfo.setBackgroundResource(
           node.isSelected() ? R.drawable.gradient_cam_uploads_rounded
