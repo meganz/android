@@ -58,7 +58,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 menu.findItem(R.id.cab_menu_send_to_chat)
                     .setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
                         R.color.white));
-                control.sendToChat().setVisible(true)
+                control.sendToChat().setVisible(selected.get(0).isFile())
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
                 control.removeLink().setVisible(true);
@@ -76,6 +76,10 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
             control.shareOut().setVisible(true)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
 
             boolean showTrash = true;
             for (MegaNode node : selected) {

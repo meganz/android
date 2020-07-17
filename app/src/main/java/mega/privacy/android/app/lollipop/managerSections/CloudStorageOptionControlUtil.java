@@ -146,7 +146,7 @@ public class CloudStorageOptionControlUtil {
     public int alwaysActionCount() {
       int count = 0;
       for (Option option : options) {
-        if (option.showAsAction == MenuItem.SHOW_AS_ACTION_ALWAYS) {
+        if (option.visible && option.showAsAction == MenuItem.SHOW_AS_ACTION_ALWAYS) {
           count++;
         }
       }
