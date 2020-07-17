@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -234,7 +235,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     int[] res = adapter.getThumbnailLocationOnScreen(viewHolder);
     res[0] += res[2] / 2;
     res[1] += res[3] / 2;
-    Intent intent =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+    Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
     intent.putExtra("screenPosition", res);
     LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
   }
@@ -547,9 +548,19 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
       }
     });
 
-    viewModel.camSyncEnabled()
-        .observe(getViewLifecycleOwner(),
-            enabled -> binding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE));
+    viewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
+      binding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
+      if (!enabled) {
+        FrameLayout.LayoutParams params =
+            (FrameLayout.LayoutParams) binding.cuList.getLayoutParams();
+        params.bottomMargin = px2dp(48, outMetrics);
+        binding.cuList.setLayoutParams(params);
+
+        params = (FrameLayout.LayoutParams) binding.scroller.getLayoutParams();
+        params.bottomMargin = px2dp(48, outMetrics);
+        binding.scroller.setLayoutParams(params);
+      }
+    });
   }
 
   @Override

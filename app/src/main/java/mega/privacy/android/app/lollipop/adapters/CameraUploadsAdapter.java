@@ -1,17 +1,21 @@
 package mega.privacy.android.app.lollipop.adapters;
 
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.facebook.drawee.generic.RoundingParams;
-import com.facebook.drawee.view.SimpleDraweeView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import java.util.ArrayList;
 import java.util.List;
 import mega.privacy.android.app.R;
@@ -244,17 +248,24 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CameraUploadsAdap
       icSelected.setLayoutParams(icSelectedParams);
     }
 
-    static void updateThumbnailDisplay(SimpleDraweeView thumbnail, CuNode node,
+    static void updateThumbnailDisplay(ImageView thumbnail, CuNode node,
         ItemSizeConfig itemSizeConfig) {
+      RequestBuilder<Drawable> requestBuilder;
       if (node.getThumbnail() != null) {
-        thumbnail.setImageURI(Uri.fromFile(node.getThumbnail()));
+        requestBuilder = Glide.with(thumbnail).load(node.getThumbnail())
+            .placeholder(R.drawable.ic_image_thumbnail);
       } else {
-        thumbnail.setImageResource(R.drawable.ic_image_thumbnail);
+        requestBuilder = Glide.with(thumbnail).load(R.drawable.ic_image_thumbnail);
       }
-
-      thumbnail.getHierarchy()
-          .setRoundingParams(RoundingParams.fromCornersRadius(
-              node.isSelected() ? itemSizeConfig.roundCornerRadius : 0));
+      if (node.isSelected()) {
+        requestBuilder = requestBuilder
+            .transform(new CenterCrop(), new RoundedCorners(itemSizeConfig.roundCornerRadius));
+      } else {
+        requestBuilder = requestBuilder.transform(new CenterCrop());
+      }
+      requestBuilder
+          .transition(DrawableTransitionOptions.withCrossFade())
+          .into(thumbnail);
 
       int padding = node.isSelected() ? itemSizeConfig.selectedPadding : 0;
       thumbnail.setPadding(padding, padding, padding, padding);
