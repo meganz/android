@@ -16,13 +16,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static android.view.MenuItem.*;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -86,16 +86,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			control.copy().setVisible(true);
 
-			boolean showTrash = true;
-			for (MegaNode node : selected) {
-				if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode()
-						!= MegaError.API_OK) {
-					showTrash = false;
-					break;
-				}
-			}
-			control.trash().setVisible(showTrash);
-
+			control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
 			control.selectAll().setVisible(notAllNodesSelected());
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);

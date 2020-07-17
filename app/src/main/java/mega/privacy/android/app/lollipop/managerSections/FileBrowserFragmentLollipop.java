@@ -59,6 +59,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -178,6 +179,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList, false);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_rename:{

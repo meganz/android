@@ -30,6 +30,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
@@ -536,5 +537,22 @@ public class MegaNodeUtil {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
         MegaNode node =  megaApi.getNodeByHandle(handle);
         return node == null || megaApi.isInRubbish(node);
+    }
+
+    /**
+     * Check if all nodes can be moved to rubbish bin.
+     *
+     * @param nodes nodes to check
+     * @return whether all nodes can be moved to rubbish bin
+     */
+    public static boolean canMoveToRubbish(List<MegaNode> nodes) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        for (MegaNode node : nodes) {
+            if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode()
+                != MegaError.API_OK) {
+                return false;
+            }
+        }
+        return true;
     }
 }

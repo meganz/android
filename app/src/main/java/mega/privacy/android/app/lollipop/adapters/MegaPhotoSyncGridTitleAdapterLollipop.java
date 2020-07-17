@@ -55,9 +55,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -226,10 +227,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.cloud_storage_action, menu);
             ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-            final Window window = ((ManagerActivityLollipop) context).getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+            Util.changeStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow(),
+                ContextCompat.getColor(context, R.color.accentColorDark));
             ((ManagerActivityLollipop) context).setDrawerLockMode(true);
             ((CameraUploadFragmentLollipop) fragment).checkScroll();
             return true;
@@ -287,15 +286,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             control.shareOut().setVisible(true)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-            boolean showTrash = true;
-            for (MegaNode node : selected) {
-                if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode()
-                    != MegaError.API_OK) {
-                    showTrash = false;
-                    break;
-                }
-            }
-            control.trash().setVisible(showTrash);
+            control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
 
             control.move().setVisible(true);
             control.copy().setVisible(true);

@@ -76,7 +76,9 @@ import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -372,10 +374,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					adapterList.setMultipleSelect(false);
 				}
 			}
-			final Window window = ((ManagerActivityLollipop) context).getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			handler.postDelayed(() -> window.setStatusBarColor(0), 350);
+			Util.changeStatusBarColorActionMode(context,
+					((ManagerActivityLollipop) context).getWindow(), handler, 2);
 			checkScroll();
 			((ManagerActivityLollipop) context).setDrawerLockMode(false);
 		}

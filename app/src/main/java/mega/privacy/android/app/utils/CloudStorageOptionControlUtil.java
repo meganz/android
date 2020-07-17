@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections;
+package mega.privacy.android.app.utils;
 
 import android.view.Menu;
 import android.view.MenuItem;
