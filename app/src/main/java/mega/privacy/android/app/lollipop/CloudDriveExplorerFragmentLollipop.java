@@ -349,12 +349,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
 
 				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
-
-				if (parent != null && parent.getHandle() == parentHandle) {
-					activateButton(false);
-				} else {
-					activateButton(true);
-				}
+				activateButton(parent == null || parent.getHandle() != parentHandle);
 
 				nodeHandleMoveCopy = ((FileExplorerActivityLollipop) context).getNodeHandleMoveCopy();
 				setDisableNodes(nodeHandleMoveCopy);
@@ -365,12 +360,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 
 				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
-
-				if (parent != null && parent.getHandle() == parentHandle) {
-					activateButton(false);
-				} else {
-					activateButton(true);
-				}
+				activateButton(parent == null || parent.getHandle() != parentHandle);
 				break;
 			}
 
@@ -824,11 +814,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
 		} else {
 			optionButton.setEnabled(show);
-			if (show) {
-				optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-			} else {
-				optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
-			}
+			optionButton.setTextColor(ContextCompat.getColor(context, show ? R.color.accentColor : R.color.invite_button_deactivated));
 		}
 	}
 
