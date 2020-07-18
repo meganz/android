@@ -4,8 +4,8 @@
     android:id="@+id/design_bottom_sheet1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_cardview_white_top"
     android:orientation="vertical"
+    android:background="#FFFFFF"
     app:layout_behavior="@string/homepage_bottom_sheet_behavior">
 
     <!--    <LinearLayout-->
@@ -37,3 +37,5 @@
     <!--app:layout_behavior="@string/bottom_sheet_behavior">-->
 
     <!--</androidx.core.widget.NestedScrollView>-->
+
+    <!--    android:background="@drawable/bg_cardview_white_top"-->

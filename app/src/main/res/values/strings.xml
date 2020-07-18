@@ -2799,4 +2799,9 @@
 
     <string name="search_hint">Search in MEGA</string>
     <string name="homepage_bottom_sheet_behavior">mega.privacy.android.app.HomepageBottomSheetBehavior</string>
+
+    <string name="category_photo">Photo</string>
+    <string name="category_documents">Document</string>
+    <string name="category_audio">Audio</string>
+    <string name="category_video">Video</string>
 </resources>
