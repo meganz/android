@@ -22,8 +22,16 @@
             android:id="@+id/banner"/>
     </LinearLayout>
 
-    <include layout="@layout/homepage_bottom_sheet"
-        android:visibility="gone"/>
+    <include layout="@layout/homepage_bottom_sheet"/>
+
+    <View
+        android:id="@+id/view_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/textGrey"
+        android:alpha="0.7"
+        android:visibility="gone"
+        android:clickable="true"/>
 
     <include layout="@layout/homepage_fabs"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
