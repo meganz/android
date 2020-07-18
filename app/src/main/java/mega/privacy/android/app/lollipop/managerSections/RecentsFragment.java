@@ -188,9 +188,29 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             }
         });
 
+        BucketSaved bucketSaved = ((ManagerActivityLollipop) context).getBucketSaved();
+        fillRecentItems(bucketSaved, buckets);
+
+        if (bucketSaved == null || getBucketSelected() == null) {
+            ((ManagerActivityLollipop) context).setDeepBrowserTreeRecents(0);
+        } else if (getBucketSelected() != null) {
+            openMultipleBucket(getBucketSelected());
+        }
+
+        adapter = new RecentsAdapter(context, this, recentsItems);
+        listView.setAdapter(adapter);
+        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
+        setVisibleContacts();
+        setRecentsView();
+
+        return v;
+    }
+
+    public void fillRecentItems(BucketSaved bucketSaved,ArrayList<MegaRecentActionBucket> buckets) {
+        recentsItems.clear();
+        this.buckets = buckets;
         String previousDate = "";
         String currentDate;
-        BucketSaved bucketSaved = ((ManagerActivityLollipop) context).getBucketSaved();
         for (int i = 0; i < buckets.size(); i++) {
             if (bucketSaved != null && bucketSaved.isTheSameBucket(buckets.get(i))) {
                 setBucketSelected(buckets.get(i));
@@ -208,20 +228,13 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             }
             recentsItems.add(item);
         }
+    }
 
-        if (bucketSaved == null || getBucketSelected() == null) {
-            ((ManagerActivityLollipop) context).setDeepBrowserTreeRecents(0);
-        } else if (getBucketSelected() != null) {
-            openMultipleBucket(getBucketSelected());
+    public void refreshRecentsActions() {
+        if(adapter != null) {
+            adapter.setItems(recentsItems);
         }
-
-        adapter = new RecentsAdapter(context, this, recentsItems);
-        listView.setAdapter(adapter);
-        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
-        setVisibleContacts();
         setRecentsView();
-
-        return v;
     }
 
     private void setRecentsView() {
