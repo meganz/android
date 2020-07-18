@@ -54,15 +54,16 @@ class HomepageFragment : Fragment() {
             }
         })
 
-        view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
+        view.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
                 Log.i("Alex", "onGlobalLayout")
-                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                view.viewTreeObserver.removeOnPreDrawListener(this)
 //                heightPixels = resources.displayMetrics.heightPixels
                 searchBottom = searchInputView.bottom
                 val banner = view?.findViewById<View>(R.id.banner)
                 behavior.peekHeight = view!!.height - banner!!.bottom - 20
-                view.findViewById<View>(R.id.design_bottom_sheet1)?.visibility = View.VISIBLE
+//                view.findViewById<View>(R.id.design_bottom_sheet1)?.visibility = View.VISIBLE
+                return true
             }
         })
 
@@ -95,13 +96,16 @@ class HomepageFragment : Fragment() {
         }
 
         view.findViewById<FloatingActionButton>(R.id.fab_main).setOnClickListener {
+            val mask = view.findViewById<View>(R.id.view_mask)
             isRotate = rotateFab(it, !isRotate)
             if (isRotate) {
+                mask.visibility = View.VISIBLE
                 showIn(fabChat)
                 showIn(fabUpload)
                 showIn(textChat)
                 showIn(textUpload)
             } else {
+                mask.visibility = View.GONE
                 showOut(fabChat)
                 showOut(fabUpload)
                 showOut(textChat)
