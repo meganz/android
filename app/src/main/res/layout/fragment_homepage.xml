@@ -24,4 +24,6 @@
 
     <include layout="@layout/homepage_bottom_sheet"
         android:visibility="gone"/>
+
+    <include layout="@layout/homepage_fabs"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
