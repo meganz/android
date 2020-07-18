@@ -77,6 +77,7 @@ class CustomRecyclerView : RecyclerView {
                 Log.e("motion_event", "down   x==y  $move_x ==== $move_y")
             }
             MotionEvent.ACTION_MOVE -> {
+                parent?.requestDisallowInterceptTouchEvent(true)
                 Log.e("motion_event", "move   x==y  $move_x ==== $move_y")
                 val y = e.y.toInt()
                 val x = e.x.toInt()

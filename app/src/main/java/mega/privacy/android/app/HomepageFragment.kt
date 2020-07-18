@@ -1,27 +1,30 @@
 package mega.privacy.android.app
 
+import android.animation.*
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.Button
-import android.widget.TextView
-import androidx.navigation.fragment.findNavController
+import android.view.animation.DecelerateInterpolator
+import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+
 
 class HomepageFragment : Fragment() {
     private lateinit var behavior: HomepageBottomSheetBehavior<*>
     private var heightPixels = 0
     private var searchBottom = 0
     private lateinit var searchInputView: FloatingSearchView
+    private var isRotate = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -40,8 +43,8 @@ class HomepageFragment : Fragment() {
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
         viewPager.adapter = BottomSheetPagerAdapter(this)
         val tabs = view.findViewById<TabLayout>(R.id.tabs)
-        val mediator = TabLayoutMediator(tabs, viewPager) {
-            tab, _ -> tab.text = "Recent"
+        val mediator = TabLayoutMediator(tabs, viewPager) { tab, _ ->
+            tab.text = "Recent"
         }
         mediator.attach()
 
@@ -76,6 +79,87 @@ class HomepageFragment : Fragment() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
 
+        val fabChat = view.findViewById<View>(R.id.fab_chat)
+        val fabUpload = view.findViewById<View>(R.id.fab_upload)
+        val textChat = view.findViewById<View>(R.id.text_chat)
+        val textUpload = view.findViewById<View>(R.id.text_upload)
+        initFabs(fabChat)
+        initFabs(fabUpload)
+        initFabs(textChat)
+        initFabs(textUpload)
+        fabChat.setOnClickListener {
+
+        }
+        fabUpload.setOnClickListener {
+
+        }
+
+        view.findViewById<FloatingActionButton>(R.id.fab_main).setOnClickListener {
+            isRotate = rotateFab(it, !isRotate)
+            if (isRotate) {
+                showIn(fabChat)
+                showIn(fabUpload)
+                showIn(textChat)
+                showIn(textUpload)
+            } else {
+                showOut(fabChat)
+                showOut(fabUpload)
+                showOut(textChat)
+                showOut(textUpload)
+            }
+        }
+
         return view
+    }
+
+    private fun initFabs(v: View) {
+        v.visibility = View.GONE;
+        v.translationY = v.height.toFloat();
+        v.alpha = 0f;
+    }
+
+    private fun rotateFab(v: View, rotate: Boolean): Boolean {
+        val rotateAnim = ObjectAnimator.ofFloat(v, "rotation", if (rotate) 135f else 0f)
+        val tintAnim = ObjectAnimator.ofArgb((v as FloatingActionButton).drawable.mutate(), "tint", if (rotate) Color.BLACK else Color.WHITE)
+        val backgroundTintAnim = ObjectAnimator.ofArgb(v.background.mutate(), "tint", if (rotate) Color.WHITE else 0xFF00BFA5.toInt())
+
+        AnimatorSet().apply { duration = 200
+            playTogether(rotateAnim, backgroundTintAnim, tintAnim)
+            start()
+        }
+        return rotate
+    }
+
+    private fun showIn(v: View) {
+        v.visibility = View.VISIBLE
+        v.alpha = 0f
+        v.translationY = v.height.toFloat()
+
+        v.animate()
+                .setDuration(200)
+                .translationY(0f)
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                    }
+                })
+                .alpha(1f)
+                .start()
+    }
+
+    private fun showOut(v: View) {
+        v.visibility = View.VISIBLE
+        v.alpha = 1f
+        v.translationY = 0f
+        v.animate()
+                .setDuration(200)
+                .translationY(v.height.toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        v.visibility = View.GONE
+                        super.onAnimationEnd(animation)
+                    }
+                }).alpha(0f)
+                .start()
     }
 }
