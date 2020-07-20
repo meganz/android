@@ -633,7 +633,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		if (parentNode != null){
 			if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-				activateButton(((FileExplorerActivityLollipop) context).isMultiselect());
+				activateButton(false);
 			}
 
             setParentHandle(parentNode.getHandle());
