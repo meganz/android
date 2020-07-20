@@ -5883,6 +5883,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //				attachHomepageFragment(obtainHomepageNavHost());
 //				obtainHomepageNavHost();
 
+				bNV.setTranslationY(0);
+				bNV.setVisibility(View.VISIBLE);
+				final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+				params.setMargins(0, 0, 0, px2dp(56, outMetrics));
+				fragmentLayout.setLayoutParams(params);
+
 				FragmentManager fragmentManager = getSupportFragmentManager();
 				String tag = FragmentTag.HOMEPAGE.getTag();
 				NavHostFragment navHostFragment = (NavHostFragment) fragmentManager.findFragmentByTag(tag);
