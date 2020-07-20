@@ -81,6 +81,7 @@ import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
@@ -811,6 +812,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 else if (action.equals(ACTION_CANCEL_DOWNLOAD)) {
                     ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
 
+                } else if (action.equals(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)) {
+                    String accountBlockedString = intentReceived.getStringExtra(ACCOUNT_BLOCKED_STRING);
+                    if (!isTextEmpty(accountBlockedString)) {
+                        showErrorAlertDialog(accountBlockedString, false, getActivity());
+                    }
                 }
             }
             else{

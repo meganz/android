@@ -2792,5 +2792,5 @@
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
-
+    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support@mega.nz</string>
 </resources>
