@@ -14,6 +14,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.getStatusBarHeight;
 
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
 
@@ -52,7 +53,8 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                 ViewCompat.animate(draggableView)
                         .withLayer()
                         .translationX(screenPosition[0] - (draggableView.getWidth() / 2))
-                        .translationY(screenPosition[1] - (draggableView.getHeight() / 2))
+                        .translationY(screenPosition[1] - (draggableView.getHeight() / 2)
+                            - getStatusBarHeight(draggableView.getContext()))
                         .scaleX(scaleX)
                         .scaleY(scaleY)
                         .rotation(0f)

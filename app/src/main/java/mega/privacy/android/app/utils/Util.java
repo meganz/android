@@ -1433,6 +1433,18 @@ public class Util {
         window.setStatusBarColor(ContextCompat.getColor(context, color));
     }
 
+    public static int getStatusBarHeight(Context context) {
+		int statusBarHeight;
+		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+				"android");
+		if (resourceId > 0) {
+			statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+		} else {
+			statusBarHeight = px2dp(24, context.getResources().getDisplayMetrics());
+		}
+		return statusBarHeight;
+	}
+
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
