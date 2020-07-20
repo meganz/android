@@ -1276,6 +1276,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
 				((ManagerActivityLollipop)context).setParentHandleBrowser(((ManagerActivityLollipop)context).comesFromNotificationHandleSaved);
 				((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
+				((ManagerActivityLollipop) context).refreshCloudDrive();
 
 				return 2;
 			}

@@ -2797,4 +2797,9 @@
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Joining&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Leaving&#8230;</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
 </resources>
