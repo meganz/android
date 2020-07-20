@@ -424,13 +424,12 @@ public class TimeUtils implements Comparator<Calendar> {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.AM_PM, Calendar.AM);
 
         if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING)){
             calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
-            calendar.set(Calendar.AM_PM, Calendar.PM);
         }else{
             calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
-            calendar.set(Calendar.AM_PM, Calendar.AM);
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         return calendar;
