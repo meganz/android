@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#EEF2F1"
     tools:context=".HomepageFragment">
 
     <LinearLayout
@@ -31,6 +32,7 @@
         android:background="@color/textGrey"
         android:alpha="0.7"
         android:visibility="gone"
+        android:elevation="6dp"
         android:clickable="true"/>
 
     <include layout="@layout/homepage_fabs"/>

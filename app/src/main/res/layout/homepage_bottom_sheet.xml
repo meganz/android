@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#FFFFFF"
-    app:layout_behavior="@string/homepage_bottom_sheet_behavior">
+    android:background="@drawable/bg_cardview_white_top"
+    app:layout_behavior="@string/homepage_bottom_sheet_behavior"
+    android:elevation="6dp">
 
     <!--    <LinearLayout-->
     <!--        android:layout_width="match_parent"-->
