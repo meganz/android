@@ -359,19 +359,19 @@ public class ChatController {
      * @param option     The selected mute option.
      */
     public void muteChat(long chatHandle, String option) {
-        if (chatHandle != MEGACHAT_INVALID_HANDLE || context instanceof ManagerActivityLollipop) {
-            if (option.equals(NOTIFICATIONS_ENABLED)) {
-                showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
-            } else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
-                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
-            } else {
-                String text = getMutedPeriodString(option);
-                if (text != null) {
-                    showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
-                }
+        if (chatHandle == MEGACHAT_INVALID_HANDLE || !(context instanceof ManagerActivityLollipop))
+            return;
+
+        if (option.equals(NOTIFICATIONS_ENABLED)) {
+            showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+        } else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
+            showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+        } else {
+            String text = getMutedPeriodString(option);
+            if (isTextEmpty(text)) {
+                showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
             }
         }
-
     }
 
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {

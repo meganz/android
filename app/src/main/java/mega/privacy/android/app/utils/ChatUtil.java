@@ -589,26 +589,6 @@ public class ChatUtil {
     }
 
     /**
-     * Method for the treatment of plurals in the strings
-     *
-     * @param text The string to update.
-     * @return The updated string.
-     */
-    private static String getStringPlural(String text) {
-        try {
-            text = text.replace("[A]", "");
-            text = text.replace("[/A]", "");
-            text = text.replace("[B]", "");
-            text = text.replace("[/B]", "");
-            text = text.replace("[C]", "");
-            text = text.replace("[/C]", "");
-        } catch (Exception e) {
-            logWarning("Error replacing text.");
-        }
-        return text;
-    }
-
-    /**
      * Method to know if the chat notifications are activated or deactivated.
      *
      * @return The type of mute.
@@ -644,8 +624,8 @@ public class ChatUtil {
      */
     public static void createMuteNotificationsChatAlertDialog(Activity context, long chatId) {
 
-        final android.app.AlertDialog muteDialog;
-        android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        final AlertDialog muteDialog;
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
 
         if (chatId == MEGACHAT_INVALID_HANDLE) {
             View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
@@ -764,8 +744,7 @@ public class ChatUtil {
      * @param muteOption The selected mute option.
      */
     public static void muteChat(Context context, long chatId, String muteOption) {
-        ChatController chatC = new ChatController(context);
-        chatC.muteChat(chatId, muteOption);
+        new ChatController(context).muteChat(chatId, muteOption);
     }
 
     /**
@@ -812,8 +791,8 @@ public class ChatUtil {
             } else {
                 notificationsSubTitle.setText(getCorrectStringDependingOnOptionSelected(timestampMute));
                 notificationsSubTitle.setVisibility(View.VISIBLE);
-            }
 
+            }
         } else {
             notificationsSwitch.setChecked(true);
             notificationsSubTitle.setVisibility(View.GONE);

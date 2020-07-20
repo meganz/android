@@ -498,7 +498,7 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             }
             case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
-                snackbar.setAction(R.string.unmute_button_snackbar, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
+                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
                 snackbar.show();
                 break;
         }

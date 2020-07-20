@@ -251,15 +251,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
 					if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-						if(request.getMegaPushNotificationSettings() != null){
-							push = request.getMegaPushNotificationSettings().copy();
-						}else{
-							push = MegaPushNotificationSettings.createInstance();
-						}
-
-						Intent intent = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-						intent.setAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-						LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
+						sendPushNotificationSettings(request.getMegaPushNotificationSettings());
 					}
 				}else if (e.getErrorCode() == MegaError.API_OK) {
 					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
@@ -288,15 +280,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
 				if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
 					if (e.getErrorCode() == MegaError.API_OK) {
-						if(request.getMegaPushNotificationSettings() != null){
-							push = request.getMegaPushNotificationSettings().copy();
-						}else{
-							push = MegaPushNotificationSettings.createInstance();
-						}
-						Intent intent = new Intent(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-						intent.setAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-						LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
-
+						sendPushNotificationSettings(request.getMegaPushNotificationSettings());
 					} else {
 						logError("Chat notification settings cannot be updated");
 					}
@@ -694,7 +678,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	/**
-	 * Method for obtaining the PushNotificationSetting instance.
+	 * Method for getting the PushNotificationSetting instance.
 	 *
 	 * @return MegaPushNotificationSettings.
 	 */
@@ -709,6 +693,21 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 
 		return push;
+	}
+
+	/**
+	 * Method for getting the MegaPushNotificationSettings and sending it via a broadcast
+	 *
+	 * @param receivedPush The MegaPushNotificationSettings obtained from the request.
+	 */
+	private void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
+		if (receivedPush != null) {
+			push = receivedPush.copy();
+		} else {
+			push = MegaPushNotificationSettings.createInstance();
+		}
+		Intent intent = new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+		sendBroadcast(intent);
 	}
 
 	/**

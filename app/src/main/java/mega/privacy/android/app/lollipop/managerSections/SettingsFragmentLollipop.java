@@ -70,6 +70,7 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
@@ -83,6 +84,7 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -1935,8 +1937,24 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		startActivity(intent);
 	}
 
-	public void updateNotifChat(){
-		nestedNotificationsChat.setSummary(getGeneralNotification().equals(NOTIFICATIONS_ENABLED) ? getString(R.string.mute_chat_notification_option_on) : getString(R.string.mute_chatroom_notification_option_off));
+	public void updateNotifChat() {
+		MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
+
+		String option = NOTIFICATIONS_ENABLED;
+		if (pushNotificationSettings != null && pushNotificationSettings.isGlobalChatsDndEnabled()) {
+			option = pushNotificationSettings.getGlobalChatsDnd() == 0 ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_DISABLED_X_TIME;
+		}
+
+		if (option.equals(NOTIFICATIONS_DISABLED)) {
+			nestedNotificationsChat.setSummary(getString(R.string.mute_chatroom_notification_option_off));
+			return;
+		}
+
+		if (option.equals(NOTIFICATIONS_ENABLED)) {
+			nestedNotificationsChat.setSummary(getString(R.string.mute_chat_notification_option_on));
+		} else {
+			nestedNotificationsChat.setSummary(getCorrectStringDependingOnOptionSelected(pushNotificationSettings.getGlobalChatsDnd()));
+		}
 	}
 
 	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){

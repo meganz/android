@@ -41,9 +41,8 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
-        IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-        filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+        IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+        registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
     }
 
     public void changeSound(String soundString) {
@@ -92,6 +91,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(chatRoomMuteUpdateReceiver);
     }
 }

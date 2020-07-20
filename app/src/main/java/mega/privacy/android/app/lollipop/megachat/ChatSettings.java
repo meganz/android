@@ -2,9 +2,9 @@ package mega.privacy.android.app.lollipop.megachat;
 
 public class ChatSettings {
 
-    String notificationsSound;
-    String vibrationEnabled;
-    String sendOriginalAttachments;
+    private String notificationsSound;
+    private String vibrationEnabled;
+    private String sendOriginalAttachments;
 
     public ChatSettings(String notificationsSound, String vibrationEnabled, String sendOriginalAttachments) {
         this.notificationsSound = notificationsSound;

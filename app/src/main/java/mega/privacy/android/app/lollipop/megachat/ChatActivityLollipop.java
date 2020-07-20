@@ -736,9 +736,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
-        IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-        filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+        IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+        registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -7437,7 +7436,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(chatRoomMuteUpdateReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);

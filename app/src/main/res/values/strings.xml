@@ -1193,8 +1193,6 @@
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="unmute_button_snackbar" context="Text of a button to unmute the general chat notifications">Unmute</string>
-
     <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
     <string name="chat_notifications_muted_tomorrow" context="String that appears when we show the date until which a specific chat is silenced, this date is on the next day.">Mute until tomorrow %1$s</string>
 

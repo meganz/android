@@ -53,8 +53,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         chatDndSwitch = findPreference(KEY_CHAT_DND);
         chatDndSwitch.setVisible(false);
         chatDndSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
-            boolean switched = ((SwitchPreferenceCompat) preference).isChecked();
-            if(switched){
+            if(((SwitchPreferenceCompat) preference).isChecked()){
                 MegaApplication.getInstance().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
             }else{
                 createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), MEGACHAT_INVALID_HANDLE);
@@ -62,7 +61,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
             return false;
         });
 
-        chatNotificationsSwitch.setChecked(getGeneralNotification().equals(NOTIFICATIONS_ENABLED) ? true : false);
+        chatNotificationsSwitch.setChecked(getGeneralNotification().equals(NOTIFICATIONS_ENABLED));
 
         updateSwitch();
 
@@ -78,15 +77,10 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
 
         String option = NOTIFICATIONS_ENABLED;
-        if(pushNotificationSettings != null){
-            if(pushNotificationSettings.isGlobalChatsDndEnabled()){
-                long timestampMute = pushNotificationSettings.getGlobalChatsDnd();
-                if(timestampMute == 0){
-                    option = NOTIFICATIONS_DISABLED;
-                }else{
-                    option = NOTIFICATIONS_DISABLED_X_TIME;
-                }
-            }else{
+        if (pushNotificationSettings != null) {
+            if (pushNotificationSettings.isGlobalChatsDndEnabled()) {
+                option = pushNotificationSettings.getGlobalChatsDnd() == 0 ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_DISABLED_X_TIME;
+            } else {
                 option = NOTIFICATIONS_ENABLED;
             }
         }
@@ -94,25 +88,24 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         if(option.equals(NOTIFICATIONS_DISABLED)){
             chatDndSwitch.setVisible(false);
             chatVibrateSwitch.setVisible(false);
+            chatVibrateSwitch.setEnabled(false);
             chatSoundPreference.setVisible(false);
             return;
         }
 
-        if(option.equals(NOTIFICATIONS_ENABLED)){
-            chatNotificationsSwitch.setChecked(true);
-        }else{
-            chatNotificationsSwitch.setChecked(false);
-        }
+        chatNotificationsSwitch.setChecked(option.equals(NOTIFICATIONS_ENABLED));
 
         chatVibrateSwitch.setVisible(true);
+        chatVibrateSwitch.setEnabled(option.equals(NOTIFICATIONS_ENABLED));
         if(option.equals(NOTIFICATIONS_ENABLED) && (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled()))){
             dbH.setVibrationEnabledChat(true+"");
+            chatSettings.setVibrationEnabled(true+"");
             chatVibrateSwitch.setChecked(true);
         }else{
             dbH.setVibrationEnabledChat(false+"");
+            chatSettings.setVibrationEnabled(false+"");
             chatVibrateSwitch.setChecked(false);
         }
-
         chatSoundPreference.setVisible(true);
         if (isTextEmpty(chatSettings.getNotificationsSound())) {
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);

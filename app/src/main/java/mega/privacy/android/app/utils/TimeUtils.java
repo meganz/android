@@ -30,6 +30,9 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_SHORT_SHORT_FORMAT = 2;
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
+    private static final int TIME_OF_CHANGE = 8;
+    private static final int INITIAL_PERIOD_TIME = 18;
+    private static final int FINAL_PERIOD_TIME = 4;
 
     int type;
 
@@ -423,10 +426,10 @@ public class TimeUtils implements Comparator<Calendar> {
         calendar.set(Calendar.MINUTE, 0);
 
         if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING)){
-            calendar.set(Calendar.HOUR, 7);
+            calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
             calendar.set(Calendar.AM_PM, Calendar.PM);
         }else{
-            calendar.set(Calendar.HOUR, 8);
+            calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
             calendar.set(Calendar.AM_PM, Calendar.AM);
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
@@ -442,6 +445,6 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         int hour = cal.get(Calendar.HOUR_OF_DAY);
-        return hour <= 18 && hour >= 4;
+        return hour <= INITIAL_PERIOD_TIME && hour >= FINAL_PERIOD_TIME;
     }
 }

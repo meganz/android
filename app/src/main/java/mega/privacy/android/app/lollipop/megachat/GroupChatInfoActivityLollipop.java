@@ -410,9 +410,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
             LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
-            IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-            filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-            LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+            IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+            registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 
             //Set participants
             participants = new ArrayList<>();
@@ -496,7 +495,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(chatRoomMuteUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
     }
 

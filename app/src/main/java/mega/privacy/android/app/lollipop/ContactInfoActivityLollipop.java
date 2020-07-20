@@ -615,6 +615,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
+		IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+		registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+
 		IntentFilter userNameUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
@@ -1706,7 +1709,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         }
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
+		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
 	}
 

@@ -1338,8 +1338,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				return;
 
 			if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
-				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if (rChatFL != null && rChatFL.isVisible()) {
+				if (getChatsFragment() != null) {
 					rChatFL.notifyPushChanged();
 				}
 				if(getSettingsFragment() != null){
@@ -2032,9 +2031,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
 
-            IntentFilter filterMuteChatRoom = new IntentFilter(BROADCAST_ACTION_INTENT_MUTE_CHATROOM);
-            filterMuteChatRoom.addAction(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-            LocalBroadcastManager.getInstance(this).registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+            IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
+            registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -4624,7 +4622,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatRoomMuteUpdateReceiver);
+		unregisterReceiver(chatRoomMuteUpdateReceiver);
 
         unregisterReceiver(cameraUploadLauncherReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
