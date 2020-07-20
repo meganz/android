@@ -7,7 +7,6 @@ import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import com.google.android.material.textfield.TextInputLayout;
@@ -18,7 +17,6 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
-import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -1132,7 +1130,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					else {
 						resetPassIntent.setAction(ACTION_PASS_CHANGED);
 						logWarning("General Error");
-						resetPassIntent.putExtra("RESULT", -1);
+						resetPassIntent.putExtra(RESULT, e.getErrorCode());
 						startActivity(resetPassIntent);
 						finish();
 					}
@@ -1152,92 +1150,46 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					//Intent to MyAccount
 					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 					resetPassIntent.setAction(ACTION_PASS_CHANGED);
-					resetPassIntent.putExtra("RESULT", 0);
+					resetPassIntent.putExtra(RESULT, e.getErrorCode());
 					startActivity(resetPassIntent);
 					finish();
 				}
 			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){
+		} else if (request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK) {
 			logDebug("TYPE_CONFIRM_RECOVERY_LINK");
-			if(megaApi.getRootNode()==null) {
-				logDebug("Not logged in");
-				if (e.getErrorCode() != MegaError.API_OK){
-					logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
-					try{
-						progress.dismiss();
-					} catch(Exception ex) {};
-
-					//Intent to Login
-					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-					resetPassIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-					resetPassIntent.setAction(ACTION_PASS_CHANGED);
-
-					if(e.getErrorCode()==MegaError.API_EARGS){
-						resetPassIntent.putExtra("RESULT", MegaError.API_EARGS);
-					}
-					else if(e.getErrorCode()==MegaError.API_EKEY){
-						resetPassIntent.putExtra("RESULT", MegaError.API_EKEY);
-					}
-					else{
-						resetPassIntent.putExtra("RESULT", -1);
-					}
-
-					startActivity(resetPassIntent);
-					finish();
-				}
-				else{
-					logDebug("Pass changed");
-					try{
-						progress.dismiss();
-					} catch(Exception ex) {};
-
-					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-					//Intent to Login
-					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-					resetPassIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-					resetPassIntent.setAction(ACTION_PASS_CHANGED);
-					resetPassIntent.putExtra("RESULT", 0);
-					startActivity(resetPassIntent);
-					finish();
-				}
+			try {
+				progress.dismiss();
+			} catch (Exception ex) {
+				logWarning("Exception dismissing progress dialog", ex);
 			}
-			else {
+
+			if (e.getErrorCode() != MegaError.API_OK) {
+				logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+			} else {
+				logDebug("Pass changed");
+				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+			}
+
+			Intent resetPassIntent;
+
+			if (megaApi.getRootNode() == null) {
+				logDebug("Not logged in");
+
+				//Intent to Login
+				resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+				resetPassIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			} else {
 				logDebug("Logged IN");
 
-				if (e.getErrorCode() != MegaError.API_OK){
-					logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
-
-					try{
-						progress.dismiss();
-					} catch(Exception ex) {};
-
-					//Intent to Login
-					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-					resetPassIntent.setAction(ACTION_PASS_CHANGED);
-					resetPassIntent.putExtra("RESULT", -1);
-					startActivity(resetPassIntent);
-					finish();
-				}
-				else{
-					logDebug("Pass changed");
-					try{
-						progress.dismiss();
-					} catch(Exception ex) {};
-
-					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-					//Intent to Login
-					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-					resetPassIntent.setAction(ACTION_PASS_CHANGED);
-					resetPassIntent.putExtra("RESULT", 0);
-					startActivity(resetPassIntent);
-					finish();
-				}
-
+				resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
+
+			resetPassIntent.setAction(ACTION_PASS_CHANGED);
+			resetPassIntent.putExtra(RESULT, e.getErrorCode());
+			startActivity(resetPassIntent);
+			finish();
+		} else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (request.getFlag()){
 					is2FAEnabled = true;

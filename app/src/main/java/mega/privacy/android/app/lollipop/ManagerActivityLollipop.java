@@ -2869,8 +2869,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
-						int result = getIntent().getIntExtra("RESULT",-20);
-						if(result==0){
+						int result = getIntent().getIntExtra(RESULT,MegaError.API_OK);
+						if (result == MegaError.API_OK) {
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
 							selectDrawerItemPending=false;

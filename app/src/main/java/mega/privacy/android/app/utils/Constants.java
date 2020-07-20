@@ -70,6 +70,8 @@ public class Constants {
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
+    public static final String RESULT = "RESULT";
+
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
     //MultipleRequestListener options
