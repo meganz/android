@@ -719,18 +719,22 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	 */
 	public void controlMuteNotifications(Context context, String option, long chatId) {
 		if (option.equals(NOTIFICATIONS_DISABLED)) {
+
 			if (chatId == MEGACHAT_INVALID_HANDLE) {
 				push.enableChats(false);
 			} else {
 				push.enableChat(chatId, false);
 			}
 		} else if (option.equals(NOTIFICATIONS_ENABLED)) {
+
 			if (chatId == MEGACHAT_INVALID_HANDLE) {
 				push.enableChats(true);
 			} else {
 				push.enableChat(chatId, true);
 			}
-		} else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
+		} else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ||
+				option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)) {
+
 			long timestamp = getCalendarSpecificTime(option).getTimeInMillis();
 			if (chatId == MEGACHAT_INVALID_HANDLE) {
 				push.setGlobalChatsDnd(timestamp);
@@ -738,6 +742,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				push.setChatDnd(chatId, timestamp);
 			}
 		} else {
+
 			Calendar newCalendar = Calendar.getInstance();
 			newCalendar.setTimeInMillis(System.currentTimeMillis());
 			switch (option) {
@@ -753,13 +758,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				case NOTIFICATIONS_24_HOURS:
 					newCalendar.add(Calendar.HOUR, 24);
 					break;
-				case NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING:
-				case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW:
-					getCalendarSpecificTime(option);
-					break;
 			}
-			long timestamp = newCalendar.getTimeInMillis();
 
+			long timestamp = newCalendar.getTimeInMillis();
 			if (chatId == MEGACHAT_INVALID_HANDLE) {
 				push.setGlobalChatsDnd(timestamp);
 			} else {
@@ -768,7 +769,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 
 		megaApi.setPushNotificationSettings(push, null);
-		muteChat(context, chatId, option);
+		muteChat(context, option);
 	}
 	
 	public MegaApiAndroid getMegaApiFolder(){

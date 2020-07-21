@@ -634,9 +634,9 @@ public class ChatUtil {
             dialogBuilder.setTitle(context.getString(R.string.title_dialog_mute_chatroom_notifications));
         }
 
-        boolean isUntilThisEvening = isUntilThisEvening();
+        boolean isUntilThisMorning = isUntilThisMorning();
         int initialOption = getItemClicked(NOTIFICATIONS_ENABLED);
-        String optionUntil = isUntilThisEvening ? context.getString(R.string.mute_chatroom_notification_option_until_this_evening) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
+        String optionUntil = isUntilThisMorning ? context.getString(R.string.mute_chatroom_notification_option_until_this_morning) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
         AtomicReference<Integer> itemClicked = new AtomicReference<>(initialOption);
 
         ArrayList<String> stringsArray = new ArrayList<>();
@@ -658,7 +658,7 @@ public class ChatUtil {
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() != initialOption) {
-                        MegaApplication.getInstance().controlMuteNotifications(context, getTypeMute(itemClicked.get(), isUntilThisEvening), chatId);
+                        MegaApplication.getInstance().controlMuteNotifications(context, getTypeMute(itemClicked.get(), isUntilThisMorning), chatId);
                     }
                     dialog.dismiss();
                 });
@@ -731,20 +731,19 @@ public class ChatUtil {
             case 4:
                 return NOTIFICATIONS_24_HOURS;
             case 5:
-                return (isThisEvening ? NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING : NOTIFICATIONS_DISABLED_UNTIL_TOMORROW);
+                return (isThisEvening ? NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING : NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING);
             default:
                 return NOTIFICATIONS_ENABLED;
         }
     }
 
     /**
-     * Method to mute a specific chat or general noifications chat for a specific period of time.
+     * Method to mute a specific chat or general notifications chat for a specific period of time.
      * @param context Context of Activity.
-     * @param chatId Chat ID.
      * @param muteOption The selected mute option.
      */
-    public static void muteChat(Context context, long chatId, String muteOption) {
-        new ChatController(context).muteChat(chatId, muteOption);
+    public static void muteChat(Context context, String muteOption) {
+        new ChatController(context).muteChat(muteOption);
     }
 
     /**

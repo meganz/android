@@ -29,6 +29,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -355,20 +356,21 @@ public class ChatController {
     /**
      * Method to silence notifications for all chats or for a specific chat.
      *
-     * @param chatHandle Chat ID.
      * @param option     The selected mute option.
      */
-    public void muteChat(long chatHandle, String option) {
-        if (chatHandle == MEGACHAT_INVALID_HANDLE || !(context instanceof ManagerActivityLollipop))
+    public void muteChat(String option) {
+        if (context instanceof ChatPreferencesActivity)
             return;
 
         if (option.equals(NOTIFICATIONS_ENABLED)) {
             showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
-        } else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) || option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW)) {
+
+        } else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) || option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)) {
             showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+
         } else {
             String text = getMutedPeriodString(option);
-            if (isTextEmpty(text)) {
+            if (!isTextEmpty(text)) {
                 showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
             }
         }

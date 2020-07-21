@@ -31,8 +31,7 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
     private static final int TIME_OF_CHANGE = 8;
-    private static final int INITIAL_PERIOD_TIME = 18;
-    private static final int FINAL_PERIOD_TIME = 4;
+    private static final int INITIAL_PERIOD_TIME = 0;
 
     int type;
 
@@ -377,9 +376,9 @@ public class TimeUtils implements Comparator<Calendar> {
         df.setTimeZone(tz);
         String time = df.format(calendar.getTime());
 
-        return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING) ?
-                context.getString(R.string.success_muting_a_chat_until_this_evening, time) :
-                context.getString(R.string.success_muting_a_chat_until_tomorrow_morning, context.getString(R.string.label_tomorrow), time);
+        return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ?
+                context.getString(R.string.success_muting_a_chat_until_this_morning, time) :
+                context.getString(R.string.success_muting_a_chat_until_tomorrow_morning, context.getString(R.string.label_tomorrow).toLowerCase(), time);
     }
 
     /**
@@ -424,26 +423,24 @@ public class TimeUtils implements Comparator<Calendar> {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
         calendar.set(Calendar.AM_PM, Calendar.AM);
 
-        if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_EVENING)){
-            calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
-        }else{
-            calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
+        if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)){
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         return calendar;
     }
 
     /**
-     * Method to know if the silencing should be until this evening.
+     * Method to know if the silencing should be until this morning.
      *
      * @return True if it is. False it is not.
      */
-    public static boolean isUntilThisEvening() {
+    public static boolean isUntilThisMorning() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         int hour = cal.get(Calendar.HOUR_OF_DAY);
-        return hour <= INITIAL_PERIOD_TIME && hour >= FINAL_PERIOD_TIME;
+        return hour < INITIAL_PERIOD_TIME && hour <= TIME_OF_CHANGE;
     }
 }
