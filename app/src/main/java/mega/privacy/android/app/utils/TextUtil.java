@@ -1,6 +1,7 @@
 package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 
 public class TextUtil {
 
@@ -26,5 +27,9 @@ public class TextUtil {
             logWarning("Error replacing text.");
         }
         return text;
+    }
+
+    public static boolean isEmail(String str) {
+        return EMAIL_ADDRESS.matcher(str).matches();
     }
 }

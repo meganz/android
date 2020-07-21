@@ -62,7 +62,7 @@
                 android:background="@null"
                 android:src="@drawable/circle_status_contact_offline" />
 
-            <TextView
+            <mega.privacy.android.app.components.MarqueeTextView
                 android:id="@+id/contact_list_contact_mail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

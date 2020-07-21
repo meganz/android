@@ -4,7 +4,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := zenlib
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/ZenLib/Source $(LOCAL_PATH)/ZenLib/Source/ZenLib
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/ZenLib/Source
-LOCAL_CFLAGS := -fexceptions -frtti -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DUNICODE -D_LARGE_FILES -D_FILE_OFFSET_BITS=64
+LOCAL_CFLAGS := -fexceptions -frtti -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DUNICODE -D_LARGE_FILES
+ifeq ($(TARGET_ARCH_ABI),x86_64)
+  LOCAL_CFLAGS += -D_FILE_OFFSET_BITS=64
+else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+  LOCAL_CFLAGS += -D_FILE_OFFSET_BITS=64
+endif
+
 LOCAL_SRC_FILES := $(addprefix ZenLib/Source/ZenLib/, \
                        Conf.cpp \
                        CriticalSection.cpp \
