@@ -2804,4 +2804,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Your Credentials</string>
     <string name="action_reset" context="Button to reset credentials">Reset</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana's credentials">%s\'s credentials</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+
 </resources>

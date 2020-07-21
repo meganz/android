@@ -282,10 +282,11 @@
 
         <activity
             android:name="mega.privacy.android.app.OpenPasswordLinkActivity"
-            android:label="@string/app_name"
+            android:label=""
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.AppCompat.Dialog">
         </activity>
 
         <activity
@@ -310,7 +311,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
             android:label="@string/settings_pin_lock"
-            android:windowSoftInputMode="stateVisible"
+            android:windowSoftInputMode="adjustResize|stateVisible"
             android:theme="@style/Theme.Megaactionbar.Secondary">
         </activity>
 

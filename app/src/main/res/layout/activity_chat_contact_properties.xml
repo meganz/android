@@ -82,25 +82,14 @@
                         android:id="@+id/first_line_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="72dp"
+                        android:layout_marginStart="72dp"
+                        android:layout_marginEnd="36dp"
                         android:textSize="20sp"
                         app:emojiSize="18sp"
                         android:paddingTop="6dp"
                         android:textColor="@color/white"
-                        android:maxLines="1"
-                        android:singleLine="true"
+                        android:maxLines="2"
                         android:textAppearance="@style/ToolbarTitle.Secondary" />
-
-                    <ImageView
-                        android:id="@+id/contact_drawable_state"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="7dp"
-                        android:layout_toRightOf="@+id/first_line_toolbar"
-                        android:background="@null"
-                        android:src="@drawable/ic_offline"
-                        app:layout_collapseMode="pin"
-                        android:layout_marginTop="8dp"/>
 
                     <mega.privacy.android.app.components.MarqueeTextView
                         android:id="@+id/second_line_toolbar"

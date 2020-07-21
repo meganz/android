@@ -6,11 +6,13 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -24,11 +26,17 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaContactGetter implements MegaRequestListenerInterface {
 
+    /**
+     * @see MegaApiJava#getRegisteredContacts
+     */
+    private static final int INDEX_ID = 1, INDEX_DATA = 0;
+
     private MegaContactUpdater updater;
 
     private Context context;
 
     private ArrayList<MegaContact> megaContacts = new ArrayList<>();
+    private ArrayList<MegaContact> megaContactsWithEmail = new ArrayList<>();
 
     private int currentContactIndex;
 
@@ -178,38 +186,34 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_GET_REGISTERED_CONTACTS) {
             requestInProgress = false;
+            resetAfterRequest();
             if (e.getErrorCode() == MegaError.API_OK) {
-                megaContacts.clear();
-                MegaStringMap map = request.getMegaStringMap();
+                // The table contains all the mathced users.
                 MegaStringTable table = request.getMegaStringTable();
 
+                // When there's no matched user, should be considered as successful
                 if (table.size() == 0) {
-                    // when there's no matched user, should be considered as successful
                     updateLastSyncTimestamp();
-                }
-                MegaContact contact;
-                for (int i = 0; i < table.size(); i++) {
-                    contact = new MegaContact();
-                    MegaStringList list = table.get(i);
-                    contact.id = list.get(1);
-                    contact.normalizedPhoneNumber = list.get(0);
-                    contact.handle = getUserHandler(list.get(1));
-                    //the normalized phone number is the key
-                    contact.localName = map.get(list.get(0));
-
-                    logDebug("contact: " + contact);
-                    megaContacts.add(contact);
-                }
-                if (megaContacts.size() > 0) {
-                    currentContactIndex = 0;
-                    MegaContact firstContact = getCurrentContactIndex();
-                    if (firstContact != null) {
-                        api.getUserEmail(getUserHandler(firstContact.id), this);
-                    }
                 } else {
-                    logWarning("No mega contacts.");
-                    if (updater != null) {
-                        updater.noContacts();
+                    MegaStringMap map = request.getMegaStringMap();
+                    Map<String, MegaContact> contacts = parseMatchedContacts(map, table);
+                    fillContactsList(contacts);
+                    // Need to ask for email from server.
+                    if (megaContacts.size() > 0) {
+                        MegaContact firstContact = getCurrentContactIndex();
+                        if (firstContact != null) {
+                            api.getUserEmail(firstContact.handle, this);
+                        }
+                    } else {
+                        // All the contacts are matched by email.
+                        if(megaContactsWithEmail.size() > 0) {
+                            processFinished(api, megaContactsWithEmail);
+                        } else {
+                            logWarning("No mega contacts.");
+                            if (updater != null) {
+                                updater.noContacts();
+                            }
+                        }
                     }
                 }
             } else {
@@ -226,9 +230,12 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         } else if (request.getType() == MegaRequest.TYPE_GET_USER_EMAIL) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 String email = request.getEmail();
+                long handle = request.getNodeHandle();
+
                 if (!TextUtils.isEmpty(email)) {
                     MegaContact currentContact = getCurrentContactIndex();
-                    if (currentContact != null) {
+                    // Avoid to set email to wrong user.
+                    if (currentContact != null && handle == currentContact.handle) {
                         currentContact.email = email;
                         if (currentContact.localName == null) {
                             currentContact.localName = email;
@@ -236,35 +243,109 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     }
                 } else {
                     logWarning("Contact's email is empty!");
+                    megaContacts.remove(currentContactIndex);
                 }
             } else {
                 logWarning("Get contact's email faild with error code: " + e.getErrorCode());
-                if (updater != null) {
-                    updater.onException(e.getErrorCode(), request.getRequestString());
-                }
+                megaContacts.remove(currentContactIndex);
             }
-            //get next contact's email.
+            // Get next contact's email.
             currentContactIndex++;
-            //all the emails have been gotten.
+            // All the emails have been gotten.
             if (currentContactIndex >= megaContacts.size()) {
-                // save to db
-                dbH.clearMegaContacts();
-                dbH.batchInsertMegaContacts(megaContacts);
-
-                // filter out
-                List<MegaContact> list = filterOut(api, megaContacts);
-                //when request is successful, update the timestamp.
-                updateLastSyncTimestamp();
-                currentContactIndex = 0;
-                if (updater != null) {
-                    updater.onFinish(list);
-                }
+                megaContacts.addAll(megaContactsWithEmail);
+                processFinished(api, megaContacts);
             } else {
                 MegaContact nextContact = getCurrentContactIndex();
                 if (nextContact != null) {
                     api.getUserEmail(getUserHandler(nextContact.id), this);
                 }
             }
+        }
+    }
+
+    /**
+     * Fill the matched MEGA contacts into two lists:
+     * megaContactsWithEmail contains the contacts with email.
+     * megaContacts contains the contacts without email, need to ask for email.
+     *
+     * @param contacts All the unique MEGA contacts, may be empty.
+     */
+    private void fillContactsList(Map<String, MegaContact> contacts) {
+        for (MegaContact megaContact : contacts.values()) {
+            if (megaContact.email != null) {
+                megaContactsWithEmail.add(megaContact);
+            } else {
+                megaContacts.add(megaContact);
+            }
+        }
+    }
+
+    private void resetAfterRequest() {
+        megaContacts.clear();
+        megaContactsWithEmail.clear();
+        currentContactIndex = 0;
+    }
+
+    /**
+     * Parse server reponse to get matched and unique MEGA users.
+     *
+     * @see this#getRequestParameter
+     * @see MegaApiJava#getRegisteredContacts
+     *
+     * @param map The submited data, Key is phone number or email of the local contact, Value is the local name.
+     *            Here is used to get local name.
+     * @param table Server returned infomation, contains matched MEGA users.
+     * @return MEGA users. Key is user handle in Base64, value is corresponding MegaContact object.
+     */
+    private Map<String, MegaContact> parseMatchedContacts(MegaStringMap map,MegaStringTable table) {
+        Map<String, MegaContact> temp = new HashMap<>();
+        for (int i = 0; i < table.size(); i++) {
+            // Each MegaStringList is a matched MEGA user.
+            MegaStringList list = table.get(i);
+
+            // User handle in Base64.
+            String id = list.get(INDEX_ID);
+            // Phone number or email.
+            String data = list.get(INDEX_DATA);
+
+            // Check if there's already a MegaContact with same id.
+            MegaContact ex = temp.get(id);
+            if (ex != null) {
+                if(ex.email == null) {
+                    ex.email = data;
+                }
+                if(ex.normalizedPhoneNumber == null) {
+                    ex.normalizedPhoneNumber = data;
+                }
+            } else {
+                MegaContact contact = new MegaContact();
+                contact.id = id;
+                if (TextUtil.isEmail(data)) {
+                    contact.email = data;
+                } else {
+                    contact.normalizedPhoneNumber = data;
+                }
+                contact.handle = getUserHandler(contact.id);
+                // The data(phone number or email) is the key.
+                contact.localName = map.get(data);
+                temp.put(id, contact);
+            }
+        }
+        return temp;
+    }
+
+    private void processFinished(MegaApiJava api, ArrayList<MegaContact> list) {
+        // save to db
+        dbH.clearMegaContacts();
+        dbH.batchInsertMegaContacts(list);
+
+        // filter out
+        list = filterOut(api, list);
+        //when request is successful, update the timestamp.
+        updateLastSyncTimestamp();
+        if (updater != null) {
+            updater.onFinish(list);
         }
     }
 
@@ -284,13 +365,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             }
         }
 
-        Collections.sort(list, new Comparator<MegaContact>() {
-
-            @Override
-            public int compare(MegaContact o1, MegaContact o2) {
-                return o1.localName.compareTo(o2.localName);
-            }
-        });
+        Collections.sort(list, (o1, o2) -> o1.localName.compareTo(o2.localName));
         return list;
     }
 
@@ -339,10 +414,13 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         for (ContactsUtil.LocalContact contact : localContacts) {
             String name = contact.getName();
             List<String> normalizedPhoneNumberSet = contact.getNormalizedPhoneNumberList();
-            if (!normalizedPhoneNumberSet.isEmpty()) {
-                for (String phoneNumber : normalizedPhoneNumberSet) {
-                    stringMap.set(phoneNumber, name);
-                }
+            List<String> emailSet = contact.getEmailList();
+            for (String phoneNumber : normalizedPhoneNumberSet) {
+                stringMap.set(phoneNumber, name);
+            }
+
+            for (String email : emailSet) {
+                stringMap.set(email, name);
             }
         }
         logDebug("local contacts size is: " + stringMap.size());
