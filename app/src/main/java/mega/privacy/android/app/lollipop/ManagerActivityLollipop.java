@@ -3415,6 +3415,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void askForSMSVerification() {
+        if(!smsDialogTimeChecker.shouldShow()) return;
         showStorageAlertWithDelay = true;
         //If mobile device, only portrait mode is allowed
         if (!isTablet(this)) {
