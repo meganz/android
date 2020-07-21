@@ -709,7 +709,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             @NonNull View target,
             float velocityX,
             float velocityY) {
-        if (nestedScrollingChildRef.isEmpty()) {
+        if (!nestedScrollingChildRef.isEmpty()) {
             return target == getNestedScrollingChild()
                     && (state != STATE_EXPANDED
                     || super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY));
@@ -1194,11 +1194,13 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         return Math.abs(newTop - collapsedOffset) / (float) peek > HIDE_THRESHOLD;
     }
 
+    private int count = 0;
     @Nullable
     @VisibleForTesting
     void findScrollingChild(View view) {
         if (ViewCompat.isNestedScrollingEnabled(view)) {
             nestedScrollingChildRef.add(view);
+            if (count++ > 1) return;
         }
 
         if (view instanceof ViewGroup) {
