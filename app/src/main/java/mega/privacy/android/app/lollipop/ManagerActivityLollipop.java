@@ -2031,8 +2031,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
 
-            IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-            registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+			registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -2064,7 +2063,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			megaChatApi.retryPendingConnections(false, null);
 		}
 
-		app.getPushNotificationSettingManagement().getPushNotificationSetting();
+		MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
 
 		transfersInProgress = new ArrayList<Integer>();
 
@@ -6786,7 +6785,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case CHAT:
 					if (searchExpand) {
 						openSearchView();
-
 					} else {
 						doNotDisturbMenuItem.setVisible(true);
 						inviteMenuItem.setVisible(true);
@@ -13612,7 +13610,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 				}
 			}
-
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){

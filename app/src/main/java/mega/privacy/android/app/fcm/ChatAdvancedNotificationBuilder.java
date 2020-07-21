@@ -1279,11 +1279,9 @@ public final class ChatAdvancedNotificationBuilder {
             if (chatSettings.getNotificationsSound() == null){
                 Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                 buildNotificationPreN(defaultSoundUri, chatSettings.getVibrationEnabled(), request);
-
-            } else if(chatSettings.getNotificationsSound().equals(INVALID_OPTION)){
+            } else if (chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
                 buildNotificationPreN(null, chatSettings.getVibrationEnabled(), request);
-
-            } else{
+            } else {
                 String soundString = chatSettings.getNotificationsSound();
                 Uri uri = Uri.parse(soundString);
                 logDebug("Uri: " + uri);
@@ -1291,10 +1289,8 @@ public final class ChatAdvancedNotificationBuilder {
                 if (STRING_TRUE.equals(soundString) || isTextEmpty(soundString)) {
                     Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                     buildNotificationPreN(defaultSoundUri, chatSettings.getVibrationEnabled(), request);
-
                 } else if (soundString.equals(INVALID_OPTION)) {
                     buildNotificationPreN(null, chatSettings.getVibrationEnabled(), request);
-
                 } else {
                     Ringtone sound = RingtoneManager.getRingtone(context, uri);
                     if (sound == null) {
@@ -1332,7 +1328,8 @@ public final class ChatAdvancedNotificationBuilder {
         } else if (chatSettings.getNotificationsSound() != null) {
             String soundString = chatSettings.getNotificationsSound();
             Uri uri = Uri.parse(soundString);
-            if (STRING_TRUE.equals(soundString) || "".equals(soundString)) {
+
+            if (STRING_TRUE.equals(soundString) || isTextEmpty(soundString)) {
                 defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
             } else if (soundString.equals(INVALID_OPTION) || RingtoneManager.getRingtone(context, uri) == null) {
                 defaultSoundUri = null;

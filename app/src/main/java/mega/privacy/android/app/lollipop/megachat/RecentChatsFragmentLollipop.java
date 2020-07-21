@@ -1759,7 +1759,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                 case R.id.cab_menu_unmute:
                     if (context instanceof ManagerActivityLollipop) {
-                        MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chats.get(0).getChatId());
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chats.get(0).getChatId());
                         clearSelections();
                         hideMultipleSelect();
                     }

@@ -613,9 +613,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         clearPublicCache(this);
 
 		ContextUtils.initialize(getApplicationContext());
-
 	}
-
 
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");
@@ -680,10 +678,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
-
-
-
-	
 	public MegaApiAndroid getMegaApiFolder(){
 		if (megaApiFolder == null){
 			PackageManager m = getPackageManager();

@@ -41,8 +41,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
-        IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-        registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+        registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
     public void changeSound(String soundString) {

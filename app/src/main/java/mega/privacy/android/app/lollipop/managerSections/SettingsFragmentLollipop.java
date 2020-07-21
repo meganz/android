@@ -1130,10 +1130,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
 			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
-
 		} else if (preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0) {
 			updateNotifChat();
 		}
+
 		return true;
 	}
 
@@ -1478,11 +1478,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				logDebug("Change persistence chat to true");
 				megaChatApi.setPresencePersist(true);
 			}
-
 		} else if (preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0) {
-			Intent i = new Intent(context, ChatPreferencesActivity.class);
-			startActivity(i);
-
+			startActivity(new Intent(context, ChatPreferencesActivity.class));
 		} else if (preference.getKey().equals(KEY_STORAGE_DOWNLOAD)) {
 			startActivity(new Intent(context, DownloadPreferencesActivity.class));
 		} else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
@@ -1938,22 +1935,24 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	}
 
 	public void updateNotifChat() {
-		MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSettingManagement().getPushNotificationSetting();
+		MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
 
 		String option = NOTIFICATIONS_ENABLED;
 		if (pushNotificationSettings != null && pushNotificationSettings.isGlobalChatsDndEnabled()) {
 			option = pushNotificationSettings.getGlobalChatsDnd() == 0 ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_DISABLED_X_TIME;
 		}
 
-		if (option.equals(NOTIFICATIONS_DISABLED)) {
-			nestedNotificationsChat.setSummary(getString(R.string.mute_chatroom_notification_option_off));
-			return;
-		}
+		switch (option) {
+			case NOTIFICATIONS_DISABLED:
+				nestedNotificationsChat.setSummary(getString(R.string.mute_chatroom_notification_option_off));
+				break;
 
-		if (option.equals(NOTIFICATIONS_ENABLED)) {
-			nestedNotificationsChat.setSummary(getString(R.string.mute_chat_notification_option_on));
-		} else {
-			nestedNotificationsChat.setSummary(getCorrectStringDependingOnOptionSelected(pushNotificationSettings.getGlobalChatsDnd()));
+			case NOTIFICATIONS_ENABLED:
+				nestedNotificationsChat.setSummary(getString(R.string.mute_chat_notification_option_on));
+				break;
+
+			default:
+				nestedNotificationsChat.setSummary(getCorrectStringDependingOnOptionSelected(pushNotificationSettings.getGlobalChatsDnd()));
 		}
 	}
 

@@ -282,7 +282,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                     if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
                         createMuteNotificationsChatAlertDialog((Activity) context, chat.getChatId());
                     } else {
-                        MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chat.getChatId());
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chat.getChatId());
                     }
                 }
                 break;

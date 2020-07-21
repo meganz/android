@@ -72,7 +72,7 @@
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
         <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlNormal">@color/white</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -490,5 +490,11 @@
 
     <style name="MyCredentialsText" parent="CredentialsText">
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="CheckBoxStyleStyle" parent="Theme.Megaactionbar">
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="android:colorControlNormal">@color/mail_my_account</item>
+        <item name="colorControlNormal">@color/mail_my_account</item>
     </style>
 </resources>

@@ -410,8 +410,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
             LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
-            IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-            registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+            registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
             //Set participants
             participants = new ArrayList<>();
@@ -900,7 +899,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 if (notificationsSwitch.isChecked()) {
                     createMuteNotificationsChatAlertDialog(this, chatHandle);
                 } else {
-                    app.getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
+                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
                 }
                 break;
             case R.id.chat_group_contact_properties_chat_link_layout: {

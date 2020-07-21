@@ -362,17 +362,21 @@ public class ChatController {
         if (context instanceof ChatPreferencesActivity)
             return;
 
-        if (option.equals(NOTIFICATIONS_ENABLED)) {
-            showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+        switch (option) {
+            case NOTIFICATIONS_ENABLED:
+                showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+                break;
 
-        } else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) || option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)) {
-            showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+            case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
+            case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
+                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+                break;
 
-        } else {
-            String text = getMutedPeriodString(option);
-            if (!isTextEmpty(text)) {
-                showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
-            }
+            default:
+                String text = getMutedPeriodString(option);
+                if (!isTextEmpty(text)) {
+                    showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+                }
         }
     }
 

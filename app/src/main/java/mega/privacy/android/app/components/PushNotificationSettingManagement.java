@@ -2,7 +2,9 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import android.content.Intent;
+
 import java.util.Calendar;
+
 import nz.mega.sdk.MegaPushNotificationSettings;
 import mega.privacy.android.app.MegaApplication;
 
@@ -41,13 +43,8 @@ public class PushNotificationSettingManagement {
      * @param receivedPush The MegaPushNotificationSettings obtained from the request.
      */
     public void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
-        if (receivedPush != null) {
-            push = receivedPush.copy();
-        } else {
-            push = MegaPushNotificationSettings.createInstance();
-        }
-        Intent intent = new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-        MegaApplication.getInstance().sendBroadcast(intent);
+        push = receivedPush != null ? receivedPush.copy() : MegaPushNotificationSettings.createInstance();
+        MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
     /**
@@ -58,54 +55,57 @@ public class PushNotificationSettingManagement {
      * @param chatId  Chat ID.
      */
     public void controlMuteNotifications(Context context, String option, long chatId) {
-        if (option.equals(NOTIFICATIONS_DISABLED)) {
+        switch (option) {
+            case NOTIFICATIONS_DISABLED:
+                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                    push.enableChats(false);
+                } else {
+                    push.enableChat(chatId, false);
+                }
+                break;
 
-            if (chatId == MEGACHAT_INVALID_HANDLE) {
-                push.enableChats(false);
-            } else {
-                push.enableChat(chatId, false);
-            }
-        } else if (option.equals(NOTIFICATIONS_ENABLED)) {
+            case NOTIFICATIONS_ENABLED:
+                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                    push.enableChats(true);
+                } else {
+                    push.enableChat(chatId, true);
+                }
+                break;
 
-            if (chatId == MEGACHAT_INVALID_HANDLE) {
-                push.enableChats(true);
-            } else {
-                push.enableChat(chatId, true);
-            }
-        } else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ||
-                option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)) {
+            case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
+            case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
+                long timestamp = getCalendarSpecificTime(option).getTimeInMillis();
+                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                    push.setGlobalChatsDnd(timestamp);
+                } else {
+                    push.setChatDnd(chatId, timestamp);
+                }
+                break;
 
-            long timestamp = getCalendarSpecificTime(option).getTimeInMillis();
-            if (chatId == MEGACHAT_INVALID_HANDLE) {
-                push.setGlobalChatsDnd(timestamp);
-            } else {
-                push.setChatDnd(chatId, timestamp);
-            }
-        } else {
+            default:
+                Calendar newCalendar = Calendar.getInstance();
+                newCalendar.setTimeInMillis(System.currentTimeMillis());
+                switch (option) {
+                    case NOTIFICATIONS_30_MINUTES:
+                        newCalendar.add(Calendar.MINUTE, 30);
+                        break;
+                    case NOTIFICATIONS_1_HOUR:
+                        newCalendar.add(Calendar.HOUR, 1);
+                        break;
+                    case NOTIFICATIONS_6_HOURS:
+                        newCalendar.add(Calendar.HOUR, 6);
+                        break;
+                    case NOTIFICATIONS_24_HOURS:
+                        newCalendar.add(Calendar.HOUR, 24);
+                        break;
+                }
 
-            Calendar newCalendar = Calendar.getInstance();
-            newCalendar.setTimeInMillis(System.currentTimeMillis());
-            switch (option) {
-                case NOTIFICATIONS_30_MINUTES:
-                    newCalendar.add(Calendar.MINUTE, 30);
-                    break;
-                case NOTIFICATIONS_1_HOUR:
-                    newCalendar.add(Calendar.HOUR, 1);
-                    break;
-                case NOTIFICATIONS_6_HOURS:
-                    newCalendar.add(Calendar.HOUR, 6);
-                    break;
-                case NOTIFICATIONS_24_HOURS:
-                    newCalendar.add(Calendar.HOUR, 24);
-                    break;
-            }
-
-            long timestamp = newCalendar.getTimeInMillis();
-            if (chatId == MEGACHAT_INVALID_HANDLE) {
-                push.setGlobalChatsDnd(timestamp);
-            } else {
-                push.setChatDnd(chatId, timestamp);
-            }
+                long time = newCalendar.getTimeInMillis();
+                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                    push.setGlobalChatsDnd(time);
+                } else {
+                    push.setChatDnd(chatId, time);
+                }
         }
 
         MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);

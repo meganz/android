@@ -736,8 +736,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
-        IntentFilter filterMuteChatRoom = new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-        registerReceiver(chatRoomMuteUpdateReceiver, filterMuteChatRoom);
+        registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -2275,7 +2274,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
 
             case R.id.cab_menu_unmute_chat:
-                MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatRoom.getChatId());
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatRoom.getChatId());
                 break;
         }
         return super.onOptionsItemSelected(item);

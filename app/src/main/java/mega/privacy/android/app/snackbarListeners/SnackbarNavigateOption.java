@@ -45,12 +45,10 @@ public class SnackbarNavigateOption implements View.OnClickListener {
         //Intent to Settings
 
         if (context instanceof ManagerActivityLollipop) {
-            if(type == MUTE_NOTIFICATIONS_SNACKBAR_TYPE){
-                MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
-
-            }else if (isSentAsMessageSnackbar) {
+            if (type == MUTE_NOTIFICATIONS_SNACKBAR_TYPE) {
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
+            } else if (isSentAsMessageSnackbar) {
                 ((ManagerActivityLollipop) context).moveToChatSection(idChat);
-
             } else {
                 ((ManagerActivityLollipop) context).moveToSettingsSectionStorage();
             }

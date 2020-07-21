@@ -595,7 +595,7 @@ public class ChatUtil {
      */
     public static String getGeneralNotification() {
         MegaApplication app = MegaApplication.getInstance();
-        MegaPushNotificationSettings pushNotificationSettings = app.getPushNotificationSettingManagement().getPushNotificationSetting();
+        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
         if (pushNotificationSettings != null) {
             if (!pushNotificationSettings.isGlobalChatsDndEnabled() || pushNotificationSettings.getGlobalChatsDnd() == -1) {
                 ChatSettings chatSettings = app.getDbH().getChatSettings();
@@ -659,7 +659,7 @@ public class ChatUtil {
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() != initialOption) {
-                        MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), isUntilThisMorning), chatId);
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), isUntilThisMorning), chatId);
                     }
                     dialog.dismiss();
                 });
@@ -754,7 +754,7 @@ public class ChatUtil {
      * @return True, if notifications are activated. False in the opposite case
      */
     public static boolean isEnableChatNotifications(long chatId) {
-        MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getInstance().getPushNotificationSettingManagement().getPushNotificationSetting();
+        MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
         return megaPushNotificationSettings == null || !megaPushNotificationSettings.isChatDndEnabled(chatId);
     }
 
@@ -766,7 +766,7 @@ public class ChatUtil {
      * @param notificationsSubTitle The TextView with the info.
      */
     public static void checkSpecificChatNotifications(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
-        if (MegaApplication.getInstance().getPushNotificationSettingManagement().getPushNotificationSetting() != null) {
+        if (MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting() != null) {
             updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle);
         }
     }
@@ -779,7 +779,7 @@ public class ChatUtil {
      * @param notificationsSubTitle The TextView with the info.
      */
     public static void updateSwitchButton(long chatId, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
-        MegaPushNotificationSettings push = MegaApplication.getInstance().getPushNotificationSettingManagement().getPushNotificationSetting();
+        MegaPushNotificationSettings push = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
         if(push == null)
             return;
 
