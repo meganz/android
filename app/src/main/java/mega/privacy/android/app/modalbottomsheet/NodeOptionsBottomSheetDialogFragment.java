@@ -1,10 +1,8 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -13,10 +11,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
@@ -29,10 +23,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PermissionsFragment;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PermissionUtils;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -52,15 +43,12 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    public static final int REQUEST_WRITE_STORAGE = 4231;
-
     private MegaNode node = null;
     private NodeController nC;
 
     private TextView nodeInfo;
 
     private ManagerActivityLollipop.DrawerItem drawerItem;
-    private SwitchMaterial offlineSwitch;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,7 +92,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 //      counterSave
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
-        offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
+        SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
 //      counterShares
         LinearLayout optionLink = contentView.findViewById(R.id.option_link_layout);
         TextView optionLinkText = contentView.findViewById(R.id.option_link_text);
@@ -872,12 +860,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         separatorModify.setVisibility(counterModify <= 0 ? View.GONE : View.VISIBLE);
         separatorOpen.setVisibility(counterOpen <= 0 || counterRemove <= 0 ? View.GONE : View.VISIBLE);
 
-        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> {
-            if (isChecked && !hasStoragePermission()) {
-                view.setChecked(false);
-            }
-            onClick(view);
-        });
+        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -1029,6 +1012,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 shareNode(context, node);
                 break;
         }
+
+        setStateBottomSheetBehaviorHidden();
     }
 
     private void refreshView() {
@@ -1092,19 +1077,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         }
 
-        if (hasStoragePermission()) {
-            saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
-
-            if (!offlineSwitch.isChecked()) {
-                offlineSwitch.setChecked(true);
-            }
-        } else {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-        }
-    }
-
-    private boolean hasStoragePermission() {
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        // Save the new file to offline
+        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
     }
 
     @Override
@@ -1112,20 +1086,5 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_WRITE_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    saveForOffline();
-                } else {
-                    showToast(requireContext(), getString(R.string.download_requires_permission));
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 }

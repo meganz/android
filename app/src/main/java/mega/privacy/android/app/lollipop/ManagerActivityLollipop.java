@@ -1721,13 +1721,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 
 			}
-
-			case NodeOptionsBottomSheetDialogFragment.REQUEST_WRITE_STORAGE:
-				if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded()) {
-					bottomSheetDialogFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
-				}
-				break;
-		}
+        }
     }
 
 	public void setTypesCameraPermission(int typesCameraPermission) {
