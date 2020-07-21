@@ -900,7 +900,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 if (notificationsSwitch.isChecked()) {
                     createMuteNotificationsChatAlertDialog(this, chatHandle);
                 } else {
-                    app.controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
+                    app.getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
                 }
                 break;
             case R.id.chat_group_contact_properties_chat_link_layout: {

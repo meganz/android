@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
@@ -103,7 +104,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	static final public String USER_AGENT = "MEGAAndroid/3.7.6_314";
 
-	DatabaseHandler dbH;
+    private static PushNotificationSettingManagement pushNotificationSettingManagement;
+
+    DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -157,7 +160,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static boolean isLoggingRunning = false;
 
 	MegaChatApiAndroid megaChatApi = null;
-	private MegaPushNotificationSettings push;
 
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
@@ -251,7 +253,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
 					if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-						sendPushNotificationSettings(request.getMegaPushNotificationSettings());
+						pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
 					}
 				}else if (e.getErrorCode() == MegaError.API_OK) {
 					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
@@ -280,7 +282,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
 				if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
 					if (e.getErrorCode() == MegaError.API_OK) {
-						sendPushNotificationSettings(request.getMegaPushNotificationSettings());
+                        pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
 					} else {
 						logError("Chat notification settings cannot be updated");
 					}
@@ -526,6 +528,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
+        pushNotificationSettingManagement = new PushNotificationSettingManagement();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -677,100 +680,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
-	/**
-	 * Method for getting the PushNotificationSetting instance.
-	 *
-	 * @return MegaPushNotificationSettings.
-	 */
-	public MegaPushNotificationSettings getPushNotificationSetting() {
-		if (push == null) {
-			if (megaApi == null) {
-				getMegaApi();
-			}
-			if (megaApi != null) {
-				megaApi.getPushNotificationSettings(null);
-			}
-		}
 
-		return push;
-	}
 
-	/**
-	 * Method for getting the MegaPushNotificationSettings and sending it via a broadcast
-	 *
-	 * @param receivedPush The MegaPushNotificationSettings obtained from the request.
-	 */
-	private void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
-		if (receivedPush != null) {
-			push = receivedPush.copy();
-		} else {
-			push = MegaPushNotificationSettings.createInstance();
-		}
-		Intent intent = new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING);
-		sendBroadcast(intent);
-	}
 
-	/**
-	 * Method that controls the change in general and specific chat notifications.
-	 *
-	 * @param context Context of Activity.
-	 * @param option  Muting option selected
-	 * @param chatId  Chat ID.
-	 */
-	public void controlMuteNotifications(Context context, String option, long chatId) {
-		if (option.equals(NOTIFICATIONS_DISABLED)) {
-
-			if (chatId == MEGACHAT_INVALID_HANDLE) {
-				push.enableChats(false);
-			} else {
-				push.enableChat(chatId, false);
-			}
-		} else if (option.equals(NOTIFICATIONS_ENABLED)) {
-
-			if (chatId == MEGACHAT_INVALID_HANDLE) {
-				push.enableChats(true);
-			} else {
-				push.enableChat(chatId, true);
-			}
-		} else if (option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ||
-				option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)) {
-
-			long timestamp = getCalendarSpecificTime(option).getTimeInMillis();
-			if (chatId == MEGACHAT_INVALID_HANDLE) {
-				push.setGlobalChatsDnd(timestamp);
-			} else {
-				push.setChatDnd(chatId, timestamp);
-			}
-		} else {
-
-			Calendar newCalendar = Calendar.getInstance();
-			newCalendar.setTimeInMillis(System.currentTimeMillis());
-			switch (option) {
-				case NOTIFICATIONS_30_MINUTES:
-					newCalendar.add(Calendar.MINUTE, 30);
-					break;
-				case NOTIFICATIONS_1_HOUR:
-					newCalendar.add(Calendar.HOUR, 1);
-					break;
-				case NOTIFICATIONS_6_HOURS:
-					newCalendar.add(Calendar.HOUR, 6);
-					break;
-				case NOTIFICATIONS_24_HOURS:
-					newCalendar.add(Calendar.HOUR, 24);
-					break;
-			}
-
-			long timestamp = newCalendar.getTimeInMillis();
-			if (chatId == MEGACHAT_INVALID_HANDLE) {
-				push.setGlobalChatsDnd(timestamp);
-			} else {
-				push.setChatDnd(chatId, timestamp);
-			}
-		}
-
-		megaApi.setPushNotificationSettings(push, null);
-		muteChat(context, option);
-	}
 	
 	public MegaApiAndroid getMegaApiFolder(){
 		if (megaApiFolder == null){
@@ -872,7 +784,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 			megaApi.addGlobalListener(new GlobalListener());
 			megaChatApi = getMegaChatApi();
-			push = getPushNotificationSetting();
 
 			String language = Locale.getDefault().toString();
 			boolean languageString = megaApi.setLanguage(language);
@@ -1735,4 +1646,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
 	}
+
+    public static PushNotificationSettingManagement getPushNotificationSettingManagement() {
+        return pushNotificationSettingManagement;
+    }
 }

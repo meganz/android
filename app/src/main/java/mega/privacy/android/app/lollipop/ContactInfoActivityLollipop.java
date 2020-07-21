@@ -1223,7 +1223,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				if (notificationsSwitch.isChecked()) {
 					createMuteNotificationsChatAlertDialog(this, chatHandle);
 				} else {
-					app.controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
+					app.getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
 				}
 				break;
 

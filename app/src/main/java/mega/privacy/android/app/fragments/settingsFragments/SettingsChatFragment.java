@@ -54,7 +54,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         chatDndSwitch.setVisible(false);
         chatDndSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
             if(((SwitchPreferenceCompat) preference).isChecked()){
-                MegaApplication.getInstance().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
+                MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
             }else{
                 createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), MEGACHAT_INVALID_HANDLE);
             }
@@ -74,7 +74,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
      * Method to update the UI items when the Push notification Settings change.
      */
     public void updateSwitch(){
-        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
+        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSettingManagement().getPushNotificationSetting();
 
         String option = NOTIFICATIONS_ENABLED;
         if (pushNotificationSettings != null) {
@@ -153,7 +153,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         }
         switch (preference.getKey()){
             case KEY_CHAT_NOTIFICATIONS:
-                MegaApplication.getInstance().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, MEGACHAT_INVALID_HANDLE);
+                MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, MEGACHAT_INVALID_HANDLE);
                 break;
 
             case KEY_CHAT_VIBRATE:

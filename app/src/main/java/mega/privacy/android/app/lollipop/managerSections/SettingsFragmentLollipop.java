@@ -1938,7 +1938,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	}
 
 	public void updateNotifChat() {
-		MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSetting();
+		MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getInstance().getPushNotificationSettingManagement().getPushNotificationSetting();
 
 		String option = NOTIFICATIONS_ENABLED;
 		if (pushNotificationSettings != null && pushNotificationSettings.isGlobalChatsDndEnabled()) {

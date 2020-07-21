@@ -2064,7 +2064,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			megaChatApi.retryPendingConnections(false, null);
 		}
 
-		app.getPushNotificationSetting();
+		app.getPushNotificationSettingManagement().getPushNotificationSetting();
 
 		transfersInProgress = new ArrayList<Integer>();
 

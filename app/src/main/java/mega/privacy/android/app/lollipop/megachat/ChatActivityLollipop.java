@@ -2275,7 +2275,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
 
             case R.id.cab_menu_unmute_chat:
-                MegaApplication.getInstance().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatRoom.getChatId());
+                MegaApplication.getInstance().getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatRoom.getChatId());
                 break;
         }
         return super.onOptionsItemSelected(item);
