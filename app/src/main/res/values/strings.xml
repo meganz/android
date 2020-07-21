@@ -2790,4 +2790,6 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
 
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+
 </resources>
