@@ -17,15 +17,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
-import mega.privacy.android.app.utils.MegaNodeUtil;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class LinksFragment extends MegaNodeBaseFragment {
@@ -52,44 +48,28 @@ public class LinksFragment extends MegaNodeBaseFragment {
             CloudStorageOptionControlUtil.Control control =
                 new CloudStorageOptionControlUtil.Control();
 
-            control.copy().setVisible(true);
-
             if (selected.size() == 1) {
                 control.manageLink().setVisible(true)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-                menu.findItem(R.id.cab_menu_send_to_chat)
-                    .setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-                        R.color.white));
-                control.sendToChat().setVisible(selected.get(0).isFile())
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
                 control.removeLink().setVisible(true);
-
-                if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode()
-                    == MegaError.API_OK) {
-                    control.rename().setVisible(true);
-                }
             } else {
                 control.removeLink().setVisible(true)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
             control.shareOut().setVisible(true)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-
-            control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
-            control.selectAll().setVisible(notAllNodesSelected());
-
+            setupCommonOptions(menu, control);
             CloudStorageOptionControlUtil.applyControl(menu, control);
 
             return true;
+        }
+
+        @Override
+        protected boolean isInSubFolder() {
+            return managerActivity.getDeepBrowserTreeLinks() > 0;
         }
     }
 

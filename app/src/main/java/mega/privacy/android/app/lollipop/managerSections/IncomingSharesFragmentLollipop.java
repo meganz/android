@@ -50,25 +50,28 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			CloudStorageOptionControlUtil.Control control =
 					new CloudStorageOptionControlUtil.Control();
 
-			if (selected.size() == 1
-					&& megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
-				control.rename().setVisible(true)
-						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-
-			control.copy().setVisible(true)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-			control.selectAll().setVisible(notAllNodesSelected());
-
 			control.leaveShare().setVisible(managerActivity.getDeepBrowserTreeIncoming() == 0)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			control.trash().setVisible(false);
+			setupCommonOptions(menu, control);
+
+			if (managerActivity.getDeepBrowserTreeIncoming() > 0) {
+				for (MegaNode node : selected) {
+					if (megaApi.checkAccess(node, ACCESS_FULL).getErrorCode() != API_OK) {
+						control.move().setVisible(false);
+						break;
+					}
+				}
+			}
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
 			return true;
+		}
+
+		@Override
+		protected boolean isInSubFolder() {
+			return managerActivity.getDeepBrowserTreeIncoming() > 0;
 		}
 	}
 

@@ -48,7 +48,9 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
@@ -105,7 +107,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         downloadLocationDefaultPath = getDownloadLocation();
     }
 
-    protected class BaseActionBarCallBack implements ActionMode.Callback {
+    protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
 
@@ -234,6 +236,58 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         protected boolean notAllNodesSelected() {
             return selected.size() < adapter.getItemCount();
         }
+
+        protected void setupCommonOptions(Menu menu, CloudStorageOptionControlUtil.Control control) {
+            if (isInSubFolder()) {
+                boolean showSendToChat = true;
+                for (MegaNode node : selected) {
+                    if (!node.isFile()) {
+                        showSendToChat = false;
+                        break;
+                    }
+                }
+                if (showSendToChat) {
+                    menu.findItem(R.id.cab_menu_send_to_chat)
+                        .setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+                            R.color.white));
+
+                    control.sendToChat().setVisible(true)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                }
+
+                control.move().setVisible(true);
+                if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                    control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                } else {
+                    control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                }
+
+                control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
+            } else {
+                control.trash().setVisible(false);
+            }
+
+            if (selected.size() == 1
+                && megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+                control.rename().setVisible(true);
+                if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                    control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                } else {
+                    control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                }
+            }
+
+            control.copy().setVisible(true);
+            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            } else {
+                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            }
+
+            control.selectAll().setVisible(notAllNodesSelected());
+        }
+
+        protected abstract boolean isInSubFolder();
     }
 
     @Override

@@ -62,13 +62,11 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					}
 				}
-				if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode()
-						== MegaError.API_OK) {
-					control.rename().setVisible(true);
-				}
 
-				control.shareFolder().setVisible(true)
-						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if (selected.get(0).isFolder()) {
+					control.shareFolder().setVisible(true)
+							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
 
 				if (MegaNodeUtil.isOutShare(selected.get(0))) {
 					control.removeShare().setVisible(true);
@@ -79,22 +77,20 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 								R.color.white));
 				control.removeShare().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-				control.copy().setVisible(true)
-						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
 			control.shareOut().setVisible(true)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			control.copy().setVisible(true);
-
-			control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
-			control.selectAll().setVisible(notAllNodesSelected());
-
+			setupCommonOptions(menu, control);
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
 			return true;
+		}
+
+		@Override
+		protected boolean isInSubFolder() {
+			return managerActivity.getDeepBrowserTreeOutgoing() > 0;
 		}
 	}
 
