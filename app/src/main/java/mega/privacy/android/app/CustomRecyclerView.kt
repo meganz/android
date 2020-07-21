@@ -62,22 +62,21 @@ class CustomRecyclerView : RecyclerView {
 //        return super.onTouchEvent(e)
 //    }
 
-    override fun dispatchTouchEvent(e: MotionEvent?): Boolean {
-//        if (!canScrollHorizontally(1)) {
-//            Log.i("Alex", "return")
-//            parent?.requestDisallowInterceptTouchEvent(false)
-//            return super.dispatchTouchEvent(e)
-//        }
+    override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
+        handleInterceptTouchEvent(e)
+        return super.onInterceptTouchEvent(e)
+    }
 
-        parent?.requestDisallowInterceptTouchEvent(true)
+    private fun handleInterceptTouchEvent(e: MotionEvent) {
         when (e?.action) {
             MotionEvent.ACTION_DOWN -> {
                 move_x = e.x.toInt()
                 move_y = e.y.toInt()
                 Log.e("motion_event", "down   x==y  $move_x ==== $move_y")
+                parent?.requestDisallowInterceptTouchEvent(true)
             }
             MotionEvent.ACTION_MOVE -> {
-                parent?.requestDisallowInterceptTouchEvent(true)
+//                parent?.requestDisallowInterceptTouchEvent(true)
                 Log.e("motion_event", "move   x==y  $move_x ==== $move_y")
                 val y = e.y.toInt()
                 val x = e.x.toInt()
@@ -92,10 +91,42 @@ class CustomRecyclerView : RecyclerView {
                 }
             }
         }
-
-        val res = super.dispatchTouchEvent(e)
-//        Log.i("Alex", "dispatch return:" + res)
-        return res
     }
+
+//    override fun dispatchTouchEvent(e: MotionEvent?): Boolean {
+////        if (!canScrollHorizontally(1)) {
+////////            Log.i("Alex", "return")
+////////            parent?.requestDisallowInterceptTouchEvent(false)
+////            return super.dispatchTouchEvent(e)
+////        }
+//
+//        when (e?.action) {
+//            MotionEvent.ACTION_DOWN -> {
+//                move_x = e.x.toInt()
+//                move_y = e.y.toInt()
+//                Log.e("motion_event", "down   x==y  $move_x ==== $move_y")
+//                parent?.requestDisallowInterceptTouchEvent(true)
+//            }
+//            MotionEvent.ACTION_MOVE -> {
+////                parent?.requestDisallowInterceptTouchEvent(true)
+//                Log.e("motion_event", "move   x==y  $move_x ==== $move_y")
+//                val y = e.y.toInt()
+//                val x = e.x.toInt()
+//                if (Math.abs(y - move_y) > mTouchSlop) {
+//                    Log.i("Alex", "false")
+//                    parent?.requestDisallowInterceptTouchEvent(false)
+//                }
+//
+//                if ((move_x - x > mTouchSlop) && !canScrollHorizontally(1)) {
+//                    parent?.requestDisallowInterceptTouchEvent(false)
+//                    Log.i("Alex", "scroll right")
+//                }
+//            }
+//        }
+//
+//        val res = super.dispatchTouchEvent(e)
+////        Log.i("Alex", "dispatch return:" + res)
+//        return res
+//    }
 
 }
