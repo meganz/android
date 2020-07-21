@@ -2793,4 +2793,7 @@
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support@mega.nz</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+
 </resources>

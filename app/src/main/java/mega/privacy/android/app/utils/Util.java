@@ -1054,42 +1054,6 @@ public class Util {
 		return yearList;
 	}
 
-
-	public static String getSubtitleDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-
-		Context context = MegaApplication.getInstance().getApplicationContext();
-
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = context.getString(R.string.no_folders_shared);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-
-		return info;
-	}
-
 	public static BitSet convertToBitSet(long value) {
 	    BitSet bits = new BitSet();
 	    int index = 0;
