@@ -2,17 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <item
-      android:id="@+id/cab_menu_share_out"
-      android:icon="@drawable/ic_social_share_white"
-      android:orderInCategory="80"
-      android:tint="@color/white"
-      android:title="@string/general_share"
-      app:showAsAction="always" />
+      android:id="@+id/cab_menu_restore_from_rubbish"
+      android:icon="@drawable/ic_restore"
+      android:orderInCategory="100"
+      android:title="@string/context_restore"
+      app:showAsAction="always"/>
 
   <item
       android:id="@+id/cab_menu_delete"
       android:icon="@drawable/ic_close_white"
-      android:orderInCategory="90"
+      android:orderInCategory="110"
       android:title="@string/context_delete_offline"
       app:showAsAction="always" />
 
