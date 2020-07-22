@@ -4406,6 +4406,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		};
 
 		inputFirstName.setSingleLine();
+		inputFirstName.setHint(R.string.first_name_text);
 		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -4436,6 +4437,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		inputFirstName.requestFocus();
 
 		inputLastName.setSingleLine();
+		inputLastName.setHint(R.string.lastname_text);
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
 		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -4466,6 +4468,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.setSingleLine();
+		inputMail.setHint(R.string.email_text);
 		inputMail.setText(megaApi.getMyUser().getEmail());
 		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
