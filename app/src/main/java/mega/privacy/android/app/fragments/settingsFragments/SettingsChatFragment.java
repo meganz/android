@@ -43,11 +43,12 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         chatNotificationsSwitch.setOnPreferenceClickListener(this);
 
         chatSoundPreference = findPreference(KEY_CHAT_SOUND);
-        chatSoundPreference.setVisible(false);
+        chatSoundPreference.setVisible(true);
         chatSoundPreference.setOnPreferenceClickListener(this);
 
         chatVibrateSwitch = findPreference(KEY_CHAT_VIBRATE);
-        chatVibrateSwitch.setVisible(false);
+        chatVibrateSwitch.setVisible(true);
+        chatVibrateSwitch.setEnabled(true);
         chatVibrateSwitch.setOnPreferenceClickListener(this);
 
         chatDndSwitch = findPreference(KEY_CHAT_DND);
@@ -75,10 +76,9 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
      */
     public void updateSwitch() {
         MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
-
         String option = NOTIFICATIONS_ENABLED;
-        if (pushNotificationSettings != null) {
 
+        if (pushNotificationSettings != null) {
             if (pushNotificationSettings.isGlobalChatsDndEnabled()) {
                 option = pushNotificationSettings.getGlobalChatsDnd() == 0 ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_DISABLED_X_TIME;
             } else {
@@ -88,19 +88,12 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
 
         if (option.equals(NOTIFICATIONS_DISABLED)) {
             chatDndSwitch.setVisible(false);
-            chatVibrateSwitch.setVisible(false);
-            chatVibrateSwitch.setEnabled(false);
-            chatSoundPreference.setVisible(false);
             return;
         }
 
         chatNotificationsSwitch.setChecked(option.equals(NOTIFICATIONS_ENABLED));
 
-        chatVibrateSwitch.setVisible(true);
-        chatVibrateSwitch.setEnabled(option.equals(NOTIFICATIONS_ENABLED));
-
-        if (option.equals(NOTIFICATIONS_ENABLED) &&
-                (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled()))) {
+        if (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled())) {
             dbH.setVibrationEnabledChat(true + "");
             chatSettings.setVibrationEnabled(true + "");
             chatVibrateSwitch.setChecked(true);
@@ -109,8 +102,6 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
             chatSettings.setVibrationEnabled(false + "");
             chatVibrateSwitch.setChecked(false);
         }
-
-        chatSoundPreference.setVisible(true);
 
         if (isTextEmpty(chatSettings.getNotificationsSound())) {
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);

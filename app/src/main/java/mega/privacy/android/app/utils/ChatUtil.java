@@ -636,7 +636,6 @@ public class ChatUtil {
         }
 
         boolean isUntilThisMorning = isUntilThisMorning();
-        int initialOption = getItemClicked(NOTIFICATIONS_ENABLED);
         String optionUntil = chatId != MEGACHAT_INVALID_HANDLE ?
                 context.getString(R.string.mute_chatroom_notification_option_forever) :
                 (isUntilThisMorning ? context.getString(R.string.mute_chatroom_notification_option_until_this_morning) :
@@ -647,35 +646,34 @@ public class ChatUtil {
                 (isUntilThisMorning ? NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING :
                         NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING);
 
-        AtomicReference<Integer> itemClicked = new AtomicReference<>(initialOption);
+        AtomicReference<Integer> itemClicked = new AtomicReference<>();
 
         ArrayList<String> stringsArray = new ArrayList<>();
-        stringsArray.add(0, context.getString(R.string.mute_chatroom_notification_option_off));
-        stringsArray.add(1, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
-        stringsArray.add(2, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
-        stringsArray.add(3, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
-        stringsArray.add(4, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
-        stringsArray.add(5, optionUntil);
+        stringsArray.add(0, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
+        stringsArray.add(1, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
+        stringsArray.add(2, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
+        stringsArray.add(3, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
+        stringsArray.add(4, optionUntil);
 
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
         ListView listView = new ListView(context);
         listView.setAdapter(itemsAdapter);
 
-        dialogBuilder.setSingleChoiceItems(itemsAdapter, itemClicked.get(), (dialog, item) -> {
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, INVALID_POSITION, (dialog, item) -> {
             itemClicked.set(item);
+            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
         });
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
-                    if (itemClicked.get() != initialOption) {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), optionSelected), chatId);
-                    }
+                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), optionSelected), chatId);
                     dialog.dismiss();
                 });
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
 
         muteDialog = dialogBuilder.create();
         muteDialog.show();
+        muteDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
     }
 
     /**
@@ -701,27 +699,6 @@ public class ChatUtil {
     }
 
     /**
-     * Method for getting the selected item depending on the selected mute option.
-     *
-     * @param option The selected mute option.
-     * @return The right item.
-     */
-    private static int getItemClicked(String option) {
-        switch (option) {
-            case NOTIFICATIONS_30_MINUTES:
-                return 1;
-            case NOTIFICATIONS_1_HOUR:
-                return 2;
-            case NOTIFICATIONS_6_HOURS:
-                return 3;
-            case NOTIFICATIONS_24_HOURS:
-                return 4;
-            default:
-                return 0;
-        }
-    }
-
-    /**
      * Method for getting the selected mute option depending on the selected item.
      *
      * @param itemClicked   The selected item.
@@ -731,16 +708,14 @@ public class ChatUtil {
     private static String getTypeMute(int itemClicked, String optionSelected) {
         switch (itemClicked) {
             case 0:
-                return NOTIFICATIONS_ENABLED;
-            case 1:
                 return NOTIFICATIONS_30_MINUTES;
-            case 2:
+            case 1:
                 return NOTIFICATIONS_1_HOUR;
-            case 3:
+            case 2:
                 return NOTIFICATIONS_6_HOURS;
-            case 4:
+            case 3:
                 return NOTIFICATIONS_24_HOURS;
-            case 5:
+            case 4:
                 return optionSelected;
             default:
                 return NOTIFICATIONS_ENABLED;
