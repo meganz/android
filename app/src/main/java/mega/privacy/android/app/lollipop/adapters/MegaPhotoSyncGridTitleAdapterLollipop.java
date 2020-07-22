@@ -228,7 +228,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             inflater.inflate(R.menu.cloud_storage_action, menu);
             ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
             Util.changeStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow(),
-                ContextCompat.getColor(context, R.color.accentColorDark));
+                R.color.accentColorDark);
             ((ManagerActivityLollipop) context).setDrawerLockMode(true);
             ((CameraUploadFragmentLollipop) fragment).checkScroll();
             return true;
