@@ -121,12 +121,14 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class PdfViewerActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
@@ -1593,6 +1595,10 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_chat: {
+                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning();
+                    break;
+                }
 
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);

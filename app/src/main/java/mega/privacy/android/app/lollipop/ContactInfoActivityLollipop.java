@@ -112,6 +112,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -125,6 +126,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
@@ -869,6 +871,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void sendFileToChat(){
 		logDebug("sendFileToChat");
 
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		if(user==null){
 			logWarning("Selected contact NULL");
 			return;
@@ -881,6 +888,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	public void sendMessageToChat(){
 		logDebug("sendMessageToChat");
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		if(user!=null){
 			MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chat==null){
@@ -1198,10 +1211,15 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startingACall(boolean withVideo) {
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		startVideo = withVideo;
 		if (checkPermissionsCall()) {
 			startCall();
-
 		}
 	}
 
@@ -1247,6 +1265,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
 				logDebug("Share contact option");
+
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					return;
+				}
+
 				if(user==null){
 					logDebug("Selected contact NULL");
 					return;

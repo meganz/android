@@ -21,6 +21,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -28,6 +29,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 
 public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -120,6 +122,13 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
     @Override
     public void onClick(View v) {
+
+        if (app.getStorageState() == STORAGE_STATE_PAYWALL && v.getId() != R.id.contact_list_info_contact_layout) {
+            showOverDiskQuotaPaywallWarning();
+            setStateBottomSheetBehaviorHidden();
+            return;
+        }
+
         if (contact == null) {
             logWarning("Selected contact NULL");
             return;

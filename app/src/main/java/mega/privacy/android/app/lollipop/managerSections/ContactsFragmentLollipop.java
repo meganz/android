@@ -71,6 +71,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -592,6 +593,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL &&
+					item.getItemId() != R.id.cab_menu_select_all && item.getItemId() != R.id.cab_menu_unselect_all) {
+				showOverDiskQuotaPaywallWarning();
+				return false;
+			}
+
 			ArrayList<MegaUser> users = adapter.getSelectedUsers();
 
 			switch(item.getItemId()){

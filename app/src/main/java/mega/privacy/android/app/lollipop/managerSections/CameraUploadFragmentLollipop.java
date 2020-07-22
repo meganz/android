@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -96,6 +97,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, MegaRequestListenerInterface{
@@ -382,6 +384,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 				case R.id.cab_menu_send_to_chat:{
 					logDebug("Send files to chat");
+					if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+						showOverDiskQuotaPaywallWarning();
+						break;
+					}
 					// For adapterGrid, please go to MegaPhotoSyncGridTitleAdapterLollipop
 					NodeController nC = new NodeController(context);
 					ArrayList<Long> handleList = new ArrayList();
