@@ -6682,7 +6682,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (getContactsFragment() != null && cFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 
 						}
