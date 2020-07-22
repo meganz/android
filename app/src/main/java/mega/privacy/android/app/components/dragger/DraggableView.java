@@ -55,7 +55,7 @@ public class DraggableView extends FrameLayout{
     float originalViewY = 0;
     float touchInterceptSensibility = 100;
 
-    int[] selfInitialLocationOnWindow;
+    private int[] selfInitialLocationOnWindow;
 
     public DraggableView(Context context) {
         this(context, null);

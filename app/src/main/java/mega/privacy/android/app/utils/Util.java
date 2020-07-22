@@ -1443,16 +1443,13 @@ public class Util {
         window.setStatusBarColor(ContextCompat.getColor(context, color));
     }
 
-    public static int getStatusBarHeight(Context context) {
-		int statusBarHeight;
+	public static int getStatusBarHeight() {
+		Context context = MegaApplication.getInstance().getBaseContext();
 		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
 				"android");
-		if (resourceId > 0) {
-			statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
-		} else {
-			statusBarHeight = px2dp(24, context.getResources().getDisplayMetrics());
-		}
-		return statusBarHeight;
+
+		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
+				: px2dp(24, context.getResources().getDisplayMetrics());
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
