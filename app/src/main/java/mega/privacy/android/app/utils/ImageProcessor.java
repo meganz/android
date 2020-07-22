@@ -17,8 +17,6 @@ import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import nz.mega.sdk.AndroidGfxProcessor;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -28,33 +26,7 @@ public class ImageProcessor {
 
     private static final int THUMBNAIL_SIZE = 200;
 
-    public static void createImageThumbnail(MegaApiJava api,String localPath,File dst) {
-        logDebug("Create image thumbnail for: " + localPath);
-        boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
-        if (!result) {
-            processThumbnail(null, api, localPath, dst);
-        }
-    }
-
-    public static void createVideoThumbnail(MegaApiJava api,String localPath,File dst) {
-        logDebug("Create video thumbnail for: " + localPath);
-        boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
-        if (!result) {
-            processThumbnail(null, api, localPath, dst);
-        }
-    }
-
-    private static void processThumbnail(Bitmap thumbnail,MegaApiJava api,String localPath,File dst) {
-        if (thumbnail == null) {
-            logDebug("create thumbnail use api");
-            api.createThumbnail(localPath,dst.getAbsolutePath());
-        } else {
-            logDebug("get from db is not null");
-            nz.mega.sdk.AndroidGfxProcessor.saveBitmap(thumbnail,dst);
-        }
-    }
-
-    public static boolean createImageThumbnail(Context context, File origin ,File thumbnail) {
+    public static boolean createThumbnail(Context context, File origin, File thumbnail) {
         if (!origin.exists()) return false;
         if (thumbnail.exists()) thumbnail.delete();
 
@@ -68,12 +40,12 @@ public class ImageProcessor {
         return false;
     }
 
-    public static boolean createImagePreview(Context context, File img,File preview) {
-        int [] wh = calculatePreviewWidthAndHeight(img);
+    public static boolean createImagePreview(Context context, File img, File preview) {
+        int[] wh = calculatePreviewWidthAndHeight(img);
         int w = wh[0];
         int h = wh[1];
 
-        if ((w == 0) || (h == 0)) return false;
+        if (w == 0 || h == 0) return false;
         try {
             Bitmap bitmap = Glide.with(context).asBitmap().load(img).submit(w, h).get();
             return AndroidGfxProcessor.saveBitmap(bitmap, preview);
@@ -202,7 +174,7 @@ public class ImageProcessor {
 
         try {
             if (bmThumbnail != null) {
-                return Bitmap.createScaledBitmap(bmThumbnail,w,h,true);
+                return Glide.with(context).asBitmap().load(bmThumbnail).submit(w, h).get();
             }
         } catch (Exception e) {
         }

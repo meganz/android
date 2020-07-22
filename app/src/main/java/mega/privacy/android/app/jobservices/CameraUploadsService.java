@@ -1565,19 +1565,16 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                         threadPool.execute(() -> {
                             File img = new File(finalRecord.getLocalPath());
                             if (!preview.exists()) {
-                                //for Android 5, 5.1 devices may have insufficient memory, so don't create previews.
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    createVideoPreview(CameraUploadsService.this, img, preview);
-                                }
+                                createVideoPreview(CameraUploadsService.this, img, preview);
                             }
-                            createVideoThumbnail(api, finalRecord.getLocalPath(), thumb);
+                            createThumbnail(CameraUploadsService.this, img, thumb);
                         });
                     } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
                         threadPool.execute(() -> {
                             if (!preview.exists()) {
                                 ImageProcessor.createImagePreview(CameraUploadsService.this, src, preview);
                             }
-                            ImageProcessor.createImageThumbnail(CameraUploadsService.this, src, thumb);
+                            ImageProcessor.createThumbnail(CameraUploadsService.this, src, thumb);
                         });
                     }
                 }
