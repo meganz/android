@@ -13,8 +13,7 @@
 
 	<item
 		android:id="@+id/bottom_navigation_item_homepage"
-		android:icon="@drawable/ic_homepage"
-		android:title="@string/section_homepage"/>
+		android:icon="@drawable/ic_homepage" />
 
 	<item
 		android:id="@+id/bottom_navigation_item_chat"

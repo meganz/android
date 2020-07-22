@@ -89,7 +89,6 @@ import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.Chronometer;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -307,7 +306,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private static final int HOMEPAGE_BNV = 2;
 	private static final int CHAT_BNV = 3;
 	private static final int SHARED_BNV = 4;
-//	private static final int OFFLINE_BNV = 4;
 	private static final int HIDDEN_BNV = 5;
 	private static final int MEDIA_UPLOADS_BNV = 6;
 
@@ -435,7 +433,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		public String getTag () {
 			switch (this) {
 				case CLOUD_DRIVE: return "fbFLol";
-				case HOMEPAGE: return "fragmentHomePage";
+				case HOMEPAGE: return "fragmentHomepage";
 				case RECENTS: return "rF";
 				case RUBBISH_BIN: return "rubbishBinFLol";
 				case OFFLINE: return "oFLol";
@@ -476,7 +474,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case HOMEPAGE: return context.getString(R.string.section_homepage);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
@@ -957,7 +954,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if(actionType == GO_OFFLINE){
 				    //stop cu process
                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
-//					showOfflineMode();
+					showOfflineMode();
 				}
 				else if(actionType == GO_ONLINE){
 					showOnlineMode();
@@ -2541,8 +2538,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			selectDrawerItemLollipop(drawerItem);
-
-//			showOfflineMode();
+			showOfflineMode();
 
 			UserCredentials credentials = dbH.getCredentials();
 			if (credentials != null) {
@@ -2828,7 +2824,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						drawerItem=DrawerItem.ACCOUNT;
 						showMKLayout();
 						selectDrawerItemLollipop(drawerItem);
-						selectDrawerItemPending=false;
 						return;
 					}
 					else if(getIntent().getAction().equals(ACTION_CANCEL_ACCOUNT)){
@@ -2862,15 +2857,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 
 						if (locationFileInfo){
-//							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
-//							if (offlineAdapter){
-//								drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-//								String pathNavigation = getIntent().getStringExtra("pathNavigation");
-//								setPathNavigationOffline(pathNavigation);
-//								selectDrawerItemLollipop(drawerItem);
-//								selectDrawerItemPending=false;
-//							}
-//							else {
+							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
+							if (offlineAdapter){
+								drawerItem = DrawerItem.HOMEPAGE;
+								// FIXME: Homepage: make the offline fragment in the hompage navigate to the path
+								String pathNavigation = getIntent().getStringExtra("pathNavigation");
+								setPathNavigationOffline(pathNavigation);
+								selectDrawerItemLollipop(drawerItem);
+								selectDrawerItemPending=false;
+							}
+							else {
 								long fragmentHandle = getIntent().getLongExtra("fragmentHandle", -1);
 
 								if (fragmentHandle == megaApi.getRootNode().getHandle()){
@@ -2903,7 +2899,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									selectDrawerItemLollipop(drawerItem);
 									selectDrawerItemPending=false;
 								}
-//							}
+							}
 						}
 						else {
 							actionOpenFolder(handleIntent);
@@ -4146,10 +4142,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					break;
 				}
-				case HOMEPAGE: {
-					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
-					break;
-				}
 				case CAMERA_UPLOADS: {
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 					break;
@@ -4161,6 +4153,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					break;
 				}
+				case HOMEPAGE:
 				default:
 					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
 					break;
@@ -4709,10 +4702,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             else if (fTag.equals(FragmentTag.LINKS.getTag())) {
                 ((LinksFragment) f).headerItemDecoration = null;
             }
-//			else if (fTag.equals(FragmentTag.OFFLINE.getTag())) {
-//				((OfflineFragmentLollipop) f).setHeaderItemDecoration(null);
-//				((OfflineFragmentLollipop) f).setPathNavigation(pathNavigationOffline);
-//			}
 			else if (fTag.equals(FragmentTag.INBOX.getTag())) {
 				((InboxFragmentLollipop) f).headerItemDecoration = null;
 			}
@@ -4931,39 +4920,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				break;
 			}
-//			case SAVED_FOR_OFFLINE: {
-//				aB.setSubtitle(null);
-//
-//				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//				if (oFLol != null && oFLol.getSearchString() != null) {
-//					String title = getString(R.string.action_search).toUpperCase() + ": " + oFLol.getSearchString();
-//					aB.setTitle(title);
-//					firstNavigationLevel = false;
-//				} else if(pathNavigationOffline != null){
-//					logDebug("AFTER PathNavigation is: " + pathNavigationOffline);
-//					if (pathNavigationOffline.equals("/")){
-//						aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
-//						firstNavigationLevel=true;
-//					}
-//					else{
-//						logDebug("The pathNavigation is: " + pathNavigationOffline);
-//						String title = pathNavigationOffline;
-//						int index=title.lastIndexOf("/");
-//						title=title.substring(0,index);
-//						index=title.lastIndexOf("/");
-//						title=title.substring(index+1,title.length());
-//						aB.setTitle(title);
-//						firstNavigationLevel=false;
-//					}
-//				}
-//				else{
-//					logWarning("PathNavigation is NULL");
-//					aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
-//					firstNavigationLevel=true;
-//				}
-//
-//				break;
-//			}
+			// FIXME: for removed OFFLINE, how shall we set firstNavigationLevel?
 			case INBOX:{
 				aB.setSubtitle(null);
 				if(parentHandleInbox==megaApi.getInboxNode().getHandle()||parentHandleInbox==-1){
@@ -5219,98 +5176,98 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		finish();
 	}
 
-//	public void showOfflineMode() {
-//		logDebug("showOfflineMode");
-//
-//		try{
-//			if (megaApi == null) {
-//				logWarning("megaApi is Null in Offline mode");
-//			}
-//
-//			if (usedSpaceLayout != null) {
-//				usedSpaceLayout.setVisibility(View.GONE);
-//			}
-//
-//			UserCredentials credentials = dbH.getCredentials();
-//			if (credentials != null) {
-//				String emailCredentials = credentials.getEmail();
-//				if (emailCredentials != null) {
-//					if (nVEmail != null) {
-//						nVEmail.setText(emailCredentials);
-//					}
-//				}
-//
-//				String myHandleCredentials = credentials.getMyHandle();
-//				long myHandle = -1;
-//				if (myHandleCredentials != null) {
-//					if (!myHandleCredentials.isEmpty()) {
-//						myHandle = Long.parseLong(myHandleCredentials);
-//					}
-//				}
-//
-//				String firstNameText = credentials.getFirstName();
-//				String lastNameText = credentials.getLastName();
-//				String fullName = "";
-//				if (firstNameText == null) {
-//					firstNameText = "";
-//				}
-//				if (lastNameText == null) {
-//					lastNameText = "";
-//				}
-//				if (firstNameText.trim().length() <= 0) {
-//					fullName = lastNameText;
-//				} else {
-//					fullName = firstNameText + " " + lastNameText;
-//				}
-//
-//				if (fullName.trim().length() <= 0) {
-//					logDebug("Put email as fullname");
-//					String[] splitEmail = emailCredentials.split("[@._]");
-//					fullName = splitEmail[0];
-//				}
-//
-//				if (fullName.trim().length() <= 0) {
-//					fullName = getString(R.string.name_text) + " " + getString(R.string.lastname_text);
-//					logDebug("Full name set by default");
-//				}
-//
-//				if (nVDisplayName != null) {
-//					nVDisplayName.setText(fullName);
-//				}
-//
-//				setOfflineAvatar(emailCredentials, myHandle, fullName);
-//			}
-//
-//			if (getSettingsFragment() != null) {
-//				sttFLol.setOnlineOptions(false);
-//			}
-//
-//			logDebug("DrawerItem on start offline: " + drawerItem);
-//			if (drawerItem == null) {
-//				logWarning("drawerItem == null --> On start OFFLINE MODE");
-//				drawerItem = DrawerItem.HOMEPAGE;
-//				if (bNV != null) {
-//					Menu bNVMenu = bNV.getMenu();
-//					if (bNVMenu != null) {
-//						disableNavigationViewMenu(bNVMenu);
-//					}
-//				}
-//				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
-//				selectDrawerItemLollipop(drawerItem);
-//			} else {
-//				if (bNV != null) {
-//					Menu bNVMenu = bNV.getMenu();
-//					if (bNVMenu != null) {
-//						disableNavigationViewMenu(bNVMenu);
-//					}
-//				}
-//				logDebug("Change to OFFLINE MODE");
-//				clickDrawerItemLollipop(drawerItem);
-//			}
-//
-//			supportInvalidateOptionsMenu();
-//		}catch(Exception e){}
-//	}
+	public void showOfflineMode() {
+		logDebug("showOfflineMode");
+
+		try{
+			if (megaApi == null) {
+				logWarning("megaApi is Null in Offline mode");
+			}
+
+			if (usedSpaceLayout != null) {
+				usedSpaceLayout.setVisibility(View.GONE);
+			}
+
+			UserCredentials credentials = dbH.getCredentials();
+			if (credentials != null) {
+				String emailCredentials = credentials.getEmail();
+				if (emailCredentials != null) {
+					if (nVEmail != null) {
+						nVEmail.setText(emailCredentials);
+					}
+				}
+
+				String myHandleCredentials = credentials.getMyHandle();
+				long myHandle = -1;
+				if (myHandleCredentials != null) {
+					if (!myHandleCredentials.isEmpty()) {
+						myHandle = Long.parseLong(myHandleCredentials);
+					}
+				}
+
+				String firstNameText = credentials.getFirstName();
+				String lastNameText = credentials.getLastName();
+				String fullName = "";
+				if (firstNameText == null) {
+					firstNameText = "";
+				}
+				if (lastNameText == null) {
+					lastNameText = "";
+				}
+				if (firstNameText.trim().length() <= 0) {
+					fullName = lastNameText;
+				} else {
+					fullName = firstNameText + " " + lastNameText;
+				}
+
+				if (fullName.trim().length() <= 0) {
+					logDebug("Put email as fullname");
+					String[] splitEmail = emailCredentials.split("[@._]");
+					fullName = splitEmail[0];
+				}
+
+				if (fullName.trim().length() <= 0) {
+					fullName = getString(R.string.name_text) + " " + getString(R.string.lastname_text);
+					logDebug("Full name set by default");
+				}
+
+				if (nVDisplayName != null) {
+					nVDisplayName.setText(fullName);
+				}
+
+				setOfflineAvatar(emailCredentials, myHandle, fullName);
+			}
+
+			if (getSettingsFragment() != null) {
+				sttFLol.setOnlineOptions(false);
+			}
+
+			logDebug("DrawerItem on start offline: " + drawerItem);
+			if (drawerItem == null) {
+				logWarning("drawerItem == null --> On start OFFLINE MODE");
+				drawerItem = DrawerItem.HOMEPAGE;
+				if (bNV != null) {
+					Menu bNVMenu = bNV.getMenu();
+					if (bNVMenu != null) {
+						disableNavigationViewMenu(bNVMenu);
+					}
+				}
+				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+				selectDrawerItemLollipop(drawerItem);
+			} else {
+				if (bNV != null) {
+					Menu bNVMenu = bNV.getMenu();
+					if (bNVMenu != null) {
+						disableNavigationViewMenu(bNVMenu);
+					}
+				}
+				logDebug("Change to OFFLINE MODE");
+				clickDrawerItemLollipop(drawerItem);
+			}
+
+			supportInvalidateOptionsMenu();
+		}catch(Exception e){}
+	}
 
 	public void clickDrawerItemLollipop(DrawerItem item){
 		logDebug("Item: " + item);
@@ -5329,10 +5286,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 					break;
 				}
-//				case SAVED_FOR_OFFLINE:{
-//					setBottomNavigationMenuItemChecked(OFFLINE_BNV);
-//					break;
-//				}
 				case HOMEPAGE: {
 					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
 					break;
@@ -5879,15 +5832,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
-//				drawerItem = DrawerItem.HOMEPAGE;
-//				attachHomepageFragment(obtainHomepageNavHost());
-//				obtainHomepageNavHost();
 
-				bNV.setTranslationY(0);
-				bNV.setVisibility(View.VISIBLE);
-				final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-				params.setMargins(0, 0, 0, px2dp(56, outMetrics));
-				fragmentLayout.setLayoutParams(params);
+				// Showing the BottomNavigationBar without anim delay,
+				// or the BottomSheet would not be measured correctly
+				showBNVImmediate();
 
 				FragmentManager fragmentManager = getSupportFragmentManager();
 				String tag = FragmentTag.HOMEPAGE.getTag();
@@ -5908,35 +5856,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				break;
 			}
-//    		case SAVED_FOR_OFFLINE:{
-//				tB.setVisibility(View.VISIBLE);
-//
-//				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//    			if (oFLol == null){
-//					logWarning("New OfflineFragment");
-//    				oFLol = new OfflineFragmentLollipop();
-//    			}
-//
-//				replaceFragment(oFLol, FragmentTag.OFFLINE.getTag());
-//
-//				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//					if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//						ActivityCompat.requestPermissions(this,
-//								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//								REQUEST_WRITE_STORAGE);
-//					}
-//				}
-//
-//    			supportInvalidateOptionsMenu();
-//    			setToolbarTitle();
-//				showFabButton();
-//				showHideBottomNavigationView(false);
-//				if (!comesFromNotifications) {
-//					bottomNavigationCurrentItem = OFFLINE_BNV;
-//				}
-//				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
-//    			break;
-//    		}
+			// FIXME: for removed OFFLINE, when should we do the checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)?
     		case CAMERA_UPLOADS:{
 				tB.setVisibility(View.VISIBLE);
 				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -6130,6 +6050,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
+	private void showBNVImmediate() {
+		bNV.setTranslationY(0);
+		bNV.setVisibility(View.VISIBLE);
+		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+		params.setMargins(0, 0, 0, px2dp(56, outMetrics));
+		fragmentLayout.setLayoutParams(params);
+	}
+
 	public boolean isOnRecents() {
 		if (getDrawerItem() == DrawerItem.CLOUD_DRIVE && getTabItemCloud() == RECENTS_TAB ) return true;
 
@@ -6189,13 +6118,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				else if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) rF.checkScroll();
                 break;
             }
-//            case SAVED_FOR_OFFLINE: {
-//				oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//                if (oFLol != null) {
-//                    oFLol.checkScroll();
-//                }
-//                break;
-//            }
             case CAMERA_UPLOADS: {
 				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
                 if (cuFL != null) {
@@ -6408,13 +6330,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		searchDrawerItem = null;
 	}
 
-	private void offlineSearch() {
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if (oFLol != null) {
-			oFLol.filterOffline(searchQuery);
-		}
-	}
-
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
@@ -6447,12 +6362,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("onMenuItemActionExpand");
 				searchQuery = "";
 				searchExpand = true;
-//				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-//					if (!isOfflineSearchPathEmpty()) {
-//						offlineSearchPaths.clear();
-//					}
-//					offlineSearch();
-//				} else
+
 				if (drawerItem != DrawerItem.CHAT) {
 					textsearchQuery = false;
 					firstNavigationLevel = true;
@@ -6481,15 +6391,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
-				}
-//				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-//					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//					if (oFLol != null) {
-//						oFLol.closeSearch();
-//						supportInvalidateOptionsMenu();
-//					}
-//				}
-				else {
+				} else {
 					cancelSearch();
 					textSubmitted = true;
 					closeSearchSection();
@@ -6504,20 +6406,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			public boolean onQueryTextSubmit(String query) {
 				if (drawerItem == DrawerItem.CHAT) {
 					hideKeyboard(managerActivity, 0);
-				}
-//				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-//					searchExpand = false;
-//					textSubmitted = true;
-//					hideKeyboard(managerActivity, 0);
-//					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//					if (oFLol != null) {
-//						addOfflineSearchPath(oFLol.getPathNavigation());
-//						addOfflineSearchPath(OFFLINE_SEARCH_QUERY + searchQuery);
-//						setToolbarTitle();
-//						supportInvalidateOptionsMenu();
-//					}
-//				}
-				else {
+				} else {    // FIXME: For removed OFFLINE: addOfflineSearchPath() should be called in the global search
 					searchExpand = false;
 					searchQuery = "" + query;
 					setToolbarTitle();
@@ -6538,17 +6427,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (rChatFL != null) {
 						rChatFL.filterChats(newText);
 					}
-				}
-//				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-//					if (textSubmitted) {
-//						textSubmitted = false;
-//						return true;
-//					}
-//
-//					searchQuery = newText;
-//					offlineSearch();
-//				}
-				else {
+				} else {
 					getSearchFragment();
 
 					if (textSubmitted) {
@@ -6661,23 +6540,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						searchMenuItem.setVisible(true);
 					}
 					break;
-
-//				case SAVED_FOR_OFFLINE:
-//					if (searchExpand) {
-//						openSearchView();
-//					} else {
-//						rubbishBinMenuItem.setVisible(true);
-//
-//						if (getOfflineFragment() != null && oFLol.getItemCount() > 0) {
-//							thumbViewMenuItem.setVisible(true);
-//							setGridListIcon();
-//							sortByMenuItem.setVisible(true);
-//							selectMenuItem.setVisible(true);
-//							searchMenuItem.setVisible(true);
-//						}
-//					}
-//					break;
-
 				case CAMERA_UPLOADS:
 				case MEDIA_UPLOADS:
 					gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -6997,13 +6859,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							return true;
 						}
 					}
-//		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-//						oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//		    			if (oFLol != null){
-//		    				oFLol.onBackPressed();
-//		    				return true;
-//		    			}
-//		    		}
 					else if (drawerItem == DrawerItem.INBOX){
 						iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 						if (iFLol != null){
@@ -7273,12 +7128,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								break;
 						}
 						break;
-
-//					case SAVED_FOR_OFFLINE:
-//						if (getOfflineFragment() != null) {
-//							oFLol.selectAll();
-//						}
-//						break;
 
 					case CHAT:
 						if (getChatsFragment() != null) {
@@ -7835,7 +7684,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else if (drawerItem == DrawerItem.SETTINGS){
 
 			if (!isOnline(this)){
-//				showOfflineMode();
+				showOfflineMode();
 			}
 			backToDrawerItem(bottomNavigationCurrentItem);
 			return;
@@ -7849,39 +7698,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			return;
 		}
-//		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-//			oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//			if (oFLol != null && oFLol.onBackPressed() == 0){
-//				if (!isOnline(this)){
-//					super.onBackPressed();
-//					return;
-//				}
-//
-//				if (isCloudAdded()){
-//					drawerItem = DrawerItem.CLOUD_DRIVE;
-//					selectDrawerItemLollipop(drawerItem);
-//				}
-//				else{
-//					super.onBackPressed();
-//				}
-//
-//				return;
-//			}
-//		}
 		else if (drawerItem == DrawerItem.CHAT){
 			if (!isOnline(this)){
 				super.onBackPressed();
 				return;
-			}
-			else{
-				if(megaApi!=null && megaApi.getRootNode()!=null){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItemLollipop(drawerItem);
-				}
-//				else{
-//					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-//					selectDrawerItemLollipop(DrawerItem.SAVED_FOR_OFFLINE);
-//				}
+			} else {
+				drawerItem = DrawerItem.HOMEPAGE;
+				selectDrawerItemLollipop(drawerItem);
 			}
 		}
 		else if (drawerItem == DrawerItem.CONTACTS){
@@ -8022,9 +7845,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else if (item == HOMEPAGE_BNV) {
 			drawerItem = DrawerItem.HOMEPAGE;
 		}
-//		else if (item == OFFLINE_BNV) {
-//			drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-//		}
 		else if (item == MEDIA_UPLOADS_BNV) {
     		drawerItem = DrawerItem.MEDIA_UPLOADS;
 		}
@@ -8082,19 +7902,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 				}
 				break;
-			}
-//			case R.id.bottom_navigation_item_offline: {
-//				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-//					if (!pathNavigationOffline.equals("/")){
-//						pathNavigationOffline = "/";
-//						refreshFragment(FragmentTag.OFFLINE.getTag());
-//					}
-//				} else {
-//					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-//					setBottomNavigationMenuItemChecked(OFFLINE_BNV);
-//				}
-//				break;
-//			}
+			} // FIXME: for removed OFFLINE, should set pathNavigationOffline = "/" ?
 			case R.id.bottom_navigation_item_homepage: {
 				drawerItem = DrawerItem.HOMEPAGE;
 				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
@@ -11598,7 +11406,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
 
-						String pathNavigation = getPathNavigationOffline();
 						NodeController nC = new NodeController(managerActivity);
 						for (int i=0;i<documents.size();i++){
 							nC.deleteOffline(documents.get(i));
@@ -12497,11 +12304,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
-//		mi = menu.findItem(R.id.bottom_navigation_item_offline);
-//		if (mi != null){
-//			mi.setChecked(false);
-//			mi.setEnabled(true);
-//		}
 
 		resetNavigationViewLayout();
 	}
@@ -14318,13 +14120,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				else if (drawerItem == DrawerItem.INBOX){
 					refreshInboxList();
 				}
-//				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-//
-//					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-//					if (oFLol != null){
-//						oFLol.getRecyclerView().invalidate();
-//					}
-//				}
+                // FIXME: for removed OFFLINE, should we call oFLol.getRecyclerView().invalidate()?
 				else if (drawerItem == DrawerItem.SHARED_ITEMS){
     				onNodesSharedUpdate();
 				}

@@ -2790,10 +2790,6 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
 
-    <string name="section_homepage" context="The homepage">Homepage</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-
     <string name="search_hint">Search in MEGA</string>
     <string name="homepage_bottom_sheet_behavior">mega.privacy.android.app.HomepageBottomSheetBehavior</string>
 
