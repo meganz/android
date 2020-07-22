@@ -19,9 +19,12 @@ import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -50,28 +53,45 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			CloudStorageOptionControlUtil.Control control =
 					new CloudStorageOptionControlUtil.Control();
 
-			control.leaveShare().setVisible(managerActivity.getDeepBrowserTreeIncoming() == 0)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			if (managerActivity.getDeepBrowserTreeIncoming() == 0) {
+				control.leaveShare().setVisible(true)
+						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			} else {
+				if (areAllFileNodes(selected)) {
+					menu.findItem(R.id.cab_menu_send_to_chat)
+							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+									R.color.white));
 
-			setupCommonOptions(menu, control);
+					control.sendToChat().setVisible(true)
+							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
 
-			if (managerActivity.getDeepBrowserTreeIncoming() > 0) {
-				for (MegaNode node : selected) {
-					if (megaApi.checkAccess(node, ACCESS_FULL).getErrorCode() != API_OK) {
-						control.move().setVisible(false);
-						break;
-					}
+				control.move().setVisible(allHaveFullAccess(selected));
+			}
+
+			if (selected.size() == 1
+					&& megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+				control.rename().setVisible(true);
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				} else {
+					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 			}
+
+			control.copy().setVisible(true);
+			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			} else {
+				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			}
+
+			control.selectAll().setVisible(notAllNodesSelected());
+			control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
 			return true;
-		}
-
-		@Override
-		protected boolean isInSubFolder() {
-			return managerActivity.getDeepBrowserTreeIncoming() > 0;
 		}
 	}
 

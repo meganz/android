@@ -23,11 +23,14 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaError.API_OK;
+import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
@@ -82,15 +85,47 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			control.shareOut().setVisible(true)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			setupCommonOptions(menu, control);
+			if (managerActivity.getDeepBrowserTreeOutgoing() > 0) {
+				if (areAllFileNodes(selected)) {
+					menu.findItem(R.id.cab_menu_send_to_chat)
+							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+									R.color.white));
+
+					control.sendToChat().setVisible(true)
+							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+			}
+
+			if (selected.size() == 1
+					&& megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+				control.rename().setVisible(true);
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				} else {
+					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
+			}
+
+			control.move().setVisible(true);
+			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			} else {
+				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			}
+
+			control.copy().setVisible(true);
+			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			} else {
+				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			}
+
+			control.selectAll().setVisible(notAllNodesSelected());
+			control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
+
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
 			return true;
-		}
-
-		@Override
-		protected boolean isInSubFolder() {
-			return managerActivity.getDeepBrowserTreeOutgoing() > 0;
 		}
 	}
 

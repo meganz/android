@@ -40,6 +40,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class MegaNodeUtil {
 
@@ -550,6 +551,37 @@ public class MegaNodeUtil {
         for (MegaNode node : nodes) {
             if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode()
                 != MegaError.API_OK) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if all nodes are file nodes.
+     *
+     * @param nodes nodes to check
+     * @return whether all nodes are file nodes
+     */
+    public static boolean areAllFileNodes(List<MegaNode> nodes) {
+        for (MegaNode node : nodes) {
+            if (!node.isFile()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if all nodes have full access.
+     *
+     * @param nodes nodes to check
+     * @return whether all nodes have full access
+     */
+    public static boolean allHaveFullAccess(List<MegaNode> nodes) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        for (MegaNode node : nodes) {
+            if (megaApi.checkAccess(node, ACCESS_FULL).getErrorCode() != MegaError.API_OK) {
                 return false;
             }
         }
