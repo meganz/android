@@ -431,7 +431,17 @@ public class Util {
 		
 	    return scale;
 	}
-	
+
+	/**
+	 * Convert dp to px.
+	 *
+	 * Note: the name of this function is wrong since the beginning, we should rename it in
+	 * the future.
+	 *
+	 * @param dp dp value
+	 * @param outMetrics display metrics
+	 * @return corresponding px value
+	 */
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
 	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
