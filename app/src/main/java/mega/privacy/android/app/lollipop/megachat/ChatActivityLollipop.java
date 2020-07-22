@@ -5887,15 +5887,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("Index: " + itr.nextIndex());
 
             if(!messageToCheck.isUploading()){
-
-                if(rejected){
+                if (rejected) {
                     if (messageToCheck.getMessage().getTempId() == msg.getTempId()) {
                         indexToChange = itr.nextIndex();
                         break;
                     }
-                }
-                else{
-                    if (messageToCheck.getMessage().getMsgId() == msg.getMsgId() || messageToCheck.getMessage().getTempId() == msg.getTempId()){
+                } else {
+                    if (messageToCheck.getMessage().getMsgId() == msg.getMsgId()
+                        || (msg.getTempId() != -1
+                        && messageToCheck.getMessage().getTempId() == msg.getTempId())) {
                         indexToChange = itr.nextIndex();
                         break;
                     }
