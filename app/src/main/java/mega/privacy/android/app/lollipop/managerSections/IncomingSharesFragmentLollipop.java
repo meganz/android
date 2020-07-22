@@ -87,7 +87,8 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			}
 
 			control.selectAll().setVisible(notAllNodesSelected());
-			control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
+			control.trash().setVisible(managerActivity.getDeepBrowserTreeIncoming() > 0
+					&& MegaNodeUtil.allHaveFullAccess(selected));
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
