@@ -637,7 +637,16 @@ public class ChatUtil {
 
         boolean isUntilThisMorning = isUntilThisMorning();
         int initialOption = getItemClicked(NOTIFICATIONS_ENABLED);
-        String optionUntil = isUntilThisMorning ? context.getString(R.string.mute_chatroom_notification_option_until_this_morning) : context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning);
+        String optionUntil = chatId != MEGACHAT_INVALID_HANDLE ?
+                context.getString(R.string.mute_chatroom_notification_option_forever) :
+                (isUntilThisMorning ? context.getString(R.string.mute_chatroom_notification_option_until_this_morning) :
+                        context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning));
+
+        String optionSelected = chatId != MEGACHAT_INVALID_HANDLE ?
+                NOTIFICATIONS_DISABLED :
+                (isUntilThisMorning ? NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING :
+                        NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING);
+
         AtomicReference<Integer> itemClicked = new AtomicReference<>(initialOption);
 
         ArrayList<String> stringsArray = new ArrayList<>();
@@ -659,7 +668,7 @@ public class ChatUtil {
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() != initialOption) {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), isUntilThisMorning), chatId);
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), optionSelected), chatId);
                     }
                     dialog.dismiss();
                 });
@@ -716,10 +725,10 @@ public class ChatUtil {
      * Method for getting the selected mute option depending on the selected item.
      *
      * @param itemClicked   The selected item.
-     * @param isThisEvening True, if the current time is between 4 a.m. and 6 p.m. .Otherwise, false
+     * @param optionSelected The right choice when you select the fifth option.
      * @return The right mute option.
      */
-    private static String getTypeMute(int itemClicked, boolean isThisEvening) {
+    private static String getTypeMute(int itemClicked, String optionSelected) {
         switch (itemClicked) {
             case 0:
                 return NOTIFICATIONS_ENABLED;
@@ -732,7 +741,7 @@ public class ChatUtil {
             case 4:
                 return NOTIFICATIONS_24_HOURS;
             case 5:
-                return (isThisEvening ? NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING : NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING);
+                return optionSelected;
             default:
                 return NOTIFICATIONS_ENABLED;
         }
@@ -780,19 +789,16 @@ public class ChatUtil {
      */
     public static void updateSwitchButton(long chatId, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
         MegaPushNotificationSettings push = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
-        if(push == null)
+        if (push == null)
             return;
 
         if (push.isChatDndEnabled(chatId)) {
             notificationsSwitch.setChecked(false);
             long timestampMute = push.getChatDnd(chatId);
-            if (timestampMute == 0) {
-                notificationsSubTitle.setVisibility(View.GONE);
-            } else {
-                notificationsSubTitle.setText(getCorrectStringDependingOnOptionSelected(timestampMute));
-                notificationsSubTitle.setVisibility(View.VISIBLE);
-
-            }
+            notificationsSubTitle.setVisibility(View.VISIBLE);
+            notificationsSubTitle.setText(timestampMute == 0 ?
+                    MegaApplication.getInstance().getString(R.string.mute_chatroom_notification_option_off) :
+                    getCorrectStringDependingOnOptionSelected(timestampMute));
         } else {
             notificationsSwitch.setChecked(true);
             notificationsSubTitle.setVisibility(View.GONE);
