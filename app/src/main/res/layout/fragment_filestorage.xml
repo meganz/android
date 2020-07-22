@@ -16,7 +16,7 @@
             android:layout_centerHorizontal="true"
             android:fontFamily="sans-serif"
             android:textSize="20sp"
-            android:text="@string/file_storage_empty_folder"
+            android:text="@string/file_storage_loading"
             android:textColor="@color/black"
             android:visibility="gone"/>
 

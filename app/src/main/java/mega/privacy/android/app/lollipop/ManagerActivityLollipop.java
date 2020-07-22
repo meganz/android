@@ -74,7 +74,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -109,7 +108,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -146,7 +144,6 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -979,21 +976,31 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     };
 
-	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null)
+			if (intent == null || intent.getAction() == null)
 				return;
-			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-			if (getContactsFragment() != null) {
-				cFLol.updateContact(userHandle);
-			}
 
-			if(getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0){
-				inSFLol.updateNicknames(userHandle);
-			}
-			if(getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0){
-				outSFLol.updateNicknames(userHandle);
+
+			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE);
+
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
+				if (getContactsFragment() != null) {
+					cFLol.updateContact(userHandle);
+				}
+
+				if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
+					inSFLol.updateContact(userHandle);
+				}
+
+				if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
+					outSFLol.updateContact(userHandle);
+				}
+			} else if (intent.getAction().equals(ACTION_UPDATE_CREDENTIALS) && getContactsFragment() != null) {
+				cFLol.updateContact(userHandle);
 			}
 		}
 	};
@@ -1970,8 +1977,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
 		if (localBroadcastManager != null) {
-			localBroadcastManager.registerReceiver(nicknameReceiver,
-					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+			IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+			contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
+			contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+			localBroadcastManager.registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
 			localBroadcastManager.registerReceiver(receiverUpdatePosition,
 					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
@@ -2367,9 +2378,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		getProText.setText(getProTextString);
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
-
-		accountInfoFrame = findViewById(R.id.navigation_drawer_account_view);
-        accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
         nVDisplayName.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
@@ -3407,6 +3415,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void askForSMSVerification() {
+        if(!smsDialogTimeChecker.shouldShow()) return;
         showStorageAlertWithDelay = true;
         //If mobile device, only portrait mode is allowed
         if (!isTablet(this)) {
@@ -3477,7 +3486,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
-        if(!firstTimeAfterInstallation) {
+        // For Android devices which have Android below 6, no need to go to request permission fragment.
+        if(!firstTimeAfterInstallation || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             tB.setVisibility(View.VISIBLE);
             abL.setVisibility(View.VISIBLE);
 
@@ -3877,6 +3887,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					megaApi.setAvatar(path, this);
 				} else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
 					logDebug("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+					drawerItem = DrawerItem.TRANSFERS;
+					indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+					selectDrawerItemLollipop(drawerItem);
 
                     String text = getString(R.string.cam_sync_cancel_sync);
 
@@ -4252,8 +4265,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final EmojiEditText inputFirstName = new EmojiEditText(this);
-		inputFirstName.setEmojiSize(px2dp(14, outMetrics));
-
 		inputFirstName.getBackground().mutate().clearColorFilter();
 		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
@@ -4582,7 +4593,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
 		isStorageStatusDialogShown = false;
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
@@ -6012,7 +6023,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					bottomNavigationCurrentItem = CHAT_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-				showFabButton();
 				break;
 			}
     	}
@@ -9261,24 +9271,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void showOpenLinkDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this,
+				R.style.AppCompatAlertDialogStyle);
 		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_open_link, null);
-		builder.setView(v);
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
+		builder.setView(v).setPositiveButton(R.string.context_open_link, null)
+				.setNegativeButton(R.string.general_cancel, null);
 
-		TextView title = (TextView) v.findViewById(R.id.link_title);
-
-		openLinkText = (EditText) v.findViewById(R.id.link_text);
+		openLinkText = v.findViewById(R.id.text);
 		openLinkText.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -9298,47 +9304,35 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 
-		openLinkError = (RelativeLayout) v.findViewById(R.id.link_error);
-		openLinkError.setVisibility(View.GONE);
-		openLinkErrorText = (TextView) v.findViewById(R.id.link_error_text);
+		openLinkError = v.findViewById(R.id.error);
+		openLinkErrorText = v.findViewById(R.id.error_text);
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-			title.setText(R.string.action_open_link);
+			builder.setTitle(R.string.action_open_link);
 			openLinkText.setHint(R.string.hint_paste_link);
 		}
 		else if (drawerItem == DrawerItem.CHAT) {
-			title.setText(R.string.action_open_chat_link);
+			builder.setTitle(R.string.action_open_chat_link);
 			openLinkText.setHint(R.string.hint_enter_chat_link);
 		}
-
-		OnClickListener clickListener = new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				switch (v.getId()) {
-					case R.id.link_cancel_button: {
-						dismissOpenLinkDialog();
-						break;
-					}
-					case R.id.link_open_button: {
-						hideKeyboardView(managerActivity, v, 0);
-						openLink(openLinkText.getText().toString());
-						break;
-					}
-				}
-			}
-		};
-
-		Button cancelButton = (Button) v.findViewById(R.id.link_cancel_button);
-		cancelButton.setOnClickListener(clickListener);
-		openLinkOpenButton = (Button) v.findViewById(R.id.link_open_button);
-		openLinkOpenButton.setOnClickListener(clickListener);
 
 		openLinkDialog = builder.create();
 		openLinkDialog.setCanceledOnTouchOutside(false);
 
 		try {
 			openLinkDialog.show();
+			openLinkText.requestFocus();
 			openLinkDialogIsShown = true;
+
+			// Set onClickListeners for buttons after showing the dialog would prevent
+			// the dialog from dismissing automatically on clicking the buttons
+			openLinkOpenButton = openLinkDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+			openLinkOpenButton.setOnClickListener((view) -> {
+				hideKeyboard(managerActivity, 0);
+				openLink(openLinkText.getText().toString());
+			});
+			openLinkDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener((view) ->
+					dismissOpenLinkDialog());
 		}catch (Exception e){}
 	}
 
@@ -10259,13 +10253,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setPinDialog.show();
 	}
 
-	public void chooseAddContactDialog(boolean isMegaContact){
+	public void chooseAddContactDialog(boolean isMegaContact) {
 		logDebug("chooseAddContactDialog");
-		if(isMegaContact){
-			if(megaApi!=null && megaApi.getRootNode()!=null){
-				Intent in = new Intent(this, AddContactActivityLollipop.class);
-				in.putExtra("contactType", CONTACT_TYPE_MEGA);
-				startActivityForResult(in, REQUEST_CREATE_CHAT);
+		if (isMegaContact) {
+			if (megaApi != null && megaApi.getRootNode() != null) {
+				Intent intent = new Intent(this, AddContactActivityLollipop.class);
+				intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+				startActivityForResult(intent, REQUEST_CREATE_CHAT);
 			}
 			else{
 				logWarning("Online but not megaApi");
@@ -16473,7 +16467,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     }
 
-    private void showAddPhoneNumberInMenu(){
+    public void showAddPhoneNumberInMenu(){
 	    if(megaApi == null){
 	        return;
         }

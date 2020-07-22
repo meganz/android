@@ -36,6 +36,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -45,7 +46,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -516,7 +517,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 //				params.height = ViewGroup.LayoutParams.MATCH_PARENT;
 //				holder.imageView.setLayoutParams(params);
 
-            Bitmap temp = getThumbnailFromCache(node);
+            Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
 
             if (temp != null) {
                 thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
@@ -526,7 +527,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
 
             } else {
-                temp = getThumbnailFromFolder(node,context);
+                temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                 if (temp != null) {
                     thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
@@ -552,7 +553,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 }
             }
         } else {
-            Bitmap temp = getThumbnailFromCache(node);
+            Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
 
 //				thumb = getThumbnailFromCache(node);
             if (temp != null) {
@@ -562,7 +563,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.imageViewThumb.setImageBitmap(thumb);
                 holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
             } else {
-                temp = getThumbnailFromFolder(node,context);
+                temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                 if (temp != null) {
                     thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
@@ -651,68 +652,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
             if (node.hasThumbnail()) {
                 logDebug("Node has thumbnail");
-                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
-                params1.setMargins(left,0,0,0);
-
-                holder.imageView.setLayoutParams(params1);
-
-                thumb = getThumbnailFromCache(node);
-                if (thumb != null) {
-
-                    holder.imageView.setImageBitmap(thumb);
-
-                } else {
-                    thumb = getThumbnailFromFolder(node,context);
-                    if (thumb != null) {
-                        holder.imageView.setImageBitmap(thumb);
-
-                    } else {
-                        try {
-                            thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node,context,holder,megaApi,this);
-                        } catch (Exception e) {
-                        } // Too many AsyncTasks
-
-                        if (thumb != null) {
-                            holder.imageView.setImageBitmap(thumb);
-                        }
-                    }
-                }
+                getThumbAndSetView(holder, node);
             } else {
-                logWarning("Node NOT thumbnail");
-                thumb = getThumbnailFromCache(node);
-                if (thumb != null) {
-                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                    params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                    params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                    int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
-                    params1.setMargins(left,0,0,0);
-
-                    holder.imageView.setLayoutParams(params1);
-                    holder.imageView.setImageBitmap(thumb);
-
-
-                } else {
-                    thumb = getThumbnailFromFolder(node,context);
-                    if (thumb != null) {
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                        params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                        int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
-                        params1.setMargins(left,0,0,0);
-
-                        holder.imageView.setLayoutParams(params1);
-                        holder.imageView.setImageBitmap(thumb);
-
-                    } else {
-                        try {
-                            ThumbnailUtilsLollipop.createThumbnailList(context,node,holder,megaApi,this);
-                        } catch (Exception e) {
-                        } // Too many AsyncTasks
-                    }
-                }
+                logDebug("Node NOT thumbnail");
+                getThumbAndSetViewOrCreate(holder, node);
             }
         } else {
             logDebug("Multiselection ON");
@@ -726,80 +669,25 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.imageView.setImageResource(R.drawable.ic_select_folder);
             } else {
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.white));
-
                 logDebug("Check the thumb");
 
                 if (node.hasThumbnail()) {
                     logDebug("Node has thumbnail");
-                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                    params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                    params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                    int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
-                    params1.setMargins(left,0,0,0);
-
-                    holder.imageView.setLayoutParams(params1);
-
-                    thumb = getThumbnailFromCache(node);
-                    if (thumb != null) {
-
-                        holder.imageView.setImageBitmap(thumb);
-
-                    } else {
-                        thumb = getThumbnailFromFolder(node,context);
-                        if (thumb != null) {
-                            holder.imageView.setImageBitmap(thumb);
-
-                        } else {
-                            try {
-                                thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node,context,holder,megaApi,this);
-                            } catch (Exception e) {
-                            } // Too many AsyncTasks
-
-                            if (thumb != null) {
-                                holder.imageView.setImageBitmap(thumb);
-                            }
-                        }
-                    }
+                    getThumbAndSetView(holder, node);
                 } else {
-                    logWarning("Node NOT thumbnail");
-
-                    thumb = getThumbnailFromCache(node);
-                    if (thumb != null) {
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                        params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                        int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
-                        params1.setMargins(left,0,0,0);
-
-                        holder.imageView.setLayoutParams(params1);
-                        holder.imageView.setImageBitmap(thumb);
-
-
-                    } else {
-                        thumb = getThumbnailFromFolder(node,context);
-                        if (thumb != null) {
-                            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                            params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                            params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
-                            int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
-                            params1.setMargins(left,0,0,0);
-
-                            holder.imageView.setLayoutParams(params1);
-                            holder.imageView.setImageBitmap(thumb);
-
-                        } else {
-                            logWarning("NOT thumbnail");
-                            holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                            try {
-                                ThumbnailUtilsLollipop.createThumbnailList(context,node,holder,megaApi,this);
-                            } catch (Exception e) {
-                            } // Too many AsyncTasks
-                        }
-                    }
+                    logDebug("Node NOT thumbnail");
+                    getThumbAndSetViewOrCreate(holder, node);
                 }
             }
         }
+    }
 
+    private void getThumbAndSetView(ViewHolderBrowserList holder, MegaNode node) {
+        getThumbAndSetViewForList(context, node, holder, megaApi, this, holder.imageView);
+    }
+
+    private void getThumbAndSetViewOrCreate(ViewHolderBrowserList holder, MegaNode node) {
+        getThumbAndSetViewOrCreateForList(context, node, holder, megaApi, this, holder.imageView);
     }
 
     @Override

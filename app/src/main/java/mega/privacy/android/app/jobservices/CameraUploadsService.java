@@ -71,6 +71,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -1237,6 +1239,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         // end new logic
         mIntent = new Intent(this,ManagerActivityLollipop.class);
         mIntent.setAction(ACTION_CANCEL_CAM_SYNC);
+        mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        mIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
+
         mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
         tempRoot = new File(getCacheDir(),CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
         File root = new File(tempRoot);
