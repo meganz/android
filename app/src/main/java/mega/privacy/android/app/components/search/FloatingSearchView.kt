@@ -16,24 +16,39 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
-import com.example.kotlintest.SearchInputView
+
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Util
 
+/**
+ * Floating Search View aka Persistent search view
+ * Conventionally serves as a global search box (not for contextual searching)
+ * situated on the top of the screen
+ * The implementation refers to https://github.com/arimorty/floatingsearchview
+ */
 class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
-    private var menuBtnDrawable: DrawerArrowDrawable? = null
-    private var iconClear: Drawable? = null
-    private var iconBackArrow: Drawable? = null
-
     private var mainLayout: View? = null
     private var searchInput: SearchInputView? = null
-    private var leftAction: ImageView? = null
-    private var clearButton: ImageView? = null
 
+    private var leftActionImageView: ImageView? = null
+
+    // The drawable in leftActionImageView, switching between hamburger icon and the left arrow icon
+    private var menuBtnDrawable: DrawerArrowDrawable? = null
+
+    // The Clear button sits on the right and only shows when inputting something
+    private var clearButton: ImageView? = null
+    private var iconClear: Drawable? = null
+
+    // The left Navigation Drawer is opened or closed
     private var menuOpen = false
+
     private var isInputFocused = false
+
+    // Click the ENTER key on the keyboard would also trigger the text changed callback, so ignore it
     private var skipTextChangeEvent = false
-    private var oldQuery = ""
+
+    // The searching keyword
+    private var query = ""
 
     private var queryListener: OnQueryChangeListener? = null
     private var clearSearchActionListener: OnClearSearchActionListener? = null
@@ -43,38 +58,14 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
     private val drawerListener = DrawerListener()
 
-    private val textChangedCallback: (text: CharSequence?, start: Int, count: Int, after: Int) -> Unit =
-        { _, _, _, _ ->
-            val textStr = searchInput?.text.toString()
-
-            // TODO: investigate why this is called twice when pressing back on the keyboard
-            if (skipTextChangeEvent || !isInputFocused) {
-                skipTextChangeEvent = false
-            } else {
-                changeClearButton(textStr.isEmpty())
-                callTextChangeCallback(textStr)
-            }
-
-            oldQuery = textStr
-        }
-
     init {
         init()
-    }
-
-    companion object {
-        private const val CLEAR_BTN_FADE_ANIM_DURATION: Long = 500
-        private const val MENU_ICON_ANIM_DURATION: Long = 250
-        private const val MENU_BUTTON_PROGRESS_ARROW = 1.0f
-        private const val MENU_BUTTON_PROGRESS_HAMBURGER = 0.0f
     }
 
     /**
      * Interface for implementing a callback to be
      * invoked when the left menu (navigation menu) is
      * clicked.
-     * Note: This is only relevant when leftActionMode is
-     * set to {@value #LEFT_ACTION_MODE_SHOW_HAMBURGER}
      */
     interface OnLeftMenuClickListener {
         /**
@@ -127,8 +118,6 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         /**
          * Called when the current search has completed
          * as a result of pressing search key in the keyboard.
-         * Note: This will only get called if
-         * [FloatingSearchView.setShowSearchKey]} is set to true.
          * @param currentQuery the text that is currently set in the query TextView
          */
         fun onSearchAction(currentQuery: String?)
@@ -152,27 +141,61 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         fun onFocusCleared()
     }
 
+    inner class DrawerListener : DrawerLayout.DrawerListener {
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            setMenuIconProgress(slideOffset)
+        }
+
+        override fun onDrawerOpened(drawerView: View) {}
+        override fun onDrawerClosed(drawerView: View) {}
+        override fun onDrawerStateChanged(newState: Int) {}
+    }
+
+    /**
+     * Sets the listener that will be called when the
+     * left/start menu (or navigation menu) is clicked.
+     *
+     * @param listener
+     */
+    public fun setOnLeftMenuClickListener(listener: OnLeftMenuClickListener?) {
+        menuClickListener = listener
+    }
+
+    public fun attachNavigationDrawerToMenuButton(@NonNull drawerLayout: DrawerLayout) {
+        drawerLayout.addDrawerListener(drawerListener)
+        setOnLeftMenuClickListener(NavDrawerLeftMenuClickListener(drawerLayout))
+    }
+
+    /**
+     * Sets the listener that will be called when the focus
+     * of the search has changed.
+     *
+     * @param listener listener for search focus changes
+     */
+    public fun setOnFocusChangeListener(listener: OnFocusChangeListener?) {
+        focusChangeListener = listener
+    }
+
     private fun init() {
         initDrawables()
         findUiElements()
         initClearButton()
         initSearchInput()
         initLeftAction()
-        refreshLeftIcon()
-    }
-
-    private fun findUiElements() {
-        mainLayout = View.inflate(context, R.layout.search_query_section, this)
-        clearButton = findViewById<View>(R.id.clear_btn) as ImageView
-        searchInput = findViewById<View?>(R.id.search_bar_text) as SearchInputView?
-        leftAction = findViewById<View>(R.id.left_action) as ImageView
-        clearButton = findViewById<View>(R.id.clear_btn) as ImageView
     }
 
     private fun initDrawables() {
         menuBtnDrawable = DrawerArrowDrawable(context)
         iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)
-        iconBackArrow = Util.getWrappedDrawable(context, R.drawable.ic_arrow_back_black)
+    }
+
+    private fun findUiElements() {
+        mainLayout = View.inflate(context, R.layout.search_query_section, this)
+
+        clearButton = findViewById<View>(R.id.clear_btn) as ImageView
+        searchInput = findViewById<View?>(R.id.search_bar_text) as SearchInputView
+        leftActionImageView = findViewById<View>(R.id.left_action) as ImageView
+        clearButton = findViewById<View>(R.id.clear_btn) as ImageView
     }
 
     private fun initClearButton() {
@@ -187,6 +210,20 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun initSearchInput() {
+        val textChangedCallback: (text: CharSequence?, start: Int, count: Int, after: Int) -> Unit =
+            { _, _, _, _ ->
+                val textStr = searchInput?.text.toString()
+
+                if (skipTextChangeEvent || !isInputFocused) {
+                    skipTextChangeEvent = false
+                } else {
+                    changeClearButton(textStr.isEmpty())
+                    callTextChangeCallback(textStr)
+                }
+
+                query = textStr
+            }
+
         searchInput?.apply {
             doOnTextChanged(textChangedCallback)
 
@@ -209,7 +246,10 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun initLeftAction() {
-        leftAction?.setOnClickListener { _ ->
+        leftActionImageView?.setImageDrawable(menuBtnDrawable)
+        menuBtnDrawable?.progress = MENU_BUTTON_PROGRESS_HAMBURGER
+
+        leftActionImageView?.setOnClickListener { _ ->
             if (isInputFocused) {
                 setSearchFocusedInternal(false)
             } else {
@@ -228,7 +268,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
                 alpha = 0.0f
                 visibility = View.VISIBLE
                 ViewCompat.animate(this).alpha(1.0f)
-                    .setDuration(CLEAR_BTN_FADE_ANIM_DURATION).start()
+                    .setDuration(CLEAR_BTN_FADE_IN_ANIM_DURATION).start()
             } else if (textIsEmpty) {
                 visibility = View.INVISIBLE
             }
@@ -236,15 +276,12 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun callTextChangeCallback(text: String) {
-        if (!isInputFocused || oldQuery == text) return
-        queryListener?.onSearchTextChanged(oldQuery, text)
+        if (!isInputFocused || query == text) return
+        queryListener?.onSearchTextChanged(query, text)
     }
 
     private fun setSearchFocusedInternal(focused: Boolean) {
         isInputFocused = focused
-        searchInput?.apply {
-            setText("")
-        }
 
         if (focused) {
             searchInput?.requestFocus()
@@ -257,6 +294,9 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
             }
             focusChangeListener?.onFocus()
         } else {
+            searchInput?.apply {
+                setText("")
+            }
             getHostActivity()?.let { Util.hideKeyboard(it) }
             searchInput?.clearFocus()
             changeMenuDrawable(withAnim = true, isOpen = false)
@@ -271,7 +311,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
      * @return the current query
      */
     private fun getQuery(): String? {
-        return oldQuery
+        return query
     }
 
     private fun changeMenuDrawable(
@@ -293,29 +333,8 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         }
     }
 
-    /**
-     * Sets the listener that will be called when the
-     * left/start menu (or navigation menu) is clicked.
-     * Note that this is different from the overflow menu
-     * that has a separate listener.
-     * @param listener
-     */
-    public fun setOnLeftMenuClickListener(listener: OnLeftMenuClickListener?) {
-        menuClickListener = listener
-    }
-
-    private fun refreshLeftIcon() {
-        leftAction?.setImageDrawable(menuBtnDrawable)
-        menuBtnDrawable?.progress = MENU_BUTTON_PROGRESS_HAMBURGER
-    }
-
-    public fun attachNavigationDrawerToMenuButton(@NonNull drawerLayout: DrawerLayout) {
-        drawerLayout.addDrawerListener(drawerListener)
-        setOnLeftMenuClickListener(NavDrawerLeftMenuClickListener(drawerLayout))
-    }
-
     private class NavDrawerLeftMenuClickListener(var drawerLayout: DrawerLayout) :
-            OnLeftMenuClickListener {
+        OnLeftMenuClickListener {
         override fun onMenuOpened() {
             drawerLayout.openDrawer(GravityCompat.START)
         }
@@ -335,6 +354,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
      */
     fun setMenuIconProgress(progress: Float) {
         menuBtnDrawable?.progress = progress
+
         if (progress == MENU_BUTTON_PROGRESS_HAMBURGER) {
             closeMenu(false)
         } else if (progress == MENU_BUTTON_PROGRESS_ARROW) {
@@ -342,21 +362,11 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         }
     }
 
-    inner class DrawerListener : DrawerLayout.DrawerListener {
-        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            setMenuIconProgress(slideOffset)
-        }
-
-        override fun onDrawerOpened(drawerView: View) {}
-        override fun onDrawerClosed(drawerView: View) {}
-        override fun onDrawerStateChanged(newState: Int) {}
-    }
-
     /**
      * Mimics a menu click that opens the menu. Useful for navigation
      * drawers when they open as a result of dragging.
      */
-    fun openMenu(withAnim: Boolean) {
+    private fun openMenu(withAnim: Boolean) {
         menuOpen = true
         changeMenuDrawable(withAnim, true)
         menuClickListener?.onMenuOpened()
@@ -369,30 +379,28 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
      * @param withAnim true, will close the menu button with
      * the  Material animation
      */
-    fun closeMenu(withAnim: Boolean) {
+    private fun closeMenu(withAnim: Boolean) {
         menuOpen = false
         changeMenuDrawable(withAnim, false)
         menuClickListener?.onMenuClosed()
-    }
-
-    /**
-     * Sets the listener that will be called when the focus
-     * of the search has changed.
-     *
-     * @param listener listener for search focus changes
-     */
-     public fun setOnFocusChangeListener(listener: OnFocusChangeListener?) {
-        focusChangeListener = listener
     }
 
     private fun getHostActivity(): Activity? {
         var context = context
         while (context is ContextWrapper) {
             if (context is Activity) {
-                return context as Activity
+                return context
             }
             context = context.baseContext
         }
+
         return null
+    }
+
+    companion object {
+        private const val CLEAR_BTN_FADE_IN_ANIM_DURATION: Long = 500
+        private const val MENU_ICON_ANIM_DURATION: Long = 250
+        private const val MENU_BUTTON_PROGRESS_ARROW = 1.0f
+        private const val MENU_BUTTON_PROGRESS_HAMBURGER = 0.0f
     }
 }

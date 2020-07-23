@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/search_query_section"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -23,18 +24,19 @@
             android:alpha="1"
             android:background="@drawable/oval_btn_selector"
             android:clickable="true"
+            android:focusable="true"
             android:padding="@dimen/square_button_padding"
-            android:src="@drawable/ic_arrow_back_black"
-            android:focusable="true" />
+            tools:src="@drawable/ic_arrow_back_black" />
 
         <FrameLayout
             android:id="@+id/search_input_parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="@dimen/search_bar_search_input_left_margin"
             android:layout_toEndOf="@+id/left_action">
-            <com.example.kotlintest.SearchInputView
+
+            <mega.privacy.android.app.components.search.SearchInputView
                 android:id="@+id/search_bar_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -62,6 +64,5 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="@dimen/square_button_padding" />
-
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
