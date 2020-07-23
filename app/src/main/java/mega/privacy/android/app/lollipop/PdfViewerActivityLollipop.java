@@ -1579,7 +1579,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             case R.id.pdf_viewer_share: {
                 if (type == ZIP_ADAPTER) {
                     shareFile(this, new File(uri.toString()));
-                } else if (type == OFFLINE_ADAPTER) {
+                } else if (type == OFFLINE_ADAPTER || !inside) {
                     shareWithUri(this, "pdf", uri);
                 } else if (type == FILE_LINK_ADAPTER) {
                     shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));

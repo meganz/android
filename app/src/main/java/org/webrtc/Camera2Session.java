@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
 
+import static mega.privacy.android.app.utils.CallUtil.disableLocalCamera;
+
 @TargetApi(21)
 class Camera2Session implements CameraSession {
   private static final String TAG = "Camera2Session";
@@ -100,6 +102,7 @@ class Camera2Session implements CameraSession {
       checkIsOnCameraThread();
       final boolean startFailure = (captureSession == null) && (state != SessionState.STOPPED);
       state = SessionState.STOPPED;
+      disableLocalCamera();
       stopInternal();
       if (startFailure) {
         callback.onFailure(FailureType.DISCONNECTED, "Camera disconnected / evicted.");

@@ -734,10 +734,12 @@
                         <!-- Video elements -->
                         <RelativeLayout
                             android:id="@+id/gradient_own_message_thumb_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@id/content_own_message_thumb_portrait"
+                            android:layout_alignRight="@id/content_own_message_thumb_portrait"
+                            android:layout_alignLeft="@id/content_own_message_thumb_portrait"
+                            android:layout_alignBottom="@id/content_own_message_thumb_portrait"/>
 
                         <ImageView
                             android:id="@+id/video_icon_own_message_thumb_portrait"
@@ -877,10 +879,12 @@
                         <!-- Video elements -->
                         <RelativeLayout
                             android:id="@+id/gradient_own_message_thumb_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@id/content_own_message_thumb_landscape"
+                            android:layout_alignRight="@id/content_own_message_thumb_landscape"
+                            android:layout_alignLeft="@id/content_own_message_thumb_landscape"
+                            android:layout_alignBottom="@id/content_own_message_thumb_landscape"/>
 
                         <ImageView
                             android:id="@+id/video_icon_own_message_thumb_landscape"
@@ -1775,10 +1779,12 @@
                         <!-- Video elements -->
                         <RelativeLayout
                             android:id="@+id/gradient_contact_message_thumb_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:layout_alignBottom="@+id/content_contact_message_thumb_portrait" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@id/content_contact_message_thumb_portrait"
+                            android:layout_alignRight="@id/content_contact_message_thumb_portrait"
+                            android:layout_alignLeft="@id/content_contact_message_thumb_portrait"
+                            android:layout_alignBottom="@id/content_contact_message_thumb_portrait"/>
 
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_portrait"
@@ -1801,7 +1807,6 @@
                             android:layout_marginBottom="5dp"
                             android:layout_marginRight="10dp"
                             android:text="00:00"/>
-
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -1860,10 +1865,12 @@
                         <!-- Video elements -->
                         <RelativeLayout
                             android:id="@+id/gradient_contact_message_thumb_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="30dp"
-                            android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
-                            android:layout_gravity="center_horizontal|center_vertical"/>
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@id/content_contact_message_thumb_landscape"
+                            android:layout_alignRight="@id/content_contact_message_thumb_landscape"
+                            android:layout_alignLeft="@id/content_contact_message_thumb_landscape"
+                            android:layout_alignBottom="@id/content_contact_message_thumb_landscape"/>
 
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_landscape"

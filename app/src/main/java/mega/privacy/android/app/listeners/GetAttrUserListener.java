@@ -15,6 +15,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
@@ -48,6 +49,11 @@ public class GetAttrUserListener extends BaseListener {
         this.onlyDBUpdate = onlyDBUpdate;
     }
 
+    /**
+     * When calling {@link MegaApiJava#getUserAttribute(int)}, the MegaRequest object won't store
+     * node handle, so we can't get user handle from {@code request.getNodeHandle()}, we should
+     * use {@code api.getContact(request.getEmail())} to get MegaUser, then get user handle from it.
+     */
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() != MegaRequest.TYPE_GET_ATTR_USER) return;
@@ -116,27 +122,26 @@ public class GetAttrUserListener extends BaseListener {
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateFirstName(context, request.getText(), request.getEmail());
+                    MegaUser user = api.getContact(request.getEmail());
+                    if (user != null) {
+                        notifyFirstNameUpdate(context, user.getHandle());
+                    }
                 }
                 break;
 
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateLastName(context, request.getText(), request.getEmail());
+                    MegaUser user = api.getContact(request.getEmail());
+                    if (user != null) {
+                        notifyLastNameUpdate(context, user.getHandle());
+                    }
                 }
                 break;
 
             case USER_ATTR_ALIAS:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    String nickname = request.getName();
-                    if (nickname == null) {
-                        updateDBNickname(api, context, request.getMegaStringMap());
-                        break;
-                    }
-                    dBH.setContactNickname(nickname, request.getNodeHandle());
-                    notifyNicknameUpdate(context, request.getNodeHandle());
-                } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    dBH.setContactNickname(null, request.getNodeHandle());
-                    notifyNicknameUpdate(context, request.getNodeHandle());
+                    updateDBNickname(api, context, request.getMegaStringMap());
                 } else {
                     logError("Error recovering the alias" + e.getErrorCode());
                 }
@@ -157,7 +162,8 @@ public class GetAttrUserListener extends BaseListener {
                         ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e, true);
                     }
                 } else {
-                    logError("Error getting USER_ATTR_CAMERA_UPLOADS_FOLDER " + e.getErrorString());
+                    logWarning("Get CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    JobUtil.stopRunningCameraUploadService(context);
                 }
                 break;
 

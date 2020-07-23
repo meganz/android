@@ -26,6 +26,8 @@ public class BroadcastConstants {
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
     public static final String ACTION_UPDATE_NICKNAME = "ACTION_UPDATE_NICKNAME";
+    public static final String ACTION_UPDATE_FIRST_NAME = "ACTION_UPDATE_FIRST_NAME";
+    public static final String ACTION_UPDATE_LAST_NAME = "ACTION_UPDATE_LAST_NAME";
     public static final String ACTION_UPDATE_CREDENTIALS = "ACTION_UPDATE_CREDENTIALS";
 
     //    Broadcasts' extras
