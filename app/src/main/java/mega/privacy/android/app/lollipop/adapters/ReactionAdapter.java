@@ -216,7 +216,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 break;
 
             case R.id.item_reaction_layout:
-                addReactionInMsg(context, chatId, megaMessage.getMessage(), holder.emojiReaction, false);
+                addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.emojiReaction, false);
                 break;
         }
     }

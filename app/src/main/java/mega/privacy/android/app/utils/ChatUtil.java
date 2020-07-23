@@ -413,26 +413,19 @@ public class ChatUtil {
      *
      * @param context        Context of Activity.
      * @param chatId         The chat ID.
-     * @param message        The msg ID.
+     * @param messageId        The msg ID.
      * @param emoji          The chosen reaction.
      * @param isFromKeyboard If it's from the keyboard.
      */
-    public static void addReactionInMsg(Context context, long chatId, MegaChatMessage message, Emoji emoji, boolean isFromKeyboard) {
+    public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
+        if(!(context instanceof ChatActivityLollipop))
+            return;
+
+        MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
         String reaction = editText.getText().toString();
-        MegaChatError error = MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, message.getMsgId(), reaction);
-        switch (error.getErrorCode()) {
-            case MegaChatError.ERROR_OK:
-                logDebug("The reaction has been added correctly");
-                break;
-            case MegaError.API_EEXIST:
-                if (!isFromKeyboard) {
-                    logDebug("This reaction is already added in this message, so it should be removed");
-                    delReactionInMsg(chatId, message, reaction);
-                }
-                break;
-        }
+        MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, (ChatActivityLollipop) context);
     }
 
     /**
@@ -442,11 +435,8 @@ public class ChatUtil {
      * @param message  The msg ID.
      * @param reaction The chosen reaction.
      */
-    public static void delReactionInMsg(long chatId, MegaChatMessage message, String reaction) {
-        MegaChatError error = MegaApplication.getInstance().getMegaChatApi().delReaction(chatId, message.getMsgId(), reaction);
-        if (error.getErrorCode() == MegaChatError.ERROR_OK) {
-            logDebug("The reaction has been deleted correctly");
-        }
+    public static void delReactionInMsg(Context context, long chatId, MegaChatMessage message, String reaction) {
+        MegaApplication.getInstance().getMegaChatApi().delReaction(chatId, message.getMsgId(), reaction, (ChatActivityLollipop) context);
     }
 
     /**

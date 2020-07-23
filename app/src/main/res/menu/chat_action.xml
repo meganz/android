@@ -31,12 +31,6 @@
         MEGA:showAsAction="never" />
 
     <item
-        android:id="@+id/cab_menu_select_messages"
-        android:orderInCategory="123"
-        android:title="@string/tab_select_mode"
-        MEGA:showAsAction="never"/>
-
-    <item
         android:id="@+id/cab_menu_contact_info_chat"
         android:orderInCategory="125"
         android:title="@string/contact_properties_activity"

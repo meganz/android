@@ -1424,7 +1424,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logError("Chatroom is NULL - finish activity!!");
             finish();
         }
-
+        if(adapter != null) {
+            adapter.updateChatRoom(chatRoom);
+        }
         megaChatApi.closeChatRoom(idChat, this);
         if (megaChatApi.openChatRoom(idChat, this)) {
             MegaApplication.setClosedChat(false);
@@ -7379,6 +7381,27 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error) + ": " + e.getErrorString(), -1);
                 }
+            }
+        } else if (request.getType() == MegaChatRequest.TYPE_MANAGE_REACTION) {
+            long chatId = request.getChatHandle();
+            long msgId = request.getUserHandle();
+            String reaction = request.getText();
+            boolean hasReactionBeenAdded = request.getFlag();
+
+            switch (e.getErrorCode()) {
+                case MegaChatError.ERROR_OK:
+                    logDebug(hasReactionBeenAdded ? "The reaction has been added correctly" : "The reaction has been deleted correctly");
+                    MegaHandleList listUsers = megaChatApi.getReactionUsers(chatId, msgId, reaction);
+                    int count = listUsers != null ? (int) listUsers.size() : 0;
+                    adapter.checkReactionUpdated(idChat, megaChatApi.getMessage(chatId, msgId), reaction, count);
+                    break;
+
+                case MegaError.API_EEXIST:
+                    if (hasReactionBeenAdded && !MegaApplication.isIsReactionFromKeyboard()) {
+                        logDebug("This reaction is already added in this message, so it should be removed");
+                        delReactionInMsg(this, request.getChatHandle(), megaChatApi.getMessage(chatId, msgId), reaction);
+                    }
+                    break;
             }
         }
     }
