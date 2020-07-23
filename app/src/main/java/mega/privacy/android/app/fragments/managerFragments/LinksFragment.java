@@ -16,14 +16,18 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
-import static android.view.MenuItem.*;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
+import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaError.API_OK;
+import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class LinksFragment extends MegaNodeBaseFragment {
 
@@ -43,67 +47,64 @@ public class LinksFragment extends MegaNodeBaseFragment {
     private class ActionBarCallBack extends BaseActionBarCallBack {
 
         @Override
-        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            checkSelectOptions(menu, false);
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            super.onPrepareActionMode(mode, menu);
 
-            if (managerActivity.getDeepBrowserTreeLinks() == 0) {
-                menu.findItem(R.id.cab_menu_download).setVisible(false);
-                menu.findItem(R.id.cab_menu_rename).setVisible(false);
-                menu.findItem(R.id.cab_menu_copy).setVisible(false);
-                menu.findItem(R.id.cab_menu_move).setVisible(false);
-                showRemoveLink = true;
-                for (MegaNode node : selected) {
-                    if (node.isTakenDown()) {
-                        showRemoveLink = false;
-                    }
-                }
-                menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-                menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                menu.findItem(R.id.cab_menu_trash).setVisible(false);
+            CloudStorageOptionControlUtil.Control control =
+                new CloudStorageOptionControlUtil.Control();
+
+            if (selected.size() == 1) {
+                control.manageLink().setVisible(true)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                control.removeLink().setVisible(true);
             } else {
-                checkOptions();
-
-                menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
-                menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
-                menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-                int show;
-                if (onlyOneFileSelected) {
-                    show = SHOW_AS_ACTION_NEVER;
-                } else {
-                    show = SHOW_AS_ACTION_ALWAYS;
-                }
-                menu.findItem(R.id.cab_menu_copy).setShowAsAction(show);
-                menu.findItem(R.id.cab_menu_move).setShowAsAction(show);
-
-                menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-                menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-                menu.findItem(R.id.cab_menu_edit_link).setVisible(showEditLink);
-                if (showLink) {
-                    menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                    menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(SHOW_AS_ACTION_NEVER);
-                } else {
-                    menu.findItem(R.id.cab_menu_share_link).setShowAsAction(SHOW_AS_ACTION_NEVER);
-                    menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                }
-
-                menu.findItem(R.id.cab_menu_share).setVisible(showShare);
-                menu.findItem(R.id.cab_menu_share).setTitle(context.getResources().getQuantityString(R.plurals.context_share_folders, selected.size()));
-                if (onlyOneFileSelected) {
-                    menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                } else {
-                    menu.findItem(R.id.cab_menu_share).setShowAsAction(SHOW_AS_ACTION_NEVER);
-                }
-
-                menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+                control.removeLink().setVisible(true)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
-            menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+            control.shareOut().setVisible(true)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-            return false;
+            if (areAllFileNodes(selected)) {
+                menu.findItem(R.id.cab_menu_send_to_chat)
+                    .setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+                        R.color.white));
+
+                control.sendToChat().setVisible(true)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
+
+            control.move().setVisible(true);
+            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            } else {
+                control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            }
+
+            if (selected.size() == 1
+                && megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+                control.rename().setVisible(true);
+                if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                    control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                } else {
+                    control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                }
+            }
+
+            control.copy().setVisible(true);
+            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            } else {
+                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            }
+
+            control.selectAll().setVisible(notAllNodesSelected());
+            control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
+
+            CloudStorageOptionControlUtil.applyControl(menu, control);
+
+            return true;
         }
     }
 

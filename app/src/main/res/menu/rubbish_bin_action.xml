@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <item
+      android:id="@+id/cab_menu_restore_from_rubbish"
+      android:icon="@drawable/ic_restore"
+      android:orderInCategory="100"
+      android:title="@string/context_restore"
+      app:showAsAction="always"/>
+
+  <item
+      android:id="@+id/cab_menu_delete"
+      android:icon="@drawable/ic_close_white"
+      android:orderInCategory="110"
+      android:title="@string/context_delete_offline"
+      app:showAsAction="always" />
+
+  <item
+      android:id="@+id/cab_menu_select_all"
+      android:orderInCategory="100"
+      android:title="@string/action_select_all"
+      app:showAsAction="never" />
+
+  <item
+      android:id="@+id/cab_menu_clear_selection"
+      android:orderInCategory="110"
+      android:title="@string/action_unselect_all"
+      app:showAsAction="never" />
+
+</menu>
