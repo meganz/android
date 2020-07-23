@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,6 +43,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.adapters.CameraUploadsAdapter;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
@@ -50,7 +52,6 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.adapters.CameraUploadsAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaNode;
 
@@ -98,6 +99,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
   private FragmentCameraUploadsFirstLoginBinding firstLoginBinding;
   private FragmentCameraUploadsBinding binding;
   private CameraUploadsAdapter adapter;
+  private ActionMode actionMode;
 
   private CuViewModel viewModel;
   private long draggingNodeHandle = -1;
@@ -521,6 +523,23 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
       ActionBar actionBar = ((AppCompatActivity) context).getSupportActionBar();
       if (actionBar != null && viewModel.isSearchMode()) {
         actionBar.setTitle(title);
+      }
+    });
+
+    viewModel.actionMode().observe(getViewLifecycleOwner(), visible -> {
+      if (visible) {
+        if (actionMode == null) {
+          actionMode = ((AppCompatActivity) context).startSupportActionMode(
+              new CuActionModeCallback(context, this, viewModel, megaApi));
+        }
+
+        actionMode.setTitle(String.valueOf(viewModel.getSelectedNodesCount()));
+        actionMode.invalidate();
+      } else {
+        if (actionMode != null) {
+          actionMode.finish();
+          actionMode = null;
+        }
       }
     });
 

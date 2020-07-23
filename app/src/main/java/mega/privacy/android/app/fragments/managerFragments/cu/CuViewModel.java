@@ -52,6 +52,7 @@ class CuViewModel extends BaseRxViewModel {
   private final MutableLiveData<Pair<Integer, CuNode>> nodeToOpen = new MutableLiveData<>();
   private final MutableLiveData<Pair<Integer, CuNode>> nodeToAnimate = new MutableLiveData<>();
   private final MutableLiveData<String> actionBarTitle = new MutableLiveData<>();
+  private final MutableLiveData<Boolean> actionMode = new MutableLiveData<>();
 
   private final Subject<Pair<Integer, CuNode>> openNodeAction = PublishSubject.create();
   private final Subject<Object> creatingThumbnailFinished = PublishSubject.create();
@@ -99,6 +100,10 @@ class CuViewModel extends BaseRxViewModel {
 
   public LiveData<String> actionBarTitle() {
     return actionBarTitle;
+  }
+
+  public LiveData<Boolean> actionMode() {
+    return actionMode;
   }
 
   public void loadCuNodes(int orderBy) {
@@ -164,6 +169,7 @@ class CuViewModel extends BaseRxViewModel {
         selectedNodes.remove(node.getNode().getHandle());
       }
       selecting = !selectedNodes.isEmpty();
+      actionMode.setValue(selecting);
 
       nodeToAnimate.setValue(Pair.create(position, node));
     } else {
@@ -172,10 +178,7 @@ class CuViewModel extends BaseRxViewModel {
   }
 
   public void onNodeLongClicked(int position, CuNode node) {
-    if (!selecting) {
-      // TODO(px): toggle tool bar action on fragment
-      selecting = true;
-    }
+    selecting = true;
     onNodeClicked(position, node);
   }
 
@@ -188,27 +191,40 @@ class CuViewModel extends BaseRxViewModel {
     return nodes;
   }
 
-  public void selectAll() {
-    if (selecting) {
-      List<CuNode> nodes = cuNodes.getValue();
-      if (nodes == null || nodes.isEmpty()) {
-        return;
-      }
+  public int getSelectedNodesCount() {
+    return selectedNodes.size();
+  }
 
-      for (CuNode node : nodes) {
-        if (node.getNode() != null) {
-          node.setSelected(true);
-          selectedNodes.put(node.getNode().getHandle(), node.getNode());
-        }
-      }
-
-      cuNodes.setValue(nodes);
+  public int getRealNodesCount() {
+    List<CuNode> nodes = cuNodes.getValue();
+    if (nodes == null || nodes.isEmpty()) {
+      return 0;
     }
+    return nodes.get(nodes.size() - 1).getIndex();
+  }
+
+  public void selectAll() {
+    List<CuNode> nodes = cuNodes.getValue();
+    if (nodes == null || nodes.isEmpty()) {
+      return;
+    }
+
+    for (CuNode node : nodes) {
+      if (node.getNode() != null) {
+        node.setSelected(true);
+        selectedNodes.put(node.getNode().getHandle(), node.getNode());
+      }
+    }
+
+    selecting = true;
+    cuNodes.setValue(nodes);
+    actionMode.setValue(true);
   }
 
   public void clearSelection() {
     if (selecting) {
       selecting = false;
+      actionMode.setValue(false);
 
       List<CuNode> nodes = cuNodes.getValue();
       if (nodes == null || nodes.isEmpty()) {
