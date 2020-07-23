@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -123,6 +124,14 @@ public class DecryptAlertDialog extends DialogFragment {
         View v = inflater.inflate(R.layout.dialog_error_hint, null);
 
         builder.setTitle(mTitle).setView(v)
+                .setOnKeyListener((dialog, keyCode, event) -> {
+                    if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP
+                        && mListener != null) {
+                        mListener.onDialogNegativeClick();
+                        return true;
+                    }
+                    return false;
+                })
                 .setMessage(mMessage)
                 .setPositiveButton(mPosStringId, null)
                 .setNegativeButton(mNegStringId, null);

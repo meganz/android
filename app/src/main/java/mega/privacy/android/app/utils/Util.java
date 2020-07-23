@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
@@ -1060,42 +1061,6 @@ public class Util {
 		return yearList;
 	}
 
-
-	public static String getSubtitleDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-
-		Context context = MegaApplication.getInstance().getApplicationContext();
-
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = context.getString(R.string.no_folders_shared);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-
-		return info;
-	}
-
 	public static BitSet convertToBitSet(long value) {
 	    BitSet bits = new BitSet();
 	    int index = 0;
@@ -1427,10 +1392,10 @@ public class Util {
         return circle;
     }
 
-    public static void changeStatusBarColor(Context context, Window window, int color) {
+    public static void changeStatusBarColor(Context context, Window window, @ColorRes int colorId) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(context, color));
+        window.setStatusBarColor(ContextCompat.getColor(context, colorId));
     }
 
 	public static MegaPreferences getPreferences (Context context) {
