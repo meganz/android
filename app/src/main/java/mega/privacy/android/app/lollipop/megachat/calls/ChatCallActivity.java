@@ -505,10 +505,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        }
+        statusBarHeight = getStatusBarHeight();
 
         widthScreenPX = outMetrics.widthPixels;
         heightScreenPX = outMetrics.heightPixels - statusBarHeight;
