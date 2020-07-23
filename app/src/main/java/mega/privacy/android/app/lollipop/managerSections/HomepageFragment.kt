@@ -1,7 +1,6 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.lollipop.managerSections
 
 import android.animation.*
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -9,12 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.view.animation.DecelerateInterpolator
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import mega.privacy.android.app.BottomSheetPagerAdapter
+import mega.privacy.android.app.HomepageBottomSheetBehavior
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 

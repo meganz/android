@@ -1866,44 +1866,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	@Override
-	public void onStart(){
+	public void onStart() {
 		logDebug("onStart");
 		super.onStart();
-	}
-
-	@Override
-	protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-//		NavHostFragment fragment = obtainHomepageNavHost();
-//
-//		DrawerItem drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
-//		if (drawerItem == DrawerItem.HOMEPAGE) {
-//			attachHomepageFragment(fragment);
-//		} else {
-//			detachHomepageFragment(fragment);
-//		}
-	}
-
-//	private void attachHomepageFragment(NavHostFragment fragment) {
-//    	getSupportFragmentManager().beginTransaction().attach(fragment).commitNow();
-//	}
-//
-//	private void detachHomepageFragment(NavHostFragment fragment) {
-//		getSupportFragmentManager().beginTransaction().detach(fragment).commitNow();
-//	}
-
-	private NavHostFragment obtainHomepageNavHost() {
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		String tag = FragmentTag.HOMEPAGE.getTag();
-		NavHostFragment navHostFragment = (NavHostFragment) fragmentManager.findFragmentByTag(tag);
-
-		if (navHostFragment != null) return navHostFragment;
-
-		navHostFragment = NavHostFragment.create(R.navigation.homepage);
-//		fragmentManager.beginTransaction().add(R.id.fragment_container, navHostFragment, tag)
-//				.commitNow();
-
-		return navHostFragment;
 	}
 
 	@SuppressLint("NewApi") @Override
@@ -2009,8 +1974,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			deepBrowserTreeOutgoing = 0;
 			deepBrowserTreeLinks = 0;
 			this.setPathNavigationOffline("/");
-
-//			obtainHomepageNavHost();
 		}
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -3122,7 +3085,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			setNotificationsTitleSection();
 
 			if (drawerItem == null) {
-//	        	drawerItem = DrawerItem.CLOUD_DRIVE;
 	        	drawerItem = DrawerItem.HOMEPAGE;
 	        	Intent intent = getIntent();
 	        	if (intent != null){
@@ -5785,10 +5747,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
 			removeFragment(rChatFL);
 		}
-
-//		if (item != DrawerItem.HOMEPAGE) {
-//			detachHomepageFragment(obtainHomepageNavHost());
-//		}
 
     	switch (item){
 			case CLOUD_DRIVE:{

@@ -27,7 +27,7 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
                 fragments.put(position, WeakReference(fragment))
                 return fragment
             }
-            else -> HomepageFragment2.newInstance("", "")
+            else -> OfflineFragmentLollipop()
         }
     }
 

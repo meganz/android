@@ -123,7 +123,6 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         holder.mediaRecycler = v.findViewById(R.id.media_recyler);
 
         holder.mediaRecycler.setNestedScrollingEnabled(false);
-//        holder.mediaRecycler.getParent().requestDisallowInterceptTouchEvent(true);
 
         v.setTag(holder);
         return holder;
@@ -239,8 +238,6 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     holder.mediaRecycler.setHasFixedSize(true);
                     holder.mediaRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
                     holder.mediaRecycler.setAdapter(adapter);
-//                    holder.mediaRecycler.setNestedScrollingEnabled(false);
-//                    holder.mediaRecycler.requestDisallowInterceptTouchEvent(true);
                 } else {
                     holder.title.setText(context.getString(R.string.title_bucket, node.getName(), (nodeList.size() - 1)));
                 }

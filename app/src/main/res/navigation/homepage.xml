@@ -6,17 +6,8 @@
     app:startDestination="@id/homepageFragment">
     <fragment
         android:id="@+id/homepageFragment"
-        android:name="mega.privacy.android.app.HomepageFragment"
+        android:name="mega.privacy.android.app.lollipop.managerSections.HomepageFragment"
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage" >
-        <action
-            android:id="@+id/action_homepageFragment_to_homepageFragment2"
-            app:destination="@id/homepageFragment2" />
     </fragment>
-
-    <fragment
-        android:id="@+id/homepageFragment2"
-        android:name="mega.privacy.android.app.HomepageFragment2"
-        android:label="fragment_homepage"
-        tools:layout="@layout/fragment_homepage2" />
 </navigation>
