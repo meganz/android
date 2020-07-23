@@ -216,6 +216,12 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="LightToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/light_toolbar_title</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
     <style name="ToolbarSubTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/mail_my_account</item>
@@ -521,4 +527,13 @@
     <style name="GalleryImageShape.Selected">
         <item name="cornerSize">@dimen/cu_fragment_selected_round_corner_radius</item>
     </style>
+
+    <style name="Theme.Giphy" parent="Theme.Megaactionbar">
+        <item name="autoCompleteTextViewStyle">@style/GiphyCursor</item>
+    </style>
+
+    <style name="GiphyCursor" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/giphy_search_cursor</item>
+    </style>
+
 </resources>

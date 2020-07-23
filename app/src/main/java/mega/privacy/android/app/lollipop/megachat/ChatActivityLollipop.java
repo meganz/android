@@ -91,6 +91,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.activities.GiphyActivity;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
@@ -362,6 +363,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     ImageButton mediaButton;
     ImageButton pickFileStorageButton;
     ImageButton pickAttachButton;
+    private ImageButton gifButton;
 
     private EmojiKeyboard emojiKeyboard;
     private RelativeLayout rLKeyboardTwemojiButton;
@@ -369,6 +371,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     RelativeLayout rLMediaButton;
     RelativeLayout rLPickFileStorageButton;
     RelativeLayout rLPickAttachButton;
+    private RelativeLayout rlGifButton;
 
     RelativeLayout callInProgressLayout;
     TextView callInProgressText;
@@ -850,11 +853,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         rLMediaButton = findViewById(R.id.rl_media_icon_chat);
         rLPickFileStorageButton = findViewById(R.id.rl_pick_file_storage_icon_chat);
         rLPickAttachButton = findViewById(R.id.rl_attach_icon_chat);
+        rlGifButton = findViewById(R.id.rl_gif_chat);
 
         keyboardTwemojiButton = findViewById(R.id.keyboard_twemoji_chat);
         mediaButton = findViewById(R.id.media_icon_chat);
         pickFileStorageButton = findViewById(R.id.pick_file_storage_icon_chat);
         pickAttachButton = findViewById(R.id.pick_attach_chat);
+        gifButton = findViewById(R.id.gif_chat);
 
         keyboardHeight = getOutMetrics().heightPixels / 2 - getActionBarHeight(this, getResources());
         marginBottomDeactivated = px2dp(MARGIN_BUTTON_DEACTIVATED, getOutMetrics());
@@ -884,6 +889,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         enableButton(rLMediaButton, mediaButton);
         enableButton(rLPickAttachButton, pickAttachButton);
         enableButton(rLPickFileStorageButton, pickFileStorageButton);
+        enableButton(rlGifButton, gifButton);
 
         messageJumpLayout.setOnClickListener(this);
 
@@ -2545,6 +2551,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         disableButton(rLMediaButton, mediaButton);
         disableButton(rLPickAttachButton, pickAttachButton);
         disableButton(rLPickFileStorageButton, pickFileStorageButton);
+        disableButton(rlGifButton, gifButton);
     }
 
     private void disableButton(final  RelativeLayout layout, final  ImageButton button){
@@ -2564,6 +2571,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         enableButton(rLMediaButton, mediaButton);
         enableButton(rLPickAttachButton, pickAttachButton);
         enableButton(rLPickFileStorageButton, pickFileStorageButton);
+        enableButton(rlGifButton, gifButton);
     }
 
     private void enableButton(RelativeLayout layout, ImageButton button){
@@ -3214,8 +3222,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             chatC.prepareForDownload(intent, parentPath);
-        }
-        else{
+        } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK) {
+
+        } else{
             logError("Error onActivityResult");
         }
 
@@ -3628,6 +3637,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 break;
             }
+            case R.id.rl_gif_chat:
+            case R.id.gif_chat:
+                startActivityForResult(
+                        new Intent(this, GiphyActivity.class), REQUEST_CODE_PICK_GIF);
+                break;
+
             case R.id.toolbar_chat:{
                 logDebug("toolbar_chat");
                 if(recordView.isRecordingNow()) break;

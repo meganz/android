@@ -2844,4 +2844,5 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
+    <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
 </resources>

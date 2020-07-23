@@ -214,4 +214,6 @@
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
 
+    <color name="light_toolbar_title">#A8A8A8</color>
+    <color name="giphy_search_text">#121212</color>
 </resources>
