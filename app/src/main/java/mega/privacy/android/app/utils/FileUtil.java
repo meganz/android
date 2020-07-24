@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
@@ -35,6 +36,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -49,6 +52,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 public class FileUtil {
 
@@ -290,16 +294,24 @@ public class FileUtil {
         final String[] projection = {data};
         final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";
         final String[] selectionArgs = {fileName, String.valueOf(fileSize)};
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
-                selectionArgs, null);
+        String path;
 
-        String path = checkFileInStorage(cursor, data);
-        if (path == null) {
-            cursor = context.getContentResolver().query(
-                    MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
+        try {
+            Cursor cursor = context.getContentResolver().query(
+                    MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
                     selectionArgs, null);
+
             path = checkFileInStorage(cursor, data);
+            if (path == null) {
+                cursor = context.getContentResolver().query(
+                        MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
+                        selectionArgs, null);
+                path = checkFileInStorage(cursor, data);
+            }
+        } catch (SecurityException e) {
+            // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
+            logError("Haven't granted the permission.", e);
+            return null;
         }
 
         return path;
@@ -550,6 +562,38 @@ public class FileUtil {
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    /**
+     * Share multiple files to other apps.
+     *
+     * credit: https://stackoverflow.com/a/15577579/3077508
+     *
+     * @param context current Context
+     * @param files files to share
+     */
+    public static void shareFiles(Context context, List<File> files) {
+        String intentType = null;
+        for (File file : files) {
+            String type = MimeTypeList.typeForName(file.getName()).getType();
+            if (intentType == null) {
+                intentType = type;
+            } else if (!TextUtils.equals(intentType, type)) {
+                intentType = "*";
+                break;
+            }
+        }
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (File file : files) {
+            uris.add(getUriForFile(context, file));
+        }
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        shareIntent.setType(intentType + "/*");
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(
+                Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 
     /**

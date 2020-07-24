@@ -534,12 +534,12 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             }
             case MESSAGE_SNACKBAR_TYPE: {
-                snackbar.setAction("SEE", new SnackbarNavigateOption(view.getContext(), idChat));
+                snackbar.setAction(R.string.action_see, new SnackbarNavigateOption(view.getContext(), idChat));
                 snackbar.show();
                 break;
             }
             case NOT_SPACE_SNACKBAR_TYPE: {
-                snackbar.setAction("Settings", new SnackbarNavigateOption(view.getContext()));
+                snackbar.setAction(R.string.action_settings, new SnackbarNavigateOption(view.getContext()));
                 snackbar.show();
                 break;
             }

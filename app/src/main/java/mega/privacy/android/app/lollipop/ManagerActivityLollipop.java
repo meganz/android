@@ -3462,6 +3462,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void askForSMSVerification() {
+        if(!smsDialogTimeChecker.shouldShow()) return;
         showStorageAlertWithDelay = true;
         //If mobile device, only portrait mode is allowed
         if (!isTablet(this)) {
@@ -4301,8 +4302,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final EmojiEditText inputFirstName = new EmojiEditText(this);
-		inputFirstName.setEmojiSize(px2dp(14, outMetrics));
-
 		inputFirstName.getBackground().mutate().clearColorFilter();
 		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
@@ -16351,7 +16350,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
-    private void showAddPhoneNumberInMenu(){
+    public void showAddPhoneNumberInMenu(){
 	    if(megaApi == null){
 	        return;
         }

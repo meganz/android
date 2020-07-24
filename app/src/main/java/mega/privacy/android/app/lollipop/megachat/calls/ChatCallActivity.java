@@ -505,10 +505,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        }
+        statusBarHeight = getStatusBarHeight();
 
         widthScreenPX = outMetrics.widthPixels;
         heightScreenPX = outMetrics.heightPixels - statusBarHeight;
@@ -2813,6 +2810,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
             logDebug("Participant has been added to the array");
         }
+
+        checkAudioLevelMonitor();
     }
 
     private void removeContact(InfoPeerGroupCall peer) {
@@ -2821,5 +2820,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         logDebug("Participant has been removed from the array");
         peersOnCall.remove(peer);
+        checkAudioLevelMonitor();
+    }
+
+    /**
+     * Method to enable or disable the audio level monitor.
+     */
+    private void checkAudioLevelMonitor() {
+        if (peersOnCall.size() >= MIN_PEERS_LIST) {
+            if (!megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
+                megaChatApi.enableAudioLevelMonitor(true, chatId);
+            }
+        } else if (megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
+            megaChatApi.enableAudioLevelMonitor(false, chatId);
+        }
     }
 }

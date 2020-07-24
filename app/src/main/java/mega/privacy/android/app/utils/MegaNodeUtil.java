@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -29,6 +30,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
@@ -38,6 +40,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class MegaNodeUtil {
 
@@ -266,6 +269,64 @@ public class MegaNodeUtil {
     }
 
     /**
+     * Share multiple nodes out of MEGA app.
+     *
+     * If a folder is involved, we will share links of all nodes.
+     *
+     * Other apps can't handle the mixture of link and file, so if there is any file that is not
+     * downloaded, we will share links of all files.
+     *
+     * @param context the context where nodes are shared
+     * @param nodes nodes to share
+     */
+    public static void shareNodes(Context context, List<MegaNode> nodes) {
+        if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
+            return;
+        }
+        List<File> downloadedFiles = new ArrayList<>();
+        boolean allDownloadedFiles = true;
+        for (MegaNode node : nodes) {
+            String path = node.isFolder() ? null
+                : getLocalFile(context, node.getName(), node.getSize());
+            if (isTextEmpty(path)) {
+                allDownloadedFiles = false;
+                break;
+            } else {
+                downloadedFiles.add(new File(path));
+            }
+        }
+        if (allDownloadedFiles) {
+            shareFiles(context, downloadedFiles);
+            return;
+        }
+
+        int notExportedNodes = 0;
+        StringBuilder links = new StringBuilder();
+        for (MegaNode node : nodes) {
+            if (!node.isExported()) {
+                notExportedNodes++;
+            } else {
+                links.append(node.getPublicLink())
+                    .append("\n\n");
+            }
+        }
+        if (notExportedNodes == 0) {
+            startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
+                links.toString());
+            return;
+        }
+
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
+            new Intent(android.content.Intent.ACTION_SEND));
+        for (MegaNode node : nodes) {
+            if (!node.isExported()) {
+                megaApi.exportNode(node, exportListener);
+            }
+        }
+    }
+
+    /**
      * Shares a link.
      *
      * @param context   current Context.
@@ -301,6 +362,30 @@ public class MegaNodeUtil {
 
         if (node == null) {
             logError(error + "Node == NULL");
+            return false;
+        } else if (!isOnline(context)) {
+            logError(error + "No network connection");
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if there is any error before continues any action.
+     *
+     * @param context   current Context.
+     * @param message   action being taken.
+     * @param nodes      nodes involved in the action.
+     * @return True if there is not any error, false otherwise.
+     */
+    private static boolean shouldContinueWithoutError(Context context, String message,
+        List<MegaNode> nodes) {
+        String error = "Error " + message + ". ";
+
+        if (nodes == null || nodes.isEmpty()) {
+            logError(error + "no nodes");
             return false;
         } else if (!isOnline(context)) {
             logError(error + "No network connection");
@@ -532,5 +617,53 @@ public class MegaNodeUtil {
      */
     private static boolean isOutgoingOrIncomingFolder(MegaNode node) {
         return node.isOutShare() || node.isInShare();
+    }
+
+    /*
+     * Check if all nodes can be moved to rubbish bin.
+     *
+     * @param nodes nodes to check
+     * @return whether all nodes can be moved to rubbish bin
+     */
+    public static boolean canMoveToRubbish(List<MegaNode> nodes) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        for (MegaNode node : nodes) {
+            if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode()
+                != MegaError.API_OK) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if all nodes are file nodes.
+     *
+     * @param nodes nodes to check
+     * @return whether all nodes are file nodes
+     */
+    public static boolean areAllFileNodes(List<MegaNode> nodes) {
+        for (MegaNode node : nodes) {
+            if (!node.isFile()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if all nodes have full access.
+     *
+     * @param nodes nodes to check
+     * @return whether all nodes have full access
+     */
+    public static boolean allHaveFullAccess(List<MegaNode> nodes) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        for (MegaNode node : nodes) {
+            if (megaApi.checkAccess(node, ACCESS_FULL).getErrorCode() != MegaError.API_OK) {
+                return false;
+            }
+        }
+        return true;
     }
 }

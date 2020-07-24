@@ -101,7 +101,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.6_314";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.7_318";
 
 	private static TransfersManagement transfersManagement;
 
