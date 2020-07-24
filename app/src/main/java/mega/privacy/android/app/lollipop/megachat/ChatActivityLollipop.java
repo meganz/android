@@ -1395,8 +1395,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             setChatSubtitle();
         }
         if (adapter != null) {
-            chatRoom = megaChatApi.getChatRoom(idChat);
-            adapter.updateChatRoom(chatRoom);
             adapter.notifyDataSetChanged();
         }
     }
@@ -1465,7 +1463,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (adapter == null) {
             createAdapter();
         } else {
-            adapter.setChatRoom(chatRoom);
+            adapter.updateChatRoom(chatRoom);
             adapter.notifyDataSetChanged();
         }
 
@@ -4954,7 +4952,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("onChatRoomUpdate!");
         this.chatRoom = chat;
         if (adapter != null) {
-            adapter.setChatRoom(chatRoom);
+            adapter.updateChatRoom(chatRoom);
         }
 
         if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CLOSED)){
@@ -7235,7 +7233,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         if (adapter == null) {
                             createAdapter();
                         } else {
-                            adapter.setChatRoom(chatRoom);
+                            adapter.updateChatRoom(chatRoom);
                             adapter.notifyDataSetChanged();
                         }
                         megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
