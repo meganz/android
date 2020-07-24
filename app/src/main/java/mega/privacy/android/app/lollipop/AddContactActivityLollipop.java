@@ -1973,7 +1973,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                 }
                 else if (!createNewGroup && !createNewChatLink) {
-                    aB.setTitle(getString(R.string.title_new_group).toUpperCase());
+                    aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
                 }
                 else if ((createNewGroup || createNewChatLink) && !onNewGroup) {
                     if (onlyCreateGroup) {
@@ -3149,6 +3149,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private void returnToStartConversation() {
         createNewGroup = false;
         createNewChatLink = false;
+        aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
         aB.setSubtitle(null);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             inviteContactButton.setVisibility(View.VISIBLE);
