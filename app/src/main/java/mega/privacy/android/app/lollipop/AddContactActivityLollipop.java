@@ -1966,10 +1966,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
                 else if ((createNewGroup || createNewChatLink) && !onNewGroup) {
                     if (onlyCreateGroup) {
-                        aB.setTitle(getString(R.string.title_new_group));
+                        aB.setTitle(getString(R.string.title_new_group).toUpperCase());
                     }
                     else {
-                        aB.setTitle(getString(R.string.title_new_group));
+                        aB.setTitle(getString(R.string.title_new_group).toUpperCase());
                     }
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
@@ -2098,8 +2098,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         hideKeyboard(addContactActivityLollipop, 0);
 
         if (addedContactsMEGA.contains(contact)) {
-            int contactPosition = addedContactsMEGA.indexOf(contact);
-            deleteContact(contactPosition);
+            deleteContact(addedContactsMEGA.indexOf(contact));
             return;
         } else {
             addedContactsMEGA.add(contact);
@@ -3457,6 +3456,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
+    /**
+     * Given a list of `MegaContactAdapter`, marks `contact` as selected when found.
+     *
+     * @param list List of `MegaContactAdapter` items.
+     * @param contact `MegaContactAdapter` to find and mark as selected.
+     * @param isSelected Boolean to mark/unmark the required `MegaContactAdapter` as selected.
+     */
     private void markContactAsSelected(ArrayList<MegaContactAdapter> list, MegaContactAdapter contact, boolean isSelected) {
         int filteredPosition = list.indexOf(contact);
         if (filteredPosition != INVALID_POSITION) {
@@ -3465,11 +3471,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     private void showHeader(boolean isVisible) {
-        if (!comesFromChat && isVisible) {
-            headerContacts.setVisibility(View.VISIBLE);
-        } else {
-            headerContacts.setVisibility(View.GONE);
-        }
+        headerContacts.setVisibility(!comesFromChat && isVisible ? View.VISIBLE : View.GONE);
     }
 
     @Override

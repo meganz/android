@@ -2199,7 +2199,6 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">You have already added the contact %s.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Share with %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">New group chat</string>
-    <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Add contacts</string>
     <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Send contacts</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Logged out</string>
