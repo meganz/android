@@ -134,14 +134,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
 	public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
 
-	public static int UPLOAD = 0;
-	public static int MOVE = 1;
-	public static int COPY = 2;
-	public static int CAMERA = 3;
-	public static int IMPORT = 4;
-	public static int SELECT = 5;
-	public static int SELECT_CAMERA_FOLDER = 7;
-	public static int SHARE_LINK = 8;
+	public static final int UPLOAD = 0;
+	public static final int MOVE = 1;
+	public static final int COPY = 2;
+	public static final int CAMERA = 3;
+	public static final int IMPORT = 4;
+	public static final int SELECT = 5;
+	public static final int SELECT_CAMERA_FOLDER = 7;
+	public static final int SHARE_LINK = 8;
 
 	private static final int NO_TABS = -1;
 	private static final int CLOUD_TAB = 0;

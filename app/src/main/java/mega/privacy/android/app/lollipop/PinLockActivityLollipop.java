@@ -652,7 +652,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	void showSnackbar (String s) {
-		showSnackbar(coordinatorLayout, s);
+		showSnackbar(fragmentContainer, s);
 	}
 
 	private void add4DigitsPin(){

@@ -941,7 +941,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             int colors[] = {0x70000000, 0x00000000};
             GradientDrawable shape = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, colors);
-            ;
             shape.setShape(GradientDrawable.RECTANGLE);
             shape.setCornerRadii(new float[]{radius, 0, radius, 0, radius, radius, radius, radius});
 
@@ -6286,7 +6285,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public AndroidMegaChatMessage getMessageAt(int positionInAdapter) {
         int position = positionInAdapter - 1;
-        return messages != null && positionInAdapter >= 0 && positionInAdapter < messages.size() ? messages.get(position) : null;
+        return messages != null && position >= 0 && position < messages.size() ? messages.get(position) : null;
     }
 
     public void loadPreviousMessages(ArrayList<AndroidMegaChatMessage> messages, int counter) {
@@ -6608,9 +6607,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("handle: " + handle);
 
         if (holder != null) {
-            AndroidMegaChatMessage megaMessage = getMessageAt(holder.getCurrentPosition());
+            AndroidMegaChatMessage megaMessage = getMessageAt(holder.getAdapterPosition());
 
-            if(megaMessage == null || (msgId != INVALID_HANDLE && megaMessage.getMessage().getMsgId() != msgId))
+            if(megaMessage == null || megaMessage.getMessage() == null || megaMessage.getMessage().getMsgId() != msgId)
                 return;
 
             File previewDir = getPreviewFolder(context);
