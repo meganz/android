@@ -36,14 +36,15 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnClickListener {
+
     private static final int MAX_WIDTH_PORT = 180;
     private static final int MAX_WIDTH_LAND = 260;
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
     private MegaChatRoom chatRoom;
     private Context context;
 
-    public UserReactionAdapter(Context context, ArrayList<Long> users, long chatId, long messageId) {
+    public UserReactionAdapter(Context context, ArrayList<Long> users, long chatId) {
         super(context, 0, users);
         this.context = context;
 
@@ -54,8 +55,8 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
-        chatRoom = megaChatApi.getChatRoom(chatId);
 
+        chatRoom = megaChatApi.getChatRoom(chatId);
     }
 
     @Override

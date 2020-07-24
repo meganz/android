@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 @SuppressWarnings("PMD.ForLoopCanBeForeach")
 public final class VariantEmojiManager implements VariantEmoji {
@@ -29,6 +30,13 @@ public final class VariantEmojiManager implements VariantEmoji {
         this.type = typeView;
     }
 
+    /**
+     * Method for obtaining the variant of an Emoji.
+     *
+     * @param desiredEmoji The emoji to retrieve the variant for. If none is found,
+     *                     the passed emoji should be returned.
+     * @return The Emoji
+     */
     @NonNull
     @Override
     public Emoji getVariant(final Emoji desiredEmoji) {
@@ -49,6 +57,11 @@ public final class VariantEmojiManager implements VariantEmoji {
         return desiredEmoji;
     }
 
+    /**
+     * Method for adding a variant of an emoji.
+     *
+     * @param newVariant The new variant to save.
+     */
     @Override
     public void addVariant(@NonNull final Emoji newVariant) {
         final Emoji newVariantBase = newVariant.getBase();
@@ -71,6 +84,9 @@ public final class VariantEmojiManager implements VariantEmoji {
         }
     }
 
+    /**
+     * Method to save the emoji variable used to display in the recent section.
+     */
     @Override
     public void persist() {
         if (variantsEmojiList.size() > 0) {
@@ -81,50 +97,34 @@ public final class VariantEmojiManager implements VariantEmoji {
             }
 
             stringBuilder.setLength(stringBuilder.length() - EMOJI_DELIMITER.length());
-            if (type.equals(TYPE_EMOJI)) {
-                getPreferences().edit().putString(VARIANT_EMOJIS, stringBuilder.toString()).apply();
-            } else if (type.equals(TYPE_REACTION)) {
-                getPreferences().edit().putString(VARIANT_REACTIONS, stringBuilder.toString()).apply();
-            }
-
+            getPreferences().edit().putString(type.equals(TYPE_EMOJI) ? VARIANT_EMOJIS : VARIANT_REACTIONS, stringBuilder.toString()).apply();
         } else {
-            if (type.equals(TYPE_EMOJI)) {
-                getPreferences().edit().remove(VARIANT_EMOJIS).apply();
-            } else if (type.equals(TYPE_REACTION)) {
-                getPreferences().edit().remove(VARIANT_REACTIONS).apply();
-            }
+            getPreferences().edit().remove(type.equals(TYPE_EMOJI) ? VARIANT_EMOJIS : VARIANT_REACTIONS).apply();
         }
     }
 
+    /**
+     * Method to initialize the emojis used that will be shown in the Recents keyboard section.
+     */
     private void initFromSharedPreferences() {
-        String savedRecentVariants = null;
-        if (type.equals(TYPE_EMOJI)) {
-            savedRecentVariants = getPreferences().getString(VARIANT_EMOJIS, "");
-        } else if (type.equals(TYPE_REACTION)) {
-            savedRecentVariants = getPreferences().getString(VARIANT_REACTIONS, "");
-        }
+        String savedRecentVariants = getPreferences().getString(type.equals(TYPE_EMOJI) ? VARIANT_EMOJIS : VARIANT_REACTIONS, "");
+        if (isTextEmpty(savedRecentVariants))
+            return;
 
-        if (savedRecentVariants.length() > 0) {
-            final StringTokenizer stringTokenizer = new StringTokenizer(savedRecentVariants, EMOJI_DELIMITER);
-            variantsEmojiList = new ArrayList<>(stringTokenizer.countTokens());
+        final StringTokenizer stringTokenizer = new StringTokenizer(savedRecentVariants, EMOJI_DELIMITER);
+        variantsEmojiList = new ArrayList<>(stringTokenizer.countTokens());
 
-            while (stringTokenizer.hasMoreTokens()) {
-                final String token = stringTokenizer.nextToken();
-                final Emoji emoji = EmojiManager.getInstance().findEmoji(token);
+        while (stringTokenizer.hasMoreTokens()) {
+            final String token = stringTokenizer.nextToken();
+            final Emoji emoji = EmojiManager.getInstance().findEmoji(token);
 
-                if (emoji != null && emoji.getLength() == token.length()) {
-                    variantsEmojiList.add(emoji);
-
-                }
+            if (emoji != null && emoji.getLength() == token.length()) {
+                variantsEmojiList.add(emoji);
             }
         }
     }
 
     private SharedPreferences getPreferences() {
-        if (type.equals(TYPE_REACTION)) {
-            return context.getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE);
-        }
-
-        return context.getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE);
+        return context.getSharedPreferences(type.equals(TYPE_REACTION) ? PREFERENCE_REACTION : PREFERENCE_EMOJI, Context.MODE_PRIVATE);
     }
 }

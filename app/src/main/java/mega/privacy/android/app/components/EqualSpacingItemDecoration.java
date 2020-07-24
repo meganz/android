@@ -2,7 +2,6 @@ package mega.privacy.android.app.components;
 
 import android.graphics.Rect;
 import android.view.View;
-
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,12 +37,14 @@ public class EqualSpacingItemDecoration extends RecyclerView.ItemDecoration {
                 outRect.top = spacing;
                 outRect.bottom = spacing;
                 break;
+
             case VERTICAL:
                 outRect.left = spacing;
                 outRect.right = spacing;
                 outRect.top = spacing;
                 outRect.bottom = position == itemCount - 1 ? spacing : 0;
                 break;
+
             case GRID:
                 if (layoutManager instanceof GridLayoutManager) {
                     GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
@@ -54,15 +55,18 @@ public class EqualSpacingItemDecoration extends RecyclerView.ItemDecoration {
                     outRect.right = position % cols == cols - 1 ? spacing : 0;
                     outRect.top = spacing;
                     outRect.bottom = position / cols == rows - 1 ? spacing : 0;
-
                 }
                 break;
         }
     }
 
     private int resolveDisplayMode(RecyclerView.LayoutManager layoutManager) {
-        if (layoutManager instanceof GridLayoutManager) return GRID;
-        if (layoutManager.canScrollHorizontally()) return HORIZONTAL;
+        if (layoutManager instanceof GridLayoutManager)
+            return GRID;
+
+        if (layoutManager.canScrollHorizontally())
+            return HORIZONTAL;
+
         return VERTICAL;
     }
 }

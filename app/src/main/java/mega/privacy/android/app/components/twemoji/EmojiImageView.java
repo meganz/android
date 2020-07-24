@@ -38,7 +38,7 @@ public final class EmojiImageView extends AppCompatImageView {
 
   private boolean hasVariants;
 
-  public EmojiImageView(final Context context){
+  public EmojiImageView(final Context context) {
     super(context);
   }
 
@@ -97,9 +97,10 @@ public final class EmojiImageView extends AppCompatImageView {
   }
 
   public void setEmoji(@NonNull final Emoji emoji, boolean isInfoReaction) {
-    if (!emoji.equals(currentEmoji)) {
-      setImageDrawable(null);
+    if(emoji.equals(currentEmoji))
+      return;
 
+      setImageDrawable(null);
       currentEmoji = emoji;
       hasVariants = !isInfoReaction;
 
@@ -109,7 +110,6 @@ public final class EmojiImageView extends AppCompatImageView {
 
       imageLoadingTask = new ImageLoadingTask(this);
       imageLoadingTask.execute(emoji);
-    }
   }
 
   public void setEmoji(@NonNull final Emoji emoji) {

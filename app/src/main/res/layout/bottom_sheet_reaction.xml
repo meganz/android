@@ -11,5 +11,4 @@
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:visibility="visible" />
-
 </RelativeLayout>

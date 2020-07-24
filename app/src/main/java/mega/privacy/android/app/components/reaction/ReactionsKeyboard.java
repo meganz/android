@@ -28,16 +28,18 @@ public class ReactionsKeyboard extends LinearLayout {
 
     private VariantEmoji variantEmoji;
     private EmojiVariantPopup variantPopup;
+    private RecentEmoji recentEmoji;
+    private View rootView;
+    private int keyboardHeight;
+    private OnEmojiSelectedListener emojiSelectedListener;
+
     private final OnEmojiLongClickListener longClickListener = new OnEmojiLongClickListener() {
         @Override
         public void onEmojiLongClick(@NonNull final EmojiImageView view, @NonNull final Emoji emoji) {
             variantPopup.show(view, emoji);
         }
     };
-    private RecentEmoji recentEmoji;
-    private View rootView;
-    private int keyboardHeight;
-    private OnEmojiSelectedListener emojiSelectedListener;
+
     private final OnEmojiClickListener clickListener = new OnEmojiClickListener() {
         @Override
         public void onEmojiClick(@NonNull final EmojiImageView imageView, @NonNull final Emoji emoji) {

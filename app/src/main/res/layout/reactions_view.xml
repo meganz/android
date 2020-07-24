@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
+
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/emojis_pager"
             android:layout_width="match_parent"
             android:layout_height="213dp"
-            android:paddingTop="10dp"
+            android:layout_above="@id/emoji_divider"
             android:layout_gravity="bottom"
-            android:layout_above="@id/emoji_divider"/>
+            android:paddingTop="10dp" />
+
         <View
             android:id="@+id/emoji_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_above="@id/emojis_tab"
             android:layout_gravity="bottom"
-            android:background="@color/divider_upgrade_account"/>
+            android:background="@color/divider_upgrade_account" />
+
         <LinearLayout
             android:id="@+id/emojis_tab"
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
-            android:layout_alignParentBottom="true"/>
+            android:orientation="horizontal" />
 </merge>

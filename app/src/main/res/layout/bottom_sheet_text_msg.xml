@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
@@ -19,17 +18,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <mega.privacy.android.app.lollipop.megachat.ChatReactionsFragment
                 android:id="@+id/fragment_container_reactions"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"/>
+                android:layout_marginBottom="5dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:background="@color/chat_sliding_panel_separator"
                 android:orientation="vertical" />
         </LinearLayout>
@@ -60,8 +61,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="32dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_forward_grey"
                         android:visibility="visible" />
@@ -71,7 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginRight="15dp"
+                        android:layout_marginEnd="15dp"
                         android:text="@string/forward_menu_item"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp" />
@@ -81,9 +82,10 @@
                     android:id="@+id/edit_separator_info"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
+                    android:layout_marginStart="72dp"
                     android:background="@color/chat_sliding_panel_separator"
                     android:orientation="vertical" />
+                
                 <LinearLayout
                     android:id="@+id/option_select_layout"
                     android:layout_width="match_parent"
@@ -98,8 +100,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="32dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_select_modal"
                         android:visibility="visible" />
@@ -109,8 +111,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginRight="15dp"
-                        android:text="@string/tab_select_mode"
+                        android:layout_marginEnd="15dp"
+                        android:text="@string/general_select"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -119,7 +121,7 @@
                     android:id="@+id/select_separator_info"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
+                    android:layout_marginStart="72dp"
                     android:background="@color/chat_sliding_panel_separator"
                     android:orientation="vertical" />
 
@@ -137,8 +139,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="32dp"
                         android:src="@drawable/ic_edit_msg"
                         android:visibility="visible" />
 
@@ -147,8 +149,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginRight="15dp"
-                        android:text="@string/context_edit"
+                        android:layout_marginEnd="15dp"
+                        android:text="@string/title_edit_profile_info"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -167,8 +169,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="32dp"
                         android:src="@drawable/ic_copy_grey"
                         android:visibility="visible" />
 
@@ -177,7 +179,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginRight="15dp"
+                        android:layout_marginEnd="15dp"
                         android:text="@string/context_copy"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp" />
@@ -187,7 +189,7 @@
                     android:id="@+id/delete_separator_info"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
+                    android:layout_marginStart="72dp"
                     android:background="@color/chat_sliding_panel_separator"
                     android:orientation="vertical" />
 
@@ -205,8 +207,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="32dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="32dp"
                         android:src="@drawable/ic_delete_msg"
                         android:visibility="visible" />
 
@@ -215,16 +217,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginRight="15dp"
+                        android:layout_marginEnd="15dp"
                         android:text="@string/delete_button"
                         android:textColor="@color/dark_primary_color"
                         android:textSize="16sp" />
                 </LinearLayout>
-
             </LinearLayout>
-
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
-
-
 </RelativeLayout>

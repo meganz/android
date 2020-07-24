@@ -38,6 +38,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
     private MegaNode node;
     private MegaNodeList nodeList;
     private AndroidMegaChatMessage message = null;
@@ -47,7 +48,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private long handle = INVALID_HANDLE;
     private ChatController chatC;
     private MegaChatRoom chatRoom;
-
     private LinearLayout reactionsLayout;
     private ChatReactionsFragment reactionsFragment;
 
@@ -88,35 +88,26 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         items_layout = contentView.findViewById(R.id.items_layout);
 
         RelativeLayout optionOpenWith = contentView.findViewById(R.id.open_with_layout);
-
         LinearLayout forwardSeparator = contentView.findViewById(R.id.forward_separator);
         RelativeLayout optionForward = contentView.findViewById(R.id.forward_layout);
-
         LinearLayout editSeparator = contentView.findViewById(R.id.edit_separator);
         RelativeLayout optionEdit = contentView.findViewById(R.id.edit_layout);
-
         LinearLayout copySeparator = contentView.findViewById(R.id.copy_separator);
         RelativeLayout optionCopy = contentView.findViewById(R.id.copy_layout);
-
         LinearLayout shareSeparator = contentView.findViewById(R.id.share_separator);
         RelativeLayout optionShare = contentView.findViewById(R.id.share_layout);
-
         LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
         RelativeLayout optionSelect = contentView.findViewById(R.id.select_layout);
-
         LinearLayout infoSeparator = contentView.findViewById(R.id.info_separator);
         RelativeLayout optionViewContacts = contentView.findViewById(R.id.option_view_layout);
         RelativeLayout optionInfoContacts = contentView.findViewById(R.id.option_info_layout);
-
         LinearLayout inviteSeparator = contentView.findViewById(R.id.invite_separator);
         RelativeLayout optionStartConversation = contentView.findViewById(R.id.option_start_conversation_layout);
         RelativeLayout optionInviteContact = contentView.findViewById(R.id.option_invite_layout);
-
         LinearLayout infoFileSeparator = contentView.findViewById(R.id.info_file_separator);
         RelativeLayout optionImport = contentView.findViewById(R.id.option_import_layout);
         RelativeLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         RelativeLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
-
         LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
         RelativeLayout optionDelete = contentView.findViewById(R.id.delete_layout);
         TextView textDelete = contentView.findViewById(R.id.delete_text);
@@ -137,7 +128,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionDownload.setOnClickListener(this);
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
-
 
         if (message == null || message.getMessage() == null || chatRoom == null || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
             optionOpenWith.setVisibility(View.GONE);
@@ -176,12 +166,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     return;
                 }
 
-                if (handle == INVALID_HANDLE) {
-                    node = nodeList.get(0);
-                } else {
-                    node = getNodeByHandle(handle);
-                }
-
+                node = handle == INVALID_HANDLE ? nodeList.get(0) : getNodeByHandle(handle);
                 if (node == null) {
                     logWarning("Node is NULL");
                     return;
@@ -205,7 +190,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             } else {
                 optionShare.setVisibility(typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT || !isOnline(context) || chatC.isInAnonymousMode() || message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() ? View.GONE : View.VISIBLE);
-
                 optionForward.setVisibility(!isOnline(context) || chatC.isInAnonymousMode() ? View.GONE : View.VISIBLE);
 
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isEditable() || typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
@@ -276,16 +260,29 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             }
         }
 
-        reactionsLayout.setVisibility((shouldReactionOptionsBeVisible(context, chatRoom, message)) ? View.VISIBLE : View.GONE);
-        forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-        editSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE && optionEdit.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-        copySeparator.setVisibility((optionEdit.getVisibility() == View.VISIBLE || optionForward.getVisibility() == View.VISIBLE) && optionCopy.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-        shareSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE && optionShare.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-        selectSeparator.setVisibility((optionSelect.getVisibility() == View.VISIBLE && (optionForward.getVisibility() == View.VISIBLE || optionCopy.getVisibility() == View.VISIBLE)) ? View.VISIBLE : View.GONE);
-        infoSeparator.setVisibility((optionViewContacts.getVisibility() == View.VISIBLE || optionInfoContacts.getVisibility() == View.VISIBLE) && optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
-        inviteSeparator.setVisibility((optionStartConversation.getVisibility() == View.VISIBLE || optionInviteContact.getVisibility() == View.VISIBLE) &&
-                (optionViewContacts.getVisibility() == View.VISIBLE || optionInfoContacts.getVisibility() == View.VISIBLE || selectSeparator.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
-        infoFileSeparator.setVisibility((optionImport.getVisibility() == View.VISIBLE || optionDownload.getVisibility() == View.VISIBLE || optionSaveOffline.getVisibility() == View.VISIBLE) && optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+        reactionsLayout.setVisibility((shouldReactionOptionsBeVisible(context, chatRoom, message)) ?
+                View.VISIBLE : View.GONE);
+        forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE &&
+                optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+        editSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
+                optionEdit.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+        copySeparator.setVisibility((optionEdit.getVisibility() == View.VISIBLE ||
+                optionForward.getVisibility() == View.VISIBLE) && optionCopy.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+        shareSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
+                optionShare.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+        selectSeparator.setVisibility((optionSelect.getVisibility() == View.VISIBLE &&
+                (optionForward.getVisibility() == View.VISIBLE ||
+                        optionCopy.getVisibility() == View.VISIBLE)) ? View.VISIBLE : View.GONE);
+        infoSeparator.setVisibility((optionViewContacts.getVisibility() == View.VISIBLE ||
+                optionInfoContacts.getVisibility() == View.VISIBLE) && optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+        inviteSeparator.setVisibility((optionStartConversation.getVisibility() == View.VISIBLE ||
+                optionInviteContact.getVisibility() == View.VISIBLE) &&
+                (optionViewContacts.getVisibility() == View.VISIBLE ||
+                        optionInfoContacts.getVisibility() == View.VISIBLE || selectSeparator.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+        infoFileSeparator.setVisibility((optionImport.getVisibility() == View.VISIBLE ||
+                optionDownload.getVisibility() == View.VISIBLE ||
+                optionSaveOffline.getVisibility() == View.VISIBLE) &&
+                optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
         deleteSeparator.setVisibility(optionDelete.getVisibility());
 
         dialog.setContentView(contentView);

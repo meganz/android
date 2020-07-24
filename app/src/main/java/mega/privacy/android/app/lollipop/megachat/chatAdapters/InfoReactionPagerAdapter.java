@@ -3,9 +3,12 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
 import java.util.ArrayList;
+
 import mega.privacy.android.app.components.reaction.*;
 
 public class InfoReactionPagerAdapter extends PagerAdapter {
@@ -42,8 +45,8 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(final ViewGroup pager, final int position) {
-        View v = views.get (position);
-        pager.addView (v);
+        View v = views.get(position);
+        pager.addView(v);
         return v;
     }
 
@@ -60,10 +63,9 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
     @Override
     public int getItemPosition(Object object) {
         int index = views.indexOf(object);
-        if (index == -1){
+        if (index == -1) {
             return POSITION_NONE;
-        }
-        else {
+        } else {
             return index;
         }
     }
@@ -99,7 +101,7 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
      * @return position of removed view.
      */
     public int removeView(ViewPager pager, View v) {
-        int position =  views.indexOf(v);
+        int position = views.indexOf(v);
         return removeView(pager, position);
     }
 
@@ -127,8 +129,8 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
         return views.get(position);
     }
 
-    public void updatePage(int position, String reaction){
-        UserReactionListView view = (UserReactionListView)getView(position);
+    public void updatePage(int position, String reaction) {
+        UserReactionListView view = (UserReactionListView) getView(position);
         view.updateUsers(reaction, msgId, chatId);
     }
 }

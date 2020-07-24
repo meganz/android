@@ -41,10 +41,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -883,7 +880,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
             holder.ownMessageReactionsRecycler = v.findViewById(R.id.own_message_reactions_recycler);
-            holder.ownMessageReactionsRecycler.setLayoutManager(new RtlGridLayoutManager(context, MAX_COLUMNS,  RecyclerView.VERTICAL, false));
+            holder.ownMessageReactionsRecycler.setLayoutManager(new RtlGridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false));
             ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
             holder.ownMessageReactionsRecycler.setHasFixedSize(false);
             holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
@@ -2936,7 +2933,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
-
         }
         else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             bindGeoLocationMessage(holder, androidMessage, position);
@@ -3676,6 +3672,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
@@ -7871,10 +7868,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    /**
+     * Method to know if the message is sent or received.
+     *
+     * @param message The MegaMessage.
+     * @return True, if sent. False if received.
+     */
     private boolean checkIfIsMyMessage(MegaChatMessage message) {
         return message.getUserHandle() == myUserHandle && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE && message.getType() != MegaChatMessage.TYPE_SET_PRIVATE_MODE;
     }
 
+    /**
+     * Method for updating reactions if necessary.
+     *
+     * @param chatId   Chat ID.
+     * @param message  Message ID.
+     * @param reaction The reaction.
+     * @param count    total number of users who have used that reaction in that message.
+     */
     public void checkReactionUpdated(long chatId, MegaChatMessage message, String reaction, int count) {
         if (chatRoom.getChatId() != chatId) {
             logDebug("Different chat ");
@@ -7883,6 +7894,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         int positionInAdapter = INVALID_POSITION;
         AndroidMegaChatMessage megaMessage = null;
+
         for (AndroidMegaChatMessage msg : messages) {
             if (msg.getMessage().getMsgId() == message.getMsgId()) {
                 positionInAdapter = messages.indexOf(msg) + 1;
@@ -7892,13 +7904,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         if (positionInAdapter == INVALID_POSITION) {
-            logDebug("Message doesn't exist ");
+            logError("Message doesn't exist ");
             return;
         }
 
         ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
         if (holder == null) {
-            logDebug("Holder not found ");
             notifyItemChanged(positionInAdapter);
             return;
         }
@@ -7922,10 +7933,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         if (checkIfIsMyMessage(megaMessage.getMessage())) {
-
             if (holder.ownReactionsAdapter == null) {
                 createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
-
             } else {
                 if (count == 0) {
                     holder.ownReactionsAdapter.removeItem(reaction);
@@ -7941,12 +7950,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.ownReactionsAdapter = null;
                 }
             }
-
         } else {
-
             if (holder.contactReactionsAdapter == null) {
                 createReactionsAdapter(listReactions, false, chatId, megaMessage, holder);
-
             } else {
                 if (count == 0) {
                     holder.contactReactionsAdapter.removeItem(reaction);
@@ -7998,7 +8004,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     private boolean noReactions(MegaStringList listReactions, MegaChatMessage message, final ViewHolderMessageChat holder) {
         if (listReactions == null || listReactions.size() <= 0) {
-            logDebug("No reactions in this message");
             if (checkIfIsMyMessage(message)) {
                 holder.ownMessageReactionsLayout.setVisibility(View.GONE);
                 holder.ownMessageReactionsRecycler.setAdapter(null);
@@ -8009,8 +8014,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contactMessageReactionsRecycler.setAdapter(null);
                 holder.contactReactionsAdapter = null;
             }
+
             return true;
         }
+
         return false;
     }
 

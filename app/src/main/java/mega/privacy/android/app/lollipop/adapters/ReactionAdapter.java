@@ -47,6 +47,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         this.messageId = megaMessage.getMessage().getMsgId();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         chatRoom = megaChatApi.getChatRoom(chatId);
+
         if (chatRoom == null)
             return;
     }
@@ -64,29 +65,23 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         holder.moreReactionsLayout.setOnClickListener(this);
         holder.itemReactionLayout.setOnClickListener(this);
+        holder.itemReactionLayout.setOnLongClickListener(chatRoom.isGroup() ? this : null);
 
-        if (chatRoom.isGroup()) {
-            holder.itemReactionLayout.setOnLongClickListener(this);
-        } else {
-            holder.itemReactionLayout.setOnLongClickListener(null);
-        }
         return holder;
     }
 
     @Override
     public void onBindViewHolder(ReactionAdapter.ViewHolderReaction holder, int position) {
         String reaction = getItemAtPosition(position);
-        if (reaction == null) {
+        if (reaction == null)
             return;
-        }
+
         if (reaction.equals(INVALID_REACTION)) {
-            /* Add more reactions icon visible*/
             holder.moreReactionsLayout.setVisibility(View.VISIBLE);
             holder.itemReactionLayout.setVisibility(View.GONE);
             return;
         }
 
-        /* Specific reaction*/
         holder.itemReactionLayout.setVisibility(View.VISIBLE);
         holder.moreReactionsLayout.setVisibility(View.GONE);
 
@@ -94,12 +89,10 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         holder.emojiReaction = emojis.get(0).emoji;
         holder.reaction = reaction;
 
-        /*Number users*/
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
         String text = numUsers + "";
         holder.itemNumUsersReaction.setText(text);
 
-        /*Color background*/
         boolean ownReaction = false;
         MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
         for (int i = 0; i < handleList.size(); i++) {
@@ -109,20 +102,17 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             }
         }
 
-        if (ownReaction) {
-            holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, R.color.stroke_own_reaction_added));
-            holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.own_reaction_added));
-        } else {
-            holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, R.color.number_reactions_added));
-            holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.contact_reaction_added));
-        }
-
-        /*Add emoji Reaction*/
+        holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.number_reactions_added));
+        holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
         holder.itemEmojiReaction.setEmoji(holder.emojiReaction);
     }
 
+    private boolean isListReactionsEmpty() {
+        return listReactions == null || listReactions.size() == 0;
+    }
+
     private String getItemAtPosition(int pos) {
-        if (listReactions == null || listReactions.size() == 0 || pos >= listReactions.size())
+        if (isListReactionsEmpty() || pos >= listReactions.size())
             return null;
 
         return listReactions.get(pos);
@@ -134,7 +124,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      * @param reaction The reaction.
      */
     public void removeItem(String reaction) {
-        if (listReactions == null || listReactions.size() == 0)
+        if (isListReactionsEmpty() )
             return;
 
         for (String item : listReactions) {
@@ -158,7 +148,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      * @param reaction The reaction.
      */
     public void updateItem(String reaction) {
-        if (listReactions == null || listReactions.size() == 0)
+        if (isListReactionsEmpty() )
             return;
 
         int position = INVALID_POSITION;
@@ -192,7 +182,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        if (listReactions == null)
+        if (isListReactionsEmpty() )
             return 0;
 
         return listReactions.size();
@@ -201,20 +191,13 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     @Override
     public void onClick(View v) {
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
-        if (holder == null)
+        if (holder == null || holder.getAdapterPosition() < 0 || !shouldReactionBeClicked(megaChatApi.getChatRoom(chatId)))
             return;
-
-        int currentPosition = holder.getAdapterPosition();
-        if (currentPosition < 0) {
-            logWarning("Current position error - not valid value");
-            return;
-        }
 
         switch (v.getId()) {
             case R.id.more_reactions_layout:
                 ((ChatActivityLollipop) context).openReactionBottomSheet(chatId, megaMessage);
                 break;
-
             case R.id.item_reaction_layout:
                 addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.emojiReaction, false);
                 break;
@@ -223,7 +206,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
     @Override
     public boolean onLongClick(View v) {
-
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
         if (holder == null)
             return false;

@@ -45,13 +45,8 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
     super(context);
     this.type = typeView;
 
-    if (type.equals(TYPE_EMOJI)) {
-      View.inflate(context, R.layout.emoji_view, this);
-      setBackgroundColor(ContextCompat.getColor(context, R.color.emoji_background));
-    } else if (type.equals(TYPE_REACTION)) {
-      View.inflate(context, R.layout.reactions_view, this);
-      setBackgroundColor(ContextCompat.getColor(context, R.color.background_chat));
-    }
+    View.inflate(context, type.equals(TYPE_EMOJI) ? R.layout.emoji_view : R.layout.reactions_view, this);
+    setBackgroundColor(ContextCompat.getColor(context, type.equals(TYPE_EMOJI) ? R.color.emoji_background : R.color.background_chat));
 
     setOrientation(VERTICAL);
     themeIconColor = ContextCompat.getColor(context, R.color.emoji_icons);
@@ -72,14 +67,15 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
     if (type.equals(TYPE_EMOJI)) {
       emojiTabs = new ImageButton[categories.length + 2];
       emojiTabs[0] = inflateButton(context, R.drawable.emoji_recent, emojisTab);
+
       for (int i = 0; i < categories.length; i++) {
         emojiTabs[i + 1] = inflateButton(context, categories[i].getIcon(), emojisTab);
       }
       emojiTabs[emojiTabs.length - 1] = inflateButton(context, R.drawable.emoji_backspace, emojisTab);
-
     } else if (type.equals(TYPE_REACTION)) {
       emojiTabs = new ImageButton[categories.length + 1];
       emojiTabs[0] = inflateButton(context, R.drawable.emoji_recent, emojisTab);
+
       for (int i = 0; i < categories.length; i++) {
         emojiTabs[i + 1] = inflateButton(context, categories[i].getIcon(), emojisTab);
       }
@@ -96,13 +92,7 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
   }
 
   private void handleOnClicks(final ViewPager emojisPager) {
-    int totalLength = 0;
-
-    if (type.equals(TYPE_REACTION)) {
-      totalLength = emojiTabs.length;
-    } else if (type.equals(TYPE_EMOJI)) {
-      totalLength = emojiTabs.length - 1;
-    }
+    int totalLength = type.equals(TYPE_REACTION) ? emojiTabs.length : emojiTabs.length - 1;
 
     for (int i = 0; i < totalLength; i++) {
       emojiTabs[i].setOnClickListener(new EmojiTabsClickListener(emojisPager, i));

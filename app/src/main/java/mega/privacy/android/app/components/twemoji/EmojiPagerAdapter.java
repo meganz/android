@@ -31,7 +31,7 @@ public final class EmojiPagerAdapter extends PagerAdapter {
 
   @Override public Object instantiateItem(final ViewGroup pager, final int position) {
     View newView;
-    if(position == RECENT_POSITION){
+    if (position == RECENT_POSITION) {
       newView = new RecentEmojiGridView(pager.getContext()).init(listener, longListener, recentEmoji);
       recentEmojiGridView = (RecentEmojiGridView) newView;
     } else {
@@ -39,7 +39,6 @@ public final class EmojiPagerAdapter extends PagerAdapter {
     }
 
     pager.addView(newView);
-
     return newView;
   }
 
@@ -59,7 +58,7 @@ public final class EmojiPagerAdapter extends PagerAdapter {
     return recentEmoji.getRecentEmojis().size();
   }
 
-  void invalidateRecentEmojis() {
+  public void invalidateRecentEmojis() {
     if (recentEmoji != null && recentEmojiGridView != null) {
       recentEmojiGridView.invalidateEmojis();
     }

@@ -9,6 +9,7 @@ import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaHandleList;
 
 public final class UserReactionListView extends ListView {
+
     ArrayList<Long> arrayOfUsers = new ArrayList<>();
     private UserReactionAdapter userArrayAdapter;
 
@@ -26,6 +27,7 @@ public final class UserReactionListView extends ListView {
      */
     public void updateUsers(String reaction, long msgId, long chatId) {
         arrayOfUsers.clear();
+
         MegaHandleList listUsers = MegaApplication.getInstance().getMegaChatApi().getReactionUsers(chatId, msgId, reaction);
         if (listUsers == null || listUsers.size() == 0)
             return;
@@ -33,7 +35,8 @@ public final class UserReactionListView extends ListView {
         for (int i = 0; i < listUsers.size(); i++) {
             arrayOfUsers.add(new Long(listUsers.get(i)));
         }
-        userArrayAdapter = new UserReactionAdapter(getContext(), arrayOfUsers, chatId, msgId);
+
+        userArrayAdapter = new UserReactionAdapter(getContext(), arrayOfUsers, chatId);
         setAdapter(userArrayAdapter);
     }
 

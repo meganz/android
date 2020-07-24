@@ -3,6 +3,7 @@
     android:id="@+id/general_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,8 +23,8 @@
                 android:layout_height="match_parent"
                 android:background="@null"
                 android:orientation="horizontal"
-                android:paddingLeft="7dp"
-                android:paddingRight="7dp" />
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp" />
         </HorizontalScrollView>
 
         <RelativeLayout
@@ -37,5 +38,4 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>
-
 </RelativeLayout>

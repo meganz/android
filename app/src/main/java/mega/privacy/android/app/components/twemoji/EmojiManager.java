@@ -36,114 +36,59 @@ public final class EmojiManager {
       return firstLength < secondLength ? 1 : firstLength == secondLength ? 0 : -1;
     }
   };
-  private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = new EmojiReplacer() {
-    @Override public void replaceWithImages(final Context context, Spannable text, final float emojiSize, final float defaultEmojiSize, final EmojiReplacer fallback) {
 
-      final EmojiManager emojiManager = EmojiManager.getInstance();
+  private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = (context, text, emojiSize, defaultEmojiSize, fallback) -> {
 
-      final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
-      if(findAllEmojis.size() == 0){
-        logDebug("The text has not MEGA emojis");
-        if(EmojiCompat.get()!=null){
-          if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-            logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
-            EmojiCompat.get().process(text);
+    final EmojiManager emojiManager = EmojiManager.getInstance();
 
-          } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-            logDebug("EmojiCompat - LOAD_STATE_LOADING");
-          }else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-            logWarning("EmojiCompat - LOAD_STATE_FAILED");
-          }else{
-            logDebug("EmojiCompat - LOAD_OTHER_CASE");
-          }
+    final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
+    if (findAllEmojis.size() == 0) {
+      if (EmojiCompat.get() != null && EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
+        EmojiCompat.get().process(text);
+      }
+
+    }else{
+      if(emojiManager.isOnlyEmojis(text.toString())){
+        for (int i = 0; i < findAllEmojis.size(); i++) {
+          final EmojiRange location = findAllEmojis.get(i);
+          text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+
       }else{
-        logDebug("The text has MEGA emojis");
+        for (int i = 0; i < findAllEmojis.size(); i++) {
+          EmojiRange currentLocation = findAllEmojis.get(i);
 
-        if(emojiManager.isOnlyEmojis(text.toString())){
-
-          for (int i = 0; i < findAllEmojis.size(); i++) {
-            final EmojiRange location = findAllEmojis.get(i);
-            text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-          }
-        }else{
-          for (int i = 0; i < findAllEmojis.size(); i++) {
-            EmojiRange currentLocation = findAllEmojis.get(i);
-
-            if(i == 0){
-              //First emoji found
-              if(EmojiCompat.get()!=null){
-                if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                  logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
-                  EmojiCompat.get().process(text,0, currentLocation.start);
-
-                } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                  logDebug("EmojiCompat - LOAD_STATE_LOADING");
-                }else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                  logWarning("EmojiCompat - LOAD_STATE_FAILED");
-                }else{
-                  logDebug("EmojiCompat - LOAD_OTHER_CASE");
-                }
-              }
-
-              if(i == (findAllEmojis.size()-1)){
-                //First emoji found and it's the last one too
-                if(EmojiCompat.get()!=null) {
-                  if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                    logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
-                    EmojiCompat.get().process(text, currentLocation.end, text.length());
-
-                  } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                    logDebug("EmojiCompat - LOAD_STATE_LOADING");
-                  } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                    logWarning("EmojiCompat - LOAD_STATE_FAILED");
-                  } else {
-                    logDebug("EmojiCompat - LOAD_OTHER_CASE");
-                  }
-                }
-              }
-
-            }else if(i == (findAllEmojis.size()-1)){
-              //Last emoji found but there is another minimum
-              EmojiRange previewLocation = findAllEmojis.get(i-1);
-              if(EmojiCompat.get()!=null) {
-                if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                  logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
-                  EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
-                  EmojiCompat.get().process(text, currentLocation.end, text.length());
-
-                } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                  logDebug("EmojiCompat - LOAD_STATE_LOADING");
-                } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                  logWarning("EmojiCompat - LOAD_STATE_FAILED");
-                } else {
-                  logDebug("EmojiCompat - LOAD_OTHER_CASE");
-                }
-              }
-            }else{
-              //Emoji found in the middle
-              EmojiRange previewLocation = findAllEmojis.get(i-1);
-              if(EmojiCompat.get()!=null) {
-                if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-                  logDebug("EmojiCompat - LOAD_STATE_SUCCEEDED");
-                  EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
-
-                } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_LOADING) {
-                  logDebug("EmojiCompat - LOAD_STATE_LOADING");
-                } else if (EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_FAILED) {
-                  logWarning("EmojiCompat - LOAD_STATE_FAILED");
-                } else {
-                  logDebug("EmojiCompat - LOAD_OTHER_CASE");
-                }
-              }
-
+          if (i == 0) {
+            if (EmojiCompat.get() != null &&
+                    EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
+              EmojiCompat.get().process(text, 0, currentLocation.start);
             }
-            text.setSpan(new EmojiSpan(context, currentLocation.emoji, emojiSize), currentLocation.start, currentLocation.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if (i == findAllEmojis.size() - 1 &&
+                    EmojiCompat.get() != null &&
+                    EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
+              EmojiCompat.get().process(text, currentLocation.end, text.length());
+            }
+
+          } else if (i == findAllEmojis.size() - 1) {
+            EmojiRange previewLocation = findAllEmojis.get(i - 1);
+            if (EmojiCompat.get() != null && EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
+              EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
+              EmojiCompat.get().process(text, currentLocation.end, text.length());
+            }
+
+          } else {
+            EmojiRange previewLocation = findAllEmojis.get(i - 1);
+            if (EmojiCompat.get() != null && EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
+              EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
+            }
           }
+
+          text.setSpan(new EmojiSpan(context, currentLocation.emoji, emojiSize), currentLocation.start, currentLocation.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
       }
     }
   };
+
   private final Map<String, Emoji> emojiMap = new LinkedHashMap<>(GUESSED_UNICODE_AMOUNT);
   private EmojiCategory[] categories;
   private Pattern emojiPattern;

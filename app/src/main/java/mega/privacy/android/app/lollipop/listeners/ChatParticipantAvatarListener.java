@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 import java.io.File;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import nz.mega.sdk.MegaApiJava;
@@ -12,16 +14,18 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getImageAvatar;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.getCircleBitmap;
 
 public class ChatParticipantAvatarListener implements MegaRequestListenerInterface {
 
     Context context;
     MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList holder;
     MegaParticipantsChatLollipopAdapter adapter;
-    ImageView imageView;
+    private ImageView imageView;
     private String userEmail;
 
     public ChatParticipantAvatarListener(Context context, MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList holder, MegaParticipantsChatLollipopAdapter adapter) {
@@ -29,6 +33,7 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
         this.holder = holder;
         this.adapter = adapter;
     }
+
     public ChatParticipantAvatarListener(Context context, final ImageView imageView, String userEmail) {
         this.context = context;
         this.imageView = imageView;
@@ -43,71 +48,29 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish()");
-        if (e.getErrorCode() == MegaError.API_OK){
-
-            if(context instanceof GroupChatInfoActivityLollipop){
-                boolean avatarExists = false;
-
+        if (e.getErrorCode() == MegaError.API_OK) {
+            if (context instanceof GroupChatInfoActivityLollipop) {
                 if (holder.contactMail != null) {
-                    if (holder.contactMail.compareTo(request.getEmail()) == 0){
-                        File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
-                        Bitmap bitmap = null;
-                        if (isFileAvailable(avatar)){
-                            if (avatar.length() > 0){
-                                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                                bOpts.inPurgeable = true;
-                                bOpts.inInputShareable = true;
-                                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                                if (bitmap == null) {
-                                    avatar.delete();
-                                }
-                                else{
-                                    holder.setImageView(bitmap);
-                                }
-                            }
+                    if (holder.contactMail.compareTo(request.getEmail()) == 0) {
+                        Bitmap bitmap = getImageAvatar(holder.contactMail);
+                        if (bitmap != null) {
+                            holder.setImageView(bitmap);
                         }
                     }
+                } else if (holder.userHandle.compareTo(request.getEmail()) == 0) {
+                    Bitmap bitmap = getImageAvatar(holder.userHandle);
+                    if (bitmap != null) {
+                        holder.setImageView(bitmap);
+                    }
+                } else {
+                    logWarning("Handle do not match");
                 }
-                else{
-                    if (holder.userHandle.compareTo(request.getEmail()) == 0){
-                        File avatar = buildAvatarFile(context, holder.userHandle + ".jpg");
-                        Bitmap bitmap = null;
-                        if (isFileAvailable(avatar)){
-                            if (avatar.length() > 0){
-                                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                                bOpts.inPurgeable = true;
-                                bOpts.inInputShareable = true;
-                                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                                if (bitmap == null) {
-                                    avatar.delete();
-                                }
-                                else{
-                                    holder.setImageView(bitmap);
-                                }
-                            }
-                        }
-                    }
-                    else{
-                        logWarning("Handle do not match");
-                    }
-                }
-
-            }else{
-                if (userEmail.compareTo(request.getEmail()) == 0) {
-                    File avatar = buildAvatarFile(context, userEmail + ".jpg");
-                    Bitmap bitmap;
-                    if (isFileAvailable(avatar) && avatar.length() > 0) {
-                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                        bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                        if (bitmap == null) {
-                            avatar.delete();
-                            return;
-                        }
-                        imageView.setImageBitmap(bitmap);
-                    }
+            } else if (userEmail.compareTo(request.getEmail()) == 0) {
+                Bitmap bitmap = getImageAvatar(userEmail);
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap);
                 }
             }
-
         }
     }
 

@@ -16,6 +16,7 @@ import mega.privacy.android.app.components.twemoji.RecentEmojiManager;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -27,7 +28,6 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
     private AndroidMegaChatMessage message = null;
     private long chatId;
     private int positionMessage;
-
     private RelativeLayout firstReaction;
     private EmojiImageView firstEmoji;
     private RelativeLayout secondReaction;
@@ -63,6 +63,7 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
         this.context = context;
         this.chatId = chatId;
         this.positionMessage = positionMessage;
+
         if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
@@ -127,6 +128,12 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
 
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
+        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+
+        if (!shouldReactionBeClicked(chatRoom)) {
+            return;
+        }
+
         switch (view.getId()) {
             case R.id.first_emoji_layout:
             case R.id.first_emoji_image:
@@ -173,6 +180,9 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
         closeDialog();
     }
 
+    /**
+     * Method to close the dialog and save the reaction used to display in recent.
+     */
     private void closeDialog() {
         if (recentEmoji != null) {
             recentEmoji.persist();

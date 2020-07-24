@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
 
 public final class EmojiUtils {
   private static final Pattern SPACE_REMOVAL = Pattern.compile("[\\s]");
@@ -40,7 +42,7 @@ public final class EmojiUtils {
    */
   @NonNull
   public static List<EmojiRange> emojis(final String text) {
-    if (text == null || text.isEmpty())
+    if (isTextEmpty(text))
       return null;
 
     return EmojiManager.getInstance().findAllEmojis(text);

@@ -9,10 +9,11 @@
     <RelativeLayout
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginRight="9dp"
-        android:layout_marginLeft="9dp"
         android:layout_centerInParent="true"
+        android:layout_marginStart="9dp"
+        android:layout_marginEnd="9dp"
         android:background="@drawable/rounded_background">
+
         <mega.privacy.android.app.components.twemoji.EmojiImageView
             android:id="@+id/reaction_image"
             android:layout_width="23dp"
@@ -21,5 +22,4 @@
             android:adjustViewBounds="true"
             android:background="@null" />
     </RelativeLayout>
-
 </RelativeLayout>

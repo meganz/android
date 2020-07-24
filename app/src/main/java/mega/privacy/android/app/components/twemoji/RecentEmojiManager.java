@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 public final class RecentEmojiManager implements RecentEmoji {
     private static final int EMOJI_GUESS_SIZE = 5;
@@ -46,16 +47,10 @@ public final class RecentEmojiManager implements RecentEmoji {
             return emojiList.getEmojis();
         }
 
-        String savedRecentEmojis = null;
-        if (type.equals(TYPE_EMOJI)) {
-            savedRecentEmojis = getPreferences().getString(RECENT_EMOJIS, "");
-        } else if (type.equals(TYPE_REACTION)) {
-            savedRecentEmojis = getPreferences().getString(RECENT_REACTIONS, "");
-        }
+        String savedRecentEmojis = getPreferences().getString(type.equals(TYPE_EMOJI) ? RECENT_EMOJIS : RECENT_REACTIONS, "");
 
-        if (savedRecentEmojis == null || savedRecentEmojis.length() == 0) {
-            emojiList = new EmojiList(0);
-            return emojiList.getEmojis();
+        if (isTextEmpty(savedRecentEmojis)) {
+            return new EmojiList(0).getEmojis();
         }
 
         final StringTokenizer stringTokenizer = new StringTokenizer(savedRecentEmojis, EMOJI_DELIMITER);
@@ -67,10 +62,8 @@ public final class RecentEmojiManager implements RecentEmoji {
 
             if (parts.length == 2) {
                 final Emoji emoji = EmojiManager.getInstance().findEmoji(parts[0]);
-
                 if (emoji != null && emoji.getLength() == parts[0].length()) {
-                    final long timestamp = Long.parseLong(parts[1]);
-                    emojiList.add(emoji, timestamp);
+                    emojiList.add(emoji, Long.parseLong(parts[1]));
                 }
             }
         }
@@ -98,12 +91,7 @@ public final class RecentEmojiManager implements RecentEmoji {
         }
 
         stringBuilder.setLength(stringBuilder.length() - EMOJI_DELIMITER.length());
-
-        if (type.equals(TYPE_EMOJI)) {
-            getPreferences().edit().putString(RECENT_EMOJIS, stringBuilder.toString()).apply();
-        } else if (type.equals(TYPE_REACTION)) {
-            getPreferences().edit().putString(RECENT_REACTIONS, stringBuilder.toString()).apply();
-        }
+        getPreferences().edit().putString(type.equals(TYPE_EMOJI) ? RECENT_EMOJIS : RECENT_REACTIONS, stringBuilder.toString()).apply();
     }
 
     /**
@@ -112,14 +100,10 @@ public final class RecentEmojiManager implements RecentEmoji {
      * @return The preferences related to reactions.
      */
     private SharedPreferences getPreferences() {
-        if (type.equals(TYPE_REACTION)) {
-            return context.getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE);
-        }
-
-        return context.getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE);
+        return context.getSharedPreferences(type.equals(TYPE_REACTION) ? PREFERENCE_REACTION : PREFERENCE_EMOJI, Context.MODE_PRIVATE);
     }
 
-    static class EmojiList {
+    private static class EmojiList {
         static final Comparator<Data> COMPARATOR = (lhs, rhs) -> Long.valueOf(rhs.timestamp).compareTo(lhs.timestamp);
 
         @NonNull
@@ -129,13 +113,12 @@ public final class RecentEmojiManager implements RecentEmoji {
             emojis = new ArrayList<>(size);
         }
 
-        void add(final Emoji emoji) {
+        private void add(final Emoji emoji) {
             add(emoji, System.currentTimeMillis());
         }
 
-        void add(final Emoji emoji, final long timestamp) {
+        private void add(final Emoji emoji, final long timestamp) {
             final Iterator<Data> iterator = emojis.iterator();
-
             final Emoji emojiBase = emoji.getBase();
 
             while (iterator.hasNext()) {
@@ -154,7 +137,6 @@ public final class RecentEmojiManager implements RecentEmoji {
 
         Collection<Emoji> getEmojis() {
             Collections.sort(emojis, COMPARATOR);
-
             final Collection<Emoji> sortedEmojis = new ArrayList<>(emojis.size());
 
             for (final Data data : emojis) {
@@ -171,7 +153,7 @@ public final class RecentEmojiManager implements RecentEmoji {
         }
     }
 
-    static class Data {
+    private static class Data {
         final Emoji emoji;
         final long timestamp;
 

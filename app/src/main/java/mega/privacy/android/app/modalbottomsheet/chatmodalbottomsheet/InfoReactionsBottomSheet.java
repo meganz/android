@@ -36,14 +36,15 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
 
     private static final int MIN_HEIGHT = 81;
     private static final int MAX_HEIGHT_PORT = 359;
-    private static final int MAX_HEIGHT_LAND = 259;
     private static final int HEIGHT_REACTIONS = 60;
     private static final int HEIGHT_USERS = 56;
+    private static final int MARGIN = 9;
 
     private Context context;
     private long chatId;
@@ -79,8 +80,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
 
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
-            chatId = savedInstanceState.getLong(CHAT_ID, -1);
-            messageId = savedInstanceState.getLong(MESSAGE_ID, -1);
+            chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+            messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
             reactionSelected = savedInstanceState.getString(REACTION_SELECTED);
 
         } else {
@@ -120,6 +121,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         if (reactionsPageAdapter == null) {
             reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
         }
+
         infoReactionsPager.setAdapter(reactionsPageAdapter);
         reactionsPageAdapter.notifyDataSetChanged();
         infoReactionsPager.setCurrentItem(indexToStart);
@@ -159,6 +161,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 numMaxUsers = user;
             }
         }
+
         long totalSize = HEIGHT_REACTIONS + (HEIGHT_USERS * numMaxUsers);
         if (totalSize > MAX_HEIGHT_PORT) {
             return px2dp(MAX_HEIGHT_PORT, outMetrics);
@@ -226,38 +229,39 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
 
     @Override
     public void onPageSelected(final int i) {
-        if (reactionTabLastSelectedIndex != i) {
-            if (reactionTabLastSelectedIndex >= 0 && reactionTabLastSelectedIndex < reactionTabs.size()) {
-                reactionTabs.get(reactionTabLastSelectedIndex).setSelected(false);
-                if (reactionTabs.get(reactionTabLastSelectedIndex).getChildCount() > 0) {
-                    reactionTabs.get(reactionTabLastSelectedIndex).removeView(separator);
-                }
-            }
+        if(reactionTabLastSelectedIndex == i)
+            return;
 
-            reactionTabs.get(i).setSelected(true);
-            if (reactionTabs.get(i).getChildCount() == 1) {
-                if (separator.getParent() != null) {
-                    ((ViewGroup) separator.getParent()).removeView(separator);
-                }
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(px2dp(40, outMetrics), px2dp(2, outMetrics));
-                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                lp.leftMargin = px2dp(9, outMetrics);
-                lp.rightMargin = px2dp(9, outMetrics);
-                reactionTabs.get(i).addView(separator, lp);
+        if (reactionTabLastSelectedIndex >= 0 && reactionTabLastSelectedIndex < reactionTabs.size()) {
+            reactionTabs.get(reactionTabLastSelectedIndex).setSelected(false);
+            if (reactionTabs.get(reactionTabLastSelectedIndex).getChildCount() > 0) {
+                reactionTabs.get(reactionTabLastSelectedIndex).removeView(separator);
             }
-            reactionTabLastSelectedIndex = i;
-            reactionTabs.get(i).getParent().requestChildFocus(reactionTabs.get(i), reactionTabs.get(i));
         }
+
+        reactionTabs.get(i).setSelected(true);
+
+        if (reactionTabs.get(i).getChildCount() == 1) {
+            if (separator.getParent() != null) {
+                ((ViewGroup) separator.getParent()).removeView(separator);
+            }
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(px2dp(40, outMetrics), px2dp(2, outMetrics));
+            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            lp.leftMargin = px2dp(MARGIN, outMetrics);
+            lp.rightMargin = px2dp(MARGIN, outMetrics);
+            reactionTabs.get(i).addView(separator, lp);
+        }
+
+        reactionTabLastSelectedIndex = i;
+        reactionTabs.get(i).getParent().requestChildFocus(reactionTabs.get(i), reactionTabs.get(i));
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) {
-    }
+    public void onPageScrollStateChanged(int state) { }
 
     /**
      * Method for controlling changes received in reactions.
@@ -297,14 +301,15 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 dismissAllowingStateLoss();
             }
         } else {
-            //Found the reaction:
             int position = INVALID_POSITION;
+
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).equals(reaction)) {
                     position = i;
                     break;
                 }
             }
+
             if (position == INVALID_POSITION) {
                 addReaction(reactionTabs.size(), reaction);
                 list.add(reaction);
@@ -314,12 +319,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 } else {
                     reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
                 }
+            } else if (reactionsPageAdapter != null) {
+                reactionsPageAdapter.updatePage(position, reaction);
             } else {
-                if (reactionsPageAdapter != null) {
-                    reactionsPageAdapter.updatePage(position, reaction);
-                } else {
-                    reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
-                }
+                reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
             }
         }
     }

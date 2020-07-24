@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_alignParentRight="true">
+    android:layout_alignParentEnd="true">
 
     <RelativeLayout
         android:id="@+id/item_reaction_layout"
@@ -14,9 +14,9 @@
             android:id="@+id/item_emoji_reaction"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="6dp"
             android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="6dp"
             android:adjustViewBounds="true"
             android:background="@null" />
 
@@ -25,8 +25,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
-            android:layout_toRightOf="@id/item_emoji_reaction"
+            android:layout_marginEnd="8dp"
+            android:layout_toEndOf="@id/item_emoji_reaction"
             android:textColor="@color/number_reactions_added"
             android:textSize="14sp" />
     </RelativeLayout>
@@ -46,5 +46,4 @@
             android:background="@null"
             android:src="@drawable/ic_emoji_add" />
     </RelativeLayout>
-
 </RelativeLayout>

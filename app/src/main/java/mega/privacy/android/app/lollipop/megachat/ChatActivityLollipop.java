@@ -181,9 +181,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -501,6 +498,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
             }
         }
+
         return false;
     }
 
@@ -1424,9 +1422,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logError("Chatroom is NULL - finish activity!!");
             finish();
         }
-        if(adapter != null) {
+
+        if (adapter != null) {
             adapter.updateChatRoom(chatRoom);
         }
+
         megaChatApi.closeChatRoom(idChat, this);
         if (megaChatApi.openChatRoom(idChat, this)) {
             MegaApplication.setClosedChat(false);
@@ -2214,13 +2214,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 activateActionMode();
                 break;
 
-            case R.id.cab_menu_invite_chat:{
+            case R.id.cab_menu_invite_chat:
                 if(recordView.isRecordingNow())
                     break;
 
                 chooseAddParticipantDialog();
                 break;
-            }
+
             case R.id.cab_menu_contact_info_chat:{
                 if(recordView.isRecordingNow()) break;
 
@@ -4375,9 +4375,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      */
     public void hideMultipleSelect() {
         if (adapter != null) {
-
             adapter.setMultipleSelect(false);
         }
+
         if (actionMode != null) {
             actionMode.finish();
         }
@@ -4418,16 +4418,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @param megaMessage The message.
      * @param reaction    The reaction.
      */
-    public void openInfoReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage, String reaction){
-        if(chatRoom.getChatId() != chatId)
+    public void openInfoReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage, String reaction) {
+        if (chatRoom.getChatId() != chatId)
             return;
 
-        int positionInMessages = messages.indexOf(megaMessage);
-        showInfoReactionBottomSheet(megaMessage, positionInMessages, reaction);
+        showInfoReactionBottomSheet(megaMessage, messages.indexOf(megaMessage), reaction);
     }
 
-    public void openReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage){
-        if(chatRoom.getChatId() != chatId)
+    public void openReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage) {
+        if (chatRoom.getChatId() != chatId)
             return;
 
         int positionInMessages = messages.indexOf(megaMessage);
@@ -4451,10 +4450,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case MegaChatMessage.TYPE_NORMAL:
                 showGeneralChatMessageBottomSheet(m, positionInMessages);
                 break;
+
             case MegaChatMessage.TYPE_CONTAINS_META:
                 MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
                 if (meta == null || meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID)
                     return;
+
                 if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW || meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
                     showGeneralChatMessageBottomSheet(m, positionInMessages);
                 }
@@ -5754,11 +5755,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
         MegaChatMessage message = api.getMessage(idChat, msgid);
         if (adapter == null || message == null) {
-            logDebug("Message not found");
+            logWarning("Message not found");
             return;
         }
 
         adapter.checkReactionUpdated(idChat, message, reaction, count);
+
         if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof InfoReactionsBottomSheet) {
             ((InfoReactionsBottomSheet) bottomSheetDialogFragment).changeInReactionReceived(msgid, idChat, reaction, count);
         }
@@ -5908,7 +5910,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void disableMultiselection(){
-        if(adapter == null || !adapter.isMultipleSelect())
+        if (adapter == null || !adapter.isMultipleSelect())
             return;
 
         finishMultiselectionMode();
@@ -6974,8 +6976,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void showReactionBottomSheet(AndroidMegaChatMessage message, int position){
-
+    public void showReactionBottomSheet(AndroidMegaChatMessage message, int position) {
         if (message == null || message.getMessage() == null)
             return;
 
@@ -6987,8 +6988,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void hideBottomSheet(){
-        if(isBottomSheetDialogShown(bottomSheetDialogFragment)){
+    public void hideBottomSheet() {
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
             bottomSheetDialogFragment.dismissAllowingStateLoss();
         }
     }

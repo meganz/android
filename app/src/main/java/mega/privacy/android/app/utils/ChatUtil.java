@@ -413,12 +413,12 @@ public class ChatUtil {
      *
      * @param context        Context of Activity.
      * @param chatId         The chat ID.
-     * @param messageId        The msg ID.
+     * @param messageId      The msg ID.
      * @param emoji          The chosen reaction.
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
-        if(!(context instanceof ChatActivityLollipop))
+        if (!(context instanceof ChatActivityLollipop))
             return;
 
         MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
@@ -451,9 +451,11 @@ public class ChatUtil {
         return chatRoom != null && message != null &&
                 context instanceof ChatActivityLollipop &&
                 !((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) &&
-                !message.isUploading() &&
-                ((chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RM && chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RO)
-                        || chatRoom.isPreview());
+                !message.isUploading();
+    }
+
+    public static boolean shouldReactionBeClicked(MegaChatRoom chatRoom) {
+        return (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) && !chatRoom.isPreview();
     }
 
     /**
@@ -468,9 +470,11 @@ public class ChatUtil {
         for (int i = 0; i < listReactions.size(); i++) {
             list.add(i, listReactions.get(i));
         }
+
         if (invalidReaction) {
             list.add(INVALID_REACTION);
         }
+
         return list;
     }
 

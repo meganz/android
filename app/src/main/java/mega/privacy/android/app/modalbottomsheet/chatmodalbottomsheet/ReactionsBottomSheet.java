@@ -24,6 +24,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ReactionsBottomSheet extends BottomSheetDialogFragment {
 
@@ -55,20 +56,18 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment {
             return;
 
         if (savedInstanceState != null) {
-            logDebug("Bundle is NOT NULL");
-            chatId = savedInstanceState.getLong(CHAT_ID, -1);
-            messageId = savedInstanceState.getLong(MESSAGE_ID, -1);
-
+            chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+            messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+
             if (messageMega != null) {
                 message = new AndroidMegaChatMessage(messageMega);
             }
-
         } else {
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
-
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+
             if (messageMega != null) {
                 message = new AndroidMegaChatMessage(messageMega);
             }
