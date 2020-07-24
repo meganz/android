@@ -123,7 +123,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
+        registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
         if (savedInstanceState != null) {
@@ -172,7 +172,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
+        unregisterReceiver(transferFinishedReceiver);
 
         super.onDestroy();
     }

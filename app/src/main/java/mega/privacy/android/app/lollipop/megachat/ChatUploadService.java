@@ -499,8 +499,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if (fileExplorerUpload) {
 			fileExplorerUpload = false;
-			LocalBroadcastManager.getInstance(this).sendBroadcast(
-					new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
 							.putExtra(FILE_EXPLORER_CHAT_UPLOAD, true)
 							.putExtra(CHAT_ID, snackbarChatHandle));
 			snackbarChatHandle = MEGACHAT_INVALID_HANDLE;
