@@ -240,7 +240,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
-	private String nickname;
 
 	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
@@ -1308,7 +1307,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				if (setNicknameText.getText().toString().equals(getString(R.string.add_nickname))) {
 					showConfirmationSetNickname(null);
 				} else if (user != null && !isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment)) {
-					nickname = firstLineTextToolbar.getText().toString();
 					contactNicknameBottomSheetDialogFragment = new ContactNicknameBottomSheetDialogFragment();
 					contactNicknameBottomSheetDialogFragment.show(getSupportFragmentManager(), contactNicknameBottomSheetDialogFragment.getTag());
 				}
@@ -1963,7 +1961,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     }
 
 	public String getNickname() {
-		return nickname;
+		return getNicknameContact(user.getHandle());
 	}
 
 	public void onFileClick(ArrayList<Long> handleList) {

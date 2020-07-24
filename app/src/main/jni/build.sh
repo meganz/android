@@ -4,15 +4,25 @@ set -e
 ##################################################
 ### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
 ##################################################
-NDK_ROOT32=${HOME}/android-ndk32
-NDK_ROOT64=${HOME}/android-ndk64
+if [ -z "$NDK_ROOT" ]; then
+    NDK_ROOT=${HOME}/android-ndk
+fi
 ##################################################
+##################################################
+# LIST OF ARCHS TO BE BUILT.
+if [ -z "${BUILD_ARCHS}" ]; then
+    # If no environment variable is defined, use all archs.
+    BUILD_ARCHS="x86 armeabi-v7a x86_64 arm64-v8a"
+fi
+##################################################
+if [ ! -d "${NDK_ROOT}" ]; then
+    echo "* NDK_ROOT not set. Please download ndk 16 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
+    exit 1
+fi
 
-NDK_BUILD32=${NDK_ROOT32}/ndk-build
-NDK_BUILD64=${NDK_ROOT64}/ndk-build
+NDK_BUILD=${NDK_ROOT}/ndk-build
 JNI_PATH=`pwd`
-CC32=`${NDK_ROOT32}/ndk-which gcc`
-CC64=`${NDK_ROOT64}/ndk-which gcc`
+CC=`${NDK_ROOT}/ndk-which gcc`
 LIBDIR=${JNI_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${JNI_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
@@ -147,16 +157,6 @@ function createMEGAchatBindings
     popd &>> ${LOG_FILE}
 }
 
-if [ ! -d "${NDK_ROOT32}" ]; then
-    echo "* NDK_ROOT for 32 bits not set. Please download ndk 14 and create a link at ${HOME}/android-ndk32 and try again."
-    exit 1
-fi
-
-if [ ! -d "${NDK_ROOT64}" ]; then
-    echo "* NDK_ROOT for 64 bits not set. Please download ndk 16 and create a link at ${HOME}/android-ndk64 and try again."
-    exit 1
-fi
-
 if (( $# != 1 )); then
     echo "Usage: $0 <all | bindings | clean | clean_mega>";
     exit 0 
@@ -252,6 +252,8 @@ if [ "$1" != "all" ]; then
     exit 1
 fi
 
+echo "* Building ${BUILD_ARCHS} arch(s)"
+
 createMEGAchatBindings
 echo "* MEGAchat is ready"
 
@@ -264,26 +266,35 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${SODIUM_DOWNLOAD_URL} ${SODIUM}/${SODIUM_SOURCE_FILE} ${SODIUM_SHA1} ${SODIUM}
     ln -sf ${SODIUM_SOURCE_FOLDER} ${SODIUM}/${SODIUM}
     pushd ${SODIUM}/${SODIUM} &>> ${LOG_FILE}
-    export ANDROID_NDK_HOME=${NDK_ROOT64}
+    export ANDROID_NDK_HOME=${NDK_ROOT}
+    export NDK_PLATFORM=${APP_PLATFORM}
     ./autogen.sh &>> ${LOG_FILE}
     echo "#include <limits.h>" >>  src/libsodium/include/sodium/export.h
     sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
     
-    echo "* Prebuilding libsodium for ARMv7"
-    dist-build/android-armv7-a.sh &>> ${LOG_FILE}
-    ln -sf libsodium-android-armv7-a libsodium-android-armeabi-v7a
+    if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
+        echo "* Prebuilding libsodium for ARMv7"
+        dist-build/android-armv7-a.sh &>> ${LOG_FILE}
+        ln -sf libsodium-android-armv7-a libsodium-android-armeabi-v7a
+    fi
     
-    echo "* Prebuilding libsodium for ARMv8"
-    dist-build/android-armv8-a.sh &>> ${LOG_FILE}
-    ln -sf libsodium-android-armv8-a libsodium-android-arm64-v8a
+    if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
+        echo "* Prebuilding libsodium for ARMv8"
+        dist-build/android-armv8-a.sh &>> ${LOG_FILE}
+        ln -sf libsodium-android-armv8-a libsodium-android-arm64-v8a
+    fi
     
-    echo "* Prebuilding libsodium for x86"
-    dist-build/android-x86.sh &>> ${LOG_FILE}
-    ln -sf libsodium-android-i686 libsodium-android-x86
+    if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
+        echo "* Prebuilding libsodium for x86"
+        dist-build/android-x86.sh &>> ${LOG_FILE}
+        ln -sf libsodium-android-i686 libsodium-android-x86
+    fi
     
-    echo "* Prebuilding libsodium for x86_64"
-    dist-build/android-x86_64.sh &>> ${LOG_FILE}
-    ln -sf libsodium-android-westmere libsodium-android-x86_64
+    if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
+        echo "* Prebuilding libsodium for x86_64"
+        dist-build/android-x86_64.sh &>> ${LOG_FILE}
+        ln -sf libsodium-android-westmere libsodium-android-x86_64
+    fi
     
     popd &>> ${LOG_FILE}
     touch ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
@@ -294,7 +305,7 @@ echo "* Setting up Crypto++"
 if [ ! -f ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready ]; then
     mkdir -p ${CRYPTOPP}/${CRYPTOPP}
     downloadCheckAndUnpack ${CRYPTOPP_DOWNLOAD_URL} ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE} ${CRYPTOPP_SHA1} ${CRYPTOPP}/${CRYPTOPP}
-    cp ${NDK_ROOT64}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
+    cp ${NDK_ROOT}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
     touch ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready
 fi
 echo "* Crypto++ is ready"
@@ -360,8 +371,8 @@ echo "* libwebsockets is ready"
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm.a | cut -d " " -f 1`
-    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "2d0e9cff4e691d9da4747315f0775be25d62b0bd" ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!wixgSaZZ!6zRMV_d8ogouBaEidHzGws1KvLrBwBiKEm0VIVgXEPk"
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "d876e79e728f58c8c9387f02914591f61ccf5066" ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
@@ -392,27 +403,35 @@ echo "* PdfViewer is ready"
 
 echo "* All dependencies are prepared!"
 
-
 rm -rf ../tmpLibs
 mkdir ../tmpLibs
-echo "* Running ndk-build x86"
-${NDK_BUILD32} -j8 APP_ABI=x86
-cp -R ../libs/x86 ../tmpLibs/
-echo "* ndk-build finished for x86"
+if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
+    echo "* Running ndk-build x86"
+    ${NDK_BUILD} -j8 APP_ABI=x86
+    mv ../libs/x86 ../tmpLibs/
+    echo "* ndk-build finished for x86"
+fi
 
-echo "* Running ndk-build arm 32bits"
-${NDK_BUILD32} -j8 APP_ABI=armeabi-v7a
-cp -R ../libs/armeabi-v7a ../tmpLibs/
-echo "* ndk-build finished for arm 32bits"
+if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
+    echo "* Running ndk-build arm 32bits"
+    ${NDK_BUILD} -j8 APP_ABI=armeabi-v7a
+    mv ../libs/armeabi-v7a ../tmpLibs/
+    echo "* ndk-build finished for arm 32bits"
+fi
 
-echo "* Running ndk-build x86_64"
-${NDK_BUILD64} -j8 APP_ABI=x86_64
-cp -R ../libs/x86_64 ../tmpLibs/
-echo "* ndk-build finished for x86_64"
+if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
+    echo "* Running ndk-build x86_64"
+    ${NDK_BUILD} -j8 APP_ABI=x86_64
+    mv ../libs/x86_64 ../tmpLibs/
+    echo "* ndk-build finished for x86_64"
+fi
 
-echo "* Running ndk-build arm 64bits"
-${NDK_BUILD64} -j8 APP_ABI=arm64-v8a
-echo "* ndk-build finished for arm 64bits"
+if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
+    echo "* Running ndk-build arm 64bits"
+    ${NDK_BUILD} -j8 APP_ABI=arm64-v8a
+    echo "* ndk-build finished for arm 64bits"
+    mv ../libs/arm64-v8a ../tmpLibs/
+fi
 mv ../tmpLibs/* ../libs/
 rmdir ../tmpLibs/
 
