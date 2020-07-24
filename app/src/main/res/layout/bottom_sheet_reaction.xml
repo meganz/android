@@ -5,10 +5,11 @@
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <mega.privacy.android.app.components.reaction.ReactionsKeyboard
+    <mega.privacy.android.app.components.twemoji.EmojiKeyboard
         android:id="@+id/reaction_keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:visibility="visible" />
+
 </RelativeLayout>

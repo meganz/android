@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components.twemoji;
+package mega.privacy.android.app.components.twemoji.reaction;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,11 +7,12 @@ import android.util.AttributeSet;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 
+import mega.privacy.android.app.components.twemoji.ImageLoadingTask;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 
 public class ReactionImageView extends AppCompatImageView {
 
-    Emoji currentEmoji = null;
+    private Emoji currentEmoji = null;
     private ImageLoadingTask imageLoadingTask;
 
     public ReactionImageView(final Context context, final AttributeSet attrs) {
@@ -38,7 +39,6 @@ public class ReactionImageView extends AppCompatImageView {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-
         if (imageLoadingTask != null) {
             imageLoadingTask.cancel(true);
             imageLoadingTask = null;
@@ -52,15 +52,14 @@ public class ReactionImageView extends AppCompatImageView {
     public void setEmoji(@NonNull final Emoji emoji) {
         if (!emoji.equals(currentEmoji)) {
             setImageDrawable(null);
-
             currentEmoji = emoji;
 
             if (imageLoadingTask != null) {
                 imageLoadingTask.cancel(true);
             }
+
             imageLoadingTask = new ImageLoadingTask(this);
             imageLoadingTask.execute(emoji);
         }
     }
 }
-

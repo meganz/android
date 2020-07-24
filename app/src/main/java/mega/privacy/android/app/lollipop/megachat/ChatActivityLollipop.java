@@ -893,7 +893,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         handlerEmojiKeyboard = new Handler();
 
         emojiKeyboard = findViewById(R.id.emojiView);
-        emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
+        emojiKeyboard.initEmoji(this, textChat, keyboardTwemojiButton);
         emojiKeyboard.setListenerActivated(true);
 
         observersLayout = findViewById(R.id.observers_layout);

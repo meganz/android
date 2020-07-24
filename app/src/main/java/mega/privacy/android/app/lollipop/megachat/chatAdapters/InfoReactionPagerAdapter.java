@@ -9,7 +9,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.components.reaction.*;
+import mega.privacy.android.app.components.twemoji.reaction.*;
 
 public class InfoReactionPagerAdapter extends PagerAdapter {
     private Context context;

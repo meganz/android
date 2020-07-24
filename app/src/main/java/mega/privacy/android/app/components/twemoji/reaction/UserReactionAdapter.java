@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components.reaction;
+package mega.privacy.android.app.components.twemoji.reaction;
 
 import android.app.Activity;
 import android.content.Context;

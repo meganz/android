@@ -10,7 +10,7 @@
         android:layout_height="28dp"
         android:background="@drawable/contact_reaction_added">
 
-        <mega.privacy.android.app.components.twemoji.ReactionImageView
+        <mega.privacy.android.app.components.twemoji.reaction.ReactionImageView
             android:id="@+id/item_emoji_reaction"
             android:layout_width="20dp"
             android:layout_height="20dp"

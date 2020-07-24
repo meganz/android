@@ -13,7 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.reaction.ReactionsKeyboard;
+import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -22,7 +22,6 @@ import nz.mega.sdk.MegaChatMessage;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -37,7 +36,7 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment {
     private View contentView;
     private BottomSheetBehavior mBehavior;
     private RelativeLayout mainLayout;
-    private ReactionsKeyboard reactionsKeyboard;
+    private EmojiKeyboard reactionsKeyboard;
     private DisplayMetrics outMetrics;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
@@ -85,7 +84,7 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_reaction, null);
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
         reactionsKeyboard = contentView.findViewById(R.id.reaction_keyboard);
-        reactionsKeyboard.init(px2dp(HEIGHT_REACTIONS_KEYBOARD, outMetrics));
+        reactionsKeyboard.initReaction(px2dp(HEIGHT_REACTIONS_KEYBOARD, outMetrics));
         reactionsKeyboard.setOnEmojiSelectedListener(emoji -> {
             addReactionInMsg(context, chatId, message.getMessage().getMsgId(), emoji, true);
             closeDialog();
