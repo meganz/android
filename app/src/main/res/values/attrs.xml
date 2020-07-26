@@ -131,4 +131,8 @@
         <attr name="mic_icon" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="CategoryButton">
+        <attr name="photo" format="reference"/>
+        <attr name="name" format="string"/>
+    </declare-styleable>
 </resources>

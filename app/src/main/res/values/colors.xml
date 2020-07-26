@@ -215,4 +215,6 @@
 
     <color name="pressed_color">#E7E7E7</color>
     <color name="transparent">#00000000</color>
+
+    <color name="homepage_background">#EEF2F1</color>
 </resources>

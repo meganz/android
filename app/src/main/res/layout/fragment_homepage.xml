@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#EEF2F1"
-    tools:context=".lollipop.managerSections.HomepageFragment">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/homepage_background"
+        tools:context=".lollipop.managerSections.HomepageFragment">
 
-        <mega.privacy.android.app.components.search.FloatingSearchView
-            android:id="@+id/searchView"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <include layout="@layout/homepage_category" />
+            <mega.privacy.android.app.components.search.FloatingSearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        <include layout="@layout/homepage_banner"
-            android:id="@+id/banner"/>
-    </LinearLayout>
+            <include layout="@layout/homepage_category" />
 
-    <include layout="@layout/homepage_bottom_sheet"/>
+            <include
+                android:id="@+id/banner"
+                layout="@layout/homepage_banner" />
+        </LinearLayout>
 
-    <View
-        android:id="@+id/view_mask"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/textGrey"
-        android:alpha="0.7"
-        android:visibility="gone"
-        android:elevation="6dp"
-        android:clickable="true"/>
+        <include layout="@layout/homepage_bottom_sheet" />
 
-    <include layout="@layout/homepage_fabs"/>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <View
+            android:id="@+id/view_mask"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.7"
+            android:background="@color/textGrey"
+            android:clickable="true"
+            android:elevation="6dp"
+            android:visibility="gone" />
+
+        <include layout="@layout/homepage_fabs" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
