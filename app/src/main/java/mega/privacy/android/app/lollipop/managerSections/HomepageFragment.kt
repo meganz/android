@@ -1,6 +1,9 @@
 package mega.privacy.android.app.lollipop.managerSections
 
-import android.animation.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -13,13 +16,14 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BottomSheetPagerAdapter
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
-
+@AndroidEntryPoint
 class HomepageFragment : Fragment() {
     private lateinit var behavior: HomepageBottomSheetBehavior<*>
     private var heightPixels = 0
