@@ -49,4 +49,11 @@
     <!-- Categories -->
     <dimen name="text_photo_span">8dp</dimen>
     <dimen name="category_padding">16dp</dimen>
+
+    <!-- Homepage Fab -->
+    <dimen name="mask_view_alpha">0.7</dimen>
+    <dimen name="label_padding">8dp</dimen>
+    <dimen name="label_margin_end">16dp</dimen>
+    <dimen name="fab_margin_span">16dp</dimen>
+
 </resources>

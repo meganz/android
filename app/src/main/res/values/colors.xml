@@ -217,4 +217,5 @@
     <color name="transparent">#00000000</color>
 
     <color name="homepage_background">#EEF2F1</color>
+    <color name="fab_upload_background_tint">#333333</color>
 </resources>
