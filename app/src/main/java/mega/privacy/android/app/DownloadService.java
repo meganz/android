@@ -21,6 +21,7 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -157,7 +158,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private BroadcastReceiver pauseBroadcastReceiver;
 	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
 
-	private CompositeDisposable rxSubscriptions = new CompositeDisposable();
+	private final CompositeDisposable rxSubscriptions = new CompositeDisposable();
+	private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
 	@SuppressLint("NewApi")
 	@Override
@@ -508,6 +510,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			currentFile.setReadable(true, false);
 
 			return false;
+		}
+
+		if(document.getSize() > ((long)1024*1024*1024*4)) {
+			logDebug("Show size alert: " + document.getSize());
+			uiHandler.post(() -> Toast.makeText(getApplicationContext(),
+					getString(R.string.error_file_size_greater_than_4gb),
+					Toast.LENGTH_LONG).show());
 		}
 
 		return true;
