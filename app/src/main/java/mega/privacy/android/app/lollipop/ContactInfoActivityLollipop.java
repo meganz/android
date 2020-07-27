@@ -131,8 +131,6 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 @SuppressLint("NewApi")
 public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
-	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
-
 	ContactController cC;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private androidx.appcompat.app.AlertDialog renameDialog;
@@ -911,7 +909,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
-
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				Intent i = new Intent(this, ChatCallActivity.class);
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
@@ -1201,7 +1198,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		startVideo = withVideo;
 		if (checkPermissionsCall()) {
 			startCall();
-
 		}
 	}
 

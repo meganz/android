@@ -11,19 +11,26 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -380,4 +387,70 @@ public class CallUtil {
         builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
+    /**
+     * Method to control when a call should be started, whether the chat room should be created or is already created.
+     *
+     * @param context The context of Activity.
+     * @param user    The mega User.
+     */
+    public static void startNewCall(Context context, MegaUser user) {
+        MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoomByUser(user.getHandle());
+        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+        if (chat == null) {
+            ArrayList<MegaChatRoom> chats = new ArrayList<>();
+            ArrayList<MegaUser> usersNoChat = new ArrayList<>();
+            usersNoChat.add(user);
+            CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, context, CreateChatListener.START_AUDIO_CALL);
+            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+            MegaApplication.getInstance().getMegaChatApi().createChat(false, peers, listener);
+        } else if (MegaApplication.getInstance().getMegaChatApi().getChatCall(chat.getChatId()) != null) {
+            Intent i = new Intent(context, ChatCallActivity.class);
+            i.putExtra(CHAT_ID, chat.getChatId());
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(i);
+        } else if (isStatusConnected(context, chat.getChatId())) {
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).setUserWaitingForCall(user.getHandle());
+            }else  if (context instanceof GroupChatInfoActivityLollipop) {
+                ((GroupChatInfoActivityLollipop) context).setUserWaitingForCall(user.getHandle());
+            }
+            startCallWithChatOnline(context, chat);
+        }
+    }
+
+    /**
+     * Method to control if the chat is online in order to start a call.
+     *
+     * @param context  The context of Activity.
+     * @param chatRoom The chatRoom.
+     */
+    public static void startCallWithChatOnline(Context context, MegaChatRoom chatRoom) {
+        if (context instanceof ManagerActivityLollipop) {
+            if (((ManagerActivityLollipop) context).checkPermissionsCall(START_CALL_PERMISSIONS)) {
+                MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
+                MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, ((ManagerActivityLollipop) context));
+                ((ManagerActivityLollipop) context).setWaitingForCall(false);
+            }
+        }else if (context instanceof GroupChatInfoActivityLollipop) {
+            if (((GroupChatInfoActivityLollipop) context).checkPermissionsCall()) {
+                MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
+                MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, ((GroupChatInfoActivityLollipop) context));
+                ((GroupChatInfoActivityLollipop) context).setWaitingForCall(false);
+            }
+        }
+
+    }
+
+    /**
+     * Method for knowing if the call start button should be enabled or not.
+     *
+     * @param userHandle User handle.
+     * @return True, if it should be enabled or false otherwise.
+     */
+    public static boolean isCallOptionEnabled(long userHandle) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(userHandle);
+        return chat == null || (!chat.isGroup() && megaChatApi.getNumCalls() <= 0 &&
+                !participatingInACall() && !megaChatApi.hasCallInChatRoom(chat.getChatId()));
+    }
 }

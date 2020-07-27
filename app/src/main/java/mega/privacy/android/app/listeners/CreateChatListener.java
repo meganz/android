@@ -10,6 +10,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -110,6 +111,10 @@ public class CreateChatListener extends ChatBaseListener {
                     showSnackbar(context, context.getString(R.string.create_chat_error));
                 } else if (context instanceof ContactInfoActivityLollipop){
                     ((ContactInfoActivityLollipop) context).setWaitingForCall();
+                } else if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop) context).setWaitingForCall(true);
+                } else if(context instanceof GroupChatInfoActivityLollipop){
+                    ((GroupChatInfoActivityLollipop) context).setWaitingForCall(true);
                 }
                 break;
 

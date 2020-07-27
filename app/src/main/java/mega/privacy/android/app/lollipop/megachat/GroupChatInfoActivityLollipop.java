@@ -1,14 +1,19 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
@@ -79,6 +84,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.startCallWithChatOnline;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -89,6 +95,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -159,6 +166,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private EmojiTextView infoTitleChatText;
     private MegaApiAndroid megaApi = null;
 
+    private boolean waitingForCall;
+    private long userWaitingForCall;
+
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
     /**
@@ -185,6 +195,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         super.onCreate(savedInstanceState);
         logDebug("onCreate");
         groupChatInfoActivity = this;
+
+        if(savedInstanceState != null){
+            waitingForCall = savedInstanceState.getBoolean(WAITING_FOR_CALL, false);
+            userWaitingForCall = savedInstanceState.getLong(USER_WAITING_FOR_CALL, MEGACHAT_INVALID_HANDLE);
+        }
+
         if (megaApi == null) {
             MegaApplication app = (MegaApplication) getApplication();
             megaApi = app.getMegaApi();
@@ -1645,7 +1661,21 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+        logDebug("Chat ID: " + chatid + ", New state: " + newState);
 
+        MegaChatRoom chatRoom = api.getChatRoom(chatid);
+        if (waitingForCall && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+                && chatRoom != null && chatRoom.getPeerHandle(0) == userWaitingForCall) {
+            startCallWithChatOnline(this, api.getChatRoom(chatid));
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
+        outState.putLong(USER_WAITING_FOR_CALL, userWaitingForCall);
     }
 
     public void showConfirmationPrivateChatDialog(){
@@ -1764,6 +1794,54 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         else{
             logError("ERROR WHEN CREATING CHAT " + errorCode);
             showSnackbar(getString(R.string.create_chat_error));
+        }
+    }
+
+    public void setWaitingForCall(boolean value) {
+        waitingForCall = value;
+    }
+
+    public void setUserWaitingForCall(long userHandle) {
+        userWaitingForCall = userHandle;
+    }
+
+    public boolean checkPermissionsCall(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+                return false;
+            }
+
+            boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+            if (!hasRecordAudioPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch(requestCode){
+            case RECORD_AUDIO:
+            case REQUEST_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    controlCallPermissions();
+                }
+                break;
+        }
+    }
+
+    private void controlCallPermissions() {
+        if (checkPermissionsCall()) {
+            MegaChatRoom chat = megaChatApi.getChatRoomByUser(userWaitingForCall);
+            if (chat != null) {
+                startCallWithChatOnline(this, chat);
+            }
         }
     }
 

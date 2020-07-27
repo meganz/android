@@ -21,6 +21,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CallUtil.isCallOptionEnabled;
+import static mega.privacy.android.app.utils.CallUtil.startNewCall;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -81,6 +83,8 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         LinearLayout optionContactInfoChat = contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
         LinearLayout optionStartConversationChat = contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
+        LinearLayout optionStartCall = contentView.findViewById(R.id.contact_list_option_call_layout);
+
         LinearLayout optionEditProfileChat = contentView.findViewById(R.id.edit_profile_group_participants_chat_layout);
         LinearLayout optionLeaveChat = contentView.findViewById(R.id.leave_group_participants_chat_layout);
         LinearLayout optionChangePermissionsChat = contentView.findViewById(R.id.change_permissions_group_participants_chat_layout);
@@ -94,7 +98,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionEditProfileChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
-
+        optionStartCall.setVisibility(View.GONE);
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
         LinearLayout separatorOptions = contentView.findViewById(R.id.separator_options);
         LinearLayout separatorLeave = contentView.findViewById(R.id.separator_leave);
@@ -171,6 +175,8 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 optionContactInfoChat.setVisibility(View.VISIBLE);
                 optionStartConversationChat.setVisibility(View.VISIBLE);
+                optionStartCall.setVisibility(View.VISIBLE);
+                optionStartCall.setOnClickListener(isCallOptionEnabled(participantHandle) ? this : null);
                 optionInvite.setVisibility(View.GONE);
             } else {
                 optionContactInfoChat.setVisibility(View.GONE);
@@ -228,6 +234,10 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.start_chat_group_participants_chat_layout:
                 ((GroupChatInfoActivityLollipop) context).startConversation(participantHandle);
+                break;
+
+            case R.id.contact_list_option_call_layout:
+                startNewCall(((GroupChatInfoActivityLollipop) context), megaApi.getContact(selectedChat.getPeerEmailByHandle(participantHandle)));
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:

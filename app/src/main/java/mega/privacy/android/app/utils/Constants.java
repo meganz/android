@@ -359,8 +359,7 @@ public class Constants {
     public static final int TAKE_PICTURE_OPTION = 0;
     public static final int TAKE_PROFILE_PICTURE = 1;
     public static final int START_CALL_PERMISSIONS = 2;
-
-
+    public static final int RETURN_CALL_PERMISSIONS = 3;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
@@ -446,6 +445,9 @@ public class Constants {
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
     public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
+    public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
+    public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
+    public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
