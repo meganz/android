@@ -64,6 +64,12 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
+    public static ImageView imageDrag;
+
+    public static final int OPEN_FROM_ROOT_SINGLE = 1;
+    public static final int OPEN_FROM_ROOT_MULTI = 2;
+    public static final int OPEN_FROM_SUB = 3;
+
     private RecentsFragment recentsFragment;
     private Context context;
     private DisplayMetrics outMetrics;
@@ -94,6 +100,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private ImageView actionImage;
     private TextView dateText;
 
+    private int openFrom;
+
     public static RecentsFragment newInstance() {
         logDebug("newInstance");
         RecentsFragment fragment = new RecentsFragment();
@@ -105,6 +113,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         super.onCreate(savedInstanceState);
 
         recentsFragment = this;
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+
+        imageDrag = null;
     }
 
     @Override
@@ -377,19 +391,69 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         return nodeHandles;
     }
 
-    public void openFile(MegaNode node, boolean isMedia) {
+    public ImageView getImageDrag(long handle) {
+        switch (openFrom) {
+            case OPEN_FROM_ROOT_SINGLE:
+            case OPEN_FROM_ROOT_MULTI:
+                return adapter.getThumbnailView(listView, handle,
+                    openFrom == OPEN_FROM_ROOT_SINGLE);
+            case OPEN_FROM_SUB:
+                return multipleBucketAdapter.getThumbnailView(multipleBucketView, handle);
+            default:
+                return null;
+        }
+    }
+
+    public void updateScrollPosition(long handle) {
+        switch (openFrom) {
+            case OPEN_FROM_ROOT_MULTI:
+                adapter.scrollToSubListNode(listView, handle);
+                break;
+            case OPEN_FROM_SUB: {
+                int position = multipleBucketAdapter.getNodePosition(handle);
+                if (position != -1) {
+                    multipleBucketView.scrollToPosition(position);
+                }
+                break;
+            }
+            case OPEN_FROM_ROOT_SINGLE:
+            default:
+                break;
+        }
+    }
+
+    public void openFile(MegaNode node, boolean isMedia, ImageView thumbnail, int openFrom) {
+        imageDrag = thumbnail;
+        this.openFrom = openFrom;
+
+        int[] screenPosition = null;
+        if (thumbnail != null) {
+            screenPosition = new int[4];
+
+            int[] loc = new int[2];
+            thumbnail.getLocationOnScreen(loc);
+
+            screenPosition[0] = loc[0];
+            screenPosition[1] = loc[1];
+            screenPosition[2] = thumbnail.getWidth();
+            screenPosition[3] = thumbnail.getHeight();
+        }
+
         Intent intent = null;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra("adapterType", RECENTS_ADAPTER);
+            if (screenPosition != null) {
+                intent.putExtra("screenPosition", screenPosition);
+            }
             intent.putExtra(HANDLE, node.getHandle());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(true));
             }
 
-            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             context.startActivity(intent);
+            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             return;
         }
 
@@ -404,6 +468,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             }
 
             intent.putExtra("adapterType", RECENTS_ADAPTER);
+            if (screenPosition != null) {
+                intent.putExtra("screenPosition", screenPosition);
+            }
             intent.putExtra("FILENAME", node.getName());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(false));
@@ -434,6 +501,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra("inside", true);
             intent.putExtra("adapterType", RECENTS_ADAPTER);
+            if (screenPosition != null) {
+                intent.putExtra("screenPosition", screenPosition);
+            }
 
             if (isLocalFile(context, node, megaApi, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
@@ -450,8 +520,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
 
         if (paramsSetSuccessfully) {
-            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             context.startActivity(intent);
+            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             return;
         }
 

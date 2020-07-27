@@ -233,7 +233,9 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 break;
             }
             case R.id.multiple_bucket_layout: {
-                ((RecentsFragment) fragment).openFile(node, true);
+                ((RecentsFragment) fragment).openFile(node, true,
+                    v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list),
+                    RecentsFragment.OPEN_FROM_SUB);
                 break;
             }
         }
@@ -248,5 +250,35 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (!isTextEmpty(name)) return name.substring(0, 1);
 
         return "";
+    }
+
+    public int getNodePosition(long handle) {
+        int position = -1;
+        for (int i = 0, n = nodes.size(); i < n; i++) {
+            if (nodes.get(i).getHandle() == handle) {
+                position = i;
+                break;
+            }
+        }
+        return position;
+    }
+
+    public ImageView getThumbnailView(RecyclerView recyclerView, long handle) {
+        if (nodes == null || nodes.isEmpty()) {
+            return null;
+        }
+
+        int position = getNodePosition(handle);
+        if (position == -1) {
+            return null;
+        }
+
+        RecyclerView.ViewHolder holder = recyclerView.findViewHolderForLayoutPosition(position);
+        if (holder instanceof ViewHolderMultipleBucket) {
+            return isMedia ? ((ViewHolderMultipleBucket) holder).thumbnailMedia
+                : ((ViewHolderMultipleBucket) holder).thumbnailList;
+        }
+
+        return null;
     }
 }

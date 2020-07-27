@@ -1269,6 +1269,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								oFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
+					} else if (adapterType == RECENTS_ADAPTER){
+						if (rF != null) {
+							long handle = intent.getLongExtra("handle", -1);
+							if (actionType == UPDATE_IMAGE_DRAG) {
+								imageDrag = rF.getImageDrag(handle);
+								if (rF.imageDrag != null) {
+									rF.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null) {
+									rF.imageDrag = imageDrag;
+									rF.imageDrag.setVisibility(View.INVISIBLE);
+								}
+							} else if (actionType == SCROLL_TO_POSITION) {
+								rF.updateScrollPosition(handle);
+							}
+						}
 					}
 
 					if (imageDrag != null){

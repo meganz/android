@@ -332,7 +332,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 MegaNodeList nodeList = getMegaNodeListOfItem(item);
                 if (nodeList == null) break;
                 if (nodeList.size() == 1) {
-                    ((RecentsFragment) fragment).openFile(node, false);
+                    ((RecentsFragment) fragment).openFile(node, false,
+                        v.findViewById(R.id.thumbnail_view), RecentsFragment.OPEN_FROM_ROOT_SINGLE);
                     break;
                 }
                 if (item.getBucket() == null) break;
@@ -383,5 +384,85 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 || position < 0 || position >= recentsItems.size()) return "";
 
         return recentsItems.get(position).getDate();
+    }
+
+    private int[] getNodePosition(long handle, boolean rootLevel) {
+        int position = -1;
+        int subListPosition = -1;
+        for (int i = 0, n = recentsItems.size(); i < n; i++) {
+            MegaRecentActionBucket bucket = recentsItems.get(i).getBucket();
+            if (bucket == null) {
+                continue;
+            }
+            MegaNodeList nodes = bucket.getNodes();
+            if (nodes == null) {
+                continue;
+            }
+            if (rootLevel) {
+                MegaNode node = nodes.get(0);
+                if (node != null && node.getHandle() == handle) {
+                    position = i;
+                    break;
+                }
+            } else {
+                for (int j = 0, len = nodes.size(); j < len; j++) {
+                    MegaNode node = nodes.get(j);
+                    if (node != null && node.getHandle() == handle) {
+                        position = i;
+                        subListPosition = j;
+                        break;
+                    }
+                }
+                if (position != -1) {
+                    break;
+                }
+            }
+        }
+        return new int[] { position, subListPosition };
+    }
+
+    public void scrollToSubListNode(RecyclerView recyclerView, long handle) {
+        if (recentsItems == null || recentsItems.isEmpty()) {
+            return;
+        }
+
+        int[] positions = getNodePosition(handle, false);
+        if (positions[0] == -1 || positions[1] == -1) {
+            return;
+        }
+
+        RecyclerView.ViewHolder viewHolder
+            = recyclerView.findViewHolderForLayoutPosition(positions[0]);
+        if (viewHolder instanceof ViewHolderBucket) {
+            ((ViewHolderBucket) viewHolder).mediaRecycler.scrollToPosition(positions[1]);
+        }
+    }
+
+    public ImageView getThumbnailView(RecyclerView recyclerView, long handle, boolean rootLevel) {
+        if (recentsItems == null || recentsItems.isEmpty()) {
+            return null;
+        }
+
+        int[] positions = getNodePosition(handle, rootLevel);
+        if (positions[0] == -1) {
+            return null;
+        }
+
+        RecyclerView.ViewHolder viewHolder
+            = recyclerView.findViewHolderForLayoutPosition(positions[0]);
+        if (viewHolder instanceof ViewHolderBucket) {
+            if (rootLevel) {
+                return ((ViewHolderBucket) viewHolder).imageThumbnail;
+            } else {
+                RecyclerView.ViewHolder subListViewHolder =
+                    ((ViewHolderBucket) viewHolder).mediaRecycler.findViewHolderForLayoutPosition(
+                        positions[1]);
+                if (subListViewHolder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+                    return ((MediaRecentsAdapter.ViewHolderMediaBucket) subListViewHolder).getThumbnail();
+                }
+            }
+        }
+
+        return null;
     }
 }
