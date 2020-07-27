@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -197,11 +196,14 @@ public class ContactUtil {
 
     private static String getNewNickname(MegaStringMap map, String key) {
         String nicknameEncoded = map.get(key);
+        if (nicknameEncoded == null)
+            return null;
+
         try {
-            byte[] decrypt = Base64.decode(nicknameEncoded, Base64.DEFAULT);
-            return new String(decrypt, StandardCharsets.UTF_8);
+            byte[] data = Base64.decode(nicknameEncoded, Base64.URL_SAFE);
+            return new String(data, StandardCharsets.UTF_8);
         } catch (java.lang.Exception e) {
-            logError("Error retrieving new nickname");
+            logError("Error retrieving new nickname " + e);
             return null;
         }
     }
