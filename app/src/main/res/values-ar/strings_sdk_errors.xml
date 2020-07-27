@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="api_ok" context="Label to show that an SDK operation has been complete successfully.">لا يوجد خطأ</string>
+    <string name="api_einternal" context="Label to show that an Internal error occurs during a SDK operation.">خطأ داخلي</string>
+    <string name="api_eargs" context="Label to show that an error of Invalid argument occurs during a SDK operation.">محادثة غير صالحة</string>
+    <string name="api_eagain" context="Label to show that a request error occurs during a SDK operation.">فشل الطلب، إعادة المحاولة</string>
+    <string name="api_eratelimit" context="Label to show that the rate limit has been reached during a SDK operation.">تم تجاوز الحد الاقصي</string>
+    <string name="api_efailed" context="Label to show that a SDK operation has failed permanently.">فشلت بصفة دائمة</string>
+    <string name="api_etoomany_ec_download" context="Error shown when terms of service are breached during download.">تم خرق شروط الخدمة</string>
+    <string name="api_etoomay" context="Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation.">الكثير من الاتصالات المتزامنة أو عمليات النقل</string>
+    <string name="api_erange" context="Label to show that an error of Out of range occurs during a SDK operation.">خارج النطاق</string>
+    <string name="api_eexpired" context="State to indicate something has expired (achivements of business status account for instance)">انتهت</string>
+    <string name="api_enoent" context="Label to show that an error related with a resource Not found occurs during a SDK operation.">غير موجود</string>
+    <string name="api_ecircular_ec_upload" context="Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation.">فشل عملية التراسل بسبب وجود عودية في بنية المجلد</string>
+    <string name="api_ecircular" context="Label to show that an error related with a circular linkage occurs during a SDK operation.">Circular linkage detected</string>
+    <string name="api_eaccess" context="Label to show that an error related with an denied access occurs during a SDK operation.">غير مسموح بالدخول</string>
+    <string name="api_eexist" context="Label to show that an error related with an existent resource occurs during a SDK operation.">موجود مسبقا</string>
+    <string name="api_eincomplete" context="Label to show that an error related with an Incomplete SDK operation.">غير كاملة</string>
+    <string name="api_ekey" context="Label to show that an error related with the decryption process of a node occurs during a SDK operation.">خطأ مفتاح / فك التشفير غير صالح</string>
+    <string name="api_esid" context="Label to show that an error related with a bad session ID occurs during a SDK operation.">معرف الجلسة سي</string>
+    <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">لا يمكن الوصول إليها بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول</string>
+    <string name="api_eblocked" context="Label to show that an error related with a blocked account occurs during a SDK operation.">محظور</string>
+    <string name="api_eoverquota" context="Label to show that an error related with an over quota occurs during a SDK operation.">أكثر من الحصة</string>
+    <string name="api_etempunavail" context="Label to show that an error related with a temporary problem occurs during a SDK operation.">غير متوفرة مؤقتا</string>
+    <string name="api_etoomanyconnections" context="Label to show that an error related with too many connections occurs during a SDK operation.">تجاوز سعة الاتصال</string>
+    <string name="api_ewrite" context="Label to show that an error related with an write error occurs during a SDK operation.">إرسال الخطأ</string>
+    <string name="api_eread" context="Label to show that an error related with an read error occurs during a SDK operation.">قراءة الخطأ</string>
+    <string name="api_eappkey" context="Label to show that an error related with an invalid or missing application key occurs during a SDK operation.">مفتاح التطبيق غير صالح</string>
+    <string name="api_essl" context="Error shown when SSL check has failed">فشل مصادقة شهادة التشفير SSL</string>
+    <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">لا يوجد حجم متاح كافي</string>
+    <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">مطلوب مصادقة متعددة العوامل.</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
+    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">انتهت صلاحية حساب الأعمال خاصتك</string>
+    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>
+    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Billing failed</string>
+    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Rejected by fraud protection</string>
+    <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Too many requests</string>
+    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Balance error</string>
+    <string name="payment_egeneric_api_error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">خطأ غير معروف</string>
+    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">HTTP Error</string>
+</resources>

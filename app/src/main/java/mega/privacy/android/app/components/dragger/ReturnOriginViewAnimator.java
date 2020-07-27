@@ -9,7 +9,7 @@ import android.view.View;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public abstract class ReturnOriginViewAnimator<D extends DraggableView> implements ViewAnimator<D> {
+public class ReturnOriginViewAnimator<D extends DraggableView> implements ViewAnimator<D> {
 
     public static final int ANIMATION_RETURN_TO_ORIGIN_DURATION = 500;
 
@@ -57,7 +57,9 @@ public abstract class ReturnOriginViewAnimator<D extends DraggableView> implemen
     }
 
     @Override
-    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition, View currentView) {
+    public boolean animateExit(@NonNull final D draggableView, final Direction direction,
+        int duration, Activity activity, int[] screenPosition, View currentView,
+        int[] draggableViewLocationOnScreen) {
         logDebug("animateExit");
         return false;
     }
