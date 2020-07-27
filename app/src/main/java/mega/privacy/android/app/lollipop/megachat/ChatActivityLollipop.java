@@ -1319,8 +1319,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (prefs != null) {
             String written = prefs.getWrittenText();
             if (!TextUtils.isEmpty(written)) {
-                editingMessage = !isTextEmpty(prefs.getEditedMsgId());
-                messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(prefs.getEditedMsgId())) : null;
+                String editedMsgId = prefs.getEditedMsgId();
+                editingMessage = !isTextEmpty(editedMsgId);
+                messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(editedMsgId)) : null;
                 textChat.setText(written);
                 sendIcon.setVisibility(View.VISIBLE);
                 sendIcon.setEnabled(true);
