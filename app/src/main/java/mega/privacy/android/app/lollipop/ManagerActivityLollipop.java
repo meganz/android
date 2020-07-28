@@ -802,7 +802,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 if (ACTION_STORAGE_STATE_CHANGED.equals(intent.getAction())) {
                     storageStateFromBroadcast = intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
                     if (!showStorageAlertWithDelay) {
-                        checkStorageStatus(storageStateFromBroadcast, false);
+                        checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
+								storageStateFromBroadcast : app.getStorageState(), false);
                     }
                     updateAccountDetailsVisibleInfo();
                     return;
@@ -4708,7 +4709,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("selectDrawerItemCloudDrive");
         if (showStorageAlertWithDelay) {
             showStorageAlertWithDelay = false;
-            checkStorageStatus(storageStateFromBroadcast, false);
+            checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
+					storageStateFromBroadcast : app.getStorageState(), false);
         }
 		tB.setVisibility(View.VISIBLE);
 
@@ -11034,6 +11036,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
+			case MegaApiJava.STORAGE_STATE_PAYWALL:
 				((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
 				usedSpacePB.setProgressDrawable(getResources().getDrawable(
 						R.drawable.custom_progress_bar_horizontal_exceed));
@@ -12654,6 +12657,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				} else if (newStorageState > storageState) {
 					showStorageFullDialog();
 				}
+				break;
+
+			case MegaApiJava.STORAGE_STATE_PAYWALL:
+				logWarning("STORAGE STATE PAYWALL");
 				break;
 
 			default:
