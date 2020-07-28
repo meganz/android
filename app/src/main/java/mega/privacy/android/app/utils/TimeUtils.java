@@ -389,7 +389,7 @@ public class TimeUtils implements Comparator<Calendar> {
      */
     public static String getCorrectStringDependingOnOptionSelected(long timestamp) {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestamp);
+        cal.setTimeInMillis(timestamp*1000);
 
         Calendar calToday = Calendar.getInstance();
         calToday.setTimeInMillis(System.currentTimeMillis());

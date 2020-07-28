@@ -151,7 +151,9 @@ public final class ChatAdvancedNotificationBuilder {
         for (int i = 0; i < chatHandleList.size(); i++) {
             MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
             if (chat != null) {
-                chats.add(chat);
+                if(isEnableChatNotifications(chat.getChatId())) {
+                    chats.add(chat);
+                }
             } else {
                 logError("ERROR:chatNotRecovered:NULL");
                 return;
@@ -1161,6 +1163,7 @@ public final class ChatAdvancedNotificationBuilder {
                 removeAllChatNotifications();
                 return;
             }
+
             checkShowChatNotifications(lastChatId, beep, request, chats);
         }
         else{
@@ -1212,7 +1215,7 @@ public final class ChatAdvancedNotificationBuilder {
         if(MegaApplication.getOpenChatId() != lastChatId){
             logDebug("Generate chat notification for: " + chats.size() + " chats");
             for (int i = 0; i < chats.size(); i++) {
-                if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
+                if (megaApi.isChatNotifiable(chats.get(i).getChatId()) && MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
                     MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
                     showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
                     beep = false;
@@ -1249,7 +1252,7 @@ public final class ChatAdvancedNotificationBuilder {
         });
 
         logDebug("Generate chat notification for: " + chats.size() + " chats");
-        if(chats!=null && (!(chats.isEmpty()))){
+        if(chats!=null && (!(chats.isEmpty())) && isEnableGeneralChatNotifications()){
             showChatNotificationPreN(request, beep, chats.get(0).getChatId());
         }else{
             removeAllChatNotifications();

@@ -732,6 +732,17 @@ public class ChatUtil {
     }
 
     /**
+     * Method to know if the general chat notifications are activated or muted.
+     *
+     * @return True, if notifications are activated. False in the opposite case
+     */
+    public static boolean isEnableGeneralChatNotifications(){
+        MegaPushNotificationSettings megaPushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
+        return megaPushNotificationSettings == null || !megaPushNotificationSettings.isGlobalChatsDndEnabled();
+
+    }
+
+    /**
      * Method to know if the notifications of a specific chat are activated or muted.
      *
      * @param chatId Chat id.

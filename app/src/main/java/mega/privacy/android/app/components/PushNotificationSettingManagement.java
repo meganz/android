@@ -29,12 +29,19 @@ public class PushNotificationSettingManagement {
      */
     public MegaPushNotificationSettings getPushNotificationSetting() {
         if (this.push == null) {
-            if (MegaApplication.getInstance().getMegaApi() != null) {
-                MegaApplication.getInstance().getMegaApi().getPushNotificationSettings(null);
-            }
+            updateMegaPushNotificationSetting();
         }
 
         return push;
+    }
+
+    /**
+     * Method for getting MegaPushNotificationSettings from megaApi.
+     */
+    public void updateMegaPushNotificationSetting(){
+        if (MegaApplication.getInstance().getMegaApi() != null) {
+            MegaApplication.getInstance().getMegaApi().getPushNotificationSettings(null);
+        }
     }
 
     /**
@@ -74,7 +81,7 @@ public class PushNotificationSettingManagement {
 
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
-                long timestamp = getCalendarSpecificTime(option).getTimeInMillis();
+                long timestamp = getCalendarSpecificTime(option).getTimeInMillis()/1000;
                 if (chatId == MEGACHAT_INVALID_HANDLE) {
                     push.setGlobalChatsDnd(timestamp);
                 } else {
@@ -100,7 +107,7 @@ public class PushNotificationSettingManagement {
                         break;
                 }
 
-                long time = newCalendar.getTimeInMillis();
+                long time = newCalendar.getTimeInMillis()/1000;
                 if (chatId == MEGACHAT_INVALID_HANDLE) {
                     push.setGlobalChatsDnd(time);
                 } else {

@@ -282,7 +282,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
 				if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
 					if (e.getErrorCode() == MegaError.API_OK) {
-                        pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
+						pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
 					} else {
 						logError("Chat notification settings cannot be updated");
 					}
