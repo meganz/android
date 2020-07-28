@@ -1,10 +1,14 @@
 package mega.privacy.android.app.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.SystemClock;
+
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.Chronometer;
@@ -390,55 +394,44 @@ public class CallUtil {
     /**
      * Method to control when a call should be started, whether the chat room should be created or is already created.
      *
-     * @param context The context of Activity.
+     * @param activity The Activity.
      * @param user    The mega User.
      */
-    public static void startNewCall(Context context, MegaUser user) {
+    public static void startNewCall(Activity activity, MegaUser user) {
         MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoomByUser(user.getHandle());
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         if (chat == null) {
             ArrayList<MegaChatRoom> chats = new ArrayList<>();
             ArrayList<MegaUser> usersNoChat = new ArrayList<>();
             usersNoChat.add(user);
-            CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, context, CreateChatListener.START_AUDIO_CALL);
+            CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, activity, CreateChatListener.START_AUDIO_CALL);
             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
             MegaApplication.getInstance().getMegaChatApi().createChat(false, peers, listener);
         } else if (MegaApplication.getInstance().getMegaChatApi().getChatCall(chat.getChatId()) != null) {
-            Intent i = new Intent(context, ChatCallActivity.class);
+            Intent i = new Intent(activity, ChatCallActivity.class);
             i.putExtra(CHAT_ID, chat.getChatId());
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(i);
-        } else if (isStatusConnected(context, chat.getChatId())) {
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).setUserWaitingForCall(user.getHandle());
-            }else  if (context instanceof GroupChatInfoActivityLollipop) {
-                ((GroupChatInfoActivityLollipop) context).setUserWaitingForCall(user.getHandle());
-            }
-            startCallWithChatOnline(context, chat);
+            activity.startActivity(i);
+        } else if (isStatusConnected(activity, chat.getChatId())) {
+            MegaApplication.setUserWaitingForCall(user.getHandle());
+            startCallWithChatOnline(activity, chat);
         }
     }
 
     /**
      * Method to control if the chat is online in order to start a call.
      *
-     * @param context  The context of Activity.
+     * @param activity  The Activity.
      * @param chatRoom The chatRoom.
      */
-    public static void startCallWithChatOnline(Context context, MegaChatRoom chatRoom) {
-        if (context instanceof ManagerActivityLollipop) {
-            if (((ManagerActivityLollipop) context).checkPermissionsCall(START_CALL_PERMISSIONS)) {
-                MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
-                MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, ((ManagerActivityLollipop) context));
-                ((ManagerActivityLollipop) context).setWaitingForCall(false);
-            }
-        }else if (context instanceof GroupChatInfoActivityLollipop) {
-            if (((GroupChatInfoActivityLollipop) context).checkPermissionsCall()) {
-                MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
-                MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, ((GroupChatInfoActivityLollipop) context));
-                ((GroupChatInfoActivityLollipop) context).setWaitingForCall(false);
-            }
+    public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
+        if (checkPermissionsCall(activity, INVALID_TYPE_PERMISSIONS)) {
+            MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
+            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, activity instanceof ManagerActivityLollipop ?
+                    ((ManagerActivityLollipop) activity) :
+                    ((GroupChatInfoActivityLollipop) activity));
+            MegaApplication.setIsWaitingForCall(false);
         }
-
     }
 
     /**
@@ -452,5 +445,34 @@ public class CallUtil {
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(userHandle);
         return chat == null || (!chat.isGroup() && megaChatApi.getNumCalls() <= 0 &&
                 !participatingInACall() && !megaChatApi.hasCallInChatRoom(chat.getChatId()));
+    }
+
+    /**
+     * Method for obtaining the necessary permissions in one call.
+     *
+     * @param activity       The activity.
+     * @param typePermission The type of permission
+     * @return True, if you have both permits. False, otherwise.
+     */
+    public static boolean checkPermissionsCall(Activity activity, int typePermission) {
+        boolean hasCameraPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+        if (!hasCameraPermission) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            if (activity instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            }
+            return false;
+        }
+
+        boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+        if (!hasRecordAudioPermission) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
+            if (activity instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            }
+            return false;
+        }
+
+        return true;
     }
 }

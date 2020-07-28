@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -107,15 +108,11 @@ public class CreateChatListener extends ChatBaseListener {
 
             case START_AUDIO_CALL:
             case START_VIDEO_CALL:
-                if (e.getErrorCode() != MegaError.API_OK) {
-                    showSnackbar(context, context.getString(R.string.create_chat_error));
-                } else if (context instanceof ContactInfoActivityLollipop){
-                    ((ContactInfoActivityLollipop) context).setWaitingForCall();
-                } else if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).setWaitingForCall(true);
-                } else if(context instanceof GroupChatInfoActivityLollipop){
-                    ((GroupChatInfoActivityLollipop) context).setWaitingForCall(true);
-                }
+                    if (e.getErrorCode() != MegaError.API_OK) {
+                        showSnackbar(context, context.getString(R.string.create_chat_error));
+                    } else {
+                        MegaApplication.setIsWaitingForCall(true);
+                    }
                 break;
 
             case SEND_FILES:

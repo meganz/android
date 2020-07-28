@@ -28,7 +28,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="16dp">
+                android:layout_marginStart="16dp">
 
                 <mega.privacy.android.app.components.RoundedImageView
                     android:id="@+id/sliding_group_participants_chat_list_thumbnail"
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_toRightOf="@id/recent_group_participants_chat_list_relative_layout_avatar"
-                android:layout_marginLeft="16dp">
+                android:layout_marginStart="16dp">
 
                 <ImageView
                     android:id="@+id/group_participant_list_permissions"
@@ -56,8 +56,8 @@
                     android:background="@null"
                     android:alpha="0.54"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="45dp"
-                    android:layout_marginLeft="12dp"
+                    android:layout_marginEnd="45dp"
+                    android:layout_marginStart="12dp"
                     android:layout_centerVertical="true"/>
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -78,7 +78,7 @@
                     android:layout_alignTop="@id/group_participants_chat_name_text"
                     android:layout_toRightOf="@id/group_participants_chat_name_text"
                     android:layout_marginTop="6dp"
-                    android:layout_marginLeft="6dp"
+                    android:layout_marginStart="6dp"
                     android:background="@null"
                     android:src="@drawable/circle_status_contact_offline" />
 
@@ -102,7 +102,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:background="@color/chat_sliding_panel_separator"/>
 
         <androidx.core.widget.NestedScrollView
@@ -131,7 +131,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.54"
                         android:paddingBottom="2dp"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/info_ic"
                         android:visibility="visible" />
@@ -142,7 +142,7 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
+                        android:layout_marginStart="18dp"
                         android:text="@string/contact_properties_activity"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
@@ -162,7 +162,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.54"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/info_ic"
@@ -174,7 +174,7 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
+                        android:layout_marginStart="18dp"
                         android:text="@string/group_chat_edit_profile_label"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
@@ -184,7 +184,80 @@
                     android:id="@+id/separator_info"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
+                    android:layout_marginStart="72dp"
+                    android:orientation="vertical"
+                    android:background="@color/chat_sliding_panel_separator"/>
+
+                <!--Call-->
+                <LinearLayout
+                    android:id="@+id/contact_list_option_call_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/contact_list_option_call"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:layout_marginStart="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_call_fille"
+                        android:tint="@color/name_my_account"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/contact_list_option_call_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginStart="18dp"
+                        android:text="@string/call_button"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <!--Send msg-->
+                <LinearLayout
+                    android:id="@+id/start_chat_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/start_chat_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:paddingBottom="2dp"
+                        android:layout_marginStart="5dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_chat"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/start_chat_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginStart="18dp"
+                        android:text="@string/context_send_message"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/separator_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="72dp"
                     android:orientation="vertical"
                     android:background="@color/chat_sliding_panel_separator"/>
 
@@ -203,7 +276,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.54"
                         android:paddingBottom="2dp"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_change_permissions"
                         android:visibility="visible" />
@@ -214,77 +287,13 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
+                        android:layout_marginStart="18dp"
                         android:text="@string/file_properties_shared_folder_change_permissions"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/contact_list_option_call_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <ImageView
-                        android:id="@+id/contact_list_option_call"
-                        style="@style/dialogActionButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.54"
-                        android:layout_marginLeft="5dp"
-                        android:paddingBottom="2dp"
-                        android:paddingTop="2dp"
-                        android:src="@drawable/ic_call_fille"
-                        android:tint="@color/name_my_account"
-                        android:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/contact_list_option_call_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="2dp"
-                        android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
-                        android:text="@string/call_button"
-                        android:textColor="@color/name_my_account"
-                        android:textSize="16sp"/>
-                </LinearLayout>
-
-                <!--Start conversation-->
-                <LinearLayout
-                    android:id="@+id/start_chat_group_participants_chat_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <ImageView
-                        android:id="@+id/start_chat_group_participants_chat_image"
-                        style="@style/dialogActionButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.54"
-                        android:paddingBottom="2dp"
-                        android:layout_marginLeft="5dp"
-                        android:paddingTop="2dp"
-                        android:src="@drawable/ic_chat"
-                        android:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/start_chat_group_participants_chat_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="2dp"
-                        android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
-                        android:text="@string/context_send_message"
-                        android:textColor="@color/name_my_account"
-                        android:textSize="16sp"/>
-                </LinearLayout>
-
-                <!--Invite a non-contac-->
+                <!--Invite a non-contact-->
                 <LinearLayout
                     android:id="@+id/invite_group_participants_chat_layout"
                     android:layout_width="match_parent"
@@ -297,7 +306,7 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_add_contact_chat_item"
@@ -309,7 +318,7 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
+                        android:layout_marginStart="18dp"
                         android:text="@string/menu_add_contact"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
@@ -319,7 +328,7 @@
                     android:id="@+id/separator_options"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
+                    android:layout_marginStart="72dp"
                     android:orientation="vertical"
                     android:background="@color/chat_sliding_panel_separator"/>
 
@@ -337,7 +346,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.54"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_leave_chat"
@@ -349,7 +358,7 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
+                        android:layout_marginStart="18dp"
                         android:text="@string/title_properties_chat_leave_chat"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
@@ -359,13 +368,11 @@
                     android:id="@+id/separator_leave"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
+                    android:layout_marginStart="72dp"
                     android:orientation="vertical"
                     android:background="@color/chat_sliding_panel_separator"/>
 
-
                 <!--Remove contact-->
-
                 <LinearLayout
                     android:id="@+id/remove_group_participants_chat_layout"
                     android:layout_width="match_parent"
@@ -378,7 +385,7 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:tint="@color/dark_primary_color"
@@ -391,7 +398,7 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
+                        android:layout_marginStart="18dp"
                         android:text="@string/remove_participant_menu_item"
                         android:textColor="@color/dark_primary_color"
                         android:textSize="16sp"/>

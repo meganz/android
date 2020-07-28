@@ -146,7 +146,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="0.54"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_call_fille"
@@ -159,7 +159,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/call_button"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>

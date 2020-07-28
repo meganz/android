@@ -308,8 +308,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private static final int HIDDEN_BNV = 5;
 	private static final int MEDIA_UPLOADS_BNV = 6;
 
-	private static final int INVALID_TYPE_PERMISSIONS = -1;
-
 	private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
 	public int accountFragment;
@@ -427,8 +425,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
-	private boolean waitingForCall;
-	private long userWaitingForCall;
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -1720,14 +1716,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     }
 
+	/**
+	 * Method for checking the necessary actions when you have permission to start a call or return to one in progress.
+	 */
 	private void controlCallPermissions() {
-		if (checkPermissionsCall(typesCameraPermission)) {
+		if (checkPermissionsCall(this, typesCameraPermission)) {
 			switch (typesCameraPermission) {
 				case RETURN_CALL_PERMISSIONS:
 					returnCall(this);
 					break;
+
 				case START_CALL_PERMISSIONS:
-					MegaChatRoom chat = megaChatApi.getChatRoomByUser(userWaitingForCall);
+					MegaChatRoom chat = megaChatApi.getChatRoomByUser(MegaApplication.getUserWaitingForCall());
 					if (chat != null) {
 						startCallWithChatOnline(this, chat);
 					}
@@ -1875,8 +1875,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			outState.putBoolean(BUSINESS_CU_FIRST_TIME, businessCUFirstTime);
 		}
 
-		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
-		outState.putLong(USER_WAITING_FOR_CALL, userWaitingForCall);
 		outState.putInt(TYPE_CALL_PERMISSION, typesCameraPermission);
 	}
 
@@ -1974,8 +1972,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				businessCUF = savedInstanceState.getString(BUSINESS_CU_FRAGMENT);
 				businessCUFirstTime = savedInstanceState.getBoolean(BUSINESS_CU_FIRST_TIME, false);
 			}
-			waitingForCall = savedInstanceState.getBoolean(WAITING_FOR_CALL, false);
-			userWaitingForCall = savedInstanceState.getLong(USER_WAITING_FOR_CALL, MEGACHAT_INVALID_HANDLE);
+
 			typesCameraPermission = savedInstanceState.getInt(TYPE_CALL_PERMISSION, INVALID_TYPE_PERMISSIONS);
 		}
 		else{
@@ -7413,7 +7410,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void returnCallWithPermissions() {
-		if (checkPermissionsCall(RETURN_CALL_PERMISSIONS)) {
+		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
 			returnCall(this);
 		}
 	}
@@ -9377,7 +9374,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void checkPermissions(){
-		logDebug("checkPermissionsCall");
 		typesCameraPermission = TAKE_PROFILE_PICTURE;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -12206,13 +12202,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void setWaitingForCall(boolean value) {
-		waitingForCall = value;
-	}
-
-	public void setUserWaitingForCall(long userHandle) {
-		userWaitingForCall = userHandle;
-	}
 
 	public void startGroupConversation(ArrayList<Long> userHandles){
 		logDebug("startGroupConversation");
@@ -15957,8 +15946,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		MegaChatRoom chatRoom = api.getChatRoom(chatid);
-		if (waitingForCall && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
-				&& chatRoom != null && chatRoom.getPeerHandle(0) == userWaitingForCall) {
+		if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+				&& chatRoom != null && chatRoom.getPeerHandle(0) == MegaApplication.getUserWaitingForCall()) {
 			startCallWithChatOnline(this, api.getChatRoom(chatid));
 		}
 	}
@@ -16769,26 +16758,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logDebug("Transfer panel not visible");
 		}
 	}
-
-	public boolean checkPermissionsCall(int typePermission){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-			if (!hasCameraPermission) {
-				typesCameraPermission = typePermission;
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-				return false;
-			}
-
-			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-			if (!hasRecordAudioPermission) {
-				typesCameraPermission = typePermission;
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
-				return false;
-			}
-		}
-		return true;
-	}
-
 
 	public String getSearchQuery() {
 		return searchQuery;

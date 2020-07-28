@@ -244,8 +244,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	private AskForDisplayOverDialog askForDisplayOverDialog;
 
-    private boolean waitingForCall;
-
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -621,10 +619,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			logWarning("Extras is NULL");
 		}
 
-		if (savedInstanceState != null) {
-			waitingForCall = savedInstanceState.getBoolean(WAITING_FOR_CALL, false);
-		}
-
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
@@ -936,50 +930,18 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	}
 
-	public boolean checkPermissionsCall(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-			if (!hasCameraPermission) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-				return false;
-			}
-
-			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-			if (!hasRecordAudioPermission) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
-				return false;
-			}
-
-			return true;
-		}
-		return true;
-	}
-
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch (requestCode) {
-			case REQUEST_CAMERA: {
-				logDebug("REQUEST_CAMERA");
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					if(checkPermissionsCall()){
-						startCall();
-					}
+			case REQUEST_CAMERA:
+			case RECORD_AUDIO:
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+						checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
+					startCall();
 				}
 				break;
-			}
-			case RECORD_AUDIO: {
-				logDebug("RECORD_AUDIO");
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					if(checkPermissionsCall()){
-						startCall();
-					}
-				}
-				break;
-			}
-
 		}
 	}
 
@@ -1196,7 +1158,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	private void startingACall(boolean withVideo) {
 		startVideo = withVideo;
-		if (checkPermissionsCall()) {
+		if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
 			startCall();
 		}
 	}
@@ -2426,7 +2388,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
 	}
 
 	@Override
@@ -2496,7 +2457,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		MegaChatRoom chatRoom = api.getChatRoom(chatid);
 
-		if (waitingForCall && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+		if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
 				&& chatRoom != null && chatRoom.getPeerHandle(0) == user.getHandle()) {
 			startCallWithChatOnline(api.getChatRoom(chatid));
 		}
@@ -2522,11 +2483,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
-		waitingForCall = false;
-	}
-
-	public void setWaitingForCall() {
-		waitingForCall = true;
+		MegaApplication.setIsWaitingForCall(false);
 	}
 
 	/**
