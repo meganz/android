@@ -165,7 +165,7 @@ import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-
+import static mega.privacy.android.app.utils.Util.isOnline;
 
 public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
@@ -605,7 +605,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
 
-            if (mega.privacy.android.app.utils.Util.isOnline(this)){
+            if (isOnline(this)){
                 if(megaApi==null){
                     logDebug("Refresh session - sdk");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
@@ -1360,25 +1360,13 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     void showErrorDialog() {
         logWarning("Error open video file");
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else {
-            builder = new AlertDialog.Builder(this);
-        }
-        builder.setCancelable(false);
-        String accept = getResources().getString(R.string.general_ok).toUpperCase();
-        try {
-            builder.setMessage(R.string.corrupt_video_dialog_text)
-                    .setPositiveButton(accept, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .show();
-        }
-        catch (Exception e){}
+        new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle)
+            .setCancelable(false)
+            .setMessage(isOnline(this) ? R.string.corrupt_video_dialog_text
+                : R.string.error_fail_to_open_file_no_network)
+            .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
+                (dialog, which) -> finish())
+            .show();
 
         numErrors = 0;
     }
@@ -2038,7 +2026,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 chatMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
 
-                if(megaApi==null || !mega.privacy.android.app.utils.Util.isOnline(this)) {
+                if(megaApi==null || !isOnline(this)) {
                     downloadMenuItem.setVisible(false);
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
@@ -2580,7 +2568,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         logDebug("moveToTrash");
 
         moveToRubbish = false;
-        if (!mega.privacy.android.app.utils.Util.isOnline(this)){
+        if (!isOnline(this)){
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
@@ -2897,7 +2885,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             return;
         }
 
-        if(!mega.privacy.android.app.utils.Util.isOnline(this)){
+        if(!isOnline(this)){
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
@@ -3199,7 +3187,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
         else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
-            if(!mega.privacy.android.app.utils.Util.isOnline(this)){
+            if(!isOnline(this)){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
@@ -3227,7 +3215,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
-            if(!mega.privacy.android.app.utils.Util.isOnline(this)){
+            if(!isOnline(this)){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
@@ -3267,7 +3255,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
             logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
-            if(!mega.privacy.android.app.utils.Util.isOnline(this)||megaApi==null) {
+            if(!isOnline(this)||megaApi==null) {
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
