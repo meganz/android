@@ -1298,12 +1298,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				return;
 
 			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
 
-				if (chatIdReceived == -1)
+				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
 					return;
 
-				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				switch (callStatus) {
 					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 					case MegaChatCall.CALL_STATUS_RING_IN:
@@ -1334,6 +1334,30 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					return;
 
 				if (getChatsFragment()  != null && rChatFL.isVisible()) {
+					rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
+				}
+				if (isScreenInPortrait(ManagerActivityLollipop.this)) {
+					setCallWidget();
+				} else {
+					supportInvalidateOptionsMenu();
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+				return;
+
+			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
+				if (getChatsFragment() != null && rChatFL.isVisible()) {
 					rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
 				}
 				if (isScreenInPortrait(ManagerActivityLollipop.this)) {
@@ -2024,10 +2048,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             localBroadcastManager.registerReceiver(refreshAddPhoneNumberButtonReceiver,
                     new IntentFilter(BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
 
-			IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
+			IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
 			filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
+
+			IntentFilter filterSession = new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD);
+			LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -4622,6 +4648,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
 
         unregisterReceiver(cameraUploadLauncherReceiver);
@@ -16147,6 +16174,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			callBadge.setVisibility(View.GONE);
 			return;
 		}
+
 		callBadge.setVisibility(View.VISIBLE);
 	}
 
@@ -16671,7 +16699,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void setCallWidget() {
 		setCallBadge();
 
-		if (drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT || !isScreenInPortrait(this)) {
+		if (drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS &&
+				drawerItem != DrawerItem.CHAT && drawerItem != DrawerItem.CONTACTS &&
+				drawerItem != DrawerItem.INBOX && drawerItem != DrawerItem.SAVED_FOR_OFFLINE ||
+				!isScreenInPortrait(this)) {
+
 			hideCallWidget();
 			return;
 		}
@@ -16693,8 +16725,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	 * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
 	 */
 	private void setCallMenuItem(){
-		if((drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.CLOUD_DRIVE || drawerItem == DrawerItem.SHARED_ITEMS)
-				&& !isScreenInPortrait(this) && participatingInACall() && getChatCallInProgress() != -1){
+		if((drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.CLOUD_DRIVE ||
+				drawerItem == DrawerItem.SHARED_ITEMS || drawerItem == DrawerItem.CONTACTS ||
+				drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.SAVED_FOR_OFFLINE) &&
+				!isScreenInPortrait(this) && participatingInACall() &&
+				getChatCallInProgress() != MEGACHAT_INVALID_HANDLE && !isSessionOnHold(getChatCallInProgress())){
 			returnCallMenuItem.setVisible(true);
 
 			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress());

@@ -585,7 +585,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-
                 if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) && callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT) {
                     updateCallBar();
                 }
@@ -593,6 +592,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                         cancelRecording();
                         break;
+
                     case MegaChatCall.CALL_STATUS_DESTROYED:
                         if (dialogCall != null) {
                             dialogCall.dismiss();
@@ -614,7 +614,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (intent == null || intent.getAction() == null)
                 return;
 
-            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
             if (chatId != getCurrentChatid()) {
                 logWarning("Call different chat");
                 return;
@@ -622,6 +622,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if (intent.getAction().equals(ACTION_CHANGE_REMOTE_AVFLAGS)) {
                 usersWithVideo();
+            }
+
+            if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
+                updateCallBar();
             }
         }
     };
@@ -712,7 +716,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-
         dbH = DatabaseHandler.getDbHandler(this);
 
         handler = new Handler();
@@ -731,14 +734,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
-        IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
+        IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
         filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
 
-        IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+        IntentFilter filterSession = new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD);
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
@@ -8459,9 +8461,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-        if(callInThisChat.isOnHold()){
+        if (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid())) {
             if(anotherActiveCall != null){
-                updateCallInProgressLayout(anotherActiveCall, getString(R.string.call_in_progress_layout));
+                updateCallInProgressLayout(anotherActiveCall, isSessionOnHold(callInThisChat.getChatid()) ?
+                        getString(R.string.call_on_hold) : getString(R.string.call_in_progress_layout));
                 returnCallOnHoldButtonText.setText(getResources().getString(R.string.call_on_hold));
                 returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_transfers_pause);
             }else{

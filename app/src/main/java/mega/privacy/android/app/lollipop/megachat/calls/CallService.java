@@ -109,8 +109,7 @@ public class CallService extends Service{
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filter.addAction(ACTION_CALL_STATUS_UPDATE);
+        IntentFilter filter = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
         filter.addAction(ACTION_CHANGE_CALL_ON_HOLD);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
     }

@@ -151,7 +151,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         }
 
         if (isItMe(chatId, peerId, clientId)) {
-            if (callChat.hasLocalVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
+            if (callChat.hasLocalVideo() && !callChat.isOnHold() && !isSessionOnHold(chatId)) {
                 activateVideo();
                 return;
             }
@@ -162,7 +162,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
 
         MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerId, clientId);
 
-        if (session != null && session.hasVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
+        if (session != null && session.hasVideo() && !callChat.isOnHold() && !isSessionOnHold(chatId)) {
             activateVideo();
             return;
         }
@@ -318,7 +318,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         MegaChatCall call = ((ChatCallActivity) context).getCall();
 
         boolean isShouldShown = call != null && !call.isOnHold() &&
-                !((ChatCallActivity) context).isSessionOnHold() && !call.hasLocalAudio() &&
+                !isSessionOnHold(call.getChatid()) && !call.hasLocalAudio() &&
                 (surfaceView.getVisibility() == View.VISIBLE || avatarLayout.getVisibility() == View.VISIBLE);
 
         if (isShouldShown) {

@@ -592,14 +592,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-		filter.addAction(ACTION_CALL_STATUS_UPDATE);
+		IntentFilter filter = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
 		filter.addAction(ACTION_UPDATE_CALL);
 		LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
-
-		IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
-		filterSession.addAction(ACTION_CHANGE_SESSION_ON_HOLD);
-		LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+		LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
 
 		logoutReceiver = new BroadcastReceiver() {
             @Override

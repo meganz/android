@@ -136,7 +136,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
 
         MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerId, clientId);
 
-        if (session != null && session.hasVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
+        if (session != null && session.hasVideo() && !callChat.isOnHold() && !isSessionOnHold(callChat.getChatid())) {
             activateVideo();
             showMuteIcon(this.peerid, this.clientid);
             return;

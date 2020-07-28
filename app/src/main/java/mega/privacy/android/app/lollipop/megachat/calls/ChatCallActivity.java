@@ -421,7 +421,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
 
-        updateAVFlags(getSesionIndividualCall());
+        updateAVFlags(getSesionIndividualCall(callChat));
         updateLocalSpeakerStatus();
     }
 
@@ -862,16 +862,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             initialUI(chatId);
         }
 
-        IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filterCall.addAction(ACTION_UPDATE_CALL);
+        IntentFilter filterCall = new IntentFilter(ACTION_UPDATE_CALL);
         filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
         filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
 
-        IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
-        filterSession.addAction(ACTION_UPDATE_CALL);
+        IntentFilter filterSession = new IntentFilter(ACTION_UPDATE_CALL);
         filterSession.addAction(ACTION_SESSION_STATUS_UPDATE);
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         filterSession.addAction(ACTION_CHANGE_AUDIO_LEVEL);
@@ -1839,7 +1837,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             onHoldFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_swap));
         } else {
             onHoldFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_hold_fab));
-            onHoldFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(callChat.isOnHold() || isSessionOnHold() ? R.color.accentColor : R.color.disable_fab_chat_call)));
+            onHoldFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(callChat.isOnHold() ||
+                    isSessionOnHold(chat.getChatId()) ? R.color.accentColor : R.color.disable_fab_chat_call)));
         }
     }
 
@@ -1852,7 +1851,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING || (!callChat.isOnHold() && isSessionOnHold() && !chat.isGroup())) {
+        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT ||
+                callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING ||
+                (!callChat.isOnHold() && isSessionOnHold(chat.getChatId()) && !chat.isGroup())) {
             disableFab(onHoldFAB);
         } else {
             enableFab(onHoldFAB);
@@ -1883,7 +1884,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             enableFab(microFAB);
             enableFab(speakerFAB);
-            if (!chat.isGroup() && isSessionOnHold()) {
+            if (!chat.isGroup() && isSessionOnHold(chat.getChatId())) {
                 disableFab(videoFAB);
             } else {
                 enableFab(videoFAB);
@@ -2511,7 +2512,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        boolean shoudShown = !callChat.isOnHold() && !isSessionOnHold() && !callChat.hasLocalAudio();
+        boolean shoudShown = !callChat.isOnHold() && !isSessionOnHold(chat.getChatId()) && !callChat.hasLocalAudio();
 
         if (!shoudShown || mutateContactCallLayout.getVisibility() == View.VISIBLE) {
             checkMutateOwnCallLayout(View.GONE);
@@ -2558,15 +2559,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return (int) MEGACHAT_INVALID_HANDLE;
 
         return peersOnCall.size();
-    }
-
-    /**
-     * Method to get the session of an individual call.
-     *
-     * @return The session.
-     */
-    private MegaChatSession getSesionIndividualCall() {
-        return callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
     }
 
     /**
@@ -2659,7 +2651,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (!chat.isGroup()) {
             createSmallFragment();
             createFullScreenFragment();
-            updateAVFlags(getSesionIndividualCall());
+            updateAVFlags(getSesionIndividualCall(callChat));
         }
 
         answerCallFAB.setOnTouchListener(null);
@@ -2723,27 +2715,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (chat.isGroup())
             return true;
 
-        MegaChatSession session = getSesionIndividualCall();
+        MegaChatSession session = getSesionIndividualCall(callChat);
         if (session != null && session.isOnHold() && MegaApplication.isWasLocalVideoEnable())
             return false;
 
         return session == null || (!callChat.hasLocalVideo() && !session.hasVideo());
-    }
-
-    /**
-     * Method for knowing if the session is on hold.
-     *
-     * @return True if it's on hold. False if it's not.
-     */
-    public boolean isSessionOnHold() {
-        if (!chat.isGroup()) {
-            MegaChatSession session = getSesionIndividualCall();
-            if (session == null)
-                return false;
-
-            return session.isOnHold();
-        }
-        return false;
     }
 
     /**
@@ -2792,12 +2768,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         } else {
-            MegaChatSession session = getSesionIndividualCall();
+            MegaChatSession session = getSesionIndividualCall(callChat);
             if (session != null) {
                 updateRemoteVideoStatus(session);
             }
 
-            if (callChat.isOnHold() || isSessionOnHold()) {
+            if (callChat.isOnHold() || isSessionOnHold(chat.getChatId())) {
                 callOnHoldText.setText(getString(R.string.call_on_hold));
                 callOnHoldLayout.setVisibility(View.VISIBLE);
                 checkMutateOwnCallLayout(View.GONE);

@@ -362,7 +362,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					} else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) {
 						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
 						((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
-						((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(call.isOnHold() ? R.string.call_on_hold : R.string.call_started_messages));
+						((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(call.isOnHold() ||
+								isSessionOnHold(chat.getChatId()) ? R.string.call_on_hold : R.string.call_started_messages));
 						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 						((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
 						if(call.hasLocalAudio()){

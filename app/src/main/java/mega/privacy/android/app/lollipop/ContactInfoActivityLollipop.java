@@ -125,6 +125,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
@@ -407,7 +408,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			videoCallLayout.setOnClickListener(this);
 
 			//Notifications Layout
-
 			notificationsLayout = findViewById(R.id.chat_contact_properties_notifications_layout);
 			notificationsLayout.setVisibility(View.VISIBLE);
 
@@ -1222,16 +1222,16 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				sendMessageToChat();
 				break;
 			}
-			case R.id.chat_contact_properties_chat_call_layout:{
-				logDebug("Start audio call option");
-				startingACall(false);
+
+			case R.id.chat_contact_properties_chat_video_layout:
+			case R.id.chat_contact_properties_chat_call_layout:
+				if (isCallOptionEnabled(user.getHandle())) {
+					startingACall(v.getId() == R.id.chat_contact_properties_chat_video_layout);
+				} else {
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allowed_to_start_call), MEGACHAT_INVALID_HANDLE);
+				}
 				break;
-			}
-			case R.id.chat_contact_properties_chat_video_layout:{
-				logDebug("Star video call option");
-				startingACall(true);
-				break;
-			}
+
 			case R.id.chat_contact_properties_share_contact_layout: {
 				logDebug("Share contact option");
 				if(user==null){

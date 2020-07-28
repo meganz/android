@@ -163,6 +163,35 @@ public class CallUtil {
     }
 
     /**
+     * Method to get the session of an individual call.
+     *
+     * @return The session.
+     */
+    public static MegaChatSession getSesionIndividualCall(MegaChatCall callChat) {
+        if(callChat == null)
+            return null;
+
+        return callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
+    }
+
+    /**
+     * Method for knowing if the session is on hold.
+     *
+     * @return True if it's on hold. False if it's not.
+     */
+    public static boolean isSessionOnHold(long chatId) {
+        MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        if (chat == null || chat.isGroup())
+            return false;
+
+        MegaChatSession session = getSesionIndividualCall(MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId));
+        if (session == null)
+            return false;
+
+        return session.isOnHold();
+    }
+
+    /**
      * Show or hide the "Tap to return to call" banner
      *
      * @param context              from which the action is done
@@ -175,6 +204,7 @@ public class CallUtil {
         if (callInProgressLayout == null){
             return;
         }
+
         ArrayList<Long> currentChatCallsList = getCallsParticipating();
 
         if (!participatingInACall() || currentChatCallsList == null) {
@@ -188,7 +218,7 @@ public class CallUtil {
         for (Long chatIdCall : currentChatCallsList) {
             MegaChatCall current = megaChatApi.getChatCall(chatIdCall);
             if (current != null) {
-                if (!current.isOnHold()) {
+                if (!current.isOnHold() && !isSessionOnHold(chatIdCall)) {
                     callsActive.add(current);
                 }
             }
@@ -707,11 +737,23 @@ public class CallUtil {
         return currentChatId;
     }
 
-
     public static PendingIntent getPendingIntentCall(Context context, long chatIdCallToAnswer, int requestCode) {
         Intent intentCall = new Intent(context, ChatCallActivity.class);
         intentCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentCall.putExtra(CHAT_ID, chatIdCallToAnswer);
         return PendingIntent.getActivity(context, requestCode, intentCall, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    /**
+     * Method for knowing if the call start button should be enabled or not.
+     *
+     * @param userHandle User handle.
+     * @return True, if it should be enabled or false otherwise.
+     */
+    public static boolean isCallOptionEnabled(long userHandle) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(userHandle);
+        return chat == null || (!chat.isGroup() && megaChatApi.getNumCalls() <= 0 &&
+                !participatingInACall() && !megaChatApi.hasCallInChatRoom(chat.getChatId()));
     }
 }
