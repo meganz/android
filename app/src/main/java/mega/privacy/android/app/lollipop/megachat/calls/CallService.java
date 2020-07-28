@@ -111,7 +111,7 @@ public class CallService extends Service{
 
         IntentFilter filter = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
         filter.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+        registerReceiver(chatCallUpdateReceiver, filter);
     }
 
     @Override
@@ -387,7 +387,7 @@ public class CallService extends Service{
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(chatCallUpdateReceiver);
         mNotificationManager.cancel(getCurrentCallNotifId());
         MegaApplication.setOpenCallChatId(-1);
 

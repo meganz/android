@@ -383,7 +383,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
         LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, new IntentFilter(ACTION_CALL_STATUS_UPDATE));
+        registerReceiver(chatCallUpdateReceiver, new IntentFilter(ACTION_CALL_STATUS_UPDATE));
 
         downloadLocationDefaultPath = getDownloadLocation();
 
@@ -3403,7 +3403,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(chatCallUpdateReceiver);
 
         super.onDestroy();
     }

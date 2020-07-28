@@ -867,7 +867,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
         filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
+        registerReceiver(chatCallUpdateReceiver, filterCall);
 
         IntentFilter filterSession = new IntentFilter(ACTION_UPDATE_CALL);
         filterSession.addAction(ACTION_SESSION_STATUS_UPDATE);
@@ -875,7 +875,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         filterSession.addAction(ACTION_CHANGE_AUDIO_LEVEL);
         filterSession.addAction(ACTION_CHANGE_NETWORK_QUALITY);
         filterSession.addAction(ACTION_CHANGE_SESSION_ON_HOLD);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+        registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         IntentFilter filterProximitySensor = new IntentFilter(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
         LocalBroadcastManager.getInstance(this).registerReceiver(proximitySensorReceiver, filterProximitySensor);
@@ -1074,8 +1074,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             bigRecyclerView.setAdapter(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
+        unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(chatSessionUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(proximitySensorReceiver);
 
         super.onDestroy();

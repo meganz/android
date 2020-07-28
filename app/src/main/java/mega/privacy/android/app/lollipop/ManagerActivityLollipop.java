@@ -2050,10 +2050,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
 			filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
-			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
+			registerReceiver(chatCallUpdateReceiver, filterCall);
 
 			IntentFilter filterSession = new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD);
-			LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+			registerReceiver(chatSessionUpdateReceiver, filterSession);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -4647,8 +4647,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
+		unregisterReceiver(chatCallUpdateReceiver);
+		unregisterReceiver(chatSessionUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
 
         unregisterReceiver(cameraUploadLauncherReceiver);
