@@ -7413,18 +7413,20 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         super.onDestroy();
     }
 
-    public void closeChat(boolean shouldLogout){
+    public void closeChat(boolean shouldLogout) {
         logDebug("closeChat");
-        if(megaChatApi==null || idChat == -1) return;
-        if(chatRoom!=null && chatRoom.isPreview()){
-            megaChatApi.closeChatPreview(idChat);
-            if(chatC.isInAnonymousMode() && shouldLogout){
-                megaChatApi.logout();
-            }
+        if (megaChatApi == null || chatRoom == null || idChat == -1) {
+            return;
         }
-        megaChatApi.closeChatRoom(idChat, this);
+        if (chatRoom.isPreview() && chatC.isInAnonymousMode() && shouldLogout) {
+            megaChatApi.logout();
+        } else {
+            megaChatApi.closeChatRoom(idChat, this);
+        }
         MegaApplication.setClosedChat(true);
         megaChatApi.removeChatListener(this);
+        chatRoom = null;
+        idChat = -1;
     }
 
     @Override
