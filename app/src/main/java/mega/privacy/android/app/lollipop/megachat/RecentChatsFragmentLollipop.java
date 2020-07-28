@@ -129,6 +129,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private RecyclerView contactsList;
     private TextView moreContactsTitle;
     private TextView actionBarTitle, actionBarSubtitle;
+    private ImageView actionBarSubtitleArrow;
     private View bannerDivider;
 
     private AppBarLayout appBarLayout;
@@ -2049,11 +2050,13 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             actionBarTitle = v.findViewById(R.id.ab_title);
             setCustomisedActionBarTitle(adjustForLargeFont(getString(R.string.section_chat).toUpperCase()));
             actionBarSubtitle = v.findViewById(R.id.ab_subtitle);
+            actionBarSubtitleArrow = v.findViewById(R.id.ab_subtitle_arrow);
             setStatus();
             v.findViewById(R.id.ab_subtitle_container).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (context != null && context instanceof ManagerActivityLollipop) {
+                    if (context != null && context instanceof ManagerActivityLollipop
+                        && isOnline(context)) {
                         ((ManagerActivityLollipop) context).showPresenceStatusDialog();
                     }
                 }
@@ -2067,9 +2070,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
-    private void setCustomisedActionBarSubtitle(SpannableString subtitle){
-        if(actionBarSubtitle != null){
+    private void setCustomisedActionBarSubtitle(SpannableString subtitle) {
+        if(actionBarSubtitle != null) {
             actionBarSubtitle.setText(subtitle);
+        }
+        if (actionBarSubtitleArrow != null) {
+            actionBarSubtitleArrow.setVisibility(isOnline(context) ? View.VISIBLE : View.GONE);
         }
     }
 }
