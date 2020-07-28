@@ -113,16 +113,20 @@
             android:orientation="horizontal"
             android:layout_below="@+id/bucket_layout">
 
-<!--                        <androidx.recyclerview.widget.RecyclerView-->
-            <mega.privacy.android.app.CustomRecyclerView
-                android:id="@+id/media_recyler"
+            <mega.privacy.android.app.components.NestedScrollableHost
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:choiceMode="multipleChoice"
-                android:orientation="horizontal"
-                android:paddingLeft="70dp"
-                android:clipToPadding="false"
-                android:layout_gravity="center_vertical"/>
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/media_recyler"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:choiceMode="multipleChoice"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingLeft="70dp" />
+            </mega.privacy.android.app.components.NestedScrollableHost>
 
         </LinearLayout>
         

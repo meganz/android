@@ -17,7 +17,9 @@
             <mega.privacy.android.app.components.search.FloatingSearchView
                 android:id="@+id/searchView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginHorizontal="16dp"/>
 
             <include layout="@layout/homepage_category" />
 

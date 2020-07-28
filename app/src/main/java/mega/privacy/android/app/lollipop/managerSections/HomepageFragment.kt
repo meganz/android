@@ -17,7 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.BottomSheetPagerAdapter
+import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
@@ -25,7 +25,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
-    private lateinit var behavior: HomepageBottomSheetBehavior<*>
+    private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private var heightPixels = 0
     private var searchBottom = 0
     private lateinit var searchInputView: FloatingSearchView
@@ -35,18 +35,15 @@ class HomepageFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_homepage, container, false)
-//        view.findViewById<TextView>(R.id.textview).setOnClickListener {
-//            findNavController().navigate(R.id.action_homepageFragment_to_homepageFragment2)
-//        }
 
-        behavior = HomepageBottomSheetBehavior.from(view.findViewById<View>(R.id.design_bottom_sheet1))
-                as HomepageBottomSheetBehavior<*>
+        bottomSheetBehavior = HomepageBottomSheetBehavior.from(view.findViewById<View>(R.id.homepage_bottom_sheet))
 
         searchInputView = view.findViewById<FloatingSearchView>(R.id.searchView)
         searchInputView.attachNavigationDrawerToMenuButton((activity as ManagerActivityLollipop).drawerLayout!!)
 
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
-        viewPager.adapter = BottomSheetPagerAdapter(this)
+        viewPager.adapter =
+            BottomSheetPagerAdapter(this)
         val tabs = view.findViewById<TabLayout>(R.id.tabs)
         val mediator = TabLayoutMediator(tabs, viewPager) { tab, _ ->
             tab.text = "Recent"
@@ -55,7 +52,7 @@ class HomepageFragment : Fragment() {
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                behavior.invalidateScrollingChild((viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position))
+                bottomSheetBehavior.invalidateScrollingChild((viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position))
             }
         })
 
@@ -66,13 +63,13 @@ class HomepageFragment : Fragment() {
 //                heightPixels = resources.displayMetrics.heightPixels
                 searchBottom = searchInputView.bottom
                 val banner = view?.findViewById<View>(R.id.banner)
-                behavior.peekHeight = view!!.height - banner!!.bottom - 20
+                bottomSheetBehavior.peekHeight = view!!.height - banner!!.bottom - 20
 //                view.findViewById<View>(R.id.design_bottom_sheet1)?.visibility = View.VISIBLE
                 return true
             }
         })
 
-        behavior.addBottomSheetCallback(object : HomepageBottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetBehavior.addBottomSheetCallback(object : HomepageBottomSheetBehavior.BottomSheetCallback() {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 val layoutParams = bottomSheet.layoutParams

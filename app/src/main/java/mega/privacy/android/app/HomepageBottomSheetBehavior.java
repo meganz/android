@@ -1,24 +1,4 @@
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package mega.privacy.android.app;
-
-import com.google.android.material.R;
-
-import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
@@ -31,17 +11,6 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.FloatRange;
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
-import androidx.annotation.VisibleForTesting;
-import androidx.core.math.MathUtils;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
-import androidx.core.view.accessibility.AccessibilityViewCommand;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -52,13 +21,28 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.WindowInsets;
+
+import androidx.annotation.FloatRange;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams;
+import androidx.core.math.MathUtils;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
+import androidx.core.view.accessibility.AccessibilityViewCommand;
 import androidx.customview.view.AbsSavedState;
 import androidx.customview.widget.ViewDragHelper;
+
+import com.google.android.material.R;
 import com.google.android.material.resources.MaterialResources;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -67,26 +51,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
+import static com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight;
+
 /**
- * An interaction behavior plugin for a child view of {@link CoordinatorLayout} to make it work as a
- * bottom sheet.
- *
- * <p>To send useful accessibility events, set a title on bottom sheets that are windows or are
- * window-like. For BottomSheetDialog use {@link BottomSheetDialog#setTitle(int)}, and for
- * BottomSheetDialogFragment use {@link ViewCompat#setAccessibilityPaneTitle(View, CharSequence)}.
+ * The code is pretty much copied from BottomSheetBehavior since no way to directly inherit from it
+ * Add interface to invalidate the nested scrolling view and search new one in specified parent view.
+ * Also add support for multiple nested scrolling view (only one scrolling view is visible at a time)
+ * The motivation is to support the multiple scrolling views in RecentsFragment
+ * @param <V>
  */
 public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
 
-    /** Callback for monitoring events about bottom sheets. */
+    /**
+     * Callback for monitoring events about bottom sheets.
+     */
     public abstract static class BottomSheetCallback {
 
         /**
          * Called when the bottom sheet changes its state.
          *
          * @param bottomSheet The bottom sheet view.
-         * @param newState The new state. This will be one of {@link #STATE_DRAGGING}, {@link
-         *     #STATE_SETTLING}, {@link #STATE_EXPANDED}, {@link #STATE_COLLAPSED}, {@link
-         *     #STATE_HIDDEN}, or {@link #STATE_HALF_EXPANDED}.
+         * @param newState    The new state. This will be one of {@link #STATE_DRAGGING}, {@link
+         *                    #STATE_SETTLING}, {@link #STATE_EXPANDED}, {@link #STATE_COLLAPSED}, {@link
+         *                    #STATE_HIDDEN}, or {@link #STATE_HALF_EXPANDED}.
          */
         public abstract void onStateChanged(@NonNull View bottomSheet, @State int newState);
 
@@ -95,31 +83,42 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
          *
          * @param bottomSheet The bottom sheet view.
          * @param slideOffset The new offset of this bottom sheet within [-1,1] range. Offset increases
-         *     as this bottom sheet is moving upward. From 0 to 1 the sheet is between collapsed and
-         *     expanded states and from -1 to 0 it is between hidden and collapsed states.
+         *                    as this bottom sheet is moving upward. From 0 to 1 the sheet is between collapsed and
+         *                    expanded states and from -1 to 0 it is between hidden and collapsed states.
          */
         public abstract void onSlide(@NonNull View bottomSheet, float slideOffset);
     }
 
-    /** The bottom sheet is dragging. */
+    /**
+     * The bottom sheet is dragging.
+     */
     public static final int STATE_DRAGGING = 1;
 
-    /** The bottom sheet is settling. */
+    /**
+     * The bottom sheet is settling.
+     */
     public static final int STATE_SETTLING = 2;
 
-    /** The bottom sheet is expanded. */
+    /**
+     * The bottom sheet is expanded.
+     */
     public static final int STATE_EXPANDED = 3;
 
-    /** The bottom sheet is collapsed. */
+    /**
+     * The bottom sheet is collapsed.
+     */
     public static final int STATE_COLLAPSED = 4;
 
-    /** The bottom sheet is hidden. */
+    /**
+     * The bottom sheet is hidden.
+     */
     public static final int STATE_HIDDEN = 5;
 
-    /** The bottom sheet is half-expanded (used when mFitToContents is false). */
+    /**
+     * The bottom sheet is half-expanded (used when mFitToContents is false).
+     */
     public static final int STATE_HALF_EXPANDED = 6;
 
-    /** @hide */
     @RestrictTo(LIBRARY_GROUP)
     @IntDef({
             STATE_EXPANDED,
@@ -130,7 +129,8 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             STATE_HALF_EXPANDED
     })
     @Retention(RetentionPolicy.SOURCE)
-    public @interface State {}
+    public @interface State {
+    }
 
     /**
      * Peek at the 16:9 ratio keyline of its parent.
@@ -140,19 +140,29 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      */
     public static final int PEEK_HEIGHT_AUTO = -1;
 
-    /** This flag will preserve the peekHeight int value on configuration change. */
+    /**
+     * This flag will preserve the peekHeight int value on configuration change.
+     */
     public static final int SAVE_PEEK_HEIGHT = 0x1;
 
-    /** This flag will preserve the fitToContents boolean value on configuration change. */
+    /**
+     * This flag will preserve the fitToContents boolean value on configuration change.
+     */
     public static final int SAVE_FIT_TO_CONTENTS = 1 << 1;
 
-    /** This flag will preserve the hideable boolean value on configuration change. */
+    /**
+     * This flag will preserve the hideable boolean value on configuration change.
+     */
     public static final int SAVE_HIDEABLE = 1 << 2;
 
-    /** This flag will preserve the skipCollapsed boolean value on configuration change. */
+    /**
+     * This flag will preserve the skipCollapsed boolean value on configuration change.
+     */
     public static final int SAVE_SKIP_COLLAPSED = 1 << 3;
 
-    /** This flag will preserve all aforementioned values on configuration change. */
+    /**
+     * This flag will preserve all aforementioned values on configuration change.
+     */
     public static final int SAVE_ALL = -1;
 
     /**
@@ -162,7 +172,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      */
     public static final int SAVE_NONE = 0;
 
-    /** @hide */
     @RestrictTo(LIBRARY_GROUP)
     @IntDef(
             flag = true,
@@ -175,11 +184,13 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
                     SAVE_NONE,
             })
     @Retention(RetentionPolicy.SOURCE)
-    public @interface SaveFlags {}
+    public @interface SaveFlags {
+    }
 
     private static final String TAG = "BottomSheetBehavior";
 
-    @SaveFlags private int saveFlags = SAVE_NONE;
+    @SaveFlags
+    private int saveFlags = SAVE_NONE;
 
     private static final int SIGNIFICANT_VEL_THRESHOLD = 500;
 
@@ -195,30 +206,36 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     private float maximumVelocity;
 
-    /** Peek height set by the user. */
+    /**
+     * Peek height set by the user.
+     */
     private int peekHeight;
 
-    /** Whether or not to use automatic peek height. */
+    /**
+     * Whether or not to use automatic peek height.
+     */
     private boolean peekHeightAuto;
 
-    /** Minimum peek height permitted. */
+    /**
+     * Minimum peek height permitted.
+     */
     private int peekHeightMin;
 
-    /** True if Behavior has a non-null value for the @shapeAppearance attribute */
+    /**
+     * True if Behavior has a non-null value for the @shapeAppearance attribute
+     */
     private boolean shapeThemingEnabled;
 
     private MaterialShapeDrawable materialShapeDrawable;
 
     private boolean gestureInsetBottomIgnored;
 
-    /** Default Shape Appearance to be used in bottomsheet */
-    private ShapeAppearanceModel shapeAppearanceModelDefault;
-
     private boolean isShapeExpanded;
 
     private SettleRunnable settleRunnable = null;
 
-    @Nullable private ValueAnimator interpolatorAnimator;
+    @Nullable
+    private ValueAnimator interpolatorAnimator;
 
     private static final int DEF_STYLE_RES = R.style.Widget_Design_BottomSheet_Modal;
 
@@ -240,9 +257,11 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     private boolean draggable = true;
 
-    @State int state = STATE_COLLAPSED;
+    @State
+    int state = STATE_COLLAPSED;
 
-    @Nullable ViewDragHelper viewDragHelper;
+    @Nullable
+    ViewDragHelper viewDragHelper;
 
     private boolean ignoreEvents;
 
@@ -253,15 +272,20 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
     int parentWidth;
     int parentHeight;
 
-    @Nullable WeakReference<V> viewRef;
+    @Nullable
+    WeakReference<V> viewRef;
+
+    // Support multiple nested scrolling view
+    private final static int MIN_COUNT_LIMIT = 1;
+    private final static int MAX_COUNT_LIMIT = 4;
+
+    List<WeakReference<View>> nestedScrollingChildRef = new ArrayList<>();
+
+    @NonNull
+    private final ArrayList<BottomSheetCallback> callbacks = new ArrayList<>();
 
     @Nullable
-//    List<WeakReference<View>> nestedScrollingChildRef;
-    List<View> nestedScrollingChildRef = new ArrayList<>();
-
-    @NonNull private final ArrayList<BottomSheetCallback> callbacks = new ArrayList<>();
-
-    @Nullable private VelocityTracker velocityTracker;
+    private VelocityTracker velocityTracker;
 
     int activePointerId;
 
@@ -269,9 +293,11 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     boolean touchingScrollingChild;
 
-    @Nullable private Map<View, Integer> importantForAccessibilityMap;
+    @Nullable
+    private Map<View, Integer> importantForAccessibilityMap;
 
-    public HomepageBottomSheetBehavior() {}
+    public HomepageBottomSheetBehavior() {
+    }
 
     public HomepageBottomSheetBehavior(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -292,13 +318,13 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             this.elevation = a.getDimension(R.styleable.BottomSheetBehavior_Layout_android_elevation, -1);
         }
 
-        TypedValue value = a.peekValue(R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight);
+        TypedValue value = a.peekValue(BottomSheetBehavior_Layout_behavior_peekHeight);
         if (value != null && value.data == PEEK_HEIGHT_AUTO) {
             setPeekHeight(value.data);
         } else {
             setPeekHeight(
                     a.getDimensionPixelSize(
-                            R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, PEEK_HEIGHT_AUTO));
+                            BottomSheetBehavior_Layout_behavior_peekHeight, PEEK_HEIGHT_AUTO));
         }
         setHideable(a.getBoolean(R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
         setGestureInsetBottomIgnored(
@@ -422,16 +448,18 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             ViewCompat.offsetTopAndBottom(child, savedTop - child.getTop());
         }
 
-//        nestedScrollingChildRef = new WeakReference<>(findScrollingChild(child));
         return true;
     }
 
     public void invalidateScrollingChild(View view) {
-        if (view == null) return;
-//        mPos = pos;
-//        nestedScrollingChildRef = new WeakReference<>(findScrollingChild(view));
+        invalidateScrollingChild(view, MIN_COUNT_LIMIT);
+    }
+
+    public void invalidateScrollingChild(View view, int countLimit) {
+        if (view == null || countLimit < MIN_COUNT_LIMIT || countLimit > MAX_COUNT_LIMIT) return;
+
         nestedScrollingChildRef.clear();
-        findScrollingChild(view);
+        findScrollingChild(view, countLimit);
     }
 
     @Override
@@ -467,7 +495,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
                 // Only intercept nested scrolling events here if the view not being moved by the
                 // ViewDragHelper.
                 if (state != STATE_SETTLING) {
-//                    View scroll = nestedScrollingChildRef != null ? nestedScrollingChildRef.get() : null;
                     View scroll = getNestedScrollingChild();
                     if (scroll != null && parent.isPointInChildBounds(scroll, initialX, initialY)) {
                         activePointerId = event.getPointerId(event.getActionIndex());
@@ -488,7 +515,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         // We have to handle cases that the ViewDragHelper does not capture the bottom sheet because
         // it is not the top most view of its parent. This is not necessary when the touch event is
         // happening over the scrolling content as nested scrolling logic handles that case.
-//        View scroll = nestedScrollingChildRef != null ? nestedScrollingChildRef.get() : null;
         View scroll = getNestedScrollingChild();
         return action == MotionEvent.ACTION_MOVE
                 && scroll != null
@@ -538,13 +564,11 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             @NonNull View target,
             int axes,
             int type) {
-        lastNestedScrollDy = 0;
-        nestedScrolled = false;
-        boolean res = (axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
-//        Exception e = new Exception();
-//        e.printStackTrace();
-//        Log.i("Alex", "onStartNestedScroll:" + res);
-        return res;
+        // Always return true, no judging whether the axes is vertical.
+        // This is specially for adapting RecentsFragment. The special case is:
+        // Scrolling the fragment vertically as scrolling an inside bucket recyclerView horizontally
+        // The axes would be HORIZONTAL instead of VERTICAL
+        return true;
     }
 
     @Override
@@ -558,11 +582,12 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             int type) {
         if (type == ViewCompat.TYPE_NON_TOUCH) {
             // Ignore fling here. The ViewDragHelper handles it.
+            Log.i("Alex", "onNestedPreScroll return 1");
             return;
         }
-//        View scrollingChild = nestedScrollingChildRef != null ? nestedScrollingChildRef.get() : null;
         View scrollingChild = getNestedScrollingChild();
         if (target != scrollingChild) {
+            Log.i("Alex", "onNestedPreScroll return 2");
             return;
         }
         int currentTop = child.getTop();
@@ -720,8 +745,8 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     /**
      * @return whether the height of the expanded sheet is determined by the height of its contents,
-     *     or if it is expanded in two stages (half the height of the parent container, full height of
-     *     parent container).
+     * or if it is expanded in two stages (half the height of the parent container, full height of
+     * parent container).
      */
     public boolean isFitToContents() {
         return fitToContents;
@@ -755,9 +780,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * Sets the height of the bottom sheet when it is collapsed.
      *
      * @param peekHeight The height of the collapsed bottom sheet in pixels, or {@link
-     *     #PEEK_HEIGHT_AUTO} to configure the sheet to peek automatically at 16:9 ratio keyline.
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
+     *                   #PEEK_HEIGHT_AUTO} to configure the sheet to peek automatically at 16:9 ratio keyline.
      */
     public void setPeekHeight(int peekHeight) {
         setPeekHeight(peekHeight, false);
@@ -768,10 +791,8 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * old height and the new height.
      *
      * @param peekHeight The height of the collapsed bottom sheet in pixels, or {@link
-     *     #PEEK_HEIGHT_AUTO} to configure the sheet to peek automatically at 16:9 ratio keyline.
-     * @param animate Whether to animate between the old height and the new height.
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
+     *                   #PEEK_HEIGHT_AUTO} to configure the sheet to peek automatically at 16:9 ratio keyline.
+     * @param animate    Whether to animate between the old height and the new height.
      */
     public final void setPeekHeight(int peekHeight, boolean animate) {
         boolean layout = false;
@@ -806,9 +827,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * Gets the height of the bottom sheet when it is collapsed.
      *
      * @return The height of the collapsed bottom sheet in pixels, or {@link #PEEK_HEIGHT_AUTO} if the
-     *     sheet is configured to peek automatically at 16:9 ratio keyline
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
+     * sheet is configured to peek automatically at 16:9 ratio keyline
      */
     public int getPeekHeight() {
         return peekHeightAuto ? PEEK_HEIGHT_AUTO : peekHeight;
@@ -821,8 +840,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * it is increased. The default value is 0.5.
      *
      * @param ratio a float between 0 and 1, representing the {@link #STATE_HALF_EXPANDED} ratio.
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_halfExpandedRatio
      */
     public void setHalfExpandedRatio(@FloatRange(from = 0.0f, to = 1.0f) float ratio) {
 
@@ -839,9 +856,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     /**
      * Gets the ratio for the height of the BottomSheet in the {@link #STATE_HALF_EXPANDED} state.
-     *
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_halfExpandedRatio
      */
     @FloatRange(from = 0.0f, to = 1.0f)
     public float getHalfExpandedRatio() {
@@ -854,9 +868,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * parent's top.
      *
      * @param offset an integer value greater than equal to 0, representing the {@link
-     *     #STATE_EXPANDED} offset. Value must not exceed the offset in the half expanded state.
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_expandedOffset
+     *               #STATE_EXPANDED} offset. Value must not exceed the offset in the half expanded state.
      */
     public void setExpandedOffset(int offset) {
         if (offset < 0) {
@@ -868,9 +880,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
     /**
      * Returns the current expanded offset. If {@code fitToContents} is true, it will automatically
      * pick the offset depending on the height of the content.
-     *
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_expandedOffset
      */
     public int getExpandedOffset() {
         return fitToContents ? fitToContentsOffset : expandedOffset;
@@ -880,7 +889,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * Sets whether this bottom sheet can hide when it is swiped down.
      *
      * @param hideable {@code true} to make this bottom sheet hideable.
-     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_hideable
      */
     public void setHideable(boolean hideable) {
         if (this.hideable != hideable) {
@@ -897,7 +905,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * Gets whether this bottom sheet can hide when it is swiped down.
      *
      * @return {@code true} if this bottom sheet can hide.
-     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_hideable
      */
     public boolean isHideable() {
         return hideable;
@@ -908,8 +915,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * is expanded once. Setting this to true has no effect unless the sheet is hideable.
      *
      * @param skipCollapsed True if the bottom sheet should skip the collapsed state.
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
      */
     public void setSkipCollapsed(boolean skipCollapsed) {
         this.skipCollapsed = skipCollapsed;
@@ -920,8 +925,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * is expanded once.
      *
      * @return Whether the bottom sheet should skip the collapsed state.
-     * @attr ref
-     *     com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
      */
     public boolean getSkipCollapsed() {
         return skipCollapsed;
@@ -932,7 +935,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * dragging, an app will require to implement a custom way to expand/collapse the bottom sheet
      *
      * @param draggable {@code false} to prevent dragging the sheet to collapse and expand
-     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_draggable
      */
     public void setDraggable(boolean draggable) {
         this.draggable = draggable;
@@ -946,18 +948,18 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * Sets save flags to be preserved in bottomsheet on configuration change.
      *
      * @param flags bitwise int of {@link #SAVE_PEEK_HEIGHT}, {@link #SAVE_FIT_TO_CONTENTS}, {@link
-     *     #SAVE_HIDEABLE}, {@link #SAVE_SKIP_COLLAPSED}, {@link #SAVE_ALL} and {@link #SAVE_NONE}.
+     *              #SAVE_HIDEABLE}, {@link #SAVE_SKIP_COLLAPSED}, {@link #SAVE_ALL} and {@link #SAVE_NONE}.
      * @see #getSaveFlags()
-     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_saveFlags
      */
     public void setSaveFlags(@SaveFlags int flags) {
         this.saveFlags = flags;
     }
+
     /**
      * Returns the save flags.
      *
-     * @see #setSaveFlags(int)
      * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_saveFlags
+     * @see #setSaveFlags(int)
      */
     @SaveFlags
     public int getSaveFlags() {
@@ -969,13 +971,13 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      *
      * @param callback The callback to notify when bottom sheet events occur.
      * @deprecated use {@link #addBottomSheetCallback(BottomSheetCallback)} and {@link
-     *     #removeBottomSheetCallback(BottomSheetCallback)} instead
+     * #removeBottomSheetCallback(BottomSheetCallback)} instead
      */
     @Deprecated
     public void setBottomSheetCallback(BottomSheetCallback callback) {
         Log.w(
                 TAG,
-                "BottomSheetBehavior now supports multiple callbacks. `setBottomSheetCallback()` removes"
+                "HomepageBottomSheetBehavior now supports multiple callbacks. `setBottomSheetCallback()` removes"
                         + " all existing callbacks, including ones set internally by library authors, which"
                         + " may result in unintended behavior. This may change in the future. Please use"
                         + " `addBottomSheetCallback()` and `removeBottomSheetCallback()` instead to set your"
@@ -1011,7 +1013,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * animation.
      *
      * @param state One of {@link #STATE_COLLAPSED}, {@link #STATE_EXPANDED}, {@link #STATE_HIDDEN},
-     *     or {@link #STATE_HALF_EXPANDED}.
+     *              or {@link #STATE_HALF_EXPANDED}.
      */
     public void setState(@State int state) {
         if (state == this.state) {
@@ -1075,7 +1077,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
      * Gets the current state of the bottom sheet.
      *
      * @return One of {@link #STATE_EXPANDED}, {@link #STATE_HALF_EXPANDED}, {@link #STATE_COLLAPSED},
-     *     {@link #STATE_DRAGGING}, {@link #STATE_SETTLING}, or {@link #STATE_HALF_EXPANDED}.
+     * {@link #STATE_DRAGGING}, {@link #STATE_SETTLING}, or {@link #STATE_HALF_EXPANDED}.
      */
     @State
     public int getState() {
@@ -1194,25 +1196,26 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         return Math.abs(newTop - collapsedOffset) / (float) peek > HIDE_THRESHOLD;
     }
 
-    private int count = 0;
     @Nullable
     @VisibleForTesting
-    void findScrollingChild(View view) {
+    void findScrollingChild(View view, int countLimit) {
         if (ViewCompat.isNestedScrollingEnabled(view)) {
-            nestedScrollingChildRef.add(view);
-            if (count++ > 1) return;
+            nestedScrollingChildRef.add(new WeakReference<>(view));
+            if (nestedScrollingChildRef.size() >= countLimit) return;
         }
 
         if (view instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) view;
-            for (int i = 0, count = group.getChildCount(); i < count; i++) {
-                findScrollingChild(group.getChildAt(i));
+            for (int i = 0, count = group.getChildCount();
+                 i < count && nestedScrollingChildRef.size() < countLimit; i++) {
+                findScrollingChild(group.getChildAt(i), countLimit);
             }
         }
     }
 
     private View getNestedScrollingChild() {
-        for (View view : nestedScrollingChildRef) {
+        for (WeakReference<View> viewRef : nestedScrollingChildRef) {
+            View view = viewRef.get();
             if (view.getVisibility() == View.VISIBLE)
                 return view;
         }
@@ -1231,9 +1234,9 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             boolean hasBackgroundTint,
             @Nullable ColorStateList bottomSheetColor) {
         if (this.shapeThemingEnabled) {
-            this.shapeAppearanceModelDefault =
-                    ShapeAppearanceModel.builder(context, attrs, R.attr.bottomSheetStyle, DEF_STYLE_RES)
-                            .build();
+            /** Default Shape Appearance to be used in bottomsheet */
+            ShapeAppearanceModel shapeAppearanceModelDefault = ShapeAppearanceModel.builder(context, attrs, R.attr.bottomSheetStyle, DEF_STYLE_RES)
+                    .build();
 
             this.materialShapeDrawable = new MaterialShapeDrawable(shapeAppearanceModelDefault);
             this.materialShapeDrawable.initializeElevationOverlay(context);
@@ -1317,7 +1320,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
                 settleRunnable = new SettleRunnable(child, state);
             }
             // If the SettleRunnable has not been posted, post it with the correct state.
-            if (settleRunnable.isPosted == false) {
+            if (!settleRunnable.isPosted) {
                 settleRunnable.targetState = state;
                 ViewCompat.postOnAnimation(child, settleRunnable);
                 settleRunnable.isPosted = true;
@@ -1342,7 +1345,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
                         return false;
                     }
                     if (state == STATE_EXPANDED && activePointerId == pointerId) {
-//                        View scroll = nestedScrollingChildRef != null ? nestedScrollingChildRef.get() : null;
                         View scroll = getNestedScrollingChild();
                         if (scroll != null && scroll.canScrollVertically(-1)) {
                             // Let the content scroll up
@@ -1518,7 +1520,8 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
         private boolean isPosted;
 
-        @State int targetState;
+        @State
+        int targetState;
 
         SettleRunnable(View view, @State int targetState) {
             this.view = view;
@@ -1536,9 +1539,12 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         }
     }
 
-    /** State persisted across instances */
+    /**
+     * State persisted across instances
+     */
     protected static class SavedState extends AbsSavedState {
-        @State final int state;
+        @State
+        final int state;
         int peekHeight;
         boolean fitToContents;
         boolean hideable;
@@ -1607,10 +1613,10 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
     }
 
     /**
-     * A utility function to get the {@link BottomSheetBehavior} associated with the {@code view}.
+     * A utility function to get the {@link HomepageBottomSheetBehavior} associated with the {@code view}.
      *
-     * @param view The {@link View} with {@link BottomSheetBehavior}.
-     * @return The {@link BottomSheetBehavior} associated with the {@code view}.
+     * @param view The {@link View} with {@link HomepageBottomSheetBehavior}.
+     * @return The {@link HomepageBottomSheetBehavior} associated with the {@code view}.
      */
     @NonNull
     @SuppressWarnings("unchecked")
@@ -1622,7 +1628,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         CoordinatorLayout.Behavior<?> behavior =
                 ((CoordinatorLayout.LayoutParams) params).getBehavior();
         if (!(behavior instanceof HomepageBottomSheetBehavior)) {
-            throw new IllegalArgumentException("The view is not associated with BottomSheetBehavior");
+            throw new IllegalArgumentException("The view is not associated with HomepageBottomSheetBehavior");
         }
         return (HomepageBottomSheetBehavior<V>) behavior;
     }
@@ -1651,7 +1657,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
         CoordinatorLayout parent = (CoordinatorLayout) viewParent;
         final int childCount = parent.getChildCount();
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) && expanded) {
+        if (expanded) {
             if (importantForAccessibilityMap == null) {
                 importantForAccessibilityMap = new HashMap<>(childCount);
             } else {
@@ -1707,28 +1713,29 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
         }
 
         switch (state) {
-            case STATE_EXPANDED:
-            {
+            case STATE_EXPANDED: {
                 int nextState = fitToContents ? STATE_COLLAPSED : STATE_HALF_EXPANDED;
                 addAccessibilityActionForState(
                         child, AccessibilityActionCompat.ACTION_COLLAPSE, nextState);
                 break;
             }
-            case STATE_HALF_EXPANDED:
-            {
+            case STATE_HALF_EXPANDED: {
                 addAccessibilityActionForState(
                         child, AccessibilityActionCompat.ACTION_COLLAPSE, STATE_COLLAPSED);
                 addAccessibilityActionForState(
                         child, AccessibilityActionCompat.ACTION_EXPAND, STATE_EXPANDED);
                 break;
             }
-            case STATE_COLLAPSED:
-            {
+            case STATE_COLLAPSED: {
                 int nextState = fitToContents ? STATE_EXPANDED : STATE_HALF_EXPANDED;
                 addAccessibilityActionForState(child, AccessibilityActionCompat.ACTION_EXPAND, nextState);
                 break;
             }
             default: // fall out
+            case STATE_DRAGGING:
+            case STATE_HIDDEN:
+            case STATE_SETTLING:
+                break;
         }
     }
 

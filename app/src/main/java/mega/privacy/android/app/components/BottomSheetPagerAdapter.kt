@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.components
 
 import android.util.SparseArray
 import android.view.View
