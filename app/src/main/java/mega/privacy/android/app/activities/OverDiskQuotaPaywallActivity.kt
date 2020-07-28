@@ -15,6 +15,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
+import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -75,7 +76,12 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
             R.id.dismiss_button -> {
                 logInfo("Over Disk Quota Paywall warning dismissed")
                 if (isTaskRoot) {
+                    var askPermissions: Boolean? = true
+                    if (dbH?.preferences?.firstTime != null) {
+                        askPermissions = dbH?.preferences?.firstTime?.toBoolean()
+                    }
                     val intent = Intent(applicationContext, ManagerActivityLollipop::class.java)
+                            .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
                     startActivity(intent)
                 }
                 finish()

@@ -624,7 +624,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             @Override
             public void onReceive(Context context,Intent intent) {
                 if (intent != null) {
-                    if (intent.getAction() == ACTION_LOG_OUT) {
+                    if (intent.getAction().equals(ACTION_LOG_OUT)) {
                         storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
                     }
                 }

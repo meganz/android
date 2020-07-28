@@ -466,7 +466,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS, ASK_PERMISSIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -487,6 +487,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case CHAT: return context.getString(R.string.section_chat);
 				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
 				case NOTIFICATIONS: return context.getString(R.string.title_properties_chat_contact_notifications);
+				case ASK_PERMISSIONS: return "Ask Permissions";
 			}
 			return null;
 		}
@@ -573,6 +574,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
+	private boolean askPermissions = false;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -1908,6 +1910,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
+			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
@@ -3093,11 +3096,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
 					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 					firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+					askPermissions = getIntent().getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
 
                     //reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
                     getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
 					getIntent().removeExtra(EXTRA_FIRST_LOGIN);
+					getIntent().removeExtra(EXTRA_ASK_PERMISSIONS);
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
@@ -3170,6 +3175,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                     getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
                     getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
 					firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+					askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
@@ -3268,11 +3274,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		setContactStatus();
 
-        if (firstTimeAfterInstallation) {
+        if (firstTimeAfterInstallation || askPermissions) {
             //haven't verified phone number
             if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
                 askForSMSVerification();
             } else {
+				drawerItem = DrawerItem.ASK_PERMISSIONS;
                 askForAccess();
             }
         } else if (firstLogin && !newCreationAccount) {
@@ -3453,7 +3460,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     }
 
 	public void askForAccess () {
-        showStorageAlertWithDelay = true;
+        askPermissions = false;
+    	showStorageAlertWithDelay = true;
     	//If mobile device, only portrait mode is allowed
 		if (!isTablet(this)) {
 			logDebug("Mobile only portrait mode");
@@ -3530,6 +3538,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			drawerItem = DrawerItem.CLOUD_DRIVE;
+		} else {
+			firstLogin = true;
+			drawerItem = DrawerItem.CAMERA_UPLOADS;
+		}
+
 		selectDrawerItemLollipop(drawerItem);
 	}
 
