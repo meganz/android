@@ -150,7 +150,6 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_call_fille"
-                    android:tint="@color/name_my_account"
                     android:visibility="visible" />
 
                 <TextView

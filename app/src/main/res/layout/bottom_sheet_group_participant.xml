@@ -201,12 +201,11 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:alpha="0.54"
                         android:layout_marginStart="5dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
+                        android:alpha="0.54"
                         android:src="@drawable/ic_call_fille"
-                        android:tint="@color/name_my_account"
                         android:visibility="visible" />
 
                     <TextView
