@@ -603,4 +603,7 @@ public class Constants {
     public static final String REMOVED_ACCOUNT_BLOCK = "401";
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
     public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
+
+    public static final int LOCATION_INDEX_LEFT = 0;
+    public static final int LOCATION_INDEX_TOP = 1;
 }
