@@ -2049,7 +2049,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		transfersInProgress = new ArrayList<Integer>();
 
 		//sync local contacts to see who's on mega.
-		if (hasPermissions(this, Manifest.permission.READ_CONTACTS)) {
+		if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
 			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
