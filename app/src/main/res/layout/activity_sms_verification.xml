@@ -54,7 +54,7 @@
 			          android:layout_marginLeft="8dp"
 			          android:layout_marginBottom="5dp"
 			          android:layout_toRightOf="@+id/verify_account_country_icon"
-			          android:text="@string/general_country_label"
+			          android:text="@string/sms_region_label"
 			          android:textColor="@color/accentColor"
 			          android:visibility="gone"
 			/>
@@ -63,7 +63,7 @@
 			          android:layout_marginLeft="8dp"
 			          android:layout_marginTop="22dp"
 			          android:layout_toRightOf="@+id/verify_account_country_icon"
-			          android:text="@string/general_country_label"
+			          android:text="@string/sms_region_label"
 			          android:textSize="14sp"
 			/>
 			<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
