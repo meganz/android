@@ -341,25 +341,31 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             @Override
             public void run() {
                 PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
+                List<Purchase> purchasesList = purchasesResult.getPurchasesList();
+                if (purchasesList == null) {
+                    logWarning("getPurchasesList() for in-app products returned NULL, using an empty list.");
+                    purchasesList = new ArrayList<>();
+                }
 
                 // If there are subscriptions supported, we add subscription rows as well
                 if (areSubscriptionsSupported()) {
                     PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
                     if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
-                        purchasesResult.getPurchasesList().addAll(subscriptionResult.getPurchasesList());
+                        purchasesList.addAll(subscriptionResult.getPurchasesList());
                     }
                 }
 
-                //verify all available purchases
+                // Verify all available purchases
                 List<Purchase> list = new ArrayList<>();
-                for (Purchase purchase : purchasesResult.getPurchasesList()) {
-                    if (verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+                for (Purchase purchase : purchasesList) {
+                    if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
                         list.add(purchase);
-                        logDebug("purchase added, " + purchase.getOriginalJson());
+                        logDebug("Purchase added, " + purchase.getOriginalJson());
                     }
                 }
+
                 PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
-                logDebug("final purchase result is " + finalResult.getBillingResult());
+                logDebug("Final purchase result is " + finalResult.getBillingResult());
                 onQueryPurchasesFinished(finalResult);
             }
         };

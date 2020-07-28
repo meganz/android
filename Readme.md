@@ -15,28 +15,41 @@ This document will guide you to build the application on a Linux machine with An
 
 ### Build & Run the application
 
-* Get the source code.
+1. Get the source code.
 
 ```
 git clone --recursive https://github.com/meganz/android.git
 ```
 
-* Install in your system the Android NDK 14 and Android NDK 16.
+2. Install in your system the [Android NDK 16](https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip).
 
-* Configure the variable `NDK_ROOT32` to point to your Android NDK 14 installation path and the variable `NDK_ROOT64` to point to your Android NDK 16 installation path at `app/src/main/jni/build.sh`.
+3. Export `NDK_ROOT` variable or create a symbolic link at `${HOME}/android-ndk` to point to your Android NDK installation path.
 
-* Download the link https://mega.nz/#!wixgSaZZ!6zRMV_d8ogouBaEidHzGws1KvLrBwBiKEm0VIVgXEPk, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+```
+export NDK_ROOT=/path/to/ndk
+```
+```
+ln -s /path/to/ndk ${HOME}/android-ndk
+```
 
-* Go to `app/src/main/jni/` and execute: `./build.sh clean` and `./build.sh all`.
+4. Download the link https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
 
-* Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
+5. Before running the building script, install the required packages. For example for Ubuntu or other Debian-based distro:
 
-* Open the project with Android Studio, let it build the project and hit _*Run*_.
+```
+sudo apt install build-essential swig automake libtool autoconf cmake
+```
+
+6. Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
+
+7. Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
+
+8. Open the project with Android Studio, let it build the project and hit _*Run*_.
 
 ### Notice
 
 To use the *geolocation feature* you need a *Google Maps API key*:
 
-* To get one, follow the directions here: https://developers.google.com/maps/documentation/android/signup.
+1. To get one, follow the directions here: https://developers.google.com/maps/documentation/android/signup.
 
-* Once you have your key, replace the "google_maps_key" string in these files: `app/src/debug/res/values/google_maps_api.xml` and `app/src/release/res/values/google_maps_api.xml`.
+2. Once you have your key, replace the "google_maps_key" string in these files: `app/src/debug/res/values/google_maps_api.xml` and `app/src/release/res/values/google_maps_api.xml`.

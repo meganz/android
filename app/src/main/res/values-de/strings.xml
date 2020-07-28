@@ -249,13 +249,14 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_recents" context="Label to reference a recents section">Neue/Geänderte Dateien</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Medienuploads</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">Media-Uploads</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Posteingang</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Für Offline-Zugriff gespeichert</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Freigaben</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Ordnerfreigaben</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Papierkorb</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Kontakte</string>
@@ -266,12 +267,13 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Mein Account</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Kamerauploads</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">Kamera Uploads</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Von anderen</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">An andere</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Links</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">An Sie freigegebene Ordner</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Eingehende Ordnerfreigaben von</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Freigegebenen Ordner verlassen</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Freigabe entfernen</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Link entfernen</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Dieser Link ist nicht mehr öffentlich verfügbar</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Dieser Link ist nicht mehr öffentlich verfügbar</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Dieser Link ist nicht mehr öffentlich verfügbar</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Umbenennen</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Link öffnen</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Öffnen</string>
@@ -686,6 +692,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Hochladen von Dateien aus Medienordnern</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Dateien werden für den Upload geprüft</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Kamera-Uploads werden initialisiert</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -756,7 +765,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">WLAN oder Mobildaten</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Nur via WLAN</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Dateiupload</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -790,7 +798,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nicht eingestellt</string>
-    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">PIN-Code zurücksetzen</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">PIN ändern</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN-Lock</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Eingabe</string>
@@ -864,6 +872,7 @@
     <string name="sortby_date" context="category in sort by action">Datum</string>
     <string name="sortby_creation_date" context="category in sort by action">Erstellungsdatum</string>
     <string name="sortby_modification_date" context="category in sort by action">Änderungsdatum</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Neueste</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Älteste</string>
 
@@ -910,6 +919,8 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logging aktiviert</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logging deaktiviert</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Unable to setup MEGA Camera Uploads folder</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Ordner öffnen</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Der Vorgang dauert länger als erwartet. Bitte warten Sie.</string>
@@ -1533,6 +1544,8 @@
     <string name="general_view" context="Menu option">Dateien anzeigen</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Import</string>
     <string name="save_for_offline" context="Menu option">Für Offline-Nutzung speichern</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Add to Cloud</string>
+    <string name="save_to_offline" context="Menu option to choose save to offline section">Save to Offline</string>
 
     <string name="general_view_contacts" context="Menu option">Kontakte anzeigen</string>
 
@@ -1555,7 +1568,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Infos anzeigen</string>
 
-    <string name="context_link_removal_error" context="error message">Link-Entfernung fehlgeschlagen. Bitte versuchen Sie es später noch einmal.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Link-Entfernung fehlgeschlagen. Bitte versuchen Sie es später noch einmal.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Failed to remove some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Link-Operation fehlgeschlagen. Bitte versuchen Sie es später noch einmal.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">E-Mail des Benutzers eingeben</string>
@@ -1641,6 +1661,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Der Kontakt wird aus der Ordnerfreigabe entfernt</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">In den Papierkorb verschieben?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Camera Uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">In den Papierkorb verschieben?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Von MEGA löschen?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Wenn Sie diese Ordnerfreigabe verlassen, können Sie auf sie nicht mehr zugreifen.</string>
@@ -1827,6 +1849,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Keine [/B][A]Ordnerfreigaben[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Keine [/B][A]freigegebenen Ordner[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Gesendete Anfragen</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Empfangene Anfragen</string>
@@ -2152,7 +2175,7 @@
     <string name="settings_file_management_category" context="Title of the section File management on Settings section">Dateiverwaltung</string>
 
     <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">Alle älteren Dateiversionen löschen</string>
-    <string name="settings_file_management_subtitle_delete_versions" context="subtitle of the option in Settings to delete all the versions of the account">Alle alten Dateiversionen werden gelöscht. Dateiversionen in Ordnerfreigaben eines Kontakts müssen vom Eigentümer entfernt werden werden.</string>
+    <string name="settings_file_management_subtitle_delete_versions" context="subtitle of the option in Settings to delete all the versions of the account">Alle alten Dateiversionen werden gelöscht. Dateiversionen in Ordnerfreigaben eines Kontakts müssen vom Eigentümer entfernt werden.</string>
 
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">Sie löschen die Versionshistorie aller Dateien. Dateiversionen in Ordnerfreigaben eines Kontakts müssen durch diesen gelöscht werden.\n\nDie aktuelle Version jeder Datei bleibt erhalte.</string>
 
@@ -2271,7 +2294,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Fehler bei der Initialisierung des Chats beim Laden des Chatlinks.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Sie waren früher bereits in diesem Chat. Erneut teilnehmen?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Sie sind bereits in diesem Chat</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is no longer available. If you leave the preview, you won’t be able to reopen it.</string>
@@ -2316,6 +2338,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]hat Sie blockiert.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Benachrichtigungen [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account gelöscht</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Der Account [/B][A]%s[/A][B] wurde gelöscht.[/B]</string>
@@ -2435,7 +2458,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Kamera aktivieren</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Kamerazugriff für Dokumentenscanning, Fotos und Videoanrufe freigeben.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Anrufe aktivieren</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Grant access to your address book</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable Access to Your Address Book</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Zugriff auf das Mikrofon für verschlüsselte Anrufe freigeben.</string>
@@ -2719,11 +2742,18 @@
     <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily locked for your safety.</string>
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Details</string>
-    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">E-Mail erneut senden</string>
     <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Account gesperrt</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Wir vermuten, dass Sie das Passwort für Ihren MEGA-Account auch anderswo verwenden, und dass einer dieser Dienste kompromittiert wurde.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Ihr Passwort ist so in Umlauf geraten, und dubiose Personen loggen sich in sämtliche Ihrer Accounts ein, bei denen Sie das Passwort verwenden.</string>
+
+    <string name="add_nickname" context="Button to add a nickname for a user">Alias definieren</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit Nickname</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to add the nickname</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Verbindung wiederhergestellt.</string>
@@ -2734,6 +2764,15 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Ihre Zugriffsrechte reichen nicht aus, um die Dateiversion zu ändern. Möchten Sie stattdessen eine Kopie mit der älteren Version erstellen?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version was created as a new file successfully.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to stop sharing these %1$d folders?</string>
+
     <string name="download_location" context="Download location label">Downloadziel</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+
 </resources>

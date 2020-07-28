@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
 
@@ -47,9 +48,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
-                GetAttrUserListener listener = new GetAttrUserListener(megaApplication);
-                api.getCameraUploadsFolder(listener);
-                api.getCameraUploadsFolderSecondary(listener);
+                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
                 break;
             }
         }

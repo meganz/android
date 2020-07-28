@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import androidx.annotation.NonNull;
@@ -22,18 +23,18 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
-import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHorizontalAdapter.ContactViewHolder> implements View.OnClickListener {
 
@@ -44,6 +45,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     private List<MegaContactGetter.MegaContact> contacts;
 
     private MegaApiAndroid megaApi;
+
+    private AlertDialog sendInvitationDialog;
 
     public ContactsHorizontalAdapter(Activity context, RecentChatsFragmentLollipop recentChatsFragment, List<MegaContactGetter.MegaContact> data) {
         this.context = context;
@@ -66,7 +69,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         ContactViewHolder holder = new ContactViewHolder(v);
         holder.clickableArea = v.findViewById(R.id.item_layout_add);
         holder.itemLayout = v.findViewById(R.id.chip_layout);
-        holder.textViewInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
+        holder.inviteMore = v.findViewById(R.id.invite_more);
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
@@ -80,84 +83,94 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     @Override
     public void onClick(View v) {
         ContactViewHolder holder = (ContactViewHolder) v.getTag();
-        showConfirmSentDialog(holder);
+        onContactClicked(holder);
     }
 
-    private void showConfirmSentDialog(final ContactViewHolder holder) {
+    public void onContactClicked(ContactViewHolder holder) {
         final int position = holder.getAdapterPosition();
         final MegaContactGetter.MegaContact contact = contacts.get(position);
+        // If click on 'Invite more'.
+        if (isInviteMore(contact)) {
+            context.startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
+        } else {
+            showInvitationDialog(holder, contact);
+        }
+    }
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        contacts.remove(position);
-                        recentChatsFragment.onContactsCountChange(contacts);
-                        notifyDataSetChanged();
+    public void showInvitationDialog(ContactViewHolder holder, MegaContactGetter.MegaContact contact) {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    contacts.remove(contact);
+                    recentChatsFragment.onContactsCountChange(contacts);
+                    notifyDataSetChanged();
 
-                        String email = holder.contactMail;
-                        logDebug("Sent invite to: " + email);
-                        // for UI smoothness, ignore the callback
-                        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
-                        showSnackbar(context, context.getString(R.string.context_contact_request_sent, email));
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        dialog.dismiss();
-                        break;
-                }
+                    String email = holder.contactMail;
+                    logDebug("Sent invite to: " + email);
+                    // for UI smoothness, ignore the callback
+                    megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
+                    showSnackbar(context, context.getString(R.string.context_contact_request_sent, email));
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    dismissDialog();
+                    break;
             }
         };
 
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.AppCompatAlertDialogStyle);
         String message = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
         builder.setMessage(message);
         String invite = context.getResources().getString(R.string.contact_invite).toUpperCase();
         builder.setPositiveButton(invite, dialogClickListener);
         String cancel = context.getResources().getString(R.string.general_cancel).toUpperCase();
         builder.setNegativeButton(cancel, dialogClickListener);
-        builder.show();
+        sendInvitationDialog = builder.create();
+        sendInvitationDialog.show();
+    }
+
+    public void dismissDialog() {
+        if(sendInvitationDialog != null) {
+            sendInvitationDialog.dismiss();
+        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ContactViewHolder holder, int position) {
         final MegaContactGetter.MegaContact megaContact = getItem(position);
-        String email = megaContact.getEmail();
-        holder.contactMail = email;
-        holder.textViewName.setText(megaContact.getLocalName());
-        UserAvatarListener listener = new UserAvatarListener(context, holder);
-        setDefaultAvatar(megaContact, holder);
-        File avatar = buildAvatarFile(context, email + ".jpg");
-        Bitmap bitmap;
-        if (isFileAvailable(avatar) && avatar.length() > 0) {
-            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-            if (bitmap == null) {
-                avatar.delete();
-                megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
-            } else {
-                holder.textViewInitialLetter.setVisibility(View.INVISIBLE);
-                holder.avatar.setImageBitmap(bitmap);
-            }
+        // Bind 'Invite more'.
+        if (isInviteMore(megaContact)) {
+            holder.avatar.setImageDrawable(context.getDrawable(R.drawable.invite_more));
+            holder.inviteMore.setVisibility(View.VISIBLE);
+            holder.textViewName.setVisibility(View.GONE);
+            holder.addIcon.setVisibility(View.GONE);
         } else {
-            megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
+            String email = megaContact.getEmail();
+            String localName = megaContact.getLocalName();
+            holder.contactMail = email;
+            holder.inviteMore.setVisibility(View.GONE);
+            holder.textViewName.setVisibility(View.VISIBLE);
+            holder.textViewName.setText(localName);
+
+            setImageAvatar(email, localName, holder.avatar);
+            Bitmap bitmap = getImageAvatar(email);
+            if (bitmap == null) {
+                UserAvatarListener listener = new UserAvatarListener(context, holder);
+                megaApi.getUserAvatar(email, buildAvatarFile(context, email + ".jpg").getAbsolutePath(), listener);
+            }
         }
     }
 
-    public void setDefaultAvatar(MegaContactGetter.MegaContact contact, ContactViewHolder holder) {
-        Bitmap background = createAvatarBackground(getColorAvatar(contact.getId()));
-        holder.avatar.setImageBitmap(background);
-
-        String firstLetter = getFirstLetter(contact.getLocalName());
-        if (firstLetter.trim().isEmpty() || firstLetter.equals("(")) {
-            holder.textViewInitialLetter.setVisibility(View.INVISIBLE);
-        } else {
-            holder.textViewInitialLetter.setText(firstLetter);
-            holder.textViewInitialLetter.setTextColor(WHITE);
-            holder.textViewInitialLetter.setVisibility(View.VISIBLE);
-            holder.textViewInitialLetter.setTextSize(24);
-        }
+    /**
+     * To see if the contact element is the 'Invite more'.
+     *
+     * @param contact Contact to check.
+     * @return true, the contact is 'Invite more', otherwise false.
+     */
+    private boolean isInviteMore(MegaContactGetter.MegaContact contact) {
+        return contact.getEmail() == null
+                && contact.getId() == null
+                && contact.getLocalName() == null
+                && contact.getNormalizedPhoneNumber() == null;
     }
 
     @Override
@@ -172,7 +185,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
 
-        public TextView textViewName,textViewInitialLetter;
+        TextView textViewName, inviteMore;
 
         ImageView addIcon;
 

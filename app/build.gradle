@@ -8,16 +8,16 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 305
-        versionName "3.7.5 (305)"
+        versionCode 318
+        versionName "3.7.7 (318)"
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
     }
 
     sourceSets.main {
         java {
-            srcDirs += 'src/main/jni/mega/sdk/bindings/java/nz/mega/sdk'
-            srcDirs += 'src/main/jni/megachat/sdk/bindings/java/nz/mega/sdk'
+            srcDirs += 'src/main/jni/mega/sdk/bindings/java'
+            srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
             exclude '**/MegaApiSwing.java'
         }
         jni.srcDirs = [] //disable automatic ndk-build
@@ -76,7 +76,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.exifinterface:exifinterface:1.1.0'
+    implementation 'androidx.exifinterface:exifinterface:1.2.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
@@ -106,7 +106,7 @@ dependencies {
 
     //GMS
     gmsImplementation 'com.google.android.gms:play-services-wallet:18.0.0'
-    gmsImplementation 'com.google.firebase:firebase-messaging:20.2.0'
+    gmsImplementation 'com.google.firebase:firebase-messaging:20.2.3'
     gmsImplementation 'com.android.billingclient:billing:2.1.0'
     gmsImplementation 'com.google.android.gms:play-services-location:17.0.0'
     gmsImplementation 'com.google.android.gms:play-services-maps:17.0.0'

@@ -26,14 +26,12 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
@@ -44,21 +42,17 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
-	
-	final public static int CLOUD_EXPLORER = 0;
-	final public static int INCOMING_SHARES_EXPLORER = 1;
-
 	public static int MAX_WIDTH_FILENAME_LAND=500;
 	public static int MAX_WIDTH_FILENAME_PORT=235;
 
@@ -358,7 +352,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
             if (thumb != null) {
                 setImageParams(holder.imageView, 36, 6);
-                holder.imageView.setImageBitmap(thumb);
+                holder.imageView.setImageBitmap(
+                        ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
             }
         }
     }
@@ -728,81 +723,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public void setSelectFile(boolean selectFile) {
 		this.selectFile = selectFile;
 	}
-
-	private boolean isCameraUploads(MegaNode n){
-		String cameraSyncHandle = null;
-
-		//Check if the item is the Camera Uploads folder
-		if(dbH.getPreferences()!=null){
-			prefs = dbH.getPreferences();
-			if(prefs.getCamSyncHandle()!=null){
-				cameraSyncHandle = prefs.getCamSyncHandle();
-			}else{
-				cameraSyncHandle = null;
-			}
-		}else{
-			prefs=null;
-		}
-
-		if(cameraSyncHandle!=null){
-			if(!(cameraSyncHandle.equals(""))){
-				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
-					return true;
-				}
-
-			}else{
-				if(n.getName().equals(context.getString(R.string.section_photo_sync))){
-					if (prefs != null){
-						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-					}
-					dbH.setCamSyncHandle(n.getHandle());
-					logDebug("FOUND Camera Uploads!!----> " + n.getHandle());
-					return true;
-				}
-			}
-
-		}else{
-			if(n.getName().equals(context.getString(R.string.section_photo_sync))){
-				if (prefs != null){
-					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-				}
-				dbH.setCamSyncHandle(n.getHandle());
-				logDebug("FOUND Camera Uploads!!: " + n.getHandle());
-				return true;
-			}
-		}
-
-		//Check if the item is the Media Uploads folder
-		String secondaryMediaHandle = null;
-
-		if(prefs!=null){
-			if(prefs.getMegaHandleSecondaryFolder()!=null){
-				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
-			}else{
-				secondaryMediaHandle = null;
-			}
-		}
-
-		if(secondaryMediaHandle!=null){
-			if(!(secondaryMediaHandle.equals(""))){
-				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
-					logDebug("Click on Media Uploads");
-					return true;
-				}
-			}
-		}else{
-			if(n.getName().equals(context.getString(R.string.section_secondary_media_uploads))){
-				if (prefs != null){
-					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
-				}
-				dbH.setSecondaryFolderHandle(n.getHandle());
-				logDebug("FOUND Media Uploads!!: " + n.getHandle());
-				return true;
-			}
-		}
-		return false;
-	}
-
 
 	@Override
 	public void onClick(View v) {

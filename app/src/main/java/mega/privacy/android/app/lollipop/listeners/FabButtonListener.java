@@ -7,6 +7,7 @@ import android.view.View;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -57,7 +58,9 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                         }
                         case CHAT:{
                             logDebug("Create new chat");
-                            ((ManagerActivityLollipop)context).chooseAddContactDialog(true);
+                            if (!Util.isFastDoubleClick()) {
+                                ((ManagerActivityLollipop) context).chooseAddContactDialog(true);
+                            }
                             break;
                         }
                     }

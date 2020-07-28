@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaChatRoom;
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -126,7 +127,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private Button allowBtn;
     private RelativeLayout contactsListLayout;
     private RecyclerView contactsList;
-    private TextView moreContacts;
     private TextView moreContactsTitle;
     private TextView actionBarTitle, actionBarSubtitle;
     private View bannerDivider;
@@ -223,6 +223,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             // change the settings, when have new matched contact.
             dbH.setShowInviteBanner("true");
 
+            // At the end of the contacts list, add the 'Invite more' element, it's an empty MegaContact object.
+            megaContacts.add(new MegaContactGetter.MegaContact());
             onContactsCountChange(megaContacts);
             expandContainer();
             bannerContainer.setVisibility(View.VISIBLE);
@@ -277,7 +279,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void onContactsCountChange(List<MegaContactGetter.MegaContact> megaContacts) {
-        int count = megaContacts.size();
+        // The last element is the 'Invite more', don't include in the contacts count.
+        int count = megaContacts.size() - 1;
         if (count > 0) {
             String title = context.getResources().getQuantityString(R.plurals.quantity_of_local_contact, count, count);
             inviteTitle.setText(title);
@@ -319,7 +322,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         logDebug("onCreateView");
-
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -412,8 +414,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         invitationContainer = v.findViewById(R.id.contacts_list_container);
         contactsListLayout = v.findViewById(R.id.contacts_list_layout);
         contactsList = v.findViewById(R.id.contacts_list);
-        moreContacts = v.findViewById(R.id.more_contacts);
-        moreContacts.setOnClickListener(this);
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
         bannerDivider = v.findViewById(R.id.invitation_banner_divider);
         moreContactsTitle.setOnClickListener(this);
@@ -505,6 +505,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
                         if (isOnline(context)) {
                             showEmptyChatScreen();
+                            if (context instanceof ManagerActivityLollipop) {
+                                ((ManagerActivityLollipop) context).showFabButton();
+                            }
                         } else {
                             showNoConnectionScreen();
                         }
@@ -529,6 +532,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                         listView.setVisibility(View.VISIBLE);
                         emptyLayout.setVisibility(View.GONE);
+
+                        if (context instanceof ManagerActivityLollipop) {
+                            ((ManagerActivityLollipop) context).showFabButton();
+                        }
                     }
                 } else {
                     logDebug("Show chat screen connecting...");
@@ -578,6 +585,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     fastScroller.setRecyclerView(listView);
                     visibilityFastScroller();
                     adapterList.setPositionClicked(-1);
+
+                    if (context instanceof ManagerActivityLollipop) {
+                        ((ManagerActivityLollipop) context).showFabButton();
+                    }
                 }
             } else {
                 logDebug("Show chat screen connecting...");
@@ -768,7 +779,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
                 break;
             case R.id.more_contacts_title:
-            case R.id.more_contacts:
                 logDebug("to InviteContactActivity");
                 startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
@@ -1532,6 +1542,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if(explanationDialog != null) {
             explanationDialog.cancel();
         }
+        if(adapter != null) {
+            adapter.dismissDialog();
+        }
     }
 
     @Override
@@ -1969,7 +1982,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     filteredChats.clear();
                 }
                 for (MegaChatListItem chat : chatsToSearch) {
-                    if (chat.getTitle().toLowerCase().contains(strings[0].toLowerCase())) {
+                    if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
                         filteredChats.add(chat);
                     }
                 }
