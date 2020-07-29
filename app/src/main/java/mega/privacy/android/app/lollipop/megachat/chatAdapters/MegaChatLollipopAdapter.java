@@ -1418,7 +1418,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.GONE);
                     ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
-                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
+                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
                         ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
