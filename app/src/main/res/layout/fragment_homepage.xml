@@ -28,7 +28,9 @@
                 layout="@layout/homepage_banner" />
         </LinearLayout>
 
-        <include layout="@layout/homepage_bottom_sheet" />
+        <include
+            android:id="@+id/homepage_bottom_sheet"
+            layout="@layout/homepage_bottom_sheet" />
 
         <View
             android:id="@+id/view_mask"

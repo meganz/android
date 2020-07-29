@@ -2805,5 +2805,9 @@
     <string name="fab_label_new_chat">New Chat</string>
     <string name="fab_label_upload">Upload</string>
 
+    <string name="tab_recents">Recents</string>
+    <string name="tab_favourites">Favourites</string>
+    <string name="tab_offline">Offline</string>
+
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
 </resources>

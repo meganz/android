@@ -6,166 +6,215 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.components.search.FloatingSearchView
+import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
+
+    private lateinit var viewDataBinding : FragmentHomepageBinding
+    private lateinit var rootView : View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
-    private var heightPixels = 0
-    private var searchBottom = 0
     private lateinit var searchInputView: FloatingSearchView
-    private var isRotate = false
+    private lateinit var fabMain: FloatingActionButton
+
+    private var isFabExpanded = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_homepage, container, false)
+        viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
+        rootView = viewDataBinding.root
 
-        bottomSheetBehavior = HomepageBottomSheetBehavior.from(view.findViewById<View>(R.id.homepage_bottom_sheet))
+        return rootView
+    }
 
-        searchInputView = view.findViewById<FloatingSearchView>(R.id.searchView)
-        searchInputView.attachNavigationDrawerToMenuButton((activity as ManagerActivityLollipop).drawerLayout!!)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
-        viewPager.adapter =
-            BottomSheetPagerAdapter(this)
-        val tabs = view.findViewById<TabLayout>(R.id.tabs)
-        val mediator = TabLayoutMediator(tabs, viewPager) { tab, _ ->
-            tab.text = "Recent"
+        setupSearchView()
+        setupBottomSheetUI()
+        setupBottomSheetBehavior()
+        setupFabs()
+    }
+
+    private fun setupSearchView() {
+        searchInputView = viewDataBinding.searchView
+        searchInputView.attachNavigationDrawerToMenuButton(
+            (activity as ManagerActivityLollipop).drawerLayout!!)
+    }
+
+    private fun setupBottomSheetUI() {
+        val viewPager = rootView.findViewById<ViewPager2>(R.id.view_pager)
+        viewPager.adapter = BottomSheetPagerAdapter(this)
+
+        // Attach the view pager to the tab layout
+        val tabs = rootView.findViewById<TabLayout>(R.id.tabs)
+        val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->
+            tab.text = getTabTitle(position)
         }
         mediator.attach()
 
+        // Pass selected page view to HomepageBottomSheetBehavior which would seek for
+        // the nested scrolling child views and deal with the logic of nested scrolling
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                bottomSheetBehavior.invalidateScrollingChild((viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position))
+                bottomSheetBehavior.invalidateScrollingChild(
+                    (viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position)
+                )
             }
         })
+    }
 
-        view.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                Log.i("Alex", "onGlobalLayout")
-                view.viewTreeObserver.removeOnPreDrawListener(this)
-//                heightPixels = resources.displayMetrics.heightPixels
-                searchBottom = searchInputView.bottom
-                val banner = view?.findViewById<View>(R.id.banner)
-                bottomSheetBehavior.peekHeight = view!!.height - banner!!.bottom - 20
-//                view.findViewById<View>(R.id.design_bottom_sheet1)?.visibility = View.VISIBLE
-                return true
-            }
-        })
+    private fun getTabTitle(position: Int): String? {
+        val resources = activity?.resources
 
-        bottomSheetBehavior.addBottomSheetCallback(object : HomepageBottomSheetBehavior.BottomSheetCallback() {
+        when (position) {
+            BottomSheetPagerAdapter.RECENT_INDEX -> return resources?.getString(R.string.tab_recents)
+            BottomSheetPagerAdapter.FAVOURITES_INDEX -> return resources?.getString(R.string.tab_favourites)
+            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources?.getString(R.string.tab_offline)
+        }
+
+        return ""
+    }
+
+    private fun setupBottomSheetBehavior() {
+        bottomSheetBehavior = HomepageBottomSheetBehavior.from(viewDataBinding.homepageBottomSheet)
+        setBottomSheetPeekHeight()
+        setBottomSheetExpandedTop()
+    }
+
+    private fun setBottomSheetPeekHeight() {
+        rootView.viewTreeObserver?.addOnPreDrawListener {
+            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.banner.bottom
+            true
+        }
+    }
+
+    private fun setBottomSheetExpandedTop() {
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            HomepageBottomSheetBehavior.BottomSheetCallback() {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 val layoutParams = bottomSheet.layoutParams
-                if (bottomSheet.height > view.height - searchBottom - 20) {
-                    layoutParams.height = view.height - searchBottom - 20
+                val maxHeight = rootView.height - searchInputView.bottom
+
+                if (bottomSheet.height > maxHeight) {
+                    layoutParams.height = maxHeight
                     bottomSheet.layoutParams = layoutParams
                 }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
+    }
 
-        val fabChat = view.findViewById<View>(R.id.fab_chat)
-        val fabUpload = view.findViewById<View>(R.id.fab_upload)
-        val textChat = view.findViewById<View>(R.id.text_chat)
-        val textUpload = view.findViewById<View>(R.id.text_upload)
-        initFabs(fabChat)
-        initFabs(fabUpload)
-        initFabs(textChat)
-        initFabs(textUpload)
-        fabChat.setOnClickListener {
+    private fun setupFabs() {
+        fabMain = rootView.findViewById(R.id.fab_main)
+        val fabChat = rootView.findViewById<View>(R.id.fab_chat)
+        val fabUpload = rootView.findViewById<View>(R.id.fab_upload)
+        val textChat = rootView.findViewById<View>(R.id.text_chat)
+        val textUpload = rootView.findViewById<View>(R.id.text_upload)
 
-        }
-        fabUpload.setOnClickListener {
+        fabMain.setOnClickListener {
+            val mask = viewDataBinding.viewMask
+            rotateFab()
 
-        }
-
-        view.findViewById<FloatingActionButton>(R.id.fab_main).setOnClickListener {
-            val mask = view.findViewById<View>(R.id.view_mask)
-            isRotate = rotateFab(it, !isRotate)
-            if (isRotate) {
-                mask.visibility = View.VISIBLE
-                showIn(fabChat)
-                showIn(fabUpload)
-                showIn(textChat)
-                showIn(textUpload)
-            } else {
-                mask.visibility = View.GONE
+            if (isFabExpanded) {
                 showOut(fabChat)
                 showOut(fabUpload)
                 showOut(textChat)
                 showOut(textUpload)
+            } else {
+                showIn(fabChat)
+                showIn(fabUpload)
+                showIn(textChat)
+                showIn(textUpload)
             }
+
+            mask.visibility = if (isFabExpanded) View.GONE else View.VISIBLE
+            isFabExpanded = !isFabExpanded
         }
 
-        return view
+        fabChat.setOnClickListener {
+        }
+
+        fabUpload.setOnClickListener {
+        }
     }
 
-    private fun initFabs(v: View) {
-        v.visibility = View.GONE;
-        v.translationY = v.height.toFloat();
-        v.alpha = 0f;
-    }
+    private fun rotateFab() {
+        val rotateAnim = ObjectAnimator.ofFloat(
+            fabMain, "rotation",
+            if (isFabExpanded) FAB_DEFAULT_ANGEL else FAB_ROTATE_ANGEL
+        )
 
-    private fun rotateFab(v: View, rotate: Boolean): Boolean {
-        val rotateAnim = ObjectAnimator.ofFloat(v, "rotation", if (rotate) 135f else 0f)
-        val tintAnim = ObjectAnimator.ofArgb((v as FloatingActionButton).drawable.mutate(), "tint", if (rotate) Color.BLACK else Color.WHITE)
-        val backgroundTintAnim = ObjectAnimator.ofArgb(v.background.mutate(), "tint", if (rotate) Color.WHITE else 0xFF00BFA5.toInt())
+        // The tint of the icon in the middle of the FAB
+        val tintAnim = ObjectAnimator.ofArgb(
+            fabMain.drawable.mutate(), "tint",
+            if (isFabExpanded) Color.WHITE else Color.BLACK
+        )
 
-        AnimatorSet().apply { duration = 200
+        // The background tint of the FAB
+        val backgroundTintAnim = ObjectAnimator.ofArgb(
+            fabMain.background.mutate(), "tint",
+            if (isFabExpanded) resources.getColor(R.color.accentColor) else Color.WHITE
+        )
+
+        AnimatorSet().apply {
+            duration = FAB_ANIM_DURATION
             playTogether(rotateAnim, backgroundTintAnim, tintAnim)
             start()
         }
-        return rotate
     }
 
-    private fun showIn(v: View) {
-        v.visibility = View.VISIBLE
-        v.alpha = 0f
-        v.translationY = v.height.toFloat()
+    private fun showIn(view: View) {
+        view.visibility = View.VISIBLE
+        view.alpha = ALPHA_TRANSPARENT
+        view.translationY = view.height.toFloat()
 
-        v.animate()
-                .setDuration(200)
-                .translationY(0f)
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                    }
-                })
-                .alpha(1f)
-                .start()
+        view.animate()
+            .setDuration(FAB_ANIM_DURATION)
+            .translationY(0f)
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                }
+            })
+            .alpha(ALPHA_OPAQUE)
+            .start()
     }
 
-    private fun showOut(v: View) {
-        v.visibility = View.VISIBLE
-        v.alpha = 1f
-        v.translationY = 0f
-        v.animate()
-                .setDuration(200)
-                .translationY(v.height.toFloat())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        v.visibility = View.GONE
-                        super.onAnimationEnd(animation)
-                    }
-                }).alpha(0f)
-                .start()
+    private fun showOut(view: View) {
+        view.animate()
+            .setDuration(FAB_ANIM_DURATION)
+            .translationY(view.height.toFloat())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    view.visibility = View.GONE
+                    super.onAnimationEnd(animation)
+                }
+            }).alpha(ALPHA_TRANSPARENT)
+            .start()
+    }
+
+    companion object {
+        private const val FAB_ANIM_DURATION = 200L
+        private const val ALPHA_TRANSPARENT = 0f
+        private const val ALPHA_OPAQUE = 1f
+        private const val FAB_DEFAULT_ANGEL = 0f
+        private const val FAB_ROTATE_ANGEL = 135f
     }
 }
