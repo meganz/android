@@ -249,7 +249,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">云盘</string>
     <string name="section_recents" context="Label to reference a recents section">近期</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">多媒体文件上传</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">媒体上传</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">收件箱</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">保存为离线</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">离线</string>
@@ -267,7 +267,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">传输</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">我的账号</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">相机上传</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">相机上传</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -692,6 +692,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">正在上传媒体文件夹中的文件</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">检查待上传的文件</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">正在初始化相机上传</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -762,7 +765,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或移动数据</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">仅限Wi-Fi</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">文件上传</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -917,6 +919,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日志已启用</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日志已关闭</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Unable to setup MEGA Camera Uploads folder</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">日志尚未启用，由于您未开启所需的权限</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">开启位置</string>
@@ -1541,6 +1544,8 @@
     <string name="general_view" context="Menu option">查看文件</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">输入</string>
     <string name="save_for_offline" context="Menu option">离线储存</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Add to Cloud</string>
+    <string name="save_to_offline" context="Menu option to choose save to offline section">Save to Offline</string>
 
     <string name="general_view_contacts" context="Menu option">查看联系人</string>
 
@@ -1656,6 +1661,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">正删除该文件夹的共享联系人</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">要移至垃圾桶吗？</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">您确定要将此文件夹移到“垃圾桶”吗？这将禁用相机上传功能。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">要移至垃圾桶吗？</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">确定从MEGA删除吗？</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">离开此文件夹后将无法再次查看</string>
@@ -2287,7 +2294,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">加载聊天链接时初始化聊天出错。</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">您正在预览之前的群聊记录。您想要再次加入聊天吗？</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">您已加入此聊天。</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">该聊天预览已不可用。退出预览后您无法再次打开。</string>
@@ -2766,4 +2772,7 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">总是保存到此位置？</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">添加附件&#8230;&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+
 </resources>

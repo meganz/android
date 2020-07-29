@@ -436,7 +436,17 @@ public class Util {
 		
 	    return scale;
 	}
-	
+
+	/**
+	 * Convert dp to px.
+	 *
+	 * Note: the name of this function is wrong since the beginning, we should rename it in
+	 * the future.
+	 *
+	 * @param dp dp value
+	 * @param outMetrics display metrics
+	 * @return corresponding px value
+	 */
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
 	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
@@ -1401,6 +1411,15 @@ public class Util {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(context, colorId));
     }
+
+	public static int getStatusBarHeight() {
+		Context context = MegaApplication.getInstance().getBaseContext();
+		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+				"android");
+
+		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
+				: px2dp(24, context.getResources().getDisplayMetrics());
+	}
 
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();

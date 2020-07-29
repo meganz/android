@@ -7,6 +7,7 @@ import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -49,12 +50,18 @@ public class CreateFolderListener extends BaseListener {
                 //set primary only
                 if (e.getErrorCode() == MegaError.API_OK) {
                     api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
+                } else {
+                    logWarning("Create CU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    JobUtil.stopRunningCameraUploadService(context);
                 }
             } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
                 CameraUploadsService.isCreatingSecondary = false;
                 //set secondary only
                 if (e.getErrorCode() == MegaError.API_OK) {
                     api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
+                } else {
+                    logWarning("Create MU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    JobUtil.stopRunningCameraUploadService(context);
                 }
             }
         }
