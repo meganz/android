@@ -443,9 +443,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            intent.putExtra("adapterType", RECENTS_ADAPTER);
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
             if (screenPosition != null) {
-                intent.putExtra("screenPosition", screenPosition);
+                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
             }
             intent.putExtra(HANDLE, node.getHandle());
             if (isMedia) {
@@ -467,11 +467,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 intent = new Intent(Intent.ACTION_VIEW);
             }
 
-            intent.putExtra("adapterType", RECENTS_ADAPTER);
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
             if (screenPosition != null) {
-                intent.putExtra("screenPosition", screenPosition);
+                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
             }
-            intent.putExtra("FILENAME", node.getName());
+            intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(false));
                 intent.putExtra(IS_PLAYLIST, true);
@@ -486,7 +486,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             }
 
             if (paramsSetSuccessfully) {
-                intent.putExtra("HANDLE", node.getHandle());
+                intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
                 if (isOpusFile(node)) {
                     intent.setDataAndType(intent.getData(), "audio/*");
                 }
@@ -499,10 +499,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             }
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
-            intent.putExtra("inside", true);
-            intent.putExtra("adapterType", RECENTS_ADAPTER);
+            intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
             if (screenPosition != null) {
-                intent.putExtra("screenPosition", screenPosition);
+                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
             }
 
             if (isLocalFile(context, node, megaApi, localPath)) {
@@ -511,7 +511,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
             }
 
-            intent.putExtra("HANDLE", node.getHandle());
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
         }
 
         if (intent != null && !isIntentAvailable(context, intent)) {

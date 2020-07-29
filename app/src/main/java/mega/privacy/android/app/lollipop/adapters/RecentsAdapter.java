@@ -387,9 +387,9 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     }
 
     private int[] getNodePosition(long handle, boolean rootLevel) {
-        int position = -1;
-        int subListPosition = -1;
-        for (int i = 0, n = recentsItems.size(); i < n; i++) {
+        int position = INVALID_POSITION;
+        int subListPosition = INVALID_POSITION;
+        for (int i = 0; i < recentsItems.size(); i++) {
             MegaRecentActionBucket bucket = recentsItems.get(i).getBucket();
             if (bucket == null) {
                 continue;
@@ -413,7 +413,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                         break;
                     }
                 }
-                if (position != -1) {
+                if (position != INVALID_POSITION) {
                     break;
                 }
             }
@@ -427,7 +427,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         }
 
         int[] positions = getNodePosition(handle, false);
-        if (positions[0] == -1 || positions[1] == -1) {
+        if (positions[0] == INVALID_POSITION || positions[1] == INVALID_POSITION) {
             return;
         }
 
@@ -444,7 +444,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         }
 
         int[] positions = getNodePosition(handle, rootLevel);
-        if (positions[0] == -1) {
+        if (positions[0] == INVALID_POSITION) {
             return null;
         }
 

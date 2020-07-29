@@ -253,14 +253,12 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
     }
 
     public int getNodePosition(long handle) {
-        int position = -1;
-        for (int i = 0, n = nodes.size(); i < n; i++) {
+        for (int i = 0; i < nodes.size(); i++) {
             if (nodes.get(i).getHandle() == handle) {
-                position = i;
-                break;
+                return i;
             }
         }
-        return position;
+        return INVALID_POSITION;
     }
 
     public ImageView getThumbnailView(RecyclerView recyclerView, long handle) {
@@ -269,7 +267,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         }
 
         int position = getNodePosition(handle);
-        if (position == -1) {
+        if (position == INVALID_POSITION) {
             return null;
         }
 
