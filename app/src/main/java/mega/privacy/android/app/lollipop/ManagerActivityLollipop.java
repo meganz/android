@@ -5180,56 +5180,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (usedSpaceLayout != null) {
 				usedSpaceLayout.setVisibility(View.GONE);
 			}
-
-			UserCredentials credentials = dbH.getCredentials();
-			if (credentials != null) {
-				String emailCredentials = credentials.getEmail();
-				if (emailCredentials != null) {
-					if (nVEmail != null) {
-						nVEmail.setText(emailCredentials);
-					}
-				}
-
-				String myHandleCredentials = credentials.getMyHandle();
-				long myHandle = -1;
-				if (myHandleCredentials != null) {
-					if (!myHandleCredentials.isEmpty()) {
-						myHandle = Long.parseLong(myHandleCredentials);
-					}
-				}
-
-				String firstNameText = credentials.getFirstName();
-				String lastNameText = credentials.getLastName();
-				String fullName = "";
-				if (firstNameText == null) {
-					firstNameText = "";
-				}
-				if (lastNameText == null) {
-					lastNameText = "";
-				}
-				if (firstNameText.trim().length() <= 0) {
-					fullName = lastNameText;
-				} else {
-					fullName = firstNameText + " " + lastNameText;
-				}
-
-				if (fullName.trim().length() <= 0) {
-					logDebug("Put email as fullname");
-					String[] splitEmail = emailCredentials.split("[@._]");
-					fullName = splitEmail[0];
-				}
-
-				if (fullName.trim().length() <= 0) {
-					fullName = getString(R.string.name_text) + " " + getString(R.string.lastname_text);
-					logDebug("Full name set by default");
-				}
-
-				if (nVDisplayName != null) {
-					nVDisplayName.setText(fullName);
-				}
-
-				setOfflineAvatar(emailCredentials, myHandle, fullName);
+			if (nVEmail != null) {
+				nVEmail.setText(megaChatApi.getMyEmail());
 			}
+			if (nVDisplayName != null) {
+				nVDisplayName.setText(megaChatApi.getMyFullname());
+			}
+			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
+					megaChatApi.getMyFullname());
 
 			if (getSettingsFragment() != null) {
 				sttFLol.setOnlineOptions(false);
