@@ -15335,6 +15335,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		firstLogin = flag;
 	}
 
+	public boolean getAskPermissions() {
+		return askPermissions;
+	}
+
 	public void setListCameraUploads(boolean isListCameraUploads) {
 		this.isListCameraUploads = isListCameraUploads;
 	}
