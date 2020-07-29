@@ -6545,7 +6545,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
 							searchMenuItem.setVisible(true);
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 						}
 					}
@@ -6557,7 +6556,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						setGridListIcon();
 						clearRubbishBinMenuitem.setVisible(true);
 						sortByMenuItem.setVisible(true);
-						selectMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
 					}
 					break;
@@ -6572,7 +6570,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
 							sortByMenuItem.setVisible(true);
-							selectMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 					}
@@ -6585,7 +6582,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					if ((drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFL.getItemCount() > 0)
 							|| (drawerItem == DrawerItem.MEDIA_UPLOADS && getMediaUploadFragment() != null && muFLol.getItemCount() > 0)) {
-						selectMenuItem.setVisible(true);
 						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
 
@@ -6627,7 +6623,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 
@@ -6659,7 +6654,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
@@ -6667,7 +6661,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						rubbishBinMenuItem.setVisible(true);
 
 						if (isLinksAdded() && lF.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
@@ -6682,7 +6675,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (getContactsFragment() != null && cFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 
 						}
@@ -6694,14 +6686,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						addContactMenuItem.setVisible(true);
 						upgradeAccountMenuItem.setVisible(true);
 						scanQRcodeMenuItem.setVisible(true);
-
-						if (getSentRequestFragment() != null && sRFLol.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
-						}
-					} else if (getTabItemContacts() == RECEIVED_REQUESTS_TAB) {
-						if (getReceivedRequestFragment() != null && rRFLol.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
-						}
 					}
 					break;
 
@@ -6713,7 +6697,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (getSearchFragment() != null
 								&& getSearchFragment().getNodes() != null
 								&& getSearchFragment().getNodes().size() > 0) {
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
@@ -6771,7 +6754,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					} else {
 						inviteMenuItem.setVisible(true);
 						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 						importLinkMenuItem.setVisible(true);
