@@ -3,33 +3,34 @@ package mega.privacy.android.app.utils.billing;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.utils.TextUtil;
 
 public class PaymentUtils {
 
     /** SKU for our subscription PRO_I monthly */
-    public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
+    public static final String SKU_PRO_I_MONTH = BillingManagerImpl.SKU_PRO_I_MONTH;
 
     /** SKU for our subscription PRO_I yearly */
-    public static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
+    public static final String SKU_PRO_I_YEAR = BillingManagerImpl.SKU_PRO_I_YEAR;
 
     /** SKU for our subscription PRO_II monthly */
-    public static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+    public static final String SKU_PRO_II_MONTH = BillingManagerImpl.SKU_PRO_II_MONTH;
 
     /** SKU for our subscription PRO_II yearly */
-    public static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
+    public static final String SKU_PRO_II_YEAR = BillingManagerImpl.SKU_PRO_II_YEAR;
 
     /** SKU for our subscription PRO_III monthly */
-    public static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+    public static final String SKU_PRO_III_MONTH = BillingManagerImpl.SKU_PRO_III_MONTH;
 
     /** SKU for our subscription PRO_III yearly */
-    public static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
+    public static final String SKU_PRO_III_YEAR = BillingManagerImpl.SKU_PRO_III_YEAR;
 
     /** SKU for our subscription PRO_LITE monthly */
-    public static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
+    public static final String SKU_PRO_LITE_MONTH = BillingManagerImpl.SKU_PRO_LITE_MONTH;
 
     /** SKU for our subscription PRO_LITE yearly */
-    public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
+    public static final String SKU_PRO_LITE_YEAR = BillingManagerImpl.SKU_PRO_LITE_YEAR;
 
     /**
      * Get the level of a certain sku.

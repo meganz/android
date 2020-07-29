@@ -62,6 +62,30 @@ import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
  */
 public class BillingManagerImpl implements PurchasesUpdatedListener, BillingManager {
 
+    /** SKU for our subscription PRO_I monthly */
+    public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
+
+    /** SKU for our subscription PRO_I yearly */
+    public static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
+
+    /** SKU for our subscription PRO_II monthly */
+    public static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+
+    /** SKU for our subscription PRO_II yearly */
+    public static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
+
+    /** SKU for our subscription PRO_III monthly */
+    public static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+
+    /** SKU for our subscription PRO_III yearly */
+    public static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
+
+    /** SKU for our subscription PRO_LITE monthly */
+    public static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
+
+    /** SKU for our subscription PRO_LITE yearly */
+    public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
+
     private String payload;
     private BillingClient mBillingClient;
     private boolean mIsServiceConnected;
