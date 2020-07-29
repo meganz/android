@@ -277,6 +277,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
 
     // Support multiple nested scrolling view
     private final static int MIN_COUNT_LIMIT = 1;
+    private final static int DEFAULT_COUNT_LIMIT = 2;
     private final static int MAX_COUNT_LIMIT = 4;
 
     List<WeakReference<View>> nestedScrollingChildRef = new ArrayList<>();
@@ -452,7 +453,7 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
     }
 
     public void invalidateScrollingChild(View view) {
-        invalidateScrollingChild(view, MIN_COUNT_LIMIT);
+        invalidateScrollingChild(view, DEFAULT_COUNT_LIMIT);
     }
 
     public void invalidateScrollingChild(View view, int countLimit) {
