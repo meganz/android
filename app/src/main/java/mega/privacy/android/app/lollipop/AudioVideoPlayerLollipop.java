@@ -2564,12 +2564,19 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         createPlayer();
     }
 
+    private boolean checkNoNetwork() {
+        if (!isOnline(this)) {
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            return true;
+        }
+        return false;
+    }
+
     public void moveToTrash(){
         logDebug("moveToTrash");
 
         moveToRubbish = false;
-        if (!isOnline(this)){
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+        if (checkNoNetwork()) {
             return;
         }
 
@@ -2885,8 +2892,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             return;
         }
 
-        if(!isOnline(this)){
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+        if (checkNoNetwork()) {
             return;
         }
 
@@ -3186,9 +3192,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-
-            if(!isOnline(this)){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            if (checkNoNetwork()) {
                 return;
             }
 
@@ -3215,8 +3219,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
-            if(!isOnline(this)){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            if (checkNoNetwork()) {
                 return;
             }
 
