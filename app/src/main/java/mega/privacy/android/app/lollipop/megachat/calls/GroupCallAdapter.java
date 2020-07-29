@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -25,17 +23,13 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import jp.wasabeef.blurry.Blurry;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.RelativeLayout.TRUE;
-import static mega.privacy.android.app.utils.AvatarUtil.getImageAvatar;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -51,6 +45,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     private static final int SIZE_BIG_AVATAR = 88;
     private static final int SIZE_SMALL_AVATAR = 60;
     private static final int CHECK_PARTICIPANTS_UI = 3;
+    
     private ViewHolderGroupCallGrid holderGrid = null;
     private Context context;
     private MegaApiAndroid megaApi;

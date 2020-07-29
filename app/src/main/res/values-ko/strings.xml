@@ -249,7 +249,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">클라우드 드라이브</string>
     <string name="section_recents" context="Label to reference a recents section">최근</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">미디어 업로드</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">미디어 업로드</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">수신함</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">오프라인으로 저장됨</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">오프라인</string>
@@ -267,7 +267,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">전송</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">내 계정</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">카메라 업로드</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">카메라 업로드</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -692,6 +692,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">미디어 폴더의 파일을 업로드할 수 없습니다</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">업로드할 파일 확인중</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">카메라 업로드 초기화중</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -762,7 +765,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">와이파이 전용</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">파일 올리기</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -917,6 +919,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">로그가 활성화 되었습니다.</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">로그가 비활성화 되었습니다.</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Unable to setup MEGA Camera Uploads folder</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">당신이 필요한 권한을 거부했기 때문에 기록을 활성화할 수 없습니다</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">위치 열기</string>
@@ -1541,6 +1544,8 @@
     <string name="general_view" context="Menu option">파일 보기</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">들여오기</string>
     <string name="save_for_offline" context="Menu option">오프라인용으로 저장</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Add to Cloud</string>
+    <string name="save_to_offline" context="Menu option to choose save to offline section">Save to Offline</string>
 
     <string name="general_view_contacts" context="Menu option">연락처 보기</string>
 
@@ -1656,6 +1661,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">공유된 폴더에서 연락처 제거중</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">휴지통으로 옮길까요?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">이 폴더를 휴지통에 버리시겠습니까? 이로 인해 카메라 업로드가 해제됩니다.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">휴지통으로 옮길까요?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">MEGA에서 삭제할까요?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">폴더를 떠나면, 다시 볼 수 없습니다.</string>
@@ -2287,7 +2294,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">대화 링크를 불러오던 중 대화 초기화 오류 발생</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">이전에 참여했었던 대화를 미리 보려고 합니다. 대화에 참여하시겠습니까?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">이미 이 대화에 참여하고 있습니다.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">이 대화 미리 보기는 더 이상 유효하지 않습니다. 미리 보기를 떠나면, 다시 열 수 없습니다.</string>
@@ -2766,4 +2772,7 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">항상 이 위치에 저장할까요?</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">다음에서 첨부&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+
 </resources>

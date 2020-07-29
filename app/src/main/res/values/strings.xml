@@ -690,8 +690,8 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading files of media folders</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Uploads</string>
-	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload's primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
-	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload's secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
 
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
@@ -1570,6 +1570,10 @@
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Link removal failed. Please try again later.</item>
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Failed to remove some links. Please try again later.</item>
     </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+    </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
         <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
@@ -1660,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to Rubbish Bin?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Camera Uploads.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again.</string>
@@ -2797,5 +2801,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Your Credentials</string>
     <string name="action_reset" context="Button to reset credentials">Reset</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana's credentials">%s\'s credentials</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
 
 </resources>

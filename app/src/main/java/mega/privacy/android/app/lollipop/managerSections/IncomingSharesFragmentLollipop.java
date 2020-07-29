@@ -18,59 +18,81 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaError.API_OK;
+import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	@Override
 	public void activateActionMode() {
-		super.activateActionMode();
-		actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
+		if (!adapter.isMultipleSelect()) {
+			super.activateActionMode();
+			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
+					new ActionBarCallBack());
+		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			checkSelectOptions(menu, false);
+			super.onPrepareActionMode(mode, menu);
+
+			CloudStorageOptionControlUtil.Control control =
+					new CloudStorageOptionControlUtil.Control();
 
 			if (managerActivity.getDeepBrowserTreeIncoming() == 0) {
-				menu.findItem(R.id.cab_menu_rename).setVisible(false);
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				menu.findItem(R.id.cab_menu_move).setVisible(false);
-				menu.findItem(R.id.cab_menu_trash).setVisible(false);
+				control.leaveShare().setVisible(true)
+						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			} else {
-				checkOptions();
+				if (areAllFileNodes(selected)) {
+					menu.findItem(R.id.cab_menu_send_to_chat)
+							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+									R.color.white));
 
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
-
-				menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
-				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
-				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-				if (selected.size() >= 1 && megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() != MegaError.API_OK) {
-					showMove = false;
+					control.sendToChat().setVisible(true)
+							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
-				menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-				menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 
-				menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+				control.move().setVisible(allHaveFullAccess(selected));
 			}
 
-			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			if (selected.size() == 1
+					&& megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+				control.rename().setVisible(true);
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				} else {
+					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
+			}
 
-			return false;
+			control.copy().setVisible(true);
+			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			} else {
+				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			}
+
+			control.selectAll().setVisible(notAllNodesSelected());
+			control.trash().setVisible(managerActivity.getDeepBrowserTreeIncoming() > 0
+					&& MegaNodeUtil.allHaveFullAccess(selected));
+
+			CloudStorageOptionControlUtil.applyControl(menu, control);
+
+			return true;
 		}
 	}
 

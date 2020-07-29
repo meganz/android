@@ -3493,6 +3493,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (editingMessage) {
                     editMessage(text);
                     finishMultiselectionMode();
+                    checkActionMode();
                 } else {
                     sendMessage(text);
                 }
@@ -3863,6 +3864,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             sendLocation();
             finishMultiselectionMode();
+            checkActionMode();
         } else {
             textChat.setText(messageToEdit.getContent());
             textChat.setSelection(textChat.getText().length());
@@ -4455,6 +4457,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     public void finishMultiselectionMode() {
         clearSelections();
         hideMultipleSelect();
+    }
+
+    private void checkActionMode(){
+        if (adapter.isMultipleSelect() && actionMode != null) {
+            actionMode.invalidate();
+        }else{
+            editingMessage = false;
+        }
     }
 
     public void selectAll() {
@@ -5981,15 +5991,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("Index: " + itr.nextIndex());
 
             if(!messageToCheck.isUploading()){
-
-                if(rejected){
+                if (rejected) {
                     if (messageToCheck.getMessage().getTempId() == msg.getTempId()) {
                         indexToChange = itr.nextIndex();
                         break;
                     }
-                }
-                else{
-                    if (messageToCheck.getMessage().getMsgId() == msg.getMsgId() || messageToCheck.getMessage().getTempId() == msg.getTempId()){
+                } else {
+                    if (messageToCheck.getMessage().getMsgId() == msg.getMsgId()
+                        || (msg.getTempId() != -1
+                        && messageToCheck.getMessage().getTempId() == msg.getTempId())) {
                         indexToChange = itr.nextIndex();
                         break;
                     }
