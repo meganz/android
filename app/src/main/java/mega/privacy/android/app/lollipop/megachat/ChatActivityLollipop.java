@@ -7415,7 +7415,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public void closeChat(boolean shouldLogout) {
         logDebug("closeChat");
-        if (megaChatApi == null || chatRoom == null || idChat == -1) {
+        if (megaChatApi == null || chatRoom == null || idChat == MEGACHAT_INVALID_HANDLE) {
             return;
         }
         if (chatRoom.isPreview() && chatC.isInAnonymousMode() && shouldLogout) {
@@ -7426,7 +7426,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         MegaApplication.setClosedChat(true);
         megaChatApi.removeChatListener(this);
         chatRoom = null;
-        idChat = -1;
+        idChat = MEGACHAT_INVALID_HANDLE;
     }
 
     @Override
