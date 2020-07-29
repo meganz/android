@@ -12667,8 +12667,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				return;
 		}
 
-		app.setStorageState(storageState);
 		storageState = newStorageState;
+		app.setStorageState(storageState);
 	}
 
 	/**
