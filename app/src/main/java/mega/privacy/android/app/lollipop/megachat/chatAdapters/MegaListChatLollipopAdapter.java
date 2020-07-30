@@ -1068,14 +1068,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 
-	private String getMessageSenderName(MegaChatRoom chatRoom, long chatId,long handle){
+	private String getMessageSenderName(MegaChatRoom chatRoom, long chatId, long handle) {
 		String fullNameAction = getNicknameContact(handle);
 
-		if(fullNameAction == null )
+		if (isTextEmpty(fullNameAction) && chatRoom != null) {
 			fullNameAction = chatRoom.getPeerFullnameByHandle(handle);
+		}
 
-		if(isTextEmpty(fullNameAction))
+		if (isTextEmpty(fullNameAction)) {
 			fullNameAction = cC.getFullName(handle, chatId);
+		}
 
 		return fullNameAction;
 	}

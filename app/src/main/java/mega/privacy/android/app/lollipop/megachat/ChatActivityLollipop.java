@@ -173,6 +173,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -3399,6 +3400,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (editingMessage) {
                     editMessage(text);
                     finishMultiselectionMode();
+                    checkActionMode();
                 } else {
                     sendMessage(text);
                 }
@@ -3769,6 +3771,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             sendLocation();
             finishMultiselectionMode();
+            checkActionMode();
         } else {
             textChat.setText(messageToEdit.getContent());
             textChat.setSelection(textChat.getText().length());
@@ -4363,6 +4366,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         hideMultipleSelect();
     }
 
+    private void checkActionMode(){
+        if (adapter.isMultipleSelect() && actionMode != null) {
+            actionMode.invalidate();
+        }else{
+            editingMessage = false;
+        }
+    }
+
     public void selectAll() {
         if (adapter != null) {
             if (adapter.isMultipleSelect()) {
@@ -4739,6 +4750,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 String url = null;
                                 if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
                                     url = meta.getRichPreview().getUrl();
+
+                                    if (isMEGALinkAndRequiresTransferSession(this, url)) {
+                                        return;
+                                    }
                                 } else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
                                     url = m.getMessage().getContent();
                                     MegaChatGeolocation location = meta.getGeolocation();

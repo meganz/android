@@ -100,6 +100,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LinksUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
@@ -2643,6 +2644,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
 
+                interceptLinkClicks(context, holder.urlOwnMessageText);
             } else {
                 long userHandle = message.getUserHandle();
                 logDebug("Contact message!!: " + userHandle);
@@ -2757,6 +2759,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.forwardContactRichLinks.setEnabled(true);
                     }
                 }
+
+                interceptLinkClicks(context, holder.urlContactMessageText);
             }
         } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
             if (message.getUserHandle() == myUserHandle) {
@@ -3917,6 +3921,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 checkMultiselectionMode(position, holder, true, message.getMsgId());
             }
+
+            interceptLinkClicks(context, holder.contentOwnMessageText);
         } else {
             long userHandle = message.getUserHandle();
             logDebug("Contact message!!: " + userHandle);
@@ -4096,6 +4102,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 checkMultiselectionMode(position, holder, false, message.getMsgId());
             }
+
+            interceptLinkClicks(context, holder.contentContactMessageText);
         }
     }
 
@@ -6273,7 +6281,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public AndroidMegaChatMessage getMessageAt(int positionInAdapter) {
         int position = positionInAdapter - 1;
-        return messages != null && positionInAdapter >= 0 && positionInAdapter < messages.size() ? messages.get(position) : null;
+        return messages != null && position >= 0 && position < messages.size() ? messages.get(position) : null;
     }
 
     public void loadPreviousMessages(ArrayList<AndroidMegaChatMessage> messages, int counter) {
@@ -6595,9 +6603,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("handle: " + handle);
 
         if (holder != null) {
-            AndroidMegaChatMessage megaMessage = getMessageAt(holder.getCurrentPosition());
+            AndroidMegaChatMessage megaMessage = getMessageAt(holder.getAdapterPosition());
 
-            if(megaMessage == null || (msgId != INVALID_HANDLE && megaMessage.getMessage().getMsgId() != msgId))
+            if(megaMessage == null || megaMessage.getMessage() == null || megaMessage.getMessage().getMsgId() != msgId)
                 return;
 
             File previewDir = getPreviewFolder(context);
@@ -7256,6 +7264,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.content_contact_message_text:
             case R.id.url_own_message_text:
             case R.id.url_contact_message_text:
+                if (isIsClickAlreadyIntercepted()) {
+                    resetIsClickAlreadyIntercepted();
+                    break;
+                }
+
             case R.id.message_chat_item_layout:{
                 int[] screenPosition = new int[2];
                 int [] dimens = new int[4];

@@ -230,7 +230,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
 
         protected boolean notAllNodesSelected() {
-            return selected.size() < adapter.getItemCount();
+            return selected.size() < adapter.getItemCount() - adapter.getPlaceholderCount();
         }
     }
 

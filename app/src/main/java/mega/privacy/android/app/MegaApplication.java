@@ -96,11 +96,12 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.6_316";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.7_318";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
