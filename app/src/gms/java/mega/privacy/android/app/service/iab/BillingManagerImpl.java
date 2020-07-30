@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -85,6 +86,18 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
 
     /** SKU for our subscription PRO_LITE yearly */
     public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
+
+    private static final String BASE64_ENCODED_PUBLIC_KEY_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_4 = "RU3VzOUwAYHb4mV/frPctPIRlJbzwCXpe3/mrcsAP+k6ECcd19uIUCPibXhsTkNbAk8CRkZ";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_5 = "KOy+czuZWfjWYx3Mp7srueyQ7xF6/as6FWrED0BlvmhJYj0yhTOTOopAXhGNEk7cUSFxqP2FKYX8e3pHm/uNZvKcSrLXbLUhQnULhn4WmKOQIDAQAB";
+
+    /** Public key for verify purchase. */
+    private static final String PUBLIC_KEY = BASE64_ENCODED_PUBLIC_KEY_1 + BASE64_ENCODED_PUBLIC_KEY_2 + BASE64_ENCODED_PUBLIC_KEY_3 + BASE64_ENCODED_PUBLIC_KEY_4 + BASE64_ENCODED_PUBLIC_KEY_5;
+
+    public static final int PAY_METHOD_RES_ID = R.string.payment_method_google_wallet;
+    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.google_wallet_ic;
 
     private String payload;
     private BillingClient mBillingClient;
@@ -449,7 +462,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     @Override
     public boolean verifyValidSignature(String signedData, String signature) {
         try {
-            return Security.verifyPurchase(signedData, signature);
+            return Security.verifyPurchase(signedData, signature, PUBLIC_KEY);
         } catch (IOException e) {
             logWarning("Purchase failed to valid signature", e);
             return false;

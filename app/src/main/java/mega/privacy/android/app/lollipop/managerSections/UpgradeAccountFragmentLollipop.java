@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -33,6 +34,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -553,7 +555,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 			googleWalletText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_text);
 
-            String textGoogleWallet = getString(R.string.payment_method_google_wallet);
+            String textGoogleWallet = getString(BillingManagerImpl.PAY_METHOD_RES_ID);
             try{
                 textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'#000000\'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
@@ -561,6 +563,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
             catch (Exception e){}
 
             googleWalletText.setText(getSpannedHtmlText(textGoogleWallet));
+            selectPaymentMethodClicked.<ImageView>findViewById(R.id.payment_method_google_wallet_icon).setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID);
 
 
 			creditCardLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
