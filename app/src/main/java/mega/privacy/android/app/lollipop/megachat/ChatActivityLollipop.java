@@ -8038,8 +8038,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
             updateNavigationToolbarIcon();
+        } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)) {
+            MegaChatMessage message = megaChatApi.getMessage(idChat, item.getLastMessageId());
+            sendMessageToUI(new AndroidMegaChatMessage(message));
         }
     }
 
