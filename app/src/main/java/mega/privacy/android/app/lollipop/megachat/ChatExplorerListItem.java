@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop.megachat;
 import mega.privacy.android.app.MegaContactAdapter;
 import nz.mega.sdk.MegaChatListItem;
 
+import static mega.privacy.android.app.utils.ChatUtil.*;
+
 public class ChatExplorerListItem {
 
     private MegaContactAdapter contact;
@@ -21,14 +23,14 @@ public class ChatExplorerListItem {
     public ChatExplorerListItem (MegaChatListItem chat) {
         this.contact = null;
         this.chat = chat;
-        this.title = chat.getTitle();
+        this.title = getTitleChat(chat);
         this.id = String.valueOf(chat.getChatId());
     }
 
     public ChatExplorerListItem (MegaChatListItem chat, MegaContactAdapter contact) {
         this.contact = contact;
         this.chat = chat;
-        this.title = chat.getTitle();
+        this.title = getTitleChat(chat);
         this.id = String.valueOf(chat.getChatId());
     }
 

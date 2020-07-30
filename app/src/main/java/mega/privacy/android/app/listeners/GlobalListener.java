@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -20,6 +19,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
 
@@ -40,9 +40,16 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 continue;
             }
 
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER)
-                    && api.getMyUserHandle().equals(Long.toString(user.getHandle()))) {
-                api.getMyChatFilesFolder(new GetAttrUserListener(MegaApplication.getInstance(), true));
+            boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
+                api.getMyChatFilesFolder(new GetAttrUserListener(megaApplication, true));
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
+                //user has change CU attribute, need to update local ones
+                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
+                break;
             }
         }
     }

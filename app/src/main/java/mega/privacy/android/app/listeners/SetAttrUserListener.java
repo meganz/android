@@ -2,24 +2,39 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
+import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 
 public class SetAttrUserListener extends BaseListener {
 
+    // FragmentTag is for storing the fragment which has the api call within Activity Context
+    private FragmentTag fragmentTag;
+
     public SetAttrUserListener(Context context) {
         super(context);
+    }
+
+    public SetAttrUserListener(Context context, FragmentTag fragmentTag) {
+        super(context);
+        this.fragmentTag = fragmentTag;
     }
 
     @Override
@@ -61,6 +76,56 @@ public class SetAttrUserListener extends BaseListener {
                     notifyNicknameUpdate(context, request.getNodeHandle());
                 } else {
                     logError("Error adding, updating or removing the alias" + e.getErrorCode());
+                }
+                break;
+            case USER_ATTR_CAMERA_UPLOADS_FOLDER:
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    MegaPreferences prefs = dBH.getPreferences();
+                    // Database and preference update
+                    if (prefs == null) return;
+
+                    long primaryHandle = request.getNodeHandle();
+                    long secondaryHandle = request.getParentHandle();
+                    if(primaryHandle != INVALID_HANDLE){
+                        resetPrimaryTimeline();
+                        dBH.setCamSyncHandle(primaryHandle);
+                        prefs.setCamSyncHandle(String.valueOf(primaryHandle));
+                        forceUpdateCameraUploadFolderIcon(false, primaryHandle);
+                        if (context instanceof CameraUploadsService) {
+                            ((CameraUploadsService) context).onSetFolderAttribute();
+                        } else {
+                            JobUtil.stopRunningCameraUploadService(context);
+                            JobUtil.startCameraUploadServiceIgnoreAttr(context);
+                        }
+                    }
+                    if (secondaryHandle != INVALID_HANDLE) {
+                        resetSecondaryTimeline();
+                        dBH.setSecondaryFolderHandle(secondaryHandle);
+                        prefs.setMegaHandleSecondaryFolder(String.valueOf(secondaryHandle));
+                        forceUpdateCameraUploadFolderIcon(true, secondaryHandle);
+                        //make sure to start the process once secondary is enabled
+                        if (context instanceof CameraUploadsService) {
+                            ((CameraUploadsService) context).onSetFolderAttribute();
+                        } else {
+                            JobUtil.stopRunningCameraUploadService(context);
+                            JobUtil.startCameraUploadServiceIgnoreAttr(context);
+                        }
+                    }
+
+                   if (context instanceof ManagerActivityLollipop && fragmentTag == SETTINGS) {
+                        SettingsFragmentLollipop settingsFragment = ((ManagerActivityLollipop) context).getSettingsFragment();
+                        if (settingsFragment != null) {
+                            if (primaryHandle != INVALID_HANDLE) {
+                                settingsFragment.setCUDestinationFolder(false, primaryHandle);
+                            }
+                            if (secondaryHandle != INVALID_HANDLE) {
+                                settingsFragment.setCUDestinationFolder(true, secondaryHandle);
+                            }
+                        }
+                    }
+                } else {
+                    logWarning("Set CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    JobUtil.stopRunningCameraUploadService(context);
                 }
                 break;
         }

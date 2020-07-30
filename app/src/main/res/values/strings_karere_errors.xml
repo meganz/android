@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_ok" context="Label to show that an SDK operation has been complete successfully.">No error</string>
+    <string name="error_args" context="Label to show that an error of Invalid argument occurs during a SDK operation.">Invalid argument</string>
+    <string name="error_access" context="Label to show that an error related with an denied access occurs during a SDK operation.">Access denied</string>
+    <string name="error_noent" context="Label to show that an error related to a non-existent resource occurs during a Mega Chat operation.">Resource does not exist.</string>
+    <string name="error_exist" context="Label to show that an error related to an already existing resource occurs during a Mega Chat operation.">Resource already exists.</string>
+    <string name="error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">Unknown error</string>
+    <string name="error_toomany" context="Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation.">Too many uses for this resource.</string>
+</resources>

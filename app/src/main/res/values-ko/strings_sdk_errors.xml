@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="api_ok" context="Label to show that an SDK operation has been complete successfully.">오류 없음</string>
+    <string name="api_einternal" context="Label to show that an Internal error occurs during a SDK operation.">내부 오류</string>
+    <string name="api_eargs" context="Label to show that an error of Invalid argument occurs during a SDK operation.">잘못된 인수</string>
+    <string name="api_eagain" context="Label to show that a request error occurs during a SDK operation.">요청이 실패함, 재시도중</string>
+    <string name="api_eratelimit" context="Label to show that the rate limit has been reached during a SDK operation.">비율 제한 초과</string>
+    <string name="api_efailed" context="Label to show that a SDK operation has failed permanently.">영구적으로 실패함</string>
+    <string name="api_etoomany_ec_download" context="Error shown when terms of service are breached during download.">이용 약관 침해됨</string>
+    <string name="api_etoomay" context="Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation.">너무 많은 동시 연결 또는 전송</string>
+    <string name="api_erange" context="Label to show that an error of Out of range occurs during a SDK operation.">범위를 벗어남</string>
+    <string name="api_eexpired" context="State to indicate something has expired (achivements of business status account for instance)">만료됨</string>
+    <string name="api_enoent" context="Label to show that an error related with a resource Not found occurs during a SDK operation.">발견되지 않음</string>
+    <string name="api_ecircular_ec_upload" context="Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation.">재귀적 경로 구조로 인하여 전송 실패</string>
+    <string name="api_ecircular" context="Label to show that an error related with a circular linkage occurs during a SDK operation.">순환 연결 감지</string>
+    <string name="api_eaccess" context="Label to show that an error related with an denied access occurs during a SDK operation.">접근이 거부됨</string>
+    <string name="api_eexist" context="Label to show that an error related with an existent resource occurs during a SDK operation.">이미 존재합니다</string>
+    <string name="api_eincomplete" context="Label to show that an error related with an Incomplete SDK operation.">완료되지 않음</string>
+    <string name="api_ekey" context="Label to show that an error related with the decryption process of a node occurs during a SDK operation.">잘못된 키/해독 오류</string>
+    <string name="api_esid" context="Label to show that an error related with a bad session ID occurs during a SDK operation.">세션 ID 오류</string>
+    <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">이용 약관 위반으로 인하여 접근 불가</string>
+    <string name="api_eblocked" context="Label to show that an error related with a blocked account occurs during a SDK operation.">차단됨</string>
+    <string name="api_eoverquota" context="Label to show that an error related with an over quota occurs during a SDK operation.">할당량 초과</string>
+    <string name="api_etempunavail" context="Label to show that an error related with a temporary problem occurs during a SDK operation.">일시적으로 이용이 불가능합니다</string>
+    <string name="api_etoomanyconnections" context="Label to show that an error related with too many connections occurs during a SDK operation.">연결 초과</string>
+    <string name="api_ewrite" context="Label to show that an error related with an write error occurs during a SDK operation.">쓰기 오류</string>
+    <string name="api_eread" context="Label to show that an error related with an read error occurs during a SDK operation.">읽기 오류</string>
+    <string name="api_eappkey" context="Label to show that an error related with an invalid or missing application key occurs during a SDK operation.">잘못된 어플리케이션 키</string>
+    <string name="api_essl" context="Error shown when SSL check has failed">SSL 인증 실패</string>
+    <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">충분하지 않은 할당량</string>
+    <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">2단계 인증이 필요합니다.</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
+    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">당신의 비즈니스 계정이 만료되었습니다</string>
+    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>
+    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Billing failed</string>
+    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Rejected by fraud protection</string>
+    <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Too many requests</string>
+    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Balance error</string>
+    <string name="payment_egeneric_api_error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">알 수 없는 오류</string>
+    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">HTTP Error</string>
+</resources>

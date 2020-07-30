@@ -249,7 +249,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">سحابة التخزين</string>
     <string name="section_recents" context="Label to reference a recents section">مؤخراً</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">تحميل الوسائط</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">تحميلات الوسائط</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">صندوق الوارد</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">حفظ الملفات للعمل دون اتصال</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">غير متاح</string>
@@ -267,7 +267,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">نقل</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">حسابي</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">تحميلات الكاميرا</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">رفع الألبوم</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -692,6 +692,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">رفع ملفات مجلدات الميديا</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">التحقق من الملفات المراد ترفيعها</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">تهيئة ترفيعات الكاميرا</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -762,7 +765,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او بيانات الموبايل</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">شبكة الوايرلس فقط</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">رفع ملف</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -917,6 +919,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">السجلات تم تفعيلها</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">السجلات تم إيقافها</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Unable to setup MEGA Camera Uploads folder</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">لم يتم تمكين السجلات لأنك رفضت منح الأذونات المطلوبة</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">فتح الموقع</string>
@@ -1541,6 +1544,8 @@
     <string name="general_view" context="Menu option">عرض الملفات</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">استيراد</string>
     <string name="save_for_offline" context="Menu option">احفظ دون اتصال</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Add to Cloud</string>
+    <string name="save_to_offline" context="Menu option to choose save to offline section">Save to Offline</string>
 
     <string name="general_view_contacts" context="Menu option">عرض جهات الاتصال</string>
 
@@ -1656,6 +1661,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">جار إزالة جهة الاتصال من مجلد المشاركة</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Camera Uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">الحذف من MEGA؟</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">إذا تركت المجلد، لن تكون قادراً على الوصول إليه مرة أخرى.</string>
@@ -1873,12 +1880,12 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">تم إنهاء حسابك بسبب مخالفة شروط الخدمة الخاصة ب MEGA، مثل إساءة استخدام حقوق الآخرين؛ مشاركة /أو استيراد البيانات غير المشروعة؛ أو إساءة استخدام النظام.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">لا توجد ملفات</string>
-    <string name="label_file_size_byte" context="size in byte">%s بايت</string>
-    <string name="label_file_size_kilo_byte" context="size in kilobyte">%s كيلو بايت</string>
-    <string name="label_file_size_mega_byte" context="size in megabyte">%s ميغابايب</string>
-    <string name="label_file_size_giga_byte" context="size in gigabyte">%s جيجابايت</string>
-    <string name="label_file_size_tera_byte" context="size in terabyte">%s تيرابايت</string>
-    <string name="label_mega_byte" context="size in byte">بايت</string>
+    <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s بايت</string>
+    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
+    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s MB</string>
+    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s GB</string>
+    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s TB</string>
+    <string name="label_mega_byte" context="Size in megabytes.">ميغابايب</string>
 
     <plurals name="number_of_versions" formatted="false">
         <item context="Number of versions of a file shown on the screen info of the file, version item" quantity="one">%1$d نسخة معدلة</item>
@@ -2287,7 +2294,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">حدث خطأ عند تحميل رابط المحادثة.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">أنت تحاول استعراض محادثة كنت عضواً فيها سابقاً. هل تريد الانضمام إلى المحادثة مرة أخرى؟</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">أنت تشارك بالفعل في هذه المحادثة.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">استعراض هذه المحادثة لم يعد متاحاً. إذا غادرت الاستعراض، فلن تتمكن من إعادة فتحه.</string>
@@ -2766,4 +2772,7 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">هل تريد الحفظ دائماً في هذا الموقع؟</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">أرفق من &#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+
 </resources>

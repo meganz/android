@@ -249,7 +249,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Облачный диск</string>
     <string name="section_recents" context="Label to reference a recents section">Недавние</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Загрузки медиа</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">Загрузки медиафайлов</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Входящие</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Сохранено локально</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
@@ -267,7 +267,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Передачи</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Мой аккаунт</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Загрузки камеры</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">Загрузки с камеры</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -692,6 +692,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Загрузить файлы или медиапапки</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Проверка файлов для загрузки</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Инициализация загрузок из камеры</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -762,7 +765,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi или мобильные данные</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Только Wi-Fi</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Загрузить файл</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -917,6 +919,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Журнал включён</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Журнал отключён</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Unable to setup MEGA Camera Uploads folder</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Журналы не были включены, потому что вы отказали в необходимых разрешениях</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Расположение</string>
@@ -1541,6 +1544,8 @@
     <string name="general_view" context="Menu option">Просмотр файлов</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Импортировать</string>
     <string name="save_for_offline" context="Menu option">Сохранить локально</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Add to Cloud</string>
+    <string name="save_to_offline" context="Menu option to choose save to offline section">Save to Offline</string>
 
     <string name="general_view_contacts" context="Menu option">Просмотр контактов</string>
 
@@ -1656,6 +1661,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Удаление контакта из общей папки</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Переместить в корзину?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Вы действительно хотите переместить эту папку в корзину? Это отключит загрузки из камеры.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Переместить в корзину?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Удалить с MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Если вы закроете папку, вы не сможете зайти в неё снова.</string>
@@ -2287,7 +2294,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Ошибка инициализации чата при загрузке ссылки на чат.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Вы пытаетесь просмотреть чат, участником которого вы были ранее. Хотите снова присоединиться к чату?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Вы уже участвуете в этом чате.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Это превью чата больше не доступно. Покинув превью, вы не сможете открыть его снова.</string>
@@ -2766,4 +2772,7 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Всегда сохранять в эту папку?</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Прикрепить из&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+
 </resources>

@@ -260,7 +260,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if (!multipleSelect) {
 					//Multiselect OFF
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					createGroupChatAvatar(holder, chat.getTitle());
+					createGroupChatAvatar(holder, getTitleChat(chat));
 				} else {
 					logDebug("Multiselect ON");
 
@@ -272,7 +272,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						logDebug("NOT selected");
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						createGroupChatAvatar(holder, chat.getTitle());
+						createGroupChatAvatar(holder, getTitleChat(chat));
 					}
 				}
 			}
@@ -973,7 +973,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(holder!=null){
 
 			MegaChatListItem chat = chats.get(position);
-			String title = chat.getTitle();
+			String title = getTitleChat(chat);
 
 			if(title!=null){
 				logDebug("ChatRoom id: "+chat.getChatId());
@@ -1090,14 +1090,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 
-	private String getMessageSenderName(MegaChatRoom chatRoom, long chatId,long handle){
+	private String getMessageSenderName(MegaChatRoom chatRoom, long chatId, long handle) {
 		String fullNameAction = getNicknameContact(handle);
 
-		if(fullNameAction == null )
+		if (isTextEmpty(fullNameAction) && chatRoom != null) {
 			fullNameAction = chatRoom.getPeerFullnameByHandle(handle);
+		}
 
-		if(isTextEmpty(fullNameAction))
+		if (isTextEmpty(fullNameAction)) {
 			fullNameAction = cC.getFullName(handle, chatId);
+		}
 
 		return fullNameAction;
 	}

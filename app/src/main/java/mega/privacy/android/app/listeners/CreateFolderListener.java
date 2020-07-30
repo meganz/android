@@ -3,9 +3,11 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -16,15 +18,22 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CreateFolderListener extends BaseListener {
 
-    private boolean isMyChatFiles;
+    public enum ExtraAction {
+        NONE,
+        MY_CHAT_FILES,
+        INIT_CU
+    }
+
+    private ExtraAction extraAction;
 
     public CreateFolderListener(Context context) {
         super(context);
+        this.extraAction = ExtraAction.NONE;
     }
 
-    public CreateFolderListener(Context context, boolean isMyChatFiles) {
+    public CreateFolderListener(Context context, ExtraAction extraAction) {
         super(context);
-        this.isMyChatFiles = isMyChatFiles;
+        this.extraAction = extraAction;
     }
 
     @Override
@@ -35,11 +44,33 @@ public class CreateFolderListener extends BaseListener {
         MegaNode node = api.getNodeByHandle(handle);
         String name = request.getName();
 
+        if (extraAction == ExtraAction.INIT_CU) {
+            if (name.equals(context.getString(R.string.section_photo_sync))) {
+                CameraUploadsService.isCreatingPrimary = false;
+                //set primary only
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
+                } else {
+                    logWarning("Create CU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    JobUtil.stopRunningCameraUploadService(context);
+                }
+            } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
+                CameraUploadsService.isCreatingSecondary = false;
+                //set secondary only
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
+                } else {
+                    logWarning("Create MU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
+                    JobUtil.stopRunningCameraUploadService(context);
+                }
+            }
+        }
+
         if (context instanceof FileExplorerActivityLollipop) {
             FileExplorerActivityLollipop fileExplorerActivityLollipop = (FileExplorerActivityLollipop) context;
 
             if (e.getErrorCode() == MegaError.API_OK) {
-                if (isMyChatFiles) {
+                if (extraAction == ExtraAction.MY_CHAT_FILES) {
                     fileExplorerActivityLollipop.setMyChatFilesFolder(node);
                     api.setMyChatFilesFolder(handle, new SetAttrUserListener(fileExplorerActivityLollipop));
                     fileExplorerActivityLollipop.checkIfFilesExistsInMEGA();
@@ -47,7 +78,7 @@ public class CreateFolderListener extends BaseListener {
                     fileExplorerActivityLollipop.finishCreateFolder(true, handle);
                 }
             } else {
-                if (isMyChatFiles) {
+                if (extraAction == ExtraAction.MY_CHAT_FILES) {
                     fileExplorerActivityLollipop.showSnackbar(context.getString(R.string.general_text_error));
                 } else {
                     fileExplorerActivityLollipop.finishCreateFolder(false, handle);
@@ -78,6 +109,8 @@ public class CreateFolderListener extends BaseListener {
             } else {
                 nodeAttachmentHistoryActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error));
             }
+        } else if (context instanceof CameraUploadsService) {
+            ((CameraUploadsService) context).onCreateFolder(e.getErrorCode() == MegaError.API_OK);
         }
 
         if (e.getErrorCode() != MegaError.API_OK) {

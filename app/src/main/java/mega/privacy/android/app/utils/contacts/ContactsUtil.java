@@ -37,8 +37,7 @@ public class ContactsUtil {
 
         private LocalContact(long id, String name) {
             this.id = id;
-            //If contact name has double quotes replace by single quotes to avoid JSON parse error of the string
-            this.name = name == null ? "" : name.replaceAll("\"","''");
+            this.name = name == null ? "" : name;
         }
 
         public long getId() {
