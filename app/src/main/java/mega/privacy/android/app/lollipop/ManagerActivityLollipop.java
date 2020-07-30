@@ -381,6 +381,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public Toolbar tB;
     ActionBar aB;
     AppBarLayout abL;
+	private AppBarLayout toolbarLayout;
 
 	int selectedPaymentMethod;
 	int selectedAccountType;
@@ -2052,8 +2053,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
 			registerReceiver(chatCallUpdateReceiver, filterCall);
 
-			IntentFilter filterSession = new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD);
-			registerReceiver(chatSessionUpdateReceiver, filterSession);
+			registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -2230,6 +2230,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //		dbH.setSecondaryFolderHandle(num);
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
+		toolbarLayout = (AppBarLayout) findViewById(R.id.toolbar_and_tabs_layout);
 
 		tB = (Toolbar) findViewById(R.id.toolbar);
 		if(tB==null){
@@ -2535,6 +2536,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
+		changeToolbarLayoutElevation();
 
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
@@ -6414,8 +6416,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				} else if (drawerItem == DrawerItem.CHAT){
 					resetActionBar(aB);
 				}
-				hideCallMenuItem();
-				hideCallWidget();
+
+				hideCallMenuItem(chronometerMenuItem, returnCallMenuItem);
+				hideCallWidget(ManagerActivityLollipop.this, callInProgressChrono, callInProgressLayout);
 				return true;
 			}
 
@@ -6424,7 +6427,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("onMenuItemActionCollapse()");
 				searchExpand = false;
 				setCallWidget();
-				setCallMenuItem();
+				setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
 				if (drawerItem == DrawerItem.CHAT) {
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
@@ -6571,7 +6574,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
-		setCallMenuItem();
+		setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
 
 		if (isOnline(this)) {
 			switch (drawerItem) {
@@ -16030,7 +16033,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else if (option == COLOR_STATUS_BAR_ZERO_DELAY){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
-
 	}
 
 	public void setDrawerLockMode (boolean locked) {
@@ -16041,6 +16043,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     }
+
+	/**
+	 * This method is used to change the elevation of the toolbar when a call is in progress.
+	 */
+	public void changeToolbarLayoutElevation() {
+		toolbarLayout.setElevation(callInProgressLayout.getVisibility() == View.VISIBLE ?
+				px2dp(16, outMetrics) : 0);
+	}
 
 	public void changeActionBarElevation(boolean withElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -16698,71 +16708,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void setCallWidget() {
 		setCallBadge();
 
-		if (drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS &&
-				drawerItem != DrawerItem.CHAT && drawerItem != DrawerItem.CONTACTS &&
-				drawerItem != DrawerItem.INBOX && drawerItem != DrawerItem.SAVED_FOR_OFFLINE ||
-				!isScreenInPortrait(this)) {
-
-			hideCallWidget();
+		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.ACCOUNT ||
+				drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.TRANSFERS ||
+				drawerItem == DrawerItem.NOTIFICATIONS || !isScreenInPortrait(this)) {
+			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
+
 		}
 
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
-	}
-
-	private void hideCallWidget() {
-		if (callInProgressChrono != null) {
-			activateChrono(false, callInProgressChrono, null);
-		}
-		if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
-			callInProgressLayout.setVisibility(View.GONE);
-		}
-	}
-
-	/**
-	 * This method shows or hides the toolbar icon to return a call when a call is in progress
-	 * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
-	 */
-	private void setCallMenuItem(){
-		if((drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.CLOUD_DRIVE ||
-				drawerItem == DrawerItem.SHARED_ITEMS || drawerItem == DrawerItem.CONTACTS ||
-				drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.SAVED_FOR_OFFLINE) &&
-				!isScreenInPortrait(this) && participatingInACall() &&
-				getChatCallInProgress() != MEGACHAT_INVALID_HANDLE && !isSessionOnHold(getChatCallInProgress())){
-			returnCallMenuItem.setVisible(true);
-
-			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress());
-			int callStatus = call.getStatus();
-
-			if(callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
-				layoutCallMenuItem.setBackground(ContextCompat.getDrawable(this,R.drawable.reconnection_rounded));
-			}else{
-				layoutCallMenuItem.setBackground(ContextCompat.getDrawable(this,R.drawable.dark_rounded_chat_own_message));
-			}
-
-			if(chronometerMenuItem != null && (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)){
-				if(chronometerMenuItem.getVisibility() == View.VISIBLE) return;
-				chronometerMenuItem.setVisibility(View.VISIBLE);
-				chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
-				chronometerMenuItem.start();
-				chronometerMenuItem.setFormat(" %s");
-			}else{
-				if(chronometerMenuItem.getVisibility() == View.GONE) return;
-				chronometerMenuItem.stop();
-				chronometerMenuItem.setVisibility(View.GONE);
-			}
-		}else {
-			hideCallMenuItem();
-		}
-	}
-
-	private void hideCallMenuItem() {
-		if (chronometerMenuItem != null) {
-			chronometerMenuItem.stop();
-		}
-		if (returnCallMenuItem != null) {
-			returnCallMenuItem.setVisible(false);
-		}
 	}
 
 	/**

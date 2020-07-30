@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.palette.graphics.Palette;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -48,6 +49,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -92,6 +94,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -233,8 +236,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	Drawable drawableArrow;
 	Drawable drawableDots;
 
-	MenuItem shareMenuItem;
-	MenuItem sendFileMenuItem;
+	private MenuItem shareMenuItem;
+	private MenuItem sendFileMenuItem;
+	private MenuItem returnCallMenuItem;
+	private Chronometer chronometerMenuItem;
+	private LinearLayout layoutCallMenuItem;
+
 	boolean isShareFolderExpanded;
     ContactSharedFolderFragment sharedFoldersFragment;
     MegaNode selectedNode;
@@ -248,6 +255,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private AskForDisplayOverDialog askForDisplayOverDialog;
 
     private boolean waitingForCall;
+
+	private RelativeLayout callInProgressLayout;
+	private Chronometer callInProgressChrono;
+	private TextView callInProgressText;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -284,10 +295,80 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	};
 
+	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+					return;
+
+				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
+				switch (callStatus) {
+					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+					case MegaChatCall.CALL_STATUS_RING_IN:
+					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+					case MegaChatCall.CALL_STATUS_RECONNECTING:
+					case MegaChatCall.CALL_STATUS_JOINING:
+					case MegaChatCall.CALL_STATUS_DESTROYED:
+					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+						if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
+							setCallWidget();
+						} else {
+							supportInvalidateOptionsMenu();
+						}
+						break;
+				}
+			}
+
+			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
+				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+					return;
+
+				if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
+					setCallWidget();
+				} else {
+					supportInvalidateOptionsMenu();
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+				return;
+
+			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
+				if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
+					setCallWidget();
+				} else {
+					supportInvalidateOptionsMenu();
+				}
+			}
+		}
+	};
+
 	private void setAppBarOffset(int offsetPx){
-		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-		behavior.onNestedPreScroll(fragmentContainer, appBarLayout, null, 0, offsetPx, new int[]{0, 0});
+		if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
+			changeToolbarLayoutElevation();
+		} else {
+			CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+			AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+			assert behavior != null;
+			behavior.onNestedPreScroll(fragmentContainer, appBarLayout, null, 0, offsetPx, new int[]{0, 0});
+		}
 	}
 
 	@Override
@@ -400,6 +481,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					setAppBarOffset(50);
 				}
 			});
+
+			callInProgressLayout = findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout.setOnClickListener(this);
+			callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
+			callInProgressText = findViewById(R.id.call_in_progress_text);
+			callInProgressLayout.setVisibility(View.GONE);
 
 			//OPTIONS LAYOUT
 			optionsLayout = findViewById(R.id.chat_contact_properties_options);
@@ -528,6 +615,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 
 			updateVerifyCredentialsLayout();
+			setCallWidget();
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
@@ -639,6 +727,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, userNameUpdateFilter);
+
+		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
+		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
+		registerReceiver(chatCallUpdateReceiver, filterCall);
+
+		registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
 	}
 
 	private void visibilityStateIcon() {
@@ -772,6 +866,15 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
 		sendFileMenuItem = menu.findItem(R.id.cab_menu_send_file);
+		returnCallMenuItem = menu.findItem(R.id.action_return_call);
+		RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
+		layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
+		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
+		chronometerMenuItem.setVisibility(View.GONE);
+
+		rootView.setOnClickListener(v -> onOptionsItemSelected(returnCallMenuItem));
+		setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
+
 		sendFileMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		if(isOnline(this)){
@@ -862,6 +965,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				sendFileToChat();
 				break;
 			}
+			case R.id.action_return_call:
+				if (checkPermissionsCall()) {
+					returnActiveCall(this);
+				}
+				return true;
 		}
 		return true;
 	}
@@ -1316,6 +1424,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				Intent intent = new Intent(this, AuthenticityCredentialsActivity.class);
 				intent.putExtra(EMAIL, user.getEmail());
 				startActivity(intent);
+				break;
+
+			case R.id.call_in_progress_layout:
+				if(checkPermissionsCall()){
+					returnActiveCall(this);
+				}
 				break;
 		}
 	}
@@ -1780,6 +1894,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
+		unregisterReceiver(chatCallUpdateReceiver);
+		unregisterReceiver(chatSessionUpdateReceiver);
 	}
 
 	@Override
@@ -2550,5 +2666,29 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		} else {
 			verifyCredentialsLayout.setVisibility(View.GONE);
 		}
+	}
+
+	/**
+	 * This method is used to change the elevation of the toolbar.
+	 */
+	public void changeToolbarLayoutElevation() {
+		appBarLayout.setElevation(callInProgressLayout.getVisibility() == View.VISIBLE ?
+				px2dp(16, outMetrics) : 0);
+
+		if (callInProgressLayout.getVisibility() == View.VISIBLE) {
+			appBarLayout.setExpanded(false);
+		}
+	}
+
+	/**
+	 * This method sets "Tap to return to call" banner when there is a call in progress.
+	 */
+	private void setCallWidget() {
+		if (!isScreenInPortrait(this)) {
+			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
+			return;
+		}
+
+		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
 	}
 }

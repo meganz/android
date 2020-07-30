@@ -10,8 +10,10 @@ import android.os.SystemClock;
 import androidx.core.content.ContextCompat;
 
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Chronometer;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -208,8 +210,7 @@ public class CallUtil {
         ArrayList<Long> currentChatCallsList = getCallsParticipating();
 
         if (!participatingInACall() || currentChatCallsList == null) {
-            callInProgressLayout.setVisibility(View.GONE);
-            activateChrono(false, callInProgressChrono, null);
+            hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
             return;
         }
 
@@ -224,8 +225,7 @@ public class CallUtil {
             }
         }
         if (callsActive.isEmpty()) {
-            callInProgressLayout.setVisibility(View.GONE);
-            activateChrono(false, callInProgressChrono, null);
+            hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
             return;
         }
 
@@ -257,6 +257,103 @@ public class CallUtil {
         }
 
         callInProgressLayout.setVisibility(View.VISIBLE);
+        if(context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop)context).changeToolbarLayoutElevation();
+        }
+        if(context instanceof ContactInfoActivityLollipop) {
+            ((ContactInfoActivityLollipop)context).changeToolbarLayoutElevation();
+        }
+    }
+
+    /**
+     * This method is used to hide the current call banner.
+     *
+     * @param context              The Activity context.
+     * @param callInProgressLayout RelativeLayout to be hidden
+     * @param callInProgressChrono Chronometer of the banner.
+     */
+    private static void hideCallInProgressLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
+        callInProgressLayout.setVisibility(View.GONE);
+        activateChrono(false, callInProgressChrono, null);
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+        }
+        if (context instanceof ContactInfoActivityLollipop) {
+            ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+        }
+    }
+
+    /**
+     * This method shows or hides the toolbar icon to return a call when a call is in progress
+     * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
+     */
+    public static void setCallMenuItem(final MenuItem returnCallMenuItem, final LinearLayout layoutCallMenuItem, final Chronometer chronometerMenuItem){
+        Context context = MegaApplication.getInstance().getBaseContext();
+        if (!isScreenInPortrait(context) &&
+                participatingInACall() && getChatCallInProgress() != MEGACHAT_INVALID_HANDLE &&
+                !isSessionOnHold(getChatCallInProgress())) {
+            returnCallMenuItem.setVisible(true);
+
+            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(getChatCallInProgress());
+            int callStatus = call.getStatus();
+
+            if(callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
+                layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context,R.drawable.reconnection_rounded));
+            }else{
+                layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context,R.drawable.dark_rounded_chat_own_message));
+            }
+
+            if(chronometerMenuItem != null && (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)){
+                if(chronometerMenuItem.getVisibility() == View.VISIBLE) return;
+                chronometerMenuItem.setVisibility(View.VISIBLE);
+                chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
+                chronometerMenuItem.start();
+                chronometerMenuItem.setFormat(" %s");
+            }else{
+                if(chronometerMenuItem.getVisibility() == View.GONE) return;
+                chronometerMenuItem.stop();
+                chronometerMenuItem.setVisibility(View.GONE);
+            }
+        }else {
+            hideCallMenuItem(chronometerMenuItem, returnCallMenuItem);
+        }
+    }
+
+    /**
+     * This method is used to hide the current call menu item.
+     *
+     * @param chronometerMenuItem Chronometer of the MenuItem.
+     * @param returnCallMenuItem  MenuItem to be hidden.
+     */
+    public static void hideCallMenuItem(final Chronometer chronometerMenuItem, final MenuItem returnCallMenuItem) {
+        if (chronometerMenuItem != null) {
+            chronometerMenuItem.stop();
+        }
+        if (returnCallMenuItem != null) {
+            returnCallMenuItem.setVisible(false);
+        }
+    }
+
+    /**
+     * This method is used to hide the current call banner and update the toolbar elevation.
+     *
+     * @param context              The Activity context.
+     * @param callInProgressChrono Chronometer of the banner.
+     * @param callInProgressLayout RelativeLayout to be hidden.
+     */
+    public static void hideCallWidget(Context context, final Chronometer callInProgressChrono, final RelativeLayout callInProgressLayout) {
+        if (callInProgressChrono != null) {
+            activateChrono(false, callInProgressChrono, null);
+        }
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
+            callInProgressLayout.setVisibility(View.GONE);
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+            }
+            if (context instanceof ContactInfoActivityLollipop) {
+                ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+            }
+        }
     }
 
     /**

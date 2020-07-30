@@ -29,49 +29,56 @@
                 android:layout_height="wrap_content"
                 android:theme="@style/Theme.Megaactionbar">
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/toolbar_and_tabs_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?attr/actionBarSize"
-                    android:background="?attr/colorPrimary"
-                    app:popupTheme="@style/Theme.Megaactionbar"
-                    app:titleTextAppearance="@style/ToolbarTitle"
-                    app:subtitleTextAppearance="@style/ToolbarSubtitle"
-                    app:theme="@style/Theme.Megaactionbar"
-                    tools:context=".ManagerActivityLollipop"/>
+                    android:theme="@style/Theme.Megaactionbar">
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_cloud"
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        style="@style/MyCustomTabLayout"/>
+                        android:minHeight="?attr/actionBarSize"
+                        android:background="?attr/colorPrimary"
+                        app:popupTheme="@style/Theme.Megaactionbar"
+                        app:titleTextAppearance="@style/ToolbarTitle"
+                        app:subtitleTextAppearance="@style/ToolbarSubtitle"
+                        app:theme="@style/Theme.Megaactionbar"
+                        tools:context=".ManagerActivityLollipop"/>
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_contacts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        style="@style/MyCustomTabLayout"/>
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/sliding_tabs_cloud"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            style="@style/MyCustomTabLayout"/>
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_shares"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/MyCustomTabLayout"/>
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/sliding_tabs_contacts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            style="@style/MyCustomTabLayout"/>
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_my_account"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/MyCustomTabLayout"/>
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/sliding_tabs_shares"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/MyCustomTabLayout"/>
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_transfers"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/MyCustomTabLayout"/>
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/sliding_tabs_my_account"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/MyCustomTabLayout"/>
+
+                        <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/sliding_tabs_transfers"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/MyCustomTabLayout"/>
+                    </com.google.android.material.appbar.AppBarLayout>
 
                 <include layout="@layout/item_transfers_overview"/>
 
