@@ -75,10 +75,12 @@ public class BillingManagerImpl implements BillingManager {
     public static final String SKU_PRO_LITE_YEAR = "mega.huawei.prolite.oneyear";
 
     /** Public key for verify purchase. */
-    private static final String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhq5dfS3JJkugYdnasvQyDqwx9RKwySDmCLItVsSPcSAaxtioas2Fobdba8CleeE4vBRRqxHEUVnpa+JBo9xnzgEx0yX4Mo++wi7LERCO4WJLsuDgogPjPVFBw8W0VZgENNkjI7MiuCQwAXhCEurE4wxUudbKLdy15dphNba0BMQy6U3VJSmfLQOqoAFI5mz2TwzFuoCDVY3LlAzWZMtl/baNfHsZa4XKT7C3wSnrvXL+AoBUWfRtt3+JBtLDchhbcJT8KHa/7lXaXTx0yZIUq9J3gLKbPP+Z8EPxT0N/XLiXsWiDr+iKqZjpatys0TIgoWn547+1V2yneWxPRxc+0QIDAQAB";
+    private static final String PUBLIC_KEY = "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA0xFr23QlccDUinSmbgDayePoxUCXxOtGzMgBPeB2EctW1v5m5nU4wUSDt2xMLtQVN6k+bGios/aphF+3fT3KWAlnjLgRyLwJ3G4MxmdXXjvI5OSp+8peCEQ/z3QFZ/+A5qssK88l9aRmobZcVH5q0X/H4G7nLZO4leXhXuBRNnHRTw6CNAv9tt9sjyKwMUOKJk9Ev+FpPYORcq/6Db1Q+hq9dsZOZImZAKSmmvdkdeczqvoZxVCD1EgWywfrLWZc8JjiaZHCRLFfMUkZ6SKObcv0/En97Rl7ih4tcW7FHo5ikKPgWy18nMg4/uZHO1biS6e2OyPL/XETiN3RuwR84qYg/FDmvdfqP9c4dt7z9WeYBia+4TjSpTdvUJl49qSKyrQkvk0z/HiafFbt9uiIDL+lHgU+944F8RWkQkogcZCJkUjuHihi/ZWQZitRmYNly+IQKc4d32hpgmaAtQoZHI92mABxmzWNDdnCF8nHFTl0g3FrL+WRsfd0eM/qtIknAgMBAAE=";
 
     public static final int PAY_METHOD_RES_ID = R.string.payment_method_huawei_wallet;
     public static final int PAY_METHOD_ICON_RES_ID = R.drawable.huawei_wallet_ic;
+
+    public static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
 
     private String payload;
 
@@ -181,7 +183,7 @@ public class BillingManagerImpl implements BillingManager {
     @Override
     public boolean verifyValidSignature(String signedData, String signature) {
         try {
-            return Security.verifyPurchase(signedData, signature);
+            return Security.verifyPurchase(signedData, signature, PUBLIC_KEY);
         } catch (IOException e) {
             logWarning("Purchase failed to valid signature", e);
             return false;
@@ -206,7 +208,6 @@ public class BillingManagerImpl implements BillingManager {
         req.setPriceType(IapClient.PriceType.IN_APP_SUBSCRIPTION);
         req.setProductId(skuDetails.getSku());
         req.setDeveloperPayload(payload);
-
 
         Task<PurchaseIntentResult> task = iapClient.createPurchaseIntent(req);
         task.addOnSuccessListener(result -> {
@@ -355,7 +356,6 @@ public class BillingManagerImpl implements BillingManager {
 
         public static MegaSku convert(ProductInfo sku) {
             MegaSku megaSku = new MegaSku();
-            //TODO
             megaSku.setSku(sku.getProductId());
             return megaSku;
         }
@@ -378,7 +378,6 @@ public class BillingManagerImpl implements BillingManager {
             purchase.setToken(data.getPurchaseToken());
             purchase.setState(data.getPurchaseState());
             purchase.setSku(data.getProductId());
-            //TODO get the receipt
             purchase.setReceipt(originalJson);
             return purchase;
         }

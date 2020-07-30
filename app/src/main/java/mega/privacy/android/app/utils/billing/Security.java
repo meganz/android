@@ -28,6 +28,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.SIGNATURE_ALGORITHM;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
@@ -38,7 +39,6 @@ public class Security {
     private static final String TAG = "IABUtil/Security";
 
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
-    private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
     /**
      * Verifies that the data was signed with the given signature, and returns the verified

@@ -99,6 +99,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     public static final int PAY_METHOD_RES_ID = R.string.payment_method_google_wallet;
     public static final int PAY_METHOD_ICON_RES_ID = R.drawable.google_wallet_ic;
 
+    public static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
+
     private String payload;
     private BillingClient mBillingClient;
     private boolean mIsServiceConnected;

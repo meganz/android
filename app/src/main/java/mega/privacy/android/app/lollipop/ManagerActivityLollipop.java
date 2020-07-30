@@ -12075,6 +12075,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 int purchaseResult = mBillingManager.getPurchaseResult(intent);
                 if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
                     mBillingManager.updatePurchase();
+                } else {
+                    //TODO already owned
                 }
             } else {
                 logWarning("cancel subscribe");
