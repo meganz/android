@@ -2056,6 +2056,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 @Override
                 public void onClick(View v) {
                     if (context != null && context instanceof ManagerActivityLollipop
+                        && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
                         && isOnline(context)) {
                         ((ManagerActivityLollipop) context).showPresenceStatusDialog();
                     }
@@ -2075,7 +2076,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             actionBarSubtitle.setText(subtitle);
         }
         if (actionBarSubtitleArrow != null) {
-            actionBarSubtitleArrow.setVisibility(isOnline(context) ? View.VISIBLE : View.GONE);
+            boolean showArrow = megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
+                && isOnline(context);
+            actionBarSubtitleArrow.setVisibility(showArrow ? View.VISIBLE : View.GONE);
         }
     }
 }
