@@ -241,6 +241,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -1502,9 +1503,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()) {
 			if (lastPublicHandle == INVALID_HANDLE) {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, this);
+				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, this);
 			} else {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, lastPublicHandle,
+				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
 						attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
 			}
 		}

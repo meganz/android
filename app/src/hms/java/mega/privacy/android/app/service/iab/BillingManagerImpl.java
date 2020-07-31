@@ -37,6 +37,7 @@ import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
 import mega.privacy.android.app.utils.billing.Security;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
@@ -76,11 +77,10 @@ public class BillingManagerImpl implements BillingManager {
 
     /** Public key for verify purchase. */
     private static final String PUBLIC_KEY = "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA0xFr23QlccDUinSmbgDayePoxUCXxOtGzMgBPeB2EctW1v5m5nU4wUSDt2xMLtQVN6k+bGios/aphF+3fT3KWAlnjLgRyLwJ3G4MxmdXXjvI5OSp+8peCEQ/z3QFZ/+A5qssK88l9aRmobZcVH5q0X/H4G7nLZO4leXhXuBRNnHRTw6CNAv9tt9sjyKwMUOKJk9Ev+FpPYORcq/6Db1Q+hq9dsZOZImZAKSmmvdkdeczqvoZxVCD1EgWywfrLWZc8JjiaZHCRLFfMUkZ6SKObcv0/En97Rl7ih4tcW7FHo5ikKPgWy18nMg4/uZHO1biS6e2OyPL/XETiN3RuwR84qYg/FDmvdfqP9c4dt7z9WeYBia+4TjSpTdvUJl49qSKyrQkvk0z/HiafFbt9uiIDL+lHgU+944F8RWkQkogcZCJkUjuHihi/ZWQZitRmYNly+IQKc4d32hpgmaAtQoZHI92mABxmzWNDdnCF8nHFTl0g3FrL+WRsfd0eM/qtIknAgMBAAE=";
-
     public static final int PAY_METHOD_RES_ID = R.string.payment_method_huawei_wallet;
     public static final int PAY_METHOD_ICON_RES_ID = R.drawable.huawei_wallet_ic;
-
     public static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
+    public static final int PAYMENT_GATEWAY = MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET;
 
     private String payload;
 
