@@ -4,20 +4,23 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.widget.FrameLayout
-import android.widget.ImageView
 import androidx.annotation.NonNull
-import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
-
 import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.SearchQuerySectionBinding
+import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.utils.Util
 
 /**
@@ -27,16 +30,13 @@ import mega.privacy.android.app.utils.Util
  * The implementation refers to https://github.com/arimorty/floatingsearchview
  */
 class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
-    private var mainLayout: View? = null
-    private var searchInput: SearchInputView? = null
-
-    private var leftActionImageView: ImageView? = null
+    private var binding = SearchQuerySectionBinding.inflate(LayoutInflater.from(context))
 
     // The drawable in leftActionImageView, switching between hamburger icon and the left arrow icon
-    private var menuBtnDrawable: DrawerArrowDrawable? = null
+    private var menuBtnDrawable: BadgeDrawerArrowDrawable? = null
+    private var menuBtnShowDot = false
 
     // The Clear button sits on the right and only shows when inputting something
-    private var clearButton: ImageView? = null
     private var iconClear: Drawable? = null
 
     // The left Navigation Drawer is opened or closed
@@ -59,7 +59,12 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     private val drawerListener = DrawerListener()
 
     init {
-        init()
+        addView(binding.root)
+
+        initDrawables()
+        initClearButton()
+        initSearchInput()
+        initLeftAction()
     }
 
     /**
@@ -176,34 +181,42 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         focusChangeListener = listener
     }
 
-    private fun init() {
-        initDrawables()
-        findUiElements()
-        initClearButton()
-        initSearchInput()
-        initLeftAction()
+    fun setShowLeftDot(showLeftDot: Boolean) {
+        menuBtnShowDot = showLeftDot
+        val searchInputHasFocus = binding.searchInput.hasFocus() ?: false
+        menuBtnDrawable?.isEnabled = showLeftDot && !searchInputHasFocus
+    }
+
+    fun setAvatar(avatar: Bitmap) {
+        binding.avatarImage.setImageBitmap(avatar)
+    }
+
+    fun setChatStatus(visible: Boolean, icon: Int) {
+        if (visible) {
+            binding.chatStatusIcon.visibility = View.VISIBLE
+            binding.chatStatusIcon.setImageDrawable(ContextCompat.getDrawable(context, icon))
+        }
+    }
+
+    fun setAvatarClickListener(listener: OnClickListener) {
+        binding.avatarContainer.setOnClickListener(listener)
     }
 
     private fun initDrawables() {
-        menuBtnDrawable = DrawerArrowDrawable(context)
+        menuBtnDrawable = BadgeDrawerArrowDrawable(context)
+        menuBtnDrawable?.backgroundColor = ContextCompat.getColor(context, R.color.dark_primary_color)
+        menuBtnDrawable?.setBigBackgroundColor(Color.WHITE)
+        menuBtnDrawable?.setShowDot(true)
+        menuBtnDrawable?.isEnabled = menuBtnShowDot
         iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)
     }
 
-    private fun findUiElements() {
-        mainLayout = View.inflate(context, R.layout.search_query_section, this)
-
-        clearButton = findViewById<View>(R.id.clear_btn) as ImageView
-        searchInput = findViewById<View?>(R.id.search_bar_text) as SearchInputView
-        leftActionImageView = findViewById<View>(R.id.left_action) as ImageView
-        clearButton = findViewById<View>(R.id.clear_btn) as ImageView
-    }
-
     private fun initClearButton() {
-        clearButton?.apply {
+        binding.clearBtn.apply {
             setImageDrawable(iconClear)
             visibility = View.INVISIBLE
             setOnClickListener {
-                searchInput?.setText("")
+                binding.searchInput.setText("")
                 clearSearchActionListener?.onClearSearchClicked()
             }
         }
@@ -212,7 +225,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     private fun initSearchInput() {
         val textChangedCallback: (text: CharSequence?, start: Int, count: Int, after: Int) -> Unit =
             { _, _, _, _ ->
-                val textStr = searchInput?.text.toString()
+                val textStr = binding.searchInput.text.toString()
 
                 if (skipTextChangeEvent || !isInputFocused) {
                     skipTextChangeEvent = false
@@ -224,7 +237,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
                 query = textStr
             }
 
-        searchInput?.apply {
+        binding.searchInput.apply {
             doOnTextChanged(textChangedCallback)
 
             onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
@@ -233,6 +246,9 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
                 } else if (hasFocus != isInputFocused) {
                     setSearchFocusedInternal(hasFocus)
                 }
+
+                menuBtnDrawable?.isEnabled = menuBtnShowDot && !hasFocus
+                binding.avatarContainer.visibility = if (hasFocus) View.GONE else View.VISIBLE
             }
 
             setOnSearchKeyListener(object : SearchInputView.OnKeyboardSearchKeyClickListener {
@@ -246,10 +262,10 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun initLeftAction() {
-        leftActionImageView?.setImageDrawable(menuBtnDrawable)
+        binding.leftAction.setImageDrawable(menuBtnDrawable)
         menuBtnDrawable?.progress = MENU_BUTTON_PROGRESS_HAMBURGER
 
-        leftActionImageView?.setOnClickListener { _ ->
+        binding.leftAction.setOnClickListener { _ ->
             if (isInputFocused) {
                 setSearchFocusedInternal(false)
             } else {
@@ -263,7 +279,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun changeClearButton(textIsEmpty: Boolean) {
-        clearButton?.apply {
+        binding.clearBtn.apply {
             if (!textIsEmpty && visibility == View.INVISIBLE) {
                 alpha = 0.0f
                 visibility = View.VISIBLE
@@ -284,24 +300,24 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         isInputFocused = focused
 
         if (focused) {
-            searchInput?.requestFocus()
-            Util.showKeyboardDelayed(searchInput)
+            binding.searchInput.requestFocus()
+            Util.showKeyboardDelayed(binding.searchInput)
             changeMenuDrawable(withAnim = true, isOpen = true)
             if (menuOpen) closeMenu(false)
-            searchInput?.apply {
+            binding.searchInput.apply {
                 isLongClickable = true
-                clearButton?.visibility = if (text!!.isEmpty()) View.INVISIBLE else View.VISIBLE
+                binding.clearBtn.visibility = if (text!!.isEmpty()) View.INVISIBLE else View.VISIBLE
             }
             focusChangeListener?.onFocus()
         } else {
-            searchInput?.apply {
+            binding.searchInput.apply {
                 setText("")
             }
             getHostActivity()?.let { Util.hideKeyboard(it) }
-            searchInput?.clearFocus()
+            binding.searchInput.clearFocus()
             changeMenuDrawable(withAnim = true, isOpen = false)
-            clearButton?.visibility = View.GONE
-            searchInput?.isLongClickable = false
+            binding.clearBtn.visibility = View.GONE
+            binding.searchInput.isLongClickable = false
             focusChangeListener?.onFocusCleared()
         }
     }
