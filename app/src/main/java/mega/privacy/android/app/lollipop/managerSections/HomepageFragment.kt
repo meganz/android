@@ -6,7 +6,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,6 +131,8 @@ class HomepageFragment : Fragment() {
                     // The calculation for "alpha" may get a very small Float instead of 0.0f
                     // Reset it to 0f here
                     if (backgroundMask.alpha > 0f) backgroundMask.alpha = 0f
+                    // So is the elevation
+                    if (bottomSheet.elevation < maxElevation) bottomSheet.elevation = maxElevation
                     return
                 }
 
