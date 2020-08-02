@@ -9,24 +9,52 @@
         android:background="@color/homepage_background"
         tools:context=".lollipop.managerSections.HomepageFragment">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
+
+            <!-- A smaller color mask for better rendering performance -->
+            <View
+                android:id="@+id/background_mask"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/white"
+                android:alpha="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/category"
+                />
 
             <mega.privacy.android.app.components.search.FloatingSearchView
                 android:id="@+id/searchView"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_marginHorizontal="16dp"/>
+                android:layout_marginHorizontal="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
-            <include layout="@layout/homepage_category" />
+            <include layout="@layout/homepage_category"
+                android:id="@+id/category"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/searchView"/>
 
             <include
                 android:id="@+id/banner"
-                layout="@layout/homepage_banner" />
-        </LinearLayout>
+                layout="@layout/homepage_banner"
+                android:layout_height="150dp"
+                android:layout_width="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/category"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <include
             android:id="@+id/homepage_bottom_sheet"

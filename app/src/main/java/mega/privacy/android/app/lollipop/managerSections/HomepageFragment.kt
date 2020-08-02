@@ -130,6 +130,11 @@ class HomepageFragment : BaseFragment() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             HomepageBottomSheetBehavior.BottomSheetCallback() {
 
+            val backgroundMask = rootView.findViewById<View>(R.id.background_mask)
+            val dividend = 1.0f - SLIDE_OFFSET_CHANGE_BACKGROUND
+            val bottomSheet = viewDataBinding.homepageBottomSheet
+            val maxElevation = bottomSheet.elevation
+
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 val layoutParams = bottomSheet.layoutParams
                 val maxHeight = rootView.height - searchInputView.bottom
@@ -140,7 +145,24 @@ class HomepageFragment : BaseFragment() {
                 }
             }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                // A background color and BottomSheet elevation transition anim effect
+                // as dragging the BottomSheet close to/ far away from the top
+                val diff = slideOffset - SLIDE_OFFSET_CHANGE_BACKGROUND
+
+                if (diff <= 0) {
+                    // The calculation for "alpha" may get a very small Float instead of 0.0f
+                    // Reset it to 0f here
+                    if (backgroundMask.alpha > 0f) backgroundMask.alpha = 0f
+                    // So is the elevation
+                    if (bottomSheet.elevation < maxElevation) bottomSheet.elevation = maxElevation
+                    return
+                }
+
+                val res = diff / dividend
+                backgroundMask.alpha = res
+                bottomSheet.elevation = maxElevation - res * maxElevation
+            }
         })
     }
 
@@ -239,5 +261,6 @@ class HomepageFragment : BaseFragment() {
         private const val ALPHA_OPAQUE = 1f
         private const val FAB_DEFAULT_ANGEL = 0f
         private const val FAB_ROTATE_ANGEL = 135f
+        private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
     }
 }
