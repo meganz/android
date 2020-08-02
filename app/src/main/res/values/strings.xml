@@ -2014,6 +2014,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Too many requests. Please wait.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait&#8230;</string>
 
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
 

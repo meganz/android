@@ -1362,7 +1362,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         logWarning("Error open video file");
         new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle)
             .setCancelable(false)
-            .setMessage(isOnline(this) ? R.string.corrupt_video_dialog_text
+            .setMessage(isOnline(this) ? R.string.unsupported_file_type
                 : R.string.error_fail_to_open_file_no_network)
             .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
                 (dialog, which) -> finish())
