@@ -52,6 +52,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.repo.MegaNodeRepo;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
@@ -81,19 +82,24 @@ import static mega.privacy.android.app.utils.Util.px2dp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
-    public static final int TYPE_CAMERA = 0;
-    public static final int TYPE_MEDIA = 1;
+    public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
+    public static final int TYPE_MEDIA = MegaNodeRepo.CU_TYPE_MEDIA;
 
     private static final String ARG_TYPE = "type";
 
+    // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 7.
     private static final int SPAN_LARGE_GRID = 3;
     private static final int SPAN_SMALL_GRID = 7;
+    // in large grid view, we have 6 pixels margin for thumbnail,
+    // while in small grid view, we have 3.
     private static final int MARGIN_LARGE_GRID = 6;
     private static final int MARGIN_SMALL_GRID = 3;
 
     @SuppressLint("StaticFieldLeak") private static CameraUploadsFragment sInstanceForDragging;
 
     private int type = TYPE_CAMERA;
+
+    private ManagerActivityLollipop managerActivity;
 
     private FragmentCameraUploadsFirstLoginBinding firstLoginBinding;
     private FragmentCameraUploadsBinding binding;
@@ -145,7 +151,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     public int getItemCount() {
-        return adapter.getItemCount();
+        return adapter == null ? 0 : adapter.getItemCount();
     }
 
     public void setOrderBy(int orderBy) {
@@ -161,10 +167,14 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     public void checkScroll() {
+        if (viewModel == null || binding == null) {
+            return;
+        }
+
         if (viewModel.isSelecting() && binding.cuList.canScrollVertically(-1)) {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+            managerActivity.changeActionBarElevation(true);
         } else {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+            managerActivity.changeActionBarElevation(false);
         }
     }
 
@@ -173,19 +183,19 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     public int onBackPressed() {
-        if (((ManagerActivityLollipop) context).getFirstLogin()) {
+        if (managerActivity.getFirstLogin()) {
             viewModel.setCamSyncEnabled(false);
-            ((ManagerActivityLollipop) context).setFirstLogin(false);
-            ((ManagerActivityLollipop) context).refreshMenu();
+            managerActivity.setFirstLogin(false);
+            managerActivity.refreshMenu();
         }
 
-        if (((ManagerActivityLollipop) context).isFirstNavigationLevel()) {
+        if (managerActivity.isFirstNavigationLevel()) {
             return 0;
         } else {
-            reloadNodes(((ManagerActivityLollipop) context).orderCamera);
-            ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-            ((ManagerActivityLollipop) context).setIsSearchEnabled(false);
-            ((ManagerActivityLollipop) context).setToolbarTitle();
+            reloadNodes(managerActivity.orderCamera);
+            managerActivity.invalidateOptionsMenu();
+            managerActivity.setIsSearchEnabled(false);
+            managerActivity.setToolbarTitle();
             return 1;
         }
     }
@@ -245,12 +255,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void toCloudDrive() {
         viewModel.setCamSyncEnabled(false);
-        ((ManagerActivityLollipop) context).setFirstLogin(false);
-        ((ManagerActivityLollipop) context).setInitialCloudDrive();
+        managerActivity.setFirstLogin(false);
+        managerActivity.setInitialCloudDrive();
     }
 
     private void requestCameraUploadPermission(String[] permissions, int requestCode) {
-        ActivityCompat.requestPermissions((ManagerActivityLollipop) context, permissions,
+        ActivityCompat.requestPermissions(managerActivity, permissions,
                 requestCode);
     }
 
@@ -264,7 +274,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         viewModel.enableCuForBusinessFirstTime(enableCellularSync, syncVideo);
 
-        ((ManagerActivityLollipop) context).setFirstLogin(false);
+        managerActivity.setFirstLogin(false);
         startCU();
     }
 
@@ -287,7 +297,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             dbH.setCamSyncEnabled(false);
             dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
             stopRunningCameraUploadService(context);
-            ((ManagerActivityLollipop) context).refreshCameraUpload();
+            managerActivity.refreshCameraUpload();
         } else {
             prefs = dbH.getPreferences();
             if (prefs != null &&
@@ -355,7 +365,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void startCU() {
-        ((ManagerActivityLollipop) context).refreshCameraUpload();
+        managerActivity.refreshCameraUpload();
 
         new Handler().postDelayed(() -> {
             logDebug("Starting CU");
@@ -381,6 +391,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (args != null) {
             type = getArguments().getInt(ARG_TYPE, TYPE_CAMERA);
         }
+
+        managerActivity = (ManagerActivityLollipop) context;
     }
 
     @Nullable @Override
@@ -391,43 +403,48 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context), type);
         viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
-        if (type == TYPE_CAMERA && ((ManagerActivityLollipop) context).getFirstLogin()) {
-            ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-            viewModel.setInitialPreferences();
-
-            firstLoginBinding =
-                    FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
-
-            new ListenScrollChangesHelper().addViewToListen(firstLoginBinding.camSyncScrollView,
-                    (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                        if (firstLoginBinding.camSyncScrollView.canScrollVertically(-1)) {
-                            ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-                        } else {
-                            ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-                        }
-                    });
-
-            firstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
-                ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-                String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
-                if (hasPermissions(context, permissions)) {
-                    ((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(
-                            BUSINESS_CU_FRAGMENT_CU, true);
-                } else {
-                    requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
-                }
-                ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-            });
-            firstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
-                ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-                toCloudDrive();
-            });
-
-            return firstLoginBinding.getRoot();
+        if (type == TYPE_CAMERA && managerActivity.getFirstLogin()) {
+            return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
             binding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
             return binding.getRoot();
         }
+    }
+
+    private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container) {
+        managerActivity.showHideBottomNavigationView(true);
+        viewModel.setInitialPreferences();
+
+        firstLoginBinding =
+                FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
+
+        new ListenScrollChangesHelper().addViewToListen(firstLoginBinding.camSyncScrollView,
+                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                    if (firstLoginBinding.camSyncScrollView.canScrollVertically(-1)) {
+                        managerActivity.changeActionBarElevation(true);
+                    } else {
+                        managerActivity.changeActionBarElevation(false);
+                    }
+                });
+
+        firstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
+            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+            if (hasPermissions(context, permissions)) {
+                managerActivity.checkIfShouldShowBusinessCUAlert(
+                        BUSINESS_CU_FRAGMENT_CU, true);
+            } else {
+                requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
+            }
+            managerActivity.showHideBottomNavigationView(false);
+        });
+        firstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
+            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+            toCloudDrive();
+        });
+
+        return firstLoginBinding.getRoot();
     }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -437,7 +454,13 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return;
         }
 
-        boolean smallGrid = ((ManagerActivityLollipop) context).isSmallGridCameraUploads;
+        setupRecyclerView();
+        setupOtherViews();
+        observeLiveData();
+    }
+
+    private void setupRecyclerView() {
+        boolean smallGrid = managerActivity.isSmallGridCameraUploads;
         int spanCount = smallGrid ? SPAN_SMALL_GRID : SPAN_LARGE_GRID;
 
         binding.cuList.setHasFixedSize(true);
@@ -471,19 +494,63 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         binding.cuList.setAdapter(adapter);
         binding.scroller.setRecyclerView(binding.cuList);
+    }
 
+    private void setupOtherViews() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.emptyHintImage.setImageResource(R.drawable.uploads_empty_landscape);
         } else {
             binding.emptyHintImage.setImageResource(R.drawable.ic_empty_camera_uploads);
         }
 
+        if (type == TYPE_CAMERA) {
+            binding.turnOnCuText.setText(
+                    getString(R.string.settings_camera_upload_turn_on).toUpperCase(
+                            Locale.getDefault()));
+        } else {
+            binding.turnOnCuText.setText(
+                    getString(R.string.settings_set_up_automatic_uploads).toUpperCase(
+                            Locale.getDefault()));
+        }
+
+        binding.turnOnCuLayout.setOnClickListener(v -> {
+            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+
+            if (type == TYPE_CAMERA) {
+                if (hasPermissions(context, permissions)) {
+                    managerActivity.checkIfShouldShowBusinessCUAlert(
+                            BUSINESS_CU_FRAGMENT_CU, false);
+                } else {
+                    requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
+                }
+            } else {
+                managerActivity.moveToSettingsSection();
+            }
+        });
+
+        viewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
+            binding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
+            if (!enabled) {
+                FrameLayout.LayoutParams params =
+                        (FrameLayout.LayoutParams) binding.cuList.getLayoutParams();
+                params.bottomMargin = px2dp(48, outMetrics);
+                binding.cuList.setLayoutParams(params);
+
+                params = (FrameLayout.LayoutParams) binding.scroller.getLayoutParams();
+                params.bottomMargin = px2dp(48, outMetrics);
+                binding.scroller.setLayoutParams(params);
+            }
+        });
+    }
+
+    private void observeLiveData() {
         viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
-            boolean showScroller =
-                    nodes.size() >= (smallGrid ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
+            boolean showScroller = nodes.size() >= (managerActivity.isSmallGridCameraUploads
+                    ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
             adapter.setNodes(nodes);
-            ((ManagerActivityLollipop) context).updateCuFragmentOptionsMenu();
+            managerActivity.updateCuFragmentOptionsMenu();
 
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             if (nodes.isEmpty()) {
@@ -504,7 +571,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                     } catch (Exception ignored) {
                     }
                     Spanned result;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     } else {
                         result = Html.fromHtml(textToShow);
@@ -549,46 +616,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 }
             }
         });
-
-        if (type == TYPE_CAMERA) {
-            binding.turnOnCuText.setText(
-                    getString(R.string.settings_camera_upload_turn_on).toUpperCase(
-                            Locale.getDefault()));
-        } else {
-            binding.turnOnCuText.setText(
-                    getString(R.string.settings_set_up_automatic_uploads).toUpperCase(
-                            Locale.getDefault()));
-        }
-
-        binding.turnOnCuLayout.setOnClickListener(v -> {
-            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
-
-            if (type == TYPE_CAMERA) {
-                if (hasPermissions(context, permissions)) {
-                    ((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(
-                            BUSINESS_CU_FRAGMENT_CU, false);
-                } else {
-                    requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
-                }
-            } else {
-                ((ManagerActivityLollipop) context).moveToSettingsSection();
-            }
-        });
-
-        viewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
-            binding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
-            if (!enabled) {
-                FrameLayout.LayoutParams params =
-                        (FrameLayout.LayoutParams) binding.cuList.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
-                binding.cuList.setLayoutParams(params);
-
-                params = (FrameLayout.LayoutParams) binding.scroller.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
-                binding.scroller.setLayoutParams(params);
-            }
-        });
     }
 
     @Override
@@ -599,7 +626,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             case REQUEST_CAMERA_ON_OFF: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    ((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(
+                    managerActivity.checkIfShouldShowBusinessCUAlert(
                             BUSINESS_CU_FRAGMENT_CU, false);
                 }
                 break;
@@ -607,7 +634,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             case REQUEST_CAMERA_ON_OFF_FIRST_TIME: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    ((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(
+                    managerActivity.checkIfShouldShowBusinessCUAlert(
                             BUSINESS_CU_FRAGMENT_CU, true);
                 }
                 break;
@@ -618,7 +645,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     @Override public void onResume() {
         super.onResume();
 
-        reloadNodes(((ManagerActivityLollipop) context).orderCamera);
+        reloadNodes(managerActivity.orderCamera);
         sInstanceForDragging = null;
     }
 
@@ -707,7 +734,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 if (isIntentAvailable(context, mediaIntent)) {
                     launchNodeViewer(mediaIntent, node.getHandle());
                 } else {
-                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE,
+                    managerActivity.showSnackbar(SNACKBAR_TYPE,
                             getString(R.string.intent_not_available), -1);
                 }
             }
@@ -721,7 +748,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void putExtras(Intent intent, int index, MegaNode node, int[] thumbnailLocation) {
         intent.putExtra("position", index);
-        intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCamera);
+        intent.putExtra("orderGetChildren", managerActivity.orderCamera);
 
         MegaNode parentNode = megaApi.getParentNode(node);
         if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {

@@ -12,22 +12,17 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 import java.io.File;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.arch.BaseRxViewModel;
 import mega.privacy.android.app.listeners.BaseListener;
+import mega.privacy.android.app.repo.MegaNodeRepo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -42,11 +37,13 @@ import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.RxUtil.logErr;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
+import static mega.privacy.android.app.utils.Util.fromEpoch;
 
 class CuViewModel extends BaseRxViewModel {
     private final MegaApiAndroid megaApi;
     private final DatabaseHandler dbHandler;
     private final int type;
+    private final MegaNodeRepo repo;
 
     private final MutableLiveData<List<CuNode>> cuNodes = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> nodeToOpen = new MutableLiveData<>();
@@ -76,6 +73,7 @@ class CuViewModel extends BaseRxViewModel {
         this.megaApi = megaApi;
         this.dbHandler = dbHandler;
         this.type = type;
+        repo = new MegaNodeRepo(megaApi, dbHandler, getApplication());
 
         loadCuNodes();
 
@@ -340,7 +338,7 @@ class CuViewModel extends BaseRxViewModel {
 
         LocalDate lastModifyDate = null;
         int index = 0;
-        for (MegaNode node : filterNodesByDate(getCuChildren(orderBy), searchDate)) {
+        for (MegaNode node : repo.getCuChildren(type, orderBy, searchDate)) {
             File thumbnail =
                     new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
@@ -371,61 +369,6 @@ class CuViewModel extends BaseRxViewModel {
         return nodes;
     }
 
-    /**
-     * Filter nodes by date.
-     *
-     * @param nodes all nodes
-     * @param filter search filter
-     * filter[0] is the search type:
-     * 0 means search for nodes in one day, then filter[1] is the day in millis.
-     * 1 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
-     * 2 means search for nodes between two days, filter[3] and filter[4] are start and end day in
-     * millis.
-     */
-    private List<MegaNode> filterNodesByDate(List<MegaNode> nodes, long[] filter) {
-        if (filter == null) {
-            return nodes;
-        }
-
-        List<MegaNode> result = new ArrayList<>();
-
-        Function<MegaNode, Boolean> filterFunction = null;
-        if (filter[0] == 1) {
-            LocalDate date = fromEpoch(filter[1] / 1000);
-            filterFunction = node -> date.equals(fromEpoch(node.getModificationTime()));
-        } else if (filter[0] == 2) {
-            if (filter[2] == 1) {
-                YearMonth lastMonth = YearMonth.now().minusMonths(1);
-                filterFunction =
-                        node -> lastMonth.equals(
-                                YearMonth.from(fromEpoch(node.getModificationTime())));
-            } else if (filter[2] == 2) {
-                int lastYear = YearMonth.now().getYear() - 1;
-                filterFunction =
-                        node -> fromEpoch(node.getModificationTime()).getYear() == lastYear;
-            }
-        } else if (filter[0] == 3) {
-            LocalDate from = fromEpoch(filter[3] / 1000);
-            LocalDate to = fromEpoch(filter[4] / 1000);
-            filterFunction = node -> {
-                LocalDate modifyDate = fromEpoch(node.getModificationTime());
-                return !modifyDate.isBefore(from) && !modifyDate.isAfter(to);
-            };
-        }
-
-        if (filterFunction == null) {
-            return result;
-        }
-
-        for (MegaNode node : nodes) {
-            if (filterFunction.apply(node)) {
-                result.add(node);
-            }
-        }
-
-        return result;
-    }
-
     private String getSearchDateTitle(long[] filter) {
         if (filter == null) {
             return "";
@@ -449,51 +392,5 @@ class CuViewModel extends BaseRxViewModel {
         } else {
             return "";
         }
-    }
-
-    private List<MegaNode> getCuChildren(int orderBy) {
-        long cuHandle = -1;
-        MegaPreferences pref = dbHandler.getPreferences();
-        if (type == CameraUploadsFragment.TYPE_CAMERA) {
-            if (pref != null && pref.getCamSyncHandle() != null) {
-                try {
-                    cuHandle = Long.parseLong(pref.getCamSyncHandle());
-                } catch (NumberFormatException ignored) {
-                }
-                if (megaApi.getNodeByHandle(cuHandle) == null) {
-                    cuHandle = -1;
-                }
-            }
-
-            if (cuHandle == -1) {
-                for (MegaNode node : megaApi.getChildren(megaApi.getRootNode())) {
-                    if (node.isFolder() && TextUtils.equals(
-                            getApplication().getString(R.string.section_photo_sync),
-                            node.getName())) {
-                        cuHandle = node.getHandle();
-                        dbHandler.setCamSyncHandle(cuHandle);
-                        break;
-                    }
-                }
-            }
-        } else {
-            if (pref != null && pref.getMegaHandleSecondaryFolder() != null) {
-                try {
-                    cuHandle = Long.parseLong(pref.getMegaHandleSecondaryFolder());
-                } catch (NumberFormatException ignored) {
-                }
-                if (megaApi.getNodeByHandle(cuHandle) == null) {
-                    cuHandle = -1;
-                }
-            }
-        }
-
-        return cuHandle == -1 ? Collections.emptyList()
-                : megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy);
-    }
-
-    private LocalDate fromEpoch(long seconds) {
-        return LocalDate.from(
-                LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
     }
 }
