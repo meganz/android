@@ -171,7 +171,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return;
         }
 
-        if (viewModel.isSelecting() && binding.cuList.canScrollVertically(-1)) {
+        if (viewModel.isSelecting() || binding.cuList.canScrollVertically(-1)) {
             managerActivity.changeActionBarElevation(true);
         } else {
             managerActivity.changeActionBarElevation(false);
