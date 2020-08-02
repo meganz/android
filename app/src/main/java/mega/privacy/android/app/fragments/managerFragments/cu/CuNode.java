@@ -8,49 +8,49 @@ public class CuNode {
     public static final int TYPE_IMAGE = 2;
     public static final int TYPE_VIDEO = 3;
 
-    private final MegaNode node;
-    private final int index;
-    private final File thumbnail;
-    private final int type;
-    private final String modifyDate;
+    private final MegaNode mNode;
+    private final int mIndex;
+    private final File mThumbnail;
+    private final int mType;
+    private final String mModifyDate;
 
-    private boolean selected;
+    private boolean mSelected;
 
     public CuNode(MegaNode node, int index, File thumbnail, int type, String modifyDate,
             boolean selected) {
-        this.node = node;
-        this.index = index;
-        this.thumbnail = thumbnail;
-        this.type = type;
-        this.modifyDate = modifyDate;
-        this.selected = selected;
+        mNode = node;
+        mIndex = index;
+        mThumbnail = thumbnail;
+        mType = type;
+        mModifyDate = modifyDate;
+        mSelected = selected;
     }
 
     public MegaNode getNode() {
-        return node;
+        return mNode;
     }
 
     public int getIndex() {
-        return index;
+        return mIndex;
     }
 
     public File getThumbnail() {
-        return thumbnail;
+        return mThumbnail;
     }
 
     public int getType() {
-        return type;
+        return mType;
     }
 
     public String getModifyDate() {
-        return modifyDate;
+        return mModifyDate;
     }
 
     public boolean isSelected() {
-        return selected;
+        return mSelected;
     }
 
     public void setSelected(boolean selected) {
-        this.selected = selected;
+        mSelected = selected;
     }
 }

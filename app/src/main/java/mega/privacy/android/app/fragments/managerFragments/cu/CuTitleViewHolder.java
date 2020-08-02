@@ -7,16 +7,16 @@ import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
  */
 class CuTitleViewHolder extends CuViewHolder {
 
-    private final ItemCameraUploadsTitleBinding binding;
+    private final ItemCameraUploadsTitleBinding mBinding;
 
     public CuTitleViewHolder(ItemCameraUploadsTitleBinding binding) {
         super(binding.getRoot());
 
-        this.binding = binding;
+        mBinding = binding;
     }
 
     @Override protected void bind(CuNode node) {
-        binding.gridTitle.setText(node.getModifyDate());
+        mBinding.gridTitle.setText(node.getModifyDate());
     }
 
     @Override protected boolean handleClick() {

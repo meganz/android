@@ -4,50 +4,50 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
  * Created by Piasy{github.com/Piasy} on 2020/7/17.
  */
 public class CuItemSizeConfig {
-    private final boolean smallGrid;
-    private final int gridSize;
-    private final int gridMargin;
-    private final int icSelectedSize;
-    private final int icSelectedMargin;
-    private final int roundCornerRadius;
-    private final int selectedPadding;
+    private final boolean mSmallGrid;
+    private final int mGridSize;
+    private final int mGridMargin;
+    private final int mIcSelectedSize;
+    private final int mIcSelectedMargin;
+    private final int mRoundCornerRadius;
+    private final int mSelectedPadding;
 
     public CuItemSizeConfig(boolean smallGrid, int gridSize, int gridMargin, int icSelectedSize,
             int icSelectedMargin, int roundCornerRadius, int selectedPadding) {
-        this.smallGrid = smallGrid;
-        this.gridSize = gridSize;
-        this.gridMargin = gridMargin;
-        this.icSelectedSize = icSelectedSize;
-        this.icSelectedMargin = icSelectedMargin;
-        this.roundCornerRadius = roundCornerRadius;
-        this.selectedPadding = selectedPadding;
+        mSmallGrid = smallGrid;
+        mGridSize = gridSize;
+        mGridMargin = gridMargin;
+        mIcSelectedSize = icSelectedSize;
+        mIcSelectedMargin = icSelectedMargin;
+        mRoundCornerRadius = roundCornerRadius;
+        mSelectedPadding = selectedPadding;
     }
 
     public boolean isSmallGrid() {
-        return smallGrid;
+        return mSmallGrid;
     }
 
     public int getGridSize() {
-        return gridSize;
+        return mGridSize;
     }
 
     public int getGridMargin() {
-        return gridMargin;
+        return mGridMargin;
     }
 
     public int getIcSelectedSize() {
-        return icSelectedSize;
+        return mIcSelectedSize;
     }
 
     public int getIcSelectedMargin() {
-        return icSelectedMargin;
+        return mIcSelectedMargin;
     }
 
     public int getRoundCornerRadius() {
-        return roundCornerRadius;
+        return mRoundCornerRadius;
     }
 
     public int getSelectedPadding() {
-        return selectedPadding;
+        return mSelectedPadding;
     }
 }

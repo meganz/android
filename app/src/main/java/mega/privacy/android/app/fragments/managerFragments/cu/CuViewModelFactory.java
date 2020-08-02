@@ -7,20 +7,20 @@ import mega.privacy.android.app.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 
 class CuViewModelFactory implements ViewModelProvider.Factory {
-    private final MegaApiAndroid megaApi;
-    private final DatabaseHandler databaseHandler;
-    private final int type;
+    private final MegaApiAndroid mMegaApi;
+    private final DatabaseHandler mDbHandler;
+    private final int mType;
 
-    CuViewModelFactory(MegaApiAndroid megaApi, DatabaseHandler databaseHandler, int type) {
-        this.megaApi = megaApi;
-        this.databaseHandler = databaseHandler;
-        this.type = type;
+    CuViewModelFactory(MegaApiAndroid megaApi, DatabaseHandler dbHandler, int type) {
+        mMegaApi = megaApi;
+        mDbHandler = dbHandler;
+        mType = type;
     }
 
     @SuppressWarnings("unchecked")
     @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(CuViewModel.class)) {
-            return (T) new CuViewModel(megaApi, databaseHandler, type);
+            return (T) new CuViewModel(mMegaApi, mDbHandler, mType);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

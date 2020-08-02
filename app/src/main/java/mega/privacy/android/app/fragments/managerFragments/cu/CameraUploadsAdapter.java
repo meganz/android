@@ -19,19 +19,19 @@ import nz.mega.sdk.MegaNode;
 public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
         implements SectionTitleProvider {
 
-    private final Listener listener;
-    private final List<CuNode> nodes = new ArrayList<>();
-    private final int spanCount;
-    private final CuItemSizeConfig itemSizeConfig;
+    private final Listener mListener;
+    private final List<CuNode> mNodes = new ArrayList<>();
+    private final int mSpanCount;
+    private final CuItemSizeConfig mItemSizeConfig;
 
     public CameraUploadsAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig) {
-        this.listener = listener;
-        this.spanCount = spanCount;
-        this.itemSizeConfig = itemSizeConfig;
+        mListener = listener;
+        mSpanCount = spanCount;
+        mItemSizeConfig = itemSizeConfig;
     }
 
     @Override public int getItemViewType(int position) {
-        return nodes.get(position).getType();
+        return mNodes.get(position).getType();
     }
 
     @NonNull @Override
@@ -44,36 +44,36 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
             case CuNode.TYPE_VIDEO:
                 return new CuVideoViewHolder(
                         ItemCameraUploadsVideoBinding.inflate(inflater, parent, false),
-                        itemSizeConfig);
+                        mItemSizeConfig);
             case CuNode.TYPE_IMAGE:
             default:
                 return new CuImageViewHolder(
                         ItemCameraUploadsImageBinding.inflate(inflater, parent, false),
-                        itemSizeConfig);
+                        mItemSizeConfig);
         }
     }
 
     @Override public void onBindViewHolder(@NonNull CuViewHolder holder, int position) {
-        holder.bind(position, nodes.get(position), listener);
+        holder.bind(position, mNodes.get(position), mListener);
     }
 
     @Override public int getItemCount() {
-        return nodes.size();
+        return mNodes.size();
     }
 
     public void setNodes(List<CuNode> nodes) {
-        this.nodes.clear();
-        this.nodes.addAll(nodes);
+        this.mNodes.clear();
+        this.mNodes.addAll(nodes);
         notifyDataSetChanged();
     }
 
     public int getSpanSize(int position) {
-        if (position < 0 || position >= nodes.size()) {
+        if (position < 0 || position >= mNodes.size()) {
             return 1;
         }
-        switch (nodes.get(position).getType()) {
+        switch (mNodes.get(position).getType()) {
             case CuNode.TYPE_TITLE:
-                return spanCount;
+                return mSpanCount;
             case CuNode.TYPE_IMAGE:
             case CuNode.TYPE_VIDEO:
             default:
@@ -110,8 +110,8 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     }
 
     public int getNodePosition(long handle) {
-        for (int i = 0, n = nodes.size(); i < n; i++) {
-            MegaNode node = nodes.get(i).getNode();
+        for (int i = 0, n = mNodes.size(); i < n; i++) {
+            MegaNode node = mNodes.get(i).getNode();
             if (node != null && node.getHandle() == handle) {
                 return i;
             }
@@ -121,9 +121,9 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     }
 
     public void showSelectionAnimation(int position, CuNode node, RecyclerView.ViewHolder holder) {
-        if (holder == null || position < 0 || position >= nodes.size()
-                || nodes.get(position).getNode() == null
-                || nodes.get(position).getNode().getHandle() != node.getNode().getHandle()) {
+        if (holder == null || position < 0 || position >= mNodes.size()
+                || mNodes.get(position).getNode() == null
+                || mNodes.get(position).getNode().getHandle() != node.getNode().getHandle()) {
             return;
         }
 
@@ -162,10 +162,10 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     }
 
     @Override public String getSectionTitle(int position) {
-        if (position < 0 || position >= nodes.size()) {
+        if (position < 0 || position >= mNodes.size()) {
             return "";
         }
-        return nodes.get(position).getModifyDate();
+        return mNodes.get(position).getModifyDate();
     }
 
     public interface Listener {

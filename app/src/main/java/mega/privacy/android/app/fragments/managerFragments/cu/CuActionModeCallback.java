@@ -24,81 +24,81 @@ import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 
 class CuActionModeCallback implements ActionMode.Callback {
 
-    private final Context context;
-    private final CameraUploadsFragment fragment;
-    private final CuViewModel viewModel;
-    private final MegaApiAndroid megaApi;
+    private final Context mContext;
+    private final CameraUploadsFragment mFragment;
+    private final CuViewModel mViewModel;
+    private final MegaApiAndroid mMegaApi;
 
     CuActionModeCallback(Context context, CameraUploadsFragment fragment,
             CuViewModel viewModel, MegaApiAndroid megaApi) {
-        this.context = context;
-        this.fragment = fragment;
-        this.viewModel = viewModel;
-        this.megaApi = megaApi;
+        mContext = context;
+        mFragment = fragment;
+        mViewModel = viewModel;
+        mMegaApi = megaApi;
     }
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         logDebug("onActionItemClicked");
-        List<MegaNode> documents = viewModel.getSelectedNodes();
+        List<MegaNode> documents = mViewModel.getSelectedNodes();
         if (documents.isEmpty()) {
             return false;
         }
 
         switch (item.getItemId()) {
             case R.id.cab_menu_download:
-                viewModel.clearSelection();
-                new NodeController(context)
+                mViewModel.clearSelection();
+                new NodeController(mContext)
                         .prepareForDownload(getDocumentHandles(documents), false);
                 break;
             case R.id.cab_menu_copy:
-                viewModel.clearSelection();
-                new NodeController(context)
+                mViewModel.clearSelection();
+                new NodeController(mContext)
                         .chooseLocationToCopyNodes(getDocumentHandles(documents));
                 break;
             case R.id.cab_menu_move:
-                viewModel.clearSelection();
-                new NodeController(context)
+                mViewModel.clearSelection();
+                new NodeController(mContext)
                         .chooseLocationToMoveNodes(getDocumentHandles(documents));
                 break;
             case R.id.cab_menu_share_out:
-                viewModel.clearSelection();
-                MegaNodeUtil.shareNodes(context, documents);
+                mViewModel.clearSelection();
+                MegaNodeUtil.shareNodes(mContext, documents);
                 break;
             case R.id.cab_menu_share_link:
             case R.id.cab_menu_edit_link:
                 logDebug("Public link option");
-                viewModel.clearSelection();
+                mViewModel.clearSelection();
                 if (documents.size() == 1
                         && documents.get(0).getHandle() != MegaApiJava.INVALID_HANDLE) {
-                    ((ManagerActivityLollipop) context)
+                    ((ManagerActivityLollipop) mContext)
                             .showGetLinkActivity(documents.get(0).getHandle());
                 }
                 break;
             case R.id.cab_menu_remove_link:
                 logDebug("Remove public link option");
-                viewModel.clearSelection();
+                mViewModel.clearSelection();
                 if (documents.size() == 1) {
-                    ((ManagerActivityLollipop) context)
+                    ((ManagerActivityLollipop) mContext)
                             .showConfirmationRemovePublicLink(documents.get(0));
                 }
                 break;
             case R.id.cab_menu_send_to_chat:
                 logDebug("Send files to chat");
-                viewModel.clearSelection();
-                new NodeController(context).checkIfNodesAreMineAndSelectChatsToSendNodes(
+                mViewModel.clearSelection();
+                new NodeController(mContext).checkIfNodesAreMineAndSelectChatsToSendNodes(
                         (ArrayList<MegaNode>) documents);
                 break;
             case R.id.cab_menu_trash:
-                viewModel.clearSelection();
-                ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(
+                mViewModel.clearSelection();
+                ((ManagerActivityLollipop) mContext).askConfirmationMoveToRubbish(
                         getDocumentHandles(documents));
                 break;
             case R.id.cab_menu_select_all:
-                fragment.selectAll();
+                mFragment.selectAll();
                 break;
             case R.id.cab_menu_clear_selection:
-                viewModel.clearSelection();
+                mViewModel.clearSelection();
                 break;
         }
         return true;
@@ -124,29 +124,29 @@ class CuActionModeCallback implements ActionMode.Callback {
         logDebug("onCreateActionMode");
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.cloud_storage_action, menu);
-        ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-        Util.changeStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow(),
+        ((ManagerActivityLollipop) mContext).showHideBottomNavigationView(true);
+        Util.changeStatusBarColor(mContext, ((ManagerActivityLollipop) mContext).getWindow(),
                 R.color.accentColorDark);
-        ((ManagerActivityLollipop) context).setDrawerLockMode(true);
-        fragment.checkScroll();
+        ((ManagerActivityLollipop) mContext).setDrawerLockMode(true);
+        mFragment.checkScroll();
         return true;
     }
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         logDebug("onDestroyActionMode");
-        viewModel.clearSelection();
-        ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-        Util.changeStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow(),
+        mViewModel.clearSelection();
+        ((ManagerActivityLollipop) mContext).showHideBottomNavigationView(false);
+        Util.changeStatusBarColor(mContext, ((ManagerActivityLollipop) mContext).getWindow(),
                 R.color.black);
-        fragment.checkScroll();
-        ((ManagerActivityLollipop) context).setDrawerLockMode(false);
+        mFragment.checkScroll();
+        ((ManagerActivityLollipop) mContext).setDrawerLockMode(false);
     }
 
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         logDebug("onPrepareActionMode");
-        List<MegaNode> selected = viewModel.getSelectedNodes();
+        List<MegaNode> selected = mViewModel.getSelectedNodes();
         if (selected.isEmpty()) {
             return false;
         }
@@ -155,7 +155,7 @@ class CuActionModeCallback implements ActionMode.Callback {
                 new CloudStorageOptionControlUtil.Control();
 
         if (selected.size() == 1
-                && megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
+                && mMegaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
                 == MegaError.API_OK) {
             if (selected.get(0).isExported()) {
                 control.manageLink().setVisible(true)
@@ -169,7 +169,7 @@ class CuActionModeCallback implements ActionMode.Callback {
         }
 
         menu.findItem(R.id.cab_menu_send_to_chat)
-                .setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+                .setIcon(mutateIconSecondary(mContext, R.drawable.ic_send_to_contact,
                         R.color.white));
 
         control.sendToChat().setVisible(true)
@@ -186,7 +186,7 @@ class CuActionModeCallback implements ActionMode.Callback {
             control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
-        control.selectAll().setVisible(selected.size() < viewModel.getRealNodesCount() + 1);
+        control.selectAll().setVisible(selected.size() < mViewModel.getRealNodesCount() + 1);
 
         CloudStorageOptionControlUtil.applyControl(menu, control);
 

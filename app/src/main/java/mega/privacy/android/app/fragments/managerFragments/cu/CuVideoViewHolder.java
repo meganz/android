@@ -11,39 +11,39 @@ import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
  */
 class CuVideoViewHolder extends CuViewHolder {
 
-    private final ItemCameraUploadsVideoBinding binding;
-    private final CuItemSizeConfig itemSizeConfig;
+    private final ItemCameraUploadsVideoBinding mBinding;
+    private final CuItemSizeConfig mItemSizeConfig;
 
     public CuVideoViewHolder(ItemCameraUploadsVideoBinding binding,
             CuItemSizeConfig itemSizeConfig) {
         super(binding.getRoot());
-        this.binding = binding;
-        this.itemSizeConfig = itemSizeConfig;
+        mBinding = binding;
+        mItemSizeConfig = itemSizeConfig;
 
         setViewSize(binding.getRoot(), binding.icSelected, itemSizeConfig);
     }
 
     @Override protected void bind(CuNode node) {
-        updateThumbnailDisplay(binding.thumbnail, node, itemSizeConfig);
+        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig);
 
-        if (itemSizeConfig.isSmallGrid()) {
-            binding.videoDuration.setVisibility(View.GONE);
+        if (mItemSizeConfig.isSmallGrid()) {
+            mBinding.videoDuration.setVisibility(View.GONE);
         } else {
-            binding.videoDuration.setVisibility(View.VISIBLE);
+            mBinding.videoDuration.setVisibility(View.VISIBLE);
             if (node.getNode() != null) {
-                binding.videoDuration.setText(getVideoDuration(node.getNode().getDuration()));
+                mBinding.videoDuration.setText(getVideoDuration(node.getNode().getDuration()));
             } else {
-                binding.videoDuration.setVisibility(View.GONE);
+                mBinding.videoDuration.setVisibility(View.GONE);
             }
         }
-        binding.videoInfo.setBackgroundResource(
+        mBinding.videoInfo.setBackgroundResource(
                 node.isSelected() ? R.drawable.gradient_cam_uploads_rounded
                         : R.drawable.gradient_cam_uploads);
 
-        binding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
+        mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
     }
 
     public ItemCameraUploadsVideoBinding binding() {
-        return binding;
+        return mBinding;
     }
 }

@@ -97,17 +97,17 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     @SuppressLint("StaticFieldLeak") private static CameraUploadsFragment sInstanceForDragging;
 
-    private int type = TYPE_CAMERA;
+    private int mCamera = TYPE_CAMERA;
 
-    private ManagerActivityLollipop managerActivity;
+    private ManagerActivityLollipop mManagerActivity;
 
-    private FragmentCameraUploadsFirstLoginBinding firstLoginBinding;
-    private FragmentCameraUploadsBinding binding;
-    private CameraUploadsAdapter adapter;
-    private ActionMode actionMode;
+    private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
+    private FragmentCameraUploadsBinding mBinding;
+    private CameraUploadsAdapter mAdapter;
+    private ActionMode mActionMode;
 
-    private CuViewModel viewModel;
-    private long draggingNodeHandle = -1;
+    private CuViewModel mViewModel;
+    private long mDraggingNodeHandle = -1;
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -132,13 +132,13 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (fragment == null) {
             return;
         }
-        int position = fragment.adapter.getNodePosition(fragment.draggingNodeHandle);
+        int position = fragment.mAdapter.getNodePosition(fragment.mDraggingNodeHandle);
         RecyclerView.ViewHolder viewHolder =
-                fragment.binding.cuList.findViewHolderForLayoutPosition(position);
+                fragment.mBinding.cuList.findViewHolderForLayoutPosition(position);
         if (viewHolder == null) {
             return;
         }
-        int[] res = fragment.adapter.getThumbnailLocationOnScreen(viewHolder);
+        int[] res = fragment.mAdapter.getThumbnailLocationOnScreen(viewHolder);
         System.arraycopy(res, 0, location, 0, 2);
     }
 
@@ -147,11 +147,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (fragment == null) {
             return;
         }
-        fragment.setDraggingThumbnailVisibility(fragment.draggingNodeHandle, visibility);
+        fragment.setDraggingThumbnailVisibility(fragment.mDraggingNodeHandle, visibility);
     }
 
     public int getItemCount() {
-        return adapter == null ? 0 : adapter.getItemCount();
+        return mAdapter == null ? 0 : mAdapter.getItemCount();
     }
 
     public void setOrderBy(int orderBy) {
@@ -159,43 +159,43 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     public void setSearchDate(long[] searchDate, int orderBy) {
-        viewModel.setSearchDate(searchDate, orderBy);
+        mViewModel.setSearchDate(searchDate, orderBy);
     }
 
     public void reloadNodes(int orderBy) {
-        viewModel.loadCuNodes(orderBy);
+        mViewModel.loadCuNodes(orderBy);
     }
 
     public void checkScroll() {
-        if (viewModel == null || binding == null) {
+        if (mViewModel == null || mBinding == null) {
             return;
         }
 
-        if (viewModel.isSelecting() || binding.cuList.canScrollVertically(-1)) {
-            managerActivity.changeActionBarElevation(true);
+        if (mViewModel.isSelecting() || mBinding.cuList.canScrollVertically(-1)) {
+            mManagerActivity.changeActionBarElevation(true);
         } else {
-            managerActivity.changeActionBarElevation(false);
+            mManagerActivity.changeActionBarElevation(false);
         }
     }
 
     public void selectAll() {
-        viewModel.selectAll();
+        mViewModel.selectAll();
     }
 
     public int onBackPressed() {
-        if (managerActivity.getFirstLogin()) {
-            viewModel.setCamSyncEnabled(false);
-            managerActivity.setFirstLogin(false);
-            managerActivity.refreshMenu();
+        if (mManagerActivity.getFirstLogin()) {
+            mViewModel.setCamSyncEnabled(false);
+            mManagerActivity.setFirstLogin(false);
+            mManagerActivity.refreshMenu();
         }
 
-        if (managerActivity.isFirstNavigationLevel()) {
+        if (mManagerActivity.isFirstNavigationLevel()) {
             return 0;
         } else {
-            reloadNodes(managerActivity.orderCamera);
-            managerActivity.invalidateOptionsMenu();
-            managerActivity.setIsSearchEnabled(false);
-            managerActivity.setToolbarTitle();
+            reloadNodes(mManagerActivity.orderCamera);
+            mManagerActivity.invalidateOptionsMenu();
+            mManagerActivity.setIsSearchEnabled(false);
+            mManagerActivity.setToolbarTitle();
             return 1;
         }
     }
@@ -207,11 +207,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     public void scrollToNode(long handle) {
         logDebug("scrollToNode, handle " + handle);
-        if (binding != null) {
-            int position = adapter.getNodePosition(handle);
+        if (mBinding != null) {
+            int position = mAdapter.getNodePosition(handle);
             logDebug("scrollToNode, handle " + handle + ", position " + position);
             if (position != -1) {
-                binding.cuList.scrollToPosition(position);
+                mBinding.cuList.scrollToPosition(position);
                 notifyThumbnailLocationOnScreen();
             }
         }
@@ -220,32 +220,32 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     public void hideDraggingThumbnail(long handle) {
         logDebug("hideDraggingThumbnail: " + handle);
 
-        if (viewModel != null) {
-            setDraggingThumbnailVisibility(draggingNodeHandle, View.VISIBLE);
+        if (mViewModel != null) {
+            setDraggingThumbnailVisibility(mDraggingNodeHandle, View.VISIBLE);
             setDraggingThumbnailVisibility(handle, View.GONE);
-            draggingNodeHandle = handle;
+            mDraggingNodeHandle = handle;
             notifyThumbnailLocationOnScreen();
         }
     }
 
     private void setDraggingThumbnailVisibility(long handle, int visibility) {
-        int position = adapter.getNodePosition(handle);
+        int position = mAdapter.getNodePosition(handle);
         RecyclerView.ViewHolder viewHolder =
-                binding.cuList.findViewHolderForLayoutPosition(position);
+                mBinding.cuList.findViewHolderForLayoutPosition(position);
         if (viewHolder == null) {
             return;
         }
-        adapter.setThumbnailVisibility(viewHolder, visibility);
+        mAdapter.setThumbnailVisibility(viewHolder, visibility);
     }
 
     private void notifyThumbnailLocationOnScreen() {
-        int position = adapter.getNodePosition(draggingNodeHandle);
+        int position = mAdapter.getNodePosition(mDraggingNodeHandle);
         RecyclerView.ViewHolder viewHolder =
-                binding.cuList.findViewHolderForLayoutPosition(position);
+                mBinding.cuList.findViewHolderForLayoutPosition(position);
         if (viewHolder == null) {
             return;
         }
-        int[] res = adapter.getThumbnailLocationOnScreen(viewHolder);
+        int[] res = mAdapter.getThumbnailLocationOnScreen(viewHolder);
         res[0] += res[2] / 2;
         res[1] += res[3] / 2;
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
@@ -254,27 +254,27 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void toCloudDrive() {
-        viewModel.setCamSyncEnabled(false);
-        managerActivity.setFirstLogin(false);
-        managerActivity.setInitialCloudDrive();
+        mViewModel.setCamSyncEnabled(false);
+        mManagerActivity.setFirstLogin(false);
+        mManagerActivity.setInitialCloudDrive();
     }
 
     private void requestCameraUploadPermission(String[] permissions, int requestCode) {
-        ActivityCompat.requestPermissions(managerActivity, permissions,
+        ActivityCompat.requestPermissions(mManagerActivity, permissions,
                 requestCode);
     }
 
     public void enableCuForBusinessFirstTime() {
-        if (firstLoginBinding == null) {
+        if (mFirstLoginBinding == null) {
             return;
         }
 
-        boolean enableCellularSync = firstLoginBinding.cellularConnectionSwitch.isChecked();
-        boolean syncVideo = firstLoginBinding.uploadVideosSwitch.isChecked();
+        boolean enableCellularSync = mFirstLoginBinding.cellularConnectionSwitch.isChecked();
+        boolean syncVideo = mFirstLoginBinding.uploadVideosSwitch.isChecked();
 
-        viewModel.enableCuForBusinessFirstTime(enableCellularSync, syncVideo);
+        mViewModel.enableCuForBusinessFirstTime(enableCellularSync, syncVideo);
 
-        managerActivity.setFirstLogin(false);
+        mManagerActivity.setFirstLogin(false);
         startCU();
     }
 
@@ -297,7 +297,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             dbH.setCamSyncEnabled(false);
             dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
             stopRunningCameraUploadService(context);
-            managerActivity.refreshCameraUpload();
+            mManagerActivity.refreshCameraUpload();
         } else {
             prefs = dbH.getPreferences();
             if (prefs != null &&
@@ -365,7 +365,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void startCU() {
-        managerActivity.refreshCameraUpload();
+        mManagerActivity.refreshCameraUpload();
 
         new Handler().postDelayed(() -> {
             logDebug("Starting CU");
@@ -374,12 +374,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     public void resetSwitchButtonLabel() {
-        if (binding == null) {
+        if (mBinding == null) {
             return;
         }
 
-        binding.turnOnCuLayout.setVisibility(View.VISIBLE);
-        binding.turnOnCuText.setText(
+        mBinding.turnOnCuLayout.setVisibility(View.VISIBLE);
+        mBinding.turnOnCuText.setText(
                 getString(R.string.settings_camera_upload_turn_on).toUpperCase(
                         Locale.getDefault()));
     }
@@ -389,10 +389,10 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         Bundle args = getArguments();
         if (args != null) {
-            type = getArguments().getInt(ARG_TYPE, TYPE_CAMERA);
+            mCamera = getArguments().getInt(ARG_TYPE, TYPE_CAMERA);
         }
 
-        managerActivity = (ManagerActivityLollipop) context;
+        mManagerActivity = (ManagerActivityLollipop) context;
     }
 
     @Nullable @Override
@@ -400,57 +400,57 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             @Nullable Bundle savedInstanceState) {
 
         CuViewModelFactory viewModelFactory =
-                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context), type);
-        viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
+                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context), mCamera);
+        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
-        if (type == TYPE_CAMERA && managerActivity.getFirstLogin()) {
+        if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
-            binding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
-            return binding.getRoot();
+            mBinding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
+            return mBinding.getRoot();
         }
     }
 
     private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
             @Nullable ViewGroup container) {
-        managerActivity.showHideBottomNavigationView(true);
-        viewModel.setInitialPreferences();
+        mManagerActivity.showHideBottomNavigationView(true);
+        mViewModel.setInitialPreferences();
 
-        firstLoginBinding =
+        mFirstLoginBinding =
                 FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
 
-        new ListenScrollChangesHelper().addViewToListen(firstLoginBinding.camSyncScrollView,
+        new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                    if (firstLoginBinding.camSyncScrollView.canScrollVertically(-1)) {
-                        managerActivity.changeActionBarElevation(true);
+                    if (mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)) {
+                        mManagerActivity.changeActionBarElevation(true);
                     } else {
-                        managerActivity.changeActionBarElevation(false);
+                        mManagerActivity.changeActionBarElevation(false);
                     }
                 });
 
-        firstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
+        mFirstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
             String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
             if (hasPermissions(context, permissions)) {
-                managerActivity.checkIfShouldShowBusinessCUAlert(
+                mManagerActivity.checkIfShouldShowBusinessCUAlert(
                         BUSINESS_CU_FRAGMENT_CU, true);
             } else {
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
             }
-            managerActivity.showHideBottomNavigationView(false);
+            mManagerActivity.showHideBottomNavigationView(false);
         });
-        firstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
+        mFirstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
             toCloudDrive();
         });
 
-        return firstLoginBinding.getRoot();
+        return mFirstLoginBinding.getRoot();
     }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (binding == null) {
+        if (mBinding == null) {
             return;
         }
 
@@ -460,13 +460,13 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void setupRecyclerView() {
-        boolean smallGrid = managerActivity.isSmallGridCameraUploads;
+        boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
         int spanCount = smallGrid ? SPAN_SMALL_GRID : SPAN_LARGE_GRID;
 
-        binding.cuList.setHasFixedSize(true);
+        mBinding.cuList.setHasFixedSize(true);
         GridLayoutManager layoutManager = new GridLayoutManager(context, spanCount);
-        binding.cuList.setLayoutManager(layoutManager);
-        binding.cuList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mBinding.cuList.setLayoutManager(layoutManager);
+        mBinding.cuList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -485,82 +485,82 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 roundCornerRadius,
                 selectedPadding);
 
-        adapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
+        mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override public int getSpanSize(int position) {
-                return adapter.getSpanSize(position);
+                return mAdapter.getSpanSize(position);
             }
         });
 
-        binding.cuList.setAdapter(adapter);
-        binding.scroller.setRecyclerView(binding.cuList);
+        mBinding.cuList.setAdapter(mAdapter);
+        mBinding.scroller.setRecyclerView(mBinding.cuList);
     }
 
     private void setupOtherViews() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.emptyHintImage.setImageResource(R.drawable.uploads_empty_landscape);
+            mBinding.emptyHintImage.setImageResource(R.drawable.uploads_empty_landscape);
         } else {
-            binding.emptyHintImage.setImageResource(R.drawable.ic_empty_camera_uploads);
+            mBinding.emptyHintImage.setImageResource(R.drawable.ic_empty_camera_uploads);
         }
 
-        if (type == TYPE_CAMERA) {
-            binding.turnOnCuText.setText(
+        if (mCamera == TYPE_CAMERA) {
+            mBinding.turnOnCuText.setText(
                     getString(R.string.settings_camera_upload_turn_on).toUpperCase(
                             Locale.getDefault()));
         } else {
-            binding.turnOnCuText.setText(
+            mBinding.turnOnCuText.setText(
                     getString(R.string.settings_set_up_automatic_uploads).toUpperCase(
                             Locale.getDefault()));
         }
 
-        binding.turnOnCuLayout.setOnClickListener(v -> {
+        mBinding.turnOnCuLayout.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
             String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
 
-            if (type == TYPE_CAMERA) {
+            if (mCamera == TYPE_CAMERA) {
                 if (hasPermissions(context, permissions)) {
-                    managerActivity.checkIfShouldShowBusinessCUAlert(
+                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
                             BUSINESS_CU_FRAGMENT_CU, false);
                 } else {
                     requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
                 }
             } else {
-                managerActivity.moveToSettingsSection();
+                mManagerActivity.moveToSettingsSection();
             }
         });
 
-        viewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
-            binding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
+        mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
+            mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
             if (!enabled) {
                 FrameLayout.LayoutParams params =
-                        (FrameLayout.LayoutParams) binding.cuList.getLayoutParams();
+                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
                 params.bottomMargin = px2dp(48, outMetrics);
-                binding.cuList.setLayoutParams(params);
+                mBinding.cuList.setLayoutParams(params);
 
-                params = (FrameLayout.LayoutParams) binding.scroller.getLayoutParams();
+                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
                 params.bottomMargin = px2dp(48, outMetrics);
-                binding.scroller.setLayoutParams(params);
+                mBinding.scroller.setLayoutParams(params);
             }
         });
     }
 
     private void observeLiveData() {
-        viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
-            boolean showScroller = nodes.size() >= (managerActivity.isSmallGridCameraUploads
+        mViewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
+            boolean showScroller = nodes.size() >= (mManagerActivity.isSmallGridCameraUploads
                     ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
-            binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
-            adapter.setNodes(nodes);
-            managerActivity.updateCuFragmentOptionsMenu();
+            mBinding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
+            mAdapter.setNodes(nodes);
+            mManagerActivity.updateCuFragmentOptionsMenu();
 
-            binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
+            mBinding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             if (nodes.isEmpty()) {
-                binding.cuList.setVisibility(View.GONE);
-                binding.scroller.setVisibility(View.GONE);
+                mBinding.cuList.setVisibility(View.GONE);
+                mBinding.scroller.setVisibility(View.GONE);
 
-                binding.emptyHintImage.setVisibility(
-                        viewModel.isSearchMode() ? View.GONE : View.VISIBLE);
-                if (viewModel.isSearchMode()) {
-                    binding.emptyHintText.setText(R.string.no_results_found);
+                mBinding.emptyHintImage.setVisibility(
+                        mViewModel.isSearchMode() ? View.GONE : View.VISIBLE);
+                if (mViewModel.isSearchMode()) {
+                    mBinding.emptyHintText.setText(R.string.no_results_found);
                 } else {
                     String textToShow = getString(R.string.context_empty_camera_uploads);
                     try {
@@ -576,43 +576,43 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                     } else {
                         result = Html.fromHtml(textToShow);
                     }
-                    binding.emptyHintText.setText(result);
+                    mBinding.emptyHintText.setText(result);
                 }
             }
         });
 
-        viewModel.nodeToOpen()
+        mViewModel.nodeToOpen()
                 .observe(getViewLifecycleOwner(), pair -> openNode(pair.first, pair.second));
 
-        viewModel.nodeToAnimate().observe(getViewLifecycleOwner(), pair -> {
-            if (pair.first < 0 || pair.first >= adapter.getItemCount()) {
+        mViewModel.nodeToAnimate().observe(getViewLifecycleOwner(), pair -> {
+            if (pair.first < 0 || pair.first >= mAdapter.getItemCount()) {
                 return;
             }
 
-            adapter.showSelectionAnimation(pair.first, pair.second,
-                    binding.cuList.findViewHolderForLayoutPosition(pair.first));
+            mAdapter.showSelectionAnimation(pair.first, pair.second,
+                    mBinding.cuList.findViewHolderForLayoutPosition(pair.first));
         });
 
-        viewModel.actionBarTitle().observe(getViewLifecycleOwner(), title -> {
+        mViewModel.actionBarTitle().observe(getViewLifecycleOwner(), title -> {
             ActionBar actionBar = ((AppCompatActivity) context).getSupportActionBar();
-            if (actionBar != null && viewModel.isSearchMode()) {
+            if (actionBar != null && mViewModel.isSearchMode()) {
                 actionBar.setTitle(title);
             }
         });
 
-        viewModel.actionMode().observe(getViewLifecycleOwner(), visible -> {
+        mViewModel.actionMode().observe(getViewLifecycleOwner(), visible -> {
             if (visible) {
-                if (actionMode == null) {
-                    actionMode = ((AppCompatActivity) context).startSupportActionMode(
-                            new CuActionModeCallback(context, this, viewModel, megaApi));
+                if (mActionMode == null) {
+                    mActionMode = ((AppCompatActivity) context).startSupportActionMode(
+                            new CuActionModeCallback(context, this, mViewModel, megaApi));
                 }
 
-                actionMode.setTitle(String.valueOf(viewModel.getSelectedNodesCount()));
-                actionMode.invalidate();
+                mActionMode.setTitle(String.valueOf(mViewModel.getSelectedNodesCount()));
+                mActionMode.invalidate();
             } else {
-                if (actionMode != null) {
-                    actionMode.finish();
-                    actionMode = null;
+                if (mActionMode != null) {
+                    mActionMode.finish();
+                    mActionMode = null;
                 }
             }
         });
@@ -626,7 +626,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             case REQUEST_CAMERA_ON_OFF: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    managerActivity.checkIfShouldShowBusinessCUAlert(
+                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
                             BUSINESS_CU_FRAGMENT_CU, false);
                 }
                 break;
@@ -634,7 +634,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             case REQUEST_CAMERA_ON_OFF_FIRST_TIME: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    managerActivity.checkIfShouldShowBusinessCUAlert(
+                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
                             BUSINESS_CU_FRAGMENT_CU, true);
                 }
                 break;
@@ -645,17 +645,17 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     @Override public void onResume() {
         super.onResume();
 
-        reloadNodes(managerActivity.orderCamera);
+        reloadNodes(mManagerActivity.orderCamera);
         sInstanceForDragging = null;
     }
 
     private void openNode(int position, CuNode cuNode) {
-        if (position < 0 || position >= adapter.getItemCount()) {
+        if (position < 0 || position >= mAdapter.getItemCount()) {
             return;
         }
 
-        int[] thumbnailLocation = adapter.getThumbnailLocationOnScreen(
-                binding.cuList.findViewHolderForLayoutPosition(position));
+        int[] thumbnailLocation = mAdapter.getThumbnailLocationOnScreen(
+                mBinding.cuList.findViewHolderForLayoutPosition(position));
         if (thumbnailLocation == null) {
             return;
         }
@@ -734,7 +734,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 if (isIntentAvailable(context, mediaIntent)) {
                     launchNodeViewer(mediaIntent, node.getHandle());
                 } else {
-                    managerActivity.showSnackbar(SNACKBAR_TYPE,
+                    mManagerActivity.showSnackbar(SNACKBAR_TYPE,
                             getString(R.string.intent_not_available), -1);
                 }
             }
@@ -748,7 +748,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void putExtras(Intent intent, int index, MegaNode node, int[] thumbnailLocation) {
         intent.putExtra("position", index);
-        intent.putExtra("orderGetChildren", managerActivity.orderCamera);
+        intent.putExtra("orderGetChildren", mManagerActivity.orderCamera);
 
         MegaNode parentNode = megaApi.getParentNode(node);
         if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {
@@ -757,9 +757,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             intent.putExtra("parentNodeHandle", parentNode.getHandle());
         }
 
-        if (viewModel.isSearchMode()) {
+        if (mViewModel.isSearchMode()) {
             intent.putExtra("adapterType", SEARCH_BY_ADAPTER);
-            intent.putExtra("handlesNodesSearch", viewModel.getSearchResultNodeHandles());
+            intent.putExtra("handlesNodesSearch", mViewModel.getSearchResultNodeHandles());
         } else {
             intent.putExtra("adapterType", PHOTO_SYNC_ADAPTER);
         }
@@ -772,20 +772,20 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         context.startActivity(intent);
         requireActivity().overridePendingTransition(0, 0);
         sInstanceForDragging = this;
-        draggingNodeHandle = handle;
+        mDraggingNodeHandle = handle;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        mBinding = null;
     }
 
     @Override public void onNodeClicked(int position, CuNode node) {
-        viewModel.onNodeClicked(position, node);
+        mViewModel.onNodeClicked(position, node);
     }
 
     @Override public void onNodeLongClicked(int position, CuNode node) {
-        viewModel.onNodeLongClicked(position, node);
+        mViewModel.onNodeLongClicked(position, node);
     }
 }

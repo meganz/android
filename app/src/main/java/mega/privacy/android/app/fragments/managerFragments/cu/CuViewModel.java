@@ -40,69 +40,69 @@ import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFold
 import static mega.privacy.android.app.utils.Util.fromEpoch;
 
 class CuViewModel extends BaseRxViewModel {
-    private final MegaApiAndroid megaApi;
-    private final DatabaseHandler dbHandler;
-    private final int type;
-    private final MegaNodeRepo repo;
+    private final MegaApiAndroid mMegaApi;
+    private final DatabaseHandler mDbHandler;
+    private final int mType;
+    private final MegaNodeRepo mRepo;
 
-    private final MutableLiveData<List<CuNode>> cuNodes = new MutableLiveData<>();
-    private final MutableLiveData<Pair<Integer, CuNode>> nodeToOpen = new MutableLiveData<>();
-    private final MutableLiveData<Pair<Integer, CuNode>> nodeToAnimate = new MutableLiveData<>();
-    private final MutableLiveData<String> actionBarTitle = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> actionMode = new MutableLiveData<>();
+    private final MutableLiveData<List<CuNode>> mCuNodes = new MutableLiveData<>();
+    private final MutableLiveData<Pair<Integer, CuNode>> mNodeToOpen = new MutableLiveData<>();
+    private final MutableLiveData<Pair<Integer, CuNode>> mNodeToAnimate = new MutableLiveData<>();
+    private final MutableLiveData<String> mActionBarTitle = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mActionMode = new MutableLiveData<>();
 
-    private final Subject<Pair<Integer, CuNode>> openNodeAction = PublishSubject.create();
-    private final Subject<Object> creatingThumbnailFinished = PublishSubject.create();
+    private final Subject<Pair<Integer, CuNode>> mOpenNodeAction = PublishSubject.create();
+    private final Subject<Object> mCreatingThumbnailFinished = PublishSubject.create();
 
-    private final MegaRequestListenerInterface createThumbnailRequest =
+    private final MegaRequestListenerInterface mCreateThumbnailRequest =
             new BaseListener(getApplication()) {
                 @Override
                 public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
                     if (e.getErrorCode() == MegaError.API_OK) {
-                        creatingThumbnailFinished.onNext(true);
+                        mCreatingThumbnailFinished.onNext(true);
                     }
                 }
             };
 
-    private boolean selecting;
-    private final LongSparseArray<MegaNode> selectedNodes = new LongSparseArray<>(5);
+    private boolean mSelecting;
+    private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
 
-    private long[] searchDate;
+    private long[] mSearchDate;
 
     public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, int type) {
-        this.megaApi = megaApi;
-        this.dbHandler = dbHandler;
-        this.type = type;
-        repo = new MegaNodeRepo(megaApi, dbHandler, getApplication());
+        mMegaApi = megaApi;
+        mDbHandler = dbHandler;
+        mType = type;
+        mRepo = new MegaNodeRepo(megaApi, dbHandler, getApplication());
 
         loadCuNodes();
 
-        add(openNodeAction.throttleFirst(1, TimeUnit.SECONDS)
+        add(mOpenNodeAction.throttleFirst(1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(nodeToOpen::setValue, logErr("openNodeAction")));
+                .subscribe(mNodeToOpen::setValue, logErr("openNodeAction")));
 
-        add(creatingThumbnailFinished.throttleFirst(1, TimeUnit.SECONDS)
+        add(mCreatingThumbnailFinished.throttleFirst(1, TimeUnit.SECONDS)
                 .subscribe(ignored -> loadCuNodes(), logErr("creatingThumbnailFinished")));
     }
 
     public LiveData<List<CuNode>> cuNodes() {
-        return cuNodes;
+        return mCuNodes;
     }
 
     public LiveData<Pair<Integer, CuNode>> nodeToOpen() {
-        return nodeToOpen;
+        return mNodeToOpen;
     }
 
     public LiveData<Pair<Integer, CuNode>> nodeToAnimate() {
-        return nodeToAnimate;
+        return mNodeToAnimate;
     }
 
     public LiveData<String> actionBarTitle() {
-        return actionBarTitle;
+        return mActionBarTitle;
     }
 
     public LiveData<Boolean> actionMode() {
-        return actionMode;
+        return mActionMode;
     }
 
     public void loadCuNodes(int orderBy) {
@@ -110,16 +110,16 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public void setSearchDate(long[] searchDate, int orderBy) {
-        this.searchDate = searchDate;
+        this.mSearchDate = searchDate;
         loadCuNodes(orderBy);
     }
 
     public boolean isSearchMode() {
-        return searchDate != null;
+        return mSearchDate != null;
     }
 
     public long[] getSearchResultNodeHandles() {
-        List<CuNode> nodes = cuNodes.getValue();
+        List<CuNode> nodes = mCuNodes.getValue();
         if (!isSearchMode() || nodes == null || nodes.isEmpty()) {
             return new long[0];
         }
@@ -139,7 +139,7 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public boolean isSelecting() {
-        return selecting;
+        return mSelecting;
     }
 
     /**
@@ -153,8 +153,8 @@ class CuViewModel extends BaseRxViewModel {
      * @param node clicked node
      */
     public void onNodeClicked(int position, CuNode node) {
-        if (selecting) {
-            List<CuNode> nodes = cuNodes.getValue();
+        if (mSelecting) {
+            List<CuNode> nodes = mCuNodes.getValue();
             if (nodes == null || position < 0 || position >= nodes.size()
                     || nodes.get(position).getNode() == null
                     || nodes.get(position).getNode().getHandle() != node.getNode().getHandle()) {
@@ -163,39 +163,39 @@ class CuViewModel extends BaseRxViewModel {
 
             nodes.get(position).setSelected(!nodes.get(position).isSelected());
             if (nodes.get(position).isSelected()) {
-                selectedNodes.put(node.getNode().getHandle(), node.getNode());
+                mSelectedNodes.put(node.getNode().getHandle(), node.getNode());
             } else {
-                selectedNodes.remove(node.getNode().getHandle());
+                mSelectedNodes.remove(node.getNode().getHandle());
             }
-            selecting = !selectedNodes.isEmpty();
-            actionMode.setValue(selecting);
+            mSelecting = !mSelectedNodes.isEmpty();
+            mActionMode.setValue(mSelecting);
 
-            nodeToAnimate.setValue(Pair.create(position, node));
+            mNodeToAnimate.setValue(Pair.create(position, node));
         } else {
-            openNodeAction.onNext(Pair.create(position, node));
+            mOpenNodeAction.onNext(Pair.create(position, node));
         }
     }
 
     public void onNodeLongClicked(int position, CuNode node) {
-        selecting = true;
+        mSelecting = true;
         onNodeClicked(position, node);
     }
 
     public List<MegaNode> getSelectedNodes() {
         List<MegaNode> nodes = new ArrayList<>();
-        for (int i = 0, n = selectedNodes.size(); i < n; i++) {
-            nodes.add(selectedNodes.valueAt(i));
+        for (int i = 0, n = mSelectedNodes.size(); i < n; i++) {
+            nodes.add(mSelectedNodes.valueAt(i));
         }
 
         return nodes;
     }
 
     public int getSelectedNodesCount() {
-        return selectedNodes.size();
+        return mSelectedNodes.size();
     }
 
     public int getRealNodesCount() {
-        List<CuNode> nodes = cuNodes.getValue();
+        List<CuNode> nodes = mCuNodes.getValue();
         if (nodes == null || nodes.isEmpty()) {
             return 0;
         }
@@ -203,7 +203,7 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public void selectAll() {
-        List<CuNode> nodes = cuNodes.getValue();
+        List<CuNode> nodes = mCuNodes.getValue();
         if (nodes == null || nodes.isEmpty()) {
             return;
         }
@@ -211,21 +211,21 @@ class CuViewModel extends BaseRxViewModel {
         for (CuNode node : nodes) {
             if (node.getNode() != null) {
                 node.setSelected(true);
-                selectedNodes.put(node.getNode().getHandle(), node.getNode());
+                mSelectedNodes.put(node.getNode().getHandle(), node.getNode());
             }
         }
 
-        selecting = true;
-        cuNodes.setValue(nodes);
-        actionMode.setValue(true);
+        mSelecting = true;
+        mCuNodes.setValue(nodes);
+        mActionMode.setValue(true);
     }
 
     public void clearSelection() {
-        if (selecting) {
-            selecting = false;
-            actionMode.setValue(false);
+        if (mSelecting) {
+            mSelecting = false;
+            mActionMode.setValue(false);
 
-            List<CuNode> nodes = cuNodes.getValue();
+            List<CuNode> nodes = mCuNodes.getValue();
             if (nodes == null || nodes.isEmpty()) {
                 return;
             }
@@ -233,9 +233,9 @@ class CuViewModel extends BaseRxViewModel {
             for (CuNode node : nodes) {
                 node.setSelected(false);
             }
-            selectedNodes.clear();
+            mSelectedNodes.clear();
 
-            cuNodes.setValue(nodes);
+            mCuNodes.setValue(nodes);
         }
     }
 
@@ -245,22 +245,22 @@ class CuViewModel extends BaseRxViewModel {
                 .subscribe(ignored -> {
                     logDebug("setInitialPreferences");
 
-                    dbHandler.setFirstTime(false);
-                    dbHandler.setStorageAskAlways(true);
+                    mDbHandler.setFirstTime(false);
+                    mDbHandler.setStorageAskAlways(true);
                     File defaultDownloadLocation = buildDefaultDownloadDir(getApplication());
                     defaultDownloadLocation.mkdirs();
 
-                    dbHandler.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
-                    dbHandler.setPinLockEnabled(false);
-                    dbHandler.setPinLockCode("");
+                    mDbHandler.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+                    mDbHandler.setPinLockEnabled(false);
+                    mDbHandler.setPinLockCode("");
 
-                    ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
+                    ArrayList<MegaNode> nodeLinks = mMegaApi.getPublicLinks();
                     if (nodeLinks == null || nodeLinks.size() == 0) {
                         logDebug("No public links: showCopyright set true");
-                        dbHandler.setShowCopyright(true);
+                        mDbHandler.setShowCopyright(true);
                     } else {
                         logDebug("Already public links: showCopyright set false");
-                        dbHandler.setShowCopyright(false);
+                        mDbHandler.setShowCopyright(false);
                     }
                 }, logErr("setInitialPreferences")));
     }
@@ -268,27 +268,27 @@ class CuViewModel extends BaseRxViewModel {
     public void setCamSyncEnabled(boolean enabled) {
         add(Single.just(enabled)
                 .observeOn(Schedulers.io())
-                .subscribe(dbHandler::setCamSyncEnabled, logErr("setCamSyncEnabled")));
+                .subscribe(mDbHandler::setCamSyncEnabled, logErr("setCamSyncEnabled")));
     }
 
     public void enableCuForBusinessFirstTime(boolean enableCellularSync, boolean syncVideo) {
         add(Single.just(0)
                 .observeOn(Schedulers.io())
                 .subscribe(ignored -> {
-                    dbHandler.setCamSyncEnabled(true);
+                    mDbHandler.setCamSyncEnabled(true);
                     File localFile =
                             Environment.getExternalStoragePublicDirectory(
                                     Environment.DIRECTORY_DCIM);
-                    dbHandler.setCamSyncLocalPath(localFile.getAbsolutePath());
-                    dbHandler.setCameraFolderExternalSDCard(false);
-                    dbHandler.setCamSyncWifi(!enableCellularSync);
-                    dbHandler.setCamSyncFileUpload(
+                    mDbHandler.setCamSyncLocalPath(localFile.getAbsolutePath());
+                    mDbHandler.setCameraFolderExternalSDCard(false);
+                    mDbHandler.setCamSyncWifi(!enableCellularSync);
+                    mDbHandler.setCamSyncFileUpload(
                             syncVideo ? MegaPreferences.PHOTOS_AND_VIDEOS
                                     : MegaPreferences.ONLY_PHOTOS);
 
-                    dbHandler.setCameraUploadVideoQuality(MEDIUM);
-                    dbHandler.setConversionOnCharging(true);
-                    dbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+                    mDbHandler.setCameraUploadVideoQuality(MEDIUM);
+                    mDbHandler.setConversionOnCharging(true);
+                    mDbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
                 }, logErr("enableCuForBusinessFirstTime")));
     }
 
@@ -297,7 +297,7 @@ class CuViewModel extends BaseRxViewModel {
 
         add(Single.defer(
                 () -> Single.just(
-                        Boolean.parseBoolean(dbHandler.getPreferences().getCamSyncEnabled())))
+                        Boolean.parseBoolean(mDbHandler.getPreferences().getCamSyncEnabled())))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(camSyncEnabled::setValue, logErr("camSyncEnabled")));
@@ -308,7 +308,7 @@ class CuViewModel extends BaseRxViewModel {
     private void loadCuNodes() {
         loadCuNodes(Single.defer(() -> {
             int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
-            MegaPreferences pref = dbHandler.getPreferences();
+            MegaPreferences pref = mDbHandler.getPreferences();
             if (pref != null) {
                 try {
                     orderBy = Integer.parseInt(pref.getPreferredSortCameraUpload());
@@ -323,11 +323,11 @@ class CuViewModel extends BaseRxViewModel {
         add(source.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(nodes -> {
-                    cuNodes.setValue(nodes);
+                    mCuNodes.setValue(nodes);
 
-                    String actionBarTitleWhenSearch = getSearchDateTitle(searchDate);
+                    String actionBarTitleWhenSearch = getSearchDateTitle(mSearchDate);
                     if (!TextUtils.isEmpty(actionBarTitleWhenSearch)) {
-                        actionBarTitle.setValue(actionBarTitleWhenSearch);
+                        mActionBarTitle.setValue(actionBarTitleWhenSearch);
                     }
                 }, logErr("loadCuNodes")));
     }
@@ -338,7 +338,7 @@ class CuViewModel extends BaseRxViewModel {
 
         LocalDate lastModifyDate = null;
         int index = 0;
-        for (MegaNode node : repo.getCuChildren(type, orderBy, searchDate)) {
+        for (MegaNode node : mRepo.getCuChildren(mType, orderBy, mSearchDate)) {
             File thumbnail =
                     new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
@@ -352,7 +352,7 @@ class CuViewModel extends BaseRxViewModel {
 
             nodes.add(new CuNode(node, index, thumbnail.exists() ? thumbnail : null,
                     isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE, dateString,
-                    selectedNodes.containsKey(node.getHandle())));
+                    mSelectedNodes.containsKey(node.getHandle())));
             index++;
 
             if (!thumbnail.exists()) {
@@ -363,7 +363,7 @@ class CuViewModel extends BaseRxViewModel {
         for (MegaNode node : nodesWithoutThumbnail) {
             File thumbnail =
                     new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
-            megaApi.getThumbnail(node, thumbnail.getAbsolutePath(), createThumbnailRequest);
+            mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
         }
 
         return nodes;

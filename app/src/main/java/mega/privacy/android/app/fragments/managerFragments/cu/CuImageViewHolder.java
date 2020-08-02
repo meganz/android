@@ -8,25 +8,25 @@ import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding;
  */
 class CuImageViewHolder extends CuViewHolder {
 
-    private final ItemCameraUploadsImageBinding binding;
-    private final CuItemSizeConfig itemSizeConfig;
+    private final ItemCameraUploadsImageBinding mBinding;
+    private final CuItemSizeConfig mItemSizeConfig;
 
     public CuImageViewHolder(ItemCameraUploadsImageBinding binding,
             CuItemSizeConfig itemSizeConfig) {
         super(binding.getRoot());
-        this.binding = binding;
-        this.itemSizeConfig = itemSizeConfig;
+        mBinding = binding;
+        mItemSizeConfig = itemSizeConfig;
 
         setViewSize(binding.getRoot(), binding.icSelected, itemSizeConfig);
     }
 
     @Override protected void bind(CuNode node) {
-        updateThumbnailDisplay(binding.thumbnail, node, itemSizeConfig);
+        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig);
 
-        binding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
+        mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
     }
 
     public ItemCameraUploadsImageBinding binding() {
-        return binding;
+        return mBinding;
     }
 }
