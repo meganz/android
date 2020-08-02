@@ -6,19 +6,19 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import mega.privacy.android.app.MegaApplication;
 
 public abstract class BaseRxViewModel extends AndroidViewModel {
-  protected CompositeDisposable composite = new CompositeDisposable();
+    protected CompositeDisposable composite = new CompositeDisposable();
 
-  public BaseRxViewModel() {
-    super(MegaApplication.getInstance());
-  }
+    public BaseRxViewModel() {
+        super(MegaApplication.getInstance());
+    }
 
-  protected void add(Disposable disposable) {
-    composite.add(disposable);
-  }
+    protected void add(Disposable disposable) {
+        composite.add(disposable);
+    }
 
-  @Override protected void onCleared() {
-    super.onCleared();
+    @Override protected void onCleared() {
+        super.onCleared();
 
-    composite.clear();
-  }
+        composite.clear();
+    }
 }
