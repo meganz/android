@@ -1,13 +1,6 @@
 package mega.privacy.android.app.fragments.managerFragments.homepage
 
 import android.graphics.Bitmap
-import android.graphics.Bitmap.Config.ARGB_8888
-import android.graphics.BitmapFactory
-import android.graphics.BitmapFactory.Options
-import android.graphics.BitmapShader
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Shader.TileMode.CLAMP
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,9 +17,8 @@ import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtils.isFileAvailable
-import mega.privacy.android.app.utils.PreviewUtils.calculateInSampleSize
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.app.utils.Util.getCircleAvatar
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi.STATUS_AWAY
@@ -61,7 +53,7 @@ class HomePageViewModel @ViewModelInject constructor(
         megaChatApi.addChatListener(this)
 
         _avatar.value = getDefaultAvatar(
-                getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
+            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
         )
         loadAvatar()
     }
@@ -74,68 +66,37 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     private fun loadAvatar() {
-        add(Single.just(true)
-                .subscribeOn(Schedulers.io())
-                .map {
-                    val avatar = buildAvatarFile(getApplication(), megaApi.myEmail + ".jpg")
-                    if (!isFileAvailable(avatar) || avatar.length() == 0L) {
-                        createAvatar()
-                        return@map null
-                    }
-
-                    val options = Options()
-                    options.inJustDecodeBounds = true
-                    BitmapFactory.decodeFile(avatar.absolutePath, options)
-
-                    options.inSampleSize = calculateInSampleSize(options, 250, 250)
-
-                    options.inJustDecodeBounds = false
-                    val bitmap = BitmapFactory.decodeFile(avatar.absolutePath, options)
-                    if (bitmap == null) {
-                        avatar.delete()
-                        createAvatar()
-                        return@map null
-                    }
-
-                    val circleBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, ARGB_8888)
-                    val shader = BitmapShader(bitmap, CLAMP, CLAMP)
-                    val paint = Paint()
-                    paint.shader = shader
-                    val c = Canvas(circleBitmap)
-                    val radius =
-                        if (bitmap.width < bitmap.height) bitmap.width / 2 else bitmap.height / 2
-                    c.drawCircle(
-                            bitmap.width / 2F, bitmap.height / 2F, radius.toFloat(), paint
-                    )
-                    return@map circleBitmap
+        add(Single.fromCallable { getCircleAvatar(getApplication(), megaApi.myEmail) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(Consumer {
+                if (it != null) {
+                    _avatar.value = it
+                } else {
+                    createAvatar()
                 }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer {
-                    if (it != null) {
-                        _avatar.value = it
-                    }
-                }, logErr("loadAvatar"))
+            }, logErr("loadAvatar"))
         )
     }
 
     private fun createAvatar() {
         megaApi.getUserAvatar(
-                megaApi.myUser,
-                buildAvatarFile(getApplication(), megaApi.myEmail + ".jpg").absolutePath,
-                object : DefaultMegaRequestListener {
-                    override fun onRequestFinish(
-                        api: MegaApiJava,
-                        request: MegaRequest,
-                        e: MegaError
+            megaApi.myUser,
+            buildAvatarFile(getApplication(), megaApi.myEmail + ".jpg").absolutePath,
+            object : DefaultMegaRequestListener {
+                override fun onRequestFinish(
+                    api: MegaApiJava,
+                    request: MegaRequest,
+                    e: MegaError
+                ) {
+                    if (request.type == MegaRequest.TYPE_GET_ATTR_USER
+                        && request.paramType == MegaApiJava.USER_ATTR_AVATAR
+                        && e.errorCode == MegaError.API_OK
                     ) {
-                        if (request.type == MegaRequest.TYPE_GET_ATTR_USER
-                                && request.paramType == MegaApiJava.USER_ATTR_AVATAR
-                                && e.errorCode == MegaError.API_OK
-                        ) {
-                            loadAvatar()
-                        }
+                        loadAvatar()
                     }
-                })
+                }
+            })
     }
 
     override fun onUserAlertsUpdate(

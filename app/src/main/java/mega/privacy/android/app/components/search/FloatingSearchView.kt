@@ -187,7 +187,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
     fun setShowLeftDot(showLeftDot: Boolean) {
         menuBtnShowDot = showLeftDot
-        val searchInputHasFocus = searchInput.hasFocus() ?: false
+        val searchInputHasFocus = searchInput.hasFocus()
         menuBtnDrawable?.setBadgeEnabled(showLeftDot && !searchInputHasFocus)
     }
 
