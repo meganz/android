@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 
-interface BaseMegaRequestListener : MegaRequestListenerInterface {
+interface DefaultMegaRequestListener : MegaRequestListenerInterface {
   override fun onRequestStart(
     api: MegaApiJava,
     request: MegaRequest

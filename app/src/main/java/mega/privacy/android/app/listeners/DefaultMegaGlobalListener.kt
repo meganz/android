@@ -9,7 +9,7 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import java.util.ArrayList
 
-interface BaseMegaGlobalListener : MegaGlobalListenerInterface {
+interface DefaultMegaGlobalListener : MegaGlobalListenerInterface {
   override fun onUsersUpdate(
     api: MegaApiJava,
     users: ArrayList<MegaUser>?

@@ -17,9 +17,9 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.listeners.BaseMegaChatListener
-import mega.privacy.android.app.listeners.BaseMegaGlobalListener
-import mega.privacy.android.app.listeners.BaseMegaRequestListener
+import mega.privacy.android.app.listeners.DefaultMegaChatListener
+import mega.privacy.android.app.listeners.DefaultMegaGlobalListener
+import mega.privacy.android.app.listeners.DefaultMegaRequestListener
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -44,7 +44,7 @@ import java.util.ArrayList
 class HomePageViewModel @ViewModelInject constructor(
     private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid
-) : BaseRxViewModel(), BaseMegaGlobalListener, BaseMegaChatListener {
+) : BaseRxViewModel(), DefaultMegaGlobalListener, DefaultMegaChatListener {
     private val _notification = MutableLiveData<Boolean>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
@@ -122,7 +122,7 @@ class HomePageViewModel @ViewModelInject constructor(
         megaApi.getUserAvatar(
                 megaApi.myUser,
                 buildAvatarFile(getApplication(), megaApi.myEmail + ".jpg").absolutePath,
-                object : BaseMegaRequestListener {
+                object : DefaultMegaRequestListener {
                     override fun onRequestFinish(
                         api: MegaApiJava,
                         request: MegaRequest,

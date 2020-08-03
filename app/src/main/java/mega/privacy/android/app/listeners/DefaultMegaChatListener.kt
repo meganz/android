@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatPresenceConfig
 
-interface BaseMegaChatListener : MegaChatListenerInterface {
+interface DefaultMegaChatListener : MegaChatListenerInterface {
   override fun onChatListItemUpdate(
     api: MegaChatApiJava,
     item: MegaChatListItem?
