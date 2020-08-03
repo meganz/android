@@ -23,7 +23,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     private Paint textPaint;
     private String text;
     private boolean showDot;
-    private boolean enabled = true;
+    private boolean badgeEnabled = true;
 
     public BadgeDrawerArrowDrawable(Context context) {
         super(context);
@@ -64,7 +64,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        if (!enabled) {
+        if (!badgeEnabled) {
             return;
         }
 
@@ -102,15 +102,11 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         canvas.drawText(text, x1, y1 + (float) (textBounds.height() / 2.5), textPaint);
     }
 
-    public void setEnabled(boolean enabled) {
-        if (this.enabled != enabled) {
-            this.enabled = enabled;
+    public void setBadgeEnabled(boolean badgeEnabled) {
+        if (this.badgeEnabled != badgeEnabled) {
+            this.badgeEnabled = badgeEnabled;
             invalidateSelf();
         }
-    }
-
-    public boolean isEnabled() {
-        return enabled;
     }
 
     public void setText(String text) {

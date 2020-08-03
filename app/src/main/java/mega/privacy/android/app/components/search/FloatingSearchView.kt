@@ -188,7 +188,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     fun setShowLeftDot(showLeftDot: Boolean) {
         menuBtnShowDot = showLeftDot
         val searchInputHasFocus = searchInput.hasFocus() ?: false
-        menuBtnDrawable?.isEnabled = showLeftDot && !searchInputHasFocus
+        menuBtnDrawable?.setBadgeEnabled(showLeftDot && !searchInputHasFocus)
     }
 
     fun setAvatar(avatar: Bitmap) {
@@ -211,7 +211,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         menuBtnDrawable?.backgroundColor = ContextCompat.getColor(context, R.color.dark_primary_color)
         menuBtnDrawable?.setBigBackgroundColor(Color.WHITE)
         menuBtnDrawable?.setShowDot(true)
-        menuBtnDrawable?.isEnabled = menuBtnShowDot
+        menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot)
         iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)
     }
 
@@ -251,7 +251,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
                     setSearchFocusedInternal(hasFocus)
                 }
 
-                menuBtnDrawable?.isEnabled = menuBtnShowDot && !hasFocus
+                menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot && !hasFocus)
                 binding.avatarContainer.visibility = if (hasFocus) View.GONE else View.VISIBLE
             }
 
