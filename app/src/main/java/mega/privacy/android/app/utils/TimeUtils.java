@@ -384,7 +384,7 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Method for obtaining the appropriate String depending on the option selected.
      *
-     * @param timestamp The time it's muted.
+     * @param timestamp The time in minutes that notifications of a chat or all chats are muted.
      * @return The right string
      */
     public static String getCorrectStringDependingOnOptionSelected(long timestamp) {
