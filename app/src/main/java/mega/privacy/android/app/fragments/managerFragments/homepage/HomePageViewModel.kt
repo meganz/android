@@ -20,7 +20,10 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.BaseMegaChatListener
 import mega.privacy.android.app.listeners.BaseMegaGlobalListener
 import mega.privacy.android.app.listeners.BaseMegaRequestListener
+import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
+import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
 import mega.privacy.android.app.utils.PreviewUtils.calculateInSampleSize
 import mega.privacy.android.app.utils.RxUtil.logErr
@@ -57,6 +60,9 @@ class HomePageViewModel @ViewModelInject constructor(
         megaApi.addGlobalListener(this)
         megaChatApi.addChatListener(this)
 
+        _avatar.value = getDefaultAvatar(
+                getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
+        )
         loadAvatar()
     }
 

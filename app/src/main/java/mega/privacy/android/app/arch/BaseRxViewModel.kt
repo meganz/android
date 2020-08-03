@@ -6,13 +6,15 @@ import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.MegaApplication
 
 abstract class BaseRxViewModel : AndroidViewModel(MegaApplication.getInstance()) {
-  protected var composite = CompositeDisposable()
-  protected fun add(disposable: Disposable?) {
-    composite.add(disposable)
-  }
 
-  override fun onCleared() {
-    super.onCleared()
-    composite.clear()
-  }
+    protected var composite = CompositeDisposable()
+
+    protected fun add(disposable: Disposable?) {
+        composite.add(disposable)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        composite.clear()
+    }
 }

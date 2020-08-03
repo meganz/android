@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.widget.ViewPager2
@@ -22,12 +23,17 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApiAndroid
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomepageFragment : BaseFragment() {
+class HomepageFragment : Fragment() {
+
+    @Inject lateinit var megaApi: MegaApiAndroid
+    @Inject lateinit var megaChatApi: MegaChatApiAndroid
 
     private val viewModel: HomePageViewModel by viewModels()
 
