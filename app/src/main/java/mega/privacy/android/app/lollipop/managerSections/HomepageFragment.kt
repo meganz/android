@@ -10,14 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.BottomSheetPagerAdapter
@@ -25,18 +24,18 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
-import mega.privacy.android.app.fragments.managerFragments.homepage.HomepageViewModelFactory
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
 @AndroidEntryPoint
 class HomepageFragment : BaseFragment() {
+
+    private val viewModel: HomePageViewModel by viewModels()
 
     private lateinit var viewDataBinding : FragmentHomepageBinding
     private lateinit var rootView : View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private lateinit var searchInputView: FloatingSearchView
     private lateinit var fabMain: FloatingActionButton
-    private lateinit var viewModel: HomePageViewModel
 
     private var isFabExpanded = false
 
@@ -44,9 +43,6 @@ class HomepageFragment : BaseFragment() {
                               savedInstanceState: Bundle?): View? {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
-
-        val viewModelFactory = HomepageViewModelFactory(megaApi, megaChatApi)
-        viewModel = ViewModelProvider(this, viewModelFactory)[HomePageViewModel::class.java]
 
         return rootView
     }
