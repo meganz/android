@@ -29,7 +29,6 @@
             tools:src="@drawable/ic_arrow_back_black" />
 
         <FrameLayout
-            android:id="@+id/search_input_parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -37,7 +36,7 @@
             android:layout_toEndOf="@+id/left_action">
 
             <mega.privacy.android.app.components.search.SearchInputView
-                android:id="@+id/search_bar_text"
+                android:id="@+id/search_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|start"
@@ -51,6 +50,32 @@
                 android:maxLines="1"
                 android:minHeight="@dimen/square_button_size"
                 android:textSize="@dimen/search_bar_text_size" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/avatar_container"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="14dp"
+            >
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/avatar_image"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:scaleType="fitCenter"
+                card_view:border_width="0dp"
+                card_view:corner_radius="14dp"
+                />
+            <ImageView
+                android:id="@+id/chat_status_icon"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="end"
+                android:background="@null"
+                tools:src="@drawable/ic_offline"
+                />
         </FrameLayout>
 
         <ImageView

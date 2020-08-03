@@ -61,4 +61,6 @@ ext {
     cardViewVersion = '1.0.0'
     legacySupportVersion = 'v4:1.0.0'
     hiltAndroidXVersion = '1.0.0-alpha01'
+    rxJavaVersion = '3.0.4'
+    rxAndroidVersion = '3.0.0'
 }

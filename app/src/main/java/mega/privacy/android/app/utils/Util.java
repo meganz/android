@@ -15,6 +15,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -23,6 +24,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.ExifInterface;
@@ -115,6 +117,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -1275,6 +1278,46 @@ public class Util {
 	    boolean allowVerify = api.smsAllowedState() == 2;
 	    return hasNotVerified && allowVerify;
     }
+
+    @Nullable
+    public static Bitmap getCircleAvatar(Context context, String email) {
+		File avatar = buildAvatarFile(context, email + ".jpg");
+		if (!(isFileAvailable(avatar) && avatar.length() > 0)) {
+			return null;
+		}
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+
+		// Calculate inSampleSize
+		options.inSampleSize = calculateInSampleSize(options, 250, 250);
+		// Decode bitmap with inSampleSize set
+		options.inJustDecodeBounds = false;
+
+		Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+		if (bitmap == null) {
+			avatar.delete();
+			return null;
+		}
+
+		Bitmap circleBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
+				Bitmap.Config.ARGB_8888);
+		BitmapShader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP,
+				Shader.TileMode.CLAMP);
+		Paint paint = new Paint();
+		paint.setShader(shader);
+
+		Canvas canvas = new Canvas(circleBitmap);
+		int radius;
+		if (bitmap.getWidth() < bitmap.getHeight()) {
+			radius = bitmap.getWidth() / 2;
+		} else {
+			radius = bitmap.getHeight() / 2;
+		}
+
+		canvas.drawCircle(bitmap.getWidth() / 2F, bitmap.getHeight() / 2F, radius, paint);
+		return circleBitmap;
+	}
 
 	public static Bitmap getCircleBitmap(Bitmap bitmap) {
 		final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),

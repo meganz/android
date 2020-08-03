@@ -31,6 +31,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
+import javax.inject.Inject;
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
@@ -104,8 +105,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	static final public String USER_AGENT = "MEGAAndroid/3.7.7_318";
 
-	DatabaseHandler dbH;
+	@Inject
 	MegaApiAndroid megaApi;
+	@Inject
+	MegaChatApiAndroid megaChatApi;
+
+	DatabaseHandler dbH;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -156,8 +161,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     private static boolean isBlockedDueToWeakAccount = false;
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
-
-	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
@@ -509,9 +512,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 		checkAppUpgrade();
 
-		megaApi = getMegaApi();
+		setupMegaApi();
+		setupMegaChatApi();
+
 		megaApiFolder = getMegaApiFolder();
-		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
 
@@ -661,7 +665,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			askForPaymentMethods();
 		}
 	}
-	
+
 	public MegaApiAndroid getMegaApiFolder(){
 		if (megaApiFolder == null){
 			PackageManager m = getPackageManager();
@@ -691,31 +695,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		return megaApiFolder;
 	}
 
-	public MegaChatApiAndroid getMegaChatApi(){
-		if (megaChatApi == null){
-			if (megaApi == null){
-				getMegaApi();
-			}
-			else{
-				megaChatApi = new MegaChatApiAndroid(megaApi);
-			}
-		}
-
-		if(megaChatApi!=null) {
-			if (!registeredChatListeners) {
-				logDebug("Add listeners of megaChatApi");
-				megaChatApi.addChatRequestListener(this);
-				megaChatApi.addChatNotificationListener(this);
-				megaChatApi.addChatListener(this);
-				megaChatApi.addChatCallListener(callListener);
-				registeredChatListeners = true;
-			}
-		}
-
-		return megaChatApi;
-	}
-
-	public void disableMegaChatApi(){
+	public void disableMegaChatApi() {
 		try {
 			if (megaChatApi != null) {
 				megaChatApi.removeChatRequestListener(this);
@@ -724,56 +704,50 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				megaChatApi.removeChatCallListener(callListener);
 				registeredChatListeners = false;
 			}
+		} catch (Exception ignored) {
 		}
-		catch (Exception e){}
 	}
 
-	public MegaApiAndroid getMegaApi()
-	{
-		if(megaApi == null)
-		{
-			logDebug("MEGAAPI = null");
-			PackageManager m = getPackageManager();
-			String s = getPackageName();
-			PackageInfo p;
-			String path = null;
-			try
-			{
-				p = m.getPackageInfo(s, 0);
-				path = p.applicationInfo.dataDir + "/";
-			}
-			catch (NameNotFoundException e)
-			{
-				e.printStackTrace();
-			}
-			
-			Log.d(TAG, "Database path: " + path);
-			megaApi = new MegaApiAndroid(MegaApplication.APP_KEY, 
-					MegaApplication.USER_AGENT, path);
+	private void setupMegaApi() {
+		megaApi.retrySSLerrors(true);
 
-			megaApi.retrySSLerrors(true);
+		megaApi.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
+		megaApi.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 
-			megaApi.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-			megaApi.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-			
-			requestListener = new BackgroundRequestListener();
-			logDebug("ADD REQUESTLISTENER");
-			megaApi.addRequestListener(requestListener);
+		requestListener = new BackgroundRequestListener();
+		logDebug("ADD REQUESTLISTENER");
+		megaApi.addRequestListener(requestListener);
 
-			megaApi.addGlobalListener(new GlobalListener());
-			megaChatApi = getMegaChatApi();
+		megaApi.addGlobalListener(new GlobalListener());
 
-			String language = Locale.getDefault().toString();
-			boolean languageString = megaApi.setLanguage(language);
+		String language = Locale.getDefault().toString();
+		boolean languageString = megaApi.setLanguage(language);
+		logDebug("Result: " + languageString + " Language: " + language);
+		if (!languageString) {
+			language = Locale.getDefault().getLanguage();
+			languageString = megaApi.setLanguage(language);
 			logDebug("Result: " + languageString + " Language: " + language);
-			if(languageString==false){
-				language = Locale.getDefault().getLanguage();
-				languageString = megaApi.setLanguage(language);
-				logDebug("Result: " + languageString + " Language: " + language);
-			}
 		}
-		
+	}
+
+	private void setupMegaChatApi() {
+		if (!registeredChatListeners) {
+			logDebug("Add listeners of megaChatApi");
+			megaChatApi.addChatRequestListener(this);
+			megaChatApi.addChatNotificationListener(this);
+			megaChatApi.addChatListener(this);
+			megaChatApi.addChatCallListener(callListener);
+			registeredChatListeners = true;
+		}
+	}
+
+	public MegaApiAndroid getMegaApi() {
 		return megaApi;
+	}
+
+	public MegaChatApiAndroid getMegaChatApi() {
+		setupMegaChatApi();
+		return megaChatApi;
 	}
 
 	public DatabaseHandler getDbH() {
