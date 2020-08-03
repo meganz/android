@@ -1478,6 +1478,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
         if(max != null && mBillingManager.isPayloadValid(max.getUserHandle())){
             myAccountInfo.setActiveGooglePlaySubscription(max);
+        } else {
+            myAccountInfo.setActiveGooglePlaySubscription(null);
         }
 
 		myAccountInfo.setLevelInventory(highest);
@@ -10959,8 +10961,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else{
 			logWarning("usedSpaceLayout is NULL");
 		}
-
-		updateSubscriptionLevel(app.getMyAccountInfo());
 
 		switch (storageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
