@@ -60,16 +60,15 @@
             android:id="@+id/homepage_bottom_sheet"
             layout="@layout/homepage_bottom_sheet" />
 
-        <View
-            android:id="@+id/view_mask"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="@dimen/mask_view_alpha"
-            android:background="@color/textGrey"
-            android:clickable="true"
-            android:elevation="@dimen/elevation_low"
-            android:visibility="gone" />
-
-        <include layout="@layout/homepage_fabs" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin_span"
+            android:src="@drawable/ic_add_white"
+            android:tint="@android:color/white"
+            android:layout_gravity="bottom|end"
+            app:borderWidth="0dp"
+            app:fabSize="normal" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
