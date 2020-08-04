@@ -2,7 +2,7 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 
@@ -27,7 +27,7 @@ class GetUserDataListener(context: Context?) : BaseListener(context) {
 
         if (e.errorCode == MegaError.API_OK) {
             val intent = Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA)
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+            MegaApplication.getInstance().sendBroadcast(intent)
         } else {
             LogUtil.logError("Error getting user data: " + e.errorString)
         }

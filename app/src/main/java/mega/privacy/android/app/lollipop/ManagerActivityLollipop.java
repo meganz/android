@@ -487,7 +487,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case CHAT: return context.getString(R.string.section_chat);
 				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
 				case NOTIFICATIONS: return context.getString(R.string.title_properties_chat_contact_notifications);
-				case ASK_PERMISSIONS: return "Ask Permissions";
 			}
 			return null;
 		}
