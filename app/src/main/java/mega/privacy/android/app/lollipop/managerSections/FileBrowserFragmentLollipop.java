@@ -404,7 +404,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
-			control.selectAll().setVisible(selected.size() != adapter.getItemCount());
+			control.selectAll()
+					.setVisible(selected.size()
+							< adapter.getItemCount() - adapter.getPlaceholderCount());
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
