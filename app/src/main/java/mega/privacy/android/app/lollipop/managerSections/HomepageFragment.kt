@@ -6,23 +6,30 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.Window
+import androidx.appcompat.widget.ContentFrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.widget.ViewPager2
+import ash.TL
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_homepage.view.*
+import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.components.search.FloatingSearchView
+import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -43,8 +50,9 @@ class HomepageFragment : Fragment() {
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private lateinit var searchInputView: FloatingSearchView
     private lateinit var fabMain: FloatingActionButton
-    private lateinit var fabLayoutMain: FloatingActionButton
+    private lateinit var fabMaskMain: FloatingActionButton
     private lateinit var fabMaskLayout: View
+    private var window: ViewGroup? = null
 
     private var isFabExpanded = false
 
@@ -52,7 +60,8 @@ class HomepageFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
-        fabMaskLayout = layoutInflater.inflate(R.layout.fab_layout, null)
+        window = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
+        fabMaskLayout = FabMaskLayoutBinding.inflate(inflater, window, false).root
         return rootView
     }
 
@@ -172,76 +181,93 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupFabs() {
-        fabMain = rootView.findViewById(R.id.fab_main)
-        fabLayoutMain = fabMaskLayout.findViewById(R.id.fab_main)
-        val fabChat = fabMaskLayout.findViewById<View>(R.id.fab_chat)
-        val fabUpload = fabMaskLayout.findViewById<View>(R.id.fab_upload)
-        val textChat = fabMaskLayout.findViewById<View>(R.id.text_chat)
-        val textUpload = fabMaskLayout.findViewById<View>(R.id.text_upload)
+        fabMain = rootView.fab_home_main
+        fabMaskMain = fabMaskLayout.fab_main
+        val fabChat = fabMaskLayout.fab_chat
+        val fabUpload = fabMaskLayout.fab_upload
+        val textChat = fabMaskLayout.text_chat
+        val textUpload = fabMaskLayout.text_upload
 
         fabMain.setOnClickListener {
-            (this::clickCallback)(fabChat, fabUpload, textChat, textUpload)
+            (this::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
         }
 
-        fabLayoutMain.setOnClickListener {
-            (this::clickCallback)(fabChat, fabUpload, textChat, textUpload)
+        fabMaskMain.setOnClickListener {
+            (this::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
         }
 
         fabChat.setOnClickListener {
-
+            TL.log("fabchat")
         }
 
         fabUpload.setOnClickListener {
-
+            TL.log("fab upload")
         }
     }
 
-    private fun clickCallback(fabChat: View, fabUpload: View, textChat: View, textUpload: View) {
-        rotateFab()
-
+    private fun fabMainClickCallback(fabChat: View, fabUpload: View, textChat: View, textUpload: View) {
         if (isFabExpanded) {
-            showOut(fabChat)
-            showOut(fabUpload)
-            showOut(textChat)
-            showOut(textUpload)
+            rotateFab()
+            showOut(fabChat, fabUpload, textChat, textUpload)
+            Handler().postDelayed({
+                removeMask()
+                fabMain.visibility = View.VISIBLE
+            }, 200)
         } else {
-            showIn(fabChat)
-            showIn(fabUpload)
-            showIn(textChat)
-            showIn(textUpload)
-        }
-        if (isFabExpanded) {
-            activity?.window?.findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT)?.removeView(fabMaskLayout)
-            fabMain.visibility = View.VISIBLE
-        } else {
-            activity?.window?.findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT)?.addView(fabMaskLayout)
             fabMain.visibility = View.GONE
+            addMask()
+            rotateFab()
+            showIn(fabChat, fabUpload, textChat, textUpload)
         }
         isFabExpanded = !isFabExpanded
     }
 
+    private fun showIn(vararg fabs: View) {
+        for (fab in fabs) {
+            showIn(fab)
+        }
+    }
+
+    private fun showOut(vararg fabs: View) {
+        for (fab in fabs) {
+            showOut(fab)
+        }
+    }
+
+    private fun addMask() {
+        window?.addView(fabMaskLayout)
+    }
+
+    private fun removeMask() {
+        window?.removeView(fabMaskLayout)
+    }
+
     private fun rotateFab() {
-        val rotateAnim = ObjectAnimator.ofFloat(
-            fabMain, "rotation",
-            if (isFabExpanded) FAB_DEFAULT_ANGEL else FAB_ROTATE_ANGEL
-        )
+        if(fabMaskMain.background != null) {
+            val rotateAnim = ObjectAnimator.ofFloat(
+                fabMaskMain, "rotation",
+                if (isFabExpanded) FAB_DEFAULT_ANGEL else FAB_ROTATE_ANGEL
+            )
 
-        // The tint of the icon in the middle of the FAB
-        val tintAnim = ObjectAnimator.ofArgb(
-            fabMain.drawable.mutate(), "tint",
-            if (isFabExpanded) Color.WHITE else Color.BLACK
-        )
+            // The tint of the icon in the middle of the FAB
+            val tintAnim = ObjectAnimator.ofArgb(
+                fabMaskMain.drawable.mutate(), "tint",
+                if (isFabExpanded) Color.WHITE else Color.BLACK
+            )
 
-        // The background tint of the FAB
-        val backgroundTintAnim = ObjectAnimator.ofArgb(
-            fabMain.background.mutate(), "tint",
-            if (isFabExpanded) resources.getColor(R.color.accentColor) else Color.WHITE
-        )
+            // The background tint of the FAB
+            val backgroundTintAnim = if(fabMaskMain.background == null) null else ObjectAnimator.ofArgb(
+                fabMaskMain.background.mutate(), "tint",
+                if (isFabExpanded) resources.getColor(R.color.accentColor) else Color.WHITE
+            )
 
-        AnimatorSet().apply {
-            duration = FAB_ANIM_DURATION
-            playTogether(rotateAnim, backgroundTintAnim, tintAnim)
-            start()
+            AnimatorSet().apply {
+                duration = FAB_ANIM_DURATION
+                playTogether(rotateAnim, backgroundTintAnim, tintAnim)
+                start()
+            }
+        } else {
+            TL.log("Still null")
         }
     }
 
