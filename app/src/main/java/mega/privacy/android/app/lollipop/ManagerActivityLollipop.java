@@ -6678,8 +6678,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void updateCuFragmentOptionsMenu() {
-		if ((drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFragment.getItemCount() > 0)
-				|| (drawerItem == DrawerItem.MEDIA_UPLOADS && getMediaUploadFragment() != null && muFragment.getItemCount() > 0)) {
+		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
+			return;
+		}
+
+		if ((drawerItem == DrawerItem.CAMERA_UPLOADS
+				&& getCameraUploadFragment() != null
+				&& cuFragment.getItemCount() > 0)
+				|| (drawerItem == DrawerItem.MEDIA_UPLOADS
+				&& getMediaUploadFragment() != null
+				&& muFragment.getItemCount() > 0)) {
 			selectMenuItem.setVisible(true);
 			sortByMenuItem.setVisible(true);
 
@@ -6688,9 +6696,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			if (isSmallGridCameraUploads) {
-				gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
+				gridSmallLargeMenuItem.setIcon(
+						mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 			} else {
-				gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
+				gridSmallLargeMenuItem.setIcon(
+						mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 			}
 			gridSmallLargeMenuItem.setVisible(true);
 		}
