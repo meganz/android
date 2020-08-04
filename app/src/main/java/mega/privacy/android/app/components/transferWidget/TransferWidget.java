@@ -45,7 +45,9 @@ public class TransferWidget {
      * Hides the widget.
      */
     public void hide() {
-        transfersWidget.setVisibility(GONE);
+        if (transfersWidget.getVisibility() != GONE) {
+            transfersWidget.setVisibility(GONE);
+        }
     }
 
     /**
@@ -72,6 +74,7 @@ public class TransferWidget {
             }
 
             if (!isOnFileManagementManagerSection()) {
+                hide();
                 return;
             }
         }
@@ -98,14 +101,15 @@ public class TransferWidget {
                 && drawerItem != ManagerActivityLollipop.DrawerItem.CONTACTS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.ACCOUNT
                 && drawerItem != ManagerActivityLollipop.DrawerItem.SETTINGS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS;
+                && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS
+                && drawerItem != ManagerActivityLollipop.DrawerItem.CHAT;
     }
 
     /**
      * Updates the state of the widget.
      */
     public void updateState() {
-        if (megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)) {
+        if (MegaApplication.getTransfersManagement().areTransfersPaused()) {
             setPausedTransfers();
         } else if (isOnTransferOverQuota() && megaApi.getNumPendingUploads() <= 0){
             setOverQuotaTransfers();
@@ -189,7 +193,13 @@ public class TransferWidget {
         int numPendingUploads = megaApi.getNumPendingUploads();
         boolean pendingDownloads = numPendingDownloads > 0;
         boolean pendingUploads = numPendingUploads > 0;
-        boolean downloadIcon = typeTransfer == TYPE_DOWNLOAD || (pendingDownloads && !pendingUploads) || numPendingDownloads > numPendingUploads;
+        boolean downloadIcon;
+
+        if (typeTransfer == TYPE_UPLOAD && pendingUploads) {
+            downloadIcon = false;
+        } else {
+            downloadIcon = (typeTransfer == TYPE_DOWNLOAD && pendingDownloads) || (pendingDownloads && !pendingUploads) || numPendingDownloads > numPendingUploads;
+        }
 
         button.setImageDrawable(getDrawable(downloadIcon ? R.drawable.ic_transfers_download : R.drawable.ic_transfers_upload));
     }

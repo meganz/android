@@ -14132,6 +14132,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");
 
 			if (e.getErrorCode() == MegaError.API_OK){
+				TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+				if (request.getFlag()) {
+					transfersManagement.incrementPausedTransfers();
+				} else {
+					transfersManagement.decrementPausedTransfers();
+				}
+
 				if (isTransfersInProgressAdded()){
 					tFLol.changeStatusButton(request.getTransferTag());
 				}
@@ -14997,9 +15004,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * Shows a warning to ensure if it is sure of cancel all transfers.
 	 */
 	public void showConfirmationCancelAllTransfers() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
-				.setPositiveButton(R.string.general_cancel, (dialog, which) -> {
+				.setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
 					cancelAllUploads(ManagerActivityLollipop.this);

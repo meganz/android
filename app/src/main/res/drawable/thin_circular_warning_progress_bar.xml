@@ -12,7 +12,7 @@
             android:thicknessRatio="25.0"
             android:type="sweep"
             android:useLevel="false">
-            <solid android:color="@color/incomplete_progress" />
+            <solid android:color="@color/black_12_alpha" />
         </shape>
 
     </item>

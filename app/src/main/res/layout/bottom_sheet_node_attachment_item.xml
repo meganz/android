@@ -132,7 +132,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/forward_layout"
@@ -208,7 +208,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_view_layout"
@@ -339,7 +339,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_remove_layout"

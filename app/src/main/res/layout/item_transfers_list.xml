@@ -26,7 +26,6 @@
         android:layout_toEndOf="@id/transfers_list_thumbnail"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
-		android:layout_marginRight="13dp"
 		android:layout_toLeftOf="@+id/transfers_list_option_pause"
         android:textColor="@color/file_list_first_row"
         android:ellipsize="middle"
@@ -49,7 +48,6 @@
         android:layout_toEndOf="@id/transfers_list_completed_image"
         android:layout_below="@+id/transfers_list_filename"
         android:textColor="@color/file_list_second_row"
-		android:layout_marginEnd="13dp"
 		android:singleLine="true"
 		android:ellipsize="middle"/>
 
@@ -57,22 +55,22 @@
 		android:id="@+id/transfers_list_option_remove"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:src="@drawable/ic_close_grey"
-		android:background="@null"
+		android:layout_alignParentEnd="true"
 		android:layout_centerVertical="true"
 		android:layout_marginEnd="16dp"
-		android:layout_alignParentEnd="true"/>
+		android:background="@null"
+		android:src="@drawable/ic_close_grey" />
 
-    <ImageView
-        android:id="@+id/transfers_list_option_pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_pause"
-        android:background="@null"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="12dp"
-        android:layout_marginLeft="12dp"
-        android:layout_toStartOf="@id/transfers_list_option_remove"/>
+	<ImageView
+		android:id="@+id/transfers_list_option_pause"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerVertical="true"
+		android:layout_marginStart="16dp"
+		android:layout_marginEnd="24dp"
+		android:layout_toStartOf="@id/transfers_list_option_remove"
+		android:background="@null"
+		android:src="@drawable/ic_pause" />
 
     <TextView
         android:id="@+id/transfers_progress_text"

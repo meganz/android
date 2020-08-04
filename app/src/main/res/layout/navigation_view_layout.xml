@@ -143,7 +143,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -170,7 +170,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -197,7 +197,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -223,7 +223,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -248,7 +248,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
 				android:layout_marginTop="16dp"
-				android:background="@color/divider_upgrade_account"
+				android:background="@color/black_12_alpha"
 				android:layout_alignParentBottom="true"/>
 
 		</RelativeLayout>
@@ -277,7 +277,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 

@@ -102,7 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="60dp"
-            android:background="@color/divider_upgrade_account"/>
+            android:background="@color/black_12_alpha"/>
 
         <RelativeLayout
             android:id="@+id/external_storage_layout"
@@ -136,7 +136,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="60dp"
-            android:background="@color/divider_upgrade_account"/>
+            android:background="@color/black_12_alpha"/>
 
     </LinearLayout>
 

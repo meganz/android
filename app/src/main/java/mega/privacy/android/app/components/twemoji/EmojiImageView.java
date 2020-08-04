@@ -40,7 +40,7 @@ public final class EmojiImageView extends AppCompatImageView {
   public EmojiImageView(final Context context, final AttributeSet attrs) {
     super(context, attrs);
 
-    variantIndicatorPaint.setColor(ContextCompat.getColor(context, R.color.divider_upgrade_account));
+    variantIndicatorPaint.setColor(ContextCompat.getColor(context, R.color.black_12_alpha));
     variantIndicatorPaint.setStyle(Paint.Style.FILL);
     variantIndicatorPaint.setAntiAlias(true);
   }

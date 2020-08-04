@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
+import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
+import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
 public class TransfersManagement {
     private static final long INVALID_VALUE = -1;
@@ -22,11 +25,40 @@ public class TransfersManagement {
     private boolean failedTransfers;
     private boolean transferOverQuotaNotificationShown;
     private boolean isTransferOverQuotaBannerShown;
+    private int numPausedTransfers;
 
     private Map<String,String> targetPaths = new HashMap<>();
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
+    }
+
+    /**
+     * Checks if the queue of transfers is paused or all the current in-progress transfers are individually.
+     *
+     * @return True if the queue of transfers or all the current in-progress transfers are paused, false otherwise.
+     */
+    public boolean areTransfersPaused() {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        int totalTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+
+        return megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD) || totalTransfers == numPausedTransfers;
+    }
+
+    /**
+     * Increments the counter of paused transfers.
+     */
+    public void incrementPausedTransfers() {
+        numPausedTransfers++;
+    }
+
+    /**
+     * Decrements the counter of paused transfers.
+     */
+    public void decrementPausedTransfers() {
+        if (numPausedTransfers > 0) {
+            numPausedTransfers--;
+        }
     }
 
     /**

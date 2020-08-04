@@ -180,7 +180,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_alignTop="@id/writing_linear_layout_chat"
-                            android:background="@color/keyboard_chat_separator"
+                            android:background="@color/black_12_alpha"
                             android:orientation="horizontal"
                             android:visibility="visible" />
 
@@ -227,7 +227,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_alignTop="@id/linear_layout_options"
-                        android:background="@color/keyboard_chat_separator"
+                        android:background="@color/black_12_alpha"
                         android:orientation="horizontal"
                         android:visibility="gone" />
 
@@ -338,7 +338,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/keyboard_chat_separator"
+                    android:background="@color/black_12_alpha"
                     android:orientation="horizontal" />
 
                 <Button
@@ -511,14 +511,6 @@
                     </LinearLayout>
                 </RelativeLayout>
             </RelativeLayout>
-
-            <include
-                layout="@layout/transfers_widget"
-                android:layout_width="59dp"
-                android:layout_height="65dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="13dp"
-                android:layout_marginBottom="7dp" />
 
             <include
                 layout="@layout/item_call_in_progress_layout"

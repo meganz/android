@@ -116,7 +116,7 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:background="@color/divider_upgrade_account"
+                    android:background="@color/black_12_alpha"
                     android:layout_marginLeft="72dp"/>
 
                 <!-- NOTIFICATIONS LAYOUT -->
@@ -163,7 +163,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="72dp"
-                    android:background="@color/divider_upgrade_account" />
+                    android:background="@color/black_12_alpha" />
 
                 <!-- SHARED FILES LAYOUT -->
 
@@ -202,7 +202,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="72dp"
-                    android:background="@color/divider_upgrade_account" />
+                    android:background="@color/black_12_alpha" />
 
                 <!-- CHAT LINK LAYOUT -->
 
@@ -253,7 +253,7 @@
                     android:id="@+id/divider_chat_link_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:background="@color/divider_upgrade_account"
+                    android:background="@color/black_12_alpha"
                     android:layout_marginLeft="72dp"/>
 
                 <!-- CLEAR LAYOUT -->
@@ -291,7 +291,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="72dp"
-                    android:background="@color/divider_upgrade_account" />
+                    android:background="@color/black_12_alpha" />
 
                 <!-- ARCHIVE LAYOUT -->
 
@@ -327,7 +327,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="72dp"
-                    android:background="@color/divider_upgrade_account" />
+                    android:background="@color/black_12_alpha" />
 
                 <!-- LEAVE LAYOUT -->
 
@@ -362,7 +362,7 @@
                     android:id="@+id/divider_leave_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:background="@color/divider_upgrade_account"
+                    android:background="@color/black_12_alpha"
                     android:layout_marginLeft="16dp"/>
 
                 <!-- MAKE PRIVATE LAYOUT -->
@@ -404,7 +404,7 @@
                     android:id="@+id/divider_private_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:background="@color/divider_upgrade_account"
+                    android:background="@color/black_12_alpha"
                     android:layout_marginLeft="16dp"/>
 
                 <!-- Title Observer LAYOUT -->
@@ -471,7 +471,7 @@
                     android:id="@+id/divider_observers_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:background="@color/divider_upgrade_account"
+                    android:background="@color/black_12_alpha"
                     android:layout_marginLeft="16dp" />
 
                 <!-- Title Participants LAYOUT -->

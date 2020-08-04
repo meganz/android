@@ -9,7 +9,7 @@
         android:id="@+id/emoji_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/divider_upgrade_account"/>
+        android:background="@color/black_12_alpha"/>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/emojis_pager"
