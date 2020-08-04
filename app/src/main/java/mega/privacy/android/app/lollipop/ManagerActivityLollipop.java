@@ -241,6 +241,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -11661,6 +11662,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			Uri treeUri = intent.getData();
 			logDebug("Create the document : " + treeUri);
 			long handleToDownload = intent.getLongExtra("handleToDownload", -1);
@@ -12245,6 +12251,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if (parentNode == null){
 				parentNode = megaApi.getRootNode();
+			}
+
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
 			}
 
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()), -1);
@@ -13086,6 +13097,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
 
 			for (ShareInfo info : infos) {
@@ -13175,6 +13191,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void createFile(String name, String data, MegaNode parentNode){
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
 
 		File file = createTemporalTextFile(this, name, data);
 		if(file!=null){

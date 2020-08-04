@@ -1116,8 +1116,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (infos == null) {
             logError("Error: infos is NULL");
             return;
-        }
-        else {
+        } else {
+            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                showOverDiskQuotaPaywallWarning();
+                return;
+            }
 
             MegaNode parentNode = megaApi.getRootNode();
             showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);

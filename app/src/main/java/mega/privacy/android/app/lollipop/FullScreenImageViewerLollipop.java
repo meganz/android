@@ -2198,6 +2198,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				}
 			}
 
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			Uri treeUri = intent.getData();
 			logDebug("Create the node : " + treeUri);
 			long handleToDownload = intent.getLongExtra("handleToDownload", -1);

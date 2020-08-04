@@ -1709,7 +1709,13 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 startActivity(i);
                 break;
 			case R.id.file_properties_switch:{
-				boolean isChecked = offlineSwitch.isChecked();
+                boolean isChecked = offlineSwitch.isChecked();
+
+                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning();
+                    offlineSwitch.setChecked(!isChecked);
+                    return;
+                }
 
 				if(owner){
                     logDebug("Owner: me");
