@@ -11,14 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.Window
-import androidx.appcompat.widget.ContentFrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.widget.ViewPager2
-import ash.TL
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -197,11 +194,9 @@ class HomepageFragment : Fragment() {
         }
 
         fabChat.setOnClickListener {
-            TL.log("fabchat")
         }
 
         fabUpload.setOnClickListener {
-            TL.log("fab upload")
         }
     }
 
@@ -209,17 +204,25 @@ class HomepageFragment : Fragment() {
         if (isFabExpanded) {
             rotateFab()
             showOut(fabChat, fabUpload, textChat, textUpload)
-            Handler().postDelayed({
+            runDelay(200) {
                 removeMask()
                 fabMain.visibility = View.VISIBLE
-            }, 200)
+                isFabExpanded = !isFabExpanded
+            }
         } else {
             fabMain.visibility = View.GONE
             addMask()
-            rotateFab()
-            showIn(fabChat, fabUpload, textChat, textUpload)
+            // Have to wait for 1ms after mask added, otherwise, fabMaskMain.background is null.
+            runDelay(1) {
+                rotateFab()
+                showIn(fabChat, fabUpload, textChat, textUpload)
+                isFabExpanded = !isFabExpanded
+            }
         }
-        isFabExpanded = !isFabExpanded
+    }
+
+    private fun runDelay(delayMs: Long, task: () -> Unit) {
+        Handler().postDelayed(task, delayMs)
     }
 
     private fun showIn(vararg fabs: View) {
@@ -243,31 +246,27 @@ class HomepageFragment : Fragment() {
     }
 
     private fun rotateFab() {
-        if(fabMaskMain.background != null) {
-            val rotateAnim = ObjectAnimator.ofFloat(
-                fabMaskMain, "rotation",
-                if (isFabExpanded) FAB_DEFAULT_ANGEL else FAB_ROTATE_ANGEL
-            )
+        val rotateAnim = ObjectAnimator.ofFloat(
+            fabMaskMain, "rotation",
+            if (isFabExpanded) FAB_DEFAULT_ANGEL else FAB_ROTATE_ANGEL
+        )
 
-            // The tint of the icon in the middle of the FAB
-            val tintAnim = ObjectAnimator.ofArgb(
-                fabMaskMain.drawable.mutate(), "tint",
-                if (isFabExpanded) Color.WHITE else Color.BLACK
-            )
+        // The tint of the icon in the middle of the FAB
+        val tintAnim = ObjectAnimator.ofArgb(
+            fabMaskMain.drawable.mutate(), "tint",
+            if (isFabExpanded) Color.WHITE else Color.BLACK
+        )
 
-            // The background tint of the FAB
-            val backgroundTintAnim = if(fabMaskMain.background == null) null else ObjectAnimator.ofArgb(
-                fabMaskMain.background.mutate(), "tint",
-                if (isFabExpanded) resources.getColor(R.color.accentColor) else Color.WHITE
-            )
+        // The background tint of the FAB
+        val backgroundTintAnim = ObjectAnimator.ofArgb(
+            fabMaskMain.background.mutate(), "tint",
+            if (isFabExpanded) resources.getColor(R.color.accentColor) else Color.WHITE
+        )
 
-            AnimatorSet().apply {
-                duration = FAB_ANIM_DURATION
-                playTogether(rotateAnim, backgroundTintAnim, tintAnim)
-                start()
-            }
-        } else {
-            TL.log("Still null")
+        AnimatorSet().apply {
+            duration = FAB_ANIM_DURATION
+            playTogether(rotateAnim, backgroundTintAnim, tintAnim)
+            start()
         }
     }
 
