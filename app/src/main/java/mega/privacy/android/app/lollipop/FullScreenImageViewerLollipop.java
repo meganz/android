@@ -81,6 +81,7 @@ import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1239,6 +1240,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (LinksFragment.imageDrag != null) {
 				LinksFragment.imageDrag.setVisibility(visibility);
 			}
+		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
+			RecentsFragment.imageDrag.setVisibility(visibility);
 		}
 	}
 
@@ -1302,6 +1305,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (LinksFragment.imageDrag != null) {
 				LinksFragment.imageDrag.getLocationOnScreen(location);
 			}
+		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
+			RecentsFragment.imageDrag.getLocationOnScreen(location);
 		}
 	}
 
@@ -1393,7 +1398,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
-                    getImageView(i, -1);
+                    getImageView(i, handle);
                     break;
                 }
             }
@@ -1470,7 +1475,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
-                    scrollToPosition(i, -1);
+                    scrollToPosition(i, handle);
                     break;
                 }
             }

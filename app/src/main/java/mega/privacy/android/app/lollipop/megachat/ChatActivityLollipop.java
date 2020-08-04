@@ -173,6 +173,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -4791,6 +4792,10 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
                                 String url = null;
                                 if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
                                     url = meta.getRichPreview().getUrl();
+
+                                    if (isMEGALinkAndRequiresTransferSession(this, url)) {
+                                        return;
+                                    }
                                 } else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
                                     url = m.getMessage().getContent();
                                     MegaChatGeolocation location = meta.getGeolocation();
@@ -7455,18 +7460,20 @@ public class ChatActivityLollipop extends TransfersManagementActivity implements
         super.onDestroy();
     }
 
-    public void closeChat(boolean shouldLogout){
+    public void closeChat(boolean shouldLogout) {
         logDebug("closeChat");
-        if(megaChatApi==null || idChat == -1) return;
-        if(chatRoom!=null && chatRoom.isPreview()){
-            megaChatApi.closeChatPreview(idChat);
-            if(chatC.isInAnonymousMode() && shouldLogout){
-                megaChatApi.logout();
-            }
+        if (megaChatApi == null || chatRoom == null || idChat == MEGACHAT_INVALID_HANDLE) {
+            return;
         }
-        megaChatApi.closeChatRoom(idChat, this);
+        if (chatRoom.isPreview() && chatC.isInAnonymousMode() && shouldLogout) {
+            megaChatApi.logout();
+        } else {
+            megaChatApi.closeChatRoom(idChat, this);
+        }
         MegaApplication.setClosedChat(true);
         megaChatApi.removeChatListener(this);
+        chatRoom = null;
+        idChat = MEGACHAT_INVALID_HANDLE;
     }
 
     @Override
