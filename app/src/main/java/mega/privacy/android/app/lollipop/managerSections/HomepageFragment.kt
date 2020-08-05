@@ -49,7 +49,7 @@ class HomepageFragment : Fragment() {
     private lateinit var fabMain: FloatingActionButton
     private lateinit var fabMaskMain: FloatingActionButton
     private lateinit var fabMaskLayout: View
-    private var window: ViewGroup? = null
+    private var windowContent: ViewGroup? = null
 
     private var isFabExpanded = false
 
@@ -57,14 +57,13 @@ class HomepageFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
-        window = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
-        fabMaskLayout = FabMaskLayoutBinding.inflate(inflater, window, false).root
         return rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupMask()
         setupSearchView()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
@@ -110,6 +109,11 @@ class HomepageFragment : Fragment() {
                 )
             }
         })
+    }
+
+    private fun setupMask() {
+        windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
+        fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
     }
 
     private fun getTabTitle(position: Int): String? {
@@ -186,11 +190,11 @@ class HomepageFragment : Fragment() {
         val textUpload = fabMaskLayout.text_upload
 
         fabMain.setOnClickListener {
-            (this::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
+            (::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
         }
 
         fabMaskMain.setOnClickListener {
-            (this::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
+            (::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
         }
 
         fabChat.setOnClickListener {
@@ -204,7 +208,8 @@ class HomepageFragment : Fragment() {
         if (isFabExpanded) {
             rotateFab()
             showOut(fabChat, fabUpload, textChat, textUpload)
-            runDelay(200) {
+            // After animation completed, then remove mask.
+            runDelay(FAB_MASK_OUT_DELAY) {
                 removeMask()
                 fabMain.visibility = View.VISIBLE
                 isFabExpanded = !isFabExpanded
@@ -213,7 +218,7 @@ class HomepageFragment : Fragment() {
             fabMain.visibility = View.GONE
             addMask()
             // Have to wait for 1ms after mask added, otherwise, fabMaskMain.background is null.
-            runDelay(1) {
+            runDelay(FAB_MASK_IN_DELAY) {
                 rotateFab()
                 showIn(fabChat, fabUpload, textChat, textUpload)
                 isFabExpanded = !isFabExpanded
@@ -238,11 +243,11 @@ class HomepageFragment : Fragment() {
     }
 
     private fun addMask() {
-        window?.addView(fabMaskLayout)
+        windowContent?.addView(fabMaskLayout)
     }
 
     private fun removeMask() {
-        window?.removeView(fabMaskLayout)
+        windowContent?.removeView(fabMaskLayout)
     }
 
     private fun rotateFab() {
@@ -302,6 +307,8 @@ class HomepageFragment : Fragment() {
 
     companion object {
         private const val FAB_ANIM_DURATION = 200L
+        private const val FAB_MASK_OUT_DELAY = 200L
+        private const val FAB_MASK_IN_DELAY = 1L
         private const val ALPHA_TRANSPARENT = 0f
         private const val ALPHA_OPAQUE = 1f
         private const val FAB_DEFAULT_ANGEL = 0f
