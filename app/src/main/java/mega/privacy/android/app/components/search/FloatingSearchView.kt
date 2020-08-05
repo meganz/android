@@ -208,7 +208,8 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
     private fun initDrawables() {
         menuBtnDrawable = BadgeDrawerArrowDrawable(context)
-        menuBtnDrawable?.backgroundColor = ContextCompat.getColor(context, R.color.dark_primary_color)
+        menuBtnDrawable?.backgroundColor =
+            ContextCompat.getColor(context, R.color.dark_primary_color)
         menuBtnDrawable?.setBigBackgroundColor(Color.WHITE)
         menuBtnDrawable?.setShowDot(true)
         menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot)

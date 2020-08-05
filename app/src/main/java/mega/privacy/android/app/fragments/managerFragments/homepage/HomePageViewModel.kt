@@ -19,19 +19,9 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.Util.getCircleAvatar
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApi.STATUS_AWAY
-import nz.mega.sdk.MegaChatApi.STATUS_BUSY
-import nz.mega.sdk.MegaChatApi.STATUS_OFFLINE
-import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaUserAlert
-import java.util.ArrayList
+import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApi.*
+import java.util.*
 
 class HomePageViewModel @ViewModelInject constructor(
     private val megaApi: MegaApiAndroid,

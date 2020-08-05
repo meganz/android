@@ -14,15 +14,15 @@ class SearchInputView : AppCompatEditText {
     private var mSearchKeyListener: OnKeyboardSearchKeyClickListener? = null
     private var mOnKeyboardDismissedListener: OnKeyboardDismissedListener? = null
     private val mOnKeyListener =
-            OnKeyListener { _, keyCode, _ ->
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    mSearchKeyListener?.let {
-                        it.onSearchKeyClicked()
-                        return@OnKeyListener true
-                    }
+        OnKeyListener { _, keyCode, _ ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                mSearchKeyListener?.let {
+                    it.onSearchKeyClicked()
+                    return@OnKeyListener true
                 }
-                false
             }
+            false
+        }
 
     constructor(context: Context?) : super(context) {
         init()

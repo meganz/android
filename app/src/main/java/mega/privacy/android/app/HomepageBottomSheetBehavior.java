@@ -59,6 +59,7 @@ import static com.google.android.material.R.styleable.BottomSheetBehavior_Layout
  * Add interface to invalidate the nested scrolling view and search new one in specified parent view.
  * Also add support for multiple nested scrolling view (only one scrolling view is visible at a time)
  * The motivation is to support the multiple scrolling views in RecentsFragment
+ *
  * @param <V>
  */
 public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {

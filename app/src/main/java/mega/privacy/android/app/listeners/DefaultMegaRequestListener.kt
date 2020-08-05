@@ -6,29 +6,29 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 
 interface DefaultMegaRequestListener : MegaRequestListenerInterface {
-  override fun onRequestStart(
-    api: MegaApiJava,
-    request: MegaRequest
-  ) {
-  }
+    override fun onRequestStart(
+        api: MegaApiJava,
+        request: MegaRequest
+    ) {
+    }
 
-  override fun onRequestUpdate(
-    api: MegaApiJava,
-    request: MegaRequest
-  ) {
-  }
+    override fun onRequestUpdate(
+        api: MegaApiJava,
+        request: MegaRequest
+    ) {
+    }
 
-  override fun onRequestFinish(
-    api: MegaApiJava,
-    request: MegaRequest,
-    e: MegaError
-  ) {
-  }
+    override fun onRequestFinish(
+        api: MegaApiJava,
+        request: MegaRequest,
+        e: MegaError
+    ) {
+    }
 
-  override fun onRequestTemporaryError(
-    api: MegaApiJava,
-    request: MegaRequest,
-    e: MegaError
-  ) {
-  }
+    override fun onRequestTemporaryError(
+        api: MegaApiJava,
+        request: MegaRequest,
+        e: MegaError
+    ) {
+    }
 }

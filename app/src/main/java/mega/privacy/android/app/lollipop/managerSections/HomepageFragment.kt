@@ -37,13 +37,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
 
-    @Inject lateinit var megaApi: MegaApiAndroid
-    @Inject lateinit var megaChatApi: MegaChatApiAndroid
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
     private val viewModel: HomePageViewModel by viewModels()
 
-    private lateinit var viewDataBinding : FragmentHomepageBinding
-    private lateinit var rootView : View
+    private lateinit var viewDataBinding: FragmentHomepageBinding
+    private lateinit var rootView: View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private lateinit var searchInputView: FloatingSearchView
     private lateinit var fabMain: FloatingActionButton
@@ -53,8 +56,10 @@ class HomepageFragment : Fragment() {
 
     private var isFabExpanded = false
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
         return rootView
@@ -73,7 +78,8 @@ class HomepageFragment : Fragment() {
     private fun setupSearchView() {
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
-            (activity as ManagerActivityLollipop).drawerLayout!!)
+            (activity as ManagerActivityLollipop).drawerLayout!!
+        )
 
         viewModel.notification.observe(viewLifecycleOwner) {
             searchInputView.setShowLeftDot(it)
@@ -105,7 +111,7 @@ class HomepageFragment : Fragment() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 bottomSheetBehavior.invalidateScrollingChild(
-                        (viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position)
+                    (viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position)
                 )
             }
         })
@@ -143,7 +149,7 @@ class HomepageFragment : Fragment() {
 
     private fun setBottomSheetExpandedTop() {
         bottomSheetBehavior.addBottomSheetCallback(object :
-                HomepageBottomSheetBehavior.BottomSheetCallback() {
+            HomepageBottomSheetBehavior.BottomSheetCallback() {
 
             val backgroundMask = rootView.findViewById<View>(R.id.background_mask)
             val dividend = 1.0f - SLIDE_OFFSET_CHANGE_BACKGROUND
@@ -204,7 +210,12 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun fabMainClickCallback(fabChat: View, fabUpload: View, textChat: View, textUpload: View) {
+    private fun fabMainClickCallback(
+        fabChat: View,
+        fabUpload: View,
+        textChat: View,
+        textUpload: View
+    ) {
         if (isFabExpanded) {
             rotateFab()
             showOut(fabChat, fabUpload, textChat, textUpload)
@@ -281,28 +292,28 @@ class HomepageFragment : Fragment() {
         view.translationY = view.height.toFloat()
 
         view.animate()
-                .setDuration(FAB_ANIM_DURATION)
-                .translationY(0f)
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                    }
-                })
-                .alpha(ALPHA_OPAQUE)
-                .start()
+            .setDuration(FAB_ANIM_DURATION)
+            .translationY(0f)
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                }
+            })
+            .alpha(ALPHA_OPAQUE)
+            .start()
     }
 
     private fun showOut(view: View) {
         view.animate()
-                .setDuration(FAB_ANIM_DURATION)
-                .translationY(view.height.toFloat())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        view.visibility = View.GONE
-                        super.onAnimationEnd(animation)
-                    }
-                }).alpha(ALPHA_TRANSPARENT)
-                .start()
+            .setDuration(FAB_ANIM_DURATION)
+            .translationY(view.height.toFloat())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    view.visibility = View.GONE
+                    super.onAnimationEnd(animation)
+                }
+            }).alpha(ALPHA_TRANSPARENT)
+            .start()
     }
 
     companion object {

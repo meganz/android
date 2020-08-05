@@ -10,16 +10,17 @@ import mega.privacy.android.app.R
 
 class CategoryButton(context: Context, attrs: AttributeSet?) : ConstraintLayout(context, attrs) {
     init {
-        val typedArray = context.obtainStyledAttributes(
-            attrs, R.styleable.CategoryButton, 0 , 0)
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.CategoryButton, 0, 0)
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.category_btn_view, this, true)
 
         (getViewById(R.id.imageView_category) as ImageView).setImageDrawable(
-            typedArray.getDrawable(R.styleable.CategoryButton_photo))
+            typedArray.getDrawable(R.styleable.CategoryButton_photo)
+        )
         (getViewById(R.id.textView_category) as TextView).text = typedArray.getText(
-            R.styleable.CategoryButton_name)
+            R.styleable.CategoryButton_name
+        )
 
         typedArray.recycle()
     }
