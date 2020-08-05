@@ -190,11 +190,11 @@ class HomepageFragment : Fragment() {
         val textUpload = fabMaskLayout.text_upload
 
         fabMain.setOnClickListener {
-            (::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
         }
 
         fabMaskMain.setOnClickListener {
-            (::fabMainClickCallback)(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
         }
 
         fabChat.setOnClickListener {
@@ -217,8 +217,7 @@ class HomepageFragment : Fragment() {
         } else {
             fabMain.visibility = View.GONE
             addMask()
-            // Have to wait for 1ms after mask added, otherwise, fabMaskMain.background is null.
-            runDelay(FAB_MASK_IN_DELAY) {
+            Handler().post {
                 rotateFab()
                 showIn(fabChat, fabUpload, textChat, textUpload)
                 isFabExpanded = !isFabExpanded
@@ -308,7 +307,6 @@ class HomepageFragment : Fragment() {
     companion object {
         private const val FAB_ANIM_DURATION = 200L
         private const val FAB_MASK_OUT_DELAY = 200L
-        private const val FAB_MASK_IN_DELAY = 1L
         private const val ALPHA_TRANSPARENT = 0f
         private const val ALPHA_OPAQUE = 1f
         private const val FAB_DEFAULT_ANGEL = 0f
