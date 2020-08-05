@@ -60,16 +60,23 @@
             android:id="@+id/homepage_bottom_sheet"
             layout="@layout/homepage_bottom_sheet" />
 
-        <View
-            android:id="@+id/view_mask"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="@dimen/mask_view_alpha"
-            android:background="@color/textGrey"
-            android:clickable="true"
-            android:elevation="@dimen/elevation_low"
-            android:visibility="gone" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:elevation="@dimen/elevation_low">
 
-        <include layout="@layout/homepage_fabs" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_home_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin_span"
+                android:src="@drawable/ic_add_white"
+                android:tint="@android:color/white"
+                app:borderWidth="0dp"
+                app:fabSize="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

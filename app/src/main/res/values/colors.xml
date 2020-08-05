@@ -102,6 +102,8 @@
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
 
+    <color name="fab_mask">#6B6B6B</color>
+
     <color name="login_warning">#FFFF333A</color>
     <color name="login_title">#FFD90007</color>
 
