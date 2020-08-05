@@ -21,6 +21,7 @@ import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.TimeUtils.*
 import java.util.concurrent.TimeUnit
@@ -45,6 +46,11 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
                 IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS))
         registerReceiver(updateUserDataReceiver,
                 IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA))
+
+        // Request storage details only if is not already requested recently
+        if (callToAccountDetails()) {
+            megaApi.getSpecificAccountDetails(true, false, false)
+        }
 
         megaApi.getUserData(GetUserDataListener(this))
 
