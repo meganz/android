@@ -217,6 +217,7 @@ class HomepageFragment : Fragment() {
         } else {
             fabMain.visibility = View.GONE
             addMask()
+            // Need to do so, otherwise, fabMaskMain.background is null.
             Handler().post {
                 rotateFab()
                 showIn(fabChat, fabUpload, textChat, textUpload)
