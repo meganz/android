@@ -31,6 +31,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
@@ -398,7 +399,9 @@ public class CallUtil {
      * @param user    The mega User.
      */
     public static void startNewCall(Activity activity, MegaUser user) {
-        MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoomByUser(user.getHandle());
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         if (chat == null) {
             ArrayList<MegaChatRoom> chats = new ArrayList<>();
@@ -406,8 +409,8 @@ public class CallUtil {
             usersNoChat.add(user);
             CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, activity, CreateChatListener.START_AUDIO_CALL);
             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-            MegaApplication.getInstance().getMegaChatApi().createChat(false, peers, listener);
-        } else if (MegaApplication.getInstance().getMegaChatApi().getChatCall(chat.getChatId()) != null) {
+            megaChatApi.createChat(false, peers, listener);
+        } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
             Intent i = new Intent(activity, ChatCallActivity.class);
             i.putExtra(CHAT_ID, chat.getChatId());
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -427,9 +430,7 @@ public class CallUtil {
     public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
         if (checkPermissionsCall(activity, INVALID_TYPE_PERMISSIONS)) {
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
-            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, activity instanceof ManagerActivityLollipop ?
-                    ((ManagerActivityLollipop) activity) :
-                    ((GroupChatInfoActivityLollipop) activity));
+            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, (MegaChatRequestListenerInterface) activity);
             MegaApplication.setIsWaitingForCall(false);
         }
     }
