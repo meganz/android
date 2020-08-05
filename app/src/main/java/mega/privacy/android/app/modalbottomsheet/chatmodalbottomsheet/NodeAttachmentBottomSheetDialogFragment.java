@@ -204,10 +204,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 int count = 0;
                 for (int i = 0; i < nodeList.size(); i++) {
                     MegaNode temp = nodeList.get(i);
-                    if (!(megaChatApi.isRevoked(chatId, temp.getHandle()))) {
-                        count++;
-                        totalSize = totalSize + temp.getSize();
-                    }
+                    count++;
+                    totalSize = totalSize + temp.getSize();
                 }
                 nodeInfo.setText(getSizeString(totalSize));
                 MegaNode node = nodeList.get(0);

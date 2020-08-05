@@ -599,6 +599,8 @@ public class Constants {
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
     public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
 
+    public static final int INVALID_VALUE = -1;
+
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
 }
