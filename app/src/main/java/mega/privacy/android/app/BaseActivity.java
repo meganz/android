@@ -112,7 +112,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver,
+        registerReceiver(accountBlockedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
@@ -167,7 +167,7 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
+        unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
@@ -210,7 +210,9 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver accountBlockedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || !intent.getAction().equals(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)) return;
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED))
+                return;
 
             checkWhyAmIBlocked(intent.getLongExtra(EVENT_NUMBER, -1), intent.getStringExtra(EVENT_TEXT));
         }

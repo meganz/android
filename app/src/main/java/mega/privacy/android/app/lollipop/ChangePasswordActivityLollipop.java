@@ -1167,7 +1167,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			if (e.getErrorCode() != MegaError.API_OK) {
 				logWarning("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 			} else {
-				logDebug("Pass changed");
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 			}
 

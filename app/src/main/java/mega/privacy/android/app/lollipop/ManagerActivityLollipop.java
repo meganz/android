@@ -2869,7 +2869,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
-						int result = getIntent().getIntExtra(RESULT,MegaError.API_OK);
+						int result = getIntent().getIntExtra(RESULT, MegaError.API_OK);
 						if (result == MegaError.API_OK) {
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
@@ -3304,10 +3304,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			} else {
 				askForAccess();
 			}
-		} else if (firstLogin && !newCreationAccount) {
-			if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
-				askForSMSVerification();
-			}
+		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+			askForSMSVerification();
 		}
 	}
 
@@ -3323,6 +3321,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
+	/**
+	 * Checks if some business warning has to be shown due to the status of the account.
+	 *
+	 * @return True if some warning has been shown, false otherwise.
+	 */
     private boolean checkBusinessStatus() {
         if (isBusinessGraceAlertShown) {
             showBusinessGraceAlert();
