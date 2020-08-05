@@ -49,7 +49,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -14133,10 +14132,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+				int transferTag = request.getTransferTag();
+
 				if (request.getFlag()) {
-					transfersManagement.incrementPausedTransfers();
+					transfersManagement.addPausedTransfers(transferTag);
 				} else {
-					transfersManagement.decrementPausedTransfers();
+					transfersManagement.removePausedTransfers(transferTag);
 				}
 
 				if (isTransfersInProgressAdded()){
@@ -14146,8 +14147,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+		} else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
+			MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+		} else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			logDebug("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -14158,6 +14160,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					playTransfersMenuIcon.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
 				}
+
+				MegaApplication.getTransfersManagement().resetPausedTransfers();
 			}
 			else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
@@ -15007,8 +15011,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
 				.setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
-					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
+					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
 					cancelAllUploads(ManagerActivityLollipop.this);
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
 					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());

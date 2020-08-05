@@ -137,13 +137,11 @@
 
     <include
         layout="@layout/transfers_widget"
-        android:layout_width="59dp"
-        android:layout_height="65dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_anchor="@+id/buttons_layout"
         app:layout_anchorGravity="top|end"
-        android:layout_gravity="end"
-        android:layout_marginEnd="13dp"
-        android:layout_marginBottom="7dp" />
+        android:layout_gravity="end"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

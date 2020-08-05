@@ -2,8 +2,7 @@ package mega.privacy.android.app.components.transferWidget;
 
 import android.content.Intent;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +24,9 @@ public class TransfersManagement {
     private boolean failedTransfers;
     private boolean transferOverQuotaNotificationShown;
     private boolean isTransferOverQuotaBannerShown;
-    private int numPausedTransfers;
 
-    private Map<String,String> targetPaths = new HashMap<>();
+    private ArrayList<String> pausedTransfers = new ArrayList<>();
+    private Map<String, String> targetPaths = new HashMap<>();
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
@@ -42,23 +41,32 @@ public class TransfersManagement {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
         int totalTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 
-        return megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD) || totalTransfers == numPausedTransfers;
+        return megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD) || totalTransfers == pausedTransfers.size();
     }
 
     /**
-     * Increments the counter of paused transfers.
+     * Removes a resumed transfer.
+     *
+     * @param transferTag   tag of the resumed transfer
      */
-    public void incrementPausedTransfers() {
-        numPausedTransfers++;
+    public void removePausedTransfers(int transferTag) {
+        pausedTransfers.remove(Integer.toString(transferTag));
     }
 
     /**
-     * Decrements the counter of paused transfers.
+     * Adds a paused transfer.
+     *
+     * @param transferTag   tag of the paused transfer
      */
-    public void decrementPausedTransfers() {
-        if (numPausedTransfers > 0) {
-            numPausedTransfers--;
-        }
+    public void addPausedTransfers(int transferTag) {
+        pausedTransfers.add(Integer.toString(transferTag));
+    }
+
+    /**
+     * Clears the paused transfers list.
+     */
+    public void resetPausedTransfers() {
+        pausedTransfers.clear();
     }
 
     /**
