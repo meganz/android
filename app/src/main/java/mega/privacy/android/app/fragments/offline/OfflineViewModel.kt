@@ -16,12 +16,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.R.string
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.app.utils.SingleLiveEvent
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -29,12 +29,12 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
 import java.io.File
 import java.util.HashMap
+import java.util.Locale
 import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
     private val repo: MegaNodeRepo
 ) : BaseRxViewModel() {
-    private var path = "/"
     private var order = ORDER_DEFAULT_ASC
     private val _nodes = MutableLiveData<List<OfflineNode>>()
     private val openNodeAction: Subject<Pair<Int, OfflineNode>> =
@@ -43,8 +43,9 @@ class OfflineViewModel @ViewModelInject constructor(
     private val _actionBarTitle = MutableLiveData<String>()
     private val _actionMode = MutableLiveData<Boolean>()
     private val _nodeToAnimate: MutableLiveData<Pair<Int, OfflineNode>> = MutableLiveData()
+    private val _pathLiveData: SingleLiveEvent<String> = SingleLiveEvent()
+    private val _openFolderFullscreen: SingleLiveEvent<String> = SingleLiveEvent()
 
-    private var selecting = false
     private val selectedNodes: SparseArrayCompat<MegaOffline> = SparseArrayCompat(5)
     private var rootFolderOnly = false
     private var isList = true
@@ -55,6 +56,13 @@ class OfflineViewModel @ViewModelInject constructor(
     val actionBarTitle: LiveData<String> = _actionBarTitle
     val actionMode: LiveData<Boolean> = _actionMode
     val nodeToAnimate: LiveData<Pair<Int, OfflineNode>> = _nodeToAnimate
+    val pathLiveData: LiveData<String> = _pathLiveData
+    val openFolderFullscreen: LiveData<String> = _openFolderFullscreen
+
+    var path = "/"
+        private set
+    var selecting = false
+        private set
 
     init {
         add(
@@ -65,10 +73,6 @@ class OfflineViewModel @ViewModelInject constructor(
                     logErr("OfflineViewModel openNodeAction")
                 )
         )
-    }
-
-    fun selecting(): Boolean {
-        return selecting
     }
 
     fun buildSectionTitle(
@@ -90,12 +94,12 @@ class OfflineViewModel @ViewModelInject constructor(
         var placeholderCount = 0
         val res = getApplication<MegaApplication>().resources
         if (isList) {
-            sections[0] = res.getString(string.general_folders)
-            sections[folderCount] = res.getString(string.general_files)
+            sections[0] = res.getString(R.string.general_folders)
+            sections[folderCount] = res.getString(R.string.general_files)
         } else {
             if (folderCount > 0) {
                 for (i in 0 until spanCount) {
-                    sections[i] = res.getString(string.general_folders)
+                    sections[i] = res.getString(R.string.general_folders)
                 }
             }
             if (fileCount > 0) {
@@ -103,12 +107,12 @@ class OfflineViewModel @ViewModelInject constructor(
                     if (folderCount % spanCount == 0) 0 else spanCount - (folderCount % spanCount)
                 if (placeholderCount == 0) {
                     for (i in 0 until spanCount) {
-                        sections[folderCount + i] = res.getString(string.general_files)
+                        sections[folderCount + i] = res.getString(R.string.general_files)
                     }
                 } else {
                     for (i in 0 until spanCount) {
                         sections[folderCount + placeholderCount + i] =
-                            res.getString(string.general_files)
+                            res.getString(R.string.general_files)
                     }
                 }
             }
@@ -136,6 +140,12 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
+    fun actionBarTitle(): String {
+        return actionBarTitle.value
+            ?: getApplication<MegaApplication>().getString(R.string.tab_offline)
+                .toUpperCase(Locale.ROOT)
+    }
+
     private fun handleSelection(position: Int, node: OfflineNode) {
         val nodes = _nodes.value
         if (nodes == null || position < 0 || position >= nodes.size
@@ -157,14 +167,42 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun navigateIn(folder: MegaOffline) {
-        // todo
-        loadOfflineNodes()
+        if (rootFolderOnly) {
+            _pathLiveData.value = folder.path + folder.name + "/"
+            _openFolderFullscreen.value = _pathLiveData.value
+        } else {
+            navigateTo(folder.path + folder.name + "/", folder.name)
+        }
     }
 
     fun navigateOut(): Int {
-        // todo
+        if (path == "/") {
+            return 0
+        }
+
+        path = path.substring(0, path.length - 1)
+        path = path.substring(0, path.lastIndexOf("/") + 1)
+        navigateTo(path, titleFromPath(path))
+        return 2
+    }
+
+    private fun titleFromPath(path: String): String {
+        return if (path == "/") {
+            getApplication<MegaApplication>().getString(R.string.tab_offline)
+                .toUpperCase(Locale.ROOT)
+        } else {
+            val pathWithoutLastSlash = path.substring(0, path.length - 1)
+            pathWithoutLastSlash.substring(
+                pathWithoutLastSlash.lastIndexOf("/") + 1, pathWithoutLastSlash.length
+            )
+        }
+    }
+
+    private fun navigateTo(path: String, title: String) {
+        this.path = path
+        _pathLiveData.value = path
+        _actionBarTitle.value = title
         loadOfflineNodes()
-        return 0
     }
 
     fun setOrder(order: Int) {
@@ -172,11 +210,13 @@ class OfflineViewModel @ViewModelInject constructor(
         loadOfflineNodes()
     }
 
-    fun setDisplayParam(rootFolderOnly: Boolean, isList: Boolean, spanCount: Int) {
+    fun setDisplayParam(rootFolderOnly: Boolean, isList: Boolean, spanCount: Int, path: String) {
         this.rootFolderOnly = rootFolderOnly
         this.isList = isList
         gridSpanCount = spanCount
+        this.path = path
 
+        _actionBarTitle.value = titleFromPath(path)
         loadOfflineNodes()
     }
 
@@ -240,29 +280,27 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun getFolderInfo(file: File): String {
-        val fList = file.listFiles() ?: return " "
+        val files = file.listFiles() ?: return " "
 
-        var folders = 0
-        var files = 0
-        var info = ""
-        for (f in fList) {
+        var folderNum = 0
+        var fileNum = 0
+        for (f in files) {
             if (f.isDirectory) {
-                folders++
+                folderNum++
             } else {
-                files++
+                fileNum++
             }
         }
         val res = getApplication<MegaApplication>().resources
-        if (folders > 0) {
-            info = "$folders " + res.getQuantityString(R.plurals.general_num_folders, folders)
-            if (files > 0) {
-                info =
-                    "$info, $files " + res.getQuantityString(R.plurals.general_num_files, folders)
-            }
+
+        return if (folderNum > 0 && fileNum > 0) {
+            "$folderNum " + res.getQuantityString(R.plurals.general_num_folders, folderNum) +
+                    ", $fileNum " + res.getQuantityString(R.plurals.general_num_files, folderNum)
+        } else if (folderNum > 0) {
+            "$folderNum " + res.getQuantityString(R.plurals.general_num_folders, folderNum)
         } else {
-            info = "$files " + res.getQuantityString(R.plurals.general_num_files, files)
+            "$fileNum " + res.getQuantityString(R.plurals.general_num_files, fileNum)
         }
-        return info
     }
 
     private fun createThumbnails(nodes: List<MegaOffline>) {

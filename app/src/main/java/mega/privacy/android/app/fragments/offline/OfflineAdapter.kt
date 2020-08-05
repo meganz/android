@@ -12,7 +12,8 @@ private const val TYPE_GRID_FOLDER = 2
 private const val TYPE_GRID_FILE = 3
 
 class OfflineAdapter(
-    private val isList: Boolean
+    private val isList: Boolean,
+    private val listener: OfflineAdapterListener
 ) : RecyclerView.Adapter<OfflineViewHolder>() {
     private val nodes = ArrayList<OfflineNode>()
 
@@ -49,6 +50,12 @@ class OfflineAdapter(
     }
 
     override fun onBindViewHolder(holder: OfflineViewHolder, position: Int) {
-        holder.bind(nodes[position])
+        holder.bind(position, nodes[position], listener)
     }
+}
+
+interface OfflineAdapterListener {
+    fun onNodeClicked(position: Int, node: OfflineNode)
+
+    fun onNodeLongClicked(position: Int, node: OfflineNode)
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.offline
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +8,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewHeaderItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -22,14 +21,10 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
-import java.util.Locale
-
-private const val STATE_ROOT_FOLDER_ONLY = "rootFolderOnly"
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment() {
-    var rootFolderOnly = false
-
+    private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
 
@@ -38,16 +33,24 @@ class OfflineFragment : Fragment() {
     private var adapter: OfflineAdapter? = null
     private var itemDecoration: NewHeaderItemDecoration? = null
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         managerActivity = requireActivity() as ManagerActivityLollipop
+
+        if (!args.rootFolderOnly) {
+            // TODO: workaround for navigation with ManagerActivity
+            managerActivity?.fullscreenOfflineFragmentOpened(this)
+        }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
+    override fun onDestroy() {
+        super.onDestroy()
 
-        outState.putBoolean(STATE_ROOT_FOLDER_ONLY, rootFolderOnly)
+        if (!args.rootFolderOnly) {
+            // TODO: workaround for navigation with ManagerActivity
+            managerActivity?.fullscreenOfflineFragmentClosed()
+        }
     }
 
     override fun onCreateView(
@@ -56,9 +59,6 @@ class OfflineFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentOfflineBinding.inflate(inflater, container, false)
-
-        rootFolderOnly = savedInstanceState?.getBoolean(STATE_ROOT_FOLDER_ONLY) ?: false
-                || rootFolderOnly
 
         if (isList()) {
             binding.offlineBrowserList.isVisible = true
@@ -76,7 +76,8 @@ class OfflineFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.setDisplayParam(
-            rootFolderOnly, isList(), if (isList()) 0 else binding.offlineBrowserGrid.spanCount
+            args.rootFolderOnly, isList(),
+            if (isList()) 0 else binding.offlineBrowserGrid.spanCount, args.path
         )
         setupRecyclerView()
         observeLiveData()
@@ -90,7 +91,15 @@ class OfflineFragment : Fragment() {
             binding.offlineBrowserGrid
         }
 
-        adapter = OfflineAdapter(isList())
+        adapter = OfflineAdapter(isList(), object : OfflineAdapterListener {
+            override fun onNodeClicked(position: Int, node: OfflineNode) {
+                viewModel.onNodeClicked(position, node)
+            }
+
+            override fun onNodeLongClicked(position: Int, node: OfflineNode) {
+                viewModel.onNodeLongClicked(position, node)
+            }
+        })
         rv.adapter = adapter
         rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
         rv.clipToPadding = false
@@ -126,21 +135,38 @@ class OfflineFragment : Fragment() {
                 )
             )
 
-            if (!rootFolderOnly) {
+            if (!args.rootFolderOnly) {
                 managerActivity?.updateFullscreenOfflineFragmentOptionMenu()
             }
+        }
+
+        viewModel.actionBarTitle.observe(viewLifecycleOwner) {
+            if (viewModel.selecting) {
+
+            } else {
+                managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(
+                    it, viewModel.path == "/"
+                )
+            }
+        }
+
+        viewModel.pathLiveData.observe(viewLifecycleOwner) {
+            managerActivity?.pathNavigationOffline = it
+        }
+        viewModel.openFolderFullscreen.observe(viewLifecycleOwner) {
+            managerActivity?.openFullscreenOfflineFragment(it)
         }
     }
 
     private fun isList(): Boolean {
-        return managerActivity?.isList ?: true || rootFolderOnly
+        return managerActivity?.isList ?: true || args.rootFolderOnly
     }
 
     fun checkScroll() {
         val rv = recyclerView
         if (rv != null) {
             managerActivity?.changeActionBarElevation(
-                rv.canScrollVertically(-1) || viewModel.selecting()
+                rv.canScrollVertically(-1) || viewModel.selecting
             )
         }
     }
@@ -157,13 +183,9 @@ class OfflineFragment : Fragment() {
         return adapter?.itemCount ?: 0
     }
 
-    fun actionBarTitle(): String {
-        // todo
-        return getString(R.string.tab_offline).toUpperCase(Locale.ROOT)
-    }
-
-    fun firstNavigationLevel(): Boolean {
-        // todo
-        return true
+    companion object {
+        fun setArgs(fragment: OfflineFragment, rootFolderOnly: Boolean) {
+            fragment.arguments = OfflineFragmentArgs("/", rootFolderOnly).toBundle()
+        }
     }
 }

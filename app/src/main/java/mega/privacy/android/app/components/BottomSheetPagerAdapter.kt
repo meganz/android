@@ -30,7 +30,7 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
         try {
             fragment = tabFragmentMap[position]?.newInstance() as Fragment
             if (position == OFFLINE_INDEX) {
-                (fragment as OfflineFragment).rootFolderOnly = true
+                OfflineFragment.setArgs(fragment as OfflineFragment, true)
             }
             fragmentRefs.put(position, WeakReference(fragment))
         } catch (e: IllegalAccessException) {
