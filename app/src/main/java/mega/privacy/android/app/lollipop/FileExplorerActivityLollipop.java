@@ -1499,6 +1499,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				case CHAT_FRAGMENT:{
 					chatExplorer = getChatExplorerFragment();
 					if(chatExplorer!=null){
+						chatExplorer.clearSelections();
 						showFabButton(false);
 						chooseFragment(IMPORT_FRAGMENT);
 					}
