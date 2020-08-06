@@ -6,13 +6,12 @@
     android:layout_height="110dp"
     >
 
-  <com.google.android.material.imageview.ShapeableImageView
+  <com.facebook.drawee.view.SimpleDraweeView
       android:id="@+id/thumbnail"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:padding="@dimen/cu_fragment_selected_padding_large"
       android:scaleType="centerCrop"
-      app:strokeColor="@color/accentColor"
+      app:placeholderImage="@drawable/ic_image_thumbnail"
       />
 
   <ImageView

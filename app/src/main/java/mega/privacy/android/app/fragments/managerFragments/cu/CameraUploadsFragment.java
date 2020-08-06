@@ -33,9 +33,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Locale;
@@ -491,10 +488,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         int icSelectedMargin = getResources().getDimensionPixelSize(
                 smallGrid ? R.dimen.cu_fragment_ic_selected_margin_small
                         : R.dimen.cu_fragment_ic_selected_margin_large);
-        CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth, icSelectedWidth,
-                selectedPadding, icSelectedMargin);
+        CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
+                icSelectedWidth, selectedPadding, icSelectedMargin,
+                getResources().getDimensionPixelSize(
+                        R.dimen.cu_fragment_selected_round_corner_radius));
 
-        mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig, Glide.with(this));
+        mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
         mAdapter.setHasStableIds(true);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override public int getSpanSize(int position) {

@@ -108,6 +108,7 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
 
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
+    implementation 'com.facebook.fresco:fresco:2.2.0'
 
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.4'

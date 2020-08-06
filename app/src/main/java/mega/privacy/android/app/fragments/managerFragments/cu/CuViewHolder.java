@@ -1,29 +1,22 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import android.net.Uri;
 import android.view.View;
 import android.widget.FrameLayout;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.shape.ShapeAppearanceModel;
-
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
 import mega.privacy.android.app.R;
 
-/**
- * Created by Piasy{github.com/Piasy} on 2020/7/17.
- */
 abstract class CuViewHolder extends RecyclerView.ViewHolder {
 
     public CuViewHolder(@NonNull View itemView) {
         super(itemView);
     }
 
-    public void bind(int position, CuNode node, CameraUploadsAdapter.Listener listener, RequestManager requestManager) {
+    public void bind(int position, CuNode node, CameraUploadsAdapter.Listener listener) {
         if (handleClick() && node.getNode() != null) {
             itemView.setOnClickListener(v -> listener.onNodeClicked(position, node));
             itemView.setOnLongClickListener(v -> {
@@ -32,16 +25,17 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
             });
         }
 
-        bind(node, requestManager);
+        bind(node);
     }
 
-    protected abstract void bind(CuNode node, RequestManager requestManager);
+    protected abstract void bind(CuNode node);
 
     protected boolean handleClick() {
         return true;
     }
 
-    static void setViewSize(View grid, View icSelected, ShapeableImageView imageView, CuItemSizeConfig itemSizeConfig) {
+    static void setViewSize(View grid, View icSelected, SimpleDraweeView imageView,
+            CuItemSizeConfig itemSizeConfig) {
         GridLayoutManager.LayoutParams params =
                 (GridLayoutManager.LayoutParams) grid.getLayoutParams();
         params.width = itemSizeConfig.getGridSize();
@@ -49,7 +43,8 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         grid.setLayoutParams(params);
 
         int imageViewPadding = itemSizeConfig.getSelectedPadding();
-        imageView.setPadding(imageViewPadding, imageViewPadding, imageViewPadding, imageViewPadding);
+        imageView.setPadding(imageViewPadding, imageViewPadding, imageViewPadding,
+                imageViewPadding);
 
         FrameLayout.LayoutParams icSelectedParams =
                 (FrameLayout.LayoutParams) icSelected.getLayoutParams();
@@ -60,25 +55,16 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         icSelected.setLayoutParams(icSelectedParams);
     }
 
-    protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node,
-                                          CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
-        int strokeWidth, shapeId;
-        if (node.isSelected()) {
-            strokeWidth = itemSizeConfig.getSelectedPadding();
-            shapeId = R.style.GalleryImageShape_Selected;
+    static void updateThumbnailDisplay(SimpleDraweeView thumbnail, CuNode node,
+            CuItemSizeConfig itemSizeConfig) {
+        if (node.getThumbnail() != null) {
+            thumbnail.setImageURI(Uri.fromFile(node.getThumbnail()));
         } else {
-            strokeWidth = 0;
-            shapeId = R.style.GalleryImageShape;
+            thumbnail.setImageResource(R.drawable.ic_image_thumbnail);
         }
-        imageView.setStrokeWidth(strokeWidth);
-        imageView.setShapeAppearanceModel(
-                ShapeAppearanceModel.builder(imageView.getContext(), shapeId, 0).build()
-        );
 
-        requestManager.load(node.getThumbnail())
-                .placeholder(R.drawable.ic_image_thumbnail)
-                .error(R.drawable.ic_image_thumbnail)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView);
+        thumbnail.getHierarchy()
+                .setRoundingParams(RoundingParams.fromCornersRadius(
+                        node.isSelected() ? itemSizeConfig.getRoundCornerRadius() : 0));
     }
 }

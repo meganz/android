@@ -1,14 +1,8 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.view.View;
-
-import com.bumptech.glide.RequestManager;
-
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding;
 
-/**
- * Created by Piasy{github.com/Piasy} on 2020/7/17.
- */
 class CuImageViewHolder extends CuViewHolder {
 
     private final ItemCameraUploadsImageBinding mBinding;
@@ -23,10 +17,10 @@ class CuImageViewHolder extends CuViewHolder {
         setViewSize(binding.getRoot(), binding.icSelected, binding.thumbnail, itemSizeConfig);
     }
 
-    @Override protected void bind(CuNode node, RequestManager requestManager) {
+    @Override protected void bind(CuNode node) {
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 
-        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig, requestManager);
+        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig);
     }
 
     public ItemCameraUploadsImageBinding binding() {

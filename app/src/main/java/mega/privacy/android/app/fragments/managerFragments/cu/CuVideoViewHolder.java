@@ -1,17 +1,11 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.view.View;
-
-import com.bumptech.glide.RequestManager;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding;
 
 import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
 
-/**
- * Created by Piasy{github.com/Piasy} on 2020/7/17.
- */
 class CuVideoViewHolder extends CuViewHolder {
 
     private final ItemCameraUploadsVideoBinding mBinding;
@@ -26,7 +20,7 @@ class CuVideoViewHolder extends CuViewHolder {
         setViewSize(binding.getRoot(), binding.icSelected, binding.thumbnail, itemSizeConfig);
     }
 
-    @Override protected void bind(CuNode node, RequestManager requestManager) {
+    @Override protected void bind(CuNode node) {
         if (mItemSizeConfig.isSmallGrid()) {
             mBinding.videoDuration.setVisibility(View.GONE);
         } else {
@@ -43,7 +37,7 @@ class CuVideoViewHolder extends CuViewHolder {
 
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 
-        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig, requestManager);
+        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig);
     }
 
     public ItemCameraUploadsVideoBinding binding() {
