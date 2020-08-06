@@ -66,6 +66,8 @@ public class FileUtil {
 
     public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
 
+    public static final String JPG_EXTENSION = ".jpg";
+
     private static final String VOLUME_EXTERNAL = "external";
     private static final String VOLUME_INTERNAL = "internal";
 

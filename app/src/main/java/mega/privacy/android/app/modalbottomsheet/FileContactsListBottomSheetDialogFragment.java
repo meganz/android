@@ -94,7 +94,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         }
 
         titleNameContactPanel.setText(fullName);
-        setImageAvatar(contact, contact != null ? contact.getEmail() : nonContactEmail, fullName, contactImageView);
+        setImageAvatar(contact != null ? contact.getHandle() : INVALID_ID, contact != null ? contact.getEmail() : nonContactEmail, fullName, contactImageView);
 
         if (share != null) {
             int accessLevel = share.getAccess();

@@ -605,7 +605,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
             if (((NodeAttachmentHistoryActivity)context).chatRoom.isGroup()) {
 
-                holder.fullNameTitle = cC.getFullName(userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom);
+                holder.fullNameTitle = cC.getParticipantFullName(userHandle);
 
                 if (holder.fullNameTitle == null) {
                     holder.fullNameTitle = "";
