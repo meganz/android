@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GroupParticipantsDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
