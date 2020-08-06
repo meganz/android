@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 
+import androidx.core.content.ContextCompat;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -20,7 +22,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -83,6 +85,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
 
         String userName;
         String email;
+        ChatController chatC = new ChatController(context);
 
         if (userHandle == megaChatApi.getMyUserHandle()) {
             email = megaChatApi.getMyEmail();
@@ -91,15 +94,15 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                 userName = email;
             }
             userName = getContext().getString(R.string.chat_me_text_bracket, userName);
-
         } else {
             MegaContactDB contactDB = getContactDB(userHandle);
             if (contactDB != null) {
                 userName = getContactNameDB(contactDB);
                 email = contactDB.getMail();
             } else {
-                email = chatRoom.getPeerEmail(userHandle);
-                userName = chatRoom.getPeerFullname(userHandle);
+                chatC.setNonContactAttributesInDB(userHandle);
+                email = chatC.getParticipantEmail(userHandle);
+                userName = chatC.getParticipantFullName(userHandle);
                 if (isTextEmpty(userName)) {
                     userName = email;
                 }
@@ -109,40 +112,24 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         name.setText(userName);
 
         /*Default Avatar*/
-        int color = getColorAvatar(userHandle);
-        imageView.setImageBitmap(getDefaultAvatar(color, userName, AVATAR_SIZE, true));
+        int avatarColor = getColorAvatar(userHandle);
+        imageView.setImageBitmap(getDefaultAvatar(avatarColor, userName, AVATAR_SIZE, true));
+
         /*Avatar*/
-        if (userHandle == megaChatApi.getMyUserHandle()) {
-            File avatar = buildAvatarFile(context, email + ".jpg");
-            Bitmap bitmap;
-            if (avatar != null && avatar.exists() && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap != null) {
-                    imageView.setImageBitmap(bitmap);
-                }
+        String userHandleString = MegaApiAndroid.userHandleToBase64(userHandle);
+        String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
+
+        if (userHandleString.equals(myUserHandleEncoded)) {
+            Bitmap bitmap = getAvatarBitmap(email);
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
             }
-
         } else {
-            ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, imageView, email);
-            logDebug("The participant is contact!!");
-            MegaUser contact = megaApi.getContact(email);
-            if (contact != null) {
-                File avatar = buildAvatarFile(context, email + ".jpg");
-                Bitmap bitmap;
-                if (isFileAvailable(avatar) && avatar.length() > 0) {
-                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                    if (bitmap != null) {
-                        imageView.setImageBitmap(bitmap);
-                        return convertView;
-                    }
-                }
-
-                megaApi.getUserAvatar(contact, buildAvatarFile(context, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
-            } else {
-
-                megaApi.getUserAvatar(email, buildAvatarFile(context, email + ".jpg").getAbsolutePath(), listener);
+            String nameFileHandle = userHandleString;
+            String nameFileEmail = email;
+            Bitmap bitmap = isTextEmpty(nameFileEmail) ? getAvatarBitmap(nameFileHandle) : getUserAvatar(nameFileHandle, nameFileEmail);
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
             }
         }
 

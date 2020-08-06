@@ -449,7 +449,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public Bitmap setUserAvatar(String contactMail){
         logDebug("setUserAvatar");
 
-        Bitmap bitmap = getImageAvatar(contactMail);
+        Bitmap bitmap = getAvatarBitmap(contactMail);
         if(bitmap == null){
             return createDefaultAvatar(contactMail);
         }

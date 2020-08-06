@@ -76,6 +76,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -1290,8 +1291,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		switch (((ManagerActivityLollipop)context).orderContacts) {
 			case ORDER_DEFAULT_DESC:
 				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
-					String name1 = c1.getFullName();
-					String name2 = c2.getFullName();
+					String name1 = getContactOrderName(c1);
+					String name2 = getContactOrderName(c2);
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
 					if (res == 0) {
 						res = name1.compareTo(name2);
@@ -1322,8 +1323,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 			default:
 				Collections.sort(visibleContacts, (c1, c2) -> {
-					String name1 = c1.getFullName();
-					String name2 = c2.getFullName();
+					String name1 = getContactOrderName(c1);
+					String name2 = getContactOrderName(c2);
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
 					if (res == 0) {
 						res = name1.compareTo(name2);
@@ -1336,6 +1337,30 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if (isAdded() && adapter != null) {
 			adapter.notifyDataSetChanged();
 		}
+	}
+
+    /**
+     * Gets the contact's name to order contacts by name.
+     * If the contact is not saved in the DB, the full name will be null,
+     * so the value returned will be the email.
+	 *
+	 * Note: this method should be used only for sorting purposes.
+     *
+     * @param contact   contact from who the name has to be get
+     * @return The contact's name.
+     */
+	private String getContactOrderName(MegaContactAdapter contact) {
+		String orderName = null;
+
+		if (contact != null) {
+			orderName = contact.getFullName();
+
+			if (isTextEmpty(orderName) && contact.getMegaUser() != null) {
+				orderName = contact.getMegaUser().getEmail();
+			}
+		}
+
+		return isTextEmpty(orderName) ? "" : orderName;
 	}
 
 	public boolean showSelectMenuItem(){

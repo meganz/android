@@ -387,23 +387,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	void checkScroll (){
 		if (listView != null) {
-			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				changeActionBarElevation(true);
-			}
-			else if (adapter != null && !adapter.isMultipleSelect()) {
-				changeActionBarElevation(false);
-			}
-		}
-	}
-
-	public void changeActionBarElevation(boolean whitElevation){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (whitElevation) {
-				aB.setElevation(px2dp(4, outMetrics));
-			}
-			else {
-				aB.setElevation(0);
-			}
+			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
 	
