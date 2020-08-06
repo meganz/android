@@ -39,11 +39,14 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CallUtil {
+
+    public static final int MAX_PARTICIPANTS_IN_CALL = 20;
 
     /**
      * Retrieve if there's a call in progress that you're participating in.
@@ -613,23 +616,19 @@ public class CallUtil {
         /*Avatar*/
         String mail = getUserMailCall(chat, peerId);
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
 
-        if (peerId == megaChatApi.getMyUserHandle() || megaApi.getContact(mail) != null) {
-            Bitmap bitmap = getImageAvatar(mail);
-            if(bitmap != null){
-                return bitmap;
-            }
-
-            if (peerId != megaChatApi.getMyUserHandle()) {
-                megaApi.getUserAvatar(megaApi.getContact(mail), buildAvatarFile(context, mail + ".jpg").getAbsolutePath(), ((ChatCallActivity) context));
-            }
-
-        } else if (megaApi.getContact(mail) == null) {
-            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerId);
-            megaApi.getUserAvatar(userHandleEncoded, buildAvatarFile(context, peerId + ".jpg").getAbsolutePath(), ((ChatCallActivity) context));
+        String userHandleString = MegaApiAndroid.userHandleToBase64(peerId);
+        String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
+        if (userHandleString.equals(myUserHandleEncoded)) {
+            Bitmap bitmap = getAvatarBitmap(mail);
+            return bitmap;
+        } else {
+            String nameFileHandle = userHandleString;
+            String nameFileEmail = mail;
+            Bitmap bitmap = isTextEmpty(nameFileEmail) ? getAvatarBitmap(nameFileHandle) : getUserAvatar(nameFileHandle, nameFileEmail);
+            return bitmap;
         }
-        return null;
+
     }
 
     /**
@@ -852,5 +851,58 @@ public class CallUtil {
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(userHandle);
         return chat == null || (!chat.isGroup() && megaChatApi.getNumCalls() <= 0 &&
                 !participatingInACall() && !megaChatApi.hasCallInChatRoom(chat.getChatId()));
+    }
+
+    /**
+     * Checks if it cannot join to call because has reached the maximum number of participants.
+     * If so, shows a snackbar with a warning.
+     *
+             * @param context   current Context
+     * @param call      MegaChatCall to check
+     * @param chat      MegaChatRoom to check
+     * @return True if cannot joint to call, false otherwise
+     */
+    public static boolean canNotJoinCall(Context context, MegaChatCall call, MegaChatRoom chat) {
+        if (call == null || call.getNumParticipants(MegaChatCall.ANY_FLAG) >= MAX_PARTICIPANTS_IN_CALL) {
+            showSnackbar(context, context.getString(R.string.call_error_too_many_participants));
+            return true;
+        } else if (canNotStartCall(context, chat, true)) {
+            showSnackbar(context, context.getString(R.string.call_error_too_many_participants_join));
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if it cannot start a call because has reached the maximum number of participants.
+     * If so, shows a snackbar with a warning.
+     *
+     * @param context   current Context
+     * @param chat      MegaChatRoom to check
+     * @return True if cannot start a call, false otherwise
+     */
+    public static boolean canNotStartCall(Context context, MegaChatRoom chat) {
+        return canNotStartCall(context, chat, false);
+    }
+
+    /**
+     * Checks if it cannot start a call because has reached the maximum number of participants.
+     * If so, shows a snackbar with a warning.
+     *
+     * @param context   current Context
+     * @param chat      MegaChatRoom to check
+     * @param joining   true if it is related to a join request, false otherwise
+     * @return True if cannot start a call, false otherwise
+     */
+    public static boolean canNotStartCall(Context context, MegaChatRoom chat, boolean joining) {
+        if (chat == null || (chat.isPublic() && chat.getPeerCount() + 1 > MAX_PARTICIPANTS_IN_CALL)) {
+            if (!joining) {
+                showSnackbar(context, context.getString(R.string.call_error_too_many_participants_start));
+            }
+            return true;
+        }
+
+        return false;
     }
 }

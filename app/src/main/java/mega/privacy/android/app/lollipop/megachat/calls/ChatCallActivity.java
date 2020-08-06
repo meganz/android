@@ -53,6 +53,8 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
@@ -182,6 +184,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private FragmentPeerSelected cameraFragmentPeerSelected;
     private ViewGroup peerSelectedCameraLayout;
     private FrameLayout peerSelectedFragmentContainer;
+    private ChatController chatC;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -647,7 +650,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         cancelIncomingCallNotification(this);
         setContentView(R.layout.activity_calls_chat);
         app.setShowPinScreen(true);
-
+        chatC = new ChatController(this);
         statusBarHeight = getStatusBarHeight();
 
         widthScreenPX = getOutMetrics().widthPixels;
@@ -1257,6 +1260,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             case R.id.video_fab:
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                    if (canNotJoinCall(this, callChat, chat)) break;
+
                     displayLinearFAB(false);
                     checkAnswerCall(true);
                 } else if (callChat.hasLocalVideo()) {
@@ -1318,6 +1323,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             case R.id.answer_call_fab:
                 logDebug("Click on answer fab");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                    if (canNotJoinCall(this, callChat, chat)) break;
+
                     displayLinearFAB(false);
                     checkAnswerCall(false);
                 }
@@ -1951,7 +1958,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (session.isOnHold() || callChat.isOnHold() || session.getStatus() == MegaChatSession.SESSION_STATUS_INITIAL || session.hasAudio()) {
             mutateContactCallLayout.setVisibility(View.GONE);
         }else{
-            String name = chat.getPeerFirstname(0);
+            String name = chatC.getParticipantFirstName(chat.getPeerHandle(0));
             if (isTextEmpty(name)) {
                 if (megaChatApi != null) {
                     name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
@@ -2470,7 +2477,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @return The name of this participant.
      */
     private String getName(long peerid) {
-        return getUserNameCall(chat, peerid);
+        if (peerid == megaChatApi.getMyUserHandle()) {
+            return megaChatApi.getMyFullname();
+        }
+
+        return chatC.getParticipantFirstName(peerid);
     }
 
     /**

@@ -151,8 +151,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             holder.textViewName.setVisibility(View.VISIBLE);
             holder.textViewName.setText(localName);
 
-            setImageAvatar(email, localName, holder.avatar);
-            Bitmap bitmap = getImageAvatar(email);
+            setImageAvatar(megaContact.getHandle(), email, localName, holder.avatar);
+            Bitmap bitmap = getUserAvatar(MegaApiAndroid.userHandleToBase64(megaContact.getHandle()), email);
             if (bitmap == null) {
                 UserAvatarListener listener = new UserAvatarListener(context, holder);
                 megaApi.getUserAvatar(email, buildAvatarFile(context, email + ".jpg").getAbsolutePath(), listener);

@@ -137,7 +137,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 
-	ContactController cC;
+	private ChatController chatC;
+	private ContactController cC;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private androidx.appcompat.app.AlertDialog renameDialog;
 
@@ -409,6 +410,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		megaChatApi.addChatListener(this);
 
 		handler = new Handler();
+		chatC = new ChatController(this);
 		cC = new ContactController(this);
 		nC = new NodeController(this);
         megaApi.addGlobalListener(this);
@@ -665,7 +667,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			else{
 				logDebug("OFFLINE -- NO network connection");
 				if(chat!=null){
-					String userEmail = chat.getPeerEmail(0);
+					String userEmail = chatC.getParticipantEmail(chat.getPeerHandle(0));
 					setOfflineAvatar(userEmail);
 					emailText.setText(user.getEmail());
 				}
@@ -1360,9 +1362,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					return;
 				}
 
-				ChatController cC = new ChatController(this);
-
-				cC.selectChatsToAttachContact(user);
+				chatC.selectChatsToAttachContact(user);
 				break;
 			}
 			case R.id.chat_contact_properties_shared_folders_button:
@@ -1379,12 +1379,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				}
 				else{
 					boolean enabled = notificationsSwitch.isChecked();
-
-					ChatController chatC = new ChatController(this);
-					if(enabled){
+					if (enabled) {
 						chatC.unmuteChat(chatHandle);
-					}
-					else{
+					} else {
 						chatC.muteChat(chatHandle);
 					}
 
@@ -1530,7 +1527,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		if(isOnline(this)){
 			setAvatar();
 		}else if (chat != null){
-			setOfflineAvatar(chat.getPeerEmail(0));
+			setOfflineAvatar(chatC.getParticipantEmail(chat.getPeerHandle(0)));
 		}
 	}
 
@@ -1588,7 +1585,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatRoomToSend.getChatId());
+				chatC.checkIfNodesAreMineAndAttachNodes(fileHandles, chatRoomToSend.getChatId());
 			}
 			else{
 				//Create first the chat
@@ -1625,7 +1622,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             long userHandle[] = {user.getHandle()};
             intent.putExtra(USER_HANDLES, userHandle);
 
-            new ChatController(this).checkIntentToShareSomething(intent);
+            chatC.checkIntentToShareSomething(intent);
 		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -1941,7 +1938,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					case DialogInterface.BUTTON_POSITIVE:
 						logDebug("Clear chat!");
 						logDebug("Clear history selected!");
-						ChatController chatC = new ChatController(contactInfoActivityLollipop);
 						chatC.clearHistory(chat);
 						break;
 

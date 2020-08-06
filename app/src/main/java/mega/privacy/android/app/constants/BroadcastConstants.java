@@ -11,6 +11,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED = "BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED";
     public static final String BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR = "INTENT_PROXIMITY_SENSOR";
     public static final String BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE";
+    public static final String BROADCAST_ACTION_INTENT_LEFT_CHAT = "INTENT_LEFT_CHAT";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -29,6 +30,7 @@ public class BroadcastConstants {
     public static final String ACTION_UPDATE_FIRST_NAME = "ACTION_UPDATE_FIRST_NAME";
     public static final String ACTION_UPDATE_LAST_NAME = "ACTION_UPDATE_LAST_NAME";
     public static final String ACTION_UPDATE_CREDENTIALS = "ACTION_UPDATE_CREDENTIALS";
+    public static final String ACTION_LEFT_CHAT = "ACTION_LEFT_CHAT";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";

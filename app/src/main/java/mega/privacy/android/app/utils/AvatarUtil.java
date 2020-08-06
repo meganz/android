@@ -16,6 +16,7 @@ import com.vdurmont.emoji.EmojiParser;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -274,14 +275,9 @@ public class AvatarUtil {
 
         if (contact.isPhoneContact() || contact.isMegaContact()) {
             /*Avatar*/
-            File avatar = buildAvatarFile(context, mail + ".jpg");
-            Bitmap bitmap;
-            if (isFileAvailable(avatar) && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap != null) {
-                    return getCircleBitmap(bitmap);
-                }
+            Bitmap bitmap = getAvatarBitmap(mail);
+            if (bitmap != null) {
+                return getCircleBitmap(bitmap);
             }
         }
 
@@ -290,54 +286,59 @@ public class AvatarUtil {
     }
 
     /**
-     * Retrieve the avatar image of a particular user.
+     * Gets the bitmap of an avatar file.
      *
-     * @param email The String containing the user's email.
-     * @return The bitmap with the avatar image.
+     * @param avatarName    name of the avatar file
+     * @return Bitmap of the avatar if the file exists.
      */
-    public static Bitmap getImageAvatar(String email) {
-        File avatar = buildAvatarFile(MegaApplication.getInstance().getBaseContext(), email + ".jpg");
-        if (isFileAvailable(avatar)) {
-            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-            if (bitmap != null) {
-                return getCircleBitmap(bitmap);
-            }
+    public static Bitmap getAvatarBitmap(String avatarName) {
+        Bitmap bitmap = null;
+        File avatar = buildAvatarFile(MegaApplication.getInstance(), avatarName + JPG_EXTENSION);
+
+        if (isFileAvailable(avatar) && avatar.length() > 0) {
+            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), new BitmapFactory.Options());
         }
 
-        return null;
+        return bitmap;
+    }
+
+    /**
+     * Checks if already exists the avatar of a participant.
+     * First with the handle and if not exists, then with the email.
+     *
+     * @param nameFileHandle    participant's handle
+     * @param nameFileEmail     participant's email
+     * @return The participan's avatar if exists
+     */
+    public static Bitmap getUserAvatar(String nameFileHandle, String nameFileEmail) {
+        Bitmap bitmap = getAvatarBitmap(nameFileHandle);
+
+        if (bitmap == null) {
+            bitmap = getAvatarBitmap(nameFileEmail);
+        }
+
+        return bitmap;
     }
 
     /**
      * Sets the user's avatar
      *
-     * @param user              MegaUser object which contains all the user's data
+     * @param handle            user's handle
      * @param email             user's email
      * @param fullName          user's full name
-     * @param avatarImageView   view in which the avatar has to be ser
+     * @param avatarImageView   view in which the avatar has to be set
      */
-    public static void setImageAvatar(MegaUser user, String email, String fullName, ImageView avatarImageView) {
+    public static void setImageAvatar(long handle, String email, String fullName, ImageView avatarImageView) {
         if (avatarImageView == null) {
             return;
         }
 
-        Bitmap bitmap = getImageAvatar(email);
+        Bitmap bitmap = getUserAvatar(MegaApiAndroid.userHandleToBase64(handle), email);
         if (bitmap != null) {
             avatarImageView.setImageBitmap(bitmap);
             return;
         }
 
-        avatarImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(user), fullName, AVATAR_SIZE, true));
-    }
-
-    /**
-     * Sets the user's avatar
-     *
-     * @param email             user's email
-     * @param fullName          user's full name
-     * @param avatarImageView   view in which the avatar has to be ser
-     */
-    public static void setImageAvatar(String email, String fullName, ImageView avatarImageView) {
-        setImageAvatar(MegaApplication.getInstance().getMegaApi().getContact(email), email, fullName, avatarImageView);
+        avatarImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(handle), fullName, AVATAR_SIZE, true));
     }
 }

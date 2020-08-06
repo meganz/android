@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -61,6 +62,8 @@ public class CallService extends Service{
 
     private String notificationChannelId = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelName = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
+
+    private ChatController chatC;
 
     private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -102,6 +105,8 @@ public class CallService extends Service{
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
+
+        chatC = new ChatController(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             mBuilder = new Notification.Builder(this);
@@ -216,7 +221,7 @@ public class CallService extends Service{
                     }
                 } else {
                     userHandle = chat.getPeerHandle(0);
-                    email = chat.getPeerEmail(0);
+                    email = chatC.getParticipantEmail(chat.getPeerHandle(0));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
                         if (largeIcon != null) {
@@ -268,7 +273,7 @@ public class CallService extends Service{
                     }
                 } else {
                     userHandle = chat.getPeerHandle(0);
-                    email = chat.getPeerEmail(0);
+                    email = chatC.getParticipantEmail(chat.getPeerHandle(0));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
                         if (largeIcon != null) {

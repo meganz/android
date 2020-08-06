@@ -781,7 +781,8 @@ public class PDFView extends RelativeLayout {
                         .show();
             }
         } else {
-            builder.setMessage(R.string.corrupt_pdf_dialog_text)
+            builder.setMessage(isOnline(pdfViewer) ? R.string.corrupt_pdf_dialog_text
+                : R.string.error_fail_to_open_file_no_network)
                     .setPositiveButton(R.string.general_ok, (dialog, which) -> pdfViewer.finish())
                     .show();
         }
