@@ -283,7 +283,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					.setIcon(mutateIconSecondary(context, R.drawable.ic_restore,
 							R.color.white));
 			menu.findItem(R.id.cab_menu_select_all)
-					.setVisible(adapter.getSelectedItemCount() != adapter.getItemCount());
+					.setVisible(adapter.getSelectedItemCount()
+							< adapter.getItemCount() - adapter.getPlaceholderCount());
 
 			return true;
 		}

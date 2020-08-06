@@ -12,6 +12,8 @@ public class MegaChatParticipant {
 
     private String lastGreen;
 
+    private boolean empty;
+
     public MegaChatParticipant(long handle, String firstName, String lastName, String fullName, String email, int privilege) {
         this.fullName = fullName;
         this.firstName = firstName;
@@ -20,6 +22,18 @@ public class MegaChatParticipant {
         this.email = email;
         this.privilege = privilege;
         lastGreen = "";
+        empty = false;
+    }
+
+    public MegaChatParticipant(long handle, int privilege) {
+        this.fullName = "";
+        this.firstName = "";
+        this.lastName = "";
+        this.handle = handle;
+        this.email = "";
+        this.privilege = privilege;
+        lastGreen = "";
+        empty = true;
     }
 
     public MegaChatParticipant(long handle) {
@@ -90,4 +104,11 @@ public class MegaChatParticipant {
         this.lastGreen = lastGreen;
     }
 
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
+    }
 }

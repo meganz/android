@@ -1269,6 +1269,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								oFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
+					} else if (adapterType == RECENTS_ADAPTER && rF != null) {
+						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
+						if (actionType == UPDATE_IMAGE_DRAG) {
+							imageDrag = rF.getImageDrag(handle);
+							if (rF.imageDrag != null) {
+								rF.imageDrag.setVisibility(View.VISIBLE);
+							}
+							if (imageDrag != null) {
+								rF.imageDrag = imageDrag;
+								rF.imageDrag.setVisibility(View.INVISIBLE);
+							}
+						} else if (actionType == SCROLL_TO_POSITION) {
+							rF.updateScrollPosition(handle);
+						}
 					}
 
 					if (imageDrag != null){
@@ -5180,56 +5194,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (usedSpaceLayout != null) {
 				usedSpaceLayout.setVisibility(View.GONE);
 			}
-
-			UserCredentials credentials = dbH.getCredentials();
-			if (credentials != null) {
-				String emailCredentials = credentials.getEmail();
-				if (emailCredentials != null) {
-					if (nVEmail != null) {
-						nVEmail.setText(emailCredentials);
-					}
-				}
-
-				String myHandleCredentials = credentials.getMyHandle();
-				long myHandle = -1;
-				if (myHandleCredentials != null) {
-					if (!myHandleCredentials.isEmpty()) {
-						myHandle = Long.parseLong(myHandleCredentials);
-					}
-				}
-
-				String firstNameText = credentials.getFirstName();
-				String lastNameText = credentials.getLastName();
-				String fullName = "";
-				if (firstNameText == null) {
-					firstNameText = "";
-				}
-				if (lastNameText == null) {
-					lastNameText = "";
-				}
-				if (firstNameText.trim().length() <= 0) {
-					fullName = lastNameText;
-				} else {
-					fullName = firstNameText + " " + lastNameText;
-				}
-
-				if (fullName.trim().length() <= 0) {
-					logDebug("Put email as fullname");
-					String[] splitEmail = emailCredentials.split("[@._]");
-					fullName = splitEmail[0];
-				}
-
-				if (fullName.trim().length() <= 0) {
-					fullName = getString(R.string.name_text) + " " + getString(R.string.lastname_text);
-					logDebug("Full name set by default");
-				}
-
-				if (nVDisplayName != null) {
-					nVDisplayName.setText(fullName);
-				}
-
-				setOfflineAvatar(emailCredentials, myHandle, fullName);
+			if (nVEmail != null) {
+				nVEmail.setText(megaChatApi.getMyEmail());
 			}
+			if (nVDisplayName != null) {
+				nVDisplayName.setText(megaChatApi.getMyFullname());
+			}
+			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
+					megaChatApi.getMyFullname());
 
 			if (getSettingsFragment() != null) {
 				sttFLol.setOnlineOptions(false);
@@ -6545,7 +6517,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
 							searchMenuItem.setVisible(true);
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 						}
 					}
@@ -6557,7 +6528,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						setGridListIcon();
 						clearRubbishBinMenuitem.setVisible(true);
 						sortByMenuItem.setVisible(true);
-						selectMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
 					}
 					break;
@@ -6572,7 +6542,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
 							sortByMenuItem.setVisible(true);
-							selectMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 					}
@@ -6585,7 +6554,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					if ((drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFL.getItemCount() > 0)
 							|| (drawerItem == DrawerItem.MEDIA_UPLOADS && getMediaUploadFragment() != null && muFLol.getItemCount() > 0)) {
-						selectMenuItem.setVisible(true);
 						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
 
@@ -6627,7 +6595,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 
@@ -6659,7 +6626,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
@@ -6667,7 +6633,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						rubbishBinMenuItem.setVisible(true);
 
 						if (isLinksAdded() && lF.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
@@ -6682,7 +6647,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (getContactsFragment() != null && cFLol.getItemCount() > 0) {
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 
 						}
@@ -6694,14 +6658,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						addContactMenuItem.setVisible(true);
 						upgradeAccountMenuItem.setVisible(true);
 						scanQRcodeMenuItem.setVisible(true);
-
-						if (getSentRequestFragment() != null && sRFLol.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
-						}
-					} else if (getTabItemContacts() == RECEIVED_REQUESTS_TAB) {
-						if (getReceivedRequestFragment() != null && rRFLol.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
-						}
 					}
 					break;
 
@@ -6713,7 +6669,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (getSearchFragment() != null
 								&& getSearchFragment().getNodes() != null
 								&& getSearchFragment().getNodes().size() > 0) {
-							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
 							thumbViewMenuItem.setVisible(true);
 							setGridListIcon();
@@ -6771,7 +6726,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					} else {
 						inviteMenuItem.setVisible(true);
 						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
-							selectMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 						importLinkMenuItem.setVisible(true);
