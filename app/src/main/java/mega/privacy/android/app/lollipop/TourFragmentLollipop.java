@@ -30,6 +30,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.utils.TextUtil;
 
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
 import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
@@ -213,19 +214,16 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         AlertDialog dialog = dialogBuilder.create();
         dialog.show();
 
-        TextInputLayout editInputLayout = (TextInputLayout) dialog.findViewById(R.id.input_recovery_key);
-        EditText editText = (EditText) dialog.findViewById(R.id.edit_recovery_key);
+        TextInputLayout editInputLayout = dialog.findViewById(R.id.input_recovery_key);
+        EditText editText = dialog.findViewById(R.id.edit_recovery_key);
         editText.setOnEditorActionListener((view, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                logDebug("IME OK BTTN PASSWORD");
-                String key = view.getText().toString().trim();
-                if (key.equals("") || key.isEmpty()) {
-                    logWarning("Input is empty");
+                String key = editText.getText().toString();
+                if (TextUtil.isTextEmpty(key)) {
                     editInputLayout.setError(getString(R.string.invalid_string));
                     view.requestFocus();
                 } else {
-                    logDebug("Positive button pressed - reset pass");
-                    startChangePasswordActivity(recoveryKeyUrl, key);
+                    startChangePasswordActivity(recoveryKeyUrl, key.trim());
                     dialog.dismiss();
                 }
             } else {
@@ -235,15 +233,12 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         });
 
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-            logDebug("OK BTTN PASSWORD");
-            String key = editText.getText().toString().trim();
-            if (key.equals("") || key.isEmpty()) {
-                logWarning("Input is empty");
+            String key = editText.getText().toString();
+            if (TextUtil.isTextEmpty(key)) {
                 editInputLayout.setError(getString(R.string.invalid_string));
                 editText.requestFocus();
             } else {
-                logDebug("Positive button pressed - reset pass");
-                startChangePasswordActivity(recoveryKeyUrl, key);
+                startChangePasswordActivity(recoveryKeyUrl, key.trim());
                 dialog.dismiss();
             }
         });
