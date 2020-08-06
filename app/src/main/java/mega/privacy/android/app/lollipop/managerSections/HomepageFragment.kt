@@ -4,9 +4,9 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -29,8 +29,14 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Inject
 
@@ -204,9 +210,39 @@ class HomepageFragment : Fragment() {
         }
 
         fabChat.setOnClickListener {
+            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            runDelay(FAB_MASK_OUT_DELAY) {
+                toChat()
+            }
         }
 
         fabUpload.setOnClickListener {
+            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            runDelay(FAB_MASK_OUT_DELAY) {
+                showUploadPanel()
+            }
+        }
+    }
+
+    private fun toChat() {
+        val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
+            putExtra(KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
+        }
+        activity?.startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT)
+    }
+
+    private fun showUploadPanel() {
+        if (activity is ManagerActivityLollipop) {
+            val managerActivity = activity as ManagerActivityLollipop
+            if (!Util.isOnline(context)) {
+                managerActivity.showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    getString(R.string.error_server_connection_problem),
+                    INVALID_HANDLE
+                )
+                return
+            }
+            managerActivity.showUploadPanel()
         }
     }
 
@@ -229,16 +265,12 @@ class HomepageFragment : Fragment() {
             fabMain.visibility = View.GONE
             addMask()
             // Need to do so, otherwise, fabMaskMain.background is null.
-            Handler().post {
+            post {
                 rotateFab()
                 showIn(fabChat, fabUpload, textChat, textUpload)
                 isFabExpanded = !isFabExpanded
             }
         }
-    }
-
-    private fun runDelay(delayMs: Long, task: () -> Unit) {
-        Handler().postDelayed(task, delayMs)
     }
 
     private fun showIn(vararg fabs: View) {
@@ -324,5 +356,6 @@ class HomepageFragment : Fragment() {
         private const val FAB_DEFAULT_ANGEL = 0f
         private const val FAB_ROTATE_ANGEL = 135f
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
+        private const val KEY_CONTACT_TYPE = "contactType"
     }
 }

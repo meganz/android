@@ -9902,6 +9902,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		long parentHandle = -1;
 
 		switch (drawerItem) {
+            case HOMEPAGE:
+                // For home page, its parent is always the root of cloud drive.
+                parentHandle = megaApi.getRootNode().getHandle();
+                break;
 			case CLOUD_DRIVE:
 				parentHandle = getParentHandleBrowser();
 				break;
