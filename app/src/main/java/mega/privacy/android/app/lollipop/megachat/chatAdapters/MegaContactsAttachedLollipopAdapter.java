@@ -280,17 +280,12 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 		MegaContactDB contact = (MegaContactDB) getItem(position);
 
+		setContactStatus(getUserStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
+
 		MegaUser user = megaApi.getContact(contact.getMail());
 		holder.verifiedIcon.setVisibility(!isItemChecked(position) && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
 
 		holder.contactMail = contact.getMail();
-
-		if (user != null) {
-			setContactStatus(megaChatApi.getUserOnlineStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
-		} else {
-			logWarning("Offline non contact: ");
-			holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-		}
 
 		if (!multipleSelect) {
 
@@ -359,7 +354,8 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		holder.contactMail = contact.getMail();
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
-		setContactStatus(megaChatApi.getUserOnlineStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
+
+		setContactStatus(getUserStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon);
 		holder.textViewContactName.setText(getContactNameDB(contact));
 
 		if (!multipleSelect) {

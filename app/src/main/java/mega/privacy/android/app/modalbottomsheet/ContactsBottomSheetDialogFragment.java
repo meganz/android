@@ -114,7 +114,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
             titleMailContactPanel.setVisibility(View.GONE);
         }
 
-        setImageAvatar(contact.getMegaUser(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
+        setImageAvatar(contact.getMegaUser().getHandle(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
 
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);
