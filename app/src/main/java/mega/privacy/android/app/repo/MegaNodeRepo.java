@@ -14,6 +14,7 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.fromEpoch;
 
 public class MegaNodeRepo {
@@ -50,7 +51,8 @@ public class MegaNodeRepo {
             if (pref != null && pref.getCamSyncHandle() != null) {
                 try {
                     cuHandle = Long.parseLong(pref.getCamSyncHandle());
-                } catch (NumberFormatException ignored) {
+                } catch (NumberFormatException e) {
+                    logError("parse getCamSyncHandle error " + e);
                 }
                 if (megaApi.getNodeByHandle(cuHandle) == null) {
                     cuHandle = -1;
@@ -72,7 +74,8 @@ public class MegaNodeRepo {
             if (pref != null && pref.getMegaHandleSecondaryFolder() != null) {
                 try {
                     cuHandle = Long.parseLong(pref.getMegaHandleSecondaryFolder());
-                } catch (NumberFormatException ignored) {
+                } catch (NumberFormatException e) {
+                    logError("parse MegaHandleSecondaryFolder error " + e);
                 }
                 if (megaApi.getNodeByHandle(cuHandle) == null) {
                     cuHandle = -1;

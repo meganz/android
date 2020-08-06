@@ -61,6 +61,15 @@ import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS
 import static mega.privacy.android.app.utils.CameraUploadUtil.resetCUTimestampsAndCache;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
@@ -80,6 +89,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.Util.checkFingerprint;
 import static mega.privacy.android.app.utils.Util.px2dp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
     public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
@@ -107,7 +117,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private ActionMode mActionMode;
 
     private CuViewModel mViewModel;
-    private long mDraggingNodeHandle = -1;
+    private long mDraggingNodeHandle = INVALID_HANDLE;
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -210,7 +220,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (mBinding != null) {
             int position = mAdapter.getNodePosition(handle);
             logDebug("scrollToNode, handle " + handle + ", position " + position);
-            if (position != -1) {
+            if (position != INVALID_POSITION) {
                 mBinding.cuList.scrollToPosition(position);
                 notifyThumbnailLocationOnScreen();
             }
@@ -684,8 +694,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
             putExtras(mediaIntent, cuNode.getIndex(), node, thumbnailLocation);
 
-            mediaIntent.putExtra("HANDLE", node.getHandle());
-            mediaIntent.putExtra("FILENAME", node.getName());
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
 
             String localPath = null;
             try {
@@ -719,11 +729,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                     activityManager.getMemoryInfo(mi);
                 }
 
-                if (mi.totalMem > BUFFER_COMP) {
-                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                } else {
-                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                }
+                megaApi.httpServerSetMaxBufferSize(
+                        mi.totalMem > BUFFER_COMP ? MAX_BUFFER_32MB : MAX_BUFFER_16MB);
 
                 String url = megaApi.httpServerGetLocalLink(node);
                 mediaIntent.setDataAndType(Uri.parse(url), mimeType);
@@ -747,25 +754,26 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void putExtras(Intent intent, int index, MegaNode node, int[] thumbnailLocation) {
-        intent.putExtra("position", index);
-        intent.putExtra("orderGetChildren", mManagerActivity.orderCamera);
+        intent.putExtra(INTENT_EXTRA_KEY_POSITION, index);
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, mManagerActivity.orderCamera);
 
         MegaNode parentNode = megaApi.getParentNode(node);
         if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {
-            intent.putExtra("parentNodeHandle", -1);
+            intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE);
         } else {
-            intent.putExtra("parentNodeHandle", parentNode.getHandle());
+            intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.getHandle());
         }
 
         if (mViewModel.isSearchMode()) {
-            intent.putExtra("adapterType", SEARCH_BY_ADAPTER);
-            intent.putExtra("handlesNodesSearch", mViewModel.getSearchResultNodeHandles());
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER);
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
+                    mViewModel.getSearchResultNodeHandles());
         } else {
-            intent.putExtra("adapterType", PHOTO_SYNC_ADAPTER);
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
         }
 
         logDebug("openNode screenPosition " + Arrays.toString(thumbnailLocation));
-        intent.putExtra("screenPosition", thumbnailLocation);
+        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, thumbnailLocation);
     }
 
     private void launchNodeViewer(Intent intent, long handle) {

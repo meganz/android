@@ -16,6 +16,8 @@ import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+
 public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
         implements SectionTitleProvider {
 
@@ -117,7 +119,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
             }
         }
 
-        return -1;
+        return INVALID_POSITION;
     }
 
     public void showSelectionAnimation(int position, CuNode node, RecyclerView.ViewHolder holder) {
