@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -87,7 +88,15 @@ public class MegaNodeRepo {
             return Collections.emptyList();
         }
 
-        List<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy);
+        List<MegaNode> children = megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy);
+        List<MegaNode> nodes = new ArrayList<>();
+        for (MegaNode node : children) {
+            MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
+            if (mime.isImage() || mime.isVideoReproducible()) {
+                nodes.add(node);
+            }
+        }
+
         if (filter == null) {
             return nodes;
         }

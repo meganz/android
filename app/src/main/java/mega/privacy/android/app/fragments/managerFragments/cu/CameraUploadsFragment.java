@@ -563,10 +563,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             mManagerActivity.updateCuFragmentOptionsMenu();
 
             mBinding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
+            mBinding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
+            mBinding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             if (nodes.isEmpty()) {
-                mBinding.cuList.setVisibility(View.GONE);
-                mBinding.scroller.setVisibility(View.GONE);
-
                 mBinding.emptyHintImage.setVisibility(
                         mViewModel.isSearchMode() ? View.GONE : View.VISIBLE);
                 if (mViewModel.isSearchMode()) {
@@ -675,16 +674,17 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return;
         }
 
-        if (MimeTypeThumbnail.typeForName(node.getName()).isImage()) {
+        MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
+        if (mime.isImage()) {
             Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
             putExtras(intent, cuNode.getIndex(), node, thumbnailLocation);
             launchNodeViewer(intent, node.getHandle());
-        } else if (MimeTypeThumbnail.typeForName(node.getName()).isVideoReproducible()) {
-            String mimeType = MimeTypeThumbnail.typeForName(node.getName()).getType();
+        } else if (mime.isVideoReproducible()) {
+            String mimeType = mime.getType();
 
             Intent mediaIntent;
             boolean internalIntent;
-            if (MimeTypeThumbnail.typeForName(node.getName()).isVideoNotSupported()) {
+            if (mime.isVideoNotSupported()) {
                 mediaIntent = new Intent(Intent.ACTION_VIEW);
                 internalIntent = false;
             } else {
@@ -713,8 +713,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                             MimeTypeList
                                     .typeForName(node.getName()).getType());
                 } else {
-                    mediaIntent.setDataAndType(Uri.fromFile(mediaFile),
-                            MimeTypeThumbnail.typeForName(node.getName()).getType());
+                    mediaIntent.setDataAndType(Uri.fromFile(mediaFile), mime.getType());
                 }
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else {
@@ -745,11 +744,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                             getString(R.string.intent_not_available), -1);
                 }
             }
-        } else {
-            ArrayList<Long> handleList = new ArrayList<>();
-            handleList.add(node.getHandle());
-            NodeController nC = new NodeController(context);
-            nC.prepareForDownload(handleList, true);
         }
     }
 
