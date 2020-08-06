@@ -60,6 +60,7 @@ import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -507,6 +508,26 @@ public class ChatUtil {
     }
 
     /**
+     * Gets the name of an attached contact.
+     *
+     * @param message   chat message
+     * @return The contact's name by this order if available: nickname, name or email
+     */
+    public static String getNameContactAttachment(MegaChatMessage message) {
+        String email = message.getUserEmail(0);
+        String name = getMegaUserNameDB(MegaApplication.getInstance().getMegaApi().getContact(email));
+        if (isTextEmpty(name)) {
+            name = message.getUserName(0);
+        }
+
+        if (isTextEmpty(name)) {
+            name = email;
+        }
+
+        return name;
+    }
+
+    /*
      * Method for obtaining the AudioFocusRequest when get the focus audio.
      *
      * @param listener  The listener.
@@ -789,5 +810,17 @@ public class ChatUtil {
             notificationsSwitch.setChecked(true);
             notificationsSubTitle.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Gets the user's online status.
+     *
+     * @param userHandle    handle of the user
+     * @return The user's status.
+     */
+    public static int getUserStatus(long userHandle) {
+        return isContact(userHandle)
+                ? MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(userHandle)
+                : MegaChatApi.STATUS_INVALID;
     }
 }

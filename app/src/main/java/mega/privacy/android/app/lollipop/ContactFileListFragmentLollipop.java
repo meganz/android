@@ -403,22 +403,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 	public void checkScroll() {
 		if (listView != null) {
-			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				changeActionBarElevation(true);
-			}
-			else if ((adapter != null && !adapter.isMultipleSelect())) {
-				changeActionBarElevation(false);
-			}
-		}
-	}
-
-	public void changeActionBarElevation(boolean whitElevation){
-		if (aB == null) return;
-		if (whitElevation) {
-			aB.setElevation(px2dp(4, outMetrics));
-		}
-		else {
-			aB.setElevation(0);
+			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
 

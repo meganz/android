@@ -886,7 +886,7 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
 			importIcon = menu.findItem(R.id.chat_cab_menu_import);
 			menu.findItem(R.id.chat_cab_menu_offline).setIcon(mutateIconSecondary(nodeAttachmentHistoryActivity, R.drawable.ic_b_save_offline, R.color.white));
-			changeActionBarElevation(true);
+			changeViewElevation(aB, true, outMetrics);
 			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
@@ -1593,23 +1593,7 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
 	public void checkScroll () {
 		if (listView != null) {
-			if (listView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
-				changeActionBarElevation(true);
-			}
-			else {
-				changeActionBarElevation(false);
-			}
-		}
-	}
-
-	public void changeActionBarElevation(boolean whitElevation){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (whitElevation) {
-				aB.setElevation(px2dp(4, outMetrics));
-			}
-			else {
-				aB.setElevation(0);
-			}
+			changeViewElevation(aB, listView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
 

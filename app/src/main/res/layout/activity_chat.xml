@@ -368,6 +368,44 @@
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/joining_leaving_layout_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_alignParentBottom="true"
+                android:background="@android:color/transparent"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/keyboard_chat_separator"
+                    android:orientation="horizontal" />
+
+                <TextView
+                    android:id="@+id/joining_leaving_text_chat_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="20dp"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="16sp" />
+
+                <ProgressBar
+                    android:id="@+id/add_contact_progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/joining_leaving_text_chat_layout"
+                    android:layout_marginStart="44dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="44dp"
+                    android:indeterminate="true" />
+
+            </RelativeLayout>
+
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"

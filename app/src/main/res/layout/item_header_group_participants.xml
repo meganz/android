@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/chat_group_contact_properties_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/chat_group_properties_avatar_container_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="1dp">
+
+            <RelativeLayout
+                android:id="@+id/chat_group_properties_avatar_layout"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="16dp">
+
+                <mega.privacy.android.app.components.RoundedImageView
+                    android:id="@+id/chat_group_properties_thumbnail"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:scaleType="fitCenter"
+                    rounded:border_color="@color/border_file_properties"
+                    rounded:border_width="0dp"
+                    rounded:corner_radius="30dp" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/chat_group_contact_properties_info_text_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:id="@+id/chat_group_contact_properties_info_title_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="left|center_vertical"
+                android:orientation="horizontal">
+
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/chat_group_contact_properties_info_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="15sp"
+                    app:emojiSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/chat_group_contact_properties_edit_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_rename_title" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/chat_group_contact_properties_info_participants"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/chat_group_contact_properties_info_title_layout"
+                android:layout_gravity="left|center_vertical"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="72dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- NOTIFICATIONS LAYOUT -->
+
+    <LinearLayout
+        android:id="@+id/chat_group_contact_properties_notifications_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="72dp">
+
+            <TextView
+                android:id="@+id/chat_group_contact_properties_notifications_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:textColor="@color/name_my_account"
+                android:text="@string/title_properties_chat_notifications_contact"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/chat_group_contact_properties_notifications_muted_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/chat_group_contact_properties_notifications_title"
+                android:layout_gravity="start|center_vertical"
+                android:textColor="@color/black_40_alpha"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/chat_group_contact_properties_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="end|center_vertical">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/chat_group_contact_properties_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:clickable="false" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider_notifications_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="72dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- SHARED FILES LAYOUT -->
+
+    <RelativeLayout
+        android:id="@+id/chat_group_contact_properties_chat_files_shared_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="left|center_vertical">
+
+        <ImageView
+            android:id="@+id/chat_group_contact_properties_chat_files_shared_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="16dp"
+            android:alpha="0.54"
+            android:src="@drawable/ic_share" />
+
+        <TextView
+            android:id="@+id/chat_group_contact_properties_chat_files_shared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="32dp"
+            android:layout_toRightOf="@id/chat_group_contact_properties_chat_files_shared_icon"
+            android:text="@string/title_chat_shared_files_info"
+            android:textColor="@color/name_my_account"
+            android:textSize="16dp" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/divider_chat_files_shared_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="72dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- CHAT LINK LAYOUT -->
+
+    <LinearLayout
+        android:id="@+id/chat_group_contact_properties_chat_link_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="16dp">
+
+            <ImageView
+                android:id="@+id/chat_group_contact_properties_chat_link_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.54"
+                android:src="@drawable/link_ic" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="32dp">
+
+            <TextView
+                android:id="@+id/chat_group_contact_properties_chat_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:layout_weight="5"
+                android:text="@string/get_chat_link_option"
+                android:textColor="@color/name_my_account"
+                android:textSize="16dp" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider_chat_link_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="72dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- CLEAR LAYOUT -->
+
+    <RelativeLayout
+        android:id="@+id/chat_group_contact_properties_clear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/chat_group_contact_properties_clear_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:alpha="0.64"
+            android:src="@drawable/ic_clear_history" />
+
+        <TextView
+            android:id="@+id/chat_group_contact_properties_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="32dp"
+            android:layout_toRightOf="@id/chat_group_contact_properties_clear_icon"
+            android:text="@string/title_properties_chat_clear_chat"
+            android:textColor="@color/name_my_account"
+            android:textSize="16dp" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/divider_clear_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="72dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- ARCHIVE LAYOUT -->
+
+    <RelativeLayout
+        android:id="@+id/chat_group_contact_properties_archive_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/chat_group_contact_properties_archive_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_b_archive" />
+
+        <TextView
+            android:id="@+id/chat_group_contact_properties_archive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="32dp"
+            android:layout_toRightOf="@id/chat_group_contact_properties_archive_icon"
+            android:text="@string/general_archive"
+            android:textColor="@color/name_my_account"
+            android:textSize="16dp" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/divider_archive_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="72dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- LEAVE LAYOUT -->
+
+    <RelativeLayout
+        android:id="@+id/chat_group_contact_properties_leave_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/chat_group_contact_properties_leave_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_r_leave_chat" />
+
+        <TextView
+            android:id="@+id/chat_group_contact_properties_leave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="32dp"
+            android:layout_toRightOf="@id/chat_group_contact_properties_leave_icon"
+            android:text="@string/title_properties_chat_leave_chat"
+            android:textColor="@color/login_warning"
+            android:textSize="16dp" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/divider_leave_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- MAKE PRIVATE LAYOUT -->
+
+    <LinearLayout
+        android:id="@+id/chat_group_contact_properties_private_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/chat_group_contact_properties_private"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="16dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/make_chat_private_option"
+            android:textAllCaps="true"
+            android:textColor="@color/accentColor"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/chat_group_contact_properties_private_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="11dp"
+            android:text="@string/make_chat_private_option_text"
+            android:textColor="@color/mail_my_account"
+            android:textSize="14dp" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider_private_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- Title Observer LAYOUT -->
+
+    <RelativeLayout
+        android:id="@+id/chat_group_observers_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/chat_group_observers_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:text="@string/observers_chat_label"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14dp" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/chat_group_observers_info_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="right|center_vertical">
+
+            <ImageView
+                android:id="@+id/chat_group_observer_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="24dp"
+                android:alpha="1.5"
+                android:src="@drawable/ic_b_shared_read_chat" />
+
+            <TextView
+                android:id="@+id/chat_group_observers_number_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/chat_group_observer_icon"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14dp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/divider_observers_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:background="@color/divider_upgrade_account" />
+
+    <!-- Title Participants LAYOUT -->
+
+    <RelativeLayout
+        android:id="@+id/chat_group_contact_properties_participants_title"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/chat_group_contact_properties_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/participants_chat_label"
+            android:textColor="@color/name_my_account"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</LinearLayout>

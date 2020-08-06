@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,7 +25,6 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
@@ -95,21 +93,13 @@ public class ChatController {
     public ChatController(Context context){
         logDebug("ChatController created");
         this.context = context;
-        if(context instanceof  MegaApplication){
-            if (megaApi == null){
-                megaApi = ((MegaApplication)context).getMegaApi();
-            }
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication)context).getMegaChatApi();
-            }
+
+        if (megaApi == null){
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
-        else{
-            if (megaApi == null){
-                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-            }
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-            }
+
+        if (megaChatApi == null){
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
         if (dbH == null){
@@ -122,7 +112,10 @@ public class ChatController {
             megaChatApi.leaveChat(chat.getChatId(), (ManagerActivityLollipop) context);
         }
         else if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.leaveChat(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
+            context.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_LEFT_CHAT)
+                    .setAction(ACTION_LEFT_CHAT)
+                    .putExtra(CHAT_ID, chat.getChatId()));
+            ((GroupChatInfoActivityLollipop) context).finish();
         }
         else if(context instanceof ChatActivityLollipop){
             megaChatApi.leaveChat(chat.getChatId(), (ChatActivityLollipop) context);
@@ -410,25 +403,7 @@ public class ChatController {
                 int privilege = message.getPrivilege();
                 logDebug("Privilege of me: " + privilege);
                 String textToShow = "";
-                String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
-
-                if(!fullNameAction.isEmpty()){
-                    if (fullNameAction.trim().length() <= 0) {
-                        logWarning("No name!");
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                        if (nonContact != null) {
-                            fullNameAction = nonContact.getFullName();
-                        } else {
-                            logDebug("Ask for name non-contact");
-                            fullNameAction = "Participant left";
-//                            log("1-Call for nonContactName: "+ message.getUserHandle());
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        }
-                    }
-
-                }
+                String fullNameAction = getParticipantFullName(message.getUserHandle());
 
                 if (privilege != MegaChatRoom.PRIV_RM) {
                     logDebug("I was added");
@@ -453,22 +428,7 @@ public class ChatController {
                 int privilege = message.getPrivilege();
                 logDebug("Privilege of the user: " + privilege);
 
-                String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
-
-                if(!fullNameTitle.isEmpty()){
-                    if (fullNameTitle.trim().length() <= 0) {
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
-                        if (nonContact != null) {
-                            fullNameTitle = nonContact.getFullName();
-                        } else {
-                            fullNameTitle = context.getString(R.string.unknown_name_label);
-//                            log("3-Call for nonContactName: "+ message.getUserHandle());
-//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
-//                        megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
-//                        megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
-                        }
-                    }
-                }
+                String fullNameTitle = getParticipantFullName(message.getHandleOfAction());
 
                 StringBuilder builder = new StringBuilder();
                 builder.append(fullNameTitle + ": ");
@@ -480,28 +440,9 @@ public class ChatController {
                         logDebug("By me");
                         textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, megaChatApi.getMyFullname());
                     } else {
-//                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
                         logDebug("By other");
-                        String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
-
-                        if(!fullNameAction.isEmpty()){
-                            if (fullNameAction.trim().length() <= 0) {
-                                NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                                if (nonContact != null) {
-                                    fullNameAction = nonContact.getFullName();
-                                } else {
-                                    fullNameAction = context.getString(R.string.unknown_name_label);
-                                    logDebug("2-Call for nonContactName: " + message.getUserHandle());
-//                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                                }
-
-                            }
-                        }
-
+                        String fullNameAction = getParticipantFullName(message.getUserHandle());
                         textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, fullNameAction);
-
                     }
                 }//END participant was added
                 else {
@@ -517,27 +458,9 @@ public class ChatController {
 
                         } else {
                             logDebug("The participant was removed");
-                            String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
-
-                            if(!fullNameAction.isEmpty()){
-                                if (fullNameAction.trim().length() <= 0) {
-                                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                                    if (nonContact != null) {
-                                        fullNameAction = nonContact.getFullName();
-                                    } else {
-                                        fullNameAction = context.getString(R.string.unknown_name_label);
-                                        logDebug("4-Call for nonContactName: " + message.getUserHandle());
-//                                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                                    }
-
-                                }
-                            }
-
+                            String fullNameAction = getParticipantFullName(message.getUserHandle());
                             textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, fullNameAction);
                         }
-//                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getHandleOfAction()+"");
                     }
                 } //END participant removed
 
@@ -574,24 +497,7 @@ public class ChatController {
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, megaChatApi.getMyFullname());
                 } else {
                     logDebug("My permission was changed by someone");
-                    String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
-
-                    if(!fullNameAction.isEmpty()){
-                        if (fullNameAction.trim().length() <= 0) {
-                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                            if (nonContact != null) {
-                                fullNameAction = nonContact.getFullName();
-                            } else {
-                                fullNameAction = context.getString(R.string.unknown_name_label);
-                                logDebug("5-Call for nonContactName: " + message.getUserHandle());
-//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                            }
-
-                        }
-                    }
-
+                    String fullNameAction = getParticipantFullName(message.getUserHandle());
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, fullNameAction);
                 }
 
@@ -601,23 +507,7 @@ public class ChatController {
                 logDebug("Participant privilege change!");
                 logDebug("Message type PRIVILEGE CHANGE - Message ID: " + message.getMsgId());
 
-                String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
-
-                if(!fullNameTitle.isEmpty()){
-                    if (fullNameTitle.trim().length() <= 0) {
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
-                        if (nonContact != null) {
-                            fullNameTitle = nonContact.getFullName();
-                        } else {
-                            fullNameTitle = context.getString(R.string.unknown_name_label);
-                            logDebug("6-Call for nonContactName: " + message.getUserHandle());
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
-//                            megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
-//                            megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
-                        }
-                    }
-                }
-
+                String fullNameTitle = getParticipantFullName(message.getHandleOfAction());
                 StringBuilder builder = new StringBuilder();
                 builder.append(fullNameTitle + ": ");
 
@@ -641,23 +531,7 @@ public class ChatController {
 
                 } else {
                     logDebug("By other");
-                    String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
-
-                    if(!fullNameTitle.isEmpty()){
-                        if (fullNameAction.trim().length() <= 0) {
-                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                            if (nonContact != null) {
-                                fullNameAction = nonContact.getFullName();
-                            } else {
-                                fullNameAction = context.getString(R.string.unknown_name_label);
-                                logDebug("8-Call for nonContactName: " + message.getUserHandle());
-//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                            }
-                        }
-                    }
-
+                    String fullNameAction = getParticipantFullName(message.getUserHandle());
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), fullNameTitle, privilegeString, fullNameAction);
                 }
 
@@ -847,24 +721,7 @@ public class ChatController {
             } else {
                 logDebug("Contact message!!");
 
-                String fullNameTitle = getFullName(userHandle, chatRoom);
-
-                if(!fullNameTitle.isEmpty()){
-                    if (fullNameTitle.trim().length() <= 0) {
-//                        String userHandleString = megaApi.userHandleToBase64(message.getUserHandle());
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                        if (nonContact != null) {
-                            fullNameTitle = nonContact.getFullName();
-                        } else {
-                            fullNameTitle = context.getString(R.string.unknown_name_label);
-//
-//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        }
-                    }
-                }
-
+                String fullNameTitle = getParticipantFullName(userHandle);
                 StringBuilder builder = new StringBuilder();
                 builder.append(fullNameTitle + ": ");
 
@@ -1047,174 +904,66 @@ public class ChatController {
         return createManagementString(message, chatRoom);
     }
 
-    public String getFirstName(long userHandle, MegaChatRoom chatRoom){
-        logDebug("User handle: " + userHandle);
-        int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
-        logDebug("Privilege is: " + privilege);
-        if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
-            logDebug("Not participant any more!");
-            String handleString = megaApi.handleToBase64(userHandle);
-            MegaUser contact = megaApi.getContact(handleString);
-            if(contact!=null){
-                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    logDebug("Is contact!");
-                    return getFirstNameDB(userHandle);
-                }
-                else{
-                    logDebug("Old contact");
-                    return getNonContactFirstName(userHandle);
-                }
-            }
-            else{
-                logDebug("Non contact");
-                return getNonContactFirstName(userHandle);
-            }
+    /**
+     * Gets a partcipant's name (not contact).
+     * If the participant has a first name, it returns the first name.
+     * If the participant has a last name, it returns the last name.
+     * Otherwise, it returns the email.
+     *
+     * @param userHandle    participant's identifier
+     * @return The participant's name.
+     */
+    private String getNonContactFirstName(long userHandle) {
+        NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle + "");
+        if (nonContact == null) {
+            return "";
         }
-        else{
-            logDebug("Is participant");
-            return getParticipantFirstName(userHandle, chatRoom);
+
+        String name = nonContact.getFirstName();
+
+        if (isTextEmpty(name)) {
+            name = nonContact.getLastName();
         }
+
+        if (isTextEmpty(name)) {
+            name = nonContact.getEmail();
+        }
+
+        return name;
     }
 
-    public String getFullName(long userHandle, long chatId){
-        logDebug("User handle: "+ userHandle + ", Chat ID: " + chatId);
-        MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
-        if(chat!=null){
-            return getFullName(userHandle, chat);
-        }
-        else{
-            logWarning("Chat is NULL - error!");
-        }
-        return "";
-    }
-
-    public String getFullName(long userHandle, MegaChatRoom chatRoom){
-        logDebug("User Handle: " + userHandle + ",Chat ID: " + chatRoom.getChatId());
-        int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
-        logDebug("Privilege is: " + privilege);
-        if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
-            logDebug("Not participant any more!");
-            String handleString = MegaApiJava.userHandleToBase64(userHandle);
-            logDebug("The user handle to find is: " + handleString);
-            MegaUser contact = megaApi.getContact(handleString);
-            if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                logDebug("Is contact!");
-                String nameContact = getContactNameDB(userHandle);
-                if (nameContact != null) {
-                    return nameContact;
-                }
-
-                return "";
-            }
-            else{
-                logDebug("Non contact");
-                return getNonContactFullName(userHandle);
-            }
-        }
-        else{
-            logDebug("Is participant");
-            return getParticipantFullName(userHandle, chatRoom);
-        }
-    }
-
-    public String getNonContactFirstName(long userHandle){
-        NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
-
-        if(nonContact!=null){
-
-            String name = nonContact.getFirstName();
-
-            if(name==null){
-                name="";
-            }
-
-            if (name.trim().length() <= 0){
-                String lastName = nonContact.getLastName();
-                if(lastName==null){
-                    lastName="";
-                }
-                if (lastName.trim().length() <= 0){
-                    logWarning("Full name empty");
-                    logDebug("Put email as fullname");
-                    String mail = nonContact.getEmail();
-                    if(mail==null){
-                        mail="";
-                    }
-                    if (mail.trim().length() <= 0){
-                        return "";
-                    }
-                    else{
-                        return mail;
-                    }
-                }
-                else{
-                    return lastName;
-                }
-
-            }
-            else{
-                return name;
-            }
-        }
-        return "";
-    }
-
-    public String getNonContactFullName(long userHandle){
-        NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
-        if(nonContact!=null) {
-            String fullName = nonContact.getFullName();
-
-            if (fullName != null && !fullName.trim().isEmpty()) {
-                return fullName;
-            }
-            else {
-                String email = nonContact.getEmail();
-                if (email != null && !email.trim().isEmpty()) {
-                    return email;
-                }
-            }
+    /**
+     * Gets a partcipant's full name (not contact).
+     * If the participant has a full name, it returns the full name.
+     * Otherwise, it returns the email.
+     *
+     * @param userHandle    participant's identifier
+     * @return The participant's full name.
+     */
+    private String getNonContactFullName(long userHandle) {
+        NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle + "");
+        if (nonContact == null) {
+            return "";
         }
 
-        return "";
-    }
+        String fullName = nonContact.getFullName();
 
-    public String getParticipantFirstName(long userHandle, MegaChatRoom chatRoom) {
-        logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
-        String firstName = getFirstNameDB(userHandle);
-        if (firstName == null) firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
-
-        if (isTextEmpty(firstName)) {
-            String lastName = chatRoom.getPeerLastnameByHandle(userHandle);
-            if (isTextEmpty(lastName)) {
-                logWarning("Full name empty");
-                logDebug("Put email as fullname");
-                String mail = chatRoom.getPeerEmailByHandle(userHandle);
-                if (isTextEmpty(mail)) {
-                    return "";
-                } else {
-                    return mail;
-                }
-            } else {
-                return lastName;
-            }
-
-        } else {
-            return firstName;
-        }
-    }
-
-    public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom) {
-        logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
-
-        String fullName = getNicknameContact(userHandle);
-        if (fullName == null) {
-            fullName = chatRoom.getPeerFullnameByHandle(userHandle);
-        }
         if (isTextEmpty(fullName)) {
-            fullName = chatRoom.getPeerEmailByHandle(userHandle);
+            fullName = nonContact.getEmail();
         }
 
         return fullName;
+    }
+
+    /**
+     * Gets a partcipant's email (not contact).
+     *
+     * @param userHandle    participant's identifier
+     * @return The participant's email.
+     */
+    private String getNonContactEmail(long userHandle) {
+        NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle + "");
+        return nonContact != null ? nonContact.getEmail() : "";
     }
 
     public String getMyFullName(){
@@ -2195,5 +1944,109 @@ public class ChatController {
                 megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
             }
         }
+    }
+
+    /**
+     * Stores in DB the user's attributes of a non contact.
+     *
+     * @param peerHandle    identifier of the user to save
+     */
+    public void setNonContactAttributesInDB (long peerHandle) {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
+        String firstName = megaChatApi.getUserFirstnameFromCache(peerHandle);
+        if (!isTextEmpty(firstName)) {
+            dbH.setNonContactFirstName(firstName, peerHandle + "");
+        }
+
+        String lastName = megaChatApi.getUserLastnameFromCache(peerHandle);
+        if (!isTextEmpty(lastName)) {
+            dbH.setNonContactLastName(lastName, peerHandle + "");
+        }
+
+        String email = megaChatApi.getUserEmailFromCache(peerHandle);
+        if (!isTextEmpty(email)) {
+            dbH.setNonContactEmail(email, peerHandle + "");
+        }
+    }
+
+    /**
+     * Gets the participant's first name.
+     * If the participant has an alias, it returns the alias.
+     * If the participant has a first name, it returns the first name.
+     * If the participant has a last name, it returns the last name.
+     * Otherwise, it returns the email.
+     *
+     * @param userHandle    participant's identifier
+     * @return The participant's first name
+     */
+    public String getParticipantFirstName(long userHandle) {
+        String firstName = getFirstNameDB(userHandle);
+
+        if (isTextEmpty(firstName)) {
+            firstName = getNonContactFirstName(userHandle);
+        }
+
+        if (isTextEmpty(firstName)) {
+            firstName = megaChatApi.getUserFirstnameFromCache(userHandle);
+        }
+
+        if (isTextEmpty(firstName)) {
+            firstName = megaChatApi.getUserLastnameFromCache(userHandle);
+        }
+
+        if (isTextEmpty(firstName)) {
+            firstName = megaChatApi.getUserEmailFromCache(userHandle);
+        }
+
+        return firstName;
+    }
+
+    /**
+     * Gets the participant's full name.
+     * If the participant has an alias, it returns the alias.
+     * If the participant has a full name, it returns the full name.
+     * Otherwise, it returns the email.
+     *
+     * @param handle    participant's identifier
+     * @return The participant's full name.
+     */
+    public String getParticipantFullName(long handle) {
+        String fullName = getContactNameDB(handle);
+
+        if (isTextEmpty(fullName)) {
+            fullName = getNonContactFullName(handle);
+        }
+
+        if (isTextEmpty(fullName)) {
+            fullName = megaChatApi.getUserFullnameFromCache(handle);
+        }
+
+        if (isTextEmpty(fullName)) {
+            fullName = megaChatApi.getUserEmailFromCache(handle);
+        }
+
+        return fullName;
+    }
+
+    /**
+     * Gets the participant's email.
+     *
+     * @param handle    participant's identifier
+     * @return The participant's email.
+     */
+    public String getParticipantEmail(long handle) {
+        String email = getContactEmailDB(handle);
+
+        if (isTextEmpty(email)) {
+            email = getNonContactEmail(handle);
+        }
+
+        if (isTextEmpty(email)) {
+            email = megaChatApi.getUserEmailFromCache(handle);
+        }
+
+        return email;
     }
 }
