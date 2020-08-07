@@ -35,6 +35,7 @@ import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVE
 import static mega.privacy.android.app.utils.FileUtils.buildDefaultDownloadDir;
 import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.RxUtil.ignore;
 import static mega.privacy.android.app.utils.RxUtil.logErr;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
 import static mega.privacy.android.app.utils.Util.fromEpoch;
@@ -240,9 +241,8 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public void setInitialPreferences() {
-        add(Single.just(true)
-                .subscribeOn(Schedulers.io())
-                .subscribe(ignored -> {
+        add(Single.fromCallable(
+                () -> {
                     logDebug("setInitialPreferences");
 
                     mDbHandler.setFirstTime(false);
@@ -250,7 +250,8 @@ class CuViewModel extends BaseRxViewModel {
                     File defaultDownloadLocation = buildDefaultDownloadDir(getApplication());
                     defaultDownloadLocation.mkdirs();
 
-                    mDbHandler.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+                    mDbHandler.setStorageDownloadLocation(
+                            defaultDownloadLocation.getAbsolutePath());
                     mDbHandler.setPinLockEnabled(false);
                     mDbHandler.setPinLockCode("");
 
@@ -262,19 +263,25 @@ class CuViewModel extends BaseRxViewModel {
                         logDebug("Already public links: showCopyright set false");
                         mDbHandler.setShowCopyright(false);
                     }
-                }, logErr("setInitialPreferences")));
+                    return true;
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(ignore(), logErr("setInitialPreferences")));
     }
 
     public void setCamSyncEnabled(boolean enabled) {
-        add(Single.just(enabled)
-                .observeOn(Schedulers.io())
-                .subscribe(mDbHandler::setCamSyncEnabled, logErr("setCamSyncEnabled")));
+        add(Single.fromCallable(
+                () -> {
+                    mDbHandler.setCamSyncEnabled(enabled);
+                    return enabled;
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(ignore(), logErr("setCamSyncEnabled")));
     }
 
     public void enableCuForBusinessFirstTime(boolean enableCellularSync, boolean syncVideo) {
-        add(Single.just(0)
-                .observeOn(Schedulers.io())
-                .subscribe(ignored -> {
+        add(Single.fromCallable(
+                () -> {
                     mDbHandler.setCamSyncEnabled(true);
                     File localFile =
                             Environment.getExternalStoragePublicDirectory(
@@ -289,15 +296,17 @@ class CuViewModel extends BaseRxViewModel {
                     mDbHandler.setCameraUploadVideoQuality(MEDIUM);
                     mDbHandler.setConversionOnCharging(true);
                     mDbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-                }, logErr("enableCuForBusinessFirstTime")));
+                    return true;
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(ignore(), logErr("enableCuForBusinessFirstTime")));
     }
 
     public LiveData<Boolean> camSyncEnabled() {
         MutableLiveData<Boolean> camSyncEnabled = new MutableLiveData<>();
 
-        add(Single.defer(
-                () -> Single.just(
-                        Boolean.parseBoolean(mDbHandler.getPreferences().getCamSyncEnabled())))
+        add(Single.fromCallable(
+                () -> Boolean.parseBoolean(mDbHandler.getPreferences().getCamSyncEnabled()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(camSyncEnabled::setValue, logErr("camSyncEnabled")));

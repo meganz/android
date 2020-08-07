@@ -34,7 +34,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
@@ -51,7 +50,6 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.repo.MegaNodeRepo;
 import nz.mega.sdk.MegaNode;
 
@@ -100,10 +98,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 7.
     private static final int SPAN_LARGE_GRID = 3;
     private static final int SPAN_SMALL_GRID = 7;
-    // in large grid view, we have 6 pixels margin for thumbnail,
-    // while in small grid view, we have 3.
-    private static final int MARGIN_LARGE_GRID = 6;
-    private static final int MARGIN_SMALL_GRID = 3;
 
     @SuppressLint("StaticFieldLeak") private static CameraUploadsFragment sInstanceForDragging;
 
@@ -212,7 +206,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     public void onStoragePermissionRefused() {
         showSnackbar(context, getString(R.string.on_refuse_storage_permission));
-        toCloudDrive();
+        navigateToCloudDrive();
     }
 
     public void scrollToNode(long handle) {
@@ -263,7 +257,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private void toCloudDrive() {
+    private void navigateToCloudDrive() {
         mViewModel.setCamSyncEnabled(false);
         mManagerActivity.setFirstLogin(false);
         mManagerActivity.setInitialCloudDrive();
@@ -451,7 +445,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         });
         mFirstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-            toCloudDrive();
+            navigateToCloudDrive();
         });
 
         return mFirstLoginBinding.getRoot();
@@ -484,18 +478,27 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
         });
 
-        int gridMargin = smallGrid ? MARGIN_SMALL_GRID : MARGIN_LARGE_GRID;
+        int gridMargin = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_small_grid_margin
+                        : R.dimen.cu_fragment_large_grid_margin);
         int gridWidth = outMetrics.widthPixels / spanCount - gridMargin * 2;
-        int icSelectedWidth = px2dp(smallGrid ? 16 : 23, outMetrics);
-        int icSelectedMargin = px2dp(smallGrid ? 3 : 7, outMetrics);
-        int roundCornerRadius = px2dp(4, outMetrics);
-        int selectedPadding = px2dp(1, outMetrics);
+        int icSelectedWidth = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_ic_selected_size_small
+                        : R.dimen.cu_fragment_ic_selected_size_large);
+        int icSelectedMargin = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_ic_selected_margin_small
+                        : R.dimen.cu_fragment_ic_selected_margin_large);
+        int roundCornerRadius = getResources().getDimensionPixelSize(
+                R.dimen.cu_fragment_selected_round_corner_radius);
+        int selectedPadding =
+                getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding);
         CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(
                 smallGrid, gridWidth, gridMargin, icSelectedWidth, icSelectedMargin,
                 roundCornerRadius,
                 selectedPadding);
 
         mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
+        mAdapter.setHasStableIds(true);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override public int getSpanSize(int position) {
                 return mAdapter.getSpanSize(position);
@@ -536,20 +539,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 }
             } else {
                 mManagerActivity.moveToSettingsSection();
-            }
-        });
-
-        mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
-            mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
-            if (!enabled) {
-                FrameLayout.LayoutParams params =
-                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
-                mBinding.cuList.setLayoutParams(params);
-
-                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
-                mBinding.scroller.setLayoutParams(params);
             }
         });
     }
@@ -623,6 +612,20 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                     mActionMode.finish();
                     mActionMode = null;
                 }
+            }
+        });
+
+        mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
+            mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
+            if (!enabled) {
+                FrameLayout.LayoutParams params =
+                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
+                params.bottomMargin = px2dp(48, outMetrics);
+                mBinding.cuList.setLayoutParams(params);
+
+                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
+                params.bottomMargin = px2dp(48, outMetrics);
+                mBinding.scroller.setLayoutParams(params);
             }
         });
     }

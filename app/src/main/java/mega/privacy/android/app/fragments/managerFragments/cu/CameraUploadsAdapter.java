@@ -32,6 +32,17 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
         mItemSizeConfig = itemSizeConfig;
     }
 
+    @Override public long getItemId(int position) {
+        switch (getItemViewType(position)) {
+            case CuNode.TYPE_TITLE:
+                return mNodes.get(position).getModifyDate().hashCode();
+            case CuNode.TYPE_IMAGE:
+            case CuNode.TYPE_VIDEO:
+            default:
+                return mNodes.get(position).getNode().getHandle();
+        }
+    }
+
     @Override public int getItemViewType(int position) {
         return mNodes.get(position).getType();
     }
@@ -129,8 +140,6 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
             return;
         }
 
-        notifyItemChanged(position);
-
         if (holder instanceof CuImageViewHolder) {
             showSelectionAnimation(((CuImageViewHolder) holder).binding().icSelected, position,
                     node.isSelected());
@@ -141,20 +150,21 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     }
 
     private void showSelectionAnimation(View view, int position, boolean showing) {
+        if (showing) {
+            view.setVisibility(View.VISIBLE);
+        }
         Animation flipAnimation = AnimationUtils.loadAnimation(view.getContext(),
                 R.anim.multiselect_flip);
         flipAnimation.setDuration(200);
         flipAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override public void onAnimationStart(Animation animation) {
-                if (showing) {
-                    notifyItemChanged(position);
-                }
             }
 
             @Override public void onAnimationEnd(Animation animation) {
                 if (!showing) {
-                    notifyItemChanged(position);
+                    view.setVisibility(View.GONE);
                 }
+                notifyItemChanged(position);
             }
 
             @Override public void onAnimationRepeat(Animation animation) {

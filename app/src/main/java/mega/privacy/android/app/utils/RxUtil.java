@@ -8,6 +8,11 @@ public class RxUtil {
     private RxUtil() {
     }
 
+    public static <T> Consumer<T> ignore() {
+        return ignored -> {
+        };
+    }
+
     public static Consumer<? super Throwable> logErr(String context) {
         return throwable -> logError(context + " onError", throwable);
     }
