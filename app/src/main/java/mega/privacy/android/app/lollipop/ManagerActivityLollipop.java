@@ -704,7 +704,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private Chronometer chronometerMenuItem;
 	private LinearLayout layoutCallMenuItem;
 
-	private int typesCameraPermission;
+	private int typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 	AlertDialog enable2FADialog;
 	boolean isEnable2FADialogShown = false;
 	Button enable2FAButton;
@@ -1552,7 +1552,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
 		switch(requestCode){
 			case REQUEST_READ_CONTACTS:{
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -1594,7 +1593,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					}
-				}else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
+				} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
 				}
@@ -15887,7 +15886,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		logDebug("Chat ID: " + chatid + ", New state: " + newState);
-
 		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
 			logDebug("Online Connection: " + chatid);
 			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());

@@ -101,7 +101,6 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
         optionSendFile.setVisibility(View.VISIBLE);
         optionStartConversation.setVisibility(View.VISIBLE);
-
         optionSendContact.setVisibility(View.VISIBLE);
 
         titleNameContactPanel.setText(contact.getFullName());
@@ -119,12 +118,11 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);
         optionStartCall.setVisibility(View.VISIBLE);
-        optionStartCall.setOnClickListener(isCallOptionEnabled(contact.getMegaUser().getHandle()) ? this : null);
+        optionStartCall.setOnClickListener(participatingInACall() ? null : this);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
     }
-
 
     @Override
     public void onClick(View v) {

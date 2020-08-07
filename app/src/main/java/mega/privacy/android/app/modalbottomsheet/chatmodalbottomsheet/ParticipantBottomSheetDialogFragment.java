@@ -171,7 +171,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionContactInfoChat.setVisibility(View.VISIBLE);
                 optionStartConversationChat.setVisibility(View.VISIBLE);
                 optionStartCall.setVisibility(View.VISIBLE);
-                optionStartCall.setOnClickListener(isCallOptionEnabled(participantHandle) ? this : null);
+                optionStartCall.setOnClickListener(participatingInACall() ? null : this);
                 optionInvite.setVisibility(View.GONE);
             } else {
                 optionContactInfoChat.setVisibility(View.GONE);

@@ -935,7 +935,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch (requestCode) {
 			case REQUEST_CAMERA:
@@ -947,7 +946,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				break;
 		}
 	}
-
 
 	public void openChat(long chatId, String text){
 		logDebug("openChat: " + chatId);
@@ -2380,12 +2378,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
     }
-
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
 
 	@Override
     public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {

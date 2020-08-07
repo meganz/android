@@ -430,24 +430,11 @@ public class CallUtil {
      * @param chatRoom The chatRoom.
      */
     public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
-        if (checkPermissionsCall(activity, INVALID_TYPE_PERMISSIONS)) {
+        if (checkPermissionsCall(activity, START_CALL_PERMISSIONS)) {
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
             MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, (MegaChatRequestListenerInterface) activity);
             MegaApplication.setIsWaitingForCall(false);
         }
-    }
-
-    /**
-     * Method for knowing if the call start button should be enabled or not.
-     *
-     * @param userHandle User handle.
-     * @return True, if it should be enabled or false otherwise.
-     */
-    public static boolean isCallOptionEnabled(long userHandle) {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaChatRoom chat = megaChatApi.getChatRoomByUser(userHandle);
-        return chat == null || (!chat.isGroup() && megaChatApi.getNumCalls() <= 0 &&
-                !participatingInACall() && !megaChatApi.hasCallInChatRoom(chat.getChatId()));
     }
 
     /**
@@ -460,19 +447,19 @@ public class CallUtil {
     public static boolean checkPermissionsCall(Activity activity, int typePermission) {
         boolean hasCameraPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
         if (!hasCameraPermission) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
             return false;
         }
 
         boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
         if (!hasRecordAudioPermission) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
             return false;
         }
 
