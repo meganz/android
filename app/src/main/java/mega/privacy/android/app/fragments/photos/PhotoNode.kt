@@ -12,7 +12,7 @@ data class PhotoNode(
     var selected: Boolean
 ) {
     companion object {
-        const val TYPE_TITLE = 0
+        const val TYPE_TITLE = 0   // The datetime header
         const val TYPE_PHOTO = 1
     }
 }

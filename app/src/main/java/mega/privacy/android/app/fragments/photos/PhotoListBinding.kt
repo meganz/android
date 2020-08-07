@@ -10,25 +10,29 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import okhttp3.Dispatcher
 import java.io.File
 
 @BindingAdapter("app:items")
 fun setItems(listView: RecyclerView, items: List<PhotoNode>?) {
     items?.let {
-        Log.i("Alex", "submit list")
         (listView.adapter as PhotosGridAdapter).submitList(items)
     }
 }
 
 @BindingAdapter("app:thumbnail")
 fun setThumbnail(imageView: ImageView, file: File?) {
-    imageView.let {
+    with(imageView) {
         var requestBuilder = if (file != null) {
-            Glide.with(imageView).load(file)
+            Glide.with(this).load(file)
                 .placeholder(R.drawable.ic_image_thumbnail)
         } else {
-            Glide.with(imageView).load(R.drawable.ic_image_thumbnail)
+            Glide.with(this).load(R.drawable.ic_image_thumbnail)
         }
 //        requestBuilder = if (node.isSelected()) {
 //            requestBuilder
@@ -37,14 +41,16 @@ fun setThumbnail(imageView: ImageView, file: File?) {
 //                    RoundedCorners(itemSizeConfig.getRoundCornerRadius())
 //                )
 //        } else {
-         requestBuilder = requestBuilder.transform(CenterCrop())
+        requestBuilder = requestBuilder.transform(CenterCrop())
 //        }
         requestBuilder
             .transition(DrawableTransitionOptions.withCrossFade())
-            .into(imageView)
+            .into(this)
+
 
 //        val padding = if (node.isSelected()) itemSizeConfig.getSelectedPadding() else 0
         val padding = 0
-        imageView.setPadding(padding, padding, padding, padding)
+        setPadding(padding, padding, padding, padding)
     }
+
 }

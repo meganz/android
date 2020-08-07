@@ -29,7 +29,7 @@
             android:id="@+id/photo_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:columnWidth="86dp"
+            android:columnWidth="@dimen/photo_item_width"
             app:items="@{viewmodel.items}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

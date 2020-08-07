@@ -471,13 +471,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, PHOTOS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
+				case PHOTOS: return "Photos";
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
 				case CONTACTS: {
@@ -5831,7 +5832,27 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				break;
 			}
 			// FIXME: for removed OFFLINE, when should we do the checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)?
-    		case CAMERA_UPLOADS:{
+			case PHOTOS: {
+				tB.setVisibility(View.VISIBLE);
+				photosFragment = (PhotosFragment) getSupportFragmentManager()
+						.findFragmentByTag("photolist");
+				if (photosFragment == null) {
+					photosFragment = new PhotosFragment();
+				} else {
+					refreshFragment("photolist");
+				}
+
+				replaceFragment(photosFragment, "photolist");
+
+//				setToolbarTitle();
+				supportInvalidateOptionsMenu();
+//				showFabButton();
+				fabButton.hide();
+				showHideBottomNavigationView(false);
+//				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				break;
+			}
+    		case CAMERA_UPLOADS: {
 				tB.setVisibility(View.VISIBLE);
 				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 				if (cuFL == null) {
@@ -5850,7 +5871,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					bottomNavigationCurrentItem = CAMERA_UPLOADS_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
-      			break;
     		}
     		case MEDIA_UPLOADS:{
 				tB.setVisibility(View.VISIBLE);
@@ -7294,23 +7314,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				return true;
 			}
 			case R.id.action_menu_photos: {
-				tB.setVisibility(View.VISIBLE);
-				photosFragment = (PhotosFragment) getSupportFragmentManager()
-						.findFragmentByTag("photolist");
-				if (photosFragment == null) {
-					photosFragment = new PhotosFragment();
-				} else {
-					refreshFragment("photolist");
-				}
-
-				replaceFragment(photosFragment, "photolist");
-
-//				setToolbarTitle();
-				supportInvalidateOptionsMenu();
-//				showFabButton();
-				fabButton.hide();
-				showHideBottomNavigationView(false);
-//				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				selectDrawerItemLollipop(DrawerItem.PHOTOS);
 			}
             default:{
 	            return super.onOptionsItemSelected(item);

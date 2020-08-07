@@ -3,27 +3,22 @@ package mega.privacy.android.app.fragments.photos
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.databinding.ItemPhotoBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.fragments.managerFragments.cu.CuItemSizeConfig
 import javax.inject.Inject
 
 class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewModel*/) :
     ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()) {
+
+    private var itemSizeConfig: CuItemSizeConfig? = null
+
     class PhotoViewHolder(private val binding: ViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
-        init {
-//            if (binding is ItemPhotoBinding) {
-//                val params =
-//                    binding.root.layoutParams
-//                params.width = 200
-//                params.height = 200
-//                binding.root.layoutParams = params
-//            }
-        }
 
         fun bind(item: PhotoNode) {
             if (binding is ItemPhotosTitleBinding) {
@@ -55,7 +50,28 @@ class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewM
                 )
         }
 
+        if (viewType == PhotoNode.TYPE_PHOTO && itemSizeConfig != null) {
+            setItemLayoutParams(binding)
+        }
+
         return PhotoViewHolder(binding)
+    }
+
+    private fun setItemLayoutParams(binding: ViewBinding) {
+        (binding.root.layoutParams as GridLayoutManager.LayoutParams).apply {
+            with(itemSizeConfig!!) {
+                gridSize.let {
+                    width = it
+                    height = it
+                }
+                gridMargin.let {
+                    topMargin = it
+                    bottomMargin = it
+                    marginStart = it
+                    marginEnd = it
+                }
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
@@ -72,5 +88,16 @@ class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewM
         }
     }
 
+    fun setItemSizeConfig(config: CuItemSizeConfig) {
+        itemSizeConfig = config
+    }
 
+    fun getSpanSizeLookup(spanCount: Int) = object : GridLayoutManager.SpanSizeLookup() {
+        override fun getSpanSize(position: Int): Int {
+            return when (getItem(position).type) {
+                PhotoNode.TYPE_TITLE -> spanCount
+                else -> 1
+            }
+        }
+    }
 }

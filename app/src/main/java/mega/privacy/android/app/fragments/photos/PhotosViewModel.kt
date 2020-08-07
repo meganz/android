@@ -8,13 +8,11 @@ class PhotosViewModel @ViewModelInject constructor(
     private val photosRepository: PhotosRepository
 ) : ViewModel() {
 
-    private var count: Int = 0
-    private var _query = MutableLiveData<Int>()
-//    private var _items : LiveData<List<PhotoNode>>
+    private var _query = MutableLiveData<PhotoQuery>()
 
     val items: LiveData<List<PhotoNode>> = Transformations.switchMap(_query) { query ->
             viewModelScope.launch {
-                photosRepository.getPhotos(PhotoQuery(searchDate = LongArray(0)))
+                photosRepository.getPhotos(query)
 //            if (result is Result.Success) {
 //                _items.value = result.data
 //            } else {
@@ -26,7 +24,7 @@ class PhotosViewModel @ViewModelInject constructor(
     }
 
     fun loadPhotos(query: PhotoQuery) {
-        _query.value = 123
+        _query.value = query
     }
 
     fun refresh() {

@@ -3,7 +3,6 @@ package mega.privacy.android.app.fragments.photos
 import android.content.Context
 import android.os.Handler
 import android.text.TextUtils
-import android.util.Log
 import android.util.LongSparseArray
 import androidx.core.util.containsKey
 import androidx.lifecycle.LiveData
@@ -24,9 +23,8 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.LinkedHashMap
 import kotlin.collections.ArrayList
-
+import kotlin.collections.LinkedHashMap
 
 class PhotosRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
@@ -36,37 +34,31 @@ class PhotosRepository @Inject constructor(
     private var order = MegaApiJava.ORDER_MODIFICATION_DESC
 
     private val selectedNodes: LongSparseArray<MegaNode> = LongSparseArray()
+
+    // LinkedHashMap guarantees that the index order of elements is consistent with
+    // the order of putting. Moreover, it has a quick element search[O(1)] (for
+    // the callback of megaApi.getThumbnail())
     private val photoNodesMap: MutableMap<Long, PhotoNode> = LinkedHashMap()
 
     private var waitingForRefresh = false
-//
-//    val photoNodes: LiveData<List<PhotoNode>> = liveData {
-//        getSortOrder()
-//        emit(getPhotoNodes())
-//    }
 
     private val _photoNodes = MutableLiveData<List<PhotoNode>>()
     val photoNodes: LiveData<List<PhotoNode>> = _photoNodes
 
-    suspend fun getPhotos(query: PhotoQuery)/*: LiveData<List<PhotoNode>>*/ = withContext(Dispatchers.IO) {
-            if (query.order == MegaApiJava.ORDER_NONE) {
-                getSortOrder()
-            } else {
-                order = query.order
-            }
-
-            getPhotoNodes()
-
-            withContext(Dispatchers.Main) {
-
-                _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
-                Log.i("Alex", "_photoNodes size= " + photoNodesMap.values.size)
-//                    listOf(PhotoNode(null, -1, null, PhotoNode.TYPE_TITLE, "dateString", false))
-            }
+    suspend fun getPhotos(query: PhotoQuery) = withContext(Dispatchers.IO) {
+        if (query.order == MegaApiJava.ORDER_NONE) {
+            getSortOrder()
+        } else {
+            order = query.order
         }
 
-//        return photoNodes
+        getPhotoNodes()
 
+        // Update LiveData must in main thread
+        withContext(Dispatchers.Main) {
+            _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
+        }
+    }
 
     private fun getSortOrder(): Int {
         try {
@@ -96,31 +88,35 @@ class PhotosRepository @Inject constructor(
                     e: MegaError?
                 ) {
                     request?.let {
-                        val photoNode = photoNodesMap[it.nodeHandle]
-                        photoNode?.thumbnail = thumbFile.absoluteFile
+                        // Must generate a new PhotoNode object, or the oldItem and newItem in
+                        // PhotosGridAdapter's areContentsTheSame will be an identical object,
+                        // then the item wouldn't be refreshed
+                        photoNodesMap[it.nodeHandle]?.apply {
+                            photoNodesMap[it.nodeHandle] = copy(thumbnail = thumbFile.absoluteFile)
+                        }
                     }
 
                     refreshLiveData()
                 }
-
             })
 
             null
         }
     }
 
+    /**
+     * Throttle for updating the Photos LiveData
+     */
     private fun refreshLiveData() {
         if (waitingForRefresh) return
+        waitingForRefresh = true
 
         Handler().postDelayed(
             {
-                _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
-                Log.i("Alex", "refresh data")
                 waitingForRefresh = false
-            }, 1000
+                _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
+            }, UPDATE_DATA_THROTTLE
         )
-
-        waitingForRefresh = true
     }
 
     private fun getPhotoNodes() {
@@ -191,5 +187,10 @@ class PhotosRepository @Inject constructor(
         }
 
         return megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), order)
+    }
+
+    companion object {
+        private const val UPDATE_DATA_THROTTLE =
+            500L   // 500ms, user can see the update of photos instantly
     }
 }

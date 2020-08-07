@@ -463,6 +463,10 @@ public class Util {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
 
+	public static int dp2px (float dp, DisplayMetrics outMetrics) {
+		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
+	}
+	
 	/*
 	 * AES encryption
 	 */

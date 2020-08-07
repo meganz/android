@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="android.view.View" />
 
         <variable
@@ -11,14 +12,16 @@
             type="mega.privacy.android.app.fragments.photos.PhotoNode" />
     </data>
 
+    <!-- Caution: don't set to wrap_content, or the grid item size will be messy and
+     loading images by Glide would cause performance issue of UI stuck -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/thumbnail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,8 +38,7 @@
             android:src="@drawable/ic_select_folder"
             android:visibility="@{item.selected ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="@id/thumbnail"
-            app:layout_constraintTop_toTopOf="@id/thumbnail"
-             />
+            app:layout_constraintTop_toTopOf="@id/thumbnail" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
