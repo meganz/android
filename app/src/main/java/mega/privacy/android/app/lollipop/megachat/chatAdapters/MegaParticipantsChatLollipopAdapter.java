@@ -650,7 +650,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
      *
      * @param position      the position of the participant in the adapter.
      * @param participant   the participant to check.
-     * @return The participant's avatar if the have, null otherwise.
+     * @return The participant's avatar if they have, null otherwise.
      */
     private Bitmap checkParticipant(ViewHolderParticipantsList holderParticipantsList, int position, MegaChatParticipant participant) {
         boolean needUpdate = false;
