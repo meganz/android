@@ -248,6 +248,17 @@
         <item name="colorAccent">@color/accentColor</item>
     </style>
 
+    <style name="Theme.Swipe.BackFullScreen" parent="Theme.Swipe.Back">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
     <style name="AppCompatAlertDialogStyleAddContacts" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:background">@color/white</item>
         <item name="android:positiveButtonText">@color/accentColor</item>
