@@ -146,6 +146,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.photos.PhotosFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -650,6 +651,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
+	private PhotosFragment photosFragment;
 
 	ProgressDialog statusDialog;
 
@@ -7290,6 +7292,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					returnCall(this);
 				}
 				return true;
+			}
+			case R.id.action_menu_photos: {
+				tB.setVisibility(View.VISIBLE);
+				photosFragment = (PhotosFragment) getSupportFragmentManager()
+						.findFragmentByTag("photolist");
+				if (photosFragment == null) {
+					photosFragment = new PhotosFragment();
+				} else {
+					refreshFragment("photolist");
+				}
+
+				replaceFragment(photosFragment, "photolist");
+
+//				setToolbarTitle();
+				supportInvalidateOptionsMenu();
+//				showFabButton();
+				fabButton.hide();
+				showHideBottomNavigationView(false);
+//				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 			}
             default:{
 	            return super.onOptionsItemSelected(item);

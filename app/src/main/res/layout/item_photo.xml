@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="item"
+            type="mega.privacy.android.app.fragments.photos.PhotoNode" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:thumbnail="@{item.thumbnail}"
+            tools:src="@drawable/ic_image_thumbnail" />
+
+        <ImageView
+            android:id="@+id/icon_selected"
+            android:layout_width="@dimen/icon_selected_size"
+            android:layout_height="@dimen/icon_selected_size"
+            android:layout_marginStart="@dimen/icon_selected_margin"
+            android:layout_marginTop="@dimen/icon_selected_margin"
+            android:src="@drawable/ic_select_folder"
+            android:visibility="@{item.selected ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toStartOf="@id/thumbnail"
+            app:layout_constraintTop_toTopOf="@id/thumbnail"
+             />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

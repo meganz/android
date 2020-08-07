@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
+import dagger.hilt.android.internal.managers.ViewComponentManager;
+
 public class NewGridRecyclerView extends RecyclerView {
     
     private CustomizedGridLayoutManager manager;
@@ -72,7 +74,15 @@ public class NewGridRecyclerView extends RecyclerView {
     
     private int getScreenX() {
         Point point = new Point();
-        ((Activity)getContext()).getWindowManager().getDefaultDisplay().getSize(point);
+        Context context = getContext();
+        Activity activity = null;
+        if (context instanceof ViewComponentManager.FragmentContextWrapper) {
+            activity = ((ViewComponentManager.FragmentContextWrapper) getContext()).fragment.getActivity();
+        } else {
+            activity = ((Activity)context);
+        }
+
+        activity.getWindowManager().getDefaultDisplay().getSize(point);
         return point.x;
     }
     

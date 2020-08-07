@@ -56,4 +56,7 @@
     <dimen name="label_margin_end">16dp</dimen>
     <dimen name="fab_margin_span">16dp</dimen>
 
+    <dimen name="icon_selected_size">23dp</dimen>
+    <dimen name="icon_selected_margin">7dp</dimen>
+
 </resources>
