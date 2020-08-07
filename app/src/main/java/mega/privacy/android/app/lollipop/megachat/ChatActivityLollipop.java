@@ -1627,6 +1627,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void setSubtitleVisibility() {
+        if(chatRoom == null){
+            chatRoom = megaChatApi.getChatRoom(idChat);
+        }
+
+        if(chatRoom == null){
+            return;
+        }
+
         boolean isGroup = chatRoom.isGroup();
 
         individualSubtitleToobar.setVisibility(isGroup ? View.GONE : View.VISIBLE);
@@ -7193,7 +7201,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         } else if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("TYPE_HANG_CHAT_CALL finished with success  ---> answerChatCall chatid = " + idChat);
+                logDebug("The call has been successfully hung up");
                 MegaChatCall call = api.getChatCall(idChat);
                 if (call == null) return;
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
@@ -7209,7 +7217,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         } else if (request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("TYPE_START_CHAT_CALL finished with success");
+                logDebug(" The call has been started success");
                 //getFlag - Returns true if it is a video-audio call or false for audio call
             } else {
                 logError("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
@@ -7217,7 +7225,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("TYPE_ANSWER_CHAT_CALL finished with success");
+                logDebug("The call has been answered success");
+                MegaApplication.setShowPinScreen(false);
+                Intent i = new Intent(this, ChatCallActivity.class);
+                i.putExtra(CHAT_ID, idChat);
+                i.setAction(SECOND_CALL);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                this.startActivity(i);
                 //getFlag - Returns true if it is a video-audio call or false for audio call
             } else {
                 logError("ERROR WHEN TYPE_ANSWER_CHAT_CALL e.getErrorCode(): " + e.getErrorString());

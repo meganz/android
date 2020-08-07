@@ -847,10 +847,7 @@ public class CallUtil {
      * @return True, if it should be enabled or false otherwise.
      */
     public static boolean isCallOptionEnabled(long userHandle) {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaChatRoom chat = megaChatApi.getChatRoomByUser(userHandle);
-        return chat == null || (!chat.isGroup() && megaChatApi.getNumCalls() <= 0 &&
-                !participatingInACall() && !megaChatApi.hasCallInChatRoom(chat.getChatId()));
+        return !participatingInACall();
     }
 
     /**
