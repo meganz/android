@@ -390,18 +390,23 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 MegaChatParticipant participant = getParticipant(position);
                 if (participant == null) return;
 
+                long handle = participant.getHandle();
+                holderParticipantsList.userHandle = MegaApiAndroid.userHandleToBase64(handle);
                 holderParticipantsList.currentPosition = position;
                 holderParticipantsList.imageView.setImageBitmap(null);
 
-                checkParticipant(position, participant);
+                Bitmap avatarBitmap = checkParticipant(holderParticipantsList, position, participant);
+                if (avatarBitmap != null) {
+                    holderParticipantsList.setImageView(avatarBitmap);
+                } else {
+                    /*Default Avatar*/
+                    int avatarColor = getColorAvatar(holderParticipantsList.userHandle);
+                    holderParticipantsList.imageView.setImageBitmap(getDefaultAvatar(avatarColor, holderParticipantsList.fullName, AVATAR_SIZE, true));
+                }
 
                 MegaUser contact = participant.isEmpty() ? null : megaApi.getContact(participant.getEmail());
                 holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
 
-                long handle = participant.getHandle();
-                holderParticipantsList.contactMail = participant.getEmail();
-                holderParticipantsList.userHandle = MegaApiAndroid.userHandleToBase64(handle);
-                holderParticipantsList.fullName = participant.getFullName();
 
                 int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle);
                 setContactStatus(userStatus, ((ViewHolderParticipantsList) holder).statusImage, ((ViewHolderParticipantsList) holder).textViewContent);
@@ -411,36 +416,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderParticipantsList.threeDotsLayout.setOnClickListener(this);
                 holderParticipantsList.itemLayout.setOnClickListener(this);
                 holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
-
-                /*Default Avatar*/
-                int avatarColor = getColorAvatar(holderParticipantsList.userHandle);
-                holderParticipantsList.imageView.setImageBitmap(getDefaultAvatar(avatarColor, holderParticipantsList.fullName, AVATAR_SIZE, true));
-
-                /*Avatar*/
-                String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
-                if ((holderParticipantsList.userHandle).equals(myUserHandleEncoded)) {
-                    Bitmap bitmap = getAvatarBitmap(holderParticipantsList.contactMail);
-                    if (bitmap != null) {
-                        holderParticipantsList.setImageView(bitmap);
-                    }
-                } else {
-                    String nameFileHandle = holderParticipantsList.userHandle;
-                    String nameFileEmail = holderParticipantsList.contactMail;
-                    Bitmap bitmap;
-                    
-                    if (isTextEmpty(nameFileEmail)) {
-                        holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
-                        holderParticipantsList.threeDotsLayout.setOnClickListener(null);
-                        holderParticipantsList.itemLayout.setOnClickListener(null);
-                        bitmap = getAvatarBitmap(nameFileHandle);
-                    } else {
-                        bitmap = getUserAvatar(nameFileHandle, nameFileEmail);
-                    }
-                    
-                    if (bitmap != null) {
-                        holderParticipantsList.setImageView(bitmap);
-                    }
-                }
 
                 if (isPreview && megaChatApi.getInitState() == INIT_ANONYMOUS) {
                     holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
@@ -675,8 +650,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
      *
      * @param position      the position of the participant in the adapter.
      * @param participant   the participant to check.
+     * @return The participant's avatar if the have, null otherwise.
      */
-    private void checkParticipant(int position, MegaChatParticipant participant) {
+    private Bitmap checkParticipant(ViewHolderParticipantsList holderParticipantsList, int position, MegaChatParticipant participant) {
+        boolean needUpdate = false;
+
         if (participant.isEmpty()) {
             long handle = participant.getHandle();
 
@@ -692,15 +670,53 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
             if (groupChatInfoActivity.hasParticipantAttributes(participant)) {
                 participant.setEmpty(false);
-                int arrayPosition = getParticipantPositionInArray(position);
-                groupChatInfoActivity.updateParticipant(arrayPosition, participant);
-                participants.set(arrayPosition, participant);
+                needUpdate = true;
             }
         }
 
-        if (!groupChatInfoActivity.hasParticipantAttributes(participant)) {
+        holderParticipantsList.fullName = participant.getFullName();
+        holderParticipantsList.contactMail = participant.getEmail();
+
+        Bitmap avatarBitmap = null;
+
+        /*Avatar*/
+        String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
+        if ((holderParticipantsList.userHandle).equals(myUserHandleEncoded)) {
+            avatarBitmap = getUserAvatar(myUserHandleEncoded, megaApi.getMyEmail());
+        } else {
+            String nameFileHandle = holderParticipantsList.userHandle;
+            String nameFileEmail = holderParticipantsList.contactMail;
+
+            if (isTextEmpty(nameFileEmail)) {
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                holderParticipantsList.threeDotsLayout.setOnClickListener(null);
+                holderParticipantsList.itemLayout.setOnClickListener(null);
+                avatarBitmap = getAvatarBitmap(nameFileHandle);
+            } else {
+                avatarBitmap = getUserAvatar(nameFileHandle, nameFileEmail);
+            }
+        }
+
+        boolean hasAvatar = participant.hasAvatar();
+        participant.setHasAvatar(avatarBitmap != null);
+
+        if (!needUpdate && hasAvatar != participant.hasAvatar()) {
+            needUpdate = true;
+        }
+
+        boolean avatar = participant.hasAvatar();
+
+        if (needUpdate) {
+            int arrayPosition = getParticipantPositionInArray(position);
+            groupChatInfoActivity.updateParticipant(arrayPosition, participant);
+            participants.set(arrayPosition, participant);
+        }
+
+        if (!groupChatInfoActivity.hasParticipantAttributes(participant) || avatarBitmap == null) {
             groupChatInfoActivity.addParticipantRequest(position, participant);
         }
+
+        return avatarBitmap;
     }
 
     private MegaChatRoom getChat() {
