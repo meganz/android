@@ -2828,4 +2828,6 @@
     <string name="tab_recents">Recents</string>
     <string name="tab_favourites">Favourites</string>
     <string name="tab_offline">Offline</string>
+
+    <string name="photos_no_photos">NO PHOTOS TO SHOW</string>
 </resources>

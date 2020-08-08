@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!-- This layout is used for either no photos or search photo result is empty -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
@@ -11,22 +10,22 @@
             android:id="@+id/empty_hint_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/ic_zero_data_recents"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_empty_camera_uploads" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/empty_hint_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
+            android:text="@string/photos_no_photos"
             android:textColor="@color/text_secondary"
-            android:textSize="18sp"
+            android:textSize="@dimen/empty_data_font_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/empty_hint_image"
-            tools:text="@string/no_results_found" />
+            app:layout_constraintTop_toBottomOf="@id/empty_hint_image" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
