@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.CuItemSizeConfig
@@ -18,6 +20,7 @@ class PhotosFragment : BaseFragment() {
 
     private val viewModel by viewModels<PhotosViewModel>()
     private lateinit var binding: FragmentPhotosBinding
+    private lateinit var listView: NewGridRecyclerView
 
     @Inject
     lateinit var listAdapter: PhotosGridAdapter
@@ -31,6 +34,8 @@ class PhotosFragment : BaseFragment() {
             viewmodel = viewModel
         }
 
+        listView = binding.photoList
+
         return binding.root
     }
 
@@ -39,22 +44,27 @@ class PhotosFragment : BaseFragment() {
 
         binding.lifecycleOwner = viewLifecycleOwner
         setupListAdapter()
+        setupFastScroller()
         setupNavigation()
 
         viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
+    }
+
+    private fun setupFastScroller() {
+        binding.scroller.setRecyclerView(listView)
     }
 
     private fun setupNavigation() {
     }
 
     private fun setupListAdapter() {
-        binding.photoList.layoutManager?.apply {
+        listView.layoutManager?.apply {
             spanSizeLookup = listAdapter.getSpanSizeLookup(spanCount)
             val itemSizeConfig = getItemSizeConfig(spanCount)
             listAdapter.setItemSizeConfig(itemSizeConfig)
         }
 
-        binding.photoList.adapter = listAdapter
+        listView.adapter = listAdapter
     }
 
     private fun getItemSizeConfig(spanCount: Int): CuItemSizeConfig {

@@ -4,10 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
+        <import type="mega.privacy.android.app.utils.Constants" />
+
         <variable
             name="viewmodel"
-            type="mega.privacy.android.app.fragments.photos.PhotosViewModel"/>
+            type="mega.privacy.android.app.fragments.photos.PhotosViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,6 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:visibility="@{viewmodel.items.size() > Constants.MIN_ITEMS_SCROLLBAR_GRID ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

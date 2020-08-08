@@ -1,19 +1,22 @@
 package mega.privacy.android.app.fragments.photos
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.fragments.managerFragments.cu.CuItemSizeConfig
 import javax.inject.Inject
 
 class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewModel*/) :
-    ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()) {
+    ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()),
+    SectionTitleProvider {
 
     private var itemSizeConfig: CuItemSizeConfig? = null
 
@@ -52,6 +55,9 @@ class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewM
 
         if (viewType == PhotoNode.TYPE_PHOTO && itemSizeConfig != null) {
             setItemLayoutParams(binding)
+            // FastScroller would affect the normal process of RecyclerView that makes the "selected"
+            // icon appear before binding the item. Therefore, hide the icon up front
+            (binding as ItemPhotoBinding).iconSelected.visibility = View.GONE
         }
 
         return PhotoViewHolder(binding)
@@ -100,4 +106,8 @@ class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewM
             }
         }
     }
+
+    override fun getSectionTitle(position: Int) = if (position < 0 || position >= itemCount) {
+        ""
+    } else getItem(position).modifiedDate
 }
