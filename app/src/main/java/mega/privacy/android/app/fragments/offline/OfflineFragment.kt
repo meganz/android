@@ -125,18 +125,12 @@ class OfflineFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentOfflineBinding.inflate(inflater, container, false)
-
-        if (isList()) {
-            binding.offlineBrowserList.isVisible = true
-        } else {
-            binding.offlineBrowserGrid.isVisible = true
-        }
-
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
             receiverUpdatePosition,
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION)
         )
+
+        binding = FragmentOfflineBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -162,13 +156,6 @@ class OfflineFragment : Fragment() {
     }
 
     private fun setupView() {
-        val rv = if (isList()) {
-            binding.offlineBrowserList.layoutManager = LinearLayoutManager(context)
-            binding.offlineBrowserList
-        } else {
-            binding.offlineBrowserGrid
-        }
-
         adapter = OfflineAdapter(isList(), object : OfflineAdapterListener {
             override fun onNodeClicked(position: Int, node: OfflineNode) {
                 viewModel.onNodeClicked(position, node)
@@ -182,17 +169,19 @@ class OfflineFragment : Fragment() {
                 viewModel.onNodeOptionsClicked(position, node)
             }
         })
-        rv.adapter = adapter
-        rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
-        rv.clipToPadding = false
-        rv.setHasFixedSize(true)
-        rv.itemAnimator = DefaultItemAnimator()
-        rv.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                checkScroll()
-            }
-        })
+
+        binding.offlineBrowserList.layoutManager = LinearLayoutManager(context)
+        setupRecyclerView(binding.offlineBrowserList)
+        setupRecyclerView(binding.offlineBrowserGrid)
+
+        recyclerView = if (isList()) {
+            binding.offlineBrowserList.isVisible = true
+            binding.offlineBrowserList
+        } else {
+            binding.offlineBrowserGrid.isVisible = true
+            binding.offlineBrowserGrid
+        }
+        recyclerView?.adapter = adapter
 
         val decor = NewHeaderItemDecoration(context)
         if (isList()) {
@@ -200,10 +189,8 @@ class OfflineFragment : Fragment() {
         } else {
             decor.setType(ITEM_VIEW_TYPE_GRID)
         }
-        rv.addItemDecoration(decor)
-
-        recyclerView = rv
         itemDecoration = decor
+        recyclerView?.addItemDecoration(decor)
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.emptyHintImage.setImageResource(drawable.offline_empty_landscape)
@@ -225,6 +212,19 @@ class OfflineFragment : Fragment() {
         } else {
             Html.fromHtml(textToShow)
         }
+    }
+
+    private fun setupRecyclerView(rv: RecyclerView) {
+        rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
+        rv.clipToPadding = false
+        rv.setHasFixedSize(true)
+        rv.itemAnimator = DefaultItemAnimator()
+        rv.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                checkScroll()
+            }
+        })
     }
 
     private fun observeLiveData() {
@@ -561,6 +561,30 @@ class OfflineFragment : Fragment() {
 
     fun refreshNodes() {
         viewModel.loadOfflineNodes()
+    }
+
+    fun refreshListGridView() {
+        recyclerView = if (isList()) {
+            binding.offlineBrowserList.isVisible = true
+            binding.offlineBrowserList.adapter = adapter
+            binding.offlineBrowserGrid.isVisible = false
+            binding.offlineBrowserGrid.adapter = null
+            adapter?.isList = true
+            itemDecoration?.setType(ITEM_VIEW_TYPE_LIST)
+
+            binding.offlineBrowserList
+        } else {
+            binding.offlineBrowserGrid.isVisible = true
+            binding.offlineBrowserGrid.adapter = adapter
+            binding.offlineBrowserList.isVisible = false
+            binding.offlineBrowserList.adapter = null
+            adapter?.isList = false
+            itemDecoration?.setType(ITEM_VIEW_TYPE_GRID)
+
+            binding.offlineBrowserGrid
+        }
+        recyclerView?.adapter = adapter
+        adapter?.notifyDataSetChanged()
     }
 
     private fun setDraggingThumbnailVisibility(

@@ -6748,7 +6748,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void updateFullscreenOfflineFragmentOptionMenu() {
-    	if (rubbishBinMenuItem == null || fullscreenOfflineFragment != null) {
+    	if (rubbishBinMenuItem == null || fullscreenOfflineFragment == null) {
     		return;
 		}
 
@@ -7391,7 +7391,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 
         //Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-        //refreshFragment(FragmentTag.FULLSCREEN_OFFLINE.getTag());
+        if (fullscreenOfflineFragment != null) {
+        	fullscreenOfflineFragment.refreshListGridView();
+		}
 
         //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
         refreshFragment(FragmentTag.CONTACTS.getTag());
