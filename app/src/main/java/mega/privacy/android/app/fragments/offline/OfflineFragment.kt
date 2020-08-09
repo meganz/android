@@ -4,10 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +29,8 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.R.drawable
+import mega.privacy.android.app.R.string
 import mega.privacy.android.app.components.NewHeaderItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
@@ -46,6 +50,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.Util.scaleHeightPx
@@ -145,7 +150,7 @@ class OfflineFragment : Fragment() {
             args.rootFolderOnly, isList(),
             if (isList()) 0 else binding.offlineBrowserGrid.spanCount, args.path
         )
-        setupRecyclerView()
+        setupView()
         observeLiveData()
     }
 
@@ -156,7 +161,7 @@ class OfflineFragment : Fragment() {
             .unregisterReceiver(receiverUpdatePosition)
     }
 
-    private fun setupRecyclerView() {
+    private fun setupView() {
         val rv = if (isList()) {
             binding.offlineBrowserList.layoutManager = LinearLayoutManager(context)
             binding.offlineBrowserList
@@ -199,10 +204,34 @@ class OfflineFragment : Fragment() {
 
         recyclerView = rv
         itemDecoration = decor
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.emptyHintImage.setImageResource(drawable.offline_empty_landscape)
+        } else {
+            binding.emptyHintImage.setImageResource(drawable.ic_empty_offline)
+        }
+        var textToShow = getString(string.context_empty_offline)
+        try {
+            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>")
+            textToShow = textToShow.replace("[/A]", "</font>")
+            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>")
+            textToShow = textToShow.replace("[/B]", "</font>")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            logError("Exception formatting string", e)
+        }
+        binding.emptyHintText.text = if (VERSION.SDK_INT >= VERSION_CODES.N) {
+            Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            Html.fromHtml(textToShow)
+        }
     }
 
     private fun observeLiveData() {
         viewModel.nodes.observe(viewLifecycleOwner) {
+            recyclerView?.isVisible = it.isNotEmpty()
+            binding.emptyHint.isVisible = it.isEmpty()
+
             adapter?.setNodes(it)
 
             val isList = isList()
