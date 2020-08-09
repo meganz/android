@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -62,6 +63,7 @@ class OfflineFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
     private var adapter: OfflineAdapter? = null
     private var itemDecoration: NewHeaderItemDecoration? = null
+    private var actionMode: ActionMode? = null
 
     private val receiverUpdatePosition = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -215,9 +217,27 @@ class OfflineFragment : Fragment() {
             }
         }
 
+        viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
+            val actionModeVal = actionMode
+            val activity = managerActivity ?: return@observe
+            if (visible) {
+                if (actionModeVal == null) {
+                    actionMode = managerActivity?.startSupportActionMode(
+                        OfflineActionModeCallback(activity, this, viewModel)
+                    )
+                }
+                actionMode?.title = viewModel.getSelectedNodesCount().toString()
+                actionMode?.invalidate()
+            } else {
+                if (actionModeVal != null) {
+                    actionModeVal.finish()
+                    actionMode = null
+                }
+            }
+        }
         viewModel.actionBarTitle.observe(viewLifecycleOwner) {
             if (viewModel.selecting) {
-
+                managerActivity?.supportActionBar?.setTitle(it)
             } else {
                 managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(
                     it, viewModel.path == "/"
@@ -246,6 +266,20 @@ class OfflineFragment : Fragment() {
         }
         viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner) {
             openFile(it, MimeTypeList.typeForName(it.name))
+        }
+
+        viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
+            val rv = recyclerView
+            val rvAdapter = adapter
+            if (rv == null || rvAdapter == null || it.first < 0 ||
+                it.first >= rvAdapter.itemCount
+            ) {
+                return@observe;
+            }
+
+            rvAdapter.showSelectionAnimation(
+                it.first, it.second, rv.findViewHolderForLayoutPosition(it.first)
+            )
         }
     }
 
@@ -494,6 +528,10 @@ class OfflineFragment : Fragment() {
         setDraggingThumbnailVisibility(handle, View.GONE)
         draggingNodeHandle = handle
         notifyThumbnailLocationOnScreen()
+    }
+
+    fun refreshNodes() {
+        viewModel.loadOfflineNodes()
     }
 
     private fun setDraggingThumbnailVisibility(

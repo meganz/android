@@ -75,6 +75,8 @@ class OfflineViewModel @ViewModelInject constructor(
         private set
     var selecting = false
         private set
+    var placeholderCount = 0
+        private set
 
     init {
         add(
@@ -119,7 +121,7 @@ class OfflineViewModel @ViewModelInject constructor(
             }
         }
 
-        var placeholderCount = 0
+        placeholderCount = 0
         val res = getApplication<MegaApplication>().resources
         if (isList) {
             sections[0] = res.getString(R.string.general_folders)
@@ -146,6 +148,46 @@ class OfflineViewModel @ViewModelInject constructor(
             }
         }
         return sections
+    }
+
+    fun getSelectedNodes(): List<MegaOffline> {
+        val list = ArrayList<MegaOffline>()
+        for (i in 0 until selectedNodes.size()) {
+            list.add(selectedNodes.valueAt(i))
+        }
+        return list
+    }
+
+    fun getSelectedNodesCount(): Int {
+        return selectedNodes.size()
+    }
+
+    fun selectAll() {
+        val nodeList = nodes.value ?: return
+
+        for (node in nodeList) {
+            node.selected = true
+            selectedNodes.put(node.node.id, node.node)
+        }
+        selecting = true
+        _nodes.value = nodeList
+        _actionMode.value = true
+    }
+
+    fun clearSelection() {
+        if (!selecting) {
+            return
+        }
+
+        selecting = false
+        _actionMode.value = false
+        selectedNodes.clear()
+
+        val nodeList = nodes.value ?: return
+        for (node in nodeList) {
+            node.selected = false
+        }
+        _nodes.value = nodeList
     }
 
     fun onNodeClicked(position: Int, node: OfflineNode) {
@@ -278,7 +320,7 @@ class OfflineViewModel @ViewModelInject constructor(
         )
     }
 
-    private fun loadOfflineNodes() {
+    fun loadOfflineNodes() {
         add(Single.fromCallable { repo.loadOfflineNodes(path, order) }
             .map {
                 val nodes = ArrayList<OfflineNode>()

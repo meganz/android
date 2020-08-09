@@ -2,12 +2,15 @@ package mega.privacy.android.app.fragments.offline
 
 import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.FitCenter
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.utils.Util.px2dp
 
@@ -37,9 +40,21 @@ class OfflineGridFileViewHolder(
             .into(binding.thumbnail)
 
         binding.filename.text = node.node.name
+
+        binding.icSelected.isVisible = node.selected
+
+        binding.root.background = ContextCompat.getDrawable(
+            binding.root.context,
+            if (node.selected) R.drawable.background_item_grid_selected
+            else R.drawable.background_item_grid
+        )
     }
 
     fun getThumbnailView(): View {
         return binding.thumbnail
+    }
+
+    fun getIcSelected(): View {
+        return binding.icSelected
     }
 }

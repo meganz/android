@@ -12888,18 +12888,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void updateOfflineView(MegaOffline mOff){
-		//logDebug("updateOfflineView");
-		//oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		//if(oFLol!=null){
-		//	oFLol.hideMultipleSelect();
-		//	if(mOff==null){
-		//		oFLol.refresh();
-		//	}
-		//	else{
-		//		oFLol.refreshPaths(mOff);
-		//	}
-		//	supportInvalidateOptionsMenu();
-		//}
+		logDebug("updateOfflineView");
+		if (fullscreenOfflineFragment != null) {
+			fullscreenOfflineFragment.refreshNodes();
+		}
 	}
 
 	public void updateContactsView(boolean contacts, boolean sentRequests, boolean receivedRequests){

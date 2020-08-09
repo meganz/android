@@ -16,10 +16,13 @@
 			/>
 	<ImageView
 			android:id="@+id/ic_selected"
-			android:layout_width="23dp"
-			android:layout_height="23dp"
+			android:layout_width="24dp"
+			android:layout_height="24dp"
 			android:layout_marginStart="7dp"
 			android:layout_marginTop="7dp"
+			android:src="@drawable/ic_select_folder"
+			android:visibility="gone"
+			tools:visibility="visible"
 			/>
 	<View
 			android:layout_width="match_parent"
