@@ -340,13 +340,14 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 						control.removeLink().setVisible(true);
-						if (selected.get(0).isFolder()
-								&& MegaNodeUtil.isOutShare(selected.get(0))) {
-							control.removeShare().setVisible(true);
-						}
 					} else {
 						control.getLink().setVisible(true)
 								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					}
+
+					if (selected.get(0).isFolder()
+							&& MegaNodeUtil.isOutShare(selected.get(0))) {
+						control.removeShare().setVisible(true);
 					}
 				}
 
