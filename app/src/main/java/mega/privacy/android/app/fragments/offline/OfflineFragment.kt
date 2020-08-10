@@ -99,8 +99,10 @@ class OfflineFragment : Fragment() {
 
         managerActivity = requireActivity() as ManagerActivityLollipop
 
-        if (!args.rootFolderOnly) {
-            // TODO: workaround for navigation with ManagerActivity
+        // TODO: workaround for navigation with ManagerActivity
+        if (args.rootFolderOnly) {
+            managerActivity?.pagerOfflineFragmentOpened(this)
+        } else {
             managerActivity?.fullscreenOfflineFragmentOpened(this)
         }
     }
@@ -114,8 +116,10 @@ class OfflineFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        if (!args.rootFolderOnly) {
-            // TODO: workaround for navigation with ManagerActivity
+        // TODO: workaround for navigation with ManagerActivity
+        if (args.rootFolderOnly) {
+            managerActivity?.pagerOfflineFragmentClosed()
+        } else {
             managerActivity?.fullscreenOfflineFragmentClosed()
         }
     }
@@ -242,7 +246,7 @@ class OfflineFragment : Fragment() {
             )
 
             if (!args.rootFolderOnly) {
-                managerActivity?.updateFullscreenOfflineFragmentOptionMenu()
+                managerActivity?.updateFullscreenOfflineFragmentOptionMenu(false)
             }
         }
 
@@ -269,13 +273,16 @@ class OfflineFragment : Fragment() {
                 managerActivity?.supportActionBar?.setTitle(it)
             } else {
                 managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(
-                    it, viewModel.path == "/"
+                    it, viewModel.path == "/" && !viewModel.isSearching()
                 )
             }
         }
 
         viewModel.pathLiveData.observe(viewLifecycleOwner) {
             managerActivity?.pathNavigationOffline = it
+        }
+        viewModel.submitSearchQuery.observe(viewLifecycleOwner) {
+            managerActivity?.setTextSubmitted()
         }
         viewModel.openFolderFullscreen.observe(viewLifecycleOwner) {
             managerActivity?.openFullscreenOfflineFragment(it)
@@ -313,11 +320,6 @@ class OfflineFragment : Fragment() {
     }
 
     private fun openNode(position: Int, node: OfflineNode) {
-        val activity = managerActivity
-        if (activity != null && activity.isSearchViewExpanded && !activity.isValidSearchQuery) {
-            activity.setTextSubmitted()
-        }
-
         val file = getOfflineFile(context, node.node)
         val mime = MimeTypeList.typeForName(file.name)
         when {
@@ -530,6 +532,18 @@ class OfflineFragment : Fragment() {
 
     fun setOrder(order: Int) {
         viewModel.setOrder(order)
+    }
+
+    fun setSearchQuery(query: String?) {
+        viewModel.setSearchQuery(query)
+    }
+
+    fun onSearchQuerySubmitted() {
+        viewModel.onSearchQuerySubmitted()
+    }
+
+    fun selectAll() {
+        viewModel.selectAll()
     }
 
     fun onBackPressed(): Int {

@@ -38,6 +38,10 @@ class OfflineViewModel @ViewModelInject constructor(
     private val repo: MegaNodeRepo
 ) : BaseRxViewModel() {
     private var order = ORDER_DEFAULT_ASC
+    private var searchQuery: String? = null
+    private var historySearchQuery: String? = null
+    private var historySearchPath: String? = null
+    private var navigationDepthInSearch = 0
 
     private val openNodeAction = PublishSubject.create<Pair<Int, OfflineNode>>()
     private val openFolderFullscreenAction = PublishSubject.create<String>()
@@ -49,6 +53,7 @@ class OfflineViewModel @ViewModelInject constructor(
     private val _actionMode = SingleLiveEvent<Boolean>()
     private val _nodeToAnimate = SingleLiveEvent<Pair<Int, OfflineNode>>()
     private val _pathLiveData = SingleLiveEvent<String>()
+    private val _submitSearchQuery = SingleLiveEvent<Boolean>()
     private val _openFolderFullscreen = SingleLiveEvent<String>()
     private val _showOptionsPanel = SingleLiveEvent<MegaOffline>()
     private val _urlFileOpenAsUrl = SingleLiveEvent<String>()
@@ -66,6 +71,7 @@ class OfflineViewModel @ViewModelInject constructor(
     val actionMode: LiveData<Boolean> = _actionMode
     val nodeToAnimate: LiveData<Pair<Int, OfflineNode>> = _nodeToAnimate
     val pathLiveData: LiveData<String> = _pathLiveData
+    val submitSearchQuery: LiveData<Boolean> = _submitSearchQuery
     val openFolderFullscreen: LiveData<String> = _openFolderFullscreen
     val showOptionsPanel: LiveData<MegaOffline> = _showOptionsPanel
     val urlFileOpenAsUrl: LiveData<String> = _urlFileOpenAsUrl
@@ -239,6 +245,18 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun navigateIn(folder: MegaOffline) {
+        val query = searchQuery
+        searchQuery = null
+        // submit search query and push search action into back stack when click folder
+        if (query != null) {
+            historySearchQuery = query
+            historySearchPath = path
+            navigationDepthInSearch++
+            _submitSearchQuery.value = true
+        } else if (historySearchQuery != null) {
+            navigationDepthInSearch++
+        }
+
         if (rootFolderOnly) {
             _pathLiveData.value = folder.path + folder.name + "/"
             openFolderFullscreenAction.onNext(_pathLiveData.value)
@@ -248,10 +266,35 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun navigateOut(): Int {
-        if (path == "/") {
+        // no search action in back stack, should dismiss OfflineFragment
+        if (path == "/" && searchQuery == null) {
             return 0
         }
 
+        val query = searchQuery
+        searchQuery = null
+        // has active search, should exit search mode
+        if (query != null) {
+            navigateTo(path, titleFromPath(path))
+            return 2
+        }
+
+        val searchPath = historySearchPath
+        // has search action in back stack, should pop back stack
+        if (navigationDepthInSearch > 0 && searchPath != null) {
+            navigationDepthInSearch--
+            // and if back stack is empty, then should re-enter search mode
+            if (navigationDepthInSearch == 0) {
+                searchQuery = historySearchQuery
+                path = searchPath
+                historySearchQuery = null
+                historySearchPath = null
+                navigateTo(path, titleFromPath(path))
+                return 2
+            }
+        }
+
+        // if back stack isn't empty, or no search action in back stack, just navigate out
         path = path.substring(0, path.length - 1)
         path = path.substring(0, path.lastIndexOf("/") + 1)
         navigateTo(path, titleFromPath(path))
@@ -259,14 +302,22 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun titleFromPath(path: String): String {
-        return if (path == "/") {
-            getApplication<MegaApplication>().getString(R.string.tab_offline)
-                .toUpperCase(Locale.ROOT)
-        } else {
-            val pathWithoutLastSlash = path.substring(0, path.length - 1)
-            pathWithoutLastSlash.substring(
-                pathWithoutLastSlash.lastIndexOf("/") + 1, pathWithoutLastSlash.length
-            )
+        val query = searchQuery
+        return when {
+            query != null -> {
+                getApplication<MegaApplication>().getString(R.string.action_search)
+                    .toUpperCase(Locale.ROOT) + ": " + query
+            }
+            path == "/" -> {
+                getApplication<MegaApplication>().getString(R.string.tab_offline)
+                    .toUpperCase(Locale.ROOT)
+            }
+            else -> {
+                val pathWithoutLastSlash = path.substring(0, path.length - 1)
+                pathWithoutLastSlash.substring(
+                    pathWithoutLastSlash.lastIndexOf("/") + 1, pathWithoutLastSlash.length
+                )
+            }
         }
     }
 
@@ -280,6 +331,19 @@ class OfflineViewModel @ViewModelInject constructor(
     fun setOrder(order: Int) {
         this.order = order
         loadOfflineNodes()
+    }
+
+    fun setSearchQuery(query: String?) {
+        searchQuery = query
+        loadOfflineNodes()
+    }
+
+    fun onSearchQuerySubmitted() {
+        _actionBarTitle.value = titleFromPath(path)
+    }
+
+    fun isSearching(): Boolean {
+        return searchQuery != null || historySearchQuery != null
     }
 
     fun setDisplayParam(rootFolderOnly: Boolean, isList: Boolean, spanCount: Int, path: String) {
@@ -321,7 +385,7 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun loadOfflineNodes() {
-        add(Single.fromCallable { repo.loadOfflineNodes(path, order) }
+        add(Single.fromCallable { repo.loadOfflineNodes(path, order, searchQuery) }
             .map {
                 val nodes = ArrayList<OfflineNode>()
                 val nodesWithoutThumbnail = ArrayList<MegaOffline>()
