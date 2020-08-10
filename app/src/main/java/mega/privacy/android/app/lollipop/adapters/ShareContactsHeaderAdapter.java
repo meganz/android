@@ -224,9 +224,24 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                     holder.avatar.setImageResource(R.drawable.ic_select_folder);
                 } else {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    Bitmap bitmap = getImageAvatar(mail);
-                    if (bitmap != null) {
-                        holder.avatar.setImageBitmap(bitmap);
+
+                    File avatar = buildAvatarFile(mContext, mail + ".jpg");
+                    Bitmap bitmap = null;
+                    if (isFileAvailable(avatar)) {
+                        if (avatar.length() > 0) {
+                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                            bOpts.inPurgeable = true;
+                            bOpts.inInputShareable = true;
+                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                            if (bitmap == null) {
+                                avatar.delete();
+                                megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), buildAvatarFile(mContext, mail + ".jpg").getAbsolutePath(), listener);
+                            } else {
+                                holder.avatar.setImageBitmap(bitmap);
+                            }
+                        } else {
+                            megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), buildAvatarFile(mContext, mail + ".jpg").getAbsolutePath(), listener);
+                        }
                     } else {
                         megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), buildAvatarFile(mContext, mail + ".jpg").getAbsolutePath(), listener);
                     }
