@@ -980,6 +980,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setContentIntent(getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1))
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(patternIncomingCall)
+                    .setOngoing(true)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
             notify(notificationId, notificationBuilderO.build());
@@ -997,6 +998,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setDeleteIntent(intentIgnore)
                     .setAutoCancel(true)
                     .setVibrate(pattern)
+                    .setOngoing(true)
                     .setSound(defaultSoundUri)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
@@ -1107,6 +1109,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setContentIntent(getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1))
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(patternIncomingCall)
+                    .setOngoing(true)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -1126,6 +1129,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setAutoCancel(true)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
+                    .setOngoing(true)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
