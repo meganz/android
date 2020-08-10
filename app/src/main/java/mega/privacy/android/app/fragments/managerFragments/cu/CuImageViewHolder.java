@@ -1,8 +1,11 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import mega.privacy.android.app.R;
@@ -28,11 +31,17 @@ class CuImageViewHolder extends CuViewHolder {
     @Override protected void bind(CuNode node, RequestManager requestManager) {
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 
-        requestManager.load(node.getThumbnail())
-                .placeholder(R.drawable.ic_image_thumbnail)
+        RequestBuilder<Drawable> request = requestManager.load(node.getThumbnail())
                 .error(R.drawable.ic_image_thumbnail)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(mBinding.thumbnail);
+                .transition(DrawableTransitionOptions.withCrossFade());
+
+        if (node.isSelected()) {
+            request.transform(new RoundedCorners(mItemSizeConfig.getRoundCornerRadius()));
+        } else {
+            request.placeholder(R.drawable.ic_image_thumbnail);
+        }
+
+        request.into(mBinding.thumbnail);
     }
 
     public ItemCameraUploadsImageBinding binding() {
