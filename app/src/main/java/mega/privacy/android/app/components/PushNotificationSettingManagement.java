@@ -7,6 +7,7 @@ import java.util.Calendar;
 
 import nz.mega.sdk.MegaPushNotificationSettings;
 import mega.privacy.android.app.MegaApplication;
+import nz.mega.sdk.MegaPushNotificationSettingsAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -50,7 +51,7 @@ public class PushNotificationSettingManagement {
      * @param receivedPush The MegaPushNotificationSettings obtained from the request.
      */
     public void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
-        push = receivedPush != null ? receivedPush.copy() : MegaPushNotificationSettings.createInstance();
+        push = receivedPush != null ? MegaPushNotificationSettingsAndroid.copy(receivedPush) : MegaPushNotificationSettings.createInstance();
         MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
