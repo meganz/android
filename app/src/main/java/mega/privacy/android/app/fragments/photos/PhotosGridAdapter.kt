@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.photos
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -14,20 +15,27 @@ import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.fragments.managerFragments.cu.CuItemSizeConfig
 import javax.inject.Inject
 
-class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewModel*/) :
+class PhotosGridAdapter @Inject constructor(
+    private val viewModel: PhotosViewModel,
+    private val actionModeViewModel: ActionModeViewModel
+) :
     ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
     private var itemSizeConfig: CuItemSizeConfig? = null
 
-    class PhotoViewHolder(private val binding: ViewBinding) :
+    class PhotoViewHolder(private val binding: ViewDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: PhotoNode) {
-            if (binding is ItemPhotosTitleBinding) {
-                binding.gridTitle.text = item.modifiedDate
-            } else if (binding is ItemPhotoBinding) {
-                binding.item = item
+        fun bind(viewModel: PhotosViewModel, actionModeViewModel : ActionModeViewModel, item: PhotoNode) {
+            binding.apply {
+                if (this is ItemPhotoBinding) {
+                    this.viewModel = viewModel
+                    this.actionModeViewModel = actionModeViewModel
+                    this.item = item
+                } else if (this is ItemPhotosTitleBinding) {
+                    this.item = item
+                }
             }
         }
     }
@@ -81,7 +89,7 @@ class PhotosGridAdapter @Inject constructor(/*private val viewModel: PhotosViewM
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(viewModel, actionModeViewModel, getItem(position))
     }
 
     private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNode>() {

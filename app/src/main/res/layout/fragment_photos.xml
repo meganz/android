@@ -10,8 +10,12 @@
         <import type="mega.privacy.android.app.utils.Constants" />
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="mega.privacy.android.app.fragments.photos.PhotosViewModel" />
+
+        <variable
+            name="actionModeViewModel"
+            type="mega.privacy.android.app.fragments.photos.ActionModeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,7 +26,7 @@
             layout="@layout/empty_result_photos"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{viewmodel.items.empty ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.items.empty ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -34,8 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:columnWidth="@dimen/photo_item_width"
-            android:visibility="@{viewmodel.items.empty ? View.GONE : View.VISIBLE}"
-            app:items="@{viewmodel.items}"
+            android:visibility="@{viewModel.items.empty ? View.GONE : View.VISIBLE}"
+            app:items="@{viewModel.items}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="@{viewmodel.items.size() > Constants.MIN_ITEMS_SCROLLBAR_GRID ? View.VISIBLE : View.GONE }"
+            android:visibility="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR_GRID ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

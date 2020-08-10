@@ -115,7 +115,7 @@ class PhotosRepository @Inject constructor(
             {
                 waitingForRefresh = false
                 _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
-            }, UPDATE_DATA_THROTTLE
+            }, UPDATE_DATA_THROTTLE_TIME
         )
     }
 
@@ -135,15 +135,15 @@ class PhotosRepository @Inject constructor(
             ) {
                 lastModifyDate = modifyDate
                 photoNodesMap[mapKeyTitle++] =
-                    PhotoNode(null, -1, null, PhotoNode.TYPE_TITLE, dateString, false)
+                    PhotoNode(PhotoNode.TYPE_TITLE, null, -1, dateString, null, false)
             }
 
             photoNodesMap[node.handle] = PhotoNode(
+                PhotoNode.TYPE_PHOTO,
                 node,
                 index,
-                thumbnail,
-                PhotoNode.TYPE_PHOTO,
                 dateString,
+                thumbnail,
                 selectedNodes.containsKey(node.handle)
             )
         }
@@ -190,7 +190,7 @@ class PhotosRepository @Inject constructor(
     }
 
     companion object {
-        private const val UPDATE_DATA_THROTTLE =
+        private const val UPDATE_DATA_THROTTLE_TIME =
             500L   // 500ms, user can see the update of photos instantly
     }
 }

@@ -5848,7 +5848,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				supportInvalidateOptionsMenu();
 //				showFabButton();
 				fabButton.hide();
-				showHideBottomNavigationView(false);
+				showHideBottomNavigationView(true);
 //				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 				break;
 			}

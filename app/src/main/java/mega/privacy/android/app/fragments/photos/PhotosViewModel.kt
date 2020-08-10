@@ -1,26 +1,31 @@
 package mega.privacy.android.app.fragments.photos
 
-import androidx.hilt.lifecycle.ViewModelInject
+import android.util.Log
 import androidx.lifecycle.*
+import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PhotosViewModel @ViewModelInject constructor(
+@FragmentScoped
+// Use scoped @Inject instead of @ViewModelInject. Then the ViewModel object in PhotosFragment
+// and PhotosGridAdapter are identical
+class PhotosViewModel @Inject constructor(
     private val photosRepository: PhotosRepository
 ) : ViewModel() {
 
     private var _query = MutableLiveData<PhotoQuery>()
 
     val items: LiveData<List<PhotoNode>> = Transformations.switchMap(_query) { query ->
-            viewModelScope.launch {
-                photosRepository.getPhotos(query)
+        viewModelScope.launch {
+            photosRepository.getPhotos(query)
 //            if (result is Result.Success) {
 //                _items.value = result.data
 //            } else {
 //                logError(result.toString())
 //            }
-            }
+        }
 
-            photosRepository.photoNodes
+        photosRepository.photoNodes
     }
 
     fun loadPhotos(query: PhotoQuery) {
@@ -32,4 +37,14 @@ class PhotosViewModel @ViewModelInject constructor(
             _query.value = it
         }
     }
+
+    fun onPhotoClick() {
+        Log.i("Alex", "onClick:$this")
+        // TODO: Navigate to Photo Viewer
+    }
+//
+//    fun onPhotoLongClick(): Boolean {
+//        Log.i("Alex", "onClick:$this")
+//        return true
+//    }
 }

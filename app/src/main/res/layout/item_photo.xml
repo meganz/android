@@ -4,7 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="mega.privacy.android.app.fragments.photos.PhotosViewModel" />
+
+        <variable
+            name="actionModeViewModel"
+            type="mega.privacy.android.app.fragments.photos.ActionModeViewModel" />
 
         <variable
             name="item"
@@ -15,7 +24,9 @@
      loading images by Glide would cause performance issue of UI stuck -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick() : actionModeViewModel.onPhotoClick(item))}"
+        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
 
         <ImageView
             android:id="@+id/thumbnail"
@@ -35,7 +46,6 @@
             android:layout_marginStart="@dimen/icon_selected_margin"
             android:layout_marginTop="@dimen/icon_selected_margin"
             android:src="@drawable/ic_select_folder"
-            android:visibility="@{item.selected ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="@id/thumbnail"
             app:layout_constraintTop_toTopOf="@id/thumbnail" />
     </androidx.constraintlayout.widget.ConstraintLayout>

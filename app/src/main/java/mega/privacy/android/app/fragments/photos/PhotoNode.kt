@@ -4,13 +4,13 @@ import nz.mega.sdk.MegaNode
 import java.io.File
 
 data class PhotoNode(
-    val node: MegaNode?,
-    val index: Int,
-    var thumbnail: File?,
     val type: Int,
-    val modifiedDate: String,
-    var selected: Boolean
-) {
+    override val node: MegaNode?,
+    override val index: Int,
+    override val modifiedDate: String,
+    override var thumbnail: File?,
+    override var selected: Boolean
+) : SelectableNode {
     companion object {
         const val TYPE_TITLE = 0   // The datetime header
         const val TYPE_PHOTO = 1

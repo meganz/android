@@ -1,10 +1,13 @@
 package mega.privacy.android.app.fragments.photos
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
+import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
@@ -16,13 +19,22 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class PhotosFragment : BaseFragment() {
+    @Inject
+    lateinit var viewModel: PhotosViewModel
 
-    private val viewModel by viewModels<PhotosViewModel>()
+    @Inject
+    lateinit var actionModeViewModel: ActionModeViewModel
+
     private lateinit var binding: FragmentPhotosBinding
     private lateinit var listView: NewGridRecyclerView
 
     @Inject
     lateinit var listAdapter: PhotosGridAdapter
+
+    private var actionMode: ActionMode? = null
+
+    @Inject
+    lateinit var actionModeCallback: HomepageActionModeCallback
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,7 +42,8 @@ class PhotosFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
-            viewmodel = viewModel
+            viewModel = this@PhotosFragment.viewModel
+            actionModeViewModel = this@PhotosFragment.actionModeViewModel
         }
 
         listView = binding.photoList
@@ -45,8 +58,37 @@ class PhotosFragment : BaseFragment() {
         setupListAdapter()
         setupFastScroller()
         setupNavigation()
+        setupActionMode()
+        Log.i("Alex", "viewmodel:$viewModel")
 
         viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
+    }
+
+    private fun setupActionMode() {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
+            if (it.isEmpty()) {
+                actionMode?.apply {
+                    finish()
+                    actionMode = null
+                }
+            } else {
+                if (actionMode == null) {
+                    actionMode = (activity as AppCompatActivity).startSupportActionMode(
+                        actionModeCallback
+                    )
+                } else {
+                    actionMode?.invalidate()  // Update the action items based on the selected nodes
+                }
+
+                actionMode?.title = it.size.toString()
+            }
+        })
+
+        actionModeViewModel.selectAllEvent.observe(viewLifecycleOwner, Observer {
+            viewModel.items.value?.run {
+                actionModeViewModel.selectAll(filter {it.node != null})
+            }
+        })
     }
 
     private fun setupFastScroller() {
