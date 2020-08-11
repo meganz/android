@@ -8,6 +8,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.shape.ShapeAppearanceModel;
+
+import mega.privacy.android.app.R;
 
 /**
  * Created by Piasy{github.com/Piasy} on 2020/7/17.
@@ -54,5 +59,18 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         icSelectedParams.topMargin = itemSizeConfig.getIcSelectedMargin();
         icSelectedParams.setMarginStart(itemSizeConfig.getIcSelectedMargin());
         icSelected.setLayoutParams(icSelectedParams);
+    }
+
+    protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node, RequestManager requestManager) {
+        int shapeId = node.isSelected() ? R.style.GalleryImageShape_Selected : R.style.GalleryImageShape;
+        imageView.setShapeAppearanceModel(
+                ShapeAppearanceModel.builder(itemView.getContext(), shapeId, 0).build()
+        );
+
+        requestManager.load(node.getThumbnail())
+                .placeholder(R.drawable.ic_image_thumbnail)
+                .error(R.drawable.ic_image_thumbnail)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(imageView);
     }
 }

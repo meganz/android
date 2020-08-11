@@ -3,10 +3,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 import android.view.View;
 
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.google.android.material.shape.ShapeAppearanceModel;
 
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding;
 
 /**
@@ -29,16 +26,7 @@ class CuImageViewHolder extends CuViewHolder {
     @Override protected void bind(CuNode node, RequestManager requestManager) {
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 
-        int shapeId = node.isSelected() ? R.style.GalleryImageShape_Selected : R.style.GalleryImageShape;
-        mBinding.thumbnail.setShapeAppearanceModel(
-                ShapeAppearanceModel.builder(itemView.getContext(), shapeId, 0).build()
-        );
-
-        requestManager.load(node.getThumbnail())
-                .placeholder(R.drawable.ic_image_thumbnail)
-                .error(R.drawable.ic_image_thumbnail)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(mBinding.thumbnail);
+        updateThumbnailDisplay(mBinding.thumbnail, node, requestManager);
     }
 
     public ItemCameraUploadsImageBinding binding() {
