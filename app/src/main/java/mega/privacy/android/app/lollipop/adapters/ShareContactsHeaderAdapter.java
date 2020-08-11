@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -216,34 +217,21 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 holder.contactStateIcon.setVisibility(View.VISIBLE);
                 setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle()), holder.contactStateIcon);
-                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, contact));
-                UserAvatarListenerShare listener = new UserAvatarListenerShare(mContext, holder);
 
                 if (contact.getMegaContactAdapter().isSelected()) {
                     holder.itemLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.new_multiselect_color));
-                    holder.avatar.setImageResource(R.drawable.ic_select_folder);
+                    holder.avatar.setImageResource(R.drawable.ic_select_avatar);
                 } else {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-                    File avatar = buildAvatarFile(mContext, mail + ".jpg");
-                    Bitmap bitmap = null;
-                    if (isFileAvailable(avatar)) {
-                        if (avatar.length() > 0) {
-                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                            bOpts.inPurgeable = true;
-                            bOpts.inInputShareable = true;
-                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                            if (bitmap == null) {
-                                avatar.delete();
-                                megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), buildAvatarFile(mContext, mail + ".jpg").getAbsolutePath(), listener);
-                            } else {
-                                holder.avatar.setImageBitmap(bitmap);
-                            }
-                        } else {
-                            megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), buildAvatarFile(mContext, mail + ".jpg").getAbsolutePath(), listener);
-                        }
+                    Bitmap bitmap = getUserAvatar(MegaApiJava.userHandleToBase64(contact.getMegaContactAdapter().getMegaUser().getHandle()), contact.getMegaContactAdapter().getMegaUser().getEmail());
+                    if (bitmap != null) {
+                        holder.avatar.setImageBitmap(bitmap);
                     } else {
-                        megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), buildAvatarFile(mContext, mail + ".jpg").getAbsolutePath(), listener);
+                        holder.avatar.setImageBitmap(getAvatarShareContact(mContext, contact));
+                        megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(),
+                                buildAvatarFile(mContext, contact.getMegaContactAdapter().getMegaUser().getEmail() + JPG_EXTENSION).getAbsolutePath(),
+                                new UserAvatarListenerShare(mContext, holder));
                     }
                 }
             }
