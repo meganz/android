@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,7 +62,8 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         icSelected.setLayoutParams(icSelectedParams);
     }
 
-    protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node, RequestManager requestManager) {
+    protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node,
+            CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
         int shapeId = node.isSelected() ? R.style.GalleryImageShape_Selected : R.style.GalleryImageShape;
         imageView.setShapeAppearanceModel(
                 ShapeAppearanceModel.builder(itemView.getContext(), shapeId, 0).build()
@@ -72,5 +74,16 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
                 .error(R.drawable.ic_image_thumbnail)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView);
+
+        // TODO: setting them could break round corner of ShapeableImageView
+        //int padding = node.isSelected() ? itemSizeConfig.getSelectedPadding() : 0;
+        //imageView.setPadding(padding, padding, padding, padding);
+        //
+        //if (node.isSelected()) {
+        //    imageView.setBackground(ContextCompat.getDrawable(imageView.getContext(),
+        //            R.drawable.background_item_grid_selected));
+        //} else {
+        //    imageView.setBackground(null);
+        //}
     }
 }

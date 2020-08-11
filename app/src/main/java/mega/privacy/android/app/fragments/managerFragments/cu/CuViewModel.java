@@ -351,7 +351,7 @@ class CuViewModel extends BaseRxViewModel {
             File thumbnail =
                     new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
-            String dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate);
+            String dateString = DateTimeFormatter.ofPattern("MMMM uuuu").format(modifyDate);
 
             if (lastModifyDate == null
                     || !YearMonth.from(lastModifyDate).equals(YearMonth.from(modifyDate))) {
@@ -387,7 +387,7 @@ class CuViewModel extends BaseRxViewModel {
             return DateTimeFormatter.ofPattern("d MMM").format(fromEpoch(filter[1] / 1000));
         } else if (filter[0] == 2) {
             if (filter[2] == 1) {
-                return DateTimeFormatter.ofPattern("MMM").format(YearMonth.now().minusMonths(1));
+                return DateTimeFormatter.ofPattern("MMMM").format(YearMonth.now().minusMonths(1));
             } else if (filter[2] == 2) {
                 return String.valueOf(YearMonth.now().getYear() - 1);
             } else {

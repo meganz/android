@@ -43,7 +43,7 @@ class CuVideoViewHolder extends CuViewHolder {
 
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 
-        updateThumbnailDisplay(mBinding.thumbnail, node, requestManager);
+        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig, requestManager);
     }
 
     public ItemCameraUploadsVideoBinding binding() {
