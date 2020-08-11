@@ -1,12 +1,10 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.android.material.shape.ShapeAppearanceModel;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding;
@@ -31,17 +29,16 @@ class CuImageViewHolder extends CuViewHolder {
     @Override protected void bind(CuNode node, RequestManager requestManager) {
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 
-        RequestBuilder<Drawable> request = requestManager.load(node.getThumbnail())
+        int shapeId = node.isSelected() ? R.style.GalleryImageShape_Selected : R.style.GalleryImageShape;
+        mBinding.thumbnail.setShapeAppearanceModel(
+                ShapeAppearanceModel.builder(itemView.getContext(), shapeId, 0).build()
+        );
+
+        requestManager.load(node.getThumbnail())
+                .placeholder(R.drawable.ic_image_thumbnail)
                 .error(R.drawable.ic_image_thumbnail)
-                .transition(DrawableTransitionOptions.withCrossFade());
-
-        if (node.isSelected()) {
-            request.transform(new RoundedCorners(mItemSizeConfig.getRoundCornerRadius()));
-        } else {
-            request.placeholder(R.drawable.ic_image_thumbnail);
-        }
-
-        request.into(mBinding.thumbnail);
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(mBinding.thumbnail);
     }
 
     public ItemCameraUploadsImageBinding binding() {
