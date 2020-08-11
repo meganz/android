@@ -87,8 +87,6 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
     }
 
     private void initView(Context context) {
-        logDebug("*********************** initView");
-
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.add_reaction_layout, null);
         firstReaction = view.findViewById(R.id.first_emoji_layout);
@@ -137,7 +135,6 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
         switch (view.getId()) {
             case R.id.first_emoji_layout:
             case R.id.first_emoji_image:
-                logDebug("*********************** first_emoji_image");
                 addReaction(view.findViewById(R.id.first_emoji_image));
                 break;
 
