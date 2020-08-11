@@ -15,6 +15,7 @@ import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 
 public class ChatLogoutListener extends ChatBaseListener{
 
@@ -28,8 +29,8 @@ public class ChatLogoutListener extends ChatBaseListener{
      * Constructor used when an account has been blocked and
      * a warning dialog has to be shown when the logout process has finished.
      *
-     * @param context
-     * @param accountBlockedString
+     * @param context               current Context
+     * @param accountBlockedString  text to show in the warning
      */
     public ChatLogoutListener(Context context, String accountBlockedString) {
         super(context);
@@ -46,13 +47,17 @@ public class ChatLogoutListener extends ChatBaseListener{
         resetLoggerSDK();
 
         if (!isTextEmpty(accountBlockedString)) {
-            MegaApplication app = MegaApplication.getInstance();
-            Intent loginIntent = new Intent(app.getApplicationContext(), LoginActivityLollipop.class)
-                    .setAction(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    .putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT)
-                    .putExtra(ACCOUNT_BLOCKED_STRING, accountBlockedString);
-            app.startActivity(loginIntent);
+            if (context instanceof LoginActivityLollipop) {
+                showErrorAlertDialog(accountBlockedString, false, (LoginActivityLollipop) context);
+            } else {
+                MegaApplication app = MegaApplication.getInstance();
+                Intent loginIntent = new Intent(app.getApplicationContext(), LoginActivityLollipop.class)
+                        .setAction(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                        .putExtra(ACCOUNT_BLOCKED_STRING, accountBlockedString);
+                app.startActivity(loginIntent);
+            }
         }
     }
 }

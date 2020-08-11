@@ -591,14 +591,14 @@ public class BaseActivity extends AppCompatActivity {
 //                I am not blocked
                 break;
             case COPYRIGHT_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext(), getString(R.string.account_suspended_breache_ToS)));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_breache_ToS)));
                 break;
             case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext(), getString(R.string.account_suspended_multiple_breaches_ToS)));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS)));
                 break;
 
             case DISABLED_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext(),getString(R.string.error_account_blocked)));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_account_blocked)));
                 break;
 
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
