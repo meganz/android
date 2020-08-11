@@ -45,10 +45,7 @@ public final class VariantEmojiManager implements VariantEmoji {
         }
 
         final Emoji baseEmoji = desiredEmoji.getBase();
-
-        for (int i = 0; i < variantsEmojiList.size(); i++) {
-            final Emoji emoji = variantsEmojiList.get(i);
-
+        for (Emoji emoji : variantsEmojiList) {
             if (baseEmoji.equals(emoji.getBase())) {
                 return emoji;
             }
@@ -70,17 +67,12 @@ public final class VariantEmojiManager implements VariantEmoji {
             variantsEmojiList.add(newVariant);
         }
 
-        for (int i = 0; i < variantsEmojiList.size(); i++) {
-            final Emoji variant = variantsEmojiList.get(i);
-
-            if (variant.getBase().equals(newVariantBase)) {
-                if (variant.equals(newVariant)) {
-                    return;
-                }
-                variantsEmojiList.remove(i);
+        for (Emoji variant : variantsEmojiList) {
+            if (!variant.getBase().equals(newVariantBase)) {
+                variantsEmojiList.remove(variant);
                 variantsEmojiList.add(newVariant);
-                return;
             }
+            return;
         }
     }
 
@@ -92,8 +84,8 @@ public final class VariantEmojiManager implements VariantEmoji {
         if (variantsEmojiList.size() > 0) {
             final StringBuilder stringBuilder = new StringBuilder(variantsEmojiList.size() * EMOJI_GUESS_SIZE);
 
-            for (int i = 0; i < variantsEmojiList.size(); i++) {
-                stringBuilder.append(variantsEmojiList.get(i).getUnicode()).append(EMOJI_DELIMITER);
+            for (Emoji emoji : variantsEmojiList) {
+                stringBuilder.append(emoji.getUnicode()).append(EMOJI_DELIMITER);
             }
 
             stringBuilder.setLength(stringBuilder.length() - EMOJI_DELIMITER.length());

@@ -40,49 +40,44 @@ public final class EmojiManager {
   private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = (context, text, emojiSize, defaultEmojiSize, fallback) -> {
 
     final EmojiManager emojiManager = EmojiManager.getInstance();
-
     final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
-    if (findAllEmojis.size() == 0) {
-      if (EmojiCompat.get() != null && EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-        EmojiCompat.get().process(text);
-      }
+    EmojiCompat emojiCompat = EmojiCompat.get();
+    boolean shouldProcess = emojiCompat != null && emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED;
 
-    }else{
-      if(emojiManager.isOnlyEmojis(text.toString())){
+    if (findAllEmojis.size() == 0) {
+      if (shouldProcess) {
+        emojiCompat.process(text);
+      }
+    } else {
+      if (emojiManager.isOnlyEmojis(text.toString())) {
         for (int i = 0; i < findAllEmojis.size(); i++) {
           final EmojiRange location = findAllEmojis.get(i);
           text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-
-      }else{
+      } else {
         for (int i = 0; i < findAllEmojis.size(); i++) {
           EmojiRange currentLocation = findAllEmojis.get(i);
 
           if (i == 0) {
-            if (EmojiCompat.get() != null &&
-                    EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-              EmojiCompat.get().process(text, 0, currentLocation.start);
-            }
-            if (i == findAllEmojis.size() - 1 &&
-                    EmojiCompat.get() != null &&
-                    EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-              EmojiCompat.get().process(text, currentLocation.end, text.length());
+            if (shouldProcess) {
+              emojiCompat.process(text, 0, currentLocation.start);
             }
 
+            if (i == findAllEmojis.size() - 1 && shouldProcess) {
+              emojiCompat.process(text, currentLocation.end, text.length());
+            }
           } else if (i == findAllEmojis.size() - 1) {
             EmojiRange previewLocation = findAllEmojis.get(i - 1);
-            if (EmojiCompat.get() != null && EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-              EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
-              EmojiCompat.get().process(text, currentLocation.end, text.length());
+            if (shouldProcess) {
+              emojiCompat.process(text, previewLocation.end, currentLocation.start);
+              emojiCompat.process(text, currentLocation.end, text.length());
             }
-
           } else {
             EmojiRange previewLocation = findAllEmojis.get(i - 1);
-            if (EmojiCompat.get() != null && EmojiCompat.get().getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
-              EmojiCompat.get().process(text, previewLocation.end, currentLocation.start);
+            if (shouldProcess) {
+              emojiCompat.process(text, previewLocation.end, currentLocation.start);
             }
           }
-
           text.setSpan(new EmojiSpan(context, currentLocation.emoji, emojiSize), currentLocation.start, currentLocation.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
       }

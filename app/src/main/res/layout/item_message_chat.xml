@@ -1218,11 +1218,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/content_own_message_layout"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="6dp"
             android:layout_marginTop="4dp"
-            android:layout_alignRight="@id/content_own_message_layout"
-            android:gravity="right"
+            android:layout_alignEnd="@id/content_own_message_layout"
+            android:gravity="end"
             android:background="@null"
             android:visibility="gone">
 
@@ -1230,7 +1230,7 @@
                 android:id="@+id/own_message_reactions_recycler"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:orientation="horizontal"/>
         </RelativeLayout>
     </RelativeLayout>
@@ -1475,10 +1475,8 @@
                             android:id="@+id/url_contact_message_enable_layout_inside"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:layout_marginEnd="12dp"
-                            android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_marginStart="12dp"
                             android:orientation="vertical"
                             android:layout_gravity="center_vertical"

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.components.twemoji.reaction.*;
 
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+
 public class InfoReactionPagerAdapter extends PagerAdapter {
     private Context context;
     private ArrayList<View> views = new ArrayList<>();
@@ -31,10 +33,8 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
      * @param listReactions Reactions list.
      */
     private void fillList(ArrayList<String> listReactions) {
-        for (int i = 0; i < listReactions.size(); i++) {
-            String reaction = listReactions.get(i);
-            View newView = new UserReactionListView(context).init(reaction, msgId, chatId);
-            views.add(newView);
+        for (String reaction : listReactions) {
+            views.add(new UserReactionListView(context).init(reaction, msgId, chatId));
         }
     }
 
@@ -63,11 +63,7 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
     @Override
     public int getItemPosition(Object object) {
         int index = views.indexOf(object);
-        if (index == -1) {
-            return POSITION_NONE;
-        } else {
-            return index;
-        }
+        return  index == INVALID_POSITION ? POSITION_NONE : index;
     }
 
     /**
@@ -101,8 +97,7 @@ public class InfoReactionPagerAdapter extends PagerAdapter {
      * @return position of removed view.
      */
     public int removeView(ViewPager pager, View v) {
-        int position = views.indexOf(v);
-        return removeView(pager, position);
+        return removeView(pager, views.indexOf(v));
     }
 
     /**

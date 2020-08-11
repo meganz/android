@@ -39,10 +39,8 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
     private RelativeLayout fifthReaction;
     private EmojiImageView fifthEmoji;
     private RelativeLayout addReaction;
-
     private MegaChatApiAndroid megaChatApi;
     private RecentEmoji recentEmoji = null;
-    private LayoutInflater inflater;
 
     public ChatReactionsFragment(Context context) {
         super(context);
@@ -89,7 +87,9 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
     }
 
     private void initView(Context context) {
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        logDebug("*********************** initView");
+
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.add_reaction_layout, null);
         firstReaction = view.findViewById(R.id.first_emoji_layout);
         firstEmoji = view.findViewById(R.id.first_emoji_image);
@@ -137,6 +137,7 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
         switch (view.getId()) {
             case R.id.first_emoji_layout:
             case R.id.first_emoji_image:
+                logDebug("*********************** first_emoji_image");
                 addReaction(view.findViewById(R.id.first_emoji_image));
                 break;
 
@@ -161,7 +162,7 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
                 break;
 
             case R.id.icon_more_reactions:
-                ((ChatActivityLollipop) context).showReactionBottomSheet(messagesSelected.get(0), positionMessage);
+                ((ChatActivityLollipop) context).showReactionBottomSheet(messagesSelected.get(0), positionMessage, null);
                 break;
         }
     }

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -9,15 +9,11 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatMessage;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -25,31 +21,20 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ReactionsBottomSheet extends BottomSheetDialogFragment {
+public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
 
     private final static int HEIGHT_REACTIONS_KEYBOARD = 250;
 
-    private Context context;
     private AndroidMegaChatMessage message = null;
     private long chatId;
     private long messageId;
-    private View contentView;
     private BottomSheetBehavior mBehavior;
     private RelativeLayout mainLayout;
     private EmojiKeyboard reactionsKeyboard;
-    private DisplayMetrics outMetrics;
-    private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (megaApi == null) {
-            megaApi = MegaApplication.getInstance().getMegaApi();
-        }
-        if (megaChatApi == null) {
-            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        }
 
         if (!(context instanceof ChatActivityLollipop))
             return;
@@ -57,22 +42,18 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment {
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-
-            if (messageMega != null) {
-                message = new AndroidMegaChatMessage(messageMega);
-            }
         } else {
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+        }
 
-            if (messageMega != null) {
-                message = new AndroidMegaChatMessage(messageMega);
-            }
+        MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+        if (messageMega != null) {
+            message = new AndroidMegaChatMessage(messageMega);
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
@@ -93,12 +74,6 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment {
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
     }
 
     @Override

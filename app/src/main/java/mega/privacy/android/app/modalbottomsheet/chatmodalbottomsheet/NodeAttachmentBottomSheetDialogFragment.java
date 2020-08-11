@@ -61,7 +61,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
             handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
-        } else {
+        } else if (context instanceof NodeAttachmentHistoryActivity) {
             chatId = ((NodeAttachmentHistoryActivity) context).chatId;
             messageId = ((NodeAttachmentHistoryActivity) context).selectedMessageId;
         }

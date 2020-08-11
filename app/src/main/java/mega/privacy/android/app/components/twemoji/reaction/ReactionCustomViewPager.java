@@ -6,15 +6,15 @@ import android.view.MotionEvent;
 
 import androidx.viewpager.widget.ViewPager;
 
-public class CustomViewPager extends ViewPager {
+public class ReactionCustomViewPager extends ViewPager {
 
     private boolean isPagingEnabled = true;
 
-    public CustomViewPager(Context context) {
+    public ReactionCustomViewPager(Context context) {
         super(context);
     }
 
-    public CustomViewPager(Context context, AttributeSet attrs) {
+    public ReactionCustomViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -49,10 +50,9 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     private Context context;
     private long chatId;
     private long messageId;
-    private DisplayMetrics outMetrics;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
-    private View contentView;
+    private DisplayMetrics outMetrics;
     private LinearLayout infoReactionsTab;
     private int reactionTabLastSelectedIndex = INVALID_POSITION;
     private ArrayList<RelativeLayout> reactionTabs = null;
@@ -90,15 +90,13 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_info_reactions, null);
+        outMetrics = MegaApplication.getInstance().getBaseContext().getResources().getDisplayMetrics();
+        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_info_reactions, null);
         RelativeLayout generalLayout = contentView.findViewById(R.id.general_layout);
         infoReactionsTab = contentView.findViewById(R.id.info_reactions_tabs);
         infoReactionsPager = contentView.findViewById(R.id.info_reactions_pager);
@@ -149,8 +147,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             return MIN_HEIGHT;
 
         ArrayList<Long> totalUsers = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            String currentReaction = list.get(i);
+        for (String currentReaction : list) {
             MegaHandleList listUsers = MegaApplication.getInstance().getMegaChatApi().getReactionUsers(chatId, messageId, currentReaction);
             totalUsers.add(listUsers.size());
         }
@@ -302,7 +299,6 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             }
         } else {
             int position = INVALID_POSITION;
-
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).equals(reaction)) {
                     position = i;
@@ -313,17 +309,16 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             if (position == INVALID_POSITION) {
                 addReaction(reactionTabs.size(), reaction);
                 list.add(reaction);
-
                 if (reactionsPageAdapter != null) {
                     addView(reaction);
-                } else {
-                    reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
+                    return;
                 }
             } else if (reactionsPageAdapter != null) {
                 reactionsPageAdapter.updatePage(position, reaction);
-            } else {
-                reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
+                return;
             }
+
+            reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
         }
     }
 

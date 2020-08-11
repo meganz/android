@@ -40,7 +40,7 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -48,11 +48,9 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaStringList;
 
@@ -426,37 +424,13 @@ public class ChatUtil {
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
         String reaction = editText.getText().toString();
-        MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, (ChatActivityLollipop) context);
-    }
-
-    /**
-     * Method for removing a reaction from a message.
-     *
-     * @param chatId   The chat ID.
-     * @param message  The msg ID.
-     * @param reaction The chosen reaction.
-     */
-    public static void delReactionInMsg(Context context, long chatId, MegaChatMessage message, String reaction) {
-        MegaApplication.getInstance().getMegaChatApi().delReaction(chatId, message.getMsgId(), reaction, (ChatActivityLollipop) context);
-    }
-
-    /**
-     * Method for knowing if the option to add reactions should be visible.
-     *
-     * @param context  Context of Activity.
-     * @param chatRoom The chat.
-     * @param message  The message.
-     * @return True, if it should be visible. False, the opposite.
-     */
-    public static boolean shouldReactionOptionsBeVisible(Context context, MegaChatRoom chatRoom, AndroidMegaChatMessage message) {
-        return chatRoom != null && message != null &&
-                context instanceof ChatActivityLollipop &&
-                !((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) &&
-                !message.isUploading();
+        MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
     }
 
     public static boolean shouldReactionBeClicked(MegaChatRoom chatRoom) {
-        return (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) && !chatRoom.isPreview();
+        return !chatRoom.isPreview() &&
+                (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD ||
+                        chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
     }
 
     /**

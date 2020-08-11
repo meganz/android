@@ -42,8 +42,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     private ChatController chatC;
     private int position;
 
-    private LinearLayout titleContact;
-    private LinearLayout separatorTitleContact;
     public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
     public EmojiTextView titleMailContactChatPanel;
@@ -63,7 +61,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 message = new AndroidMegaChatMessage(messageMega);
             }
         } else {
-
             chatId = ((ContactAttachmentActivityLollipop) context).chatId;
             messageId = ((ContactAttachmentActivityLollipop) context).messageId;
             email = ((ContactAttachmentActivityLollipop) context).selectedEmail;
@@ -76,7 +73,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
         chatC = new ChatController(context);
-        dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
     @SuppressLint("RestrictedApi")
@@ -91,8 +87,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
         mainLinearLayout = contentView.findViewById(R.id.contact_attachment_bottom_sheet);
-        titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
-        separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
+        LinearLayout titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
+        LinearLayout separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
         items_layout = contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);

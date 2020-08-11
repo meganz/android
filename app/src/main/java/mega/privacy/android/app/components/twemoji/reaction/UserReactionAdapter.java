@@ -3,7 +3,6 @@ package mega.privacy.android.app.components.twemoji.reaction;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -12,9 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 
-import androidx.core.content.ContextCompat;
-
-import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -25,25 +21,19 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
-public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnClickListener {
+public class UserReactionAdapter extends ArrayAdapter<Long> {
 
     private static final int MAX_WIDTH_PORT = 180;
     private static final int MAX_WIDTH_LAND = 260;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
-    private MegaChatRoom chatRoom;
     private Context context;
 
     public UserReactionAdapter(Context context, ArrayList<Long> users, long chatId) {
@@ -57,8 +47,6 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
-
-        chatRoom = megaChatApi.getChatRoom(chatId);
     }
 
     @Override
@@ -72,16 +60,9 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.user_reaction_item, parent, false);
         }
-        RelativeLayout layout = convertView.findViewById(R.id.layout);
-        layout.setOnClickListener(this);
         RoundedImageView imageView = convertView.findViewById(R.id.contact_list_thumbnail);
         EmojiTextView name = convertView.findViewById(R.id.contact_list_name);
-
-        if (isScreenInPortrait(context)) {
-            name.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_PORT, outMetrics));
-        } else {
-            name.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
-        }
+        name.setMaxWidthEmojis(scaleWidthPx(isScreenInPortrait(context) ? MAX_WIDTH_PORT : MAX_WIDTH_LAND, outMetrics));
 
         String userName;
         String email;
@@ -134,13 +115,5 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         }
 
         return convertView;
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.layout:
-                break;
-        }
     }
 }

@@ -4528,7 +4528,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (chatRoom.getChatId() != chatId)
             return;
 
-        showInfoReactionBottomSheet(megaMessage, messages.indexOf(megaMessage), reaction);
+        showReactionBottomSheet(megaMessage, messages.indexOf(megaMessage), reaction);
     }
 
     public void openReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage) {
@@ -4536,7 +4536,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
 
         int positionInMessages = messages.indexOf(megaMessage);
-        showReactionBottomSheet(megaMessage, positionInMessages);
+        showReactionBottomSheet(megaMessage, positionInMessages, null);
     }
 
     public void itemLongClick(int positionInAdapter) {
@@ -6989,7 +6989,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void showInfoReactionBottomSheet(AndroidMegaChatMessage message, int position, String reaction){
+    public void showReactionBottomSheet(AndroidMegaChatMessage message, int position, String reaction) {
         if (message == null || message.getMessage() == null)
             return;
 
@@ -6997,19 +6997,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         hideBottomSheet();
 
         selectedMessageId = message.getMessage().getMsgId();
-        bottomSheetDialogFragment = new InfoReactionsBottomSheet(this, reaction);
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-    }
-
-    public void showReactionBottomSheet(AndroidMegaChatMessage message, int position) {
-        if (message == null || message.getMessage() == null)
-            return;
-
-        selectedPosition = position;
-        hideBottomSheet();
-
-        selectedMessageId = message.getMessage().getMsgId();
-        bottomSheetDialogFragment = new ReactionsBottomSheet();
+        bottomSheetDialogFragment = reaction == null ? new ReactionsBottomSheet() : new InfoReactionsBottomSheet(this, reaction);
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
@@ -7130,7 +7118,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-
     private void createAdapter() {
         //Create adapter
         adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, removedMessages, listView);
@@ -7138,6 +7125,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         listView.setLayoutManager(mLayoutManager);
         listView.setAdapter(adapter);
         adapter.setMessages(messages);
+    }
+
+    public void updateReactionAdapter(MegaChatMessage msg, String reaction, int count) {
+        adapter.checkReactionUpdated(idChat, msg, reaction, count);
     }
 
     @Override
@@ -7417,27 +7408,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error) + ": " + e.getErrorString(), -1);
                 }
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_MANAGE_REACTION) {
-            long chatId = request.getChatHandle();
-            long msgId = request.getUserHandle();
-            String reaction = request.getText();
-            boolean hasReactionBeenAdded = request.getFlag();
-
-            switch (e.getErrorCode()) {
-                case MegaChatError.ERROR_OK:
-                    logDebug(hasReactionBeenAdded ? "The reaction has been added correctly" : "The reaction has been deleted correctly");
-                    MegaHandleList listUsers = megaChatApi.getReactionUsers(chatId, msgId, reaction);
-                    int count = listUsers != null ? (int) listUsers.size() : 0;
-                    adapter.checkReactionUpdated(idChat, megaChatApi.getMessage(chatId, msgId), reaction, count);
-                    break;
-
-                case MegaError.API_EEXIST:
-                    if (hasReactionBeenAdded && !MegaApplication.isIsReactionFromKeyboard()) {
-                        logDebug("This reaction is already added in this message, so it should be removed");
-                        delReactionInMsg(this, request.getChatHandle(), megaChatApi.getMessage(chatId, msgId), reaction);
-                    }
-                    break;
             }
         }
     }

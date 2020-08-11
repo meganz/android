@@ -47,9 +47,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         this.messageId = megaMessage.getMessage().getMsgId();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         chatRoom = megaChatApi.getChatRoom(chatId);
-
-        if (chatRoom == null)
-            return;
     }
 
     @Override
@@ -112,10 +109,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     }
 
     private String getItemAtPosition(int pos) {
-        if (isListReactionsEmpty() || pos >= listReactions.size())
-            return null;
-
-        return listReactions.get(pos);
+        return isListReactionsEmpty() || pos >= listReactions.size() ? null : listReactions.get(pos);
     }
 
     /**
@@ -182,10 +176,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        if (isListReactionsEmpty() )
-            return 0;
-
-        return listReactions.size();
+        return isListReactionsEmpty() ? 0 : listReactions.size();
     }
 
     @Override

@@ -212,9 +212,7 @@
     <color name="reconnecting_bar">#FFF5A623</color>
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
-    <color name="background_reactions">#09000000</color>
-    <color name="stroke_add_reaction">#12000000</color>
-    <color name="background_own_reaction_added">#6000BFA5</color>
-    <color name="number_reactions_added">#54000000</color>
+    <color name="background_own_reaction_added">#A800BFA5</color>
+    <color name="number_reactions_added">#8A000000</color>
 
 </resources>

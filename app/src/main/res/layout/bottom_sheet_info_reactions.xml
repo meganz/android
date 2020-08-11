@@ -2,13 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/general_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:background="@color/white">
 
         <HorizontalScrollView
             android:id="@+id/horizontalScroll"
@@ -31,11 +26,12 @@
             android:id="@+id/info_reactions_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_below="@id/horizontalScroll"
             android:background="@color/divider_upgrade_account" />
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/info_reactions_pager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_below="@id/info_reactions_divider" />
 </RelativeLayout>

@@ -74,7 +74,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         chatRoom = megaChatApi.getChatRoom(chatId);
         chatC = new ChatController(context);
-        dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
     @SuppressLint("RestrictedApi")
@@ -225,31 +224,32 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             if (typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                 long userCount = message.getMessage().getUsersCount();
+                long userHandle = message.getMessage().getUserHandle(0);
+                String userEmail = message.getMessage().getUserEmail(0);
 
-                optionInfoContacts.setVisibility((message.getMessage().getUsersCount() == 1 &&
-                        message.getMessage().getUserHandle(0) != megaChatApi.getMyUserHandle() &&
-                        megaApi.getContact(message.getMessage().getUserEmail(0)) != null &&
-                        megaApi.getContact(message.getMessage().getUserEmail(0)).getVisibility() == MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
+                optionInfoContacts.setVisibility((userCount == 1 &&
+                        userHandle != megaChatApi.getMyUserHandle() &&
+                        megaApi.getContact(userEmail) != null &&
+                        megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
 
-                optionViewContacts.setVisibility(message.getMessage().getUsersCount() > 1 ? View.VISIBLE : View.GONE);
-
+                optionViewContacts.setVisibility(userCount > 1 ? View.VISIBLE : View.GONE);
 
                 if(userCount == 1){
-                    optionInviteContact.setVisibility(message.getMessage().getUserHandle(0) != megaChatApi.getMyUserHandle() &&
-                            (megaApi.getContact(message.getMessage().getUserEmail(0)) == null ||
-                                    megaApi.getContact(message.getMessage().getUserEmail(0)).getVisibility() != MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
+                    optionInviteContact.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                            (megaApi.getContact(userEmail) == null ||
+                                    megaApi.getContact(userEmail).getVisibility() != MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
 
-                    optionStartConversation.setVisibility(message.getMessage().getUserHandle(0) != megaChatApi.getMyUserHandle() &&
-                            megaApi.getContact(message.getMessage().getUserEmail(0)) != null &&
-                            megaApi.getContact(message.getMessage().getUserEmail(0)).getVisibility() == MegaUser.VISIBILITY_VISIBLE &&
-                            (chatRoom.isGroup() || message.getMessage().getUserHandle(0) != chatRoom.getPeerHandle(0)) ? View.VISIBLE : View.GONE);
-
+                    optionStartConversation.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                            megaApi.getContact(userEmail) != null &&
+                            megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE &&
+                            (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)) ? View.VISIBLE : View.GONE);
                 }else{
                     optionStartConversation.setVisibility(View.VISIBLE);
                     optionInviteContact.setVisibility(View.GONE);
+
                     for (int i = 0; i < userCount; i++) {
-                        String userEmail = message.getMessage().getUserEmail(i);
-                        MegaUser contact = megaApi.getContact(userEmail);
+                        String email = message.getMessage().getUserEmail(i);
+                        MegaUser contact = megaApi.getContact(email);
                         if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
                             optionStartConversation.setVisibility(View.GONE);
                             break;
@@ -260,29 +260,44 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             }
         }
 
-        reactionsLayout.setVisibility((shouldReactionOptionsBeVisible(context, chatRoom, message)) ?
-                View.VISIBLE : View.GONE);
+        boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
+                context instanceof ChatActivityLollipop &&
+                !((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) &&
+                !message.isUploading();
+
+        reactionsLayout.setVisibility(shouldReactionOptionBeVisible ? View.VISIBLE : View.GONE);
         forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE &&
                 optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
         editSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
                 optionEdit.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
         copySeparator.setVisibility((optionEdit.getVisibility() == View.VISIBLE ||
-                optionForward.getVisibility() == View.VISIBLE) && optionCopy.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+                optionForward.getVisibility() == View.VISIBLE) &&
+                optionCopy.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
         shareSeparator.setVisibility(optionForward.getVisibility() == View.VISIBLE &&
                 optionShare.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
         selectSeparator.setVisibility((optionSelect.getVisibility() == View.VISIBLE &&
                 (optionForward.getVisibility() == View.VISIBLE ||
                         optionCopy.getVisibility() == View.VISIBLE)) ? View.VISIBLE : View.GONE);
+
         infoSeparator.setVisibility((optionViewContacts.getVisibility() == View.VISIBLE ||
-                optionInfoContacts.getVisibility() == View.VISIBLE) && optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+                optionInfoContacts.getVisibility() == View.VISIBLE) &&
+                optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
         inviteSeparator.setVisibility((optionStartConversation.getVisibility() == View.VISIBLE ||
                 optionInviteContact.getVisibility() == View.VISIBLE) &&
                 (optionViewContacts.getVisibility() == View.VISIBLE ||
-                        optionInfoContacts.getVisibility() == View.VISIBLE || selectSeparator.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+                        optionInfoContacts.getVisibility() == View.VISIBLE ||
+                        selectSeparator.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+
         infoFileSeparator.setVisibility((optionImport.getVisibility() == View.VISIBLE ||
                 optionDownload.getVisibility() == View.VISIBLE ||
                 optionSaveOffline.getVisibility() == View.VISIBLE) &&
                 optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
+
         deleteSeparator.setVisibility(optionDelete.getVisibility());
 
         dialog.setContentView(contentView);

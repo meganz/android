@@ -12,7 +12,7 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 
 public class ReactionImageView extends AppCompatImageView {
 
-    private Emoji currentEmoji = null;
+    private Emoji currentEmoji;
     private ImageLoadingTask imageLoadingTask;
 
     public ReactionImageView(final Context context, final AttributeSet attrs) {

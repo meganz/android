@@ -3697,8 +3697,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void bindNormalMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        logDebug("Position: " + position);
-
         MegaChatMessage message = androidMessage.getMessage();
         if (message.getUserHandle() == myUserHandle) {
             logDebug("MY message handle!!: " + message.getMsgId());
@@ -7906,8 +7904,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @param message The MegaMessage.
      * @return True, if sent. False if received.
      */
-    private boolean checkIfIsMyMessage(MegaChatMessage message) {
-        return message.getUserHandle() == myUserHandle && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE && message.getType() != MegaChatMessage.TYPE_SET_PRIVATE_MODE;
+    private boolean isMyMessage(MegaChatMessage message) {
+        return message.getUserHandle() == myUserHandle &&
+                message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE &&
+                message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE &&
+                message.getType() != MegaChatMessage.TYPE_SET_PRIVATE_MODE;
     }
 
     /**
@@ -7964,7 +7965,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             return;
         }
 
-        if (checkIfIsMyMessage(megaMessage.getMessage())) {
+        if (isMyMessage(megaMessage.getMessage())) {
             if (holder.ownReactionsAdapter == null) {
                 createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
             } else {
@@ -8036,11 +8037,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     private boolean noReactions(MegaStringList listReactions, MegaChatMessage message, final ViewHolderMessageChat holder) {
         if (listReactions == null || listReactions.size() <= 0) {
-            if (checkIfIsMyMessage(message)) {
+            if (isMyMessage(message)) {
                 holder.ownMessageReactionsLayout.setVisibility(View.GONE);
                 holder.ownMessageReactionsRecycler.setAdapter(null);
                 holder.ownReactionsAdapter = null;
-
             } else {
                 holder.contactMessageReactionsLayout.setVisibility(View.GONE);
                 holder.contactMessageReactionsRecycler.setAdapter(null);
@@ -8071,7 +8071,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         if (multipleSelect) {
-            if (checkIfIsMyMessage(megaMessage.getMessage())) {
+            if (isMyMessage(megaMessage.getMessage())) {
                 holder.ownMessageReactionsLayout.setVisibility(View.GONE);
             } else {
                 holder.contactMessageReactionsLayout.setVisibility(View.GONE);
@@ -8084,7 +8084,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             return;
         }
 
-        if (checkIfIsMyMessage(megaMessage.getMessage())) {
+        if (isMyMessage(megaMessage.getMessage())) {
             if (holder.ownReactionsAdapter == null) {
                 createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
             } else {

@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
         android:background="@null"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -23,17 +21,15 @@
                 android:id="@+id/first_emoji_layout"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/rounded_background">
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_background" />
 
-                <mega.privacy.android.app.components.twemoji.EmojiImageView
-                    android:id="@+id/first_emoji_image"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:adjustViewBounds="true"
-                    android:background="@null" />
-            </RelativeLayout>
+            <mega.privacy.android.app.components.twemoji.EmojiImageView
+                android:id="@+id/first_emoji_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:background="@null" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -47,17 +43,15 @@
                 android:id="@+id/second_emoji_layout"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/rounded_background">
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_background" />
 
-                <mega.privacy.android.app.components.twemoji.EmojiImageView
-                    android:id="@+id/second_emoji_image"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:adjustViewBounds="true"
-                    android:background="@null" />
-            </RelativeLayout>
+            <mega.privacy.android.app.components.twemoji.EmojiImageView
+                android:id="@+id/second_emoji_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:background="@null" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -71,17 +65,15 @@
                 android:id="@+id/third_emoji_layout"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/rounded_background">
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_background" />
 
-                <mega.privacy.android.app.components.twemoji.EmojiImageView
-                    android:id="@+id/third_emoji_image"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:adjustViewBounds="true"
-                    android:background="@null" />
-            </RelativeLayout>
+            <mega.privacy.android.app.components.twemoji.EmojiImageView
+                android:id="@+id/third_emoji_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:background="@null" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -95,17 +87,15 @@
                 android:id="@+id/fourth_emoji_layout"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/rounded_background">
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_background" />
 
-                <mega.privacy.android.app.components.twemoji.EmojiImageView
-                    android:id="@+id/fourth_emoji_image"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:adjustViewBounds="true"
-                    android:background="@null" />
-            </RelativeLayout>
+            <mega.privacy.android.app.components.twemoji.EmojiImageView
+                android:id="@+id/fourth_emoji_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:background="@null" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -119,17 +109,15 @@
                 android:id="@+id/fifth_emoji_layout"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/rounded_background">
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_background" />
 
-                <mega.privacy.android.app.components.twemoji.EmojiImageView
-                    android:id="@+id/fifth_emoji_image"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:adjustViewBounds="true"
-                    android:background="@null" />
-            </RelativeLayout>
+            <mega.privacy.android.app.components.twemoji.EmojiImageView
+                android:id="@+id/fifth_emoji_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:background="@null" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -143,17 +131,14 @@
                 android:id="@+id/icon_more_reactions"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/rounded_background">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_centerInParent="true"
-                    android:adjustViewBounds="true"
-                    android:background="@null"
-                    android:src="@drawable/ic_emoji_add" />
-            </RelativeLayout>
+                android:layout_centerInParent="true"
+                android:background="@drawable/rounded_background" />
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:background="@null"
+                android:src="@drawable/ic_emoji_add" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>
