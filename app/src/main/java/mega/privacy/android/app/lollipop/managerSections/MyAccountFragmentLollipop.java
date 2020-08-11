@@ -62,6 +62,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -72,6 +73,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -157,7 +159,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	private boolean removePhoneNumberDialogShowing;
 
+	private PhoneNumberBottomSheetDialogFragment phoneNumberBottomSheet;
+
 	private static final String KEY_RPN_DIALOG_SHOWING = "removePhoneNumberDialogShowing";
+
+    /**
+     * Modify or remove verified phone number.
+     */
+	private boolean isModify;
+
+    private static final String KEY_IS_MODIFY = "isModify";
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -230,7 +241,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 			}
             if (savedInstanceState.getBoolean(KEY_RPN_DIALOG_SHOWING, false)) {
-                showConfirmRemovePhoneNumberDialog();
+                showConfirmRemovePhoneNumberDialog(isModify = savedInstanceState.getBoolean(KEY_IS_MODIFY, false));
             }
 		}
 
@@ -729,16 +740,23 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                     Intent intent = new Intent(context, SMSVerificationActivity.class);
                     startActivity(intent);
                 } else {
-                    showConfirmRemovePhoneNumberDialog();
+                    if (!isBottomSheetDialogShown(phoneNumberBottomSheet)) {
+                        if(getActivity() != null) {
+                            phoneNumberBottomSheet = new PhoneNumberBottomSheetDialogFragment();
+                            phoneNumberBottomSheet.show(getActivity().getSupportFragmentManager(), phoneNumberBottomSheet.getTag());
+                        }
+                    }
                 }
                 break;
             }
 		}
 	}
 
-	private void showConfirmRemovePhoneNumberDialog() {
+    public void showConfirmRemovePhoneNumberDialog(boolean isModify) {
+        this.isModify = isModify;
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setMessage(R.string.remove_phone_number)
+                .setTitle(isModify ? R.string.option_modify_phone_number : R.string.option_remove_phone_number)
+                .setMessage(isModify ? R.string.modify_phone_number_message : R.string.remove_phone_number_message)
                 .setPositiveButton(R.string.general_ok, (dialog, which) -> {
                     addPhoneNumber.setClickable(false);
                     removePhoneNumberDialogShowing = false;
@@ -1008,7 +1026,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context).showAddPhoneNumberInMenu();
                 }
-                showSnackbar(context, getString(R.string.remove_phone_number_success));
+                if (isModify) {
+                    Intent intent = new Intent(context, SMSVerificationActivity.class);
+                    startActivity(intent);
+                } else {
+                    showSnackbar(context, getString(R.string.remove_phone_number_success));
+                }
             }
         } else {
             // Allow to retry when refresh data failed.
@@ -1062,6 +1085,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			outState.putByteArray("qrAvatar", qrAvatarByteArray);
 		}
 		outState.putBoolean(KEY_RPN_DIALOG_SHOWING, removePhoneNumberDialogShowing);
+		outState.putBoolean(KEY_IS_MODIFY, isModify);
 	}
 
     /**
