@@ -33,6 +33,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Locale;
@@ -497,7 +500,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 roundCornerRadius,
                 selectedPadding);
 
-        mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
+        mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig, Glide.with(this));
         mAdapter.setHasStableIds(true);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override public int getSpanSize(int position) {

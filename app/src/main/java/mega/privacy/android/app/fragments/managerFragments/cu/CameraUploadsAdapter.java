@@ -7,6 +7,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.RequestManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import mega.privacy.android.app.R;
@@ -25,11 +28,13 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     private final List<CuNode> mNodes = new ArrayList<>();
     private final int mSpanCount;
     private final CuItemSizeConfig mItemSizeConfig;
+    private final RequestManager mRequestManager;
 
-    public CameraUploadsAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig) {
+    public CameraUploadsAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
         mListener = listener;
         mSpanCount = spanCount;
         mItemSizeConfig = itemSizeConfig;
+        mRequestManager = requestManager;
     }
 
     @Override public long getItemId(int position) {
@@ -67,7 +72,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     }
 
     @Override public void onBindViewHolder(@NonNull CuViewHolder holder, int position) {
-        holder.bind(position, mNodes.get(position), mListener);
+        holder.bind(position, mNodes.get(position), mListener, mRequestManager);
     }
 
     @Override public int getItemCount() {

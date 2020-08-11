@@ -1,5 +1,7 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import com.bumptech.glide.RequestManager;
+
 import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
 
 /**
@@ -15,7 +17,7 @@ class CuTitleViewHolder extends CuViewHolder {
         mBinding = binding;
     }
 
-    @Override protected void bind(CuNode node) {
+    @Override protected void bind(CuNode node, RequestManager requestManager) {
         mBinding.gridTitle.setText(node.getModifyDate());
     }
 

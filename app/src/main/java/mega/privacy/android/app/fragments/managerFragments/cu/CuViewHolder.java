@@ -1,17 +1,17 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.shape.ShapeAppearanceModel;
+
 import mega.privacy.android.app.R;
 
 /**
@@ -23,7 +23,7 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
     }
 
-    public void bind(int position, CuNode node, CameraUploadsAdapter.Listener listener) {
+    public void bind(int position, CuNode node, CameraUploadsAdapter.Listener listener, RequestManager requestManager) {
         if (handleClick() && node.getNode() != null) {
             itemView.setOnClickListener(v -> listener.onNodeClicked(position, node));
             itemView.setOnLongClickListener(v -> {
@@ -31,10 +31,11 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
                 return true;
             });
         }
-        bind(node);
+
+        bind(node, requestManager);
     }
 
-    protected abstract void bind(CuNode node);
+    protected abstract void bind(CuNode node, RequestManager requestManager);
 
     protected boolean handleClick() {
         return true;
@@ -60,27 +61,16 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         icSelected.setLayoutParams(icSelectedParams);
     }
 
-    static void updateThumbnailDisplay(ImageView thumbnail, CuNode node,
-            CuItemSizeConfig itemSizeConfig) {
-        RequestBuilder<Drawable> requestBuilder;
-        if (node.getThumbnail() != null) {
-            requestBuilder = Glide.with(thumbnail).load(node.getThumbnail())
-                    .placeholder(R.drawable.ic_image_thumbnail);
-        } else {
-            requestBuilder = Glide.with(thumbnail).load(R.drawable.ic_image_thumbnail);
-        }
-        if (node.isSelected()) {
-            requestBuilder = requestBuilder
-                    .transform(new CenterCrop(),
-                            new RoundedCorners(itemSizeConfig.getRoundCornerRadius()));
-        } else {
-            requestBuilder = requestBuilder.transform(new CenterCrop());
-        }
-        requestBuilder
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(thumbnail);
+    protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node, RequestManager requestManager) {
+        int shapeId = node.isSelected() ? R.style.GalleryImageShape_Selected : R.style.GalleryImageShape;
+        imageView.setShapeAppearanceModel(
+                ShapeAppearanceModel.builder(itemView.getContext(), shapeId, 0).build()
+        );
 
-        int padding = node.isSelected() ? itemSizeConfig.getSelectedPadding() : 0;
-        thumbnail.setPadding(padding, padding, padding, padding);
+        requestManager.load(node.getThumbnail())
+                .placeholder(R.drawable.ic_image_thumbnail)
+                .error(R.drawable.ic_image_thumbnail)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(imageView);
     }
 }

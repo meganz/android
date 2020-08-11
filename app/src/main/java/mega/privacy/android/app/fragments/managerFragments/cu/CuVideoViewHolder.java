@@ -1,6 +1,9 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.view.View;
+
+import com.bumptech.glide.RequestManager;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding;
 
@@ -23,9 +26,7 @@ class CuVideoViewHolder extends CuViewHolder {
         setViewSize(binding.getRoot(), binding.icSelected, itemSizeConfig);
     }
 
-    @Override protected void bind(CuNode node) {
-        updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig);
-
+    @Override protected void bind(CuNode node, RequestManager requestManager) {
         if (mItemSizeConfig.isSmallGrid()) {
             mBinding.videoDuration.setVisibility(View.GONE);
         } else {
@@ -41,6 +42,8 @@ class CuVideoViewHolder extends CuViewHolder {
                         : R.drawable.gradient_cam_uploads);
 
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
+
+        updateThumbnailDisplay(mBinding.thumbnail, node, requestManager);
     }
 
     public ItemCameraUploadsVideoBinding binding() {
