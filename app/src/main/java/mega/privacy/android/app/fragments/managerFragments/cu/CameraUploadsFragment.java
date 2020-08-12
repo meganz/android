@@ -488,17 +488,10 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         int icSelectedWidth = getResources().getDimensionPixelSize(
                 smallGrid ? R.dimen.cu_fragment_ic_selected_size_small
                         : R.dimen.cu_fragment_ic_selected_size_large);
-        int icSelectedMargin = getResources().getDimensionPixelSize(
-                smallGrid ? R.dimen.cu_fragment_ic_selected_margin_small
-                        : R.dimen.cu_fragment_ic_selected_margin_large);
-        int roundCornerRadius = getResources().getDimensionPixelSize(
-                R.dimen.cu_fragment_selected_round_corner_radius);
         int selectedPadding =
                 getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding);
-        CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(
-                smallGrid, gridWidth, gridMargin, icSelectedWidth, icSelectedMargin,
-                roundCornerRadius,
-                selectedPadding);
+        CuItemSizeConfig itemSizeConfig =
+                new CuItemSizeConfig(smallGrid, gridWidth, icSelectedWidth, selectedPadding);
 
         mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig, Glide.with(this));
         mAdapter.setHasStableIds(true);

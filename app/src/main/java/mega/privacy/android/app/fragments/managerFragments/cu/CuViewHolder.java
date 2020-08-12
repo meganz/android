@@ -1,23 +1,14 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.ShapeAppearanceModel;
 
@@ -55,18 +46,12 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
                 (GridLayoutManager.LayoutParams) grid.getLayoutParams();
         params.width = itemSizeConfig.getGridSize();
         params.height = itemSizeConfig.getGridSize();
-        params.topMargin = itemSizeConfig.getGridMargin();
-        params.bottomMargin = itemSizeConfig.getGridMargin();
-        params.setMarginStart(itemSizeConfig.getGridMargin());
-        params.setMarginEnd(itemSizeConfig.getGridMargin());
         grid.setLayoutParams(params);
 
         FrameLayout.LayoutParams icSelectedParams =
                 (FrameLayout.LayoutParams) icSelected.getLayoutParams();
         icSelectedParams.width = itemSizeConfig.getIcSelectedSize();
         icSelectedParams.height = itemSizeConfig.getIcSelectedSize();
-        icSelectedParams.topMargin = itemSizeConfig.getIcSelectedMargin();
-        icSelectedParams.setMarginStart(itemSizeConfig.getIcSelectedMargin());
         icSelected.setLayoutParams(icSelectedParams);
     }
 
