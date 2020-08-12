@@ -70,6 +70,10 @@ public class Constants {
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
+    public static final String RESULT = "RESULT";
+    public static final String ACCOUNT_BLOCKED_STRING = "ACCOUNT_BLOCKED_STRING";
+    public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
+
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
     //MultipleRequestListener options
@@ -591,6 +595,11 @@ public class Constants {
             "^https://mega\\.nz/#sitetransfer!.+$"
     };
 
+    public static final String[] BUSINESS_INVITE_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#businessinvite.+$",
+            "^https://mega\\.nz/#businessinvite.+$"
+    };
+
     //Types of blocked accounts
     public static final String ACCOUNT_NOT_BLOCKED = "0";
     public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
@@ -599,6 +608,8 @@ public class Constants {
     public static final String REMOVED_ACCOUNT_BLOCK = "401";
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
     public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
+
+    public static final int INVALID_VALUE = -1;
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;

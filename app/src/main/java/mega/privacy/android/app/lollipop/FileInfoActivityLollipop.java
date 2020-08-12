@@ -583,17 +583,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
 
         nestedScrollView = (NestedScrollView) findViewById(R.id.nested_layout);
-        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if ((v.canScrollVertically(-1) && v.getVisibility() == View.VISIBLE)) {
-                    aB.setElevation(px2dp(4, outMetrics));
-                }
-                else {
-                    aB.setElevation(0);
-                }
-            }
-        });
+        nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeViewElevation(aB, v.canScrollVertically(-1) && v.getVisibility() == View.VISIBLE, outMetrics));
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 

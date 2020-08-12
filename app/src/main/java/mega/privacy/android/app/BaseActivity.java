@@ -111,9 +111,8 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
 
-        IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
-        filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
+        registerReceiver(accountBlockedReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
@@ -163,7 +162,7 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
+        unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
@@ -206,7 +205,9 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver accountBlockedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_EVENT_ACCOUNT_BLOCKED)) return;
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED))
+                return;
 
             checkWhyAmIBlocked(intent.getLongExtra(EVENT_NUMBER, -1), intent.getStringExtra(EVENT_TEXT));
         }
@@ -585,13 +586,16 @@ public class BaseActivity extends AppCompatActivity {
 //                I am not blocked
                 break;
             case COPYRIGHT_ACCOUNT_BLOCK:
-                showErrorAlertDialog(getString(R.string.account_suspended_breache_ToS), false, this);
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_breache_ToS)));
                 break;
             case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
-                showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS)));
                 break;
+
+            case DISABLED_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_account_blocked)));
+                break;
+
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
                 if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return;
 
@@ -616,15 +620,16 @@ public class BaseActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(NAME_USER_LOCKED, true);
                 startActivity(intent);
-
                 break;
+
             case WEAK_PROTECTION_ACCOUNT_BLOCK:
-                if (app.isBlockedDueToWeakAccount() || app.isWebOpenDueToEmailVerification()) {
+                if (MegaApplication.isBlockedDueToWeakAccount() || MegaApplication.isWebOpenDueToEmailVerification()) {
                     break;
                 }
                 intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
                 startActivity(intent);
                 break;
+
             default:
                 showErrorAlertDialog(stringError, false, this);
         }

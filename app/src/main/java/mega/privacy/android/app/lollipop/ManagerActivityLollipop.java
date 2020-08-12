@@ -774,7 +774,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private TextView openLinkErrorText;
 	private Button openLinkOpenButton;
 
-	private boolean isBusinessGraceAlertShown = false;
+	private boolean isBusinessGraceAlertShown;
 	private AlertDialog businessGraceAlert;
 	private boolean isBusinessCUAlertShown;
 	private AlertDialog businessCUAlert;
@@ -2888,8 +2888,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
-						int result = getIntent().getIntExtra("RESULT",-20);
-						if(result==0){
+						int result = getIntent().getIntExtra(RESULT, MegaError.API_OK);
+						if (result == MegaError.API_OK) {
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
 							selectDrawerItemPending=false;
@@ -3289,19 +3289,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		setContactStatus();
 
-        if (firstTimeAfterInstallation || askPermissions) {
-            //haven't verified phone number
-            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
-                askForSMSVerification();
-            } else {
-				drawerItem = DrawerItem.ASK_PERMISSIONS;
-                askForAccess();
-            }
-        } else if (firstLogin && !newCreationAccount) {
-            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
-                askForSMSVerification();
-            }
-        }
+		checkInitialScreens();
 
 		if (openLinkDialogIsShown) {
 			showOpenLinkDialog();
@@ -3318,34 +3306,81 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showMKLayout();
 		}
 
-		checkBusinessStatus();
-
 		logDebug("END onCreate");
 	}
 
-    private void checkBusinessStatus() {
+	/**
+	 * Checks which screen should be shown when an user is logins.
+	 * There are three different screens or warnings:
+	 * - Business warning: it takes priority over the other two
+	 * - SMS verification screen: it takes priority over the other one
+	 * - Onboarding permissions screens: it has to be only shown when account is logged in after the installation,
+	 * 		some of the permissions required have not been granted
+	 * 		and the business warnings and SMS verification have not to be shown.
+	 */
+	private void checkInitialScreens() {
+    	if (checkBusinessStatus()) {
+			setBusinessAlertShown(true);
+			return;
+		}
+
+		if (firstTimeAfterInstallation || askPermissions) {
+			//haven't verified phone number
+			if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
+				askForSMSVerification();
+			} else {
+				drawerItem = DrawerItem.ASK_PERMISSIONS;
+				askForAccess();
+			}
+		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+			askForSMSVerification();
+		}
+	}
+
+	/**
+	 * Updates the state of the flag indicating if there is a business alert shown.
+	 *
+	 * @param shown	true if there is any business alert shown, false otherwise.
+	 */
+	private void setBusinessAlertShown(boolean shown) {
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo != null) {
+			myAccountInfo.setBusinessAlertShown(shown);
+		}
+	}
+
+	/**
+	 * Checks if some business warning has to be shown due to the status of the account.
+	 *
+	 * @return True if some warning has been shown, false otherwise.
+	 */
+    private boolean checkBusinessStatus() {
         if (isBusinessGraceAlertShown) {
             showBusinessGraceAlert();
-            return;
+            return true;
         }
 
         if (isBusinessCUAlertShown) {
         	showBusinessCUAlert();
-        	return;
+        	return true;
 		}
 
-        MyAccountInfo myAccountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
 
         if (myAccountInfo != null && myAccountInfo.shouldShowBusinessAlert()) {
             int status = megaApi.getBusinessStatus();
             if (status == BUSINESS_STATUS_EXPIRED) {
                 myAccountInfo.setShouldShowBusinessAlert(false);
                 startActivity(new Intent(this, BusinessExpiredAlertActivity.class));
+                return true;
             } else if (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD) {
                 myAccountInfo.setShouldShowBusinessAlert(false);
                 showBusinessGraceAlert();
+                return true;
             }
         }
+
+        return false;
     }
 
     private void showBusinessGraceAlert() {
@@ -3360,17 +3395,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         builder.setView(v);
 
         Button dismissButton = v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            	isBusinessGraceAlertShown = false;
-                try {
-                    businessGraceAlert.dismiss();
-                } catch (Exception e) {
-                    logWarning("Exception dismissing businessGraceAlert", e);
-                }
-            }
-        });
+        dismissButton.setOnClickListener(view -> {
+			setBusinessAlertShown(isBusinessGraceAlertShown = false);
+			try {
+				businessGraceAlert.dismiss();
+			} catch (Exception e) {
+				logWarning("Exception dismissing businessGraceAlert", e);
+			}
+		});
 
         businessGraceAlert = builder.create();
         businessGraceAlert.setCanceledOnTouchOutside(false);
@@ -3403,7 +3435,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCU())
 				.setCancelable(false)
-				.setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
+				.setOnDismissListener(dialog -> setBusinessAlertShown(isBusinessCUAlertShown = false));
         businessCUAlert = builder.create();
         businessCUAlert.show();
         isBusinessCUAlertShown = true;
@@ -4779,6 +4811,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
+
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo != null && myAccountInfo.isBusinessAlertShown()) {
+			//The business alerts has priority over SMS verification
+			return;
+		}
+
         if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
             showSMSVerificationDialog();
         }
@@ -5218,56 +5257,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (usedSpaceLayout != null) {
 				usedSpaceLayout.setVisibility(View.GONE);
 			}
-
-			UserCredentials credentials = dbH.getCredentials();
-			if (credentials != null) {
-				String emailCredentials = credentials.getEmail();
-				if (emailCredentials != null) {
-					if (nVEmail != null) {
-						nVEmail.setText(emailCredentials);
-					}
-				}
-
-				String myHandleCredentials = credentials.getMyHandle();
-				long myHandle = -1;
-				if (myHandleCredentials != null) {
-					if (!myHandleCredentials.isEmpty()) {
-						myHandle = Long.parseLong(myHandleCredentials);
-					}
-				}
-
-				String firstNameText = credentials.getFirstName();
-				String lastNameText = credentials.getLastName();
-				String fullName = "";
-				if (firstNameText == null) {
-					firstNameText = "";
-				}
-				if (lastNameText == null) {
-					lastNameText = "";
-				}
-				if (firstNameText.trim().length() <= 0) {
-					fullName = lastNameText;
-				} else {
-					fullName = firstNameText + " " + lastNameText;
-				}
-
-				if (fullName.trim().length() <= 0) {
-					logDebug("Put email as fullname");
-					String[] splitEmail = emailCredentials.split("[@._]");
-					fullName = splitEmail[0];
-				}
-
-				if (fullName.trim().length() <= 0) {
-					fullName = getString(R.string.name_text) + " " + getString(R.string.lastname_text);
-					logDebug("Full name set by default");
-				}
-
-				if (nVDisplayName != null) {
-					nVDisplayName.setText(fullName);
-				}
-
-				setOfflineAvatar(emailCredentials, myHandle, fullName);
+			if (nVEmail != null) {
+				nVEmail.setText(megaChatApi.getMyEmail());
 			}
+			if (nVDisplayName != null) {
+				nVDisplayName.setText(megaChatApi.getMyFullname());
+			}
+			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
+					megaChatApi.getMyFullname());
 
 			if (getSettingsFragment() != null) {
 				sttFLol.setOnlineOptions(false);

@@ -490,7 +490,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 				switch (status) {
 					case BUSINESS_STATUS_EXPIRED:
-						status = R.string.expired_label;
+						status = R.string.payment_overdue_label;
 						businessAccountStatusText.setTextColor(getResources().getColor(R.color.expired_red));
 						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.mail_my_account));
 						break;
@@ -500,7 +500,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.name_my_account));
 						break;
 					case BUSINESS_STATUS_GRACE_PERIOD:
-						status = R.string.grace_label;
+						status = R.string.payment_required_label;
 						businessAccountStatusText.setTextColor(getResources().getColor(R.color.grace_yellow));
 						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grace_yellow));
 						break;

@@ -16,31 +16,41 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
-    private Drawable mDivider;
-    DisplayMetrics outMetrics;
-    Context context;
+    protected Context context;
+    protected Drawable mDivider;
+    protected DisplayMetrics outMetrics;
+
+    protected int left;
+    protected int right;
+    protected int childCount;
 
     public SimpleDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
         mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
-        this.outMetrics = outMetrics;
         this.context = context;
+        this.outMetrics = outMetrics;
     }
 
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        int childCount = parent.getChildCount();
+        initItemDecoration(parent);
+
         for (int i = 0; i < childCount; i++) {
-            View child = parent.getChildAt(i);
-            drawDivider(c, parent, child);
+            drawDivider(c, parent.getChildAt(i));
         }
     }
 
-    protected void drawDivider(Canvas c, RecyclerView parent, View child) {
-        int left = (int) context.getResources().getDimension(R.dimen.recycler_view_separator);
-        int right = parent.getWidth() - parent.getPaddingRight();
+    protected void initItemDecoration(RecyclerView parent) {
+        left = (int) MegaApplication.getInstance().getResources().getDimension(R.dimen.recycler_view_separator);
+        right = parent.getWidth() - parent.getPaddingRight();
+
+        childCount = parent.getChildCount();
+    }
+
+    protected void drawDivider(Canvas c, View child) {
 
         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 

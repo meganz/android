@@ -83,6 +83,7 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
@@ -780,25 +781,25 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     }
                 } else if (action.equals(ACTION_PASS_CHANGED)) {
-                    int result = intentReceived.getIntExtra("RESULT", -20);
-                    if (result == 0) {
-                        logDebug("Show success mesage");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.pass_changed_alert));
-                        return v;
-                    } else if (result == MegaError.API_EARGS) {
-                        logWarning("Incorrect arguments!");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
-                        return v;
-                    } else if (result == MegaError.API_EKEY) {
-                        logWarning("Incorrect MK when changing pass");
-//                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.incorrect_MK));
-                        ((LoginActivityLollipop)context).showAlertIncorrectRK();
-                        return v;
-                    } else {
-                        logError("Error when changing pass - show error message");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
-                        return v;
+                    int result = intentReceived.getIntExtra(RESULT, MegaError.API_OK);
+                    switch (result) {
+                        case MegaError.API_OK:
+                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.pass_changed_alert));
+                            break;
+
+                        case MegaError.API_EKEY:
+                            ((LoginActivityLollipop)context).showAlertIncorrectRK();
+                            break;
+
+                        case MegaError.API_EBLOCKED:
+                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_reset_account_blocked));
+                            break;
+
+                        default:
+                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                     }
+
+                    return v;
                 } else if (action.equals(ACTION_PARK_ACCOUNT)) {
                     String link = intentReceived.getDataString();
                     if (link != null) {
@@ -814,6 +815,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 else if (action.equals(ACTION_CANCEL_DOWNLOAD)) {
                     ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
 
+                } else if (action.equals(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)) {
+                    String accountBlockedString = intentReceived.getStringExtra(ACCOUNT_BLOCKED_STRING);
+                    if (!isTextEmpty(accountBlockedString)) {
+                        showErrorAlertDialog(accountBlockedString, false, getActivity());
+                    }
                 }
             }
             else{
