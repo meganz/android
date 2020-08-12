@@ -755,7 +755,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
     public void showConfirmRemovePhoneNumberDialog(boolean isModify) {
         this.isModify = isModify;
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(isModify ? R.string.option_modify_phone_number : R.string.option_remove_phone_number)
+                .setTitle(isModify ? R.string.title_modify_phone_number : R.string.title_remove_phone_number)
                 .setMessage(isModify ? R.string.modify_phone_number_message : R.string.remove_phone_number_message)
                 .setPositiveButton(R.string.general_ok, (dialog, which) -> {
                     addPhoneNumber.setClickable(false);
@@ -1026,12 +1026,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context).showAddPhoneNumberInMenu();
                 }
-                if (isModify) {
-                    Intent intent = new Intent(context, SMSVerificationActivity.class);
-                    startActivity(intent);
-                } else {
-                    showSnackbar(context, getString(R.string.remove_phone_number_success));
-                }
+                showSnackbar(context, getString(R.string.remove_phone_number_success));
             }
         } else {
             // Allow to retry when refresh data failed.
@@ -1048,8 +1043,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
           but user data hasn't refreshed successfully need to refresh user data again.
         */
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-            // Have to getUserData to refresh, otherwise, phone number remains previous value.
-            megaApi.getUserData(new GetUserDataListener(context, this));
+            if (isModify) {
+                startActivity(new Intent(context, SMSVerificationActivity.class));
+            } else {
+                // Have to getUserData to refresh, otherwise, phone number remains previous value.
+                megaApi.getUserData(new GetUserDataListener(context, this));
+            }
         } else {
             addPhoneNumber.setClickable(true);
             showSnackbar(context, getString(R.string.remove_phone_number_fail));

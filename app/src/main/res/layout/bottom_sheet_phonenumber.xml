@@ -12,47 +12,17 @@
         android:id="@+id/phonenumber_title_layout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:paddingStart="16dp"
-        android:layout_marginTop="8dp">
+        android:paddingStart="16dp">
 
-        <ImageView
-            android:id="@+id/verify_account_phone_icon"
+        <TextView
+            android:id="@+id/phonenumber_title_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_verify_phone"
-            />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="50dp"
-            >
-
-            <TextView
-                android:id="@+id/phonenumber_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/phonenumber_title_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/phonenumber_text"
-                android:text="@string/phonenumber_title"
-                android:textColor="@color/transparent_black"
-                android:textSize="14sp" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentBottom="true"
-            android:background="@color/divider_upgrade_account" />
+            android:text="@string/phonenumber_title"
+            android:textColor="@color/transparent_black"
+            android:textSize="16sp" />
 
     </RelativeLayout>
 
@@ -120,7 +90,7 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_rubbish_bin"
+                    android:src="@drawable/ic_remove"
                     android:tint="@color/dark_primary_color" />
 
                 <TextView
@@ -130,7 +100,7 @@
                     android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:text="@string/option_remove_phone_number"
+                    android:text="@string/general_remove"
                     android:textColor="@color/dark_primary_color"
                     android:textSize="16sp" />
             </LinearLayout>

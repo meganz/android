@@ -4,27 +4,20 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import nz.mega.sdk.MegaApiAndroid;
 
 public class PhoneNumberBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
-
-    private String phoneNumber;
 
     private MyAccountFragmentLollipop myAccountFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
-        phoneNumber = api.smsVerifiedPhoneNumber();
         if (getActivity() != null) {
             myAccountFragment = (MyAccountFragmentLollipop) getActivity().getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.MY_ACCOUNT.getTag());
         }
@@ -38,7 +31,6 @@ public class PhoneNumberBottomSheetDialogFragment extends BaseBottomSheetDialogF
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_phonenumber, null);
         mainLinearLayout = contentView.findViewById(R.id.phonenumber_bottom_sheet);
         items_layout = contentView.findViewById(R.id.items_layout);
-        ((TextView) contentView.findViewById(R.id.phonenumber_text)).setText(phoneNumber);
         contentView.findViewById(R.id.modify_phonenumber_layout).setOnClickListener(this);
         contentView.findViewById(R.id.remove_phonenumber_layout).setOnClickListener(this);
         dialog.setContentView(contentView);
