@@ -18,6 +18,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.shape.ShapeAppearanceModel;
 
 import mega.privacy.android.app.R;
 
@@ -68,38 +70,25 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         icSelected.setLayoutParams(icSelectedParams);
     }
 
-    protected void updateThumbnailDisplay(ImageView imageView, CuNode node,
+    protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node,
                                           CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
-        RequestBuilder<Drawable> request = requestManager.load(node.getThumbnail())
+        int strokeWidth, shapeId;
+        if (node.isSelected()) {
+            strokeWidth = itemSizeConfig.getSelectedPadding();
+            shapeId = R.style.GalleryImageShape_Selected;
+        } else {
+            strokeWidth = 0;
+            shapeId = R.style.GalleryImageShape;
+        }
+        imageView.setStrokeWidth(strokeWidth);
+        imageView.setShapeAppearanceModel(
+                ShapeAppearanceModel.builder(imageView.getContext(), shapeId, 0).build()
+        );
+
+        requestManager.load(node.getThumbnail())
+                .placeholder(R.drawable.ic_image_thumbnail)
                 .error(R.drawable.ic_image_thumbnail)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .addListener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        int padding;
-                        if (node.isSelected()) {
-                            padding = itemSizeConfig.getSelectedPadding();
-                            imageView.setBackgroundResource(R.drawable.background_item_grid_selected);
-                        } else {
-                            padding = 0;
-                            imageView.setBackground(null);
-                        }
-                        imageView.setPadding(padding, padding, padding, padding);
-                        return false;
-                    }
-                });
-
-        if (node.isSelected()) {
-            request.transform(new RoundedCorners(itemSizeConfig.getRoundCornerRadius()));
-        } else {
-            request.placeholder(R.drawable.ic_image_thumbnail);
-        }
-
-        request.into(imageView);
+                .into(imageView);
     }
 }
