@@ -30,6 +30,7 @@ public class BroadcastConstants {
     public static final String ACTION_UPDATE_LAST_NAME = "ACTION_UPDATE_LAST_NAME";
     public static final String ACTION_UPDATE_CREDENTIALS = "ACTION_UPDATE_CREDENTIALS";
     public static final String ACTION_LEFT_CHAT = "ACTION_LEFT_CHAT";
+    public static final String ACTION_CLOSE_CHAT_AFTER_IMPORT = "ACTION_CLOSE_CHAT_AFTER_IMPORT";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";

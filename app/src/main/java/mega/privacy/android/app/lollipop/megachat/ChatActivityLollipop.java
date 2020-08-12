@@ -635,24 +635,36 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     };
 
+    private BroadcastReceiver closeChatReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null) return;
+
+            if (intent.getAction().equals(ACTION_CLOSE_CHAT_AFTER_IMPORT)) {
+                finish();
+            }
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
-    public void openMegaLink(String url, boolean isFile){
+    public void openMegaLink(String url, boolean isFile) {
         logDebug("url: " + url + ", isFile: " + isFile);
-        if(isFile){
-            Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
-            openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
-            openFileIntent.setData(Uri.parse(url));
-            startActivity(openFileIntent);
-        }else{
-            Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
-            openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
-            openFolderIntent.setData(Uri.parse(url));
-            startActivity(openFolderIntent);
+        Intent openLink;
+
+        if (isFile) {
+            openLink = new Intent(this, FileLinkActivityLollipop.class);
+            openLink.setAction(ACTION_OPEN_MEGA_LINK);
+        } else {
+            openLink = new Intent(this, FolderLinkActivityLollipop.class);
+            openLink.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
         }
+
+        openLink.putExtra(OPENED_FROM_CHAT, true);
+        openLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        openLink.setData(Uri.parse(url));
+        startActivity(openLink);
     }
 
     public void showMessageInfo(int positionInAdapter){
@@ -750,6 +762,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
         leftChatFilter.addAction(ACTION_LEFT_CHAT);
         registerReceiver(leftChatReceiver, leftChatFilter);
+
+        registerReceiver(closeChatReceiver, new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT));
 
         changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
 
@@ -7437,6 +7451,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
         unregisterReceiver(leftChatReceiver);
+        unregisterReceiver(closeChatReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
