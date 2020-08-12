@@ -1,17 +1,23 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.shape.ShapeAppearanceModel;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import mega.privacy.android.app.R;
 
@@ -62,28 +68,38 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         icSelected.setLayoutParams(icSelectedParams);
     }
 
-    protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node,
-            CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
-        int shapeId = node.isSelected() ? R.style.GalleryImageShape_Selected : R.style.GalleryImageShape;
-        imageView.setShapeAppearanceModel(
-                ShapeAppearanceModel.builder(itemView.getContext(), shapeId, 0).build()
-        );
-
-        requestManager.load(node.getThumbnail())
-                .placeholder(R.drawable.ic_image_thumbnail)
+    protected void updateThumbnailDisplay(ImageView imageView, CuNode node,
+                                          CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
+        RequestBuilder<Drawable> request = requestManager.load(node.getThumbnail())
                 .error(R.drawable.ic_image_thumbnail)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView);
+                .addListener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        return false;
+                    }
 
-        // TODO: setting them could break round corner of ShapeableImageView
-        //int padding = node.isSelected() ? itemSizeConfig.getSelectedPadding() : 0;
-        //imageView.setPadding(padding, padding, padding, padding);
-        //
-        //if (node.isSelected()) {
-        //    imageView.setBackground(ContextCompat.getDrawable(imageView.getContext(),
-        //            R.drawable.background_item_grid_selected));
-        //} else {
-        //    imageView.setBackground(null);
-        //}
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        int padding;
+                        if (node.isSelected()) {
+                            padding = itemSizeConfig.getSelectedPadding();
+                            imageView.setBackgroundResource(R.drawable.background_item_grid_selected);
+                        } else {
+                            padding = 0;
+                            imageView.setBackground(null);
+                        }
+                        imageView.setPadding(padding, padding, padding, padding);
+                        return false;
+                    }
+                });
+
+        if (node.isSelected()) {
+            request.transform(new RoundedCorners(itemSizeConfig.getRoundCornerRadius()));
+        } else {
+            request.placeholder(R.drawable.ic_image_thumbnail);
+        }
+
+        request.into(imageView);
     }
 }
