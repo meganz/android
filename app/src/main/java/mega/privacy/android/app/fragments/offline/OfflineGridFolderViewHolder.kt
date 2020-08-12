@@ -18,6 +18,7 @@ class OfflineGridFolderViewHolder(
             return
         }
 
+        binding.root.visibility = View.VISIBLE
         binding.filename.text = node.node.name
         binding.icon.setImageResource(
             if (node.selected) R.drawable.ic_select_folder else R.drawable.ic_folder_list
@@ -26,7 +27,7 @@ class OfflineGridFolderViewHolder(
         binding.root.background = ContextCompat.getDrawable(
             binding.root.context,
             if (node.selected) R.drawable.background_item_grid_selected
-            else R.drawable.background_item_grid
+            else R.drawable.background_item_grid_new
         )
     }
 

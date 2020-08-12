@@ -16,7 +16,9 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.fragments.offline.OfflineNode.Companion
 import mega.privacy.android.app.repo.MegaNodeRepo
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RxUtil.logErr
@@ -25,13 +27,17 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.util.HashMap
 import java.util.Locale
+import java.util.Stack
 import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
@@ -42,10 +48,12 @@ class OfflineViewModel @ViewModelInject constructor(
     private var historySearchQuery: String? = null
     private var historySearchPath: String? = null
     private var navigationDepthInSearch = 0
+    private val firstVisiblePositionStack = Stack<Int>()
 
     private val openNodeAction = PublishSubject.create<Pair<Int, OfflineNode>>()
     private val openFolderFullscreenAction = PublishSubject.create<String>()
     private val showOptionsPanelAction = PublishSubject.create<MegaOffline>()
+    private val showSortedByAction = PublishSubject.create<Boolean>()
 
     private val _nodes = MutableLiveData<List<OfflineNode>>()
     private val _nodeToOpen = SingleLiveEvent<Pair<Int, OfflineNode>>()
@@ -54,8 +62,10 @@ class OfflineViewModel @ViewModelInject constructor(
     private val _nodeToAnimate = SingleLiveEvent<Pair<Int, OfflineNode>>()
     private val _pathLiveData = SingleLiveEvent<String>()
     private val _submitSearchQuery = SingleLiveEvent<Boolean>()
+    private val _scrollToPositionWhenNavigateOut = SingleLiveEvent<Int>()
     private val _openFolderFullscreen = SingleLiveEvent<String>()
     private val _showOptionsPanel = SingleLiveEvent<MegaOffline>()
+    private val _showSortedBy = SingleLiveEvent<Boolean>()
     private val _urlFileOpenAsUrl = SingleLiveEvent<String>()
     private val _urlFileOpenAsFile = SingleLiveEvent<File>()
 
@@ -72,8 +82,10 @@ class OfflineViewModel @ViewModelInject constructor(
     val nodeToAnimate: LiveData<Pair<Int, OfflineNode>> = _nodeToAnimate
     val pathLiveData: LiveData<String> = _pathLiveData
     val submitSearchQuery: LiveData<Boolean> = _submitSearchQuery
+    val scrollToPositionWhenNavigateOut: LiveData<Int> = _scrollToPositionWhenNavigateOut
     val openFolderFullscreen: LiveData<String> = _openFolderFullscreen
     val showOptionsPanel: LiveData<MegaOffline> = _showOptionsPanel
+    val showSortedBy: LiveData<Boolean> = _showSortedBy
     val urlFileOpenAsUrl: LiveData<String> = _urlFileOpenAsUrl
     val urlFileOpenAsFile: LiveData<File> = _urlFileOpenAsFile
 
@@ -109,51 +121,14 @@ class OfflineViewModel @ViewModelInject constructor(
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
-    }
-
-    fun buildSectionTitle(
-        nodes: List<OfflineNode>,
-        isList: Boolean,
-        spanCount: Int
-    ): Map<Int, String> {
-        val sections = HashMap<Int, String>()
-        var folderCount = 0
-        var fileCount = 0
-        for (node in nodes) {
-            if (node.node.isFolder) {
-                folderCount++
-            } else {
-                fileCount++
-            }
-        }
-
-        placeholderCount = 0
-        val res = getApplication<MegaApplication>().resources
-        if (isList) {
-            sections[0] = res.getString(R.string.general_folders)
-            sections[folderCount] = res.getString(R.string.general_files)
-        } else {
-            if (folderCount > 0) {
-                for (i in 0 until spanCount) {
-                    sections[i] = res.getString(R.string.general_folders)
-                }
-            }
-            if (fileCount > 0) {
-                placeholderCount =
-                    if (folderCount % spanCount == 0) 0 else spanCount - (folderCount % spanCount)
-                if (placeholderCount == 0) {
-                    for (i in 0 until spanCount) {
-                        sections[folderCount + i] = res.getString(R.string.general_files)
-                    }
-                } else {
-                    for (i in 0 until spanCount) {
-                        sections[folderCount + placeholderCount + i] =
-                            res.getString(R.string.general_files)
-                    }
-                }
-            }
-        }
-        return sections
+        add(
+            showSortedByAction.throttleFirst(1, SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    Consumer { _showSortedBy.value = it },
+                    logErr("OfflineViewModel showSortedByAction")
+                )
+        )
     }
 
     fun getSelectedNodes(): List<MegaOffline> {
@@ -172,6 +147,9 @@ class OfflineViewModel @ViewModelInject constructor(
         val nodeList = nodes.value ?: return
 
         for (node in nodeList) {
+            if (node == OfflineNode.HEADER_SORTED_BY || node == Companion.PLACE_HOLDER) {
+                continue
+            }
             node.selected = true
             selectedNodes.put(node.node.id, node.node)
         }
@@ -196,12 +174,14 @@ class OfflineViewModel @ViewModelInject constructor(
         _nodes.value = nodeList
     }
 
-    fun onNodeClicked(position: Int, node: OfflineNode) {
+    fun onNodeClicked(position: Int, node: OfflineNode, firstVisiblePosition: Int) {
         if (selecting) {
             handleSelection(position, node)
         } else {
             val nodeFile = getOfflineFile(getApplication(), node.node)
             if (isFileAvailable(nodeFile) && nodeFile.isDirectory) {
+                firstVisiblePositionStack
+                    .push(if (firstVisiblePosition >= 0) firstVisiblePosition else 0)
                 navigateIn(node.node)
             } else if (isFileAvailable(nodeFile) && nodeFile.isFile) {
                 openNodeAction.onNext(Pair(position, node))
@@ -213,14 +193,20 @@ class OfflineViewModel @ViewModelInject constructor(
         if (!rootFolderOnly) {
             selecting = true
         }
-        onNodeClicked(position, node)
+        onNodeClicked(position, node, INVALID_POSITION)
     }
 
     fun onNodeOptionsClicked(position: Int, node: OfflineNode) {
         if (selecting) {
-            onNodeClicked(position, node)
+            onNodeClicked(position, node, INVALID_POSITION)
         } else {
             showOptionsPanelAction.onNext(node.node)
+        }
+    }
+
+    fun onSortedByClicked() {
+        if (!selecting) {
+            showSortedByAction.onNext(true)
         }
     }
 
@@ -265,9 +251,9 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
-    fun navigateOut(): Int {
+    fun navigateOut(initPath: String): Int {
         // no search action in back stack, should dismiss OfflineFragment
-        if (path == "/" && searchQuery == null) {
+        if (path == initPath && searchQuery == null) {
             return 0
         }
 
@@ -290,7 +276,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 historySearchQuery = null
                 historySearchPath = null
                 navigateTo(path, titleFromPath(path))
-                return 2
+                return 1
             }
         }
 
@@ -298,6 +284,11 @@ class OfflineViewModel @ViewModelInject constructor(
         path = path.substring(0, path.length - 1)
         path = path.substring(0, path.lastIndexOf("/") + 1)
         navigateTo(path, titleFromPath(path))
+
+        if (firstVisiblePositionStack.isNotEmpty()) {
+            _scrollToPositionWhenNavigateOut.value = firstVisiblePositionStack.pop()
+        }
+
         return 2
     }
 
@@ -331,6 +322,17 @@ class OfflineViewModel @ViewModelInject constructor(
     fun setOrder(order: Int) {
         this.order = order
         loadOfflineNodes()
+    }
+
+    fun getOrderDisplay(): String {
+        val resId = when (order) {
+            ORDER_MODIFICATION_ASC -> R.string.sortby_modification_date
+            ORDER_MODIFICATION_DESC -> R.string.sortby_modification_date
+            ORDER_SIZE_ASC -> R.string.sortby_modification_date
+            ORDER_SIZE_DESC -> R.string.sortby_modification_date
+            else -> R.string.sortby_name
+        }
+        return getApplication<MegaApplication>().resources.getString(resId)
     }
 
     fun setSearchQuery(query: String?) {
@@ -412,7 +414,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 }
 
                 if (!isList && gridSpanCount != 0) {
-                    val placeholderCount = if (folderCount % gridSpanCount == 0) {
+                    placeholderCount = if (folderCount % gridSpanCount == 0) {
                         0
                     } else {
                         gridSpanCount - (folderCount % gridSpanCount)
@@ -422,6 +424,11 @@ class OfflineViewModel @ViewModelInject constructor(
                             nodes.add(folderCount + i, OfflineNode.PLACE_HOLDER)
                         }
                     }
+                }
+
+                if (nodes.isNotEmpty() && !rootFolderOnly) {
+                    placeholderCount++
+                    nodes.add(0, OfflineNode.HEADER_SORTED_BY)
                 }
 
                 createThumbnails(nodesWithoutThumbnail)
@@ -474,13 +481,10 @@ class OfflineViewModel @ViewModelInject constructor(
     private fun createThumbnails(nodes: List<MegaOffline>) {
         add(Observable.fromIterable(nodes)
             .subscribeOn(Schedulers.io())
-            .filter {
-                getOfflineFile(getApplication(), it).exists()
-            }
-            .map {
-                createThumbnail(getOfflineFile(getApplication(), it), getThumbnailFile(it))
-            }
-            .throttleFirst(1, SECONDS)
+            .map { Pair(getOfflineFile(getApplication(), it), getThumbnailFile(it)) }
+            .filter { it.first.exists() }
+            .map { createThumbnail(it.first, it.second) }
+            .throttleLatest(1, SECONDS, true)
             .subscribe(Consumer { loadOfflineNodes() }, logErr("createThumbnail"))
         )
     }

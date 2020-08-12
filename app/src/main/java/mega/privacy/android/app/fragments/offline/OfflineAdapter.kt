@@ -14,14 +14,17 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 import mega.privacy.android.app.databinding.OfflineItemListBinding
+import mega.privacy.android.app.databinding.OfflineItemSortedByBinding
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 
 private const val TYPE_LIST = 1
 private const val TYPE_GRID_FOLDER = 2
 private const val TYPE_GRID_FILE = 3
+private const val TYPE_SORTED_BY_HEADER = 4
 
 class OfflineAdapter(
     var isList: Boolean,
+    var sortedBy: String,
     private val listener: OfflineAdapterListener
 ) : RecyclerView.Adapter<OfflineViewHolder>() {
     private val nodes = ArrayList<OfflineNode>()
@@ -134,16 +137,31 @@ class OfflineAdapter(
             TYPE_GRID_FILE -> OfflineGridFileViewHolder(
                 OfflineItemGridFileBinding.inflate(inflater, parent, false)
             )
+            TYPE_SORTED_BY_HEADER -> OfflineSortedByViewHolder(
+                OfflineItemSortedByBinding.inflate(inflater, parent, false), this
+            )
             else -> OfflineListViewHolder(OfflineItemListBinding.inflate(inflater, parent, false))
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when {
+            nodes[position] == OfflineNode.HEADER_SORTED_BY -> TYPE_SORTED_BY_HEADER
             isList -> TYPE_LIST
             nodes[position] == OfflineNode.PLACE_HOLDER
                     || nodes[position].node.isFolder -> TYPE_GRID_FOLDER
             else -> TYPE_GRID_FILE
+        }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return if (nodes[position] == OfflineNode.HEADER_SORTED_BY ||
+            nodes[position] == OfflineNode.PLACE_HOLDER
+        ) {
+            // id for real node should be positive integer, let's use negative for placeholders
+            -position.toLong()
+        } else {
+            nodes[position].node.id.toLong()
         }
     }
 
@@ -162,4 +180,6 @@ interface OfflineAdapterListener {
     fun onNodeLongClicked(position: Int, node: OfflineNode)
 
     fun onOptionsClicked(position: Int, node: OfflineNode)
+
+    fun onSortedByClicked()
 }

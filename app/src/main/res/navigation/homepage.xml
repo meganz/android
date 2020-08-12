@@ -24,5 +24,8 @@
         android:name="rootFolderOnly"
         android:defaultValue="false"
         app:argType="boolean" />
+    <action
+        android:id="@+id/action_homepage_to_fullscreen_offline"
+        app:destination="@id/fullscreen_offline" />
   </fragment>
 </navigation>

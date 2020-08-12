@@ -22,6 +22,7 @@ import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -31,15 +32,13 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
-import mega.privacy.android.app.components.NewHeaderItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
-import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -67,7 +66,6 @@ class OfflineFragment : Fragment() {
     private var managerActivity: ManagerActivityLollipop? = null
     private var recyclerView: RecyclerView? = null
     private var adapter: OfflineAdapter? = null
-    private var itemDecoration: NewHeaderItemDecoration? = null
     private var actionMode: ActionMode? = null
 
     private val receiverUpdatePosition = object : BroadcastReceiver() {
@@ -91,6 +89,11 @@ class OfflineFragment : Fragment() {
             }
         }
     }
+    private val receiverRefreshOffline = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            refreshNodes()
+        }
+    }
 
     private var draggingNodeHandle = INVALID_HANDLE
 
@@ -111,6 +114,17 @@ class OfflineFragment : Fragment() {
         super.onResume()
 
         instanceForDragging = null
+
+        val filter = IntentFilter(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST)
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(receiverRefreshOffline, filter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        LocalBroadcastManager.getInstance(requireContext())
+            .unregisterReceiver(receiverRefreshOffline)
     }
 
     override fun onDestroy() {
@@ -118,9 +132,9 @@ class OfflineFragment : Fragment() {
 
         // TODO: workaround for navigation with ManagerActivity
         if (args.rootFolderOnly) {
-            managerActivity?.pagerOfflineFragmentClosed()
+            managerActivity?.pagerOfflineFragmentClosed(this)
         } else {
-            managerActivity?.fullscreenOfflineFragmentClosed()
+            managerActivity?.fullscreenOfflineFragmentClosed(this)
         }
     }
 
@@ -144,12 +158,16 @@ class OfflineFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.setDisplayParam(
-            args.rootFolderOnly, isList(),
-            if (isList()) 0 else binding.offlineBrowserGrid.spanCount, args.path
-        )
+        setViewModelDisplayParam(args.path)
         setupView()
         observeLiveData()
+    }
+
+    private fun setViewModelDisplayParam(path: String) {
+        viewModel.setDisplayParam(
+            args.rootFolderOnly, isList(),
+            if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path
+        )
     }
 
     override fun onDestroyView() {
@@ -160,21 +178,51 @@ class OfflineFragment : Fragment() {
     }
 
     private fun setupView() {
-        adapter = OfflineAdapter(isList(), object : OfflineAdapterListener {
-            override fun onNodeClicked(position: Int, node: OfflineNode) {
-                viewModel.onNodeClicked(position, node)
-            }
+        adapter =
+            OfflineAdapter(isList(), viewModel.getOrderDisplay(), object : OfflineAdapterListener {
+                override fun onNodeClicked(position: Int, node: OfflineNode) {
+                    var firstVisiblePosition = INVALID_POSITION
+                    if (isList()) {
+                        firstVisiblePosition =
+                            (binding.offlineBrowserList.layoutManager as LinearLayoutManager)
+                                .findFirstCompletelyVisibleItemPosition()
+                    } else {
+                        firstVisiblePosition =
+                            binding.offlineBrowserGrid.findFirstCompletelyVisibleItemPosition()
+                        if (firstVisiblePosition == INVALID_POSITION) {
+                            firstVisiblePosition =
+                                binding.offlineBrowserGrid.findFirstVisibleItemPosition()
+                        }
+                    }
+                    viewModel.onNodeClicked(position, node, firstVisiblePosition)
+                }
 
-            override fun onNodeLongClicked(position: Int, node: OfflineNode) {
-                viewModel.onNodeLongClicked(position, node)
-            }
+                override fun onNodeLongClicked(position: Int, node: OfflineNode) {
+                    viewModel.onNodeLongClicked(position, node)
+                }
 
-            override fun onOptionsClicked(position: Int, node: OfflineNode) {
-                viewModel.onNodeOptionsClicked(position, node)
-            }
-        })
+                override fun onOptionsClicked(position: Int, node: OfflineNode) {
+                    viewModel.onNodeOptionsClicked(position, node)
+                }
+
+                override fun onSortedByClicked() {
+                    viewModel.onSortedByClicked()
+                }
+            })
+        adapter?.setHasStableIds(true)
 
         binding.offlineBrowserList.layoutManager = LinearLayoutManager(context)
+
+        binding.offlineBrowserGrid.layoutManager?.spanSizeLookup = object : SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position == 0) {
+                    binding.offlineBrowserGrid.spanCount
+                } else {
+                    1
+                }
+            }
+        }
+
         setupRecyclerView(binding.offlineBrowserList)
         setupRecyclerView(binding.offlineBrowserGrid)
 
@@ -186,15 +234,6 @@ class OfflineFragment : Fragment() {
             binding.offlineBrowserGrid
         }
         recyclerView?.adapter = adapter
-
-        val decor = NewHeaderItemDecoration(context)
-        if (isList()) {
-            decor.setType(ITEM_VIEW_TYPE_LIST)
-        } else {
-            decor.setType(ITEM_VIEW_TYPE_GRID)
-        }
-        itemDecoration = decor
-        recyclerView?.addItemDecoration(decor)
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.emptyHintImage.setImageResource(drawable.offline_empty_landscape)
@@ -237,13 +276,6 @@ class OfflineFragment : Fragment() {
             binding.emptyHint.isVisible = it.isEmpty()
 
             adapter?.setNodes(it)
-
-            val isList = isList()
-            itemDecoration?.setKeys(
-                viewModel.buildSectionTitle(
-                    it, isList, if (isList) 0 else binding.offlineBrowserGrid.spanCount
-                )
-            )
 
             if (!args.rootFolderOnly) {
                 managerActivity?.updateFullscreenOfflineFragmentOptionMenu(false)
@@ -291,6 +323,9 @@ class OfflineFragment : Fragment() {
         viewModel.showOptionsPanel.observe(viewLifecycleOwner) {
             managerActivity?.showOptionsPanel(it)
         }
+        viewModel.showSortedBy.observe(viewLifecycleOwner) {
+            managerActivity?.showSortOptions(managerActivity, resources.displayMetrics)
+        }
         viewModel.nodeToOpen.observe(viewLifecycleOwner) {
             openNode(it.first, it.second)
         }
@@ -316,6 +351,13 @@ class OfflineFragment : Fragment() {
             rvAdapter.showSelectionAnimation(
                 it.first, it.second, rv.findViewHolderForLayoutPosition(it.first)
             )
+        }
+
+        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner) {
+            val layoutManager = recyclerView?.layoutManager
+            if (layoutManager is LinearLayoutManager) {
+                layoutManager.scrollToPositionWithOffset(it, 0)
+            }
         }
     }
 
@@ -532,6 +574,8 @@ class OfflineFragment : Fragment() {
 
     fun setOrder(order: Int) {
         viewModel.setOrder(order)
+        adapter?.sortedBy = viewModel.getOrderDisplay()
+        adapter?.notifyItemChanged(0)
     }
 
     fun setSearchQuery(query: String?) {
@@ -547,7 +591,7 @@ class OfflineFragment : Fragment() {
     }
 
     fun onBackPressed(): Int {
-        return viewModel.navigateOut()
+        return viewModel.navigateOut(args.path)
     }
 
     fun getItemCount(): Int {
@@ -584,7 +628,6 @@ class OfflineFragment : Fragment() {
             binding.offlineBrowserGrid.isVisible = false
             binding.offlineBrowserGrid.adapter = null
             adapter?.isList = true
-            itemDecoration?.setType(ITEM_VIEW_TYPE_LIST)
 
             binding.offlineBrowserList
         } else {
@@ -593,12 +636,10 @@ class OfflineFragment : Fragment() {
             binding.offlineBrowserList.isVisible = false
             binding.offlineBrowserList.adapter = null
             adapter?.isList = false
-            itemDecoration?.setType(ITEM_VIEW_TYPE_GRID)
 
             binding.offlineBrowserGrid
         }
-        recyclerView?.adapter = adapter
-        adapter?.notifyDataSetChanged()
+        setViewModelDisplayParam(viewModel.path)
     }
 
     private fun setDraggingThumbnailVisibility(

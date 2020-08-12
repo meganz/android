@@ -46,7 +46,7 @@ class OfflineGridFileViewHolder(
         binding.root.background = ContextCompat.getDrawable(
             binding.root.context,
             if (node.selected) R.drawable.background_item_grid_selected
-            else R.drawable.background_item_grid
+            else R.drawable.background_item_grid_new
         )
     }
 

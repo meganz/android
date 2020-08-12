@@ -439,12 +439,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 		emptyTextViewFirst.setText(result);
 
-		String searchString = getSearchString();
-		if (searchString != null) {
-			filterOffline(searchString);
-			return v;
-		}
-
 		mOffList = dbH.findByPath(pathNavigation);
 		orderNodes();
 		return v;
@@ -502,16 +496,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				if (isSearching() && ((ManagerActivityLollipop) context).isOfflineSearchPathEmpty()) {
-					((ManagerActivityLollipop) context).setTextSubmitted();
-				}
-
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";
 
-				if (isSearching()) {
-					((ManagerActivityLollipop) context).addOfflineSearchPath(pathNavigation);
-				}
-				
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				((ManagerActivityLollipop)context).setToolbarTitle();
@@ -816,31 +802,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 
-		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || (pathNavigation.equals("/") && !isSearching())) {
+		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty()) {
 			return 0;
-		}
-
-		if (isSearching()) {
-			((ManagerActivityLollipop) context).removeOfflineSearchPath();
-			String searchPath = getSearchString();
-			if (searchPath != null) {
-				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
-				((ManagerActivityLollipop) context).setToolbarTitle();
-				pathNavigation = ((ManagerActivityLollipop) context).getInitialSearchPath();
-				((ManagerActivityLollipop) context).setPathNavigationOffline(pathNavigation);
-				filterOffline(searchPath);
-				return 1;
-			}
-
-			pathNavigation = ((ManagerActivityLollipop) context).getOfflineSearchPath();
-			if (((ManagerActivityLollipop) context).getOfflineSearchPath().equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
-				((ManagerActivityLollipop) context).removeOfflineSearchPath();
-				((ManagerActivityLollipop) context).setSearchQuery(null);
-			}
-		} else {
-			pathNavigation = pathNavigation.substring(0, pathNavigation.length() - 1);
-			int index = pathNavigation.lastIndexOf("/");
-			pathNavigation = pathNavigation.substring(0, index + 1);
 		}
 
 		((ManagerActivityLollipop) context).setPathNavigationOffline(pathNavigation);
@@ -1136,23 +1099,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 
 			return offline.getPath() + File.separator + offline.getName() + File.separator;
 		}
-	}
-
-	private boolean isSearching() {
-		if (!((ManagerActivityLollipop) context).isOfflineSearchPathEmpty() || ((ManagerActivityLollipop) context).isValidSearchQuery()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public String getSearchString() {
-		String path = ((ManagerActivityLollipop) context).getOfflineSearchPath();
-		if (isSearching() && !((ManagerActivityLollipop) context).isOfflineSearchPathEmpty() && path.contains(OFFLINE_SEARCH_QUERY)) {
-			return path.replace(OFFLINE_SEARCH_QUERY, "");
-		}
-
-		return null;
 	}
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
