@@ -53,4 +53,5 @@ public class BroadcastConstants {
     public static final String UPDATE_SESSION_TERM_CODE = "UPDATE_SESSION_TERM_CODE";
     public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";
+    public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
 }
