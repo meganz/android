@@ -45,9 +45,12 @@
             android:layout_height="@dimen/icon_selected_size"
             android:layout_marginStart="@dimen/icon_selected_margin"
             android:layout_marginTop="@dimen/icon_selected_margin"
+            android:visibility="@{item.selected ? View.VISIBLE : View.GONE}"
             android:src="@drawable/ic_select_folder"
             app:layout_constraintStart_toStartOf="@id/thumbnail"
             app:layout_constraintTop_toTopOf="@id/thumbnail" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
+
+<!--    android:visibility="@{item.selected ? View.VISIBLE : View.GONE}"-->

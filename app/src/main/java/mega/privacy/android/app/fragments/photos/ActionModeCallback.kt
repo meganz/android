@@ -13,63 +13,22 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaShare
 import java.util.*
 import javax.inject.Inject
 
 // ActionMode callback belongs to UI layer, same to the Fragment
-class HomepageActionModeCallback @Inject constructor(
+class ActionModeCallback @Inject constructor(
     @ActivityContext private val context: Context,
     private val viewModel: ActionModeViewModel,
-    private val photosViewModel: PhotosViewModel,
     private val megaApi: MegaApiAndroid
 ) : ActionMode.Callback {
 
     private var mainActivity = context as ManagerActivityLollipop
-
-    private var configItemsFun = fun(menu: Menu) {
-        Log.i("Alex", "defaultConfigActionItems")
-        val selectedNodes = viewModel.selectedNodes.value!!.map { it.node }
-        val control = CloudStorageOptionControlUtil.Control()
-
-        if (selectedNodes.size == 1
-            && megaApi.checkAccess(selectedNodes[0], MegaShare.ACCESS_OWNER).errorCode
-            == MegaError.API_OK
-        ) {
-            if (selectedNodes[0]!!.isExported) {
-                control.manageLink().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-                control.removeLink().isVisible = true
-                Log.i("Alex", "removeLink")
-            } else {
-                control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-            }
-        }
-
-        viewModel.selectedNodes.value?.run {
-            val selectedMegaNodes = map { it.node }
-            control.trash().isVisible = MegaNodeUtil.canMoveToRubbish(selectedMegaNodes)
-
-            photosViewModel.items.value?.let {
-                control.selectAll().isVisible = selectedMegaNodes.size < it[it.size - 1].index + 1
-            }
-        }
-
-        if (selectedNodes.size > 1) {
-            control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-        }
-
-        control.sendToChat().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-        control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-        control.move().isVisible = true
-        control.copy().isVisible = true
-
-        menu.findItem(R.id.cab_menu_send_to_chat).icon = Util.mutateIconSecondary(
-            context, R.drawable.ic_send_to_contact,
-            R.color.white
-        )
-
-        CloudStorageOptionControlUtil.applyControl(menu, control)
-    }
+    var nodeCount = 0
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         val selectedNodes = viewModel.selectedNodes.value!!.map { it.node }
@@ -131,7 +90,10 @@ class HomepageActionModeCallback @Inject constructor(
             inflater.inflate(R.menu.cloud_storage_action, menu)
         }
 
-        Log.i("Alex", "onCreateActionMode")
+        Util.changeStatusBarColor(
+            context, mainActivity.window,
+            R.color.accentColorDark
+        )
 
         mainActivity.apply {
             setDrawerLockMode(true)
@@ -142,21 +104,59 @@ class HomepageActionModeCallback @Inject constructor(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        menu?.let {
-            configItemsFun(menu)
+        val selectedNodes = viewModel.selectedNodes.value!!.map { it.node }
+        val control = CloudStorageOptionControlUtil.Control()
+
+        if (selectedNodes.size == 1
+            && megaApi.checkAccess(selectedNodes[0], MegaShare.ACCESS_OWNER).errorCode
+            == MegaError.API_OK
+        ) {
+            if (selectedNodes[0]!!.isExported) {
+                control.manageLink().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                control.removeLink().isVisible = true
+            } else {
+                control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+            }
         }
+
+        viewModel.selectedNodes.value?.run {
+            val selectedMegaNodes = map { it.node }
+            control.trash().isVisible = MegaNodeUtil.canMoveToRubbish(selectedMegaNodes)
+            control.selectAll().isVisible = selectedMegaNodes.size < nodeCount
+        }
+
+        if (selectedNodes.size > 1) {
+            control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+        }
+
+        control.sendToChat().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+        control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+        control.move().isVisible = true
+        control.copy().isVisible = true
+
+        menu?.findItem(R.id.cab_menu_send_to_chat)?.icon = Util.mutateIconSecondary(
+            context, R.drawable.ic_send_to_contact,
+            R.color.white
+        )
+
+        CloudStorageOptionControlUtil.applyControl(menu, control)
 
         return true
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         viewModel.clearSelection()
+
+        Util.changeStatusBarColor(
+            context, mainActivity.window,
+            R.color.black
+        )
+
         mainActivity.apply {
+            setDrawerLockMode(false)
             changeActionBarElevation(false)
         }
-    }
 
-    fun setConfigItemsFun(function: (menu: Menu) -> Unit) {
-        configItemsFun = function
+        viewModel.actionModeDestroy()
     }
 }

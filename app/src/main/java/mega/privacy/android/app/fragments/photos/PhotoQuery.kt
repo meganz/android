@@ -13,7 +13,6 @@ data class PhotoQuery(var order: Int = MegaApiJava.ORDER_NONE, var searchDate: L
         if (!searchDate.contentEquals(other.searchDate)) return false
 
         return true
-        return false
     }
 
     override fun hashCode(): Int {

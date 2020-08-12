@@ -92,7 +92,9 @@ class PhotosRepository @Inject constructor(
                         // PhotosGridAdapter's areContentsTheSame will be an identical object,
                         // then the item wouldn't be refreshed
                         photoNodesMap[it.nodeHandle]?.apply {
-                            photoNodesMap[it.nodeHandle] = copy(thumbnail = thumbFile.absoluteFile)
+//                            photoNodesMap[it.nodeHandle] = copy(thumbnail = thumbFile.absoluteFile)
+                           thumbnail = thumbFile.absoluteFile
+                            uiDirty = true
                         }
                     }
 
@@ -122,8 +124,9 @@ class PhotosRepository @Inject constructor(
     private fun getPhotoNodes() {
         var lastModifyDate: LocalDate? = null
         var mapKeyTitle = Long.MIN_VALUE
+        var index = 0
 
-        for ((index, node) in getMegaNodesOfPhotos().withIndex()) {
+        for ((_, node) in getMegaNodesOfPhotos().withIndex()) {
             val thumbnail = getThumbnail(node)
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
@@ -135,13 +138,13 @@ class PhotosRepository @Inject constructor(
             ) {
                 lastModifyDate = modifyDate
                 photoNodesMap[mapKeyTitle++] =
-                    PhotoNode(PhotoNode.TYPE_TITLE, null, -1, dateString, null, false)
+                    PhotoNode(PhotoNode.TYPE_TITLE, null, index++, dateString, null, false)
             }
 
             photoNodesMap[node.handle] = PhotoNode(
                 PhotoNode.TYPE_PHOTO,
                 node,
-                index,
+                index++,
                 dateString,
                 thumbnail,
                 selectedNodes.containsKey(node.handle)

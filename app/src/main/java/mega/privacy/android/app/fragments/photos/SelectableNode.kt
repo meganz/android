@@ -9,4 +9,5 @@ interface SelectableNode {
     val modifiedDate: String
     var thumbnail: File?
     var selected: Boolean
+    var uiDirty: Boolean
 }

@@ -18,11 +18,6 @@ class PhotosViewModel @Inject constructor(
     val items: LiveData<List<PhotoNode>> = Transformations.switchMap(_query) { query ->
         viewModelScope.launch {
             photosRepository.getPhotos(query)
-//            if (result is Result.Success) {
-//                _items.value = result.data
-//            } else {
-//                logError(result.toString())
-//            }
         }
 
         photosRepository.photoNodes
@@ -42,9 +37,4 @@ class PhotosViewModel @Inject constructor(
         Log.i("Alex", "onClick:$this")
         // TODO: Navigate to Photo Viewer
     }
-//
-//    fun onPhotoLongClick(): Boolean {
-//        Log.i("Alex", "onClick:$this")
-//        return true
-//    }
 }

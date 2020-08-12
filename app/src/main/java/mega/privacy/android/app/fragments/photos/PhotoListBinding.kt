@@ -1,21 +1,11 @@
 package mega.privacy.android.app.fragments.photos
 
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import okhttp3.Dispatcher
 import java.io.File
 
 @BindingAdapter("app:items")
@@ -44,7 +34,7 @@ fun setThumbnail(imageView: ImageView, file: File?) {
         requestBuilder = requestBuilder.transform(CenterCrop())
 //        }
         requestBuilder
-            .transition(DrawableTransitionOptions.withCrossFade())
+//            .transition(DrawableTransitionOptions.withCrossFade())
             .into(this)
 
 

@@ -18,8 +18,7 @@ import javax.inject.Inject
 class PhotosGridAdapter @Inject constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
-) :
-    ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()),
+) : ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
     private var itemSizeConfig: CuItemSizeConfig? = null
@@ -27,7 +26,11 @@ class PhotosGridAdapter @Inject constructor(
     class PhotoViewHolder(private val binding: ViewDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(viewModel: PhotosViewModel, actionModeViewModel : ActionModeViewModel, item: PhotoNode) {
+        fun bind(
+            viewModel: PhotosViewModel,
+            actionModeViewModel: ActionModeViewModel,
+            item: PhotoNode
+        ) {
             binding.apply {
                 if (this is ItemPhotoBinding) {
                     this.viewModel = viewModel
@@ -46,6 +49,7 @@ class PhotosGridAdapter @Inject constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
+
         val binding = when (viewType) {
             PhotoNode.TYPE_TITLE ->
                 ItemPhotosTitleBinding.inflate(
@@ -98,7 +102,13 @@ class PhotosGridAdapter @Inject constructor(
         }
 
         override fun areContentsTheSame(oldItem: PhotoNode, newItem: PhotoNode): Boolean {
-            return oldItem.thumbnail == newItem.thumbnail
+            if (newItem.uiDirty) {
+                newItem.uiDirty = false
+                return false
+            }
+
+            return true
+//            return oldItem.thumbnail == newItem.thumbnail
         }
     }
 
