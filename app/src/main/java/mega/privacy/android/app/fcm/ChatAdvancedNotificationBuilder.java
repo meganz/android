@@ -38,7 +38,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -956,13 +955,14 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
+        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //Create a channel for android Oreo or higher
             NotificationChannel channel = new NotificationChannel(notificationChannelIdIncomingCall, notificationChannelNameIncomingCall, NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("");
             channel.enableLights(true);
             channel.enableVibration(true);
-            channel.setShowBadge(true);
 
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -972,17 +972,18 @@ public final class ChatAdvancedNotificationBuilder {
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setAutoCancel(true)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
                     .setCustomContentView(collapsedViews)
                     .setCustomBigContentView(expandedView)
-                    .setContentIntent(getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1))
+                    .setContentIntent(callScreen)
+                    .setFullScreenIntent(callScreen, true)
+                    .setAutoCancel(true)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(patternIncomingCall)
-                    .setOngoing(true)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
+
             notify(notificationId, notificationBuilderO.build());
         } else {
             long[] pattern = {0, 1000};
@@ -994,11 +995,11 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
                     .setCustomContentView(collapsedViews)
                     .setCustomBigContentView(expandedView)
-                    .setContentIntent(getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1))
-                    .setDeleteIntent(intentIgnore)
+                    .setContentIntent(callScreen)
+                    .setFullScreenIntent(callScreen, true)
                     .setAutoCancel(true)
+                    .setDeleteIntent(intentIgnore)
                     .setVibrate(pattern)
-                    .setOngoing(true)
                     .setSound(defaultSoundUri)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
@@ -1083,6 +1084,7 @@ public final class ChatAdvancedNotificationBuilder {
         expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join));
         expandedView.setOnClickPendingIntent(R.id.decline_button_layout, pendingIntentIgnore);
         expandedView.setOnClickPendingIntent(R.id.answer_button_layout, pendingIntentAnswer);
+        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             //Create a channel for android Oreo or higher
@@ -1090,26 +1092,24 @@ public final class ChatAdvancedNotificationBuilder {
             channel.setDescription("");
             channel.enableLights(true);
             channel.enableVibration(true);
-            channel.setShowBadge(true);
 
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
-
             notificationManager.createNotificationChannel(channel);
 
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setAutoCancel(true)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setCustomHeadsUpContentView(expandedView)
                     .setCustomContentView(collapsedViews)
                     .setCustomBigContentView(expandedView)
-                    .setContentIntent(getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1))
+                    .setContentIntent(callScreen)
+                    .setFullScreenIntent(callScreen, true)
+                    .setAutoCancel(true)
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(patternIncomingCall)
-                    .setOngoing(true)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -1124,12 +1124,12 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomHeadsUpContentView(expandedView)
                     .setCustomContentView(collapsedViews)
                     .setCustomBigContentView(expandedView)
-                    .setContentIntent(getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1))
-                    .setDeleteIntent(pendingIntentIgnore)
+                    .setContentIntent(callScreen)
+                    .setFullScreenIntent(callScreen, true)
                     .setAutoCancel(true)
+                    .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
-                    .setOngoing(true)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
@@ -1141,7 +1141,6 @@ public final class ChatAdvancedNotificationBuilder {
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
-
             notify(notificationId, notificationBuilder.build());
         }
     }
@@ -1246,7 +1245,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void showMissedCallNotification(long chatId, long chatCallId) {
-        logDebug("***********+ MISSED CALL Chat ID: " + chatId + ", Call ID: " + chatCallId);
+        logDebug("MISSED CALL Chat ID: " + chatId + ", Call ID: " + chatCallId);
 
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
         String notificationContent;
