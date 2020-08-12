@@ -41,17 +41,22 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         return true;
     }
 
-    static void setViewSize(View grid, View icSelected, CuItemSizeConfig itemSizeConfig) {
+    static void setViewSize(View grid, View icSelected, ShapeableImageView imageView, CuItemSizeConfig itemSizeConfig) {
         GridLayoutManager.LayoutParams params =
                 (GridLayoutManager.LayoutParams) grid.getLayoutParams();
         params.width = itemSizeConfig.getGridSize();
         params.height = itemSizeConfig.getGridSize();
         grid.setLayoutParams(params);
 
+        int imageViewPadding = itemSizeConfig.getSelectedPadding();
+        imageView.setPadding(imageViewPadding, imageViewPadding, imageViewPadding, imageViewPadding);
+
         FrameLayout.LayoutParams icSelectedParams =
                 (FrameLayout.LayoutParams) icSelected.getLayoutParams();
         icSelectedParams.width = itemSizeConfig.getIcSelectedSize();
         icSelectedParams.height = itemSizeConfig.getIcSelectedSize();
+        icSelectedParams.topMargin = itemSizeConfig.getIcSelectedMargin();
+        icSelectedParams.setMarginStart(itemSizeConfig.getIcSelectedMargin());
         icSelected.setLayoutParams(icSelectedParams);
     }
 

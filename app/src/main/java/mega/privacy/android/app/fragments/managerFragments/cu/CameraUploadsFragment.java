@@ -481,17 +481,18 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
         });
 
-        int gridMargin = getResources().getDimensionPixelSize(
-                smallGrid ? R.dimen.cu_fragment_small_grid_margin
-                        : R.dimen.cu_fragment_large_grid_margin);
-        int gridWidth = outMetrics.widthPixels / spanCount - gridMargin * 2;
+        int gridWidth = outMetrics.widthPixels / spanCount;
         int icSelectedWidth = getResources().getDimensionPixelSize(
                 smallGrid ? R.dimen.cu_fragment_ic_selected_size_small
                         : R.dimen.cu_fragment_ic_selected_size_large);
-        int selectedPadding =
-                getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding);
-        CuItemSizeConfig itemSizeConfig =
-                new CuItemSizeConfig(smallGrid, gridWidth, icSelectedWidth, selectedPadding);
+        int selectedPadding = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_selected_padding_small
+                        : R.dimen.cu_fragment_selected_padding_large);
+        int icSelectedMargin = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_ic_selected_margin_small
+                        : R.dimen.cu_fragment_ic_selected_margin_large);
+        CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth, icSelectedWidth,
+                selectedPadding, icSelectedMargin);
 
         mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig, Glide.with(this));
         mAdapter.setHasStableIds(true);

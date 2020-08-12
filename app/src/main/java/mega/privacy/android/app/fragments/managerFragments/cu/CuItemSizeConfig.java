@@ -8,12 +8,14 @@ public class CuItemSizeConfig {
     private final int mGridSize;
     private final int mIcSelectedSize;
     private final int mSelectedPadding;
+    private final int mIcSelectedMargin;
 
-    public CuItemSizeConfig(boolean smallGrid, int gridSize, int icSelectedSize, int selectedPadding) {
+    public CuItemSizeConfig(boolean smallGrid, int gridSize, int icSelectedSize, int selectedPadding, int icSelectedMargin) {
         mSmallGrid = smallGrid;
         mGridSize = gridSize;
         mIcSelectedSize = icSelectedSize;
         mSelectedPadding = selectedPadding;
+        mIcSelectedMargin = icSelectedMargin;
     }
 
     public boolean isSmallGrid() {
@@ -30,5 +32,9 @@ public class CuItemSizeConfig {
 
     public int getSelectedPadding() {
         return mSelectedPadding;
+    }
+
+    public int getIcSelectedMargin() {
+        return mIcSelectedMargin;
     }
 }

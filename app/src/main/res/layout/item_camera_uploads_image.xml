@@ -10,7 +10,7 @@
       android:id="@+id/thumbnail"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:padding="@dimen/cu_fragment_selected_padding"
+      android:padding="@dimen/cu_fragment_selected_padding_large"
       android:scaleType="centerCrop"
       app:strokeColor="@color/accentColor"
       />
@@ -19,7 +19,8 @@
       android:id="@+id/ic_selected"
       android:layout_width="23dp"
       android:layout_height="23dp"
-      android:layout_margin="9dp"
+      android:layout_marginStart="@dimen/cu_fragment_ic_selected_margin_large"
+      android:layout_marginTop="@dimen/cu_fragment_ic_selected_margin_large"
       android:src="@drawable/ic_select_folder"
       android:visibility="gone"
       tools:visibility="visible"
