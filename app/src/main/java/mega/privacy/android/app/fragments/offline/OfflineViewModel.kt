@@ -16,7 +16,6 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.fragments.offline.OfflineNode.Companion
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
@@ -146,9 +145,12 @@ class OfflineViewModel @ViewModelInject constructor(
     fun selectAll() {
         val nodeList = nodes.value ?: return
 
-        for (node in nodeList) {
-            if (node == OfflineNode.HEADER_SORTED_BY || node == Companion.PLACE_HOLDER) {
+        for ((position, node) in nodeList.withIndex()) {
+            if (node == OfflineNode.HEADER_SORTED_BY || node == OfflineNode.PLACE_HOLDER) {
                 continue
+            }
+            if (!node.selected) {
+                _nodeToAnimate.value = Pair(position, node)
             }
             node.selected = true
             selectedNodes.put(node.node.id, node.node)
@@ -168,7 +170,10 @@ class OfflineViewModel @ViewModelInject constructor(
         selectedNodes.clear()
 
         val nodeList = nodes.value ?: return
-        for (node in nodeList) {
+        for ((position, node) in nodeList.withIndex()) {
+            if (node.selected) {
+                _nodeToAnimate.value = Pair(position, node)
+            }
             node.selected = false
         }
         _nodes.value = nodeList
