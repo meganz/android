@@ -17,7 +17,6 @@ public class BroadcastConstants {
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
-    public static final String ACTION_EVENT_ACCOUNT_BLOCKED = "ACTION_EVENT_ACCOUNT_BLOCKED";
     public static final String ACTION_CALL_STATUS_UPDATE = "ACTION_CALL_STATUS_UPDATE";
     public static final String ACTION_CHANGE_LOCAL_AVFLAGS = "ACTION_CHANGE_LOCAL_AVFLAGS";
     public static final String ACTION_CHANGE_COMPOSITION = "ACTION_CHANGE_COMPOSITION";

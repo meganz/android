@@ -70,6 +70,10 @@ public class Constants {
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
+    public static final String RESULT = "RESULT";
+    public static final String ACCOUNT_BLOCKED_STRING = "ACCOUNT_BLOCKED_STRING";
+    public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
+
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
     //MultipleRequestListener options
@@ -588,6 +592,11 @@ public class Constants {
     public static final String[] WEB_SESSION_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#sitetransfer!.+$",
             "^https://mega\\.nz/#sitetransfer!.+$"
+    };
+
+    public static final String[] BUSINESS_INVITE_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#businessinvite.+$",
+            "^https://mega\\.nz/#businessinvite.+$"
     };
 
     //Types of blocked accounts

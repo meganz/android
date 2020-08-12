@@ -2722,7 +2722,8 @@
     <string name="user_label" context="Business user role">User</string>
     <string name="status_label" context="General label to show the status of something or someone">Status</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Active</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grace period</string>
+    <string name="payment_required_label" context="Business account status. Payment is overdue, but the account still active in grace period">Payment required</string>
+    <string name="payment_overdue_label" context="Business expired account Overdue payment page header.">Payment overdue</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available from a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Usage</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Storage usage details</string>
@@ -2807,6 +2808,9 @@
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
+    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support@mega.nz</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
 
