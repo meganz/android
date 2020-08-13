@@ -16622,6 +16622,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return true;
 	}
 
+    public void homepageToSearch() {
+        selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
+        searchMenuItem.expandActionView();
+    }
 
 	public String getSearchQuery() {
 		return searchQuery;

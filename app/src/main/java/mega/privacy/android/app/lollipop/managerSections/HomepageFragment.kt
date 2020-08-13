@@ -99,6 +99,11 @@ class HomepageFragment : Fragment() {
 
         searchInputView.setAvatarClickListener(
             OnClickListener { (activity as ManagerActivityLollipop).showMyAccount() })
+
+        searchInputView.setOnSearchInputClickListener(
+            OnClickListener {
+                (activity as ManagerActivityLollipop).homepageToSearch()
+            })
     }
 
     private fun setupBottomSheetUI() {
