@@ -42,13 +42,12 @@ public class PhoneNumberBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.modify_phonenumber_layout:
-                dismiss();
                 myAccountFragment.showConfirmRemovePhoneNumberDialog(true);
                 break;
             case R.id.remove_phonenumber_layout:
-                dismiss();
                 myAccountFragment.showConfirmRemovePhoneNumberDialog(false);
                 break;
         }
+        setStateBottomSheetBehaviorHidden();
     }
 }

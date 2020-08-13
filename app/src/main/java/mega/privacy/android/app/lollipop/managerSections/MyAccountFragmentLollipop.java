@@ -737,15 +737,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
             case R.id.add_phone_number:{
                 if (canVoluntaryVerifyPhoneNumber()) {
-                    Intent intent = new Intent(context, SMSVerificationActivity.class);
-                    startActivity(intent);
-                } else {
-                    if (!isBottomSheetDialogShown(phoneNumberBottomSheet)) {
-                        if(getActivity() != null) {
-                            phoneNumberBottomSheet = new PhoneNumberBottomSheetDialogFragment();
-                            phoneNumberBottomSheet.show(getActivity().getSupportFragmentManager(), phoneNumberBottomSheet.getTag());
-                        }
-                    }
+                    startActivity(new Intent(context, SMSVerificationActivity.class));
+                } else if (!isBottomSheetDialogShown(phoneNumberBottomSheet) && getActivity() != null) {
+                    phoneNumberBottomSheet = new PhoneNumberBottomSheetDialogFragment();
+                    phoneNumberBottomSheet.show(getActivity().getSupportFragmentManager(), phoneNumberBottomSheet.getTag());
                 }
                 break;
             }
@@ -1026,11 +1021,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context).showAddPhoneNumberInMenu();
                 }
-                showSnackbar(context, getString(R.string.remove_phone_number_success));
+                if (isModify) {
+                    startActivity(new Intent(context, SMSVerificationActivity.class));
+                } else {
+                    showSnackbar(context, getString(R.string.remove_phone_number_success));
+                }
             }
         } else {
-            // Allow to retry when refresh data failed.
-            addPhoneNumber.setClickable(true);
             showSnackbar(context, getString(R.string.remove_phone_number_fail));
             logWarning("Get user data for updating phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
         }
@@ -1043,12 +1040,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
           but user data hasn't refreshed successfully need to refresh user data again.
         */
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-            if (isModify) {
-                startActivity(new Intent(context, SMSVerificationActivity.class));
-            } else {
-                // Have to getUserData to refresh, otherwise, phone number remains previous value.
-                megaApi.getUserData(new GetUserDataListener(context, this));
-            }
+            // Have to getUserData to refresh, otherwise, phone number remains previous value.
+            megaApi.getUserData(new GetUserDataListener(context, this));
         } else {
             addPhoneNumber.setClickable(true);
             showSnackbar(context, getString(R.string.remove_phone_number_fail));
