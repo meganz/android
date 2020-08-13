@@ -20,7 +20,7 @@ class CuImageViewHolder extends CuViewHolder {
         mBinding = binding;
         mItemSizeConfig = itemSizeConfig;
 
-        setViewSize(binding.getRoot(), binding.icSelected, itemSizeConfig);
+        setViewSize(binding.getRoot(), binding.icSelected, binding.thumbnail, itemSizeConfig);
     }
 
     @Override protected void bind(CuNode node, RequestManager requestManager) {

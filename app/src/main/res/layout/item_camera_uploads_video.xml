@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="110dp"
     android:layout_height="110dp"
-    android:layout_margin="2dp"
     >
 
   <com.google.android.material.imageview.ShapeableImageView
       android:id="@+id/thumbnail"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:padding="@dimen/cu_fragment_selected_padding_large"
       android:scaleType="centerCrop"
-      app:shapeAppearance="@style/GalleryImageShape"
+      app:strokeColor="@color/accentColor"
       />
 
   <FrameLayout
@@ -20,6 +20,7 @@
       android:layout_width="match_parent"
       android:layout_height="55dp"
       android:layout_gravity="bottom"
+      android:layout_margin="2dp"
       tools:background="@drawable/gradient_cam_uploads"
       >
     <ImageView
@@ -46,8 +47,8 @@
       android:id="@+id/ic_selected"
       android:layout_width="23dp"
       android:layout_height="23dp"
-      android:layout_marginStart="7dp"
-      android:layout_marginTop="7dp"
+      android:layout_marginStart="@dimen/cu_fragment_ic_selected_margin_large"
+      android:layout_marginTop="@dimen/cu_fragment_ic_selected_margin_large"
       android:src="@drawable/ic_select_folder"
       android:visibility="gone"
       tools:visibility="visible"

@@ -4,7 +4,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,16 +41,15 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         return true;
     }
 
-    static void setViewSize(View grid, View icSelected, CuItemSizeConfig itemSizeConfig) {
+    static void setViewSize(View grid, View icSelected, ShapeableImageView imageView, CuItemSizeConfig itemSizeConfig) {
         GridLayoutManager.LayoutParams params =
                 (GridLayoutManager.LayoutParams) grid.getLayoutParams();
         params.width = itemSizeConfig.getGridSize();
         params.height = itemSizeConfig.getGridSize();
-        params.topMargin = itemSizeConfig.getGridMargin();
-        params.bottomMargin = itemSizeConfig.getGridMargin();
-        params.setMarginStart(itemSizeConfig.getGridMargin());
-        params.setMarginEnd(itemSizeConfig.getGridMargin());
         grid.setLayoutParams(params);
+
+        int imageViewPadding = itemSizeConfig.getSelectedPadding();
+        imageView.setPadding(imageViewPadding, imageViewPadding, imageViewPadding, imageViewPadding);
 
         FrameLayout.LayoutParams icSelectedParams =
                 (FrameLayout.LayoutParams) icSelected.getLayoutParams();
@@ -63,10 +61,18 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
     }
 
     protected void updateThumbnailDisplay(ShapeableImageView imageView, CuNode node,
-            CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
-        int shapeId = node.isSelected() ? R.style.GalleryImageShape_Selected : R.style.GalleryImageShape;
+                                          CuItemSizeConfig itemSizeConfig, RequestManager requestManager) {
+        int strokeWidth, shapeId;
+        if (node.isSelected()) {
+            strokeWidth = itemSizeConfig.getSelectedPadding();
+            shapeId = R.style.GalleryImageShape_Selected;
+        } else {
+            strokeWidth = 0;
+            shapeId = R.style.GalleryImageShape;
+        }
+        imageView.setStrokeWidth(strokeWidth);
         imageView.setShapeAppearanceModel(
-                ShapeAppearanceModel.builder(itemView.getContext(), shapeId, 0).build()
+                ShapeAppearanceModel.builder(imageView.getContext(), shapeId, 0).build()
         );
 
         requestManager.load(node.getThumbnail())
@@ -74,16 +80,5 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
                 .error(R.drawable.ic_image_thumbnail)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView);
-
-        // TODO: setting them could break round corner of ShapeableImageView
-        //int padding = node.isSelected() ? itemSizeConfig.getSelectedPadding() : 0;
-        //imageView.setPadding(padding, padding, padding, padding);
-        //
-        //if (node.isSelected()) {
-        //    imageView.setBackground(ContextCompat.getDrawable(imageView.getContext(),
-        //            R.drawable.background_item_grid_selected));
-        //} else {
-        //    imageView.setBackground(null);
-        //}
     }
 }

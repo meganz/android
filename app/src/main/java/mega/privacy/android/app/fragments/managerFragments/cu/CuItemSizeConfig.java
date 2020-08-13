@@ -6,21 +6,16 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 public class CuItemSizeConfig {
     private final boolean mSmallGrid;
     private final int mGridSize;
-    private final int mGridMargin;
     private final int mIcSelectedSize;
-    private final int mIcSelectedMargin;
-    private final int mRoundCornerRadius;
     private final int mSelectedPadding;
+    private final int mIcSelectedMargin;
 
-    public CuItemSizeConfig(boolean smallGrid, int gridSize, int gridMargin, int icSelectedSize,
-            int icSelectedMargin, int roundCornerRadius, int selectedPadding) {
+    public CuItemSizeConfig(boolean smallGrid, int gridSize, int icSelectedSize, int selectedPadding, int icSelectedMargin) {
         mSmallGrid = smallGrid;
         mGridSize = gridSize;
-        mGridMargin = gridMargin;
         mIcSelectedSize = icSelectedSize;
-        mIcSelectedMargin = icSelectedMargin;
-        mRoundCornerRadius = roundCornerRadius;
         mSelectedPadding = selectedPadding;
+        mIcSelectedMargin = icSelectedMargin;
     }
 
     public boolean isSmallGrid() {
@@ -31,23 +26,15 @@ public class CuItemSizeConfig {
         return mGridSize;
     }
 
-    public int getGridMargin() {
-        return mGridMargin;
-    }
-
     public int getIcSelectedSize() {
         return mIcSelectedSize;
     }
 
-    public int getIcSelectedMargin() {
-        return mIcSelectedMargin;
-    }
-
-    public int getRoundCornerRadius() {
-        return mRoundCornerRadius;
-    }
-
     public int getSelectedPadding() {
         return mSelectedPadding;
+    }
+
+    public int getIcSelectedMargin() {
+        return mIcSelectedMargin;
     }
 }
