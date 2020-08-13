@@ -58,4 +58,6 @@ interface OfflineAdapterListener {
     fun onNodeClicked(position: Int, node: OfflineNode)
 
     fun onNodeLongClicked(position: Int, node: OfflineNode)
+
+    fun onOptionsClicked(position: Int, node: OfflineNode)
 }

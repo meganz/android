@@ -39,12 +39,13 @@ class OfflineViewModel @ViewModelInject constructor(
     private val _nodes = MutableLiveData<List<OfflineNode>>()
     private val openNodeAction: Subject<Pair<Int, OfflineNode>> =
         PublishSubject.create<Pair<Int, OfflineNode>>()
-    private val _nodeToOpen: MutableLiveData<Pair<Int, OfflineNode>> = MutableLiveData()
+    private val _nodeToOpen = SingleLiveEvent<Pair<Int, OfflineNode>>()
     private val _actionBarTitle = MutableLiveData<String>()
-    private val _actionMode = MutableLiveData<Boolean>()
-    private val _nodeToAnimate: MutableLiveData<Pair<Int, OfflineNode>> = MutableLiveData()
-    private val _pathLiveData: SingleLiveEvent<String> = SingleLiveEvent()
-    private val _openFolderFullscreen: SingleLiveEvent<String> = SingleLiveEvent()
+    private val _actionMode = SingleLiveEvent<Boolean>()
+    private val _nodeToAnimate = SingleLiveEvent<Pair<Int, OfflineNode>>()
+    private val _pathLiveData = SingleLiveEvent<String>()
+    private val _openFolderFullscreen = SingleLiveEvent<String>()
+    private val _showOptionsPanel = SingleLiveEvent<MegaOffline>()
 
     private val selectedNodes: SparseArrayCompat<MegaOffline> = SparseArrayCompat(5)
     private var rootFolderOnly = false
@@ -58,6 +59,7 @@ class OfflineViewModel @ViewModelInject constructor(
     val nodeToAnimate: LiveData<Pair<Int, OfflineNode>> = _nodeToAnimate
     val pathLiveData: LiveData<String> = _pathLiveData
     val openFolderFullscreen: LiveData<String> = _openFolderFullscreen
+    val showOptionsPanel: LiveData<MegaOffline> = _showOptionsPanel
 
     var path = "/"
         private set
@@ -120,13 +122,6 @@ class OfflineViewModel @ViewModelInject constructor(
         return sections
     }
 
-    fun onNodeLongClicked(position: Int, node: OfflineNode) {
-        if (!rootFolderOnly) {
-            selecting = true
-        }
-        onNodeClicked(position, node)
-    }
-
     fun onNodeClicked(position: Int, node: OfflineNode) {
         if (selecting) {
             handleSelection(position, node)
@@ -137,6 +132,21 @@ class OfflineViewModel @ViewModelInject constructor(
             } else if (isFileAvailable(nodeFile) && nodeFile.isFile) {
                 _nodeToOpen.value = Pair(position, node)
             }
+        }
+    }
+
+    fun onNodeLongClicked(position: Int, node: OfflineNode) {
+        if (!rootFolderOnly) {
+            selecting = true
+        }
+        onNodeClicked(position, node)
+    }
+
+    fun onNodeOptionsClicked(position: Int, node: OfflineNode) {
+        if (selecting) {
+            onNodeClicked(position, node)
+        } else {
+            _showOptionsPanel.value = node.node
         }
     }
 

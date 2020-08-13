@@ -4,7 +4,6 @@
 		android:layout_height="219dp"
 		android:layout_margin="2dp"
 		android:background="@drawable/background_item_grid_new"
-		android:descendantFocusability="blocksDescendants"
 		>
 	<ImageView
 			android:id="@+id/thumbnail"
@@ -29,6 +28,7 @@
 			android:background="@color/divider_upgrade_account"
 			/>
 	<FrameLayout
+			android:id="@+id/filename_container"
 			android:layout_width="match_parent"
 			android:layout_height="47dp"
 			android:layout_marginTop="172dp"
@@ -47,11 +47,11 @@
 				tools:text="name"
 				/>
 		<ImageButton
-				android:id="@+id/three_dots"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="end|center_vertical"
 				android:background="@null"
+				android:clickable="false"
 				android:src="@drawable/ic_dots_vertical_grey"
 				/>
 	</FrameLayout>

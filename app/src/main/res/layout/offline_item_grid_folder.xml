@@ -4,7 +4,6 @@
 		android:layout_height="56dp"
 		android:layout_margin="2dp"
 		android:background="@drawable/background_item_grid_new"
-		android:descendantFocusability="blocksDescendants"
 		android:padding="1dp"
 		>
 	<ImageView

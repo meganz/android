@@ -99,6 +99,10 @@ class OfflineFragment : Fragment() {
             override fun onNodeLongClicked(position: Int, node: OfflineNode) {
                 viewModel.onNodeLongClicked(position, node)
             }
+
+            override fun onOptionsClicked(position: Int, node: OfflineNode) {
+                viewModel.onNodeOptionsClicked(position, node)
+            }
         })
         rv.adapter = adapter
         rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
@@ -155,6 +159,10 @@ class OfflineFragment : Fragment() {
         }
         viewModel.openFolderFullscreen.observe(viewLifecycleOwner) {
             managerActivity?.openFullscreenOfflineFragment(it)
+        }
+
+        viewModel.showOptionsPanel.observe(viewLifecycleOwner) {
+            managerActivity?.showOptionsPanel(it)
         }
     }
 

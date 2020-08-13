@@ -13,7 +13,11 @@ import mega.privacy.android.app.utils.Util.px2dp
 class OfflineGridFileViewHolder(
     private val binding: OfflineItemGridFileBinding
 ) : OfflineViewHolder(binding.root) {
-    override fun bind(node: OfflineNode) {
+    override fun bind(position: Int, node: OfflineNode, listener: OfflineAdapterListener) {
+        super.bind(position, node, listener)
+
+        binding.filenameContainer.setOnClickListener { listener.onOptionsClicked(position, node) }
+
         val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
 
         val requestBuilder: RequestBuilder<Drawable> = if (node.thumbnail != null) {
