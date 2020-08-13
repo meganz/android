@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.photos
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
@@ -31,6 +32,7 @@ fun setThumbnail(imageView: ShapeableImageView, file: File?, selected: Boolean) 
         ).build()
 
         Glide.with(imageView).load(file).placeholder(R.drawable.ic_image_thumbnail)
-            .error(R.drawable.ic_image_thumbnail).into(this)
+            .error(R.drawable.ic_image_thumbnail)
+            /*.transition(DrawableTransitionOptions.withCrossFade())*/.into(this)
     }
 }

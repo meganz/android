@@ -30,18 +30,9 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
-
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
 
     private val viewModel: HomePageViewModel by viewModels()
 
@@ -135,14 +126,15 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupBottomSheetBehavior() {
-        bottomSheetBehavior = HomepageBottomSheetBehavior.from(viewDataBinding.homepageBottomSheet)
+        bottomSheetBehavior =
+            HomepageBottomSheetBehavior.from(viewDataBinding.homepageBottomSheet.root)
         setBottomSheetPeekHeight()
         setBottomSheetExpandedTop()
     }
 
     private fun setBottomSheetPeekHeight() {
         rootView.viewTreeObserver?.addOnPreDrawListener {
-            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.banner.bottom
+            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.banner.root.bottom
             true
         }
     }
@@ -154,7 +146,7 @@ class HomepageFragment : Fragment() {
             val backgroundMask = rootView.findViewById<View>(R.id.background_mask)
             val dividend = 1.0f - SLIDE_OFFSET_CHANGE_BACKGROUND
             val bottomSheet = viewDataBinding.homepageBottomSheet
-            val maxElevation = bottomSheet.elevation
+            val maxElevation = bottomSheet.root.elevation
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 val layoutParams = bottomSheet.layoutParams
