@@ -29,6 +29,7 @@ public class WebViewActivityLollipop extends Activity {
         myWebView.getSettings().setJavaScriptEnabled(true);
         myWebView.getSettings().setLoadWithOverviewMode(true);
         myWebView.getSettings().setUseWideViewPort(true);
+        myWebView.getSettings().setDomStorageEnabled(true);
         myWebView.setWebViewClient(new WebViewClient() {
 
             @Override
