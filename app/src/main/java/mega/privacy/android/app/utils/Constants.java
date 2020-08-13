@@ -265,6 +265,8 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
 
+    public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
+
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
     public static final int RUBBISH_BIN_ADAPTER = 2002;

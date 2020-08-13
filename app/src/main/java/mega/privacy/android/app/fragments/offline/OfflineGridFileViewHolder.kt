@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.offline
 
 import android.graphics.drawable.Drawable
+import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.FitCenter
@@ -36,5 +37,9 @@ class OfflineGridFileViewHolder(
             .into(binding.thumbnail)
 
         binding.filename.text = node.node.name
+    }
+
+    fun getThumbnailView(): View {
+        return binding.thumbnail
     }
 }

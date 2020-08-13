@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.offline
 
 import android.graphics.drawable.Drawable
+import android.view.View
 import android.widget.FrameLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -56,5 +57,9 @@ class OfflineListViewHolder(
 
         binding.filename.text = node.node.name
         binding.nodeInfo.text = node.nodeInfo
+    }
+
+    fun getThumbnailView(): View {
+        return binding.thumbnail
     }
 }

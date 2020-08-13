@@ -11,7 +11,6 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
-import io.reactivex.rxjava3.subjects.Subject
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
@@ -27,7 +26,10 @@ import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.util.HashMap
 import java.util.Locale
 import java.util.concurrent.TimeUnit.SECONDS
@@ -36,9 +38,12 @@ class OfflineViewModel @ViewModelInject constructor(
     private val repo: MegaNodeRepo
 ) : BaseRxViewModel() {
     private var order = ORDER_DEFAULT_ASC
+
+    private val openNodeAction = PublishSubject.create<Pair<Int, OfflineNode>>()
+    private val openFolderFullscreenAction = PublishSubject.create<String>()
+    private val showOptionsPanelAction = PublishSubject.create<MegaOffline>()
+
     private val _nodes = MutableLiveData<List<OfflineNode>>()
-    private val openNodeAction: Subject<Pair<Int, OfflineNode>> =
-        PublishSubject.create<Pair<Int, OfflineNode>>()
     private val _nodeToOpen = SingleLiveEvent<Pair<Int, OfflineNode>>()
     private val _actionBarTitle = MutableLiveData<String>()
     private val _actionMode = SingleLiveEvent<Boolean>()
@@ -46,7 +51,10 @@ class OfflineViewModel @ViewModelInject constructor(
     private val _pathLiveData = SingleLiveEvent<String>()
     private val _openFolderFullscreen = SingleLiveEvent<String>()
     private val _showOptionsPanel = SingleLiveEvent<MegaOffline>()
+    private val _urlFileOpenAsUrl = SingleLiveEvent<String>()
+    private val _urlFileOpenAsFile = SingleLiveEvent<File>()
 
+    private val creatingThumbnailNodes = HashSet<String>()
     private val selectedNodes: SparseArrayCompat<MegaOffline> = SparseArrayCompat(5)
     private var rootFolderOnly = false
     private var isList = true
@@ -60,6 +68,8 @@ class OfflineViewModel @ViewModelInject constructor(
     val pathLiveData: LiveData<String> = _pathLiveData
     val openFolderFullscreen: LiveData<String> = _openFolderFullscreen
     val showOptionsPanel: LiveData<MegaOffline> = _showOptionsPanel
+    val urlFileOpenAsUrl: LiveData<String> = _urlFileOpenAsUrl
+    val urlFileOpenAsFile: LiveData<File> = _urlFileOpenAsFile
 
     var path = "/"
         private set
@@ -73,6 +83,22 @@ class OfflineViewModel @ViewModelInject constructor(
                 .subscribe(
                     Consumer { _nodeToOpen.value = it },
                     logErr("OfflineViewModel openNodeAction")
+                )
+        )
+        add(
+            openFolderFullscreenAction.throttleFirst(1, SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    Consumer { _openFolderFullscreen.value = it },
+                    logErr("OfflineViewModel openFolderFullscreenAction")
+                )
+        )
+        add(
+            showOptionsPanelAction.throttleFirst(1, SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    Consumer { _showOptionsPanel.value = it },
+                    logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
     }
@@ -130,7 +156,7 @@ class OfflineViewModel @ViewModelInject constructor(
             if (isFileAvailable(nodeFile) && nodeFile.isDirectory) {
                 navigateIn(node.node)
             } else if (isFileAvailable(nodeFile) && nodeFile.isFile) {
-                _nodeToOpen.value = Pair(position, node)
+                openNodeAction.onNext(Pair(position, node))
             }
         }
     }
@@ -146,14 +172,8 @@ class OfflineViewModel @ViewModelInject constructor(
         if (selecting) {
             onNodeClicked(position, node)
         } else {
-            _showOptionsPanel.value = node.node
+            showOptionsPanelAction.onNext(node.node)
         }
-    }
-
-    fun actionBarTitle(): String {
-        return actionBarTitle.value
-            ?: getApplication<MegaApplication>().getString(R.string.tab_offline)
-                .toUpperCase(Locale.ROOT)
     }
 
     private fun handleSelection(position: Int, node: OfflineNode) {
@@ -179,7 +199,7 @@ class OfflineViewModel @ViewModelInject constructor(
     private fun navigateIn(folder: MegaOffline) {
         if (rootFolderOnly) {
             _pathLiveData.value = folder.path + folder.name + "/"
-            _openFolderFullscreen.value = _pathLiveData.value
+            openFolderFullscreenAction.onNext(_pathLiveData.value)
         } else {
             navigateTo(folder.path + folder.name + "/", folder.name)
         }
@@ -230,6 +250,34 @@ class OfflineViewModel @ViewModelInject constructor(
         loadOfflineNodes()
     }
 
+    fun processUrlFile(file: File) {
+        add(Single
+            .fromCallable {
+                var reader: BufferedReader? = null
+                try {
+                    reader = BufferedReader(InputStreamReader(FileInputStream(file)))
+                    if (reader.readLine() != null) {
+                        val line2 = reader.readLine()
+                        return@fromCallable line2.replace("URL=", "")
+                    }
+                } finally {
+                    reader?.close()
+                }
+
+                return@fromCallable null
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(Consumer {
+                if (it != null) {
+                    _urlFileOpenAsUrl.value = it
+                } else {
+                    _urlFileOpenAsFile.value = file
+                }
+            }, logErr("processUrlFile"))
+        )
+    }
+
     private fun loadOfflineNodes() {
         add(Single.fromCallable { repo.loadOfflineNodes(path, order) }
             .map {
@@ -248,7 +296,11 @@ class OfflineViewModel @ViewModelInject constructor(
                         )
                     )
 
-                    if (!isFileAvailable(thumbnail)) {
+                    val mime = typeForName(node.name)
+                    if ((mime.isVideo || mime.isImage || mime.isPdf || mime.isAudio) &&
+                        !isFileAvailable(thumbnail) && !creatingThumbnailNodes.contains(node.handle)
+                    ) {
+                        creatingThumbnailNodes.add(node.handle)
                         nodesWithoutThumbnail.add(node)
                     }
                 }
@@ -317,10 +369,7 @@ class OfflineViewModel @ViewModelInject constructor(
         add(Observable.fromIterable(nodes)
             .subscribeOn(Schedulers.io())
             .filter {
-                val file = getOfflineFile(getApplication(), it)
-                val fileType = typeForName(it.name)
-                (fileType.isImage || fileType.isPdf || fileType.isVideo || fileType.isAudio)
-                        && file.exists()
+                getOfflineFile(getApplication(), it).exists()
             }
             .map {
                 createThumbnail(getOfflineFile(getApplication(), it), getThumbnailFile(it))
