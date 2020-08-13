@@ -18,8 +18,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.fragments.managerFragments.cu.CuItemSizeConfig
-import mega.privacy.android.app.utils.Util
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -137,9 +135,9 @@ class PhotosFragment : BaseFragment() {
                 }
             })
 
-            it.forEach { it ->
-                listView.findViewHolderForAdapterPosition(it)?.let { it ->
-                    it.itemView.findViewById<ImageView>(
+            it.forEach { pos ->
+                listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                    viewHolder.itemView.findViewById<ImageView>(
                         R.id.icon_selected
                     )?.run {
                         visibility = View.VISIBLE
@@ -185,33 +183,12 @@ class PhotosFragment : BaseFragment() {
     private fun setupListAdapter() {
         listView.layoutManager?.apply {
             spanSizeLookup = listAdapter.getSpanSizeLookup(spanCount)
-            val itemSizeConfig = getItemSizeConfig(spanCount)
-            listAdapter.setItemSizeConfig(itemSizeConfig)
+            val itemDimen =
+                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
+                    .toInt() * 2
+            listAdapter.setItemDimen(itemDimen)
         }
 
         listView.adapter = listAdapter
-    }
-
-    private fun getItemSizeConfig(spanCount: Int): CuItemSizeConfig {
-        val gridMargin = resources.getDimension(R.dimen.photo_grid_margin).toInt()
-        val gridWidth = outMetrics.widthPixels / spanCount - gridMargin * 2
-        val selectedIconWidth = Util.dp2px(
-            resources.getDimension(R.dimen.photo_selected_icon_width),
-            outMetrics
-        )
-        val selectedIconMargin =
-            Util.dp2px(resources.getDimension(R.dimen.photo_selected_icon_margin), outMetrics)
-        val roundCornerRadius = Util.dp2px(
-            resources.getDimension(R.dimen.photo_selected_icon_round_corner_radius),
-            outMetrics
-        )
-        val selectedPadding =
-            Util.dp2px(resources.getDimension(R.dimen.photo_selected_icon_padding), outMetrics)
-
-        return CuItemSizeConfig(
-            false, gridWidth, gridMargin, selectedIconWidth, selectedIconMargin,
-            roundCornerRadius,
-            selectedPadding
-        )
     }
 }

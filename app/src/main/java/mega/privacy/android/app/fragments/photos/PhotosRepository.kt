@@ -93,7 +93,7 @@ class PhotosRepository @Inject constructor(
                         // then the item wouldn't be refreshed
                         photoNodesMap[it.nodeHandle]?.apply {
 //                            photoNodesMap[it.nodeHandle] = copy(thumbnail = thumbFile.absoluteFile)
-                           thumbnail = thumbFile.absoluteFile
+                            thumbnail = thumbFile.absoluteFile
                             uiDirty = true
                         }
                     }

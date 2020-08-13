@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.photos
 
 import android.content.Context
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode

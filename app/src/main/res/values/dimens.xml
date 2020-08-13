@@ -64,7 +64,8 @@
     <dimen name="photo_selected_icon_width">16dp</dimen>
     <dimen name="photo_selected_icon_margin">4dp</dimen>
     <dimen name="photo_selected_icon_round_corner_radius">4dp</dimen>
-    <dimen name="photo_selected_icon_padding">1dp</dimen>
+    <dimen name="photo_item_padding">2dp</dimen>
+    <dimen name="photo_selected_border_width">2dp</dimen>
 
     <dimen name="empty_data_font_size">18sp</dimen>
 </resources>

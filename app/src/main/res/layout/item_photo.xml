@@ -25,18 +25,23 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="@dimen/photo_grid_margin"
         android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick() : actionModeViewModel.onPhotoClick(item))}"
         android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:padding="@dimen/photo_item_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:thumbnail="@{item.thumbnail}"
+            app:selected="@{item.selected}"
+            app:strokeColor="@color/accentColor"
             tools:src="@drawable/ic_image_thumbnail" />
 
         <ImageView
@@ -52,5 +57,3 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
-
-<!--    android:visibility="@{item.selected ? View.VISIBLE : View.GONE}"-->

@@ -12,7 +12,6 @@ import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
-import mega.privacy.android.app.fragments.managerFragments.cu.CuItemSizeConfig
 import javax.inject.Inject
 
 class PhotosGridAdapter @Inject constructor(
@@ -21,7 +20,7 @@ class PhotosGridAdapter @Inject constructor(
 ) : ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
-    private var itemSizeConfig: CuItemSizeConfig? = null
+    private var itemDimen = 0
 
     class PhotoViewHolder(private val binding: ViewDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -65,7 +64,7 @@ class PhotosGridAdapter @Inject constructor(
                 )
         }
 
-        if (viewType == PhotoNode.TYPE_PHOTO && itemSizeConfig != null) {
+        if (viewType == PhotoNode.TYPE_PHOTO && itemDimen > 0) {
             setItemLayoutParams(binding)
             // FastScroller would affect the normal process of RecyclerView that makes the "selected"
             // icon appear before binding the item. Therefore, hide the icon up front
@@ -77,18 +76,8 @@ class PhotosGridAdapter @Inject constructor(
 
     private fun setItemLayoutParams(binding: ViewBinding) {
         (binding.root.layoutParams as GridLayoutManager.LayoutParams).apply {
-            with(itemSizeConfig!!) {
-                gridSize.let {
-                    width = it
-                    height = it
-                }
-                gridMargin.let {
-                    topMargin = it
-                    bottomMargin = it
-                    marginStart = it
-                    marginEnd = it
-                }
-            }
+            width = itemDimen
+            height = itemDimen
         }
     }
 
@@ -112,8 +101,8 @@ class PhotosGridAdapter @Inject constructor(
         }
     }
 
-    fun setItemSizeConfig(config: CuItemSizeConfig) {
-        itemSizeConfig = config
+    fun setItemDimen(dimen: Int) {
+        if (dimen > 0) itemDimen = dimen
     }
 
     fun getSpanSizeLookup(spanCount: Int) = object : GridLayoutManager.SpanSizeLookup() {
