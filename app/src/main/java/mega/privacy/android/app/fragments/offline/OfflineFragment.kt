@@ -38,7 +38,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -115,7 +114,7 @@ class OfflineFragment : Fragment() {
 
         instanceForDragging = null
 
-        val filter = IntentFilter(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST)
+        val filter = IntentFilter(REFRESH_OFFLINE_FILE_LIST)
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(receiverRefreshOffline, filter)
     }
@@ -665,6 +664,8 @@ class OfflineFragment : Fragment() {
     }
 
     companion object {
+        const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
+
         var instanceForDragging: OfflineFragment? = null
 
         fun setArgs(fragment: OfflineFragment, rootFolderOnly: Boolean) {
