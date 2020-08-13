@@ -1,10 +1,8 @@
 package mega.privacy.android.app.components;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Point;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
@@ -71,9 +69,7 @@ public class NewGridRecyclerView extends RecyclerView {
     }
     
     private int getScreenX() {
-        Point point = new Point();
-        ((Activity)getContext()).getWindowManager().getDefaultDisplay().getSize(point);
-        return point.x;
+        return getResources().getDisplayMetrics().widthPixels;
     }
     
     public int getSpanCount() {

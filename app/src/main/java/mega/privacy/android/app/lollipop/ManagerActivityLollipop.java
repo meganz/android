@@ -146,6 +146,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -175,7 +176,6 @@ import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
@@ -430,7 +430,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private List<SkuDetails> mSkuDetailsList;
 
     public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		CLOUD_DRIVE, HOMEPAGE, RECENTS, FULLSCREEN_OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -438,7 +438,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case HOMEPAGE: return "fragmentHomepage";
 				case RECENTS: return "rF";
 				case RUBBISH_BIN: return "rubbishBinFLol";
-				case OFFLINE: return "oFLol";
+				case FULLSCREEN_OFFLINE: return "oFLol";
 				case CAMERA_UPLOADS: return "cuFLol";
 				case MEDIA_UPLOADS: return "muFLol";
 				case INBOX: return "iFLol";
@@ -470,7 +470,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, FULLSCREEN_OFFLINE, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -482,6 +482,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case CONTACTS: {
 					context.getString(R.string.section_contacts);
 				}
+				case FULLSCREEN_OFFLINE: return context.getString(R.string.tab_offline);
 				case SETTINGS: return context.getString(R.string.action_settings);
 				case ACCOUNT: return context.getString(R.string.section_account);
 				case SEARCH: return context.getString(R.string.action_search);
@@ -624,7 +625,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private FileBrowserFragmentLollipop fbFLol;
     private RecentsFragment rF;
     private RubbishBinFragmentLollipop rubbishBinFLol;
-    private OfflineFragmentLollipop oFLol;
     private InboxFragmentLollipop iFLol;
     private IncomingSharesFragmentLollipop inSFLol;
 	private OutgoingSharesFragmentLollipop outSFLol;
@@ -650,6 +650,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
+	private OfflineFragment fullscreenOfflineFragment;
 
 	ProgressDialog statusDialog;
 
@@ -1257,36 +1258,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if (adapterType == OFFLINE_ADAPTER){
-						oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-						if (oFLol != null){
-							if (actionType == UPDATE_IMAGE_DRAG) {
-								imageDrag = oFLol.getImageDrag(position + placeholderCount);
-								if (oFLol.imageDrag != null){
-									oFLol.imageDrag.setVisibility(View.VISIBLE);
-								}
-								if (imageDrag != null){
-									oFLol.imageDrag = imageDrag;
-									oFLol.imageDrag.setVisibility(View.GONE);
-								}
-							}
-							else if (actionType == SCROLL_TO_POSITION) {
-								oFLol.updateScrollPosition(position + placeholderCount);
-							}
-						}
-					} else if (adapterType == RECENTS_ADAPTER && rF != null) {
-						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
-						if (actionType == UPDATE_IMAGE_DRAG) {
-							imageDrag = rF.getImageDrag(handle);
-							if (rF.imageDrag != null) {
-								rF.imageDrag.setVisibility(View.VISIBLE);
-							}
-							if (imageDrag != null) {
-								rF.imageDrag = imageDrag;
-								rF.imageDrag.setVisibility(View.INVISIBLE);
-							}
-						} else if (actionType == SCROLL_TO_POSITION) {
-							rF.updateScrollPosition(handle);
-						}
+						//oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+						//if (oFLol != null){
+						//	if (actionType == UPDATE_IMAGE_DRAG) {
+						//		imageDrag = oFLol.getImageDrag(position + placeholderCount);
+						//		if (oFLol.imageDrag != null){
+						//			oFLol.imageDrag.setVisibility(View.VISIBLE);
+						//		}
+						//		if (imageDrag != null){
+						//			oFLol.imageDrag = imageDrag;
+						//			oFLol.imageDrag.setVisibility(View.GONE);
+						//		}
+						//	}
+						//	else if (actionType == SCROLL_TO_POSITION) {
+						//		oFLol.updateScrollPosition(position + placeholderCount);
+						//	}
+						//}
 					}
 
 					if (imageDrag != null){
@@ -1672,10 +1659,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else{
-						oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-						if(oFLol != null){
-							oFLol.notifyDataSetChanged();
-						}
+						//oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+						//if(oFLol != null){
+						//	oFLol.notifyDataSetChanged();
+						//}
 					}
 				}
 	        	break;
@@ -1809,10 +1796,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		outState.putInt("indexContacts", indexContacts);
 
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if(oFLol!=null){
-			pathNavigationOffline = oFLol.getPathNavigation();
-		}
+		//oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+		//if(oFLol!=null){
+		//	pathNavigationOffline = oFLol.getPathNavigation();
+		//}
 		outState.putString("pathNavigationOffline", pathNavigationOffline);
 //		outState.putParcelable("obj", myClass);
 		if(drawerItem==DrawerItem.ACCOUNT){
@@ -2284,6 +2271,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		notificationsSection.setOnClickListener(this);
 		notificationsSectionText = (TextView) findViewById(R.id.notification_section_text);
         contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
+		findViewById(R.id.offline_section).setOnClickListener(this);
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
@@ -4938,7 +4926,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				break;
 			}
-			// FIXME: for removed OFFLINE, how shall we set firstNavigationLevel?
 			case INBOX:{
 				aB.setSubtitle(null);
 				if(parentHandleInbox==megaApi.getInboxNode().getHandle()||parentHandleInbox==-1){
@@ -4997,6 +4984,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						aB.setTitle(parentNode.getName());
 						firstNavigationLevel = false;
 					}
+				}
+				break;
+			}
+			case FULLSCREEN_OFFLINE:{
+				aB.setSubtitle(null);
+				if (fullscreenOfflineFragment != null) {
+					aB.setTitle(fullscreenOfflineFragment.actionBarTitle());
+					firstNavigationLevel = fullscreenOfflineFragment.firstNavigationLevel();
+				} else {
+					aB.setTitle(getString(R.string.action_settings).toUpperCase());
+					firstNavigationLevel = true;
 				}
 				break;
 			}
@@ -5922,6 +5920,30 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				showFabButton();
 				break;
 			}
+			case FULLSCREEN_OFFLINE: {
+				fullscreenOfflineFragment = (OfflineFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.FULLSCREEN_OFFLINE.getTag());
+				if (fullscreenOfflineFragment == null) {
+					fullscreenOfflineFragment = new OfflineFragment();
+				} else {
+					refreshFragment(FragmentTag.FULLSCREEN_OFFLINE.getTag());
+				}
+				replaceFragment(fullscreenOfflineFragment, FragmentTag.FULLSCREEN_OFFLINE.getTag());
+				showFabButton();
+				showHideBottomNavigationView(false);
+				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+				tB.setVisibility(View.VISIBLE);
+				setToolbarTitle();
+				supportInvalidateOptionsMenu();
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+						&& !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					ActivityCompat.requestPermissions(this,
+							new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+							REQUEST_WRITE_STORAGE);
+				}
+				break;
+			}
     		case SETTINGS:{
 				showHideBottomNavigationView(true);
 				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
@@ -6090,6 +6112,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				else if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) rF.checkScroll();
                 break;
             }
+			case FULLSCREEN_OFFLINE: {
+				fullscreenOfflineFragment = (OfflineFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.FULLSCREEN_OFFLINE.getTag());
+				if (fullscreenOfflineFragment != null) {
+					fullscreenOfflineFragment.checkScroll();
+				}
+				break;
+			}
             case CAMERA_UPLOADS: {
 				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
                 if (cuFL != null) {
@@ -6500,7 +6530,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					break;
-
+				case FULLSCREEN_OFFLINE:
+					updateFullscreenOfflineFragmentOptionMenu();
+					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
 						thumbViewMenuItem.setVisible(true);
@@ -6707,6 +6739,27 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		logDebug("Call to super onCreateOptionsMenu");
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	public void updateFullscreenOfflineFragmentOptionMenu() {
+    	if (rubbishBinMenuItem == null) {
+    		return;
+		}
+
+		if (searchExpand) {
+			openSearchView();
+		} else {
+			rubbishBinMenuItem.setVisible(true);
+
+			if (getFullscreenOfflineFragment() != null
+					&& fullscreenOfflineFragment.getItemCount() > 0) {
+				thumbViewMenuItem.setVisible(true);
+				setGridListIcon();
+				sortByMenuItem.setVisible(true);
+				selectMenuItem.setVisible(true);
+				searchMenuItem.setVisible(true);
+			}
+		}
 	}
 
 	private void setGridListIcon() {
@@ -7331,7 +7384,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 
         //Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-        refreshFragment(FragmentTag.OFFLINE.getTag());
+        refreshFragment(FragmentTag.FULLSCREEN_OFFLINE.getTag());
 
         //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
         refreshFragment(FragmentTag.CONTACTS.getTag());
@@ -7625,6 +7678,23 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			return;
 
     	}
+		else if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE){
+			if (getFullscreenOfflineFragment() != null
+					&& fullscreenOfflineFragment.onBackPressed() == 0){
+				if (!isOnline(this)) {
+					super.onBackPressed();
+					return;
+				}
+
+				if (isCloudAdded()) {
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItemLollipop(drawerItem);
+				} else {
+					super.onBackPressed();
+				}
+				return;
+			}
+		}
 		else if (drawerItem == DrawerItem.INBOX){
 			iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 			if (iFLol != null && iFLol.onBackPressed() == 0){
@@ -10955,8 +11025,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
-		if (getOfflineFragment() != null){
-			oFLol.setOrder(orderCloud);
+		if (getFullscreenOfflineFragment() != null){
+			fullscreenOfflineFragment.setOrder(orderCloud);
 		}
 	}
 
@@ -11203,6 +11273,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.notifications_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.NOTIFICATIONS;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				selectDrawerItemLollipop(drawerItem);
+				break;
+			}
+			case R.id.offline_section: {
+				isFirstTimeCam();
+				drawerItem = DrawerItem.FULLSCREEN_OFFLINE;
 				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
@@ -12817,18 +12894,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void updateOfflineView(MegaOffline mOff){
-		logDebug("updateOfflineView");
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if(oFLol!=null){
-			oFLol.hideMultipleSelect();
-			if(mOff==null){
-				oFLol.refresh();
-			}
-			else{
-				oFLol.refreshPaths(mOff);
-			}
-			supportInvalidateOptionsMenu();
-		}
+		//logDebug("updateOfflineView");
+		//oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+		//if(oFLol!=null){
+		//	oFLol.hideMultipleSelect();
+		//	if(mOff==null){
+		//		oFLol.refresh();
+		//	}
+		//	else{
+		//		oFLol.refreshPaths(mOff);
+		//	}
+		//	supportInvalidateOptionsMenu();
+		//}
 	}
 
 	public void updateContactsView(boolean contacts, boolean sentRequests, boolean receivedRequests){
@@ -16657,8 +16734,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
 	}
 
-	private OfflineFragmentLollipop getOfflineFragment() {
-		return oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+	private OfflineFragment getFullscreenOfflineFragment() {
+		return fullscreenOfflineFragment = (OfflineFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.FULLSCREEN_OFFLINE.getTag());
 	}
 
 	private CameraUploadFragmentLollipop getCameraUploadFragment() {

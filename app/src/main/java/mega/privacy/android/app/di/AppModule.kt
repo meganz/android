@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -35,5 +36,11 @@ class AppModule {
     @Provides
     fun provideMegaChatApi(megaApi: MegaApiAndroid): MegaChatApiAndroid {
         return MegaChatApiAndroid(megaApi)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDatabaseHandler(@ApplicationContext context: Context): DatabaseHandler {
+        return DatabaseHandler.getDbHandler(context)
     }
 }

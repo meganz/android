@@ -4,8 +4,8 @@ import android.util.SparseArray
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.lollipop.managerSections.FavouritesFragment
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment
 import java.lang.ref.WeakReference
 
@@ -16,7 +16,7 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
         init {
             put(RECENT_INDEX, RecentsFragment::class.java)
             put(FAVOURITES_INDEX, FavouritesFragment::class.java)
-            put(OFFLINE_INDEX, OfflineFragmentLollipop::class.java)
+            put(OFFLINE_INDEX, OfflineFragment::class.java)
         }
     }
 
@@ -29,6 +29,9 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
 
         try {
             fragment = tabFragmentMap[position]?.newInstance() as Fragment
+            if (position == OFFLINE_INDEX) {
+                (fragment as OfflineFragment).rootFolderOnly = true
+            }
             fragmentRefs.put(position, WeakReference(fragment))
         } catch (e: IllegalAccessException) {
             e.printStackTrace()

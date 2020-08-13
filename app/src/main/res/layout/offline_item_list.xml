@@ -1,0 +1,57 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:descendantFocusability="blocksDescendants"
+    >
+
+    <ImageView
+      android:id="@+id/thumbnail"
+      android:layout_width="48dp"
+      android:layout_height="48dp"
+      android:layout_gravity="center_vertical"
+      android:layout_marginStart="12dp"
+      tools:src="@drawable/ic_image_thumbnail"
+      />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="37dp"
+        android:layout_marginStart="73dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:id="@+id/filename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textColor="@color/file_list_first_row"
+            android:textSize="16sp"
+            tools:text="2048.jpg"
+            />
+
+        <TextView
+            android:id="@+id/node_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/file_list_second_row"
+            android:textSize="14sp"
+            tools:text="55.86KB . 24 Jul 2020 20:49"
+            />
+    </LinearLayout>
+
+    <ImageView
+      android:id="@+id/three_dots"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_gravity="center_vertical|end"
+      android:layout_marginEnd="10dp"
+      android:background="@null"
+      android:src="@drawable/ic_dots_vertical_grey"
+      />
+</FrameLayout>
