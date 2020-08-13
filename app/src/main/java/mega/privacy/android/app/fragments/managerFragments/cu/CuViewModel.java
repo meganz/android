@@ -209,8 +209,12 @@ class CuViewModel extends BaseRxViewModel {
             return;
         }
 
-        for (CuNode node : nodes) {
+        for (int i = 0; i < nodes.size(); i++) {
+            CuNode node = nodes.get(i);
             if (node.getNode() != null) {
+                if (!node.isSelected()) {
+                    mNodeToAnimate.setValue(Pair.create(i, node));
+                }
                 node.setSelected(true);
                 mSelectedNodes.put(node.getNode().getHandle(), node.getNode());
             }
@@ -231,7 +235,11 @@ class CuViewModel extends BaseRxViewModel {
                 return;
             }
 
-            for (CuNode node : nodes) {
+            for (int i = 0; i < nodes.size(); i++) {
+                CuNode node = nodes.get(i);
+                if (node.isSelected()) {
+                    mNodeToAnimate.setValue(Pair.create(i, node));
+                }
                 node.setSelected(false);
             }
             mSelectedNodes.clear();
