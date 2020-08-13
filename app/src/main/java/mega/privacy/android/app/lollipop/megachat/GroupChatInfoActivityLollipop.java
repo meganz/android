@@ -1246,8 +1246,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     if (participant != null) {
                         participantRequests.put(i, participant);
                         long handle = participant.getHandle();
-                        handleList.addMegaHandle(handle);
-                        participantAvatars.put(i, MegaApiAndroid.userHandleToBase64(handle));
+                        if (participant.isEmpty()) {
+                            handleList.addMegaHandle(handle);
+                        }
+
+                        if (!participant.hasAvatar()) {
+                            participantAvatars.put(i, MegaApiAndroid.userHandleToBase64(handle));
+                        }
                     }
 
                     pendingParticipantRequests.remove(i);
@@ -1327,7 +1332,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         if (positionInArray >= 0 && positionInArray < participants.size()
                 && ((isEmail && participants.get(positionInArray).getEmail().equals(emailOrHandle)
-                || (participants.get(positionInArray).getHandle() == MegaApiJava.base64ToHandle(emailOrHandle))))) {
+                || (participants.get(positionInArray).getHandle() == MegaApiJava.base64ToUserHandle(emailOrHandle))))) {
             Bitmap avatar = getAvatarBitmap(emailOrHandle);
             if (avatar != null) {
                 adapter.notifyItemChanged(positionInAdapter);
