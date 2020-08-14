@@ -42,6 +42,7 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
     }
 
     fun clearSelection() {
+        if (selectedNodeList.isEmpty()) return
         val animNodeIndices = mutableSetOf<Int>()
 
         selectedNodeList.forEach {

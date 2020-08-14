@@ -57,8 +57,8 @@ class PhotosFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.lifecycleOwner = viewLifecycleOwner
+
         setupListAdapter()
         setupFastScroller()
         setupNavigation()
@@ -110,21 +110,35 @@ class PhotosFragment : BaseFragment() {
             }
         })
 
-    private fun observeAnimatedNodes() =
+    private fun observeAnimatedNodes() {
+        var animatorSet: AnimatorSet? = null
+
         actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {
-            val animatorSet = AnimatorSet()
+            animatorSet?.run {
+                // End the started animation if any, or the view may show messy as its property
+                // would be wrongly changed by multiple animations running at the same time
+                // via contiguous quick clicks on the item
+                if (isStarted) {
+                    end()
+                }
+            }
+
+            // Must create a new AnimatorSet, or it would keep all previous
+            // animation and play them together
+            animatorSet = AnimatorSet()
             val animatorList = mutableListOf<Animator>()
 
-            animatorSet.addListener(object : Animator.AnimatorListener {
+            animatorSet?.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(animation: Animator?) {
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
                     // Refresh the Ui here is necessary. The reason is certain cache mechanism of
                     // RecyclerView would cause a couple of selected icons failed to be updated even
-                    // though listView.setItemViewCacheSize(0) was called (some ItemViews just out of
+                    // though listView.setItemViewCacheSize(0) (some ItemViews just out of
                     // the screen are already generated but get ViewHolders return null,
-                    // and their bind() wouldn't be invoked via scrolling)
+                    // and their bind() wouldn't be invoked via scrolling). Plus adding round corner
+                    // for thumbnails
                     updateUi()
                 }
 
@@ -150,9 +164,10 @@ class PhotosFragment : BaseFragment() {
                 }
             }
 
-            animatorSet.playTogether(animatorList)
-            animatorSet.start()
+            animatorSet?.playTogether(animatorList)
+            animatorSet?.start()
         })
+    }
 
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, Observer {

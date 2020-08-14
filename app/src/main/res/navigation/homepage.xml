@@ -10,5 +10,12 @@
         android:name="mega.privacy.android.app.lollipop.managerSections.HomepageFragment"
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
+        <action
+            android:id="@+id/action_homepageFragment_to_photosFragment"
+            app:destination="@id/photosFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/photosFragment"
+        android:name="mega.privacy.android.app.fragments.photos.PhotosFragment"
+        android:label="PhotosFragment" />
 </navigation>

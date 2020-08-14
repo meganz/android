@@ -39,6 +39,8 @@ class PhotosGridAdapter @Inject constructor(
                     this.item = item
                 }
             }
+
+            item.uiDirty = false
         }
     }
 
@@ -92,7 +94,6 @@ class PhotosGridAdapter @Inject constructor(
 
         override fun areContentsTheSame(oldItem: PhotoNode, newItem: PhotoNode): Boolean {
             if (newItem.uiDirty) {
-                newItem.uiDirty = false
                 return false
             }
 
