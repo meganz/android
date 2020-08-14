@@ -507,7 +507,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		tabLayoutExplorer =  findViewById(R.id.sliding_tabs_file_explorer);
 		viewPagerExplorer = findViewById(R.id.explorer_tabs_pager);
 		viewPagerExplorer.setOffscreenPageLimit(3);
-		
+
 		//Layout for login if needed
 		loginLoggingIn = findViewById(R.id.file_logging_in_layout);
 		loginProgressBar = findViewById(R.id.file_login_progress_bar);
@@ -739,13 +739,15 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void updateAdapterExplorer(boolean isChatFirst, int tabToRemove) {
 		tabLayoutExplorer.setVisibility(View.VISIBLE);
 		viewPagerExplorer.setVisibility(View.VISIBLE);
+
+		int position = mTabsAdapterExplorer != null ? viewPagerExplorer.getCurrentItem() : 0;
 		if (isChatFirst) {
 			mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this, true);
 		} else {
 			mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this);
 		}
-
 		viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
+		viewPagerExplorer.setCurrentItem(position);
 		tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
 		if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
