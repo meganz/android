@@ -132,7 +132,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 !message.isUploading();
 
         if (shouldReactionOptionBeVisible) {
-            reactionsFragment.init(context, chatId, messageId, positionMessage);
+            reactionsFragment.init(context, this, chatId, messageId, positionMessage);
             reactionsLayout.setVisibility(View.VISIBLE);
         } else {
             reactionsLayout.setVisibility(View.GONE);
@@ -458,6 +458,10 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
                 break;
         }
+        closeDialog();
+    }
+
+    public void closeDialog() {
         setStateBottomSheetBehaviorHidden();
     }
 

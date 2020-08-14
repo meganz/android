@@ -14,6 +14,7 @@ import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.RecentEmoji;
 import mega.privacy.android.app.components.twemoji.RecentEmojiManager;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -41,6 +42,7 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
     private RelativeLayout addReaction;
     private MegaChatApiAndroid megaChatApi;
     private RecentEmoji recentEmoji;
+    private GeneralChatMessageBottomSheet parent;
 
     public ChatReactionsView(Context context) {
         super(context);
@@ -57,10 +59,11 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
         initView(context);
     }
 
-    public void init(Context context, long chatId, long messageId, int positionMessage) {
+    public void init(Context context, GeneralChatMessageBottomSheet bottomSheet, long chatId, long messageId, int positionMessage) {
         this.context = context;
         this.chatId = chatId;
         this.positionMessage = positionMessage;
+        this.parent = bottomSheet;
 
         if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
@@ -190,6 +193,7 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
             recentEmoji.persist();
         }
 
+        parent.closeDialog();
         ((ChatActivityLollipop) context).hideBottomSheet();
     }
 }
