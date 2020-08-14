@@ -13,7 +13,8 @@ import java.util.concurrent.Executors;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 
 import static mega.privacy.android.app.utils.Constants.DEVICE_HUAWEI;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class MegaMessageService extends HmsMessageService {
 
@@ -22,7 +23,7 @@ public class MegaMessageService extends HmsMessageService {
     @Override
     public void onCreate() {
         super.onCreate();
-        logDebug("HMS message created");
+        logDebug("HMS message service created");
         messageHanlder = new PushMessageHanlder();
     }
 
@@ -36,7 +37,9 @@ public class MegaMessageService extends HmsMessageService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        messageHanlder.handleMessage(convert(remoteMessage));
+        PushMessageHanlder.Message message = convert(remoteMessage);
+        logDebug("Receive remote msg: " + message);
+        messageHanlder.handleMessage(message);
     }
 
     @Override
@@ -49,7 +52,7 @@ public class MegaMessageService extends HmsMessageService {
         Executors.newFixedThreadPool(1).submit(() -> {
             String appId = AGConnectServicesConfig.fromContext(context).getString("client/app_id");
             try {
-                // wait for the callback
+                // Wait for the callback
                 String token = HmsInstanceId.getInstance(context).getToken(appId, "HCM");
                 logDebug("Get token: " + token);
                 new PushMessageHanlder().sendRegistrationToServer(token, DEVICE_HUAWEI);

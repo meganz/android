@@ -68,7 +68,7 @@ public class MyAccountInfo {
     public ArrayList<Product> productAccounts;
 
     private List<MegaSku> availableSkus = new ArrayList<>();
-    private MegaPurchase activeGooglePlaySubscription = null;
+    private MegaPurchase activeSubscription = null;
 
     MegaPricing pricing;
 
@@ -141,7 +141,7 @@ public class MyAccountInfo {
             availableSkus.clear();
         }
 
-        activeGooglePlaySubscription = null;
+        activeSubscription = null;
 
         pricing = null;
 
@@ -593,19 +593,19 @@ public class MyAccountInfo {
         return shouldShowBusinessAlert;
     }
 
-    public MegaPurchase getActiveGooglePlaySubscription() {
-        return activeGooglePlaySubscription;
+    public MegaPurchase getActiveSubscription() {
+        return activeSubscription;
     }
 
-    public void setActiveGooglePlaySubscription(MegaPurchase activeGooglePlaySubscription) {
-        this.activeGooglePlaySubscription = activeGooglePlaySubscription;
+    public void setActiveSubscription(MegaPurchase activeSubscription) {
+        this.activeSubscription = activeSubscription;
     }
 
     public boolean isPurchasedAlready(String sku) {
-        if (activeGooglePlaySubscription == null) {
+        if (activeSubscription == null) {
             return false;
         }
-        boolean result = activeGooglePlaySubscription.getSku().equals(sku);
+        boolean result = activeSubscription.getSku().equals(sku);
         if (result) {
             logDebug(sku + " already subscribed.");
         }

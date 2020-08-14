@@ -25,7 +25,8 @@ import mega.privacy.android.app.middlelayer.map.AbstractMapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCallback, HuaweiMap.OnMyLocationClickListener, HuaweiMap.OnMyLocationButtonClickListener, HuaweiMap.OnCameraMoveStartedListener, HuaweiMap.OnCameraIdleListener, HuaweiMap.OnMarkerClickListener, HuaweiMap.OnInfoWindowClickListener {
 
@@ -68,7 +69,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public void createSnapshot(double latitude, double longitude, int mapWidth) {
-        // don't create MapView for HMS, use the existing HuaweiMap object to create snapshot.
+        // Don't create MapView for HMS, use the existing HuaweiMap object to create snapshot.
         mMap.setOnMapLoadedCallback(() -> mMap.snapshot((snapshot) -> {
             if (snapshot == null) return;
             // crop the snapshot.
@@ -122,7 +123,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             showError();
         }).addOnSuccessListener(location -> {
             if (location != null) {
-                logDebug("getLastLocation() onSuccess");
+                logDebug("GetLastLocation() onSuccess");
                 onGetLastLocation(location.getLatitude(), location.getLongitude());
                 if (animateCamera) {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
@@ -199,7 +200,6 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public void onMapReady(HuaweiMap map) {
-        logDebug("onMapReady");
         mMap = map;
         enableLocationUpdates();
         if (!isGPSEnabled()) {
@@ -224,7 +224,6 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        logDebug("onInfoWindowClick");
         if (isFullScreen() && marker.equals(fullScreenMarker)) {
             setAddress(fullScreenAddress);
         }
@@ -241,12 +240,10 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public boolean onMyLocationButtonClick() {
-        logDebug("onMyLocationButtonClick");
         return false;
     }
 
     @Override
     public void onMyLocationClick(Location location) {
-        logDebug("onMyLocationClick");
     }
 }

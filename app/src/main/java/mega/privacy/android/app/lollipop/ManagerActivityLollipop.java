@@ -1359,7 +1359,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     public void launchPayment(String productId) {
         //start purchase/subscription flow
         MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
-        MegaPurchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
+        MegaPurchase purchase = app.getMyAccountInfo().getActiveSubscription();
         String oldSku = purchase == null ? null : purchase.getSku();
         String token = purchase == null ? null : purchase.getToken();
         if (mBillingManager != null) {
@@ -1391,7 +1391,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	@Override
     public void onBillingClientSetupFinished() {
-        logInfo("Google play billing client setup finished");
+        logInfo("Billing client setup finished");
         mBillingManager.getInventory(skuList -> {
             mSkuDetailsList = skuList;
             app.getMyAccountInfo().setAvailableSkus(skuList);
@@ -1477,9 +1477,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
         if(max != null && mBillingManager.isPayloadValid(max.getUserHandle())){
-            myAccountInfo.setActiveGooglePlaySubscription(max);
+            myAccountInfo.setActiveSubscription(max);
         } else {
-            myAccountInfo.setActiveGooglePlaySubscription(null);
+            myAccountInfo.setActiveSubscription(null);
         }
 
 		myAccountInfo.setLevelInventory(highest);
@@ -1492,7 +1492,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
-		MegaPurchase highestGooglePlaySubscription = myAccountInfo.getActiveGooglePlaySubscription();
+		MegaPurchase highestGooglePlaySubscription = myAccountInfo.getActiveSubscription();
 		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
 			return;
 		}

@@ -38,6 +38,7 @@ import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
 import mega.privacy.android.app.utils.billing.Security;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
@@ -45,41 +46,73 @@ import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
-/**
- * Handles all the interactions with Play Store (via Billing library), maintains connection to
- * it through BillingClient and caches temporary states/data if needed
- */
 public class BillingManagerImpl implements BillingManager {
 
-    /** SKU for our subscription PRO_I monthly */
+    /**
+     * SKU for our subscription PRO_I monthly
+     */
     public static final String SKU_PRO_I_MONTH = "mega.huawei.pro1.onemonth";
 
-    /** SKU for our subscription PRO_I yearly */
+    /**
+     * SKU for our subscription PRO_I yearly
+     */
     public static final String SKU_PRO_I_YEAR = "mega.huawei.pro1.oneyear";
 
-    /** SKU for our subscription PRO_II monthly */
+    /**
+     * SKU for our subscription PRO_II monthly
+     */
     public static final String SKU_PRO_II_MONTH = "mega.huawei.pro2.onemonth";
 
-    /** SKU for our subscription PRO_II yearly */
+    /**
+     * SKU for our subscription PRO_II yearly
+     */
     public static final String SKU_PRO_II_YEAR = "mega.huawei.pro2.oneyear";
 
-    /** SKU for our subscription PRO_III monthly */
+    /**
+     * SKU for our subscription PRO_III monthly
+     */
     public static final String SKU_PRO_III_MONTH = "mega.huawei.pro3.onemonth";
 
-    /** SKU for our subscription PRO_III yearly */
+    /**
+     * SKU for our subscription PRO_III yearly
+     */
     public static final String SKU_PRO_III_YEAR = "mega.huawei.pro3.oneyear";
 
-    /** SKU for our subscription PRO_LITE monthly */
+    /**
+     * SKU for our subscription PRO_LITE monthly
+     */
     public static final String SKU_PRO_LITE_MONTH = "mega.huawei.prolite.onemonth";
 
-    /** SKU for our subscription PRO_LITE yearly */
+    /**
+     * SKU for our subscription PRO_LITE yearly
+     */
     public static final String SKU_PRO_LITE_YEAR = "mega.huawei.prolite.oneyear";
 
-    /** Public key for verify purchase. */
+    /**
+     * Public key for verify purchase.
+     */
     private static final String PUBLIC_KEY = "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA0xFr23QlccDUinSmbgDayePoxUCXxOtGzMgBPeB2EctW1v5m5nU4wUSDt2xMLtQVN6k+bGios/aphF+3fT3KWAlnjLgRyLwJ3G4MxmdXXjvI5OSp+8peCEQ/z3QFZ/+A5qssK88l9aRmobZcVH5q0X/H4G7nLZO4leXhXuBRNnHRTw6CNAv9tt9sjyKwMUOKJk9Ev+FpPYORcq/6Db1Q+hq9dsZOZImZAKSmmvdkdeczqvoZxVCD1EgWywfrLWZc8JjiaZHCRLFfMUkZ6SKObcv0/En97Rl7ih4tcW7FHo5ikKPgWy18nMg4/uZHO1biS6e2OyPL/XETiN3RuwR84qYg/FDmvdfqP9c4dt7z9WeYBia+4TjSpTdvUJl49qSKyrQkvk0z/HiafFbt9uiIDL+lHgU+944F8RWkQkogcZCJkUjuHihi/ZWQZitRmYNly+IQKc4d32hpgmaAtQoZHI92mABxmzWNDdnCF8nHFTl0g3FrL+WRsfd0eM/qtIknAgMBAAE=";
-    public static final int PAY_METHOD_RES_ID = R.string.payment_method_huawei_wallet;
-    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.huawei_wallet_ic;
+
+    /**
+     * Verification algorithm for HMS purchase.
+     */
     public static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
+
+    /**
+     * Text res id.
+     */
+    public static final int PAY_METHOD_RES_ID = R.string.payment_method_huawei_wallet;
+
+    /**
+     * Icon res id.
+     */
+    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.huawei_wallet_ic;
+
+    /**
+     * Payment gatewat for HMS.
+     *
+     * @see MegaApiJava#submitPurchaseReceipt(int, String, MegaRequestListenerInterface)
+     */
     public static final int PAYMENT_GATEWAY = MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET;
 
     private String payload;
@@ -114,10 +147,7 @@ public class BillingManagerImpl implements BillingManager {
         }).addOnFailureListener(this::handleException);
     }
 
-    /**
-     * Query purchases across various use cases and deliver the result in a formalized way through
-     * a listener
-     */
+    @Override
     public void queryPurchases() {
         getPurchase(false);
     }
@@ -135,7 +165,7 @@ public class BillingManagerImpl implements BillingManager {
         Task<OwnedPurchasesResult> task = iapClient.obtainOwnedPurchases(req);
         task.addOnSuccessListener(result -> {
             mPurchases.clear();
-            logDebug("obtainOwnedPurchases, success");
+            logDebug("Obtain owned purchases, success");
             List<String> inAppPurchaseDataList = result.getInAppPurchaseDataList();
             List<String> signatureList = result.getInAppSignature();
 
@@ -143,7 +173,7 @@ public class BillingManagerImpl implements BillingManager {
                 String purchase = inAppPurchaseDataList.get(i);
                 String signature = signatureList.get(i);
 
-                // validate purchase's signature.
+                // Validate purchase's signature.
                 boolean success = verifyValidSignature(purchase, signature);
                 if (success) {
                     handlePurchase(purchase);
@@ -162,10 +192,10 @@ public class BillingManagerImpl implements BillingManager {
             InAppPurchaseData data = new InAppPurchaseData(originalJson);
             if (data.getPurchaseState() == InAppPurchaseData.PurchaseState.PURCHASED && data.isSubValid()) {
                 if (isPayloadValid(data.getDeveloperPayload())) {
-                    logDebug("new purchase added, " + data.getDeveloperPayload());
+                    logDebug("New purchase added, payload is: " + data.getDeveloperPayload());
                     mPurchases.add(Converter.convert(originalJson));
                 } else {
-                    logWarning("Invalid DeveloperPayload");
+                    logWarning("Invalid developer payload");
                 }
             }
         } catch (JSONException e) {
@@ -173,19 +203,13 @@ public class BillingManagerImpl implements BillingManager {
         }
     }
 
-    /**
-     * Verify signature of purchase.
-     *
-     * @param signedData the content of a purchase.
-     * @param signature  the signature of a purchase.
-     * @return If the purchase is valid.
-     */
+
     @Override
     public boolean verifyValidSignature(String signedData, String signature) {
         try {
             return Security.verifyPurchase(signedData, signature, PUBLIC_KEY);
         } catch (IOException e) {
-            logWarning("Purchase failed to valid signature", e);
+            logWarning("Purchase failed to valid signature.", e);
             return false;
         }
     }
@@ -197,16 +221,12 @@ public class BillingManagerImpl implements BillingManager {
 
     @Override
     public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails) {
-        logDebug("oldSku is:" + oldSku + ", new sku is:" + skuDetails.getSku());
-
-        //if user is upgrading, it take effect immediately otherwise wait until current plan expired
-        //TODO
-//        final int prorationMode = getProductLevel(skuDetails.getSku()) > getProductLevel(oldSku) ? 1 : 2;
-//        logDebug("prorationMode is " + prorationMode);
+        String newSku = skuDetails.getSku();
+        logDebug("OldSku is:" + oldSku + ", new sku is:" + newSku);
 
         PurchaseIntentReq req = new PurchaseIntentReq();
         req.setPriceType(IapClient.PriceType.IN_APP_SUBSCRIPTION);
-        req.setProductId(skuDetails.getSku());
+        req.setProductId(newSku);
         req.setDeveloperPayload(payload);
 
         Task<PurchaseIntentResult> task = iapClient.createPurchaseIntent(req);
@@ -221,13 +241,13 @@ public class BillingManagerImpl implements BillingManager {
 
     @Override
     public void destroy() {
-        // do nothing
+        // Do nothing on HMS
     }
 
     @Override
     public int getPurchaseResult(Intent data) {
         PurchaseResultInfo purchaseResultInfo = iapClient.parsePurchaseResultInfoFromIntent(data);
-        if (null == purchaseResultInfo) {
+        if (purchaseResultInfo == null) {
             return OrderStatusCode.ORDER_STATE_FAILED;
         }
 
@@ -261,7 +281,7 @@ public class BillingManagerImpl implements BillingManager {
 
         Task<ProductInfoResult> task = iapClient.obtainProductInfo(req);
         task.addOnSuccessListener(result -> {
-            if (null == result) {
+            if (result == null) {
                 logError("ProductInfoResult is null");
                 return;
             }
@@ -270,6 +290,11 @@ public class BillingManagerImpl implements BillingManager {
         }).addOnFailureListener(this::handleException);
     }
 
+    /**
+     * Code from HMS official sample.
+     *
+     * @param e Exception
+     */
     private void handleException(Exception e) {
         int code = -1;
         String message;
@@ -321,7 +346,7 @@ public class BillingManagerImpl implements BillingManager {
     }
 
     /**
-     * to start an activity.
+     * To start an Activity.
      *
      * @param status  This parameter contains the pendingIntent object of the payment page.
      * @param reqCode Result code.
@@ -352,6 +377,9 @@ public class BillingManagerImpl implements BillingManager {
         return payload;
     }
 
+    /**
+     * Converter for converting platform dependent objects to generic MEGA objects.
+     */
     private static class Converter {
 
         public static MegaSku convert(ProductInfo sku) {

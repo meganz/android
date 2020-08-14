@@ -51,6 +51,7 @@ import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.billing.PaymentUtils;
 import mega.privacy.android.app.utils.billing.Security;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaApiJava;
 
 import static com.android.billingclient.api.BillingFlowParams.ProrationMode.DEFERRED;
 import static com.android.billingclient.api.BillingFlowParams.ProrationMode.IMMEDIATE_WITH_TIME_PRORATION;
@@ -128,21 +129,15 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         // Start setup. This is asynchronous and the specified listener will be called
         // once setup completes.
         // It also starts to report all the new purchases through onPurchasesUpdated() callback.
-        startServiceConnection(new Runnable() {
-            @Override
-            public void run() {
-                logInfo("service connected, query purchases");
-                // Notifying the listener that billing client is ready
-                mBillingUpdatesListener.onBillingClientSetupFinished();
-                // IAB is fully set up. Now, let's get an inventory of stuff we own.
-                queryPurchases();
-            }
+        startServiceConnection(() -> {
+            logInfo("service connected, query purchases");
+            // Notifying the listener that billing client is ready
+            mBillingUpdatesListener.onBillingClientSetupFinished();
+            // IAB is fully set up. Now, let's get an inventory of stuff we own.
+            queryPurchases();
         });
     }
 
-    /**
-     * Handle a callback that purchases were updated from the Billing library
-     */
     @Override
     public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
         int resultCode = billingResult.getResponseCode();
@@ -159,13 +154,6 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         return purchase.getState() == Purchase.PurchaseState.PURCHASED;
     }
 
-    /**
-     * Start a purchase or subscription replace flow
-     *
-     * @param oldSku        The sku of current purchased item.
-     * @param purchaseToken The token of current purchased item.
-     * @param skuDetails    The item to purchase.
-     */
     @Override
     public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails) {
         logDebug("oldSku is:" + oldSku + ", new sku is:" + skuDetails);
@@ -199,9 +187,6 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         return null;
     }
 
-    /**
-     * Clear the resources
-     */
     @Override
     public void destroy() {
         logInfo("on destroy");
@@ -211,14 +196,9 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         }
     }
 
-    /**
-     * Unused for GMS
-     *
-     * @param data
-     * @return
-     */
     @Override
     public int getPurchaseResult(Intent data) {
+        // Unused for GMS
         return -1;
     }
 
@@ -280,7 +260,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * Handles the purchase
      * <p>Note: Notice that for each purchase, we check if signature is valid on the client.
      * It's recommended to move this check into your backend.
-     * See {@link Security#verifyPurchase(String, String)}
+     * See {@link Security#verifyPurchase(String, String, String)}
      * </p>
      *
      * @param purchase Purchase to be handled
@@ -294,14 +274,11 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
             // Acknowledge the purchase if it hasn't already been acknowledged.
             if (!purchase.isAcknowledged()) {
-                AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
-                    @Override
-                    public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
-                        if (billingResult.getResponseCode() == BillingResponseCode.OK) {
-                            logInfo("purchase acknowledged");
-                        } else {
-                            logWarning("purchase acknowledge failed, " + billingResult.getDebugMessage());
-                        }
+                AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = billingResult -> {
+                    if (billingResult.getResponseCode() == BillingResponseCode.OK) {
+                        logInfo("purchase acknowledged");
+                    } else {
+                        logWarning("purchase acknowledge failed, " + billingResult.getDebugMessage());
                     }
                 };
                 AcknowledgePurchaseParams acknowledgePurchaseParams =
@@ -375,37 +352,34 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      */
     @Override
     public void queryPurchases() {
-        Runnable queryToExecute = new Runnable() {
-            @Override
-            public void run() {
-                PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
-                List<Purchase> purchasesList = purchasesResult.getPurchasesList();
-                if (purchasesList == null) {
-                    logWarning("getPurchasesList() for in-app products returned NULL, using an empty list.");
-                    purchasesList = new ArrayList<>();
-                }
-
-                // If there are subscriptions supported, we add subscription rows as well
-                if (areSubscriptionsSupported()) {
-                    PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
-                    if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
-                        purchasesList.addAll(subscriptionResult.getPurchasesList());
-                    }
-                }
-
-                // Verify all available purchases
-                List<Purchase> list = new ArrayList<>();
-                for (Purchase purchase : purchasesList) {
-                    if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
-                        list.add(purchase);
-                        logDebug("Purchase added, " + purchase.getOriginalJson());
-                    }
-                }
-
-                PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
-                logDebug("Final purchase result is " + finalResult.getBillingResult());
-                onQueryPurchasesFinished(finalResult);
+        Runnable queryToExecute = () -> {
+            PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
+            List<Purchase> purchasesList = purchasesResult.getPurchasesList();
+            if (purchasesList == null) {
+                logWarning("getPurchasesList() for in-app products returned NULL, using an empty list.");
+                purchasesList = new ArrayList<>();
             }
+
+            // If there are subscriptions supported, we add subscription rows as well
+            if (areSubscriptionsSupported()) {
+                PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
+                if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
+                    purchasesList.addAll(subscriptionResult.getPurchasesList());
+                }
+            }
+
+            // Verify all available purchases
+            List<Purchase> list = new ArrayList<>();
+            for (Purchase purchase : purchasesList) {
+                if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+                    list.add(purchase);
+                    logDebug("Purchase added, " + purchase.getOriginalJson());
+                }
+            }
+
+            PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
+            logDebug("Final purchase result is " + finalResult.getBillingResult());
+            onQueryPurchasesFinished(finalResult);
         };
 
         executeServiceRequest(queryToExecute);

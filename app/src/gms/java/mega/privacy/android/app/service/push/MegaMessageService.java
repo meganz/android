@@ -13,7 +13,8 @@ import java.util.concurrent.Executors;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 
 import static mega.privacy.android.app.utils.Constants.DEVICE_ANDROID;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class MegaMessageService extends FirebaseMessagingService {
 
@@ -42,7 +43,9 @@ public class MegaMessageService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        messageHanlder.handleMessage(convert(remoteMessage));
+        PushMessageHanlder.Message message = convert(remoteMessage);
+        logDebug("Receive remote msg: " + message);
+        messageHanlder.handleMessage(message);
     }
 
     @Override
