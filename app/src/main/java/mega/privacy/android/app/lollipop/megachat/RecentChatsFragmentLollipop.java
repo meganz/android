@@ -505,9 +505,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
                         if (isOnline(context)) {
                             showEmptyChatScreen();
-                            if (context instanceof ManagerActivityLollipop) {
-                                ((ManagerActivityLollipop) context).showFabButton();
-                            }
+                            showFab();
                         } else {
                             showNoConnectionScreen();
                         }
@@ -533,9 +531,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         listView.setVisibility(View.VISIBLE);
                         emptyLayout.setVisibility(View.GONE);
 
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showFabButton();
-                        }
+                        showFab();
                     }
                 } else {
                     logDebug("Show chat screen connecting...");
@@ -586,14 +582,22 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     visibilityFastScroller();
                     adapterList.setPositionClicked(-1);
 
-                    if (context instanceof ManagerActivityLollipop) {
-                        ((ManagerActivityLollipop) context).showFabButton();
-                    }
+                    showFab();
                 }
             } else {
                 logDebug("Show chat screen connecting...");
                 showConnectingChatScreen();
             }
+        }
+    }
+
+    private void showFab() {
+        if (adapterList == null || adapterList.isMultipleSelect()) {
+            return;
+        }
+
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).showFabButton();
         }
     }
 

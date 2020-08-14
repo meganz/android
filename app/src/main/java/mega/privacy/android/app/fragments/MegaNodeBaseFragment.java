@@ -164,10 +164,12 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     nC.selectContactToShareFolders(handleList);
                     hideActionMode();
                     break;
+
                 case R.id.cab_menu_share_out:
                     MegaNodeUtil.shareNodes(context, selected);
                     hideActionMode();
                     break;
+
                 case R.id.cab_menu_share_link:
                 case R.id.cab_menu_edit_link:
                     if (selected.get(0) == null) {
@@ -184,10 +186,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                         break;
                     }
 
-                    ArrayList<MegaNode> nodes = new ArrayList<>();
-                    nodes.addAll(selected);
+                    ArrayList<MegaNode> nodes = new ArrayList<>(selected);
                     managerActivity.showConfirmationRemoveSeveralPublicLinks(nodes);
                     hideActionMode();
+                    break;
+
                 case R.id.cab_menu_leave_share:
                     managerActivity.showConfirmationLeaveMultipleShares(handleList);
                     break;

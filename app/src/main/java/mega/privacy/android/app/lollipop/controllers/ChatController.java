@@ -686,7 +686,7 @@ public class ChatController {
         }else {
             logDebug("Other type of messages");
             //OTHER TYPE OF MESSAGES
-            if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
+            if (megaApi.getMyUser() != null && megaApi.getMyUser().getHandle() == message.getUserHandle()) {
                 logDebug("MY message ID: " + message.getMsgId());
 
                 StringBuilder builder = new StringBuilder();
