@@ -15,10 +15,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class PhotosFragment : BaseFragment() {
@@ -51,6 +54,7 @@ class PhotosFragment : BaseFragment() {
 
         listView = binding.photoList
         preventListItemBlink()
+        elevateToolbarWhenScrolling()
 
         return binding.root
     }
@@ -73,6 +77,14 @@ class PhotosFragment : BaseFragment() {
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
+    }
+
+    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
+        listView
+    ) { v: View?, _, _, _, _ ->
+        (activity as ManagerActivityLollipop).changeActionBarElevation(
+            v!!.canScrollVertically(-1)
+        )
     }
 
     private fun setupActionMode() {

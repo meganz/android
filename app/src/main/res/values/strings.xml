@@ -2817,8 +2817,8 @@
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
 
-    <string name="category_photo">Photo</string>
-    <string name="category_documents">Document</string>
+    <string name="category_photo">Photos</string>
+    <string name="category_documents">Documents</string>
     <string name="category_audio">Audio</string>
     <string name="category_video">Video</string>
 

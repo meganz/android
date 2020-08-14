@@ -15,6 +15,7 @@ import android.view.Window
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -36,6 +37,7 @@ class HomepageFragment : Fragment() {
 
     private val viewModel: HomePageViewModel by viewModels()
 
+    private lateinit var activity: ManagerActivityLollipop
     private lateinit var viewDataBinding: FragmentHomepageBinding
     private lateinit var rootView: View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
@@ -47,20 +49,39 @@ class HomepageFragment : Fragment() {
 
     private var isFabExpanded = false
 
+    private val categoryClickListener = OnClickListener {
+        with (viewDataBinding.category) {
+            val direction = when (view) {
+                categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
+                else -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
+            }
+
+            findNavController().navigate(direction)
+            activity.showHideBottomNavigationView(true)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
+
+        activity = (getActivity() as ManagerActivityLollipop)
+
         return rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // TODO: Temp workaround, waiting for new NavHost implementation
+        activity.attachNavController()
+
         setupMask()
         setupSearchView()
+        setupCategories()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
@@ -69,7 +90,7 @@ class HomepageFragment : Fragment() {
     private fun setupSearchView() {
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
-            (activity as ManagerActivityLollipop).drawerLayout!!
+            activity.drawerLayout!!
         )
 
         viewModel.notification.observe(viewLifecycleOwner) {
@@ -83,7 +104,7 @@ class HomepageFragment : Fragment() {
         }
 
         searchInputView.setAvatarClickListener(
-            OnClickListener { (activity as ManagerActivityLollipop).showMyAccount() })
+            OnClickListener { activity.showMyAccount() })
     }
 
     private fun setupBottomSheetUI() {
@@ -109,12 +130,16 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupMask() {
-        windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
+        windowContent = activity.window?.findViewById(Window.ID_ANDROID_CONTENT)
         fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
     }
 
+    private fun setupCategories() {
+        viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
+    }
+
     private fun getTabTitle(position: Int): String? {
-        val resources = activity?.resources
+        val resources = activity.resources
 
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources?.getString(R.string.tab_recents)
@@ -212,7 +237,7 @@ class HomepageFragment : Fragment() {
             rotateFab()
             showOut(fabChat, fabUpload, textChat, textUpload)
             // After animation completed, then remove mask.
-            runDelay(FAB_MASK_OUT_DELAY) {
+            runDelay {
                 removeMask()
                 fabMain.visibility = View.VISIBLE
                 isFabExpanded = !isFabExpanded
@@ -229,8 +254,8 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun runDelay(delayMs: Long, task: () -> Unit) {
-        Handler().postDelayed(task, delayMs)
+    private fun runDelay(task: () -> Unit) {
+        Handler().postDelayed(task, FAB_MASK_OUT_DELAY)
     }
 
     private fun showIn(vararg fabs: View) {
@@ -286,11 +311,6 @@ class HomepageFragment : Fragment() {
         view.animate()
             .setDuration(FAB_ANIM_DURATION)
             .translationY(0f)
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    super.onAnimationEnd(animation)
-                }
-            })
             .alpha(ALPHA_OPAQUE)
             .start()
     }

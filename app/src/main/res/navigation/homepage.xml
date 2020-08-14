@@ -17,5 +17,5 @@
     <fragment
         android:id="@+id/photosFragment"
         android:name="mega.privacy.android.app.fragments.photos.PhotosFragment"
-        android:label="PhotosFragment" />
+        android:label="@string/category_photo" />
 </navigation>

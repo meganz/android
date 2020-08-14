@@ -249,12 +249,4 @@
 		android:icon="@drawable/ic_action_bar_null"
 		MEGA:showAsAction="never"
 		android:visible="false"/>
-
-	<item
-		android:id="@+id/action_menu_photos"
-		android:orderInCategory="180"
-		android:title="Photos"
-		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never"
-		android:visible="true"/>
 </menu>

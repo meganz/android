@@ -119,7 +119,6 @@
                 android:layout_height="match_parent"
                 android:layout_below="@id/app_bar_layout"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
         </LinearLayout>
 
         <RelativeLayout
