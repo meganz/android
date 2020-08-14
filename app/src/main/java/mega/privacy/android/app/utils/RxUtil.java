@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 
 import static mega.privacy.android.app.utils.LogUtil.logError;
@@ -8,8 +9,8 @@ public class RxUtil {
     private RxUtil() {
     }
 
-    public static <T> Consumer<T> ignore() {
-        return ignored -> {
+    public static Action ignore() {
+        return () -> {
         };
     }
 

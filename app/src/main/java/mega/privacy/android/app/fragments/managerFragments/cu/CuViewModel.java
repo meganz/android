@@ -7,6 +7,7 @@ import androidx.collection.LongSparseArray;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -249,7 +250,7 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public void setInitialPreferences() {
-        add(Single.fromCallable(
+        add(Completable.fromCallable(
                 () -> {
                     logDebug("setInitialPreferences");
 
@@ -278,7 +279,7 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public void setCamSyncEnabled(boolean enabled) {
-        add(Single.fromCallable(
+        add(Completable.fromCallable(
                 () -> {
                     mDbHandler.setCamSyncEnabled(enabled);
                     return enabled;
@@ -288,7 +289,7 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public void enableCuForBusinessFirstTime(boolean enableCellularSync, boolean syncVideo) {
-        add(Single.fromCallable(
+        add(Completable.fromCallable(
                 () -> {
                     mDbHandler.setCamSyncEnabled(true);
                     File localFile =
