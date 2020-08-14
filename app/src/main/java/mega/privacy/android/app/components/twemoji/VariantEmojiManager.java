@@ -68,9 +68,11 @@ public final class VariantEmojiManager implements VariantEmoji {
         }
 
         for (Emoji variant : variantsEmojiList) {
-            if (!variant.getBase().equals(newVariantBase)) {
-                variantsEmojiList.remove(variant);
-                variantsEmojiList.add(newVariant);
+            if (variant.getBase().equals(newVariantBase)) {
+                if (!variant.equals(newVariant)) {
+                    variantsEmojiList.remove(variant);
+                    variantsEmojiList.add(newVariant);
+                }
             }
             return;
         }

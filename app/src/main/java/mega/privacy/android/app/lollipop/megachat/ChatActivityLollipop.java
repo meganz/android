@@ -6326,7 +6326,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             updateActionModeTitle();
             reDoTheSelectionAfterRotation();
             recoveredSelectedPositions = null;
-
         }
 
         logDebug("AFTER updateMessagesLoaded: " + messages.size() + " messages in list");
@@ -6995,10 +6994,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         selectedPosition = position;
         hideBottomSheet();
-
         selectedMessageId = message.getMessage().getMsgId();
-        bottomSheetDialogFragment = reaction == null ? new ReactionsBottomSheet() : new InfoReactionsBottomSheet(this, reaction);
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+
+        if (reaction == null) {
+            bottomSheetDialogFragment = new ReactionsBottomSheet();
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        } else if (chatRoom != null && !chatRoom.isPreview() && chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
+            bottomSheetDialogFragment = new InfoReactionsBottomSheet(this, reaction);
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        }
     }
 
     public void hideBottomSheet() {

@@ -50,14 +50,4 @@ public class EqualSpacingItemDecoration extends RecyclerView.ItemDecoration {
                 break;
         }
     }
-
-    private int resolveDisplayMode(RecyclerView.LayoutManager layoutManager) {
-        if (layoutManager instanceof GridLayoutManager)
-            return GRID;
-
-        if (layoutManager.canScrollHorizontally())
-            return HORIZONTAL;
-
-        return VERTICAL;
-    }
 }

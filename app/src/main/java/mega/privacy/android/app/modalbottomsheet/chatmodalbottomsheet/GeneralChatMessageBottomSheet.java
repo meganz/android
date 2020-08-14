@@ -19,7 +19,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatReactionsFragment;
+import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -49,7 +49,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private ChatController chatC;
     private MegaChatRoom chatRoom;
     private LinearLayout reactionsLayout;
-    private ChatReactionsFragment reactionsFragment;
+    private ChatReactionsView reactionsFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,8 +111,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         RelativeLayout optionDelete = contentView.findViewById(R.id.delete_layout);
         TextView textDelete = contentView.findViewById(R.id.delete_text);
 
-        reactionsFragment.init(context, chatId, messageId, positionMessage);
-
         optionOpenWith.setOnClickListener(this);
         optionForward.setOnClickListener(this);
         optionEdit.setOnClickListener(this);
@@ -127,6 +125,18 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionDownload.setOnClickListener(this);
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
+
+        boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
+                context instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
+                !((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) &&
+                !message.isUploading();
+
+        if (shouldReactionOptionBeVisible) {
+            reactionsFragment.init(context, chatId, messageId, positionMessage);
+            reactionsLayout.setVisibility(View.VISIBLE);
+        } else {
+            reactionsLayout.setVisibility(View.GONE);
+        }
 
         if (message == null || message.getMessage() == null || chatRoom == null || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
             optionOpenWith.setVisibility(View.GONE);
@@ -243,7 +253,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                             megaApi.getContact(userEmail) != null &&
                             megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE &&
                             (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)) ? View.VISIBLE : View.GONE);
-                }else{
+                } else {
                     optionStartConversation.setVisibility(View.VISIBLE);
                     optionInviteContact.setVisibility(View.GONE);
 
@@ -260,12 +270,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             }
         }
 
-        boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
-                context instanceof ChatActivityLollipop &&
-                !((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) &&
-                !message.isUploading();
 
-        reactionsLayout.setVisibility(shouldReactionOptionBeVisible ? View.VISIBLE : View.GONE);
         forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE &&
                 optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
 
@@ -453,7 +458,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
                 break;
         }
-
         setStateBottomSheetBehaviorHidden();
     }
 

@@ -99,7 +99,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             }
         }
 
-        holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.number_reactions_added));
+        holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
         holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
         holder.itemEmojiReaction.setEmoji(holder.emojiReaction);
     }

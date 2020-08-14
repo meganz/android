@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <mega.privacy.android.app.lollipop.megachat.ChatReactionsFragment
+            <mega.privacy.android.app.lollipop.megachat.ChatReactionsView
                 android:id="@+id/fragment_container_reactions"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"

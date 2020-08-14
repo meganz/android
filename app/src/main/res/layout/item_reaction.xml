@@ -27,7 +27,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
             android:layout_toEndOf="@id/item_emoji_reaction"
-            android:textColor="@color/number_reactions_added"
+            android:textColor="@color/mail_my_account"
             android:textSize="14sp" />
     </RelativeLayout>
 

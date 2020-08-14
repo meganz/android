@@ -36,7 +36,7 @@ public final class UserReactionListView extends ListView {
             arrayOfUsers.add(listUsers.get(i));
         }
 
-        userArrayAdapter = new UserReactionAdapter(getContext(), arrayOfUsers, chatId);
+        userArrayAdapter = new UserReactionAdapter(getContext(), arrayOfUsers);
         setAdapter(userArrayAdapter);
     }
 

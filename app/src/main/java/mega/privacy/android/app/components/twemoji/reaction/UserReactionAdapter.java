@@ -1,10 +1,9 @@
 package mega.privacy.android.app.components.twemoji.reaction;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,25 +17,32 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class UserReactionAdapter extends ArrayAdapter<Long> {
+public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnClickListener {
 
     private static final int MAX_WIDTH_PORT = 180;
     private static final int MAX_WIDTH_LAND = 260;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private Context context;
+    private long userHandle;
+    private String email;
+    private ChatController chatC;
 
-    public UserReactionAdapter(Context context, ArrayList<Long> users, long chatId) {
+
+    public UserReactionAdapter(Context context, ArrayList<Long> users) {
         super(context, 0, users);
         this.context = context;
 
@@ -51,24 +57,27 @@ public class UserReactionAdapter extends ArrayAdapter<Long> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        DisplayMetrics outMetrics = MegaApplication.getInstance().getBaseContext().getResources().getDisplayMetrics();
 
-        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        long userHandle = getItem(position);
+        userHandle = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.user_reaction_item, parent, false);
         }
+
+        RelativeLayout layout = convertView.findViewById(R.id.layout);
         RoundedImageView imageView = convertView.findViewById(R.id.contact_list_thumbnail);
         EmojiTextView name = convertView.findViewById(R.id.contact_list_name);
         name.setMaxWidthEmojis(scaleWidthPx(isScreenInPortrait(context) ? MAX_WIDTH_PORT : MAX_WIDTH_LAND, outMetrics));
+        layout.setOnClickListener(this);
+        layout.setTag(userHandle);
 
         String userName;
-        String email;
-        ChatController chatC = new ChatController(context);
+        chatC = new ChatController(context);
 
-        if (userHandle == megaChatApi.getMyUserHandle()) {
+        String userHandleString = MegaApiAndroid.userHandleToBase64(userHandle);
+        String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
+
+        if (userHandleString.equals(myUserHandleEncoded)) {
             email = megaChatApi.getMyEmail();
             userName = megaChatApi.getMyFullname();
             if (isTextEmpty(userName)) {
@@ -89,7 +98,6 @@ public class UserReactionAdapter extends ArrayAdapter<Long> {
                 }
             }
         }
-
         name.setText(userName);
 
         /*Default Avatar*/
@@ -97,8 +105,6 @@ public class UserReactionAdapter extends ArrayAdapter<Long> {
         imageView.setImageBitmap(getDefaultAvatar(avatarColor, userName, AVATAR_SIZE, true));
 
         /*Avatar*/
-        String userHandleString = MegaApiAndroid.userHandleToBase64(userHandle);
-        String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
 
         if (userHandleString.equals(myUserHandleEncoded)) {
             Bitmap bitmap = getAvatarBitmap(email);
@@ -115,5 +121,30 @@ public class UserReactionAdapter extends ArrayAdapter<Long> {
         }
 
         return convertView;
+    }
+
+    @Override
+    public void onClick(View view) {
+        long handle = (long) view.getTag();
+
+        switch (view.getId()) {
+            case R.id.layout:
+                if (handle == MEGACHAT_INVALID_HANDLE) {
+                    break;
+                }
+
+                String userHandleString = MegaApiAndroid.userHandleToBase64(handle);
+                String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
+                if (!userHandleString.equals(myUserHandleEncoded)) {
+                    String email = chatC.getParticipantEmail(handle);
+                    MegaUser contact = megaApi.getContact(email);
+                    if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                        Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+                        i.putExtra(NAME, email);
+                        context.startActivity(i);
+                    }
+                }
+                break;
+        }
     }
 }

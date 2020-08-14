@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -14,22 +15,12 @@ import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
-public class ManageReactionListener implements MegaChatRequestListenerInterface {
+public class ManageReactionListener extends ChatBaseListener {
 
-    MegaChatApiAndroid megaChatApi;
-    Context context;
 
     public ManageReactionListener(Context context) {
-        super();
-        this.context = context;
-        megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        super(context);
     }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) { }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) { }
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
@@ -43,16 +34,17 @@ public class ManageReactionListener implements MegaChatRequestListenerInterface 
 
         switch (e.getErrorCode()) {
             case MegaChatError.ERROR_OK:
-                logDebug(hasReactionBeenAdded ? "The reaction has been added correctly" : "The reaction has been deleted correctly");
-                MegaHandleList listUsers = megaChatApi.getReactionUsers(chatId, msgId, reaction);
+                MegaHandleList listUsers = api.getReactionUsers(chatId, msgId, reaction);
                 int count = listUsers != null ? (int) listUsers.size() : 0;
-                ((ChatActivityLollipop) context).updateReactionAdapter(megaChatApi.getMessage(chatId, msgId), reaction, count);
+                if (context instanceof ChatActivityLollipop) {
+                    ((ChatActivityLollipop) context).updateReactionAdapter(api.getMessage(chatId, msgId), reaction, count);
+                }
                 break;
 
             case MegaError.API_EEXIST:
                 if (hasReactionBeenAdded && !MegaApplication.isIsReactionFromKeyboard()) {
                     logDebug("This reaction is already added in this message, so it should be removed");
-                    megaChatApi.delReaction(request.getChatHandle(), megaChatApi.getMessage(chatId, msgId).getMsgId(), reaction, ManageReactionListener.this);
+                    api.delReaction(request.getChatHandle(), api.getMessage(chatId, msgId).getMsgId(), reaction, ManageReactionListener.this);
                 }
                 break;
         }

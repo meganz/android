@@ -22,10 +22,10 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class ChatReactionsFragment extends RelativeLayout implements View.OnClickListener {
+public class ChatReactionsView extends RelativeLayout implements View.OnClickListener {
 
     private Context context;
-    private AndroidMegaChatMessage message = null;
+    private AndroidMegaChatMessage message;
     private long chatId;
     private int positionMessage;
     private RelativeLayout firstReaction;
@@ -40,19 +40,19 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
     private EmojiImageView fifthEmoji;
     private RelativeLayout addReaction;
     private MegaChatApiAndroid megaChatApi;
-    private RecentEmoji recentEmoji = null;
+    private RecentEmoji recentEmoji;
 
-    public ChatReactionsFragment(Context context) {
+    public ChatReactionsView(Context context) {
         super(context);
         initView(context);
     }
 
-    public ChatReactionsFragment(Context context, AttributeSet attrs) {
+    public ChatReactionsView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView(context);
     }
 
-    public ChatReactionsFragment(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ChatReactionsView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context);
     }
@@ -170,10 +170,14 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
      * @param imageEmoji The image Emoji.
      */
     private void addReaction(EmojiImageView imageEmoji) {
-        if (recentEmoji != null) {
-            recentEmoji.addEmoji(imageEmoji.getEmoji());
+        if(imageEmoji == null){
+            closeDialog();
+            return;
         }
 
+        if (recentEmoji != null ) {
+            recentEmoji.addEmoji(imageEmoji.getEmoji());
+        }
         addReactionInMsg(context, chatId, message.getMessage().getMsgId(), imageEmoji.getEmoji(), true);
         closeDialog();
     }

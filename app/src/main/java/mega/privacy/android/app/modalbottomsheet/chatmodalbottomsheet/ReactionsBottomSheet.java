@@ -25,10 +25,9 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
 
     private final static int HEIGHT_REACTIONS_KEYBOARD = 250;
 
-    private AndroidMegaChatMessage message = null;
+    private AndroidMegaChatMessage message;
     private long chatId;
     private long messageId;
-    private BottomSheetBehavior mBehavior;
     private RelativeLayout mainLayout;
     private EmojiKeyboard reactionsKeyboard;
 
@@ -57,11 +56,6 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_reaction, null);
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
         reactionsKeyboard = contentView.findViewById(R.id.reaction_keyboard);
