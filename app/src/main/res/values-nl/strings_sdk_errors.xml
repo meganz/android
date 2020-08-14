@@ -29,13 +29,13 @@
     <string name="api_essl" context="Error shown when SSL check has failed">SSL verificatie mislukt</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Niet genoeg tegoed</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">2-Factor Authenticatie vereist.</string>
-    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Toegang geweigerd voor niet-admin-gebruikers</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Uw zakelijke account is verlopen</string>
-    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>
-    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Billing failed</string>
-    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Rejected by fraud protection</string>
+    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit kaart geweigerd</string>
+    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Facturering mislukt</string>
+    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Afgewezen door fraudebescherming</string>
     <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Te veel verzoeken</string>
-    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Balance error</string>
+    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Saldo-fout</string>
     <string name="payment_egeneric_api_error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">Onbekende fout</string>
-    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">HTTP Error</string>
+    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">HTTP fout</string>
 </resources>

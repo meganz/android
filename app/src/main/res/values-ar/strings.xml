@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و المحادثة متاح عبر متصفحات الويب العادية، بالإضافة تطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n \nقم بتحميل ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA وبكل سهولة.\n\nتقدم ميغا MEGA  خمسين جيجابايت كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك برو لايت: 4،99 € في الشهر أو 49.99 € في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك برو 1: 9.99 € في الشهر أو 99.99 € في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر. \nاشتراك برو 2: 19.99 € في الشهر أو 199.99 € في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك برو 3: 29.99 € في الشهر أو 299.99 € في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقرعلى أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -> تحميل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-> التقاط  صورة و ترفيع صورك إلى ميغا MEGA\nاستخدام_جهات_الاتصال -> إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك المحمول بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -> تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. الرماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android \n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms\n\n\nللحاسوب المكتبي - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و المحادثة متاح عبر متصفحات الويب العادية، بالإضافة تطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n \nقم بتحميل ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA وبكل سهولة.\n\nتقدم ميغا MEGA  خمسين جيجابايت كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك برو لايت: 4،99 € في الشهر أو 49.99 € في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك برو 1: 9.99 € في الشهر أو 99.99 € في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر. \nاشتراك برو 2: 19.99 € في الشهر أو 199.99 € في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك برو 3: 29.99 € في الشهر أو 299.99 € في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقرعلى أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -> تحميل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-> التقاط  صورة و ترفيع صورك إلى ميغا MEGA\nاستخدام_جهات_الاتصال -> إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك المحمول بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -> تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. الرماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android \n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms\n\n\nللحاسوب المكتبي - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA هو تخزين سحابي مزود بخصوصية دائمة قوية</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">ملفات ملفات PDF في MEGA</string>
 
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s سيتم تحميلهم</string>
     <string name="alert_no_app" context="Alert text before download">ليس هناك أي تطبيق لفتح الملف %s. هل تريد متابعة التنزيل؟</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">لا تظهر مرة أخرى</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">لا تظهر مرة أخرى</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">هل أنت متأكد من أنك تريد إلغاء عملية تسجيل الدخول الحالية؟</string>
 
@@ -558,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">مفتاح فك التشفير</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">الرجاء إدخال مفتاح فك التشفير للرابط</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">مفتاح فك التشفير غير موجود</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">صورة</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">صوتي</string>
@@ -692,8 +690,8 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">رفع ملفات مجلدات الميديا</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">التحقق من الملفات المراد ترفيعها</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">تهيئة ترفيعات الكاميرا</string>
-	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
-	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">تم تعطيل ترفيعات الكاميرا. المجلد المحلي الخاص بك غير متوفر.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">تم تعطيل ترفيعات الوسائط. المجلد المحلي الخاص بك غير متوفر.</string>
 
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
@@ -919,7 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">السجلات تم تفعيلها</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">السجلات تم إيقافها</string>
-    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Unable to setup MEGA Camera Uploads folder</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">تعذر إعداد مجلد ميغا MEGA لترفيعات الكاميرا</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">لم يتم تمكين السجلات لأنك رفضت منح الأذونات المطلوبة</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">فتح الموقع</string>
@@ -1544,8 +1542,8 @@
     <string name="general_view" context="Menu option">عرض الملفات</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">استيراد</string>
     <string name="save_for_offline" context="Menu option">احفظ دون اتصال</string>
-    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Add to Cloud</string>
-    <string name="save_to_offline" context="Menu option to choose save to offline section">Save to Offline</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">الإضافة الي محرك السحابة</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">حفظ في قسم وضع عدم الاتصال</string>
 
     <string name="general_view_contacts" context="Menu option">عرض جهات الاتصال</string>
 
@@ -1571,6 +1569,10 @@
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
         <item context="Error message when removing public links of nodes. Plural." quantity="other">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">تمت إزالة الرابط بنجاح.</item>
@@ -1661,8 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">جار إزالة جهة الاتصال من مجلد المشاركة</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
-    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Camera Uploads.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">هل أنت متأكد أنك تريد إرسال هذا المجلد إلى سلة المهملات؟ سيؤدي هذا إلى تعطيل تحميلات الكاميرا.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">هل أنت متأكد أنك تريد نقل هذا المجلد إلى سلة المهملات؟ سيؤدي هذا إلى تعطيل ترفيعات الوسائط.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">الحذف من MEGA؟</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">إذا تركت المجلد، لن تكون قادراً على الوصول إليه مرة أخرى.</string>
@@ -1856,6 +1858,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">تم تجاوز حصة التخزين</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">رابط غير متوفر، الرجاء طلب رابط جديد صالح</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">كلمة مرور الرابط غير صالحة</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">الرابط الذي تحاول فتحه ليس رابط صالحاً لميغا MEGA.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">جاري معالجة الرابط&#8230;</string>
 
@@ -1879,12 +1884,13 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">تم تعليق حسابك بسبب انتهاكات متعددة لشروط الخدمة الخاصة ب MEGA. يرجى التحقق من بريدك الوارد.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">تم إنهاء حسابك بسبب مخالفة شروط الخدمة الخاصة ب MEGA، مثل إساءة استخدام حقوق الآخرين؛ مشاركة /أو استيراد البيانات غير المشروعة؛ أو إساءة استخدام النظام.</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">ترفيع ملفات</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">لا توجد ملفات</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s بايت</string>
-    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
-    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s MB</string>
-    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s GB</string>
-    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s TB</string>
+    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s كيلوبايت</string>
+    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s ميغابايت</string>
+    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s غيغابايت</string>
+    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s تيرابايت</string>
     <string name="label_mega_byte" context="Size in megabytes.">ميغابايب</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -1961,7 +1967,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">هل تتذكر كلمة مرورك؟</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">انت بصدد تسجيل الخروج، يرجى التحقق من كلمة المرور خاصتك للتأكد من تذكرك لها\nضياع كلمة المرور سيؤدي الى فقدان الولوج للبيانات الخاصة بك على MEGA</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">تحقق من كلمة المرور خاصتك للتأكد من تذكرك لها. ضياع كلمة المرور سيؤدي الى فقدان الولوج للبيانات الخاصة بك على MEGA</string>
-    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">عدم الإظهار مرة اخرى</string>
+    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">لا تظهر مرة أخرى</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">تحقق من كلمة المرور</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">التحقق من كلمة المرور</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">تم قبول كلمة المرور</string>
@@ -2548,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">تم العثور على جهات الاتصال %d على ميغا MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">دعوة جهة الاتصال الآن؟</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">تعرف على الموجودين بالفعل على ميغا MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">اكتشف جهات الاتصال الخاصة بك على ميغا MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">امنح ميغا MEGA حق الوصول إلى دفتر العناوين الخاص بك لاكتشاف جهات الاتصال الخاصة بك على ميغا MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">جارٍ ترفيع جهات الاتصال على ميغا MEGA &#8230;</string>
 
@@ -2578,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">ليس لديك جهات اتصال على ميغا MEGA. يرجى دعوة أصدقاء من قائمة جهات الاتصال.</string>
-    <string name="invite_more" context="Invite button for chat top cell">ادعو المزيد&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">أدعو أكثر</string>
 
     <string name="title_tour_one" context="Title of first tour screen">انت تحتفظ بالمفتاح</string>
     <string name="content_tour_one" cotext="Content of first tour screen">نحن موجودون لتوفير الأمان، ملفاتك بأمان أكثر معنا محمية خلف آلية تشفير متينة بحيث تكون أنت فقط القادر على الولوج الى ملفاتك.</string>
@@ -2766,13 +2772,28 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">في %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">هل تريد بالتأكيد إيقاف مشاركة هذه المجلدات  %1$d؟</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">هل أنت متأكد من أنك تريد إزالة جميع المشاركات من %1$d المجلدات؟</string>
 
     <string name="download_location" context="Download location label">موقع التحميل</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">هل تريد الحفظ دائماً في هذا الموقع؟</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">أرفق من &#8230;</string>
-    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
-    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">تم إنشاء المحادثة على %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">حدد الرسالة</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">وثق بيانات الإعتماد لديك</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">لم يتم التحقق</string>
+    <string name="label_verified" context="Action indicating something was verified.">تم التحقق</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">وثائق تفويض صالحة</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">من الأفضل القيام بذلك في واقع الحياة من خلال اللقاء وجها لوجه. إذا كان لديك قناة أخرى موثوقة بالفعل، مثل OTR اوPGP، يمكنك أيضا استخدام ذلك.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">بياناتك</string>
+    <string name="action_reset" context="Button to reset credentials">إعادة تعيين</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
 </resources>
