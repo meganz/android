@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Não foi possível remover alguns links. Por favor, tente novamente mais tarde.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Não foi possível criar o link. Por favor, tente novamente mais tarde.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">Não foi possível criar alguns links. Por favor, tente novamente mais tarde.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">O link foi removido.</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Mover para a lixeira?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Você tem certeza de quera mover esta pasta para a Lixeira? Fazer isso desativará os Uploads da câmera.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Você tem certeza de que quer mover esta pasta para a Lixeira? Fazer isso desativará o Upload de mídias.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Você tem certeza de que quer mover esta pasta para a Lixeira? Fazer isso desativará o upload secundário de mídia.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Mover para a lixeira?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Deletar do MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Se você sair desta pasta, não será possível acessá-la novamente.</string>
@@ -2789,11 +2789,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Suas credenciais</string>
     <string name="action_reset" context="Button to reset credentials">Resetar</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Você quer remover o seu telefone?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">O seu número de telefone foi removido corretamente.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Não foi possível remover o seu telefone.</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Visualizar</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenciais de %s</string>
 
 </resources>
