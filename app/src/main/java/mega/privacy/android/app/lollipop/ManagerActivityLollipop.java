@@ -792,6 +792,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private NavController navController;
+
 	private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -5753,18 +5755,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (view == null) return;
 		if (view.getId() == View.NO_ID) view.setId(View.generateViewId());
 
-		NavController navController = Navigation.findNavController(
+		navController = Navigation.findNavController(
 				this, navHostFragment.getView().getId());
-		AppBarConfiguration appBarConfiguration =
-				new AppBarConfiguration.Builder(navController.getGraph())
-						.setOpenableLayout(drawerLayout).build();
-		NavigationUI.setupWithNavController(
-				tB, navController, appBarConfiguration);
+
+		// TODO: Following code isn't compatible with legacy navigation code, so commented
+//		AppBarConfiguration appBarConfiguration =
+//				new AppBarConfiguration.Builder(navController.getGraph())
+//						.setOpenableLayout(drawerLayout).build();
+//		NavigationUI.setupWithNavController(
+//				tB, navController, appBarConfiguration);
 
 		navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			if(destination.getId() == R.id.homepageFragment) {
 				abL.setVisibility(View.GONE);
-//				showHideBottomNavigationView(false);
+                // Showing the bottom navigation view immediately because the initial dimension
+				// of Homepage bottom sheet is calculated based on it
 				final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
 						ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 				params.setMargins(0, 0, 0, px2dp(56, outMetrics));
@@ -6890,6 +6895,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								showUpAF();
 								return true;
 						}
+					} if (drawerItem == DrawerItem.HOMEPAGE) {
+						navController.navigateUp();
 					}
 				}
 		    	return true;

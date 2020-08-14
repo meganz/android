@@ -17,5 +17,13 @@
     <fragment
         android:id="@+id/photosFragment"
         android:name="mega.privacy.android.app.fragments.photos.PhotosFragment"
-        android:label="@string/category_photo" />
+        android:label="@string/category_photos" >
+        <action
+            android:id="@+id/action_photosFragment_to_fullScreenImageViewerLollipop"
+            app:destination="@id/fullScreenImageViewerLollipop" />
+    </fragment>
+    <activity
+        android:id="@+id/fullScreenImageViewerLollipop"
+        android:name="mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop"
+        android:label="FullScreenImageViewerLollipop" />
 </navigation>

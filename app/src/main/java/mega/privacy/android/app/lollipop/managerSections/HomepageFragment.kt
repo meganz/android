@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -76,15 +77,20 @@ class HomepageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // TODO: Temp workaround, waiting for new NavHost implementation
-        activity.attachNavController()
-
+        setupNavigation()
         setupMask()
         setupSearchView()
         setupCategories()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
+    }
+
+    private fun setupNavigation() {
+        // The legacy ManagerActivity code isn't compatible with Navigation component.
+        // Homepage has to use existed navigation system to compromise
+        activity.attachNavController()
+        activity.isFirstNavigationLevel = true
     }
 
     private fun setupSearchView() {

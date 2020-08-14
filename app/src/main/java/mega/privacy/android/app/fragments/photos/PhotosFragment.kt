@@ -20,6 +20,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.Util
 import javax.inject.Inject
 
 
@@ -42,6 +43,8 @@ class PhotosFragment : BaseFragment() {
     @Inject
     lateinit var actionModeCallback: ActionModeCallback
 
+    private lateinit var activity: ManagerActivityLollipop
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,10 +55,6 @@ class PhotosFragment : BaseFragment() {
             actionModeViewModel = this@PhotosFragment.actionModeViewModel
         }
 
-        listView = binding.photoList
-        preventListItemBlink()
-        elevateToolbarWhenScrolling()
-
         return binding.root
     }
 
@@ -63,10 +62,12 @@ class PhotosFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
+        setupListView()
         setupListAdapter()
         setupFastScroller()
         setupNavigation()
         setupActionMode()
+        setupNavigation()
         Log.i("Alex", "viewmodel:$viewModel")
 
         viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
@@ -87,11 +88,32 @@ class PhotosFragment : BaseFragment() {
         )
     }
 
+    private fun setupListView() {
+        listView = binding.photoList
+        preventListItemBlink()
+        elevateToolbarWhenScrolling()
+    }
+
     private fun setupActionMode() {
         observeSelectedNodes()
         observeSelectAll()
         observeAnimatedNodes()
         observeActionModeDestroy()
+    }
+
+    private fun setupNavigation() {
+        activity = getActivity() as ManagerActivityLollipop
+        activity.isFirstNavigationLevel = false
+
+        activity.supportActionBar?.apply {
+            title = resources.getString(R.string.category_photos)
+            setHomeAsUpIndicator(
+                Util.mutateIcon(
+                    context,
+                    R.drawable.ic_arrow_back_white,
+                    R.color.black
+                ))
+        }
     }
 
     private fun observeSelectedNodes() =
@@ -202,9 +224,6 @@ class PhotosFragment : BaseFragment() {
 
     private fun setupFastScroller() {
         binding.scroller.setRecyclerView(listView)
-    }
-
-    private fun setupNavigation() {
     }
 
     private fun setupListAdapter() {
