@@ -166,28 +166,22 @@ public class Util {
 		
 		try{ 
 			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(
-				activity.getString(android.R.string.ok),
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
 						dialog.dismiss();
 						if (finish) {
 							activity.finish();
 						}
-					}
-				});
-			dialogBuilder.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					if (finish) {
-						activity.finish();
-					}
+					});
+			dialogBuilder.setOnCancelListener(dialog -> {
+				if (finish) {
+					activity.finish();
 				}
 			});
 		
 		
 			AlertDialog dialog = dialogBuilder.create();
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.setCancelable(false);
 			dialog.show(); 
 			brandAlertDialog(dialog);
 		}

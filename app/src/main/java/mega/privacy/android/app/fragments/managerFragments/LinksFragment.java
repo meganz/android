@@ -75,13 +75,6 @@ public class LinksFragment extends MegaNodeBaseFragment {
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
-            control.move().setVisible(true);
-            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-                control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            } else {
-                control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-            }
-
             if (selected.size() == 1
                 && megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
                 control.rename().setVisible(true);
