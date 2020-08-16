@@ -253,4 +253,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
         return false
     }
+
+    override fun searchReady() {
+    }
+
+    override fun exitSearch() {
+    }
 }

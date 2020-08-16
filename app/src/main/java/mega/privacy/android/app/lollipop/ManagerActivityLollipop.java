@@ -772,6 +772,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private View mNavHostView;
 	private NavController mNavController;
+	private HomepageSearchable mHomepageSearchable;
 
 	private BroadcastReceiver refreshAddPhoneNumberButtonReceiver = new BroadcastReceiver() {
         @Override
@@ -6387,16 +6388,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				searchQuery = "";
 				searchExpand = true;
 
-				if (drawerItem != DrawerItem.CHAT) {
+				if (drawerItem == DrawerItem.CHAT) {
+					resetActionBar(aB);
+				} else if (drawerItem == DrawerItem.HOMEPAGE) {
+					resetActionBar(aB);
+					if (mHomepageSearchable != null) {
+						mHomepageSearchable.searchReady();
+					}
+				} else {
 					textsearchQuery = false;
 					firstNavigationLevel = true;
 					parentHandleSearch = -1;
 					levelsSearch = -1;
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
-				} else if (drawerItem == DrawerItem.CHAT){
-					resetActionBar(aB);
 				}
+
 				hideCallMenuItem();
 				hideCallWidget();
 				return true;
@@ -6415,10 +6422,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
+				} else if (drawerItem == DrawerItem.HOMEPAGE) {
+					if (mHomepageSearchable != null) {
+						mHomepageSearchable.exitSearch();
+						supportInvalidateOptionsMenu();
+					}
 				} else {
-					cancelSearch();
-					textSubmitted = true;
-					closeSearchSection();
+						cancelSearch();
+						textSubmitted = true;
+						closeSearchSection();
 				}
 				return true;
 			}
@@ -6751,10 +6763,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case NOTIFICATIONS:
 					break;
 				case HOMEPAGE:
-					HomepageSearchable searchable = findHomepageSearchable();
-					if (searchable != null) {
-						searchMenuItem.setVisible(searchable.shouldShowSearch());
-						if (searchable instanceof PhotosFragment) {
+					mHomepageSearchable = findHomepageSearchable();
+					if (mHomepageSearchable != null) {
+						searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearch());
+						if (mHomepageSearchable instanceof PhotosFragment) {
 							rubbishBinMenuItem.setVisible(true);
 						}
 					}

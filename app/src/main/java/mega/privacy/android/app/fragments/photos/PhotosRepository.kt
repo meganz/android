@@ -59,7 +59,6 @@ class PhotosRepository @Inject constructor(
 
         // Update LiveData must in main thread
         withContext(Dispatchers.Main) {
-            Log.i("Alex", "new data update:" + photoNodesMap.values.size)
             _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
         }
     }
