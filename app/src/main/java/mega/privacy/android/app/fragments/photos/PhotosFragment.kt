@@ -12,6 +12,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -25,7 +26,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class PhotosFragment : BaseFragment() {
+class PhotosFragment : BaseFragment(), HomepageSearchable {
     @Inject
     lateinit var viewModel: PhotosViewModel
 
@@ -61,15 +62,22 @@ class PhotosFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        activity = getActivity() as ManagerActivityLollipop
 
         setupListView()
         setupListAdapter()
         setupFastScroller()
-        setupNavigation()
         setupActionMode()
         setupNavigation()
         Log.i("Alex", "viewmodel:$viewModel")
 
+        viewModel.items.observe(viewLifecycleOwner) {
+            activity.invalidateOptionsMenu()
+        }
+        refresh()
+    }
+
+    fun refresh() {
         viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
     }
 
@@ -83,9 +91,7 @@ class PhotosFragment : BaseFragment() {
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        (activity as ManagerActivityLollipop).changeActionBarElevation(
-            v!!.canScrollVertically(-1)
-        )
+        activity.changeActionBarElevation(v!!.canScrollVertically(-1))
     }
 
     private fun setupListView() {
@@ -102,18 +108,18 @@ class PhotosFragment : BaseFragment() {
     }
 
     private fun setupNavigation() {
-        activity = getActivity() as ManagerActivityLollipop
-        activity.isFirstNavigationLevel = false
+//        activity = getActivity() as ManagerActivityLollipop
+//        activity.isFirstNavigationLevel = false
 
-        activity.supportActionBar?.apply {
-            title = resources.getString(R.string.category_photos)
-            setHomeAsUpIndicator(
-                Util.mutateIcon(
-                    context,
-                    R.drawable.ic_arrow_back_white,
-                    R.color.black
-                ))
-        }
+//        activity.supportActionBar?.apply {
+//            title = resources.getString(R.string.category_photos)
+//            setHomeAsUpIndicator(
+//                Util.mutateIcon(
+//                    context,
+//                    R.drawable.ic_arrow_back_white,
+//                    R.color.black
+//                ))
+//        }
     }
 
     private fun observeSelectedNodes() =
@@ -236,5 +242,14 @@ class PhotosFragment : BaseFragment() {
         }
 
         listView.adapter = listAdapter
+    }
+
+    override fun shouldShowSearch(): Boolean {
+        val size = viewModel.items.value?.size
+        if (size != null) {
+            return size > 0
+        }
+
+        return false
     }
 }

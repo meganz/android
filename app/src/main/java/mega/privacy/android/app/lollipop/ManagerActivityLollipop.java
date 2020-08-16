@@ -40,7 +40,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -56,11 +55,8 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
@@ -153,6 +149,8 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.photos.HomepageSearchable;
+import mega.privacy.android.app.fragments.photos.PhotosFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -592,7 +590,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	boolean megaContacts = true;
 	String feedback;
 
-//	private boolean isListCloudDrive = true;
+	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
+	private enum HomepageScreen {
+       HOMEPAGE, PHOTOS
+	}
+
+	//	private boolean isListCloudDrive = true;
 //	private boolean isListOffline = true;
 //	private boolean isListRubbishBin = true;
 	public boolean isListCameraUploads = false;
@@ -657,7 +660,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
-	private NavHostFragment navHostFragment;
 
 	ProgressDialog statusDialog;
 
@@ -767,6 +769,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private boolean onAskingPermissionsFragment = false;
 	public boolean onAskingSMSVerificationFragment = false;
 
+	private View mNavHostView;
+	private NavController mNavController;
+
 	private BroadcastReceiver refreshAddPhoneNumberButtonReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context,Intent intent) {
@@ -791,8 +796,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
-
-	private NavController navController;
 
 	private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
 		@Override
@@ -2209,6 +2212,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		logDebug("Set view");
 		setContentView(R.layout.activity_manager);
+
 //		long num = 11179220468180L;
 //		dbH.setSecondaryFolderHandle(num);
 		//Set toolbar
@@ -2518,6 +2522,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
+
+		mNavHostView = findViewById(R.id.nav_host_fragment);
+		setupNavDestListener();
 
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
@@ -5060,6 +5067,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				aB.setTitle(getString(R.string.section_secondary_media_uploads).toUpperCase());
 				break;
 			}
+			case HOMEPAGE: {
+				setFirstNavigationLevel(false);
+				if (mHomepageScreen == HomepageScreen.PHOTOS) {
+					aB.setTitle((getString(R.string.category_photos)));
+				}
+			}
 			default:{
 				logDebug("Default GONE");
 
@@ -5748,38 +5761,36 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	// TODO: Temp workaround, waiting for new NavHost implementation
-	public void attachNavController() {
-		if (navHostFragment == null) return;
-		View view = navHostFragment.getView();
-		if (view == null) return;
-		if (view.getId() == View.NO_ID) view.setId(View.generateViewId());
+	private void setupNavDestListener() {
+		mNavController = Navigation.findNavController(mNavHostView);
 
-		navController = Navigation.findNavController(
-				this, navHostFragment.getView().getId());
-
-		// TODO: Following code isn't compatible with legacy navigation code, so commented
+		// TODO: Following code isn't compatible with legacy code, so commented temporarily
 //		AppBarConfiguration appBarConfiguration =
 //				new AppBarConfiguration.Builder(navController.getGraph())
 //						.setOpenableLayout(drawerLayout).build();
 //		NavigationUI.setupWithNavController(
 //				tB, navController, appBarConfiguration);
 
-		navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-			if(destination.getId() == R.id.homepageFragment) {
-				abL.setVisibility(View.GONE);
-                // Showing the bottom navigation view immediately because the initial dimension
-				// of Homepage bottom sheet is calculated based on it
-				final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
-						ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-				params.setMargins(0, 0, 0, px2dp(56, outMetrics));
-				bNV.setVisibility(View.VISIBLE);
-				bNV.setTranslationY(0);
-				fragmentLayout.setLayoutParams(params);
-			} else {
-				abL.setVisibility(View.VISIBLE);
-				showHideBottomNavigationView(true);
+		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+			int destinationId = destination.getId();
+
+			switch (destinationId) {
+				case R.id.homepageFragment:
+					mHomepageScreen = HomepageScreen.HOMEPAGE;
+					// Showing the bottom navigation view immediately because the initial dimension
+					// of Homepage bottom sheet is calculated based on it
+					showBNVImmediate();
+					abL.setVisibility(View.GONE);
+					return;
+				case R.id.photosFragment:
+					mHomepageScreen = HomepageScreen.PHOTOS;
+					break;
 			}
+
+			abL.setVisibility(View.VISIBLE);
+			showHideBottomNavigationView(true);
+			supportInvalidateOptionsMenu();
+			setToolbarTitle();
 		});
 	}
 
@@ -5804,6 +5815,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (item != DrawerItem.CHAT) {
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
 			removeFragment(rChatFL);
+		}
+
+		if (item != DrawerItem.HOMEPAGE) {
+			mNavHostView.setVisibility(View.GONE);
 		}
 
     	switch (item){
@@ -5845,35 +5860,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				showFabButton();
 				break;
 			}
+			// FIXME: for removed OFFLINE, when should we do the checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)?
 			case HOMEPAGE: {
+				if (mHomepageScreen == HomepageScreen.HOMEPAGE) {
+					showBNVImmediate();
+					abL.setVisibility(View.GONE);
+				} else {
+					// For example, back from Rubbish Bin to Photos
+					setToolbarTitle();
+					invalidateOptionsMenu();
+				}
+
+				mNavHostView.setVisibility(View.VISIBLE);
+				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+				showFabButton();
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
-
-				// Showing the BottomNavigationBar without anim delay,
-				// or the BottomSheet would not be measured correctly
-				showBNVImmediate();
-
-				FragmentManager fragmentManager = getSupportFragmentManager();
-				String tag = FragmentTag.HOMEPAGE.getTag();
-				navHostFragment = (NavHostFragment) fragmentManager.findFragmentByTag(tag);
-
-				if (navHostFragment == null) {
-					navHostFragment = NavHostFragment.create(R.navigation.homepage);
-				}
-
-				fragmentManager.beginTransaction()
-						.replace(R.id.fragment_container, navHostFragment, tag)
-						.setPrimaryNavigationFragment(navHostFragment)
-						.commitNow();
-
-				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
-				abL.setVisibility(View.GONE);
-				showFabButton();
-
 				break;
 			}
-			// FIXME: for removed OFFLINE, when should we do the checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)?
     		case CAMERA_UPLOADS: {
 				tB.setVisibility(View.VISIBLE);
 				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -6744,6 +6749,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				case NOTIFICATIONS:
 					break;
+				case HOMEPAGE:
+					HomepageSearchable searchable = findHomepageSearchable();
+					if (searchable != null) {
+						searchMenuItem.setVisible(searchable.shouldShowSearch());
+						if (searchable instanceof PhotosFragment) {
+							rubbishBinMenuItem.setVisible(true);
+						}
+					}
+					break;
 			}
 		}
 
@@ -6753,6 +6767,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		logDebug("Call to super onCreateOptionsMenu");
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	private HomepageSearchable findHomepageSearchable() {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
+		for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
+			if (fragment instanceof HomepageSearchable) {
+				return (HomepageSearchable) fragment;
+			}
+		}
+
+		return null;
 	}
 
 	private void setGridListIcon() {
@@ -6800,8 +6826,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						else {
 							backToDrawerItem(bottomNavigationCurrentItem);
 						}
-					}
-					else {
+					} else {
 						drawerLayout.openDrawer(nV);
 					}
 				}
@@ -6816,7 +6841,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							fbFLol.onBackPressed();
 						}
 		    		}
-					else if (drawerItem == DrawerItem.RUBBISH_BIN){
+					else if (drawerItem == DrawerItem.RUBBISH_BIN) {
 		    			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
 						if (rubbishBinFLol != null){
 							rubbishBinFLol.onBackPressed();
@@ -6895,8 +6920,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								showUpAF();
 								return true;
 						}
-					} if (drawerItem == DrawerItem.HOMEPAGE) {
-						navController.navigateUp();
+					} else if (drawerItem == DrawerItem.HOMEPAGE) {
+						mNavController.navigateUp();
 					}
 				}
 		    	return true;
@@ -16739,9 +16764,5 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private TransfersFragmentLollipop getTransfersFragment() {
 		return tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-	}
-
-	public void showHideActionBar(boolean show) {
-		abL.setVisibility(show? View.VISIBLE : View.GONE);
 	}
 }

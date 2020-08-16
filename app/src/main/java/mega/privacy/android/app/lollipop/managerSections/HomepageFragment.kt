@@ -77,7 +77,7 @@ class HomepageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupNavigation()
+//        setupNavigation()
         setupMask()
         setupSearchView()
         setupCategories()
@@ -89,8 +89,8 @@ class HomepageFragment : Fragment() {
     private fun setupNavigation() {
         // The legacy ManagerActivity code isn't compatible with Navigation component.
         // Homepage has to use existed navigation system to compromise
-        activity.attachNavController()
-        activity.isFirstNavigationLevel = true
+//        activity.attachNavController()
+//        activity.isFirstNavigationLevel = true
     }
 
     private fun setupSearchView() {
