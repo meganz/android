@@ -10,7 +10,7 @@ data class PhotoNode(
     override val modifiedDate: String,
     override var thumbnail: File?,
     override var selected: Boolean,
-    override var uiDirty: Boolean = false
+    override var uiDirty: Boolean = true   // Force refresh the newly created Node list item
 ) : SelectableNode {
     companion object {
         const val TYPE_TITLE = 0   // The datetime header

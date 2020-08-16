@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +27,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class PhotosFragment : BaseFragment(), HomepageSearchable {
+class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     @Inject
     lateinit var viewModel: PhotosViewModel
 
@@ -77,7 +78,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         refresh()
     }
 
-    fun refresh() {
+    override fun refresh() {
         viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
     }
 

@@ -149,6 +149,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.photos.HomepageRefreshable;
 import mega.privacy.android.app.fragments.photos.HomepageSearchable;
 import mega.privacy.android.app.fragments.photos.PhotosFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -6779,6 +6780,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		return null;
+	}
+
+	private void refreshHomepageRefreshable() {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
+		for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
+			if (fragment instanceof HomepageRefreshable) {
+				((HomepageRefreshable)fragment).refresh();
+			}
+		}
 	}
 
 	private void setGridListIcon() {
@@ -14697,7 +14708,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdateLollipop");
-
 		try {
 			statusDialog.dismiss();
 		}
@@ -14805,6 +14815,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 		}
+
+		refreshHomepageRefreshable();
 
 		setToolbarTitle();
 		supportInvalidateOptionsMenu();

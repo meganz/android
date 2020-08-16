@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.photos
 import android.content.Context
 import android.os.Handler
 import android.text.TextUtils
+import android.util.Log
 import android.util.LongSparseArray
 import androidx.core.util.containsKey
 import androidx.lifecycle.LiveData
@@ -46,6 +47,8 @@ class PhotosRepository @Inject constructor(
     val photoNodes: LiveData<List<PhotoNode>> = _photoNodes
 
     suspend fun getPhotos(query: PhotoQuery) = withContext(Dispatchers.IO) {
+        photoNodesMap.clear()
+
         if (query.order == MegaApiJava.ORDER_NONE) {
             getSortOrder()
         } else {
@@ -56,6 +59,7 @@ class PhotosRepository @Inject constructor(
 
         // Update LiveData must in main thread
         withContext(Dispatchers.Main) {
+            Log.i("Alex", "new data update:" + photoNodesMap.values.size)
             _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
         }
     }
