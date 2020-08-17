@@ -32,6 +32,8 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
+import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -243,6 +245,16 @@ class OfflineFragment : Fragment() {
             binding.offlineBrowserGrid
         }
         recyclerView?.adapter = adapter
+
+        if (args.rootFolderOnly) {
+            recyclerView?.addItemDecoration(
+                SimpleDividerItemDecoration(requireContext(), resources.displayMetrics)
+            )
+        } else {
+            recyclerView?.addItemDecoration(
+                PositionDividerItemDecoration(requireContext(), resources.displayMetrics)
+            )
+        }
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.emptyHintImage.setImageResource(drawable.offline_empty_landscape)
