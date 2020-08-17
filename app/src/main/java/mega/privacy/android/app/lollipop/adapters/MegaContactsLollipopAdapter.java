@@ -37,7 +37,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -68,7 +68,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private SparseBooleanArray selectedItems;
 	private ContactsFragmentLollipop fragment;
 	private int adapterType;
-	private SparseBooleanArray selectedContacts;
 
 	DisplayMetrics outMetrics;
 
@@ -344,7 +343,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			else{
                 megaApi.getUserAvatar(contact.getMegaUser(),buildAvatarFile(context,contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(),listener);
 			}
-		}	
+		}
 		else{
             megaApi.getUserAvatar(contact.getMegaUser(),buildAvatarFile(context,contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(),listener);
 		}
@@ -370,46 +369,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		holder.textViewContactName.setText(contact.getFullName());
 
-		createDefaultAvatar(holder, contact);
-
-		UserAvatarListener listener = new UserAvatarListener(context, holder);
-
-		File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
-		Bitmap bitmap = null;
-		if (isFileAvailable(avatar)){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (bitmap == null) {
-					avatar.delete();
-                    megaApi.getUserAvatar(contact.getMegaUser(),buildAvatarFile(context,contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(),listener);
-                }
-				else{
-					holder.imageView.setImageBitmap(bitmap);
-				}
-			}
-			else{
-                megaApi.getUserAvatar(contact.getMegaUser(),buildAvatarFile(context,contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(),listener);
-			}
-		}
-		else{
-            megaApi.getUserAvatar(contact.getMegaUser(),buildAvatarFile(context,contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(),listener);
-		}
-
-		if (selectedContacts != null) {
-			for (int i = 0; i < selectedContacts.size(); i++) {
-				if (selectedContacts.get(position) == true) {
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
-			}
-		}
-		else{
+		if (contact.isSelected()) {
+			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+			holder.imageView.setImageResource(R.drawable.ic_select_avatar);
+		} else {
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+			Bitmap bitmap = getUserAvatar(MegaApiJava.userHandleToBase64(contact.getMegaUser().getHandle()), contact.getMegaUser().getEmail());
+			if (bitmap != null) {
+				holder.imageView.setImageBitmap(bitmap);
+			} else {
+				createDefaultAvatar(holder, contact);
+				megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + JPG_EXTENSION).getAbsolutePath(), new UserAvatarListener(context, holder));
+			}
 		}
 	}
 
@@ -461,20 +433,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
 		else{
             megaApi.getUserAvatar(contact.getMegaUser(),buildAvatarFile(context,contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(),listener);
-		}
-
-		if (selectedContacts != null) {
-			for (int i = 0; i < selectedContacts.size(); i++) {
-				if (selectedContacts.get(position) == true) {
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
-			}
-		}
-		else{
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
 		}
 	}
 	
@@ -947,11 +905,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		fragment.itemClick(currentPosition);
 
 		return true;
-	}
-
-	public void setSelectedContacts(SparseBooleanArray selectedContacts){
-		this.selectedContacts = selectedContacts;
-		notifyDataSetChanged();
 	}
 
 	public MegaUser getDocumentAt(int position) {

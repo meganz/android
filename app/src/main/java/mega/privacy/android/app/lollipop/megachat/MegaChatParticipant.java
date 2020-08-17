@@ -9,6 +9,7 @@ public class MegaChatParticipant {
     private long handle;
     private int privilege;
     private boolean isContact;
+    private boolean hasAvatar;
 
     private String lastGreen;
 
@@ -110,5 +111,13 @@ public class MegaChatParticipant {
 
     public void setEmpty(boolean empty) {
         this.empty = empty;
+    }
+
+    public boolean hasAvatar() {
+        return hasAvatar;
+    }
+
+    public void setHasAvatar(boolean hasAvatar) {
+        this.hasAvatar = hasAvatar;
     }
 }

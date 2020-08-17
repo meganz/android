@@ -348,7 +348,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             if(selectedDialCode == null) {
                 selectedCountry.setText("");
             } else {
-                selectedCountry.setText(R.string.general_country_label);
+                selectedCountry.setText(R.string.sms_region_label);
             }
             logWarning("Invalid country code");
             errorInvalidCountryCode.setVisibility(View.VISIBLE);

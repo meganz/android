@@ -58,6 +58,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
+import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -66,6 +68,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
@@ -131,6 +134,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private String notificationChannelId = NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID;
 	private String notificationChannelName = NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME;
 
+	private static boolean fileExplorerUpload;
+	private static long snackbarChatHandle = MEGACHAT_INVALID_HANDLE;
 
 	/** the receiver and manager for the broadcast to listen to the pause event */
 	private BroadcastReceiver pauseBroadcastReceiver;
@@ -241,10 +246,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE));
 
 		if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
+			fileExplorerUpload = true;
 			HashMap<String, String> fileFingerprints = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
 			long[] idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS);
 			long[] attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES);
 			long[] idChats = intent.getLongArrayExtra(EXTRA_ATTACH_CHAT_IDS);
+
+			boolean onlyOneChat = true;
 
 			if (attachFiles != null && attachFiles.length > 0 && idChats != null && idChats.length > 0) {
 				for (int i = 0; i < attachFiles.length; i++) {
@@ -252,6 +260,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						requestSent++;
 						megaChatApi.attachNode(idChats[j], attachFiles[i], this);
 					}
+				}
+
+				if (idChats.length == 1) {
+					snackbarChatHandle = idChats[0];
+				} else {
+					onlyOneChat = false;
 				}
 			}
 
@@ -283,6 +297,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 //									One transfer for file --> onTransferFinish() attach to all selected chats
 								if (pendingMsg != null && pendingMsg.getChatId() != -1 && path.equals(pendingMsg.getFilePath()) && fingerprint.equals(pendingMsg.getFingerprint())) {
 									pendingMessageSingles.add(pendingMsg);
+									if (onlyOneChat) {
+										if (snackbarChatHandle == MEGACHAT_INVALID_HANDLE) {
+											snackbarChatHandle = pendingMsg.getChatId();
+										} else if (snackbarChatHandle != pendingMsg.getChatId()) {
+											onlyOneChat = false;
+										}
+									}
 								}
 							}
 						}
@@ -473,6 +494,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(megaApi.getNumPendingUploads()<=0){
 			megaApi.resetTotalUploads();
+		}
+
+		if (fileExplorerUpload) {
+			fileExplorerUpload = false;
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+							.putExtra(FILE_EXPLORER_CHAT_UPLOAD, true)
+							.putExtra(CHAT_ID, snackbarChatHandle));
+			snackbarChatHandle = MEGACHAT_INVALID_HANDLE;
 		}
 
 		logDebug("Stopping service!!");

@@ -93,6 +93,12 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
+		if (matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS)) {
+			logDebug("Open business invite link");
+			openWebLink(url);
+			return;
+		}
+
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
 			logDebug("Open link url");

@@ -299,6 +299,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					hideMultipleSelect();
 					break;
 				}
+
+				case R.id.cab_menu_remove_share:
+					((ManagerActivityLollipop) context).showConfirmationRemoveAllSharingContacts(documents);
+					break;
 			}
 			return true;
 		}
@@ -345,10 +349,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 						control.removeLink().setVisible(true);
-						if (selected.get(0).isFolder()
-								&& MegaNodeUtil.isOutShare(selected.get(0))) {
-							control.removeShare().setVisible(true);
-						}
 					} else {
 						control.getLink().setVisible(true)
 								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -364,6 +364,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			boolean showSendToChat = true;
 			boolean showShareFolder = true;
 			boolean showTrash = true;
+			boolean showRemoveShare = true;
+
 			for (MegaNode node : selected) {
 				if (!node.isFile()) {
 					showSendToChat = false;
@@ -375,7 +377,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						!= MegaError.API_OK) {
 					showTrash = false;
 				}
+
+				if (!node.isFolder() ||  !MegaNodeUtil.isOutShare(node)) {
+					showRemoveShare = false;
+				}
 			}
+
 			if (showSendToChat) {
 				menu.findItem(R.id.cab_menu_send_to_chat)
 						.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
@@ -384,10 +391,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				control.sendToChat().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
+
 			if (showShareFolder) {
 				control.shareFolder().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
+
+			if (showRemoveShare) {
+				control.removeShare().setVisible(true);
+			}
+
 			control.trash().setVisible(showTrash);
 
 			control.shareOut().setVisible(true)
