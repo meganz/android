@@ -152,7 +152,7 @@
                     />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/file_properties_switch"
+                    android:id="@+id/available_offline_switch"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="16dp"

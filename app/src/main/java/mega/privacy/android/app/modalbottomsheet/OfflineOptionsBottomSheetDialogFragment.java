@@ -68,11 +68,11 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         ImageView nodeThumb = contentView.findViewById(R.id.offline_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.offline_name_text);
         TextView nodeInfo = contentView.findViewById(R.id.offline_info_text);
-        LinearLayout optionDeleteOffline = contentView.findViewById(R.id.option_delete_offline_layout);
         LinearLayout optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
         LinearLayout optionShare = contentView.findViewById(R.id.option_share_layout);
 
-        optionDeleteOffline.setOnClickListener(this);
+        contentView.findViewById(R.id.option_delete_offline_layout).setOnClickListener(this);
+        contentView.findViewById(R.id.available_offline_switch).setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
         optionShare.setOnClickListener(this);
 
@@ -148,8 +148,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 nodeThumb.setImageResource(R.drawable.ic_folder_list);
             }
 
-            optionDeleteOffline.setVisibility(View.VISIBLE);
-
             if (nodeOffline.isFolder() && !isOnline(context)) {
                 optionShare.setVisibility(View.GONE);
                 contentView.findViewById(R.id.separator_share).setVisibility(View.GONE);
@@ -165,6 +163,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.option_delete_offline_layout:
+            case R.id.available_offline_switch:
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
                 }
