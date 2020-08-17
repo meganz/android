@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA oferă stocare în cloud criptată, controlată de utilizatori, prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, transmite, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt îți permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul PRO LITE: 4,99€ (4,99$ SUA) pe lună sau 49,99€ (49,99$ SUA) pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul PRO I: 9,99€ (9,99$ SUA) pe lună sau 99,99€ (99,99$ SUA) pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul PRO II: 19,99€ (19,99$ SUA) pe lună sau 199,99€ (199,99$ SUA) pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul PRO III: 29,99€ (29,99$ SUA) pe lună sau 299,99€ (299,99$ SUA) pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -> Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -> Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -> Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -> MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să verifici site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA oferă stocare în cloud criptată, controlată de utilizatori, prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, redă în flux, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt îți permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul PRO LITE: 4,99€ (4,99$ SUA) pe lună sau 49,99€ (49,99$ SUA) pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul PRO I: 9,99€ (9,99$ SUA) pe lună sau 99,99€ (99,99$ SUA) pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul PRO II: 19,99€ (19,99$ SUA) pe lună sau 199,99€ (199,99$ SUA) pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul PRO III: 29,99€ (29,99$ SUA) pe lună sau 299,99€ (299,99$ SUA) pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -> Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -> Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -> Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -> MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să verifici site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA reprezintă stocarea în cloud cu o puternică confidențialitate mereu în funcțiune.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Vizualizator PDF MEGA</string>
 
@@ -117,7 +114,7 @@
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Se upgradează contul</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Selectează toate</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Șterge selecția</string>
-    <string name="action_grid" context="Menu item to change from list view to grid view">Vizualizare tip miniatură</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Vizualizare tip miniaturi</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Vizualizare tip listă</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Fă backup cheii de recuperare</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Anulează abonamentul</string>
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s va fi descărcat.</string>
     <string name="alert_no_app" context="Alert text before download">Nu există nicio aplicație care să deschidă fișierul %s. Vrei să continui cu descărcarea?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">Nu afișa din nou</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Nu afișa din nou</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Sigur vrei să anulezi procesul actual de autentificare?</string>
 
@@ -249,13 +246,14 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Unitate cloud</string>
     <string name="section_recents" context="Label to reference a recents section">Recente</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Încărcări media</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">Încărcări media</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Conținut media primit</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvate pentru offline</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Elemente partajate</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Foldere partajate</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Coș de gunoi</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacte</string>
@@ -266,12 +264,13 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferuri</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Contul meu</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Încărcări cameră</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">Încărcări cameră</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Primite</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Efectuate</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Linkuri</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Partajări primite</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Partajări primite cu</string>
@@ -382,7 +381,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Părăsește partajarea</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Elimină partajarea</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Elimină linkul</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Acest link nu va mai fi disponibil publicului.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Acest link nu va mai fi disponibil publicului.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Acest link nu va mai fi disponibil publicului.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Aceste linkuri nu vor mai fi disponibile publicului.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Redenumește</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Deschide un link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Deschide</string>
@@ -552,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Cheie de decriptare</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Te rugăm să introduci cheia de decriptare pentru link</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Cheie de decriptate nevalidă</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Imagine</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -686,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Încărcarea fișierelor din folderele media</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Se verifică fișierele care să fie încărcate</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Se inițializează încărcări cameră</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Încărcările cameră au fost dezactivate. Folderul tău local este indisponibil.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Încărcările media au fost dezactivate. Folderul tău local este indisponibil.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -756,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi sau plan de date</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Numai Wi-Fi</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Încarcă fișier(e)</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -790,7 +796,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
-    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Resetează codul PIN</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Schimbă PIN-ul</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Blocare prin PIN</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Introdu</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Dată</string>
     <string name="sortby_creation_date" context="category in sort by action">Data creării</string>
     <string name="sortby_modification_date" context="category in sort by action">Data modificării</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Data creării linkului</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Cele mai noi</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Cele mai vechi</string>
 
@@ -910,6 +917,8 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Jurnalele sunt acum activate</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Jurnalele sunt acum dezactivate</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Nu se poate configura folderul Încărcări cameră al MEGA</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Jurnalele nu au fost activate deoarece ai refuzat permisiunile necesare</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Deschide locația</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
@@ -1369,7 +1378,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]din %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Elimini din Salvate pentru offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Elimini din Ofline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Setează statusul</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Înlătură</string>
@@ -1533,6 +1542,8 @@
     <string name="general_view" context="Menu option">Vezi fișierele</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importă</string>
     <string name="save_for_offline" context="Menu option">Salvează pentru offline</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Adaugă în unitatea cloud</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">Salvează pentru offline</string>
 
     <string name="general_view_contacts" context="Menu option">Vezi contactele</string>
 
@@ -1549,13 +1560,24 @@
 
     <string name="copyright_alert_title" context="text_copyright_alert_title">Avertisment privind drepturile de autor pentru toți utilizatorii</string>
     <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respectă drepturile de autor ale celorlalți și impune utilizatorilor serviciului de stocare în cloud MEGA să se conformeze cu legislațiile privind drepturile de autor.</string>
-    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Ai interdicția strică de a folosi serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
+    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Ai interdicția strică de a folosi serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, reda în flux, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">De acord</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">Dezacord</string>
 
     <string name="download_show_info" context="Hint how to cancel the download">Afișează informații</string>
 
-    <string name="context_link_removal_error" context="error message">Eliminarea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Eliminarea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Eșec la eliminarea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link eliminat cu succes.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Linkuri eliminate cu succes.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Acțiunea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Scrie e-mailul utilizatorului</string>
@@ -1641,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Eliminarea contactului de la folderul partajat</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Muți în coșul de gunoi?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Sigur vrei să muți acest folder în coșul de gunoi? Acest lucru va dezactiva Încărcări cameră.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Sigur vrei să muți acest folder în coșul de gunoi? Acest lucru va dezactiva Încărcări media.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Muți în coșul de gunoi?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Ștergi de pe MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Dacă părăsești folderul, nu vei putea să îl vezi din nou.</string>
@@ -1673,7 +1697,7 @@
     <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Activează această opțiune numai dacă transferurile tale nu pornesc. În circumstanțe normale, HTTP este satisfăcător deoarece toate transferurile sunt deja criptate.</string>
 
     <string name="title_achievement_invite_friends" context="title of screen to invite friends and get an achievement">Cum funcționează</string>
-    <string name="first_paragraph_achievement_invite_friends" context="first paragraph of screen to invite friends and get an achievement">Invită-ți prietenii să-și facă un cont MEGA gratuit și să-și instaleze aplicația noastră mobilă. Pentru fiecare înscriere cu succes și instalare a aplicației, vei primi spațiu de stocare și cotă bonus pentru transferuri.</string>
+    <string name="first_paragraph_achievement_invite_friends" context="first paragraph of screen to invite friends and get an achievement">Invită-ți prietenii să-și facă un cont MEGA gratuit și să-și instaleze aplicația noastră mobilă. Pentru fiecare înscriere cu succes și instalare a aplicației, vei primi spațiu de stocare și cotă de transfer drept bonus.</string>
     <string name="second_paragraph_achievement_invite_friends" context="second paragraph of screen to invite friends and get an achievement">Nu vei primi credit pentru invitarea cuiva care a folosit MEGA anterior și nu vei fi notificat despre o astfel de respingere. Contactele invitate trebuie să instaleze aplicația mobilă MEGA sau aplicația desktop MEGA pe dispozitivele acestora.</string>
 
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Selectează contacte din lista de contacte a telefonului sau introdu mai multe adrese de e-mail.</string>
@@ -1827,12 +1851,16 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Niciun [/B][A]folder partajat primit[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Niciun [/B][A]folder partajat trimis[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Niciun [/B][A]link public[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Cereri trimise</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Cereri primite</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Cota de stocare depășită</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Link nevalid, te rugăm să ceri un nou link valid</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Parolă nevalidă a linkului</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">Linkul pe care încerci să îl deschizi nu este un link MEGA valid.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Se procesează linkul&#8230;</string>
 
@@ -1856,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Contul tău a fost suspendat din cauza mai multor încălcări ale Termenilor de utilizare a serviciului MEGA. Te rugăm să-ți verifici căsuța de e-mail.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Contul tău a fost desființat din cauza unei încălcări a Termenilor de utilizare a serviciului MEGA, cum ar fi abuzul drepturilor altora; partajarea și/sau importarea de date ilegale; ori abuzul de sistem.</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Se încarcă fișierele</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Niciun fișier</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -1938,7 +1967,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Îți mai aduci aminte parola?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Ești pe cale să te deconectezi, te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Te rugăm să îți testezi parola mai jos pentru a te asigura că ți-o aduci aminte. Dacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
-    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Nu-mi afișa din nou</string>
+    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Nu afișa din nou</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Testează parola</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Testează-ți parola</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Parolă acceptată</string>
@@ -2071,7 +2100,7 @@
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d fișiere nu au fost partajate</string>
     <string name="preview_content" context="button’s text to open a full screen image">Previzualizează conținutul</string>
 
-    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Transmisiunea nu poate fi executată și fișierul nu a fost descărcat</string>
+    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Redarea în flux nu poate fi executată și fișierul nu a fost descărcat</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Fișierul există deja în Salvate pentru offline</string>
 
     <plurals name="error_forwarding_messages">
@@ -2094,7 +2123,7 @@
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Format nevalid al mesajului</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Semnătură nevalidă a mesajului</string>
 
-    <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">A apărut o eroare la încercarea de a crea transmisiunea</string>
+    <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">A apărut o eroare la încercarea de a crea redarea în flux</string>
 
     <string name="context_restore" context="Menu option to restore an item from the Rubbish bin">Restaurează</string>
 
@@ -2253,7 +2282,7 @@
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Rotația cheii este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a creat un link al chatului.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a șters linkul chatului.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a eliminat linkul chatului.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Șterge linkul chatului</string>
 
@@ -2271,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Eroare de inițializare a chatului la încărcarea linkului chatului.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Încerci să previzualizezi un chat în care ai fost anterior membru. Vrei să te alături din nou chatului?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Participi deja la acest chat.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Această previzualizare a chatului nu mai este disponibilă. Dacă părăsești previzualizarea, nu vei mai putea să o redeschizi.</string>
@@ -2316,6 +2344,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]te-a blocat ca contact.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notificări [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Cont șters</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Contul [/B][A]%s[/A][B] a fost șters.[/B]</string>
@@ -2435,7 +2464,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activează camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activează apelurile</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Acordă acces la agenda de adrese</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Activează accesul la agenda de adrese</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Descoperă cu ușurință contactele din agenda de adrese pe MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA nu va folosi aceste date în alt scop și nu va interacționa niciodată cu contactele tale fără consimțământul tău.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
@@ -2495,7 +2524,7 @@
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
     <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">Încă poți acorda permisiuni MEGA în setările dispozitivului.</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your address book, you will be able to discover your contacts more easily. MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">Dacă permiți MEGA să îți acceseze agenda de adrese, vei putea să îți descoperi mai ușor contactele. MEGA nu va folosi aceste date în alt scop și nu va interacționa niciodată cu contactele fără consimțământul tău.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Mesaj redirecționat</item>
@@ -2525,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacte găsite pe MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Inviți un contact acum?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Vezi cine este deja pe MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Descoperă-ți contactele pe MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Acordă-i acces lui MEGA la agenda de adrese pentru a-ți descoperi contactele pe MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Se încarcă contactele pe MEGA&#8230;</string>
 
@@ -2555,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Nu ai contacte MEGA. Te rugăm să inviți prieteni din secțiunea Contacte.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Invită mai mulți&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Invită mai mulți</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Tu deții cheile</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Securitatea este motivul pentru care existăm, fișierele tale sunt în siguranță în spatele unei mașini de criptare bine unsă, loc în care numai tu poți accesa fișierele.</string>
@@ -2725,6 +2754,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Este posibil să folosești aceeași parolă pentru contul tău MEGA ca și pentru alte servicii și că cel puțin unul dintre aceste alte servicii a suferit o încălcare a securității datelor.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Parola ta s-a scurs și acum este folosită de persoane rău-intenționate pentru a se autentifica în conturile tale, inclusiv, dar nu numai, în contul tău MEGA.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">Setează pseudonim</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Editează pseudonimul</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Pseudonim adăugat</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Pseudonim eliminat</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">A apărut o eroare la încercarea de adăugare a pseudonimului</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Pseudonim</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Se reconectează</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Te-ai întors.</string>
 
@@ -2734,6 +2770,30 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Nu ai permisiunile necesare pentru a reveni la versiunea anterioară pentru acest fișier. Pentru a continua, putem crea un nou fișier cu datele readuse la versiunea anterioară. Dorești să continui?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Versiunea a fost creată cu succes ca un fișier nou.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">în data de %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Sigur vrei să elimini toate partajările din %1$d foldere?</string>
+
     <string name="download_location" context="Download location label">Locație de descărcare</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvezi întotdeauna în această locație?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Atașează de pe&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat creat în %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Selectează mesajele</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verifică credențialele</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Neverificate</string>
+    <string name="label_verified" context="Action indicating something was verified.">Verificat</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Credențiale de autenticitate</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Acest lucru este realizat cel mai bine întâlnindu-vă față în față. Dacă ai un alt canal verificat deja precum OTR sau PGP verificat, l-ai putea folosi și pe acela.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Credențialele tale</string>
+    <string name="action_reset" context="Button to reset credentials">Resetează</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

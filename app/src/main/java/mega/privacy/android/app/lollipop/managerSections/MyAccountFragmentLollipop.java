@@ -53,6 +53,8 @@ import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.listeners.GetUserDataListener;
+import mega.privacy.android.app.listeners.ResetPhoneNumberListener;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -60,6 +62,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -80,7 +83,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, GetUserDataListener.OnUserDataUpdateCallback, ResetPhoneNumberListener.OnResetPhoneNumberCallback {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -149,6 +152,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private DatabaseHandler dbH;
 
 	private TextView logoutWarning;
+
+	private AlertDialog removePhoneNumberDialog;
+
+	private boolean removePhoneNumberDialogShowing;
+
+	private static final String KEY_RPN_DIALOG_SHOWING = "removePhoneNumberDialogShowing";
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -220,6 +229,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					createLink = false;
 				}
 			}
+            if (savedInstanceState.getBoolean(KEY_RPN_DIALOG_SHOWING, false)) {
+                showConfirmRemovePhoneNumberDialog();
+            }
 		}
 
 		if (createLink) {
@@ -237,15 +249,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		myAccountImage = v.findViewById(R.id.my_account_thumbnail);
 
         String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-		addPhoneNumber = v.findViewById(R.id.add_phone_number);
-		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+        addPhoneNumber = v.findViewById(R.id.add_phone_number);
+        addPhoneNumber.setOnClickListener(this);
+        if (!TextUtil.isTextEmpty(registeredPhoneNumber)) {
             addPhoneNumber.setText(registeredPhoneNumber);
-        } else if(canVoluntaryVerifyPhoneNumber()) {
-			addPhoneNumber.setText(R.string.add_phone_number_label);
-			addPhoneNumber.setOnClickListener(this);
-		} else {
-			addPhoneNumber.setVisibility(View.GONE);
-		}
+        } else if (canVoluntaryVerifyPhoneNumber()) {
+            addPhoneNumber.setText(R.string.add_phone_number_label);
+        } else {
+            addPhoneNumber.setVisibility(View.GONE);
+        }
 
 		mkButton = v.findViewById(R.id.MK_button);
 		mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
@@ -478,7 +490,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 				switch (status) {
 					case BUSINESS_STATUS_EXPIRED:
-						status = R.string.expired_label;
+						status = R.string.payment_overdue_label;
 						businessAccountStatusText.setTextColor(getResources().getColor(R.color.expired_red));
 						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.mail_my_account));
 						break;
@@ -488,7 +500,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.name_my_account));
 						break;
 					case BUSINESS_STATUS_GRACE_PERIOD:
-						status = R.string.grace_label;
+						status = R.string.payment_required_label;
 						businessAccountStatusText.setTextColor(getResources().getColor(R.color.grace_yellow));
 						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grace_yellow));
 						break;
@@ -713,15 +725,48 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
             case R.id.add_phone_number:{
-                Intent intent = new Intent(context,SMSVerificationActivity.class) ;
-                startActivity(intent);
+                if (canVoluntaryVerifyPhoneNumber()) {
+                    Intent intent = new Intent(context, SMSVerificationActivity.class);
+                    startActivity(intent);
+                } else {
+                    showConfirmRemovePhoneNumberDialog();
+                }
                 break;
             }
-
 		}
 	}
 
-	public int onBackPressed(){
+	private void showConfirmRemovePhoneNumberDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setMessage(R.string.remove_phone_number)
+                .setPositiveButton(R.string.general_ok, (dialog, which) -> {
+                    addPhoneNumber.setClickable(false);
+                    removePhoneNumberDialogShowing = false;
+                    dialog.dismiss();
+                    resetPhoneNumber();
+                })
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+                    removePhoneNumberDialogShowing = false;
+                    dialog.dismiss();
+                });
+        removePhoneNumberDialog = builder.create();
+        removePhoneNumberDialog.show();
+        removePhoneNumberDialogShowing = true;
+    }
+
+    private void resetPhoneNumber() {
+        megaApi.resetSmsVerifiedPhoneNumber(new ResetPhoneNumberListener(context, this));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(removePhoneNumberDialog != null) {
+            removePhoneNumberDialog.dismiss();
+        }
+    }
+
+    public int onBackPressed(){
 		logDebug("onBackPressed");
 		return 0;
 	}
@@ -953,7 +998,43 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	class QRBackgroundTask extends AsyncTask<String, Void, Void> {
+    @Override
+    public void onUserDataUpdate(MegaError e) {
+        addPhoneNumber.setClickable(true);
+        if (e.getErrorCode() == MegaError.API_OK) {
+            if (canVoluntaryVerifyPhoneNumber()) {
+                addPhoneNumber.setText(R.string.add_phone_number_label);
+                addPhoneNumber.setVisibility(View.VISIBLE);
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).showAddPhoneNumberInMenu();
+                }
+                showSnackbar(context, getString(R.string.remove_phone_number_success));
+            }
+        } else {
+            // Allow to retry when refresh data failed.
+            addPhoneNumber.setClickable(true);
+            showSnackbar(context, getString(R.string.remove_phone_number_fail));
+            logWarning("Get user data for updating phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
+        }
+    }
+
+    @Override
+    public void onResetPhoneNumber(MegaError e) {
+        /*
+          Reset phone number successfully or the account has reset the phone number,
+          but user data hasn't refreshed successfully need to refresh user data again.
+        */
+        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+            // Have to getUserData to refresh, otherwise, phone number remains previous value.
+            megaApi.getUserData(new GetUserDataListener(context, this));
+        } else {
+            addPhoneNumber.setClickable(true);
+            showSnackbar(context, getString(R.string.remove_phone_number_fail));
+            logWarning("Reset phone number failed: " + e.getErrorCode() + ": " + e.getErrorString());
+        }
+    }
+
+    class QRBackgroundTask extends AsyncTask<String, Void, Void> {
 
 
 		@Override
@@ -980,6 +1061,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			byte[] qrAvatarByteArray = qrAvatarOutputStream.toByteArray();
 			outState.putByteArray("qrAvatar", qrAvatarByteArray);
 		}
+		outState.putBoolean(KEY_RPN_DIALOG_SHOWING, removePhoneNumberDialogShowing);
 	}
 
     /**
@@ -1020,21 +1102,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void updateAddPhoneNumberLabel(){
         logDebug("updateAddPhoneNumberLabel");
-        addPhoneNumber.setVisibility(View.GONE);
+        addPhoneNumber.setVisibility(View.INVISIBLE);
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        handler.postDelayed(() -> {
 
-                //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
-                String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-                logDebug("updateAddPhoneNumberLabel " + registeredPhoneNumber);
+            //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
+            String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+            logDebug("updateAddPhoneNumberLabel " + registeredPhoneNumber);
 
-                if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
-                    addPhoneNumber.setText(registeredPhoneNumber);
-                    addPhoneNumber.setOnClickListener(null);
-                    addPhoneNumber.setVisibility(View.VISIBLE);
-                }
+            if(!TextUtil.isTextEmpty(registeredPhoneNumber)){
+                addPhoneNumber.setText(registeredPhoneNumber);
+                addPhoneNumber.setVisibility(View.VISIBLE);
             }
         }, 3000);
 

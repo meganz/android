@@ -28,7 +28,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -112,7 +112,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
 
-        titleNameContactChatPanel.setText(chat.getTitle());
+        titleNameContactChatPanel.setText(getTitleChat(chat));
 
         if (chat.isPreview()) {
             titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
@@ -140,8 +140,8 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 iconStateChatPanel.setVisibility(View.GONE);
                 addAvatarChatPanel(null, chat);
 
-                separatorInfo.setVisibility(View.GONE);
-                optionInfoChat.setVisibility(View.GONE);
+                infoChatText.setText(getString(R.string.group_chat_info_label));
+                optionInfoChat.setVisibility(View.VISIBLE);
 
                 if (chat.isActive()) {
                     optionLeaveChat.setVisibility(View.VISIBLE);
@@ -204,8 +204,9 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             } else {
                 MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
                 if (chatRoom != null) {
-                    titleMailContactChatPanel.setText(chatRoom.getPeerEmail(0));
-                    addAvatarChatPanel(chatRoom.getPeerEmail(0), chat);
+                    String email = chatC.getParticipantEmail(chatRoom.getPeerHandle(0));
+                    titleMailContactChatPanel.setText(email);
+                    addAvatarChatPanel(email, chat);
                 }
             }
 
@@ -227,7 +228,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
     }
 
     private void addAvatarChatPanel(String contactMail, MegaChatListItem chat) {
-        Bitmap bitmap = getImageAvatar(contactMail);
+        Bitmap bitmap = getAvatarBitmap(contactMail);
 
         if (bitmap != null) {
             chatImageView.setImageBitmap(bitmap);
@@ -235,8 +236,8 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             int color;
             String name = null;
 
-            if (!isTextEmpty(chat.getTitle())) {
-                name = chat.getTitle();
+            if (!isTextEmpty(getTitleChat(chat))) {
+                name = getTitleChat(chat);
             } else if (!isTextEmpty(contactMail)) {
                 name = contactMail;
             }

@@ -20,7 +20,7 @@ public class Constants {
     public static boolean DEBUG_MODE = false;
 
     /** Between 0 and 1, the thumbnails quality (default 0.3). Increasing this value may cause performance decrease */
-    public static float THUMBNAIL_RATIO = 0.3f;
+    public static float THUMBNAIL_RATIO = 0.7f;
 
     /**
      * The size of the rendered parts (default 256)

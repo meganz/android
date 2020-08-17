@@ -125,6 +125,22 @@
 
 		</RelativeLayout>
 
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+			android:id="@+id/fab_select"
+			android:layout_width="@dimen/fab_button_diameter"
+			android:layout_height="@dimen/fab_button_diameter"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentBottom="true"
+			android:layout_gravity="bottom|right|end"
+			android:layout_margin="16dp"
+			android:elevation="@dimen/elevation_low"
+			android:src="@drawable/ic_send_white"
+			android:stateListAnimator="@anim/button_elevation"
+			android:tint="@android:color/white"
+			android:visibility="gone"
+			tools:visibility="visible"
+			/>
+
 	</RelativeLayout>
 
 	<include layout="@layout/general_progress_bar"/>

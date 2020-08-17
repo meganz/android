@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaChatRoom;
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -128,9 +129,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private Button allowBtn;
     private RelativeLayout contactsListLayout;
     private RecyclerView contactsList;
-    private TextView moreContacts;
     private TextView moreContactsTitle;
     private TextView actionBarTitle, actionBarSubtitle;
+    private ImageView actionBarSubtitleArrow;
     private View bannerDivider;
 
     private AppBarLayout appBarLayout;
@@ -225,6 +226,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             // change the settings, when have new matched contact.
             dbH.setShowInviteBanner("true");
 
+            // At the end of the contacts list, add the 'Invite more' element, it's an empty MegaContact object.
+            megaContacts.add(new MegaContactGetter.MegaContact());
             onContactsCountChange(megaContacts);
             expandContainer();
             bannerContainer.setVisibility(View.VISIBLE);
@@ -279,7 +282,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void onContactsCountChange(List<MegaContactGetter.MegaContact> megaContacts) {
-        int count = megaContacts.size();
+        // The last element is the 'Invite more', don't include in the contacts count.
+        int count = megaContacts.size() - 1;
         if (count > 0) {
             String title = context.getResources().getQuantityString(R.plurals.quantity_of_local_contact, count, count);
             inviteTitle.setText(title);
@@ -321,7 +325,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         logDebug("onCreateView");
-
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -414,8 +417,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         invitationContainer = v.findViewById(R.id.contacts_list_container);
         contactsListLayout = v.findViewById(R.id.contacts_list_layout);
         contactsList = v.findViewById(R.id.contacts_list);
-        moreContacts = v.findViewById(R.id.more_contacts);
-        moreContacts.setOnClickListener(this);
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
         bannerDivider = v.findViewById(R.id.invitation_banner_divider);
         moreContactsTitle.setOnClickListener(this);
@@ -507,6 +508,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
                         if (isOnline(context)) {
                             showEmptyChatScreen();
+                            showFab();
                         } else {
                             showNoConnectionScreen();
                         }
@@ -531,6 +533,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                         listView.setVisibility(View.VISIBLE);
                         emptyLayout.setVisibility(View.GONE);
+
+                        showFab();
                     }
                 } else {
                     logDebug("Show chat screen connecting...");
@@ -580,11 +584,23 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     fastScroller.setRecyclerView(listView);
                     visibilityFastScroller();
                     adapterList.setPositionClicked(-1);
+
+                    showFab();
                 }
             } else {
                 logDebug("Show chat screen connecting...");
                 showConnectingChatScreen();
             }
+        }
+    }
+
+    private void showFab() {
+        if (adapterList == null || adapterList.isMultipleSelect()) {
+            return;
+        }
+
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).showFabButton();
         }
     }
 
@@ -770,7 +786,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
                 break;
             case R.id.more_contacts_title:
-            case R.id.more_contacts:
                 logDebug("to InviteContactActivity");
                 startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
@@ -1460,34 +1475,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
-    public String getParticipantFullName(MegaChatRoom chat, long i) {
-
-        String nickname = getNicknameContact(chat.getPeerHandle(i));
-        if(nickname != null) return nickname;
-
-        String participantFirstName = chat.getPeerFirstname(i);
-        String participantLastName = chat.getPeerLastname(i);
-
-        if (participantFirstName == null) {
-            participantFirstName = "";
-        }
-        if (participantLastName == null) {
-            participantLastName = "";
-        }
-
-        if (participantFirstName.trim().length() <= 0) {
-            return participantLastName;
-        } else {
-            return participantFirstName + " " + participantLastName;
-        }
-    }
-
     public void updateCacheForNonContacts(MegaChatRoom chatToCheck) {
         if (chatToCheck != null) {
             long peers = chatToCheck.getPeerCount();
             for (int i = 0; i < peers; i++) {
 //                    long peerHandle = chatToCheck.getPeerHandle(i);
-                String fullName = getParticipantFullName(chatToCheck, i);
+                String fullName = new ChatController(context).getParticipantFullName(chatToCheck.getPeerHandle(i));
                 if (fullName != null) {
                     if (fullName.trim().length() <= 0) {
                         logDebug("Ask for name!");
@@ -1533,6 +1526,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
         if(explanationDialog != null) {
             explanationDialog.cancel();
+        }
+        if(adapter != null) {
+            adapter.dismissDialog();
         }
     }
 
@@ -1971,7 +1967,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     filteredChats.clear();
                 }
                 for (MegaChatListItem chat : chatsToSearch) {
-                    if (chat.getTitle().toLowerCase().contains(strings[0].toLowerCase())) {
+                    if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
                         filteredChats.add(chat);
                     }
                 }
@@ -2038,11 +2034,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             actionBarTitle = v.findViewById(R.id.ab_title);
             setCustomisedActionBarTitle(adjustForLargeFont(getString(R.string.section_chat).toUpperCase()));
             actionBarSubtitle = v.findViewById(R.id.ab_subtitle);
+            actionBarSubtitleArrow = v.findViewById(R.id.ab_subtitle_arrow);
             setStatus();
             v.findViewById(R.id.ab_subtitle_container).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (context != null && context instanceof ManagerActivityLollipop) {
+                    if (context != null && context instanceof ManagerActivityLollipop
+                        && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
+                        && isOnline(context)) {
                         ((ManagerActivityLollipop) context).showPresenceStatusDialog();
                     }
                 }
@@ -2056,9 +2055,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
-    private void setCustomisedActionBarSubtitle(SpannableString subtitle){
-        if(actionBarSubtitle != null){
+    private void setCustomisedActionBarSubtitle(SpannableString subtitle) {
+        if(actionBarSubtitle != null) {
             actionBarSubtitle.setText(subtitle);
+        }
+        if (actionBarSubtitleArrow != null) {
+            boolean showArrow = megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
+                && isOnline(context);
+            actionBarSubtitleArrow.setVisibility(showArrow ? View.VISIBLE : View.GONE);
         }
     }
 }

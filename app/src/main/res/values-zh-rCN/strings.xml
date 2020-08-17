@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA通过网页浏览器以及移动客户端的应用程序提供由用户控制的加密云储存服务。不同于其他云储存供应商，您的数据仅由用户客户端设备进行加密与解密，而从不是经由我们加解密。\n\n您可以通过智能手机或平板电脑上传您的文件，并且随时随地从任何设备上进行搜索，存储，下载，流动传输，查看，共享，重命名或删除文件。与您的联系人共享文件夹并随时查看其更新。此加密方式也代表我们无法存取或重新设定您的密码，因此您必须牢牢记住它（除非您有备份恢复密钥），否则您将无法存取您所储存的文件。\n\n终端至终端用户加密的MEGA视频聊天是完全隐私的，自2016年起已通过浏览器提供。它已扩展至我们的移动应用程序并可通过多个设备访问聊天历史记录。用户还可以轻松地将文件添加至MEGA云盘的聊天中。\n\n注册用户只要参与奖励计划即可获得50GB免费储存空间，亦可付费获得更多配额：\n\n\nPRO LITE订阅：每月€4.99 (USD$4.99)或每年€49.99 (USD$49.99)，您会获得每月400GB的存储空间和1TB的传输流量。\nPRO I订阅：每月€9.99 (USD$9.99)或每年€99.99 (USD$99.99)，您会获得每月2TB的存储空间和2TB的传输流量。\nPRO II订阅：每月€19.99 (USD$19.99)或每年€199.99 (USD$199.99)，您会获得每月8TB的存储空间和8TB的传输流量。\nPRO III订阅：每月€29.99 (USD$29.99)或每年€299.99 (USD$299.99)，您会获得每月16TB的存储空间和16TB的传输流量。\n\n此订阅将会自动更新续订，续订内容与您一开始选择的订阅时间与价格一致。欲管理您的订阅内容，只需点击您手机上的Play商店图标，以您的Google账号登入（如果您还没有这样做），然后点击MEGA应用程序。您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA \n CAMERA - >拍照并将照片上传至MEGA \n READ_CONTACTS - >从您的设备中轻松地添加联系人作为MEGA联系人\n RECORD_AUDIO＆CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供终端至终端加密音频/视频通话\n\n\n为了增强用户对MEGA系统的信心，所有的客户端代码都已发布，因此感兴趣的安全研究人员可以评估加密过程。 我们的移动应用程序的代码位于：https：//github.com/meganz/android\n\n想要了解更多信息，请查看我们的网站：\n请参阅https://mega.nz/terms \n \n \n桌面 - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端的应用程序提供由用户控制的加密云储存服务。不同于其他云储存供应商，您的数据仅由用户客户端设备进行加密与解密，而从不是经由我们加解密。\n\n您可以通过智能手机或平板电脑上传您的文件，并且随时随地从任何设备上进行搜索，存储，下载，流动传输，查看，共享，重命名或删除文件。与您的联系人共享文件夹并随时查看其更新。此加密方式也代表我们无法存取或重新设定您的密码，因此您必须牢牢记住它（除非您有备份恢复密钥），否则您将无法存取您所储存的文件。\n\n终端至终端用户加密的MEGA视频聊天是完全隐私的，自2016年起已通过浏览器提供。它已扩展至我们的移动应用程序并可通过多个设备访问聊天历史记录。用户还可以轻松地将文件添加至MEGA云盘的聊天中。\n\n注册用户只要参与奖励计划即可获得50GB免费储存空间，亦可付费获得更多配额：\n\n\nPRO LITE订阅：每月€4.99 (USD$4.99)或每年€49.99 (USD$49.99)，您会获得每月400GB的存储空间和1TB的传输流量。\nPRO I订阅：每月€9.99 (USD$9.99)或每年€99.99 (USD$99.99)，您会获得每月2TB的存储空间和2TB的传输流量。\nPRO II订阅：每月€19.99 (USD$19.99)或每年€199.99 (USD$199.99)，您会获得每月8TB的存储空间和8TB的传输流量。\nPRO III订阅：每月€29.99 (USD$29.99)或每年€299.99 (USD$299.99)，您会获得每月16TB的存储空间和16TB的传输流量。\n\n此订阅将会自动更新续订，续订内容与您一开始选择的订阅时间与价格一致。欲管理您的订阅内容，只需点击您手机上的Play商店图标，以您的Google账号登入（如果您还没有这样做），然后点击MEGA应用程序。您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA \n CAMERA - >拍照并将照片上传至MEGA \n READ_CONTACTS - >从您的设备中轻松地添加联系人作为MEGA联系人\n RECORD_AUDIO＆CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供终端至终端加密音频/视频通话\n\n\n为了增强用户对MEGA系统的信心，所有的客户端代码都已发布，因此感兴趣的安全研究人员可以评估加密过程。 我们的移动应用程序的代码位于：https：//github.com/meganz/android\n\n想要了解更多信息，请查看我们的网站：\n请参阅https://mega.nz/terms \n \n \n桌面 - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA是全面专注隐私保护的云端存储平台。</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 查看器</string>
 
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">即将下载%s</string>
     <string name="alert_no_app" context="Alert text before download">没有可以打开%s的应用程序。你要继续下载吗？</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">不再显示</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">不再显示</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">您确定要取消当前的登录进程吗？</string>
 
@@ -249,13 +246,14 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">云盘</string>
     <string name="section_recents" context="Label to reference a recents section">近期</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">多媒体文件上传</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">媒体上传</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">收件箱</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">保存为离线</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">离线</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">共享文件</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">已分享的文件夹</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">垃圾桶</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">联系人</string>
@@ -266,12 +264,13 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">传输</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">我的账号</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">相机上传</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">相机上传</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">传入</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">传出</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">链接</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">传入的分享</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">传入的共享文件夹</string>
@@ -382,7 +381,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">离开共享</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">删除分享</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">删除链接</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">该共享链接即将失效。</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">该共享链接即将失效。</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">该共享链接即将失效。</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">这些链接将失效。</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">打开链接</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">打开</string>
@@ -533,8 +536,8 @@
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">感谢您的建议！您确定要取消MEGA订阅吗？</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">您的签约未取消。请告诉我们您要取消签约的原因。</string>
     <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">感谢您订阅%1$s %2$s!</string>
-    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">Your new subscription will take effect once the current one expires, the new price will be charged at that time.</string>
-    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Your subscription will take effect once the payment is processed by Google.</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">您的新订阅将在当前订阅到期后生效，届时将收取新套餐价格。</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">您的订阅将在Google处理付款后生效。</string>
     <string name="subscription_type_monthly" context="">每月</string>
     <string name="subscription_type_yearly" context="">每年</string>
 
@@ -552,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">解密密钥</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">请输入链接的解密密钥</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">无效的密钥</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">图片</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">语音</string>
@@ -686,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">正在上传媒体文件夹中的文件</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">检查待上传的文件</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">正在初始化相机上传</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">已禁用相机上传。您的本地文件夹不可用。</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">媒体上传已禁用。您的本地文件夹不可用。</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -756,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或移动数据</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">仅限Wi-Fi</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">文件上传</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -790,7 +796,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未设定</string>
-    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">重设PIN码</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">更改PIN码</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN 锁定</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">输入</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">日期</string>
     <string name="sortby_creation_date" context="category in sort by action">创建日期</string>
     <string name="sortby_modification_date" context="category in sort by action">修改日期</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">链接创建日期</string>
     <string name="sortby_date_newest" context="sort files by date newest first">从新到旧</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">从旧到新</string>
 
@@ -910,6 +917,8 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日志已启用</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日志已关闭</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">无法设置MEGA相机上传文件夹</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">日志尚未启用，由于您未开启所需的权限</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">开启位置</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
@@ -1369,7 +1378,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">[A]%2$s[/A]中的%1$s</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">从离线存储中删除</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">从离线中删除？</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">设定状态</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">解除</string>
@@ -1533,6 +1542,8 @@
     <string name="general_view" context="Menu option">查看文件</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">输入</string>
     <string name="save_for_offline" context="Menu option">离线储存</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">增加至云盘</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">保存到离线</string>
 
     <string name="general_view_contacts" context="Menu option">查看联系人</string>
 
@@ -1555,7 +1566,18 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">显示内容</string>
 
-    <string name="context_link_removal_error" context="error message">删除链接失败。请稍后再试。</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">删除链接失败。请稍后再试。</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">链接删除失败。请稍后再试。</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">已成功删除链接。</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">已成功删除链接。</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">链接操作失败。请稍后再试。</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">写下使用者电子信箱</string>
@@ -1641,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">正删除该文件夹的共享联系人</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">要移至垃圾桶吗？</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">您确定要将此文件夹移到“垃圾桶”吗？这将禁用相机上传功能。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">您确定要将此文件夹移至“垃圾桶”吗？ 此操作将禁用媒体上传。</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">要移至垃圾桶吗？</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">确定从MEGA删除吗？</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">离开此文件夹后将无法再次查看</string>
@@ -1763,7 +1787,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">高级选项</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA需要允许下载文件</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">无法使用旧的SD卡，请设置新的下载位置。</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">无法使用旧版SD卡，请设置新的下载位置。</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">选择下载位置</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">未通过联系人的允许</string>
@@ -1827,12 +1851,16 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]无 [/B][A]传入的共享文件夹[/A][B]。[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]无 [/B][A]传出的共享文件夹[/A][B]。[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]无[/B][A]公共链接[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">送出邀请</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">接受邀请</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">超出配额</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">无效的链接，请获取一个新的有效链接</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">链接密码无效</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">此链接不是一个有效的MEGA链接。</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">正在处理链接&#8230;</string>
 
@@ -1856,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">由于多次违反MEGA的服务条款，您的账户已被暂停。请检查您的电子邮件收件箱。</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">您的账户因违反MEGA的服务条款而被终止，如侵害他人权利;共享和/或导入非法数据;或侵害系统。</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">正在加载文件</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">尚无文件</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -2253,7 +2282,7 @@
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">密钥轮换相对更为安全，但不允许您创建聊天链接，新参与者将无法看到过去的消息。</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B]创建一个聊天链接[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B]删除此聊天链接[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B]已删除该聊天链接。[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">删除聊天链接</string>
 
@@ -2271,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">加载聊天链接时初始化聊天出错。</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">您正在预览之前的群聊记录。您想要再次加入聊天吗？</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">您已加入此聊天。</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">该聊天预览已不可用。退出预览后您无法再次打开。</string>
@@ -2316,6 +2344,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]阻止您成为联系人。[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">通知[A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">帐户已删除</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]该帐户[/B][A]%s[/A][B]已被删除。[/B]</string>
@@ -2354,8 +2383,8 @@
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">选择付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">结算周期</string>
-    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
-    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
+    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]一次性付款(月)[/A] %s</string>
+    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]一次性付款(年)[/A] %s</string>
     <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]每月[/A] %s/月</string>
     <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]每年[/A] %s/年</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">取消</string>
@@ -2367,7 +2396,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">新</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">如需升级当前订阅，请联系客服团队了解[A]自定义计划[/A]</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">如需升级当前订阅，请联系客服了解[A]自定义计划[/A]。</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">文件名</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">显示上一次活动</string>
@@ -2419,7 +2448,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">聊天链接已复制到剪贴板</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]从[/A] %s / [A]月[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user/[A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">%s[A]起[/A] 每位用户/[A]月[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*续订日期到期前随时可取消续订服务。</string>
     <string name="call_started_messages" context="Message shown when a call starts.">通话已开始</string>
 
@@ -2428,16 +2457,16 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]无 [/B][A]通知[/A][B]。[/B]</string>
 
-    <string name="general_setup_mega" context="Permissions screen title">安装MEGA</string>
+    <string name="general_setup_mega" context="Permissions screen title">设置MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA需要访问您的照片，媒体内容和文件，方便您与朋友进行分享，交换加密信息和安全通话。</string>
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">允许访问照片、媒体内容和文件。</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">MEGA需要您的权限以分享照片、媒体内容和文件。</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">开启相机功能</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">允许访问您的相机以扫描文档、拍摄照片和视频通话。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">开启通话功能</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">允许访问联系人</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
-    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">开启允许访问通讯录</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">在您的MEGA通讯录中轻松找到联系人。</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA不会将这些数据用于任何其他目的，并且未经您的允许绝不会与您的联系人互动。</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">允许访问您的麦克风以进行加密通话</string>
     <string name="general_enable_access" context="General enable access">允许访问</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">已共享文件</string>
@@ -2495,7 +2524,7 @@
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
     <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">您仍然可以在设备的设置中授予MEGA权限</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your address book, you will be able to discover your contacts more easily. MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">如果您允许MEGA访问您的通讯录，则可以轻松地发现您的联系人。MEGA不会将这些数据用于任何其他目的，并且未经您的允许绝不会与您的联系人互动。</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">消息已转发</item>
@@ -2525,8 +2554,8 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">已找到%d个联系人</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">立即邀请联系人？</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
-    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">发现联系人</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">授予MEGA访问您的通讯录的权限，即可发现您在MEGA上的联系人。</string>
     <string name="get_registered_contacts" context="Getting registered contacts">正在加载MEGA联系人&#8230;&#8230;</string>
 
 
@@ -2555,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">您还没有MEGA联系人。请在“联系人”选项中邀请好友。</string>
-    <string name="invite_more" context="Invite button for chat top cell">邀请更多&#8230;&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">邀请更多</string>
 
     <string name="title_tour_one" context="Title of first tour screen">您持有这把密钥</string>
     <string name="content_tour_one" cotext="Content of first tour screen">安全即是我们存在的意义。您的文件会在我们的加密机器下受到安全保护，并且只有您可以访问您的文件。</string>
@@ -2676,20 +2705,20 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">读取中</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">请等待&#8230;</string>
 
-    <string name="account_label" context="Head label to show the business account type">Account type</string>
+    <string name="account_label" context="Head label to show the business account type">帐户类型</string>
     <string name="business_label" context="Label in My Account section to show user account type">企业</string>
     <string name="admin_label" context="Business user role">管理员</string>
     <string name="user_label" context="Business user role">用户</string>
     <string name="status_label" context="General label to show the status of something or someone">状态</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">已登录</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">宽限等待</string>
-    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available from a desktop web browser.</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">宽限期</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">用户管理仅可通过桌面网络浏览器进行。</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">用量</string>
-    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Storage usage details</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">存储空间使用详情</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">使用情况总览</string>
     <string name="transfer_label" context="Title of transfer section in Storage">传输</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact because they are part of your Business account.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">您无法删除联系人%1$s，因为它们是您的企业帐户的一部分。</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">您的上一次付款有问题。请使用桌面浏览器访问MEGA获取更多信息。</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">您的企业帐户已到期</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">处理您的付款时出现问题。在桌面浏览器中修复此问题前，MEGA仅限于查看。</string>
@@ -2697,9 +2726,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">尽管MEGA无法访问您的数据，但您的企业管理员可以控制并查看用户的帐户中的“相机上传”文件。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出错了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">请联系您的企业帐户管理员解决此问题并激活帐户。</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Transfer quota[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**用于真正的商业目的</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">无限 [A]存储空间[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">无限 [A]传输流量[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，“离线”中的文件将从您的设备中删除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">登出帐户后，正在进行的传输将被取消。</string>
@@ -2725,6 +2754,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">您的MEGA帐户使用的密码可能与其他服务使用的密码相同，并且这些其他服务中至少有一项服务的数据已遭泄露。</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">您的密码遭到泄露（包括且不限于MEGA帐户），您的帐户正在被他人登录和使用。</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">设置昵称</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">编辑昵称</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">已添加昵称</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">已删除昵称</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">添加昵称时出错</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">昵称</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">正在重新连接</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">已重连。</string>
 
@@ -2732,8 +2768,32 @@
     <string name="create_new_file_action" context="Text shown for the action create new file">创建新文档</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">未获得授权</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">您没有还原文件所需的权限，您想使用已还原的数据创建一个新文件吗？</string>
-    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version was created as a new file successfully.</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">版本已成功创建为新文件。</string>
+
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">于%1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">您确定要从%1$d文件夹中删除所有共享吗？</string>
 
     <string name="download_location" context="Download location label">下载地址</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">总是保存到此位置？</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">添加附件&#8230;&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">聊天创建于%s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">选择消息</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">验证凭证</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">未验证</string>
+    <string name="label_verified" context="Action indicating something was verified.">已验证</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">授权认证</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">这最好由实际面对面来完成。如您有其他已验证管道，如已验证的OTR或PGP，也可以使采用。</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">您的凭证</string>
+    <string name="action_reset" context="Button to reset credentials">重置密码</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

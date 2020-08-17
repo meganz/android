@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
 
@@ -47,9 +48,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
-                GetAttrUserListener listener = new GetAttrUserListener(megaApplication);
-                api.getCameraUploadsFolder(listener);
-                api.getCameraUploadsFolderSecondary(listener);
+                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
                 break;
             }
         }
@@ -147,11 +146,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             case MegaEvent.EVENT_ACCOUNT_BLOCKED:
                 logDebug("EVENT_ACCOUNT_BLOCKED: " + event.getNumber());
 
-                Intent intent = new Intent(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
-                intent.setAction(ACTION_EVENT_ACCOUNT_BLOCKED);
-                intent.putExtra(EVENT_NUMBER, event.getNumber());
-                intent.putExtra(EVENT_TEXT, event.getText());
-                LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                megaApplication.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
+                        .putExtra(EVENT_NUMBER, event.getNumber())
+                        .putExtra(EVENT_TEXT, event.getText()));
                 break;
 
             case MegaEvent.EVENT_BUSINESS_STATUS:

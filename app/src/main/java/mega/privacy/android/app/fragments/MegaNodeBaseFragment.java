@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
@@ -60,8 +61,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
-import static nz.mega.sdk.MegaError.*;
-import static nz.mega.sdk.MegaShare.*;
 
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
@@ -106,26 +105,14 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         downloadLocationDefaultPath = getDownloadLocation();
     }
 
-    protected class BaseActionBarCallBack implements ActionMode.Callback {
+    protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
-
-        protected boolean onlyOneFileSelected;
-        protected boolean showShare;
-        protected boolean allFiles;
-        protected boolean showRename;
-        protected boolean showMove;
-        protected boolean showRemoveLink;
-        protected boolean showLink;
-        protected boolean showEditLink;
-        protected boolean showSendToChat;
-        protected boolean showTrash;
-        protected boolean showSelectAll;
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
             MenuInflater inflater = actionMode.getMenuInflater();
-            inflater.inflate(R.menu.file_browser_action, menu);
+            inflater.inflate(R.menu.cloud_storage_action, menu);
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.hideFabButton();
                 managerActivity.showHideBottomNavigationView(true);
@@ -137,6 +124,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            selected = adapter.getSelectedNodes();
             return false;
         }
 
@@ -174,43 +162,38 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     hideActionMode();
                     break;
 
-                case R.id.cab_menu_share:
+                case R.id.cab_menu_share_folder:
                     nC.selectContactToShareFolders(handleList);
                     hideActionMode();
                     break;
 
+                case R.id.cab_menu_share_out:
+                    MegaNodeUtil.shareNodes(context, selected);
+                    hideActionMode();
+                    break;
+
                 case R.id.cab_menu_share_link:
-                    if (selected.get(0) == null) {
-                        logWarning("The selected node is NULL");
-                        break;
-                    }
-                    managerActivity.showGetLinkActivity(selected.get(0).getHandle());
-                    hideActionMode();
-                    break;
-
-                case R.id.cab_menu_share_link_remove:
-                    if (onlyOneFileSelected && selected.get(0) == null) {
-                        logWarning("The selected node is NULL");
-                        break;
-                    }
-
-                    ArrayList<MegaNode> nodes = new ArrayList<>();
-                    nodes.addAll(selected);
-                    managerActivity.showConfirmationRemoveSeveralPublicLinks(nodes);
-                    hideActionMode();
-                    break;
-
                 case R.id.cab_menu_edit_link:
                     if (selected.get(0) == null) {
                         logWarning("The selected node is NULL");
                         break;
                     }
-
                     managerActivity.showGetLinkActivity(selected.get(0).getHandle());
                     hideActionMode();
                     break;
 
-                case R.id.cab_menu_leave_multiple_share:
+                case R.id.cab_menu_remove_link:
+                    if (selected.size() == 1 && selected.get(0) == null) {
+                        logWarning("The selected node is NULL");
+                        break;
+                    }
+
+                    ArrayList<MegaNode> nodes = new ArrayList<>(selected);
+                    managerActivity.showConfirmationRemoveSeveralPublicLinks(nodes);
+                    hideActionMode();
+                    break;
+
+                case R.id.cab_menu_leave_share:
                     managerActivity.showConfirmationLeaveMultipleShares(handleList);
                     break;
 
@@ -227,7 +210,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     selectAll();
                     break;
 
-                case R.id.cab_menu_unselect_all:
+                case R.id.cab_menu_clear_selection:
                     hideActionMode();
                     break;
 
@@ -236,7 +219,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
             }
 
-            return false;
+            return true;
         }
 
         @Override
@@ -251,65 +234,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             checkScroll();
         }
 
-        protected void checkOptions() {
-            onlyOneFileSelected = false;
-            showShare = true;
-            allFiles = true;
-            showRename = false;
-            showMove = true;
-            showRemoveLink = false;
-            showLink = false;
-            showEditLink = false;
-            showSendToChat = true;
-            showTrash = true;
-
-            for (MegaNode node : selected) {
-                if (!node.isFile()) {
-                    allFiles = false;
-                }
-
-                if (!node.isFolder()) {
-                    showShare = false;
-                }
-
-                if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode() != API_OK) {
-                    showTrash = false;
-                }
-            }
-
-            if(!allFiles){
-                showSendToChat = false;
-            }
-
-            if (selected.size() == 1) {
-                onlyOneFileSelected = true;
-                MegaNode node = selected.get(0);
-                if (megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
-                    showRename = true;
-                }
-
-                if (!node.isTakenDown() && megaApi.checkAccess(selected.get(0), ACCESS_OWNER).getErrorCode() == API_OK) {
-                    if (node.isExported()) {
-                        showRemoveLink = true;
-                        showLink = false;
-                        showEditLink = true;
-                    } else {
-                        showRemoveLink = false;
-                        showLink = true;
-                        showEditLink = false;
-                    }
-                }
-            }
-        }
-
-        protected void checkSelectOptions(Menu menu, boolean fromTrash) {
-            selected = adapter.getSelectedNodes();
-            showSelectAll = selected.size() == adapter.getItemCount();
-
-            menu.findItem(R.id.cab_menu_select_all).setVisible(showSelectAll);
-            if (!fromTrash) {
-                menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
-            }
+        protected boolean notAllNodesSelected() {
+            return selected.size() < adapter.getItemCount() - adapter.getPlaceholderCount();
         }
     }
 

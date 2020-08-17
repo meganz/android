@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -16,6 +15,10 @@ import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,25 +35,33 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 
 public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
+    private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
+    public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -110,8 +121,8 @@ public class ChatUtil {
         builder.setView(v);
         final AlertDialog shareLinkDialog = builder.create();
 
-        TextView nameGroup = (TextView) v.findViewById(R.id.group_name_text);
-        nameGroup.setText(chat.getTitle());
+        EmojiTextView nameGroup = v.findViewById(R.id.group_name_text);
+        nameGroup.setText(getTitleChat(chat));
         TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
 
@@ -484,5 +495,119 @@ public class ChatUtil {
             contactStateText.setText(lastGreen);
             contactStateText.isMarqueeIsNecessary(context);
         }
+    }
+
+    /**
+     * Gets the name of an attached contact.
+     *
+     * @param message   chat message
+     * @return The contact's name by this order if available: nickname, name or email
+     */
+    public static String getNameContactAttachment(MegaChatMessage message) {
+        String email = message.getUserEmail(0);
+        String name = getMegaUserNameDB(MegaApplication.getInstance().getMegaApi().getContact(email));
+        if (isTextEmpty(name)) {
+            name = message.getUserName(0);
+        }
+
+        if (isTextEmpty(name)) {
+            name = email;
+        }
+
+        return name;
+    }
+
+    /*
+     * Method for obtaining the AudioFocusRequest when get the focus audio.
+     *
+     * @param listener  The listener.
+     * @param focusType Type of focus.
+     * @return The AudioFocusRequest.
+     */
+    public static AudioFocusRequest getRequest(AudioFocusListener listener, int focusType) {
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            AudioAttributes mAudioAttributes =
+                    new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build();
+            return new AudioFocusRequest.Builder(focusType)
+                    .setAudioAttributes(mAudioAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setWillPauseWhenDucked(true)
+                    .setOnAudioFocusChangeListener(listener)
+                    .build();
+        }
+
+        return null;
+    }
+
+    /**
+     * Knowing if permits have been successfully got.
+     *
+     * @return True, if it has been successful. False, if not.
+     */
+    public static boolean getAudioFocus(AudioManager mAudioManager, AudioFocusListener listener, AudioFocusRequest request, int focusType, int streamType) {
+        int focusRequest;
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            focusRequest = mAudioManager.requestAudioFocus(request);
+        } else {
+            focusRequest = mAudioManager.requestAudioFocus(listener, streamType, focusType);
+        }
+        return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
+    /**
+     * Method for leaving the audio focus.
+     */
+    public static void abandonAudioFocus(AudioFocusListener listener, AudioManager mAudioManager, AudioFocusRequest request) {
+        if (SHOULD_BUILD_FOCUS_REQUEST) {
+            if(request != null) {
+                mAudioManager.abandonAudioFocusRequest(request);
+            }
+        } else {
+            mAudioManager.abandonAudioFocus(listener);
+        }
+    }
+
+    /**
+     * Method for obtaining the title of a MegaChatRoom.
+     *
+     * @param chat The chat room.
+     * @return String with the title.
+     */
+    public static String getTitleChat(MegaChatRoom chat) {
+        if (chat.isActive()) {
+            return chat.getTitle();
+        }
+
+        MegaApplication app = MegaApplication.getInstance();
+        return app.getString(R.string.inactive_chat_title, formatDate(app.getBaseContext(), chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT));
+    }
+
+    /**
+     * Method for obtaining the title of a MegaChatListItem.
+     *
+     * @param chat The chat room.
+     * @return String with the title.
+     */
+    public static String getTitleChat(MegaChatListItem chat) {
+        if (chat.isActive()) {
+            return chat.getTitle();
+        }
+
+        return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
+    }
+
+    /**
+     * Gets the user's online status.
+     *
+     * @param userHandle    handle of the user
+     * @return The user's status.
+     */
+    public static int getUserStatus(long userHandle) {
+        return isContact(userHandle)
+                ? MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(userHandle)
+                : MegaChatApi.STATUS_INVALID;
     }
 }

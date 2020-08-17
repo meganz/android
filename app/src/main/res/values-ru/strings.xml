@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств.  В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в браузере с 2016 года. Он был расширен для нашего мобильного приложения, и история чата доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 50 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка PRO LITE: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка PRO I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка PRO II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка PRO III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем нажмите на приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -> Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -> Сделайте снимок и загрузите фото в MEGA\nREAD_CONTACTS -> Просто добавьте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -> MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android\n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms\n\n\nНастольный — https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств.  В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в браузере с 2016 года. Он был расширен для нашего мобильного приложения, и история чата доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 50 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка PRO LITE: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка PRO I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка PRO II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка PRO III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем нажмите на приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -> Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -> Сделайте снимок и загрузите фото в MEGA\nREAD_CONTACTS -> Просто добавьте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -> MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android\n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms\n\n\nНастольный — https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA — это облачное хранилище с мощной и постоянной конфиденциальностью.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Просмотр PDF MEGA</string>
 
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s будет скачан.</string>
     <string name="alert_no_app" context="Alert text before download">Нет приложений для открытия файла %s. Продолжить скачивание?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">Больше не показывать</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Больше не показывать</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Вы действительно хотите отменить текущий вход?</string>
 
@@ -249,13 +246,14 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Облачный диск</string>
     <string name="section_recents" context="Label to reference a recents section">Недавние</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Загрузки медиа</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">Загрузки медиафайлов</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Входящие</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Сохранено локально</string>
-    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</string>
+    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Общие элементы</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Общие папки</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Корзина</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Контакты</string>
@@ -266,12 +264,13 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Передачи</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Мой аккаунт</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Загрузки камеры</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">Загрузки с камеры</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Входящие</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Исходящие</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Ссылки</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Входящие общие папки</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Открытый доступ от</string>
@@ -382,7 +381,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Покинуть общее пользование</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Закрыть доступ</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Удалить ссылку</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Эта ссылка больше не будет общедоступна.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Эта ссылка больше не будет общедоступна.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Эта ссылка больше не будет общедоступна.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Эти ссылки больше не будут доступны публично.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Переименовать</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Открыть ссылку</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Открыть</string>
@@ -552,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Ключ дешифрирования</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Введите ключ дешифрирования для ссылки</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Неправильный ключ дешифрования</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Изображение</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Аудио</string>
@@ -686,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Загрузить файлы или медиапапки</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Проверка файлов для загрузки</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Инициализация загрузок из камеры</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Загрузки из камеры были отключены. Ваша локальная папка недоступна.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Загрузки медиа были отключены. Ваша локальная папка недоступна.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -756,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi или мобильные данные</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Только Wi-Fi</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Загрузить файл</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -816,18 +822,18 @@
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Версия MEGAchat SDK</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Исходный код</string>
 
-    <string name="january">январь</string>
-    <string name="february">февраль</string>
-    <string name="march">март</string>
-    <string name="april">апрель</string>
-    <string name="may">май</string>
-    <string name="june">июнь</string>
-    <string name="july">июль</string>
-    <string name="august">август</string>
-    <string name="september">сентябрь</string>
-    <string name="october">октябрь</string>
-    <string name="november">ноябрь</string>
-    <string name="december">декабрь</string>
+    <string name="january">Январь</string>
+    <string name="february">Февраль</string>
+    <string name="march">Март</string>
+    <string name="april">Апрель</string>
+    <string name="may">Май</string>
+    <string name="june">Июнь</string>
+    <string name="july">Июль</string>
+    <string name="august">Август</string>
+    <string name="september">Сентябрь</string>
+    <string name="october">Октябрь</string>
+    <string name="november">Ноябрь</string>
+    <string name="december">Декабрь</string>
 
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Просмотр ZIP</string>
 
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Дата</string>
     <string name="sortby_creation_date" context="category in sort by action">Дата создания</string>
     <string name="sortby_modification_date" context="category in sort by action">Дата изменения</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Дата создания ссылки</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Новейшие</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">старейшие</string>
 
@@ -910,6 +917,8 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Журнал включён</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Журнал отключён</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Невозможно настроить MEGA-папку загрузок из камеры</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Журналы не были включены, потому что вы отказали в необходимых разрешениях</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Расположение</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Процесс длится дольше ожидаемого. Пожалуйста, подождите.</string>
@@ -1203,7 +1212,7 @@
 
     <string name="no_results_found" context="Text shown after searching and no results found">Ничего не найдено</string>
 
-    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</string>
+    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</string>
     <string name="online_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">В сети</string>
     <string name="away_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Отсутствует</string>
     <string name="busy_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Занят</string>
@@ -1400,7 +1409,7 @@
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">В сети</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Отсутствует</item>
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Занят</item>
-        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Не в сети</item>
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">На устройстве</item>
     </string-array>
 
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">Нет локальных файлов</string>
@@ -1533,6 +1542,8 @@
     <string name="general_view" context="Menu option">Просмотр файлов</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Импортировать</string>
     <string name="save_for_offline" context="Menu option">Сохранить локально</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Добавить на облачный диск</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">Сохранить локально</string>
 
     <string name="general_view_contacts" context="Menu option">Просмотр контактов</string>
 
@@ -1555,7 +1566,18 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Подробнее</string>
 
-    <string name="context_link_removal_error" context="error message">Не удалось удалить ссылку. Попробуйте позже.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Не удалось удалить ссылку. Попробуйте позже.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Не удалось удалить некоторые ссылки. Пожалуйста, попробуйте позже.</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Ссылка успешно удалена.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Ссылки успешно удалены.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Не удалось. Попробуйте позже.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Эл. почта пользователя</string>
@@ -1641,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Удаление контакта из общей папки</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Переместить в корзину?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Вы действительно хотите переместить эту папку в корзину? Это отключит загрузки из камеры.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Вы действительно хотите переместить эту папку в корзину? Это отключит загрузку мультимедиа.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Переместить в корзину?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Удалить с MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Если вы закроете папку, вы не сможете зайти в неё снова.</string>
@@ -1827,12 +1851,16 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Нет [/B][A]входящих общих папок[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Нет [/B][A]исходящих общих папок[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]Нет [/B][A]публичных ссылок[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Отправленные запросы</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Полученные запросы</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Недостаточно места</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Недействительная ссылка, пожалуйста, запросите новую действующую ссылку</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Неверный пароль ссылки</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">Ссылка, которую вы пытаетесь открыть, не является действительной ссылкой MEGA.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Обработка ссылки&#8230;</string>
 
@@ -1856,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Ваша учетная запись была приостановлена из-за многочисленных нарушений Условий предоставления услуг MEGA. Пожалуйста, проверьте свой почтовый ящик.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Ваша учетная запись была прервана из-за нарушения Условий предоставления услуг MEGA, таких как злоупотребление правами других лиц; обмен и/или импорт незаконных данных; или злоупотребление системой.</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Загрузка файлов</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Нет файлов</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Б</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s КБ</string>
@@ -2271,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Ошибка инициализации чата при загрузке ссылки на чат.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Вы пытаетесь просмотреть чат, участником которого вы были ранее. Хотите снова присоединиться к чату?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Вы уже участвуете в этом чате.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Это превью чата больше не доступно. Покинув превью, вы не сможете открыть его снова.</string>
@@ -2316,6 +2344,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]заблокировал ваш контакт.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Оповещения [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Аккаунт удалён</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]Аккаунт [/B][A]%s[/A][B] был удалён.[/B]</string>
@@ -2435,7 +2464,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Разрешить доступ к камере</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Разрешите доступ к камере для сканирования документов, фотографирования и видеозвонков.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Разрешить звонки</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Предоставить доступ к адресной книге</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Откройте доступ к вашей адресной книге</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Легко находите контакты из своей адресной книги в MEGA.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA не будет использовать эти данные для каких-либо других целей и никогда не будет взаимодействовать с вашими контактами без вашего согласия.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Разрешите доступ к микрофону для зашифрованных звонков.</string>
@@ -2525,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">Найдено контактов в MEGA: %d</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Пригласить контакт сейчас?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Посмотрите, кто уже в MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Найдите свои контакты в MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Предоставьте MEGA доступ к адресной книге, чтобы найти свои контакты в MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Загрузка контактов в MEGA&#8230;</string>
 
@@ -2555,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">У вас нет контактов MEGA. Пожалуйста, приглашайте друзей из раздела «Контакты».</string>
-    <string name="invite_more" context="Invite button for chat top cell">Пригласить ещё&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Пригласить ещё</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Ключи хранятся у вас</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Безопасность — это то, для чего существуем. Ваши файлы в безопасности за нашей хорошо смазанной шифровальной машиной, где только вы можете получить доступ к ним.</string>
@@ -2725,6 +2754,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Возможно, вы используете тот же пароль для своего аккаунта MEGA, что и для других служб, и что по крайней мере одна из этих других служб пострадала от утечки данных.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Ваш пароль утёк и теперь используется плохими игроками для входа в ваши аккаунты, включая, но не ограничиваясь аккаунтом MEGA.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">Задать псевдоним</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Изменить псевдоним</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Псевдоним добавлен</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Псевдоним удален</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">При попытке добавить псевдоним произошла ошибка</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Псевдоним</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Переподключение</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Вы вернулись.</string>
 
@@ -2734,6 +2770,30 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">У вас нет прав, необходимых для восстановления этого файла. Чтобы продолжить, мы можем создать новый файл с восстановленными данными. Хотите продолжить?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Версия была успешно создана как новый файл.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">%1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Вы действительно хотите закрыть доступ к этим %1$d папкам?</string>
+
     <string name="download_location" context="Download location label">Папка загрузки</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Всегда сохранять в эту папку?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Прикрепить из&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Чат создан %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Выбор сообщения</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Подтвердить учётные данные</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Не подтверждено</string>
+    <string name="label_verified" context="Action indicating something was verified.">Проверен</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Подлинность учётных данных</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Лучше всего это сделать в реальной жизни, встречаясь лицом к лицу. Если у вас есть другой проверенный канал, например, проверенный OTR или PGP, вы также можете его использовать.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Ваши Учетные Данные</string>
+    <string name="action_reset" context="Button to reset credentials">Сбросить</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

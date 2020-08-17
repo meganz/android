@@ -24,7 +24,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 
 public class ModalBottomSheetUtil {
 
-    static void openWith(MegaNode node) {
+    public static void openWith(MegaNode node) {
         if (node == null) {
             logWarning("Node is null");
             return;
@@ -71,6 +71,7 @@ public class ModalBottomSheetUtil {
         }
 
         if (isIntentAvailable(app, mediaIntent)) {
+            mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             app.startActivity(mediaIntent);
         } else {
             Toast.makeText(app, app.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();

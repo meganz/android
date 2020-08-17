@@ -15,6 +15,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -115,12 +117,14 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -153,6 +157,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -161,7 +166,7 @@ import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-
+import static mega.privacy.android.app.utils.Util.isOnline;
 
 public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
@@ -331,6 +336,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private GetMediaFilesTask getMediaFilesTask;
     private long [] nodeHandles;
 
+    private AudioFocusRequest request;
+    private AudioManager mAudioManager;
+    private AudioFocusListener audioFocusListener;
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -360,7 +369,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
                 if ((callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT || callStatus == MegaChatCall.CALL_STATUS_RING_IN)
                         && player != null && player.getPlayWhenReady()) {
-                    player.setPlayWhenReady(false);
+                    stopPlayback();
                 }
             }
         }
@@ -369,7 +378,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_audiovideoplayer);
 
@@ -394,6 +404,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             finish();
             return;
         }
+
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         if (savedInstanceState != null) {
             logDebug("savedInstanceState NOT null");
@@ -567,6 +579,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         previousButton.setOnTouchListener(this);
         nextButton = (ImageButton) findViewById(R.id.exo_next);
         nextButton.setOnTouchListener(this);
+        ImageButton pauseButton = findViewById(R.id.exo_pause);
+        pauseButton.setOnTouchListener(this);
+        ImageButton playButton = findViewById(R.id.exo_play);
+        playButton.setOnTouchListener(this);
         playList = (ImageButton) findViewById(R.id.exo_play_list);
         playList.setVisibility(View.GONE);
         playList.setOnClickListener(this);
@@ -590,7 +606,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
 
-            if (mega.privacy.android.app.utils.Util.isOnline(this)){
+            if (isOnline(this)){
                 if(megaApi==null){
                     logDebug("Refresh session - sdk");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
@@ -1111,7 +1127,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
                     if (playWhenReady && participatingInACall()) {
                         //Not allow to play content when a call is in progress
-                        player.setPlayWhenReady(false);
+                        stopPlayback();
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
                     }
 
@@ -1205,7 +1221,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 }
             });
             numErrors = 0;
-            player.setPlayWhenReady(playWhenReady);
+            if (playWhenReady) {
+                startPlayback();
+            } else {
+                stopPlayback();
+            }
             player.seekTo(currentTime);
             player.setVideoDebugListener(this);
         }
@@ -1332,7 +1352,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             else {
                 player.prepare(mediaSource);
             }
-            player.setPlayWhenReady(true);
+            startPlayback();
         }
         else {
             showErrorDialog();
@@ -1341,25 +1361,13 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     void showErrorDialog() {
         logWarning("Error open video file");
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else {
-            builder = new AlertDialog.Builder(this);
-        }
-        builder.setCancelable(false);
-        String accept = getResources().getString(R.string.general_ok).toUpperCase();
-        try {
-            builder.setMessage(R.string.corrupt_video_dialog_text)
-                    .setPositiveButton(accept, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .show();
-        }
-        catch (Exception e){}
+        new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle)
+            .setCancelable(false)
+            .setMessage(isOnline(this) ? R.string.unsupported_file_type
+                : R.string.error_fail_to_open_file_no_network)
+            .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
+                (dialog, which) -> finish())
+            .show();
 
         numErrors = 0;
     }
@@ -1430,7 +1438,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
-                    getImageView(i, -1);
+                    getImageView(i, handle);
                     break;
                 }
             }
@@ -1486,7 +1494,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
             for (int i = 0; i < listNodes.size(); i++) {
                 if (listNodes.get(i).getHandle() == handle) {
-                    scrollToPosition(i, -1);
+                    scrollToPosition(i, handle);
                     break;
                 }
             }
@@ -1563,6 +1571,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (LinksFragment.imageDrag != null){
                 LinksFragment.imageDrag.setVisibility(visibility);
             }
+        } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
+            RecentsFragment.imageDrag.setVisibility(visibility);
         }
     }
 
@@ -1625,6 +1635,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (LinksFragment.imageDrag != null){
                 LinksFragment.imageDrag.getLocationOnScreen(location);
             }
+        } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null){
+            RecentsFragment.imageDrag.getLocationOnScreen(location);
         }
     }
 
@@ -1704,7 +1716,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
             // Pause either video or audio as per UX advise
             if (playWhenReady) {
-                player.setPlayWhenReady(false);
+                stopPlayback();
             }
 
             currentTime = player.getCurrentPosition();
@@ -1845,9 +1857,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                if (player != null) {
-                    player.setPlayWhenReady(false);
-                }
+                stopPlayback();
                 if (playlistFragment != null && playlistFragment.isAdded()){
                     playlistFragment.setSearchOpen(true);
                     playlistFragment.hideController();
@@ -2021,7 +2031,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 chatMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
 
-                if(megaApi==null || !mega.privacy.android.app.utils.Util.isOnline(this)) {
+                if(megaApi==null || !isOnline(this)) {
                     downloadMenuItem.setVisible(false);
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
@@ -2559,12 +2569,19 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         createPlayer();
     }
 
+    private boolean checkNoNetwork() {
+        if (!isOnline(this)) {
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            return true;
+        }
+        return false;
+    }
+
     public void moveToTrash(){
         logDebug("moveToTrash");
 
         moveToRubbish = false;
-        if (!mega.privacy.android.app.utils.Util.isOnline(this)){
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+        if (checkNoNetwork()) {
             return;
         }
 
@@ -2880,8 +2897,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             return;
         }
 
-        if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+        if (checkNoNetwork()) {
             return;
         }
 
@@ -3181,9 +3197,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-
-            if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            if (checkNoNetwork()) {
                 return;
             }
 
@@ -3210,8 +3224,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
-            if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            if (checkNoNetwork()) {
                 return;
             }
 
@@ -3250,7 +3263,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
             logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
-            if(!mega.privacy.android.app.utils.Util.isOnline(this)||megaApi==null) {
+            if(!isOnline(this)||megaApi==null) {
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
@@ -3362,6 +3375,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     protected void onPause() {
         super.onPause();
         logDebug("onPause");
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
     }
 
     @Override
@@ -3379,6 +3393,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (megaApiFolder != null) {
             megaApiFolder.httpServerStop();
         }
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
 
         if (player != null){
             player.release();
@@ -3641,6 +3656,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     public void onBackPressed() {
         retryConnectionsAndSignalPresence();
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
 
         if (!onPlaylist){
             super.onBackPressed();
@@ -3849,6 +3865,21 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         downloadConfirmationDialog.show();
     }
 
+    private void startPlayback() {
+        audioFocusListener = new AudioFocusListener(this);
+        request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
+        if (getAudioFocus(mAudioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT) && player != null) {
+            player.setPlayWhenReady(true);
+        }
+    }
+
+    public void stopPlayback() {
+        if (player != null) {
+            player.setPlayWhenReady(false);
+        }
+        abandonAudioFocus(audioFocusListener, mAudioManager, request);
+    }
+
     public void askConfirmationNoAppInstaledBeforeDownload (String parentPath,String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
@@ -4048,21 +4079,27 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     public boolean onTouch(View v, MotionEvent event) {
 
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                if (loop && player != null){
+            case MotionEvent.ACTION_DOWN:
+                if (v.getId() == R.id.exo_play) {
+                    getAudioFocus(mAudioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT);
+
+                } else if (v.getId() == R.id.exo_pause) {
+                    abandonAudioFocus(audioFocusListener, mAudioManager, request);
+
+                }else if (loop && player != null){
                     player.setRepeatMode(Player.REPEAT_MODE_OFF);
                 }
                 break;
-            }
-            case MotionEvent.ACTION_UP: {
-                if (creatingPlaylist && player != null){
+
+            case MotionEvent.ACTION_UP:
+                if(v.getId() != R.id.exo_play && v.getId() != R.id.exo_pause && creatingPlaylist && player != null) {
                     if (v.getId() == R.id.exo_next) {
                         currentWindowIndex++;
                     }
                     setPlaylist(currentWindowIndex, 0);
                 }
                 break;
-            }
+
         }
         return false;
     }

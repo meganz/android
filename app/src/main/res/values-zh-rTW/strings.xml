@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA透過標準網頁瀏覽器提供用戶可控制的加密雲端儲存及聊天功能、以及行動裝置的專屬應用程式。與其他雲端儲存服務供應商不同，您的資料僅可由您的客戶端裝置加密與解密，並非由我們加密。\n \n 從智慧型手機或平板電腦上傳檔案，然後搜尋、儲存、下載、串流播放、查看、分享，重新命名或隨時隨地從任何裝置刪除您的檔案。與您的聯絡人共享資料夾，並即時查看檔案更新狀況。加密功能表示我們無法訪問或重置您的密碼，因此您必須記住它 (除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼)，否則您將無法訪問儲存的檔案。\n \n 點對點用戶加密的MEGA視訊聊天功能確保完全的隱私，自2016年起可透過瀏覽器使用。該功能現已擴及至我們的行動應用程式，可透過多個裝置檢視聊天記錄。用戶還可透過MEGA雲端硬碟輕鬆將檔案添加到聊天室中。\n \n MEGA為所有註冊用戶提供50 GB的免費儲存空間，還可獲得額外獎勵，並提供更高空間上限的付費方案：\n\n[PRO] PRO LITE訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400 GB的儲存空間和1 TB的傳輸配額。\n PRO I訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2 TB的儲存空間和2 TB的傳輸配額。\n PRO II訂閱：每月19.99歐元或每年199.99歐元，為您提供8 TB的儲存空間和每月8 TB的傳輸配額。[Br ] PRO III訂閱：每月29.99歐元或每年299.99歐元，為您提供16 TB的儲存空間和每月16 TB的傳輸配額。\n \n訂閱將自動續訂，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄(若您尚未這麼做)，然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n 應用程式存取權限：\n外部儲存裝置資料寫入 - >將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - >選取一個圖檔並將其上傳到MEGA \n 讀取聯絡人 - > 輕鬆添加裝置中的聯絡人作為MEGA聯絡人 \n 錄音與影像截取輸出(麥克風與相機) - > MEGA提供點對點加密音訊/視訊通話\n\n\n為了增加用戶對MEGA系統的信心，所有客戶端代碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式代碼可於https://github.com/meganz/android 查詢。\n\n相關詳細資訊，請查詢我們的網站：\n請查詢：https://mega.nz/terms [ Br] \n \n桌上型電腦系統 - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA透過標準網頁瀏覽器提供用戶可控制的加密雲端儲存及聊天功能、以及行動裝置的專屬應用程式。與其他雲端儲存服務供應商不同，您的資料僅可由您的客戶端裝置加密與解密，並非由我們加密。\n \n 從智慧型手機或平板電腦上傳檔案，然後搜尋、儲存、下載、串流播放、查看、分享，重新命名或隨時隨地從任何裝置刪除您的檔案。與您的聯絡人共享資料夾，並即時查看檔案更新狀況。加密功能表示我們無法訪問或重置您的密碼，因此您必須記住它 (除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼)，否則您將無法訪問儲存的檔案。\n \n 點對點用戶加密的MEGA視訊聊天功能確保完全的隱私，自2016年起可透過瀏覽器使用。該功能現已擴及至我們的行動應用程式，可透過多個裝置檢視聊天記錄。用戶還可透過MEGA雲端硬碟輕鬆將檔案添加到聊天室中。\n \n MEGA為所有註冊用戶提供50 GB的免費儲存空間，還可獲得額外獎勵，並提供更高空間上限的付費方案：\n\n[PRO] PRO LITE訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400 GB的儲存空間和1 TB的傳輸配額。\n PRO I訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2 TB的儲存空間和2 TB的傳輸配額。\n PRO II訂閱：每月19.99歐元或每年199.99歐元，為您提供8 TB的儲存空間和每月8 TB的傳輸配額。[Br ] PRO III訂閱：每月29.99歐元或每年299.99歐元，為您提供16 TB的儲存空間和每月16 TB的傳輸配額。\n \n訂閱將自動續訂，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄(若您尚未這麼做)，然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n 應用程式存取權限：\n外部儲存裝置資料寫入 - >將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - >選取一個圖檔並將其上傳到MEGA \n 讀取聯絡人 - > 輕鬆添加裝置中的聯絡人作為MEGA聯絡人 \n 錄音與影像截取輸出(麥克風與相機) - > MEGA提供點對點加密音訊/視訊通話\n\n\n為了增加用戶對MEGA系統的信心，所有客戶端代碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式代碼可於https://github.com/meganz/android 查詢。\n\n相關詳細資訊，請查詢我們的網站：\n請查詢：https://mega.nz/terms [ Br] \n \n桌上型電腦系統 - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA雲端空間，永遠保護您的隱私。</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 查看器</string>
 
@@ -118,7 +115,7 @@
     <string name="action_select_all" context="Menu item to select all the elements of a list">全選</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">清除選取</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">縮圖檢視</string>
-    <string name="action_list" context="Menu item to change from grid view to list view">顯示列表</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">清單檢視</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">備份還原金鑰</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">取消訂購</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">此筆訂購已經成功取消</string>
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">即將下載%s。</string>
     <string name="alert_no_app" context="Alert text before download">您沒有可開啟%s檔案的應用程式。您要繼續下載嗎？</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">請別再顯示</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">請別再顯示</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">您確定要取消目前的登入嗎？</string>
 
@@ -249,13 +246,14 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">雲端硬碟</string>
     <string name="section_recents" context="Label to reference a recents section">近期的</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">媒體上傳</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">媒體上傳</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">收件夾</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">離線儲存</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">離線</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">共享檔案</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">已分享的資料夾</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">垃圾桶</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">聯絡人</string>
@@ -266,12 +264,13 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">傳輸</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">我的帳號</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">相機上傳</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">相機上傳</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">傳入</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">傳出</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">連結</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">傳入的分享</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">傳入的共享─來自</string>
@@ -382,7 +381,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">離開共享</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">移除分享</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">移除連結</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">此連結將不再是公開狀態。</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">此連結將不再是公開狀態。</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">此連結將不再是公開狀態。</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">這些連結將不再是公開狀態。</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">打開連接</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開啟</string>
@@ -552,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">解密金鑰</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">請輸入此連結的解密密鑰</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">無效的密鑰</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">圖像</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">音頻</string>
@@ -686,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">正在上傳媒體資料夾中的檔案</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">正在確認要上傳的檔案</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">初始化相機上傳</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">相機上傳功能已關閉。您的本地資料夾無法使用。</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">媒體上傳功能已關閉。您的本地資料夾無法使用。</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -756,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或行動網路</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">只在WiFi連線</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">檔案上傳</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">日期</string>
     <string name="sortby_creation_date" context="category in sort by action">創建日期</string>
     <string name="sortby_modification_date" context="category in sort by action">修改日期</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">連結建立日期</string>
     <string name="sortby_date_newest" context="sort files by date newest first">由新到舊</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">由舊至新</string>
 
@@ -910,6 +917,8 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日誌已啟用</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日誌已關閉</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">無法設定MEGA相機上傳資料夾</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">因為您拒絕所需要的權限，因此未啟用日誌功能。</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">開啟位置</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">這個過程花費的時間比預期的長。請稍候。</string>
@@ -1533,6 +1542,8 @@
     <string name="general_view" context="Menu option">查看檔案</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">匯入</string>
     <string name="save_for_offline" context="Menu option">離線儲存</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">增加至雲端硬碟</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">離線儲存</string>
 
     <string name="general_view_contacts" context="Menu option">查看聯絡人</string>
 
@@ -1555,7 +1566,18 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">相關資訊</string>
 
-    <string name="context_link_removal_error" context="error message">刪除連結失敗。請稍候再試。</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">刪除連結失敗。請稍候再試。</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">刪除某些連結失敗。請稍後再試。</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">連結刪除成功</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">連結刪除成功</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">啟動連結失敗。請稍候再試。</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">寫下使用者電子信箱</string>
@@ -1641,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">刪除共享資料夾的聯絡人共享者</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">要移至垃圾桶嗎？</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">您確定要將此資料夾移至垃圾筒嗎？這將會停用相機上傳。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">您確定要將此資料夾移至垃圾筒嗎？這將會停用相機上傳。</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">要移至垃圾桶嗎？</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">確定從MEGA刪除嗎？</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">如果您離開此資料夾，您將無法再看到它。</string>
@@ -1827,12 +1851,16 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]沒有人[/B][A]分享資料夾給你[/A] [B]。[/ B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]沒有[/B][A]分享資料夾給別人[/A][B]。[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]無[/B][A]公開連結[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">送出邀請</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">接受邀請</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">超出配額</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">無效的連結，請申請一個新的有效連結</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">無效的連結密碼</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">您嘗試打開的連結不是有效的MEGA連結。</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">連結處理中&#8230;</string>
 
@@ -1856,12 +1884,13 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">由於多次違反MEGA的服務條款，您的帳戶已被暫停使用。請至您的電子信箱收信以了解詳情。</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">您的帳戶因違反MEGA的服務條款而被終止，例如：侵犯他人權益、分享和/或匯入非法資料，或濫用系統資源。</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">檔案載入中</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">沒有檔案</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
-    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
-    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s MB</string>
-    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s GB</string>
-    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s TB</string>
+    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%sKB</string>
+    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%sMB</string>
+    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%sGB</string>
+    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%sTB</string>
     <string name="label_mega_byte" context="Size in megabytes.">MB</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -1938,7 +1967,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">您還記得你的密碼嗎？</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">您即將登出，請測試您的密碼以確保您已牢記密碼。\n如果您遺失了密碼，您將無法存取您的MEGA資料。</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">您即將登出，請測試您的密碼以確保您有記住它。如果您遺失密碼，您將無法存取MEGA資料。</string>
-    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">不再顯示</string>
+    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">請別再顯示</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">測試密碼</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">測試您的密碼</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">密碼正確</string>
@@ -2030,41 +2059,41 @@
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">寫訊息給“%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">寫訊息給“%s”&#8230;</string>
 
-    <string name="settings_2fa" context="Title of setting Two-Factor Authentication">兩階段驗證功能</string>
-    <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">兩階段身份驗證是您帳戶的第二層安全保護。</string>
-    <string name="title_2fa" context="Title of the screen Two-Factor Authentication">為什麼需要兩階段安全驗證？</string>
-    <string name="two_factor_authentication_explain">兩階段身份驗證是您帳戶的第二層安全保護。這代表著，即使某人持有您的密碼，如果他無法知道只有您會有的六位碼，也無法登入您的帳戶。</string>
+    <string name="settings_2fa" context="Title of setting Two-Factor Authentication">雙重驗證</string>
+    <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">雙重驗證是您帳戶的第二層安全保護。</string>
+    <string name="title_2fa" context="Title of the screen Two-Factor Authentication">為什麼需要雙重驗證？</string>
+    <string name="two_factor_authentication_explain">雙重驗證是您帳戶的第二層安全保護。這代表著，即使某人持有您的密碼，如果他無法知道只有您會有的六位碼，也無法登入您的帳戶。</string>
     <string name="button_setup_2fa" context="Button that permits user begin with the process of enable Two-Factor Authentication">開始設定</string>
-    <string name="explain_qr_seed_2fa_1" context="Text that explain how to do with Two-Factor Authentication QR">掃描或複製種子到您的驗證器應用程式。</string>
+    <string name="explain_qr_seed_2fa_1" context="Text that explain how to do with Two-Factor Authentication QR">掃描或複製種子到您的身份驗證應用程式。</string>
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">請務必將此種子備份於安全的地方，以防您的裝置遺失。</string>
-    <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">請輸入您的驗證程式所生成的6位碼。</string>
+    <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <string name="general_verify" context="Text button">確認</string>
     <string name="general_next" context="Text button">次一</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">生成種子或QR碼時出錯，請再試一次。</string>
-    <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">已啟用兩階段驗證</string>
-    <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">下次登入您的帳戶時，系統會要求您輸入驗證程式提供的6位碼。</string>
+    <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">已啟用雙重驗證</string>
+    <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
     <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>備份您的還原金鑰</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">無效的條碼</string>
     <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">您的驗證設備不見了？</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">登入驗證</string>
-    <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">兩階段身份驗證\n更改密碼</string>
-    <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">兩階段身份驗證\n取消帳戶</string>
-    <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">兩階段身份驗證\n更改電子郵件地址</string>
-    <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">停用兩階段驗證</string>
+    <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">雙重驗證\n更改密碼</string>
+    <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">雙重驗證\n取消帳戶</string>
+    <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">雙重驗證\n更改電子郵件地址</string>
+    <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">停用雙重驗證</string>
     <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">您的驗證設備不見了？</string>
-    <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">嘗試停用兩階段身份驗證時發生錯誤。請再試一次。</string>
-    <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">嘗試啟用兩階段身份驗證時發生錯誤。請再試一次。</string>
-    <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">啟用兩階段驗證功能</string>
-    <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">已停用兩階段驗證</string>
+    <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">嘗試停用雙重驗證時發生錯誤。請再試一次。</string>
+    <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">嘗試啟用雙重驗證時發生錯誤。請再試一次。</string>
+    <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">啟用雙重驗證</string>
+    <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">已停用雙重驗證</string>
     <string name="open_app_button" context="Text of the button which action is to show the authentication apps">開啟於</string>
-    <string name="intent_not_available_2fa" context="message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it">在您的設備上，沒有任何可用的應用程式可以用來啟用兩階段身份驗證</string>
+    <string name="intent_not_available_2fa" context="message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it">在您的設備上，沒有任何可用的應用程式可以用來啟用雙重驗證</string>
     <string name="general_close" context="Text button">關閉</string>
 
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">匯出你的還原金鑰後就完成了</string>
-    <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">驗證器應用程式</string>
-    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">您想開啟Google Play來安裝驗證程式嗎？</string>
+    <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">身份驗證應用程式</string>
+    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">您想開啟Google Play來安裝身份驗證程式嗎？</string>
     <string name="play_store_label" context="Label Play Store">應用商店</string>
-    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">您需要驗證用的應用程式才能在MEGA上啟用2FA認證。您在手機或平板電腦裡下載並安裝Google Authenticator、Duo Mobile，Authy或Microsoft Authenticator app。</string>
+    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">您需要身份驗證應用程式才能在MEGA上啟用雙重驗證。您可以在手機或平板電腦裡下載並安裝Google Authenticator、Duo Mobile，Authy或Microsoft Authenticator app。</string>
 
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">已成功分享%d個檔案</string>
@@ -2271,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">當加載聊天連結初始化聊天時發生錯誤。</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">您正在嘗試預覽您之前身為當中一員的對談。你想再次加入對談嗎？</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">您已加入此對談。</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">此對談預覽已不再可用。如果您退出預覽，將無法再開啟它。</string>
@@ -2316,6 +2344,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s[/A][B]已封鎖您。[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">[A](%1$d)[/A]則訊息</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">帳戶已刪除</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]帳戶[/B][A]%s[/A][B]已刪除。[/B]</string>
@@ -2435,7 +2464,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">啟用相機</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">允許存取相機以掃描文件、拍照與進行視訊通話。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">啟用通話</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">授予存取您通訊錄的權限</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">啟用存取您的通訊錄</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">輕易的在您通訊錄中找到有在使用MEGA的聯絡人。</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA不會將這些資料用於任何其他目的，並且未經您的同意絕不會與您的聯絡人互動。</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">允許存取麥克風以進行加密通話。</string>
@@ -2525,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">在MEGA上找到%d個聯絡人</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">立即邀請聯絡人？</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">查看誰已經在MEGA上</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">查看您在MEGA上的聯絡人</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">授予MEGA存取您通訊錄的權限，以找到有在使用MEGA的聯絡人。</string>
     <string name="get_registered_contacts" context="Getting registered contacts">正在載入MEGA的聯絡人&#8230;</string>
 
@@ -2555,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">您沒有MEGA聯絡人。請從「聯絡人」頁面邀請朋友。</string>
-    <string name="invite_more" context="Invite button for chat top cell">邀請更多&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">邀請更多</string>
 
     <string name="title_tour_one" context="Title of first tour screen">您握有鑰匙</string>
     <string name="content_tour_one" cotext="Content of first tour screen">追求安全性是我們存在的原因，您的檔案安全地存放在我們運行良好的加密主機中，只有您可以存取您的檔案。</string>
@@ -2725,6 +2754,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">這有可能是您MEGA帳戶所使用的密碼與在其它網站上所使用的密碼相同，而且這些網站當中至少有一個遭遇資料外洩。</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">您的密碼已洩漏並且現在被不肖人士拿來登入您的帳戶，包括但不限於您的MEGA帳戶。</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">設定暱稱</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">編輯暱稱</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">已加入暱稱</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">已移除暱稱</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">嘗試加入暱稱時發生錯誤</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">暱稱</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">重新連線中</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">你回來了。</string>
 
@@ -2734,6 +2770,30 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">您沒有還原此檔案的權限。為了繼續，我們能夠以還原的資料建立一個新檔案。您想要這麼做嗎？</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">已成功的以此版本建立新檔案。</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">於%1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">您確定要移除這%1$d個資料夾的所有共享嗎？</string>
+
     <string name="download_location" context="Download location label">下載地址</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">總是儲存在此位置？</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">附加自⋯</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">對話建立於%s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">選擇訊息</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">驗證憑證</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">未驗證</string>
+    <string name="label_verified" context="Action indicating something was verified.">已驗證</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">授權認證</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">這最好由實際面對面來完成。如您有其他已驗證管道，如已驗證的OTR或PGP，也可以使採用。</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">您的憑證</string>
+    <string name="action_reset" context="Button to reset credentials">重設</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import nz.mega.sdk.MegaApiJava;
@@ -21,6 +21,7 @@ import mega.privacy.android.app.MegaApplication;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class ContactUtil {
 
@@ -39,6 +40,10 @@ public class ContactUtil {
     }
 
     public static String getContactNameDB(MegaContactDB contactDB) {
+        if (contactDB == null) {
+            return null;
+        }
+
         String nicknameText = contactDB.getNickname();
         if (nicknameText != null) {
             return nicknameText;
@@ -46,10 +51,9 @@ public class ContactUtil {
 
         String firstNameText = contactDB.getName();
         String lastNameText = contactDB.getLastName();
-
         String emailText = contactDB.getMail();
-        String nameResult = buildFullName(firstNameText, lastNameText, emailText);
-        return nameResult;
+
+        return buildFullName(firstNameText, lastNameText, emailText);
     }
 
     public static String getContactNameDB(long contactHandle) {
@@ -63,9 +67,35 @@ public class ContactUtil {
 
     public static String getNicknameContact(long contactHandle) {
         MegaContactDB contactDB = getContactDB(contactHandle);
-        if (contactDB == null) return null;
-        String nicknameText = contactDB.getNickname();
-        return nicknameText;
+        if (contactDB == null)
+            return null;
+
+        return contactDB.getNickname();
+    }
+
+    public static String getNicknameContact(String email) {
+        MegaContactDB contactDB = MegaApplication.getInstance().getDbH().findContactByEmail(email);
+        if (contactDB != null) {
+            return contactDB.getNickname();
+        }
+
+        return null;
+    }
+
+    /**
+     * Method for obtaining the nickname to be displayed in the notifications in the notifications section.
+     *
+     * @param context Context of Activity.
+     * @param email   The user email.
+     * @return The nickname.
+     */
+    public static String getNicknameForNotificationsSection(Context context, String email) {
+        String nickname = getNicknameContact(email);
+        if (nickname != null) {
+            return String.format(context.getString(R.string.section_notification_user_with_nickname), nickname, email);
+        }
+
+        return email;
     }
 
     public static String buildFullName(String name, String lastName, String mail) {
@@ -148,18 +178,33 @@ public class ContactUtil {
     }
 
     public static void notifyNicknameUpdate(Context context, long userHandle) {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_NICKNAME);
-        intent.putExtra(EXTRA_USER_HANDLE, userHandle);
+        notifyUserNameUpdate(context, ACTION_UPDATE_NICKNAME, userHandle);
+    }
+
+    public static void notifyFirstNameUpdate(Context context, long userHandle) {
+        notifyUserNameUpdate(context, ACTION_UPDATE_FIRST_NAME, userHandle);
+    }
+
+    public static void notifyLastNameUpdate(Context context, long userHandle) {
+        notifyUserNameUpdate(context, ACTION_UPDATE_LAST_NAME, userHandle);
+    }
+
+    public static void notifyUserNameUpdate(Context context, String action, long userHandle) {
+        Intent intent = new Intent(action)
+            .putExtra(EXTRA_USER_HANDLE, userHandle);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     private static String getNewNickname(MegaStringMap map, String key) {
         String nicknameEncoded = map.get(key);
+        if (nicknameEncoded == null)
+            return null;
+
         try {
-            byte[] decrypt = Base64.decode(nicknameEncoded, Base64.DEFAULT);
-            return new String(decrypt, StandardCharsets.UTF_8);
+            byte[] data = Base64.decode(nicknameEncoded, Base64.URL_SAFE);
+            return new String(data, StandardCharsets.UTF_8);
         } catch (java.lang.Exception e) {
-            logError("Error retrieving new nickname");
+            logError("Error retrieving new nickname " + e);
             return null;
         }
     }
@@ -196,5 +241,55 @@ public class ContactUtil {
     public static void updateLastName(Context context, String lastName, String email) {
         MegaApplication.getInstance().getDbH().setContactLastName(lastName, email);
         updateView(context);
+    }
+
+    /**
+     * Checks if the user who their handle is received by parameter is a contact.
+     *
+     * @param userHandle    handle of the user
+     * @return true if the user is a contact, false otherwise.
+     */
+    public static boolean isContact(long userHandle) {
+        if (userHandle == INVALID_HANDLE) {
+            return false;
+        }
+
+        return isContact(MegaApiJava.userHandleToBase64(userHandle));
+    }
+
+    /**
+     * Checks if the user who their email of handle in base64 is received by parameter is a contact.
+     *
+     * @param emailOrUserHandleBase64   email or user's handle in base64
+     * @return true if the user is a contact, false otherwise.
+     */
+    public static boolean isContact(String emailOrUserHandleBase64) {
+        if (isTextEmpty(emailOrUserHandleBase64)) {
+            return false;
+        }
+
+        MegaUser contact = MegaApplication.getInstance().getMegaApi().getContact(emailOrUserHandleBase64);
+        return contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
+    }
+
+    /**
+     * Gets a contact's email from DB.
+     *
+     * @param contactHandle contact's identifier
+     * @return The contact's email.
+     */
+    public static String getContactEmailDB(long contactHandle) {
+        MegaContactDB contactDB = getContactDB(contactHandle);
+        return contactDB != null ? getContactEmailDB(contactDB) : null;
+    }
+
+    /**
+     * Gets a contact's email from DB.
+     *
+     * @param contactDB contact's MegaContactDB
+     * @return The contact's email.
+     */
+    public static String getContactEmailDB(MegaContactDB contactDB) {
+        return contactDB != null ? contactDB.getMail() : null;
     }
 }

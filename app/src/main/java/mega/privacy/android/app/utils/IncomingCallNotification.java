@@ -24,6 +24,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.isAndroid10;
 
@@ -89,13 +90,14 @@ public class IncomingCallNotification {
                 .addAction(R.drawable.ic_phone_white, context.getString(R.string.notification_incoming_action), pendingIntent)
                 .setFullScreenIntent(pendingIntent, true)
                 .setOngoing(true)
+                .setContentIntent(pendingIntent)
                 .setColor(ContextCompat.getColor(context, R.color.mega))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL);
 
         MegaChatRoom chat = megaChatApi.getChatRoom(callToLaunch.getChatid());
         if (chat != null) {
-            mBuilderCompat.setContentTitle(chat.getTitle());
+            mBuilderCompat.setContentTitle(getTitleChat(chat));
         }
 
         notificationManager.notify(INCOMING_CALL_NOTI_ID, mBuilderCompat.build());

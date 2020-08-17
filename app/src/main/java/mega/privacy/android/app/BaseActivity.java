@@ -47,6 +47,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -112,9 +113,8 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
 
-        IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
-        filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
+        registerReceiver(accountBlockedReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
@@ -122,7 +122,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
+        registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
         if (savedInstanceState != null) {
@@ -168,10 +168,10 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
+        unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
+        unregisterReceiver(transferFinishedReceiver);
 
         super.onDestroy();
     }
@@ -211,7 +211,9 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver accountBlockedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_EVENT_ACCOUNT_BLOCKED)) return;
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED))
+                return;
 
             checkWhyAmIBlocked(intent.getLongExtra(EVENT_NUMBER, -1), intent.getStringExtra(EVENT_TEXT));
         }
@@ -276,7 +278,12 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver transferFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) {
+            if (intent == null || isPaused) {
+                return;
+            }
+
+            if (intent.getBooleanExtra(FILE_EXPLORER_CHAT_UPLOAD, false)) {
+                Util.showSnackbar(baseActivity, MESSAGE_SNACKBAR_TYPE, null, intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE));
                 return;
             }
 
@@ -440,20 +447,27 @@ public class BaseActivity extends AppCompatActivity {
      *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
      */
     public void showSnackbar (int type, View view, String s, long idChat) {
-        logDebug(("showSnackbar: " + s));
+        logDebug("Show snackbar: " + s);
         Display  display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        Snackbar snackbar = null;
-        if (type == MESSAGE_SNACKBAR_TYPE) {
-            snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
-        }
-        else if (type == NOT_SPACE_SNACKBAR_TYPE) {
-            snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        }
-        else {
-            snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+        Snackbar snackbar;
+        try {
+            switch (type) {
+                case MESSAGE_SNACKBAR_TYPE:
+                    snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
+                    break;
+                case NOT_SPACE_SNACKBAR_TYPE:
+                    snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+                    break;
+                default:
+                    snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+                    break;
+            }
+        } catch (Exception e) {
+            logError("Error showing snackbar", e);
+            return;
         }
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
@@ -478,12 +492,12 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             }
             case MESSAGE_SNACKBAR_TYPE: {
-                snackbar.setAction("SEE", new SnackbarNavigateOption(view.getContext(), idChat));
+                snackbar.setAction(R.string.action_see, new SnackbarNavigateOption(view.getContext(), idChat));
                 snackbar.show();
                 break;
             }
             case NOT_SPACE_SNACKBAR_TYPE: {
-                snackbar.setAction("Settings", new SnackbarNavigateOption(view.getContext()));
+                snackbar.setAction(R.string.action_settings, new SnackbarNavigateOption(view.getContext()));
                 snackbar.show();
                 break;
             }
@@ -583,13 +597,16 @@ public class BaseActivity extends AppCompatActivity {
 //                I am not blocked
                 break;
             case COPYRIGHT_ACCOUNT_BLOCK:
-                showErrorAlertDialog(getString(R.string.account_suspended_breache_ToS), false, this);
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_breache_ToS)));
                 break;
             case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
-                showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS)));
                 break;
+
+            case DISABLED_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_account_blocked)));
+                break;
+
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
                 if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return;
 
@@ -614,15 +631,16 @@ public class BaseActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(NAME_USER_LOCKED, true);
                 startActivity(intent);
-
                 break;
+
             case WEAK_PROTECTION_ACCOUNT_BLOCK:
-                if (app.isBlockedDueToWeakAccount() || app.isWebOpenDueToEmailVerification()) {
+                if (MegaApplication.isBlockedDueToWeakAccount() || MegaApplication.isWebOpenDueToEmailVerification()) {
                     break;
                 }
                 intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
                 startActivity(intent);
                 break;
+
             default:
                 showErrorAlertDialog(stringError, false, this);
         }

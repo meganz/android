@@ -1,13 +1,12 @@
 package mega.privacy.android.app.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.Display;
-
-import java.util.Objects;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -28,6 +27,8 @@ public class BaseFragment extends Fragment {
 
     protected DisplayMetrics outMetrics;
 
+    protected Activity mActivity;
+
     public BaseFragment() {
         app = MegaApplication.getInstance();
         if (app != null) {
@@ -43,10 +44,13 @@ public class BaseFragment extends Fragment {
         super.onAttach(context);
 
         this.context = context;
+        mActivity = getActivity();
 
-        Display display = Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
+        if (mActivity != null) {
+            Display display = mActivity.getWindowManager().getDefaultDisplay();
+            outMetrics = new DisplayMetrics();
+            display.getMetrics(outMetrics);
+        }
     }
 
     public DisplayMetrics getOutMetrics() {

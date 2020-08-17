@@ -9,6 +9,8 @@
 ### Android Studio files ###
 *.iml
 .idea/assetWizardSettings.xml
+.idea/modules.xml
+.idea/jarRepositories.xml
 
 # User-specific stuff:
 .idea/workspace.xml
@@ -37,6 +39,7 @@ captures
 *.ipr
 *.iws
 /.idea/codeStyles/Project.xml
+/.idea/codeStyles/codeStyleConfig.xml
 /.idea/caches/build_file_checksums.ser
 
 ## Google API key files

@@ -93,6 +93,7 @@ import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -655,6 +656,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
         } else if (type == LINKS_ADAPTER) {
             LinksFragment.imageDrag.getLocationOnScreen(location);
+        } else if (type == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
+            RecentsFragment.imageDrag.getLocationOnScreen(location);
         }
     }
 
@@ -1577,8 +1580,10 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_share: {
-                if (type == OFFLINE_ADAPTER || type == ZIP_ADAPTER) {
+                if (type == ZIP_ADAPTER) {
                     shareFile(this, new File(uri.toString()));
+                } else if (type == OFFLINE_ADAPTER || !inside) {
+                    shareWithUri(this, "pdf", uri);
                 } else if (type == FILE_LINK_ADAPTER) {
                     shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));
                 } else {

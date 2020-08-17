@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA는 모바일 기기를 위한 전용 앱과 함께 표준 웹 브라우저를 통하여 이용자가 제어하는 암호화된 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 절대 우리가 아닌 당신의 클아이언트 기기를 통해서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드한 후 어디서든, 어떤 기기에서든, 아무때나 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 파일을 공유하고 그들의 업데이트를 실시간으로 보세요. 암호화 과정은 우리가 당신의 비밀번호에 접근하거나 재설정할 수 없다는 뜻이기 때문에 반드시 기억해야 하지 않으면 (복구 키를 백업하지 않았다면) 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 암호화 MEGA 영상 대화는 완전한 프라이버시가 가능하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이것은 우리의 모바일 앱에도 확장되어 여러 기기를 통하여 대화 기록에 접근할 수 있습니다. 이용자들은 또한 그들의 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 모든 가입자들에게 보너스 도전과제와 함께 넉넉한 50 GB의 무료 저장 공간을 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPRO LITE 요금제: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 제공합니다.\nPRO I 요금제: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 제공합니다.\nPRO II 요금제: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장 공간과 월 8 TB의 전송 할당량을 제공합니다.\nPRO III 요금제: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 제공합니다.\n\n구독은 처임 선택했던 기간과 동일한 기간과 동일한 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭하고, Google ID로 로그인하고 (만약 하지 않았다면) 그리고 MEGA 앱을 클릭합니다. 당신의 구독을 그 곳에서 관리할 수 있습니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 MEGA에 당신의 사진을 업로드합니다\n연락처 읽기 -> 당신의 기기에서 쉽게 연락처를 MEGA 연락처로 추가합니다\n녹음 &amp; 녹화 (마이크와 카메라) -> MEGA는 종단간 암호화된 음성/영상 통화를 제공합니다\n\n\nMEGA 시세틈에 대한 이용들의 확신을 높이기 위하여, 모든 클라이언트 사이드 코드는 공개되어 있으므로, 흥미 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱 코드는 다음에 있습니다: https://github.com/meganz/android\n\n더 많은 정보는, 우리의 웹사이트에서 확인하세요:\nhttps://mega.nz/terms\n\n\n데스크톱 - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA는 모바일 기기를 위한 전용 앱과 함께 표준 웹 브라우저를 통하여 이용자가 제어하는 암호화된 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 절대 우리가 아닌 당신의 클아이언트 기기를 통해서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드한 후 어디서든, 어떤 기기에서든, 아무때나 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 파일을 공유하고 그들의 업데이트를 실시간으로 보세요. 암호화 과정은 우리가 당신의 비밀번호에 접근하거나 재설정할 수 없다는 뜻이기 때문에 반드시 기억해야 하지 않으면 (복구 키를 백업하지 않았다면) 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 암호화 MEGA 영상 대화는 완전한 프라이버시가 가능하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이것은 우리의 모바일 앱에도 확장되어 여러 기기를 통하여 대화 기록에 접근할 수 있습니다. 이용자들은 또한 그들의 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 모든 가입자들에게 보너스 도전과제와 함께 넉넉한 50 GB의 무료 저장 공간을 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPRO LITE 요금제: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 제공합니다.\nPRO I 요금제: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 제공합니다.\nPRO II 요금제: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장 공간과 월 8 TB의 전송 할당량을 제공합니다.\nPRO III 요금제: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 제공합니다.\n\n구독은 처임 선택했던 기간과 동일한 기간과 동일한 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭하고, Google ID로 로그인하고 (만약 하지 않았다면) 그리고 MEGA 앱을 클릭합니다. 당신의 구독을 그 곳에서 관리할 수 있습니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 MEGA에 당신의 사진을 업로드합니다\n연락처 읽기 -> 당신의 기기에서 쉽게 연락처를 MEGA 연락처로 추가합니다\n녹음 &amp; 녹화 (마이크와 카메라) -> MEGA는 종단간 암호화된 음성/영상 통화를 제공합니다\n\n\nMEGA 시세틈에 대한 이용들의 확신을 높이기 위하여, 모든 클라이언트 사이드 코드는 공개되어 있으므로, 흥미 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱 코드는 다음에 있습니다: https://github.com/meganz/android\n\n더 많은 정보는, 우리의 웹사이트에서 확인하세요:\nhttps://mega.nz/terms\n\n\n데스크톱 - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA는 강력한 상시 개인 정보 보호를 가진 클라우드 저장소입니다.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 뷰어</string>
 
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s(이)가 다운로드 됩니다.</string>
     <string name="alert_no_app" context="Alert text before download">%s 파일을 열 앱이 없습니다. 다운로드를 진행하시겠습니까?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">다시 보여주지 마세요</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">다시 보여주지 마세요</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">현재 로그인 과정을 취소하시겠습니까?</string>
 
@@ -249,13 +246,14 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">클라우드 드라이브</string>
     <string name="section_recents" context="Label to reference a recents section">최근</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">미디어 업로드</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">미디어 업로드</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">수신함</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">오프라인으로 저장됨</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">오프라인</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">공유된 항목</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">공유된 폴더</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">휴지통</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">연락처</string>
@@ -266,12 +264,13 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">전송</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">내 계정</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">카메라 업로드</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">카메라 업로드</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">들어옴</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">나감</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">링크</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">들어오는 공유</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">다음과의 들어오는 공유</string>
@@ -382,7 +381,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">공유 떠나기</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">공유 제거</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">링크 제거</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">이 링크는 더 이상 공개되지 않습니다.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">이 링크는 더 이상 공개되지 않습니다.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">이 링크는 더 이상 공개되지 않습니다.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">이 링크들은 더 이상 공개적으로 이용할 수 없습니다.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">이름 바꾸기</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">링크 열기</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">열기</string>
@@ -552,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">해독 키</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">링크의 해독 키를 입력하세요</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">잘못된 해독 키</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">이미지</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">오디오</string>
@@ -686,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">미디어 폴더의 파일을 업로드할 수 없습니다</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">업로드할 파일 확인중</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">카메라 업로드 초기화중</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">카메라 업로드가 해제되었습니다. 로컬 폴더를 이용할 수 없습니다.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">미디어 업로드가 해제되었습니다. 로컬 폴더를 이용할 수 없습니다.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -756,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">와이파이 전용</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">파일 올리기</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">날짜</string>
     <string name="sortby_creation_date" context="category in sort by action">생성일</string>
     <string name="sortby_modification_date" context="category in sort by action">수정일</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">링크 생성일</string>
     <string name="sortby_date_newest" context="sort files by date newest first">최신</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">오래된 순</string>
 
@@ -910,6 +917,8 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">로그가 활성화 되었습니다.</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">로그가 비활성화 되었습니다.</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">MEGA 카메라 업로드 폴더를 설정할 수 없습니다</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">당신이 필요한 권한을 거부했기 때문에 기록을 활성화할 수 없습니다</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">위치 열기</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
@@ -1533,6 +1542,8 @@
     <string name="general_view" context="Menu option">파일 보기</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">들여오기</string>
     <string name="save_for_offline" context="Menu option">오프라인용으로 저장</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">클라우드 드라이브에 추가</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">오프라인에 저장</string>
 
     <string name="general_view_contacts" context="Menu option">연락처 보기</string>
 
@@ -1555,7 +1566,18 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">정보 보기</string>
 
-    <string name="context_link_removal_error" context="error message">링크 제거 실패. 나중에 다시 시도하세요.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">링크 제거 실패. 나중에 다시 시도하세요.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">일부 링크의 제거를 실패하였습니다. 나중에 다시 시도하세요.</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">링크가 성공적으로 제거되었습니다.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">링크를 성공적으로 제거하였습니다.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">링크 행동 실패. 나중에 다시 시도하세요.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">이용자의 이메일을 쓰세요</string>
@@ -1641,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">공유된 폴더에서 연락처 제거중</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">휴지통으로 옮길까요?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">이 폴더를 휴지통에 버리시겠습니까? 이로 인해 카메라 업로드가 해제됩니다.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">이 폴더를 휴지통으로 이동하시겠습니까? 미디어 업로드가 해제됩니다.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">휴지통으로 옮길까요?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">MEGA에서 삭제할까요?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">폴더를 떠나면, 다시 볼 수 없습니다.</string>
@@ -1827,12 +1851,16 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[A]나가는 공유 폴더[/A] [B]없음[/B][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B][/B][A]공개 링크[/A][B] 없음[/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">보낸 요청</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">받은 요청</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">할당량 초과</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">잘못된 링크, 새 유효한 링크를 요청하세요</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">잘못된 링크 비밀번호</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">열려고 하는 링크는 유효한 MEGA 링크가 아닙니다.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">링크 처리중&#8230;</string>
 
@@ -1856,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">당신의 계정은 MEGA 이용 약관을 다수 위반하여 정지되었습니다. 이메일 수신함을 확인하세요.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">당신의 계정은 타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 제거되었습니다.</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">파일 불러오는 중</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">파일 없음</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -1998,13 +2027,13 @@
 
     <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(대기중)</string>
 
-    <string name="option_enable_chat_rich_preview" context="Title of the dialog to disable the rich links previews on chat">Rich URL 미리보기</string>
+    <string name="option_enable_chat_rich_preview" context="Title of the dialog to disable the rich links previews on chat">고급 URL 미리보기</string>
 
     <string name="button_always_rich_links" context="Button to allow the rich links previews on chat">항상 허용</string>
     <string name="button_not_now_rich_links" context="Button do not allow now the rich links previews on chat">나중에</string>
     <string name="button_never_rich_links" context="Button do not allow the rich links previews on chat">절대 안함</string>
 
-    <string name="title_enable_rich_links" context="Title of the dialog to enable the rich links previews on chat">Rich URL 미리보기 활성화</string>
+    <string name="title_enable_rich_links" context="Title of the dialog to enable the rich links previews on chat">고급 URL 미리보기 활성화</string>
 
     <string name="text_enable_rich_links" context="Text of the dialog to enable the rich links previews on chat">MEGAchat 경험을 향상하세요. URL 컨텐츠가 종단간 암호화 없이 수신됩니다.</string>
 
@@ -2079,8 +2108,8 @@
         <item context="Error message if forwarding a message failed, many messages" quantity="other">메시지가 전달되지 않음</item>
     </plurals>
 
-    <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL 미리보기</string>
-    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">풍부한 URL 미리보기를 영구히 해제하려고 합니다. 당신은 풍부한 URL 미리보기를 설정에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
+    <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">고급 URL 미리보기</string>
+    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">고급 URL 미리보기를 영구히 해제하려고 합니다. 당신은 고급 URL 미리보기를 설정에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
 
     <string name="call_missed_messages" context="Message shown when a call ends.">[A]부재중 전화[/A]</string>
     <string name="call_rejected_messages" context="Message shown when a call ends.">[A]통화가 거절됨[/A]</string>
@@ -2271,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">대화 링크를 불러오던 중 대화 초기화 오류 발생</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">이전에 참여했었던 대화를 미리 보려고 합니다. 대화에 참여하시겠습니까?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">이미 이 대화에 참여하고 있습니다.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">이 대화 미리 보기는 더 이상 유효하지 않습니다. 미리 보기를 떠나면, 다시 열 수 없습니다.</string>
@@ -2316,6 +2344,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s님이 [/A][B]당신을 연락처에서 차단하였습니다.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">알림 [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%1$s (%2$s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">계정 삭제됨</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]계정이[/B] [B]삭제되었습니다.[/B]</string>
@@ -2435,7 +2464,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">카메라 활성화</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">문서 스캔, 사진 촬영 그리고 영상 통화를 하려면 당신의 카메라에 대한 접근을 허용하세요.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">통화 활성화</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">주소록 접근 허용</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">주소록에 대한 접근 허용</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA에서 당신의 주소록에 있는 지인들을 쉽게 찾으세요.</string>
     <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호 작용하지 않을 것입니다.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
@@ -2525,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">MEGA에서 %d개의 연락처 찾음</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">지금 연락처를 초대할까요?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">MEGA에 누가 있는지 보기</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">MEGA에서 지인들 찾기</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">MEGA가 MEGA 상의 당신의 지인들을 찾을 수 있도록 주소록에 대한 접근을 허용해주세요.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">MEGA에서 연락처 불러오는 중&#8230;</string>
 
@@ -2555,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">MEGA 연락처가 없습니다. 연락처 부문에서 친구들을 초대하세요.</string>
-    <string name="invite_more" context="Invite button for chat top cell">더 초대하기&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">더 초대하기</string>
 
     <string name="title_tour_one" context="Title of first tour screen">당신이 열쇠를 갖습니다</string>
     <string name="content_tour_one" cotext="Content of first tour screen">보안은 우리의 존재 이유이며, 당신의 파일들은 당신만이 접근 할수 있도록 우리 서버에 마치 잘 관리된 암호화 기계 뒤에 있는 것처럼 매우 안전합니다.</string>
@@ -2725,6 +2754,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">MEGA와 다른 서비스들에서 같은 비밀번호를 이용하고 있고, 다른 서비스들 중 한 곳에서 데이터 유출이 발생했을 가능성이 있습니다.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">당신의 비밀번호가 유출되어서 MEGA 계정뿐만 아니라 당신의 계정에 접속하려는 나쁜 사람들에게 이용되고 있습니다.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">별명 설정</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">별명 수정</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">별명 추가됨</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">별명 제거됨</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">별명을 추가하던 중 오류 발생</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">별명</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">다시 연결중</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">돌아왔습니다.</string>
 
@@ -2734,6 +2770,30 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">이 파일을 되돌릴 권한이 없습니다. 계속하려면 되돌린 데이터로 새 파일을 만들 수 있습니다. 계속하시겠습니까?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">기록으로 새 파일을 성공적으로 생성하였습니다.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">%1$s에</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">%1$d개의 폴더에서 모든 공유를 삭제하시겠습니까?</string>
+
     <string name="download_location" context="Download location label">다운로드 위치</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">항상 이 위치에 저장할까요?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">다음에서 첨부&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">%s에 생성된 대화</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">메시지 선택</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">자격증명 검증중</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">인증되지 않음</string>
+    <string name="label_verified" context="Action indicating something was verified.">확인됨</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">인증 정보</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">현실에서 가장 확실한 방법은 직접 만나는 것입니다. 만약 증명된 OTR이나 PGP 같은 이미 증명된 다른 방법이 있다면, 그것을 사용해도 좋습니다.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">당신의 개인정보</string>
+    <string name="action_reset" context="Button to reset credentials">재설정</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

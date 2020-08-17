@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
@@ -49,6 +50,7 @@ import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,11 +87,9 @@ import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -133,6 +133,11 @@ public class Util {
 
 	public static HashMap<String, String> countryCodeDisplay;
 
+	private static long lastClickTime;
+
+	// 150ms, a smaller value may cause the keyboard to fail to open
+	private final static int SHOW_IM_DELAY = 150;
+
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
         String nodeOriginalFingerprint = node.getOriginalFingerprint();
@@ -157,28 +162,22 @@ public class Util {
 		
 		try{ 
 			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(
-				activity.getString(android.R.string.ok),
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
 						dialog.dismiss();
 						if (finish) {
 							activity.finish();
 						}
-					}
-				});
-			dialogBuilder.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					if (finish) {
-						activity.finish();
-					}
+					});
+			dialogBuilder.setOnCancelListener(dialog -> {
+				if (finish) {
+					activity.finish();
 				}
 			});
 		
 		
 			AlertDialog dialog = dialogBuilder.create();
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.setCancelable(false);
 			dialog.show(); 
 			brandAlertDialog(dialog);
 		}
@@ -427,7 +426,17 @@ public class Util {
 		
 	    return scale;
 	}
-	
+
+	/**
+	 * Convert dp to px.
+	 *
+	 * Note: the name of this function is wrong since the beginning, we should rename it in
+	 * the future.
+	 *
+	 * @param dp dp value
+	 * @param outMetrics display metrics
+	 * @return corresponding px value
+	 */
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
 	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
@@ -1056,42 +1065,6 @@ public class Util {
 		return yearList;
 	}
 
-
-	public static String getSubtitleDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-
-		Context context = MegaApplication.getInstance().getApplicationContext();
-
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = context.getString(R.string.no_folders_shared);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-
-		return info;
-	}
-
 	public static BitSet convertToBitSet(long value) {
 	    BitSet bits = new BitSet();
 	    int index = 0;
@@ -1423,11 +1396,20 @@ public class Util {
         return circle;
     }
 
-    public static void changeStatusBarColor(Context context, Window window, int color) {
+    public static void changeStatusBarColor(Context context, Window window, @ColorRes int colorId) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(context, color));
+        window.setStatusBarColor(ContextCompat.getColor(context, colorId));
     }
+
+	public static int getStatusBarHeight() {
+		Context context = MegaApplication.getInstance().getBaseContext();
+		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+				"android");
+
+		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
+				: px2dp(24, context.getResources().getDisplayMetrics());
+	}
 
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
@@ -1713,12 +1695,17 @@ public class Util {
 	}
 
     public static void showKeyboardDelayed(final View view) {
+		if (view == null) return;
+
 		Handler handler = new Handler();
         handler.postDelayed(() -> {
-			InputMethodManager imm =
-					(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-		}, 50);
+			// The view needs to request the focus or the keyboard may not pops up
+			if (view.requestFocus()) {
+				InputMethodManager imm = (InputMethodManager)
+						MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, SHOW_IM_DELAY);
     }
 
     public static Spanned getSpannedHtmlText(String string) {
@@ -1787,6 +1774,34 @@ public class Util {
 			textInputLayout.setEndIconDrawable(R.drawable.password_toggle);
 		} else {
 			textInputLayout.setEndIconMode(END_ICON_NONE);
+		}
+	}
+
+	public static boolean isFastDoubleClick() {
+		long time = System.currentTimeMillis();
+		long timeD = time - lastClickTime;
+		if (0 <= timeD && timeD < 500) {
+			return true;
+		}
+
+		lastClickTime = time;
+		return false;
+	}
+
+	/**
+	 * Changes the elevation of the the ActionBar passed as parameter.
+	 *
+	 * @param aB				ActionBar in which the elevation has to be applied.
+	 * @param withElevation	true if should apply elevation, false otherwise.
+	 * @param outMetrics	DisplayMetrics of the current device.
+	 */
+	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
+		float elevation = px2dp(4, outMetrics);
+
+		if (withElevation) {
+			aB.setElevation(elevation);
+		} else {
+			aB.setElevation(0);
 		}
 	}
 }

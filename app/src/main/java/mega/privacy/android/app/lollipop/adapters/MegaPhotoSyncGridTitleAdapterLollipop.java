@@ -55,7 +55,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -155,100 +158,77 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             logDebug("onActionItemClicked");
             List<MegaNode> documents = getSelectedDocuments();
+            if (documents.isEmpty()) {
+                return false;
+            }
 
-            switch(item.getItemId()){
-                case R.id.cab_menu_download:{
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i=0;i<documents.size();i++){
-                        handleList.add(documents.get(i).getHandle());
-                    }
+            switch (item.getItemId()) {
+                case R.id.cab_menu_download:
                     clearSelections();
-                    NodeController nC = new NodeController(context);
-                    nC.prepareForDownload(handleList, false);
+                    new NodeController(context)
+                        .prepareForDownload(getDocumentHandles(documents), false);
                     break;
-                }
-                case R.id.cab_menu_copy:{
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i=0;i<documents.size();i++){
-                        handleList.add(documents.get(i).getHandle());
-                    }
+                case R.id.cab_menu_copy:
                     clearSelections();
-                    NodeController nC = new NodeController(context);
-                    nC.chooseLocationToCopyNodes(handleList);
+                    new NodeController(context)
+                        .chooseLocationToCopyNodes(getDocumentHandles(documents));
                     break;
-                }
-                case R.id.cab_menu_move:{
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i=0;i<documents.size();i++){
-                        handleList.add(documents.get(i).getHandle());
-                    }
+                case R.id.cab_menu_move:
                     clearSelections();
-                    NodeController nC = new NodeController(context);
-                    nC.chooseLocationToMoveNodes(handleList);
+                    new NodeController(context)
+                        .chooseLocationToMoveNodes(getDocumentHandles(documents));
                     break;
-                }
-                case R.id.cab_menu_share_link:{
+                case R.id.cab_menu_share_out:
                     clearSelections();
-                    if (documents.size()==1){
-                        //NodeController nC = new NodeController(context);
-                        //nC.exportLink(documents.get(0));
-                        if(documents.get(0)==null){
-                            logWarning("The selected node is NULL");
-                            break;
-                        }
-                        ((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
+                    MegaNodeUtil.shareNodes(context, documents);
+                    break;
+                case R.id.cab_menu_share_link:
+                case R.id.cab_menu_edit_link:
+                    logDebug("Public link option");
+                    clearSelections();
+                    if (documents.size() == 1
+                        && documents.get(0).getHandle() != MegaApiJava.INVALID_HANDLE) {
+                        ((ManagerActivityLollipop) context)
+                            .showGetLinkActivity(documents.get(0).getHandle());
                     }
                     break;
-                }
-                case R.id.cab_menu_share_link_remove:{
-
+                case R.id.cab_menu_remove_link:
+                    logDebug("Remove public link option");
                     clearSelections();
-                    if (documents.size()==1){
-                        //NodeController nC = new NodeController(context);
-                        //nC.removeLink(documents.get(0));
-                        if(documents.get(0)==null){
-                            logWarning("The selected node is NULL");
-                            break;
-                        }
-                        ((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
-
+                    if (documents.size() == 1) {
+                        ((ManagerActivityLollipop) context)
+                            .showConfirmationRemovePublicLink(documents.get(0));
                     }
                     break;
-
-                }
-                case R.id.cab_menu_trash:{
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i=0;i<documents.size();i++){
-                        handleList.add(documents.get(i).getHandle());
-                    }
+                case R.id.cab_menu_send_to_chat:
+                    logDebug("Send files to chat");
                     clearSelections();
-                    ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+                    new NodeController(context).checkIfNodesAreMineAndSelectChatsToSendNodes(
+                        (ArrayList<MegaNode>) documents);
                     break;
-                }
-                case R.id.cab_menu_select_all:{
+                case R.id.cab_menu_trash:
+                    clearSelections();
+                    ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(
+                        getDocumentHandles(documents));
+                    break;
+                case R.id.cab_menu_select_all:
                     selectAll();
                     break;
-                }
-                case R.id.cab_menu_unselect_all:{
+                case R.id.cab_menu_clear_selection:
                     clearSelections();
                     break;
-                }
             }
-            return false;
+            return true;
         }
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             logDebug("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.file_browser_action, menu);
+            inflater.inflate(R.menu.cloud_storage_action, menu);
             ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                final Window window = ((ManagerActivityLollipop) context).getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
-            }
+            Util.changeStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow(),
+                R.color.accentColorDark);
             ((ManagerActivityLollipop) context).setDrawerLockMode(true);
             ((CameraUploadFragmentLollipop) fragment).checkScroll();
             return true;
@@ -265,12 +245,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 final Window window = ((ManagerActivityLollipop) context).getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        window.setStatusBarColor(0);
-                    }
-                }, 350);
+                handler.postDelayed(() -> window.setStatusBarColor(0), 350);
             }
             ((CameraUploadFragmentLollipop) fragment).checkScroll();
             ((ManagerActivityLollipop) context).setDrawerLockMode(false);
@@ -280,98 +255,51 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             logDebug("onPrepareActionMode");
             List<MegaNode> selected = getSelectedDocuments();
+            if (selected.isEmpty()) {
+                return false;
+            }
 
-            logDebug("The num of items selected is " + selected.size());
+            CloudStorageOptionControlUtil.Control control =
+                new CloudStorageOptionControlUtil.Control();
 
-            boolean showDownload = false;
-            boolean showRename = false;
-            boolean showCopy = false;
-            boolean showMove = false;
-            boolean showLink = false;
-            boolean showTrash = false;
-            boolean showRemoveLink = false;
+            if (selected.size() == 1
+                && megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
+                == MegaError.API_OK) {
+                if (selected.get(0).isExported()) {
+                    control.manageLink().setVisible(true)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-
-            // Link
-            if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-                if(selected.get(0).isExported()){
-                    //Node has public link
-                    showRemoveLink=true;
-                    showLink=false;
-
-                }
-                else{
-                    showRemoveLink=false;
-                    showLink=true;
+                    control.removeLink().setVisible(true);
+                } else {
+                    control.getLink().setVisible(true)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 }
             }
 
-            if (selected.size() != 0) {
-                showDownload = true;
-                showTrash = true;
-                showMove = true;
-                showCopy = true;
+            menu.findItem(R.id.cab_menu_send_to_chat)
+                .setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
+                    R.color.white));
 
-                for(int i=0; i<selected.size();i++)	{
-                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-                        showTrash = false;
-                        showMove = false;
-                        break;
-                    }
-                }
+            control.sendToChat().setVisible(true)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-                if(selected.size() >= count - countTitles){
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-                    menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-                }
-                else{
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                    menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-                }
-            }
-            else{
-                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+            control.shareOut().setVisible(true)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+            control.trash().setVisible(MegaNodeUtil.canMoveToRubbish(selected));
+
+            control.move().setVisible(true);
+            control.copy().setVisible(true);
+            if (selected.size() > 1) {
+                control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
-            if(showCopy){
-                menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
+            control.selectAll().setVisible(selected.size() != count - countTitles);
 
-            if(showDownload){
-                menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
+            CloudStorageOptionControlUtil.applyControl(menu, control);
 
-            if(showLink){
-                menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-            if(showRemoveLink){
-                menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-
-            if(showMove){
-                if(selected.size()==1){
-                    menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                }else{
-                    menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                }
-            }
-
-            menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-            menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-            menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-            menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-            menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-            menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
-
-            menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
-            menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
-
-            return false;
+            return true;
         }
-
     }
 
     @Override
@@ -1588,6 +1516,21 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
 
         return documents;
+    }
+
+    /**
+     * Get handles for selected nodes.
+     *
+     * @return handles for selected nodes.
+     */
+    private ArrayList<Long> getDocumentHandles(List<MegaNode> documents) {
+        ArrayList<Long> handles = new ArrayList<>();
+
+        for (MegaNode node : documents){
+            handles.add(node.getHandle());
+        }
+
+        return handles;
     }
 
     private int getTypeOfPosition(int position){

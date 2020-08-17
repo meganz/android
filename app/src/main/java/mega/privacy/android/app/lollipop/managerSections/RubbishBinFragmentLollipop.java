@@ -216,96 +216,55 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			
-			switch(item.getItemId()){
 
-				case R.id.cab_menu_move:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
+			switch (item.getItemId()) {
+				case R.id.cab_menu_restore_from_rubbish:
+					if (documents.size() > 1) {
+						logDebug("Restore multiple: " + documents.size());
+						MultipleRequestListener moveMultipleListener =
+								new MultipleRequestListener(MULTIPLE_RESTORED_FROM_RUBBISH,
+										(ManagerActivityLollipop) context);
+						for (int i = 0; i < documents.size(); i++) {
+							MegaNode newParent =
+									megaApi.getNodeByHandle(documents.get(i).getRestoreHandle());
+							if (newParent != null) {
+								megaApi.moveNode(documents.get(i), newParent, moveMultipleListener);
+							} else {
+								logWarning("The restore folder no longer exists");
+							}
+						}
+					} else {
+						logDebug("Restore single item");
+						((ManagerActivityLollipop) context).restoreFromRubbish(documents.get(0));
 					}
-
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToMoveNodes(handleList);
 					clearSelections();
 					hideMultipleSelect();
 					break;
-				}
-				case R.id.cab_menu_rename:{
-
-					if (documents.size()==1){
-						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
-					}
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_copy:{
+				case R.id.cab_menu_delete:
 					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToCopyNodes(handleList);
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_trash:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
+					for (int i = 0; i < documents.size(); i++) {
 						handleList.add(documents.get(i).getHandle());
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
-				}
-				case R.id.cab_menu_select_all:{
+				case R.id.cab_menu_select_all:
 					selectAll();
 					break;
-				}
-				case R.id.cab_menu_unselect_all:{
+				case R.id.cab_menu_clear_selection:
 					clearSelections();
 					hideMultipleSelect();
 					break;
-				}
-				case R.id.cab_menu_restore_from_rubbish:{
-
-					if(documents!=null){
-						if(documents.size()>1){
-							logDebug("Restore multiple: " + documents.size());
-							MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_RESTORED_FROM_RUBBISH, (ManagerActivityLollipop) context);
-							for (int i=0;i<documents.size();i++){
-								MegaNode newParent = megaApi.getNodeByHandle(documents.get(i).getRestoreHandle());
-								if(newParent !=null){
-									megaApi.moveNode(documents.get(i), newParent, moveMultipleListener);
-								}
-								else{
-									logWarning("The restore folder no longer exists");
-								}
-							}
-						}
-						else{
-							logDebug("Restore single item");
-							((ManagerActivityLollipop) context).restoreFromRubbish(documents.get(0));
-
-						}
-					}
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
 			}
-			return false;
+			return true;
 		}
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_browser_action, menu);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
-            checkScroll();
+			inflater.inflate(R.menu.rubbish_bin_action, menu);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -314,111 +273,21 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
-            checkScroll();
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = adapter.getSelectedNodes();
-			boolean showDownload = false;
-			boolean showRename = false;
-			boolean showCopy = false;
-			boolean showMove = false;
-			boolean showLink = false;
-			boolean showTrash = false;
-			boolean showRestore = true;
-			showRename = false;
-			showLink = false;
+			menu.findItem(R.id.cab_menu_restore_from_rubbish)
+					.setIcon(mutateIconSecondary(context, R.drawable.ic_restore,
+							R.color.white));
+			menu.findItem(R.id.cab_menu_select_all)
+					.setVisible(adapter.getSelectedItemCount()
+							< adapter.getItemCount() - adapter.getPlaceholderCount());
 
-			if (selected.size() != 0) {
-				showTrash = true;
-				showMove = true;
-                showCopy = true;
-
-//				for(int i=0; i<selected.size();i++)	{
-//					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-//						showTrash = false;
-//						showMove = false;
-//						break;
-//					}
-//				}
-
-				if(selected.size()==1){
-					showRename=true;
-				}
-				else{
-					showRename=false;
-				}
-
-				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-				if(selected.size()==adapter.getItemCount()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-				}
-
-				for(int i = 0; i<selected.size();i++){
-					long restoreHandle = selected.get(i).getRestoreHandle();
-					if(restoreHandle!=-1){
-						MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
-						if((!megaApi.isInRubbish(selected.get(i))) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
-							showRestore = false;
-							break;
-						}
-					}
-					else{
-						showRestore = false;
-						break;
-					}
-				}
-
-				if(showRestore){
-					menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(true);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
-				}
-			}
-			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-				menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
-			}
-
-			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-
-			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-
-			if(showCopy){
-				menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-
-			if(showMove){
-				menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-
-			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			if (showTrash){
-				menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_remove));
-			}
-			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
-			if(showTrash){
-				menu.findItem(R.id.cab_menu_trash).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
-			
-			return false;
+			return true;
 		}
-		
 	}
 
 	public boolean showSelectMenuItem(){
