@@ -29,7 +29,7 @@
     <string name="api_essl" context="Error shown when SSL check has failed">SSL verification failed</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Not enough quota</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Two-Factor Authentication required.</string>
-    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for non-admin users</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Your business account is expired</string>
     <string name="api_epaywall" context="Label to show that an error of Over Disk Quota Paywall occurs during a SDK operation.">Over Disk Quota Paywall</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>

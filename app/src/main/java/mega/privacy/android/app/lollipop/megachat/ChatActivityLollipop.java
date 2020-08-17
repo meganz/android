@@ -2918,7 +2918,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     Intent in = new Intent(this, AddContactActivityLollipop.class);
                     in.putExtra("contactType", CONTACT_TYPE_MEGA);
                     in.putExtra("chat", true);
-                    in.putExtra("aBtitle", getString(R.string.add_contacts));
+                    in.putExtra("aBtitle", getString(R.string.send_contacts));
                     startActivityForResult(in, REQUEST_SEND_CONTACTS);
                 }
             }

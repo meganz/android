@@ -983,4 +983,23 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
         setListVisibility();
     }
+
+    /**
+     * Clears all the selected items.
+     */
+    public void clearSelections() {
+        if (adapterList != null) {
+            adapterList.clearSelections();
+        }
+
+        adapterAdded = null;
+
+        if (addedItems != null) {
+            addedItems.clear();
+        }
+
+        if (addedItemsSaved != null) {
+            addedItemsSaved.clear();
+        }
+    }
 }
