@@ -247,11 +247,11 @@ class OfflineFragment : Fragment() {
         recyclerView?.adapter = adapter
 
         if (args.rootFolderOnly) {
-            recyclerView?.addItemDecoration(
+            binding.offlineBrowserList.addItemDecoration(
                 SimpleDividerItemDecoration(requireContext(), resources.displayMetrics)
             )
         } else {
-            recyclerView?.addItemDecoration(
+            binding.offlineBrowserList.addItemDecoration(
                 PositionDividerItemDecoration(requireContext(), resources.displayMetrics)
             )
         }
