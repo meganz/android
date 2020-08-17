@@ -28,6 +28,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -91,6 +93,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private Button optionButton;
 	private Button cancelButton;
 	private LinearLayout optionsBar;
+	private FloatingActionButton fabSelect;
 
 	private Stack<Integer> lastPositionStack;
 
@@ -265,6 +268,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
+		fabSelect = v.findViewById(R.id.fab_select);
+		fabSelect.setOnClickListener(this);
+
 		fastScroller = v.findViewById(R.id.fastscroll);
 		if (((FileExplorerActivityLollipop) context).isList()) {
 			recyclerView = v.findViewById(R.id.file_list_view_browser);
@@ -361,10 +367,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 				activateButton(false);
 			}
 		}
-		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
+		else if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+			separator.setVisibility(View.GONE);
+			optionsBar.setVisibility(View.GONE);
+		} else if (modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER) {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		}
-		else{
+		} else {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
 
@@ -379,7 +387,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	}
 
 	private void setOptionsBarVisibility() {
-		if (!isMultiselect() && (((FileExplorerActivityLollipop)context).getDeepBrowserTree() <= 0 || selectFile)){
+		if (modeCloud == FileExplorerActivityLollipop.SELECT ||
+				(!isMultiselect() && (((FileExplorerActivityLollipop) context).getDeepBrowserTree() <= 0 || selectFile))) {
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
@@ -528,6 +537,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	public void onClick(View v) {
 
 		switch(v.getId()){
+			case R.id.fab_select:
 			case R.id.action_text:{
 				if(((FileExplorerActivityLollipop)context).isMultiselect()){
 					if(adapter.getSelectedItemCount()>0){
@@ -745,6 +755,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			emptyTextView.setVisibility(View.GONE);
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
+			activateButton(false);
 			((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
 			((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 			return 0;
@@ -784,12 +795,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		return recyclerView;
 	}
 
-	private void activateButton(boolean show){
-		optionButton.setEnabled(show);
-		if(show){
-			optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-		}else{
-			optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+	private void activateButton(boolean show) {
+		if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+			fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
+		} else {
+			optionButton.setEnabled(show);
+			optionButton.setTextColor(ContextCompat.getColor(context, show ? R.color.accentColor : R.color.invite_button_deactivated));
 		}
 	}
 
@@ -804,6 +815,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
+		}
+		if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+			activateButton(false);
 		}
 	}
 

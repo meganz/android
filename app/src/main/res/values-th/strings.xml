@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA ให้บริการจัดเก็บข้อมูลบนระบบคลาวด์ที่ผู้ใช้ควบคุมได้ด้วยตนเอง มีระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ รวมถึงแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ซึ่งแตกต่างจากผู้ให้บริการที่เก็บข้อมูลบนคลาวด์อื่น ๆ โดยที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยอุปกรณ์ไคลเอ็นต์ของคุณเท่านั้นและเราจะไม่เข้าไปยุ่งเกี่ยวกับข้อมูลใด ๆ ของคุณ\n\nอัปโหลดไฟล์จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้จากทุกที่ แชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้ก่อนหน้าแล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้\n\nการแชทด้วยวิดีโอ MEGA มีการเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง ปกป้องข้อมูลส่วนบุคคลของคุณได้ทั้งหมด และสามารถใช้งานได้ผ่านทางเบราว์เซอร์ตั้งแต่ปี 2016 ซึ่งได้มีการขยายบริการไปยังแอปบนอุปกรณ์เคลื่อนที่ของเรา หากต้องการแชทคุณสามารถเข้าถึงได้ผ่านอุปกรณ์หลายเครื่อง และผู้ใช้ยังสามารถเพิ่มไฟล์ลงในการแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างง่ายดาย\n\nMEGA มีพื้นที่เก็บข้อมูลฟรี 50 GB สำหรับผู้ใช้ที่ลงทะเบียนทั้งหมดพร้อมกับรางวัลโบนัสและแผนการจ่ายเงินที่มีให้เลือกมากมาย:\n\n\nสมัครใช้งาน PRO LITE: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน PRO I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน PRO II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน PRO III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครรับข้อมูลจะมีการต่ออายุโดยอัตโนมัติ โดยมีระยะเวลาและราคาต่อเนื่องตามการการสมัครรับข้อมูลของคุณตั้งแต่เลือกแผนในครั้งแรก ในการจัดการการสมัครรับข้อมูลของคุณเพียงแค่คลิกที่ไอคอน Play Store บนโทรศัพท์มือถือ แล้วลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นคลิกที่แอป MEGA คุณจะสามารถจัดการการสมัครรับข้อมูลได้ที่นี่\n\nการขอสิทธิ์ในแอป:\nWRITE_EXTERNAL_STORAGE -> ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -> ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -> เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -> MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android\n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms\n\n\nเดสก์ทอป - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA ให้บริการจัดเก็บข้อมูลบนระบบคลาวด์ที่ผู้ใช้ควบคุมได้ด้วยตนเอง มีระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ รวมถึงแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ซึ่งแตกต่างจากผู้ให้บริการที่เก็บข้อมูลบนคลาวด์อื่น ๆ โดยที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยอุปกรณ์ไคลเอ็นต์ของคุณเท่านั้นและเราจะไม่เข้าไปยุ่งเกี่ยวกับข้อมูลใด ๆ ของคุณ\n\nอัปโหลดไฟล์จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้จากทุกที่ แชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้ก่อนหน้าแล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้\n\nการแชทด้วยวิดีโอ MEGA มีการเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง ปกป้องข้อมูลส่วนบุคคลของคุณได้ทั้งหมด และสามารถใช้งานได้ผ่านทางเบราว์เซอร์ตั้งแต่ปี 2016 ซึ่งได้มีการขยายบริการไปยังแอปบนอุปกรณ์เคลื่อนที่ของเรา หากต้องการแชทคุณสามารถเข้าถึงได้ผ่านอุปกรณ์หลายเครื่อง และผู้ใช้ยังสามารถเพิ่มไฟล์ลงในการแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างง่ายดาย\n\nMEGA มีพื้นที่เก็บข้อมูลฟรี 50 GB สำหรับผู้ใช้ที่ลงทะเบียนทั้งหมดพร้อมกับรางวัลโบนัสและแผนการจ่ายเงินที่มีให้เลือกมากมาย:\n\n\nสมัครใช้งาน PRO LITE: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน PRO I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน PRO II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน PRO III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครรับข้อมูลจะมีการต่ออายุโดยอัตโนมัติ โดยมีระยะเวลาและราคาต่อเนื่องตามการการสมัครรับข้อมูลของคุณตั้งแต่เลือกแผนในครั้งแรก ในการจัดการการสมัครรับข้อมูลของคุณเพียงแค่คลิกที่ไอคอน Play Store บนโทรศัพท์มือถือ แล้วลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นคลิกที่แอป MEGA คุณจะสามารถจัดการการสมัครรับข้อมูลได้ที่นี่\n\nการขอสิทธิ์ในแอป:\nWRITE_EXTERNAL_STORAGE -> ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -> ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -> เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -> MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android\n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms\n\n\nเดสก์ทอป - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA เป็นระบบจัดเก็บไฟล์ในระบบคลาวด์ พร้อมด้วยความเป็นส่วนตัวอย่างทรงพลัง</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">ดูไฟล์ PDF ด้วย MEGA</string>
 
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s จะถูกดาวน์โหลด</string>
     <string name="alert_no_app" context="Alert text before download">ไม่มีแอปพลิเคชันเพื่อเปิดไฟล์ %s คุณต้องการดาวน์โหลดต่อหรือไม่</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">ไม่ต้องแสดงในครั้งต่อไป</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">ไม่ต้องแสดงในครั้งต่อไป</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">คุณแน่ใจหรือไม่ว่าต้องการยกเลิกกระบวนการล็อกอินปัจจุบัน</string>
 
@@ -249,7 +246,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">คลาวด์ไดรฟ์</string>
     <string name="section_recents" context="Label to reference a recents section">เมื่อเร็ว ๆ นี้</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">การอัปโหลดมีเดีย</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">อัปโหลดสื่อ</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">กล่องขาเข้า</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">บันทึกออฟไลน์</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">ออฟไลน์</string>
@@ -267,7 +264,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">การถ่ายโอน</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">บัญชีของฉัน</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">การอัปโหลดจากกล้อง</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">อัปโหลดจากกล้อง</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -558,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">คีย์การถอดรหัสลับ</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">กรุณากรอกคีย์ถอดรหัสสำหรับลิงก์นี้</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">คีย์ถอดรหัสลับไม่ถูกต้อง</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">รูปภาพ</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">เสียง</string>
@@ -692,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">อัปโหลดไฟล์ในโฟลเดอร์ของสื่อ</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">กำลังตรวจสอบไฟล์ที่จะอัปโหลด</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">เริ่มต้นการอัปโหลดจากกล้อง</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">การอัปโหลดจากกล้องถูกปิดใช้งาน โฟลเดอร์ในเครื่องของคุณไม่พร้อมใช้งาน</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">การอัปโหลดสื่อถูกปิดใช้งาน โฟลเดอร์ในเครื่องของคุณไม่พร้อมใช้งาน</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -762,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">อัปโหลดไฟล์</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -917,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">รายการบันทึกจะถูกเปิดใช้งานในขณะนี้</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">รายการบันทึกจะถูกปิดใช้งานในขณะนี้</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">ไม่สามารถตั้งค่าโฟลเดอร์ MEGA อัปโหลดจากกล้องได้</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">ไฟล์บันทึกยังไม่ได้เปิดใช้งาน เนื่องจากคุณปฏิเสธสิทธิ์ดังกล่าว</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">เปิดตำแหน่งที่ตั้ง</string>
@@ -1541,6 +1542,8 @@
     <string name="general_view" context="Menu option">ดูไฟล์</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">นำเข้า</string>
     <string name="save_for_offline" context="Menu option">บันทึกไว้สำหรับออฟไลน์</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">บันทึกเป็นออฟไลน์</string>
 
     <string name="general_view_contacts" context="Menu option">ดูรายชื่อติดต่อ</string>
 
@@ -1566,6 +1569,10 @@
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">การลบลิงก์ล้มเหลว กรุณาลองอีกครั้งในภายหลัง</item>
         <item context="Error message when removing public links of nodes. Plural." quantity="other">ไม่สามารถลบลิงก์บางรายการได้ กรุณาลองใหม่อีกครั้งในภายหลัง</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">ลบลิงก์สำเร็จแล้ว</item>
@@ -1656,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">นำที่อยู่ติดต่อออกจากโฟลเดอร์แชร์</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">ย้ายไปถังขยะหรือไม่</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">คุณแน่ใจหรือไม่ว่าต้องการย้ายโฟลเดอร์นี้ไปที่ถังขยะ วิธีนี้จะปิดใช้งานการอัปโหลดจากกล้อง</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">คุณแน่ใจหรือไม่ว่าต้องการย้ายโฟลเดอร์นี้ไปที่ถังขยะ วิธีนี้จะปิดใช้งานการอัปโหลดสื่อ</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">ย้ายไปถังขยะหรือไม่</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">ลบออกจาก MEGA หรือไม่</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">หากคุณออกจากโฟลเดอร์ นี้คุณจะไม่สามารถดูได้อีก</string>
@@ -1849,6 +1858,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">เกินโควต้าพื้นที่จัดเก็บ</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">ลิงก์ไม่ถูกต้อง กรุณาขอลิงก์ที่ถูกต้องใหม่อีกครั้ง</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">รหัสผ่านลิงก์ไม่ถูกต้อง</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">ลิงก์ที่คุณพยายามเปิดไม่ใช่ลิงก์ MEGA ที่ถูกต้อง</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">กำลังประมวลผลลิงก์&#8230;</string>
 
@@ -1872,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">บัญชีของคุณถูกระงับเนื่องจากมีการละเมิดเงื่อนไขการให้บริการของ MEGA หลายครั้ง กรุณาตรวจสอบกล่องจดหมายอีเมลของคุณ</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">บัญชีของคุณถูกยุติการใช้งานเนื่องจากละเมิดเงื่อนไขการให้บริการของ MEGA เช่น การสวมสิทธิผู้อื่น การแชร์และ/หรือการนำเข้าข้อมูลที่ผิดกฎหมาย หรือการละเมิดระบบ</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">กำลังโหลดไฟล์</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">ไม่มีไฟล์</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -2287,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">เกิดข้อผิดพลาดในการเริ่มต้นแชทเมื่อโหลดลิงก์แชท</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">คุณกำลังพยายามดูตัวอย่างแชทที่คุณเคยเป็นสมาชิก คุณต้องการเข้าร่วมการแชทอีกครั้งหรือไม่</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">คุณได้เข้าร่วมแชทนี้แล้ว</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">ตัวอย่างแชทนี้ไม่สามารถใช้ได้อีกต่อไป หากคุณออกจากหน้าตัวอย่าง คุณจะไม่สามารถเปิดอีกครั้งได้</string>
@@ -2542,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">พบ %d ผู้ติดต่อใน MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">เชิญผู้ติดต่อตอนนี้หรือไม่</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">ดูว่าใครอยู่ใน MEGA แล้ว</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">ค้นหาผู้ติดต่อของคุณใน MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">ให้สิทธิ์ MEGA ในการเข้าถึงสมุดรายชื่อเพื่อค้นหาผู้ติดต่อของคุณใน MEGA</string>
     <string name="get_registered_contacts" context="Getting registered contacts">กำลังโหลดผู้ติดต่อใน MEGA&#8230;</string>
 
@@ -2572,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">คุณไม่มีรายชื่อผู้ติดต่อ MEGA กรุณาเชิญเพื่อน ๆ จากส่วนผู้ติดต่อ</string>
-    <string name="invite_more" context="Invite button for chat top cell">เชิญเพิ่มเติม&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">เชิญเพิ่มเติม</string>
 
     <string name="title_tour_one" context="Title of first tour screen">คุณคือผู้ถือกุญแจ</string>
     <string name="content_tour_one" cotext="Content of first tour screen">ความปลอดภัยคือเหตุผลหลักที่เราดำเนินการอยู่ ไฟล์ของคุณจะมีความปลอดภัยมากยิ่งขึ้น เพราะใช้เครื่องมือเข้ารหัสที่ป้องกันไฟล์ของคุณ ซึ่งมีเพียงคุณเท่านั้นที่สามารถเข้าถึงไฟล์ได้</string>
@@ -2760,10 +2772,28 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">เมื่อ %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">คุณแน่ใจหรือไม่ว่าต้องการลบการแชร์ทั้งหมดออกจากโฟลเดอร์ %1$d รายการ</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">คุณแน่ใจหรือไม่ว่าต้องการลบการแชร์ทั้งหมดจาก %1$d โฟลเดอร์</string>
 
     <string name="download_location" context="Download location label">ที่ตั้งดาวน์โหลด</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">บันทึกไปยังตําแหน่งนี้เสมอหรือไม่</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">แนบจาก&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">สร้างแชทเมื่อ %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">เลือกข้อความ</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">ตรวจสอบข้อมูลประจำตัว</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">ไม่ผ่านการตรวจสอบ</string>
+    <string name="label_verified" context="Action indicating something was verified.">ตรวจสอบแล้ว</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">ความถูกต้องของข้อมูลประจำตัว</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">สิ่งนี้ทำได้ดีที่สุดในชีวิตจริงได้โดยการประชุมแบบเห็นหน้า หากคุณมีช่องทางที่ได้รับการตรวจสอบแล้ว เช่น OTR ที่ตรวจสอบแล้วหรือ PGP คุณอาจใช้ช่องดังกล่าวได้</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">ข้อมูลรับรองของคุณ</string>
+    <string name="action_reset" context="Button to reset credentials">รีเซ็ต</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaties voor mobiele apparaten. In tegenstelling tot andere cloudopslagproviders worden uw gegevens alleen door uw klant-apparaten gecodeerd en gedecodeerd en nooit door ons. \n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel, hernoem of verwijder uw bestanden altijd, vanaf elk apparaat, overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we uw wachtwoord niet kunnen openen of opnieuw instellen, dus u MOET het onthouden (tenzij u een back-up van uw Herstelsleutel maakt) of u verliest toegang tot uw opgeslagen bestanden. \n\n Eind-tot-eind gebruikter-gecodeerde MEGA videochat biedt totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met gesprekgeschiedenis toegankelijk op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een gesprek vanaf hun MEGA Cloud Drive. \n\n MEGA biedt een royale 50 GB gratis opslag voor alle geregistreerde gebruikers met bonusprestaties en biedt betaalde plannen met veel hogere limieten: \n\n \n PRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \n PRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \n PRO II abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. [Br ] PRO III-abonnement: € 29,99 per maand of € 299,99 per jaar voor 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\n Abonnementen worden automatisch verlengd voor opeenvolgende abonnementsperioden van dezelfde duur en tegen dezelfde prijs als de eerste gekozen periode. Om uw abonnementen te beheren, klikt u eenvoudig op het Play Store-pictogram op uw mobiele apparaat, log in met uw Google ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie.U kunt uw abonnement daar beheren. \n\n Applicatie-machtigingen: \n WRITE_EXTERNAL_STORAGE -> Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \n CAMERA -> Neem een foto en upload uw foto\'s naar MEGA \n READ_CONTACTS -> Voeg eenvoudig contacten van uw apparaat toe als MEGA-contacten \n RECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -> MEGA zorgt voor eind-tot-eind gecodeerde audio/video-oproepen [Br ]\n\n Om het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle client-side code gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op: https://github.com/meganz/android\n\n voor meer informatie, kijk op onze website:\n Zie https://mega.nz/terms\n\n\n Desktop - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaties voor mobiele apparaten. In tegenstelling tot andere cloudopslagproviders worden uw gegevens alleen door uw klant-apparaten gecodeerd en gedecodeerd en nooit door ons. \n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel, hernoem of verwijder uw bestanden altijd, vanaf elk apparaat, overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we uw wachtwoord niet kunnen openen of opnieuw instellen, dus u MOET het onthouden (tenzij u een back-up van uw Herstelsleutel maakt) of u verliest toegang tot uw opgeslagen bestanden. \n\n Eind-tot-eind gebruikter-gecodeerde MEGA videochat biedt totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met gesprekgeschiedenis toegankelijk op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een gesprek vanaf hun MEGA Cloud Drive. \n\n MEGA biedt een royale 50 GB gratis opslag voor alle geregistreerde gebruikers met bonusprestaties en biedt betaalde plannen met veel hogere limieten: \n\n \n PRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \n PRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \n PRO II abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. [Br ] PRO III-abonnement: € 29,99 per maand of € 299,99 per jaar voor 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\n Abonnementen worden automatisch verlengd voor opeenvolgende abonnementsperioden van dezelfde duur en tegen dezelfde prijs als de eerste gekozen periode. Om uw abonnementen te beheren, klikt u eenvoudig op het Play Store-pictogram op uw mobiele apparaat, log in met uw Google ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie.U kunt uw abonnement daar beheren. \n\n Applicatie-machtigingen: \n WRITE_EXTERNAL_STORAGE -> Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \n CAMERA -> Neem een foto en upload uw foto\'s naar MEGA \n READ_CONTACTS -> Voeg eenvoudig contacten van uw apparaat toe als MEGA-contacten \n RECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -> MEGA zorgt voor eind-tot-eind gecodeerde audio/video-oproepen [Br ]\n\n Om het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle client-side code gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op: https://github.com/meganz/android\n\n voor meer informatie, kijk op onze website:\n Zie https://mega.nz/terms\n\n\n Desktop - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA is Cloud Opslag met Krachtige geïntegreerde Privacy.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
 
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s word gedownload</string>
     <string name="alert_no_app" context="Alert text before download">Er is geen applicatie om het bestand %s te openen. Wilt u doorgaan met de download?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">Laat niet opnieuw zien</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Laat niet opnieuw zien</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Weet u zeker dat u het huidige aanmeldingsproces wilt annuleren?</string>
 
@@ -249,7 +246,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Schijf</string>
     <string name="section_recents" context="Label to reference a recents section">Recent</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Opgeslagen voor Offline gebruik</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
@@ -267,7 +264,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Overdrachten</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Mijn Account</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera uploads</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">Camera Uploads</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -558,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decoderingssleutel</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Voer de decodeer sleutel in voor de koppeling</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Ongeldige decoderingssleutel</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Afbeelding</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -692,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Bestanden uploaden van media mappen</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Bezig met zoeken naar te uploaden bestanden</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Camera-uploads initialiseren</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera-uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media-uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -762,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele data</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Alleen Wi-Fi</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Upload Bestand</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -917,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs zijn niet ingeschakeld</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs zijn nu uitgeschakeld</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Kan de map MEGA Camera Uploads niet instellen</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logboeken zijn niet ingeschakeld omdat u de vereiste rechten heeft geweigerd</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open locatie</string>
@@ -1541,6 +1542,8 @@
     <string name="general_view" context="Menu option">Bestanden weergeven</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importeren</string>
     <string name="save_for_offline" context="Menu option">Opslaan voor offline</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Toevoegen aan Cloud Schijf</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">Opslaan naar offline</string>
 
     <string name="general_view_contacts" context="Menu option">Contacten weergeven</string>
 
@@ -1566,6 +1569,10 @@
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Link verwijdering mislukt. Probeer later nogmaals.</item>
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Sommige links zijn niet verwijderd. Probeer het later opnieuw.</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link succesvol verwijderd.</item>
@@ -1656,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Verwijderen van gedeelde map</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Verplaatsen naar prullenbak?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera Uploads uit.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Weet u zeker dat u deze map naar de prullenbak wilt verplaatsen? Hiermee worden media-uploads uitgeschakeld.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Verplaatsen naar prullenbak?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Verwijderen van MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Als u de map verlaat, bent u niet in staat het weer te zien.</string>
@@ -1849,6 +1858,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">Tegoed overschreden</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Ongeldige koppeling, vraag om een nieuwe geldige koppeling</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Ongeldig linkwachtwoord</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">De link die u probeert te openen, is geen geldige MEGA-link.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Koppeling verwerken&#8230;</string>
 
@@ -1872,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Uw account is geschorst door meerdere misbruiken van MEGA\'s Algemene Voorwaarden. Controleer uw Email Postbak.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Uw account was beëindigd door een schending van MEGA\'s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Bestanden laden</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Geen bestanden</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -1954,7 +1967,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Herinnert u zich uw wachtwoord?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">U staat op het punt uit te loggen, test uw wachtwoord om er zeker van te zijn dat u deze onthoud. \nAls u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Test uw wachtwoord om er zeker van te zijn dat u deze onthoud. Als u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
-    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Laat me niet meer zien</string>
+    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Laat niet opnieuw zien</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Wachtwoord testen</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test uw wachtwoord</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Wachtwoord geaccepteerd</string>
@@ -2287,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Fout bij initialiseren van het gesprek bij het laden van de Gesprekskoppeling.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">U probeert een voorbeeld weer te geven van een gesprek waarvan u eerder lid was. Wilt u opnieuw deelnemen aan het gesprek?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">U neemt al deel aan dit gesprek.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Deze chat weergave is niet langer beschikbaar. Als u deze weergave verlaat, bent u niet in staat het te heropenen.</string>
@@ -2542,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacten op MEGA gevonden</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Contact nu uitnodigen?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Zie wie al bij MEGA is</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Ontdek uw contacten op MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Geef MEGA toegang tot uw adresboek om uw contacten op MEGA te ontdekken.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Contacten laden op MEGA&#8230;</string>
 
@@ -2572,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">U heegt geen MEGA contacten. Nodig vrienden uit vanuit de Contacten sectie.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Meer uitnodigen&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Meer uitnodigen</string>
 
     <string name="title_tour_one" context="Title of first tour screen">U heeft de sleutels</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Veiligheid is waarom we bestaan, uw bestanden zijn veilig bij ons achter een goed geolied coderingsapparaat waar alleen u toegang heeft tot uw bestanden.</string>
@@ -2760,10 +2772,28 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">op %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Weet u zeker dat u het delen van deze %1$d - mappen wilt stoppen?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Weet u zeker dat u alle gedeeld wilt verwijderen van %1$d mappen?</string>
 
     <string name="download_location" context="Download location label">Download locatie</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Altijd op deze locatie opslaan?</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Bijvoegen vanaf &#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat gecreëerd op %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Selecteer bericht</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Controleer aanmeldgegevens</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Niet geverifieerd</string>
+    <string name="label_verified" context="Action indicating something was verified.">Geverifieerd</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Authenticiteit Referenties</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Dit kan het beste gebeuren door elkaar in het echte leven, face to face te ontmoeten. Als u een andere al geverifieerde kanaal heeft, zoals geverifieerd OTR of PGP, dan kunt u deze ook gebruiken.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Uw Identiteit</string>
+    <string name="action_reset" context="Button to reset credentials">Reset</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

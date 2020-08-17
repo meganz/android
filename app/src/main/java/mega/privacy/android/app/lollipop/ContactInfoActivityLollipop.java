@@ -132,8 +132,8 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
-
-	ContactController cC;
+	private ChatController chatC;
+	private ContactController cC;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private androidx.appcompat.app.AlertDialog renameDialog;
 
@@ -191,8 +191,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	//Toolbar elements
 	private EmojiTextView firstLineTextToolbar;
+	private int firstLineTextMaxWidthExpanded;
+	private int firstLineTextMaxWidthCollapsed;
+	private int contactStateIcon = R.drawable.ic_offline;
+	private int contactStateIconPaddingLeft;
+
 	private MarqueeTextView secondLineTextToolbar;
-	private ImageView contactStateIcon;
 	private State stateToolbar = State.IDLE;
 
 	RelativeLayout clearChatLayout;
@@ -236,14 +240,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
-	private String nickname;
 
 	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
 	private AskForDisplayOverDialog askForDisplayOverDialog;
-
-    private boolean waitingForCall;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -261,12 +262,19 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	};
 
-	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver userNameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_UPDATE_NICKNAME) || user == null) return;
+			if (intent == null
+					|| intent.getAction() == null
+					|| user == null
+					|| intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) != user.getHandle()) {
+				return;
+			}
 
-			if (intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE) == user.getHandle()) {
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
 				checkNickname(user.getHandle());
 				updateAvatar();
 			}
@@ -317,6 +325,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		megaChatApi.addChatListener(this);
 
 		handler = new Handler();
+		chatC = new ChatController(this);
 		cC = new ContactController(this);
 		nC = new NodeController(this);
         megaApi.addGlobalListener(this);
@@ -343,7 +352,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			imageLayout = findViewById(R.id.chat_contact_properties_image_layout);
 
 			collapsingToolbar = findViewById(R.id.collapse_toolbar);
-			contactStateIcon = findViewById(R.id.contact_drawable_state);
 
 			/*TITLE*/
 			firstLineTextToolbar = findViewById(R.id.first_line_toolbar);
@@ -365,8 +373,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				secondLineTextToolbar.setPadding(0,0,0,5);
 			}
 			nameText.setMaxWidthEmojis(width);
-			firstLineTextToolbar.setMaxWidthEmojis(width);
 			secondLineTextToolbar.setMaxWidth(width);
+
+			// left margin 72dp + right margin 36dp
+			firstLineTextMaxWidthExpanded = outMetrics.widthPixels - px2dp(108, outMetrics);
+			firstLineTextMaxWidthCollapsed = width;
+			firstLineTextToolbar.setMaxWidthEmojis(firstLineTextMaxWidthExpanded);
+			contactStateIconPaddingLeft = px2dp(8, outMetrics);
 
 			imageGradient = findViewById(R.id.gradient_view);
 
@@ -563,7 +576,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			else{
 				logDebug("OFFLINE -- NO network connection");
 				if(chat!=null){
-					String userEmail = chat.getPeerEmail(0);
+					String userEmail = chatC.getParticipantEmail(chat.getPeerHandle(0));
 					setOfflineAvatar(userEmail);
 					emailText.setText(user.getEmail());
 				}
@@ -609,10 +622,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			logWarning("Extras is NULL");
 		}
 
-		if (savedInstanceState != null) {
-			waitingForCall = savedInstanceState.getBoolean(WAITING_FOR_CALL, false);
-		}
-
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
@@ -620,25 +629,33 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
-		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
-		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
-		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, contactUpdateFilter);
+		IntentFilter userNameUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+		userNameUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
+		LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, userNameUpdateFilter);
 	}
 
 	private void visibilityStateIcon() {
 		if (megaChatApi == null) {
-			contactStateIcon.setVisibility(View.GONE);
+			firstLineTextToolbar.updateMaxWidthAndIconVisibility(firstLineTextMaxWidthCollapsed, false);
 			return;
 		}
 
 		int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
-		if (stateToolbar == State.EXPANDED && (userStatus == MegaChatApi.STATUS_ONLINE || userStatus == MegaChatApi.STATUS_AWAY || userStatus == MegaChatApi.STATUS_BUSY || userStatus == MegaChatApi.STATUS_OFFLINE)) {
-			contactStateIcon.setVisibility(View.VISIBLE);
-			return;
+		if (stateToolbar == State.EXPANDED && (userStatus == MegaChatApi.STATUS_ONLINE
+				|| userStatus == MegaChatApi.STATUS_AWAY
+				|| userStatus == MegaChatApi.STATUS_BUSY
+				|| userStatus == MegaChatApi.STATUS_OFFLINE)) {
+			firstLineTextToolbar.setMaxLines(2);
+			firstLineTextToolbar.setTrailingIcon(contactStateIcon, contactStateIconPaddingLeft);
+			firstLineTextToolbar.updateMaxWidthAndIconVisibility(firstLineTextMaxWidthExpanded, true);
+		} else {
+			firstLineTextToolbar.setMaxLines(stateToolbar == State.EXPANDED ? 2 : 1);
+			firstLineTextToolbar.updateMaxWidthAndIconVisibility(
+					stateToolbar == State.EXPANDED ? firstLineTextMaxWidthExpanded
+							: firstLineTextMaxWidthCollapsed, false);
 		}
-
-		contactStateIcon.setVisibility(View.GONE);
-		return;
 	}
 
 	private void checkNickname(long contactHandle) {
@@ -677,23 +694,23 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				logDebug("This user is connected");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+				contactStateIcon = R.drawable.ic_online;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.online_status));
 			}else if(userStatus == MegaChatApi.STATUS_AWAY){
 				logDebug("This user is away");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+				contactStateIcon = R.drawable.ic_away;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.away_status));
 			} else if(userStatus == MegaChatApi.STATUS_BUSY){
 				logDebug("This user is busy");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+				contactStateIcon = R.drawable.ic_busy;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.busy_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+				contactStateIcon = R.drawable.ic_offline;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
 			}
@@ -889,7 +906,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
-
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				Intent i = new Intent(this, ChatCallActivity.class);
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
@@ -917,53 +933,19 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	}
 
-	public boolean checkPermissionsCall(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-			if (!hasCameraPermission) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-				return false;
-			}
-
-			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-			if (!hasRecordAudioPermission) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
-				return false;
-			}
-
-			return true;
-		}
-		return true;
-	}
-
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch (requestCode) {
-			case REQUEST_CAMERA: {
-				logDebug("REQUEST_CAMERA");
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					if(checkPermissionsCall()){
-						startCall();
-					}
+			case REQUEST_CAMERA:
+			case RECORD_AUDIO:
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+						checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
+					startCall();
 				}
 				break;
-			}
-			case RECORD_AUDIO: {
-				logDebug("RECORD_AUDIO");
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					if(checkPermissionsCall()){
-						startCall();
-					}
-				}
-				break;
-			}
-
 		}
 	}
-
 
 	public void openChat(long chatId, String text){
 		logDebug("openChat: " + chatId);
@@ -1177,9 +1159,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	private void startingACall(boolean withVideo) {
 		startVideo = withVideo;
-		if (checkPermissionsCall()) {
+		if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
 			startCall();
-
 		}
 	}
 
@@ -1230,9 +1211,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					return;
 				}
 
-				ChatController cC = new ChatController(this);
-
-				cC.selectChatsToAttachContact(user);
+				chatC.selectChatsToAttachContact(user);
 				break;
 			}
 			case R.id.chat_contact_properties_shared_folders_button:
@@ -1249,12 +1228,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				}
 				else{
 					boolean enabled = notificationsSwitch.isChecked();
-
-					ChatController chatC = new ChatController(this);
-					if(enabled){
+					if (enabled) {
 						chatC.unmuteChat(chatHandle);
-					}
-					else{
+					} else {
 						chatC.muteChat(chatHandle);
 					}
 
@@ -1285,7 +1261,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				if (setNicknameText.getText().toString().equals(getString(R.string.add_nickname))) {
 					showConfirmationSetNickname(null);
 				} else if (user != null && !isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment)) {
-					nickname = firstLineTextToolbar.getText().toString();
 					contactNicknameBottomSheetDialogFragment = new ContactNicknameBottomSheetDialogFragment();
 					contactNicknameBottomSheetDialogFragment.show(getSupportFragmentManager(), contactNicknameBottomSheetDialogFragment.getTag());
 				}
@@ -1395,7 +1370,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		if(isOnline(this)){
 			setAvatar();
 		}else if (chat != null){
-			setOfflineAvatar(chat.getPeerEmail(0));
+			setOfflineAvatar(chatC.getParticipantEmail(chat.getPeerHandle(0)));
 		}
 	}
 
@@ -1453,7 +1428,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatRoomToSend.getChatId());
+				chatC.checkIfNodesAreMineAndAttachNodes(fileHandles, chatRoomToSend.getChatId());
 			}
 			else{
 				//Create first the chat
@@ -1490,7 +1465,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             long userHandle[] = {user.getHandle()};
             intent.putExtra(USER_HANDLES, userHandle);
 
-            new ChatController(this).checkIntentToShareSomething(intent);
+            chatC.checkIntentToShareSomething(intent);
 		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -1758,7 +1733,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         }
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
 	}
 
 	@Override
@@ -1804,7 +1779,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					case DialogInterface.BUTTON_POSITIVE:
 						logDebug("Clear chat!");
 						logDebug("Clear history selected!");
-						ChatController chatC = new ChatController(contactInfoActivityLollipop);
 						chatC.clearHistory(chat);
 						break;
 
@@ -1940,7 +1914,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     }
 
 	public String getNickname() {
-		return nickname;
+		return getNicknameContact(user.getHandle());
 	}
 
 	public void onFileClick(ArrayList<Long> handleList) {
@@ -2405,17 +2379,16 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         downloadConfirmationDialog.show();
     }
 
-
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+		for (MegaUser updatedUser : users) {
+			if (updatedUser.getHandle() == user.getHandle()) {
+				user = updatedUser;
+				emailText.setText(user.getEmail());
+				break;
+			}
+		}
 	}
-
-	@Override
-    public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {
-    
-    }
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
@@ -2479,7 +2452,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		MegaChatRoom chatRoom = api.getChatRoom(chatid);
 
-		if (waitingForCall && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+		if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
 				&& chatRoom != null && chatRoom.getPeerHandle(0) == user.getHandle()) {
 			startCallWithChatOnline(api.getChatRoom(chatid));
 		}
@@ -2495,7 +2468,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
 				String formattedDate = lastGreenDate(this, lastGreen);
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
-				firstLineTextToolbar.setPadding(0, px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
 				secondLineTextToolbar.isMarqueeIsNecessary(this);
 				logDebug("Date last green: " + formattedDate);
@@ -2506,11 +2478,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
-		waitingForCall = false;
-	}
-
-	public void setWaitingForCall() {
-		waitingForCall = true;
+		MegaApplication.setIsWaitingForCall(false);
 	}
 
 	/**

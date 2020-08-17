@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA fornisce uno spazio di archiviazione cloud e una chat criptata e controllata dall\'utente attraverso dei browser web, insieme a applicazioni per dispositivi mobili dedicate. Diversamente dagli altri spazi di archiviazione cloud, i tuoi dati sono criptati e decriptati solo dai tuoi dispositivi e mai da noi.\n\nCarica i tuoi file da smartphone o tablet e cerca, archivia, scarica, streamma, vedi, condividi, rinomina o elimina i tuoi file in qualunque momento, da qualunque dispositivo in qualunque luogo. Condividi le cartelle con i tuoi contatti e vedi i loro aggiornamenti in tempo reale. Il processo di criptazione serve a fare in modo che noi non possiamo accedere ai tuoi dati o resettare la tua password quindi DEVI ricordarla (oppure hai una copia della tua Chiave di Recupero) o perderai l\'accesso a tutti i tuoi file archiviati.\n\nLa chat video criptata end-to-end ti permette di avere una privacy totale, ed è disponibile attraverso il tuo browser dal 2016. È stata estesa alla nostra app mobile, con la cronologia delle chat accessibile da più dispositivi. Gli utenti possono inoltre aggiungere facilmente file ad una chat dal loro Cloud Drive di MEGA.\n\nMEGA offre 50 GB di spazio di archiviazione gratuito a tutti gli utenti registrati con bonus ad obiettivi, ed offre dei piani a pagamento con limiti molto più alti.\n\n\nAbbonamento PRO LITE: €4.99 al mese o €49.99 l\'anno ti dà 400 GB di spazio di archiviazione e 1 TB di banda di trasferimento mensile.\nAbbonamento PRO I: €9.99 al mese o €99.99 l\'anno ti dà 2 TB di spazio di archiviazione e 2 TB di banda di trasferimento mensile.\nAbbonamento PRO II: €19.99 al mese o €199.99 l\'anno ti dà 8 TB di spazio di archiviazione e 8 TB di banda di trasferimento mensile.\nAbbonamento PRO III: €29.99 al mese o €299.99 l\'anno ti dà 16 TB di spazio di archiviazione e 16 TB di banda di trasferimento mensile.\n\nGli abbonamenti sono rinnovati automaticamente per i periodi successivi di stessa durata e prezzo. Per gestire i tuoi abbonamenti, ti basta cliccare sull\'icona del Play Store, fare l\'accesso con il tuo Google ID (se non l\'hai già fatto) e poi cliccare sull\'app MEGA. Potrai gestire i tuoi abbonamenti da lì.\n\nPermessi dell\'app:\nWRITE_EXTERNAL_STORAGE -> Scarica i tuoi file dal tuo account MEGA al tuo dispositivo e carica file dal tuo dispositivo al tuo account MEGA\nCAMERA -> Scatta una foto e carica le tue foto e i tuoi video sul tuo account MEGA\nREAD_CONTACTS -> Aggiungi facilmente i contatti dal tuo dispositivo ai contatti del tuo account MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (microfono e fotocamera) -> MEGA fornisce una criptazione end-to-end nelle chiamate audio e video\n\n\nPer migliorare la confidenza dell\'utente all\'interno del sistema di MEGA, tutto il codice sorgente del client viene pubblicato, quindi qualsiasi ricercatore di sicurezza può valutare da sé il processo di criptazione. Il codice della nostra app mobile sì trova all\'indirizzo: https://github.com/meganz/android\n\nPer più informazioni, per favore visita il nostro sito web:\nVedi: https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA fornisce uno spazio di archiviazione cloud e una chat criptata e controllata dall\'utente attraverso dei browser web, insieme a applicazioni per dispositivi mobili dedicate. Diversamente dagli altri spazi di archiviazione cloud, i tuoi dati sono criptati e decriptati solo dai tuoi dispositivi e mai da noi.\n\nCarica i tuoi file da smartphone o tablet e cerca, archivia, scarica, streamma, vedi, condividi, rinomina o elimina i tuoi file in qualunque momento, da qualunque dispositivo in qualunque luogo. Condividi le cartelle con i tuoi contatti e vedi i loro aggiornamenti in tempo reale. Il processo di criptazione serve a fare in modo che noi non possiamo accedere ai tuoi dati o resettare la tua password quindi DEVI ricordarla (oppure hai una copia della tua Chiave di Recupero) o perderai l\'accesso a tutti i tuoi file archiviati.\n\nLa chat video criptata end-to-end ti permette di avere una privacy totale, ed è disponibile attraverso il tuo browser dal 2016. È stata estesa alla nostra app mobile, con la cronologia delle chat accessibile da più dispositivi. Gli utenti possono inoltre aggiungere facilmente file ad una chat dal loro Cloud Drive di MEGA.\n\nMEGA offre 50 GB di spazio di archiviazione gratuito a tutti gli utenti registrati con bonus ad obiettivi, ed offre dei piani a pagamento con limiti molto più alti.\n\n\nAbbonamento PRO LITE: €4.99 al mese o €49.99 l\'anno ti dà 400 GB di spazio di archiviazione e 1 TB di banda di trasferimento mensile.\nAbbonamento PRO I: €9.99 al mese o €99.99 l\'anno ti dà 2 TB di spazio di archiviazione e 2 TB di banda di trasferimento mensile.\nAbbonamento PRO II: €19.99 al mese o €199.99 l\'anno ti dà 8 TB di spazio di archiviazione e 8 TB di banda di trasferimento mensile.\nAbbonamento PRO III: €29.99 al mese o €299.99 l\'anno ti dà 16 TB di spazio di archiviazione e 16 TB di banda di trasferimento mensile.\n\nGli abbonamenti sono rinnovati automaticamente per i periodi successivi di stessa durata e prezzo. Per gestire i tuoi abbonamenti, ti basta cliccare sull\'icona del Play Store, fare l\'accesso con il tuo Google ID (se non l\'hai già fatto) e poi cliccare sull\'app MEGA. Potrai gestire i tuoi abbonamenti da lì.\n\nPermessi dell\'app:\nWRITE_EXTERNAL_STORAGE -> Scarica i tuoi file dal tuo account MEGA al tuo dispositivo e carica file dal tuo dispositivo al tuo account MEGA\nCAMERA -> Scatta una foto e carica le tue foto e i tuoi video sul tuo account MEGA\nREAD_CONTACTS -> Aggiungi facilmente i contatti dal tuo dispositivo ai contatti del tuo account MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (microfono e fotocamera) -> MEGA fornisce una criptazione end-to-end nelle chiamate audio e video\n\n\nPer migliorare la confidenza dell\'utente all\'interno del sistema di MEGA, tutto il codice sorgente del client viene pubblicato, quindi qualsiasi ricercatore di sicurezza può valutare da sé il processo di criptazione. Il codice della nostra app mobile sì trova all\'indirizzo: https://github.com/meganz/android\n\nPer più informazioni, per favore visita il nostro sito web:\nVedi: https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA è Cloud con potente Privacy sempre attiva.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Visualizzatore PDF</string>
 
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s verrà scaricato.</string>
     <string name="alert_no_app" context="Alert text before download">Non hai applicazioni che possano aprire il file %s Continuare lo stesso il download?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">Non mostrare più</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Non mostrare più</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Sei sicuro di voler annullare il processo di login corrente?</string>
 
@@ -249,7 +246,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_recents" context="Label to reference a recents section">Recenti</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Caricamenti dei media</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded">Media caricati</string>
     <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">In arrivo</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvato in locale</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
@@ -267,7 +264,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Trasferimenti</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Account</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Caricamenti dalla fotocamera</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded">Camera Uploads</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -558,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Chiave di decrittazione</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Per favore, inserisci la chiave di decriptazione del link</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Chiave di decriptazione non valida</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Immagine</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -692,6 +690,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Caricamento di file di cartelle media</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Controllo di file da caricare in corso</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Inizializzazione dei Caricamenti da fotocamera in corso</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">I Caricamenti da fotocamera sono stati disattivati. La tua cartella locale non è disponibile.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">I Caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
+
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -762,7 +763,6 @@
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o connessione dati</item>
         <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Solo Wi-Fi</item>
     </string-array>
-
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Carica File</string>
 
     <string-array name="settings_camera_upload_file_upload_entries">
@@ -917,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">I log ora sono attivati</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">I log ora sono disattivati</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Impossibile settare la cartella dei Caricamenti da Fotocamera</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">I log non sono stati attivati, perché hai negato l\'autorizzazione richiesta</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Apri posizione</string>
@@ -1541,6 +1542,8 @@
     <string name="general_view" context="Menu option">Vedi file</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importa</string>
     <string name="save_for_offline" context="Menu option">Salva per l\'Offline</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Aggiungi al Cloud Drive</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">Salva per Offline</string>
 
     <string name="general_view_contacts" context="Menu option">Vedi contatti</string>
 
@@ -1566,6 +1569,10 @@
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Rimozione del link fallita. Per favore, riprova più tardi.</item>
         <item context="Error message when removing public links of nodes. Plural." quantity="other">La rimozione di alcuni link è fallita. Per favore, riprova più tardi.</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link rimosso con successo.</item>
@@ -1656,6 +1663,8 @@
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Rimuovi contatto dalla cartella condivisa</string>
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Spostare nel Cestino?</string>
+    <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti da fotocamera.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti dei media.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Spostare nel Cestino?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Eliminare da MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Se lasci la cartella, non sarai in grado di vederla di nuovo.</string>
@@ -1849,6 +1858,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">Quota superata</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Link non valido, per favore chiedi un nuovo link valido</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Password del link non valida</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">Il link che stai provando ad aprire non è un link MEGA valido.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Caricamento&#8230;</string>
 
@@ -1872,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Il tuo account è stato sospeso a causa di violazioni multiple dei Termini di Servizio di MEGA. Per favore, controlla la tua posta in arrivo.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Il tuo account è stato chiuso a causa di una violazione dei Termini di Servizio di MEGA, come ad esempio la condivisione e/o importazione di dati illegali, l\'abuso dei diritti altrui o l\'abuso dei sistema.</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Caricamento dei file</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Nessun file</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -1954,7 +1967,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Ricordi la tua password?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Stai per effettuare il logout, per favore testa la tua password per assicurarti di ricordarla.\nSe perdi la tua password, perderai accesso a tutti i tuoi dati archiviati su MEGA.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Per favore, testa la tua password per assicurarti di ricordarla. Se perdi la tua password, perderai accesso ai tuoi dati su MEGA.</string>
-    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Non mostrare di nuovo</string>
+    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Non mostrare più</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Testa password</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Testa la tua password</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Password accettata</string>
@@ -2287,7 +2300,6 @@
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Errore nell\'inizializzazione della chat durante il caricamento del link della chat.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Stai cercando di vedere l\'anteprima di una chat di cui facevi parte. Vuoi unirti di nuovo alla chat?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Stai già partecipando a questa chat.</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">L\'anteprima della chat non è più disponibile. Se lasci l\'anteprima, non potrai aprirla di nuovo.</string>
@@ -2542,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contatti trovati su MEGA.</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Invitare contatto adesso?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Guarda chi è già su MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Scopri i tuoi contatti su MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Dai a MEGA l\'accesso alla tua rubrica per scoprire i tuoi contatti su MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Caricamento dei contatti su MEGA in corso&#8230;</string>
 
@@ -2572,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Non hai contatti MEGA. Per favore, invita amici dalla sezione Contatti.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Invita altri&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Invita altri</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Tu hai le chiavi</string>
     <string name="content_tour_one" cotext="Content of first tour screen">La sicurezza è il motivo per cui esistiamo, i tuoi file sono al sicuro con noi dietro ad una macchina di criptazione ben oliata dove solo tu puoi accedere ad i tuoi file.</string>
@@ -2760,10 +2772,28 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">il %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Sei sicuro di non voler più condividere queste %1$d cartelle?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Sei sicuro di non voler rimuovere le condivisioni da %1$d cartelle?</string>
 
     <string name="download_location" context="Download location label">Locazione download</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvare sempre in questa posizione?</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Allega da&#8230;</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat creata con %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Seleziona messaggio</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verifica credenziali</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Non verificato</string>
+    <string name="label_verified" context="Action indicating something was verified.">Verificato</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Credenziali di Autenticità</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Sarebbe meglio farlo faccia a faccia nella vita reale. Se hai un altro canale di comunicazione verificato come OTR o PGP, puoi utilizzarlo.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Le tue credenziali</string>
+    <string name="action_reset" context="Button to reset credentials">Reset</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
 </resources>

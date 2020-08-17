@@ -4,6 +4,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import android.content.Intent;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -21,6 +22,10 @@ public class ExportListener extends BaseListener {
     private int numberRemove;
     private int pendingRemove;
     private int numberError;
+
+    private int numberExport;
+    private int pendingExport;
+    private StringBuilder exportedLinks;
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -48,6 +53,25 @@ public class ExportListener extends BaseListener {
         this.numberRemove = this.pendingRemove = numberRemove;
     }
 
+    /**
+     * Constructor used for the purpose of export multiple nodes, then combine links with
+     * already exported nodes, then share those links.
+     *
+     * @param context       current Context
+     * @param numberExport  number of nodes to remove the link
+     * @param exportedLinks links of already exported nodes
+     * @param shareIntent Intent to share the content
+     */
+    public ExportListener(Context context, int numberExport, StringBuilder exportedLinks,
+        Intent shareIntent) {
+        super(context);
+
+        this.numberExport = numberExport;
+        this.pendingExport = numberExport;
+        this.exportedLinks = exportedLinks;
+        this.shareIntent = shareIntent;
+    }
+
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() != TYPE_EXPORT) return;
@@ -68,6 +92,28 @@ public class ExportListener extends BaseListener {
                 }
             }
 
+            return;
+        }
+
+        if (exportedLinks != null) {
+            if (e.getErrorCode() != API_OK) {
+                numberError++;
+            } else {
+                exportedLinks.append(request.getLink())
+                    .append("\n\n");
+            }
+
+            pendingExport--;
+            if (pendingExport == 0) {
+                if (numberError < numberExport && shareIntent != null) {
+                    startShareIntent(context, shareIntent, exportedLinks.toString());
+                }
+                if (numberError != 0) {
+                    logError(numberError + " errors exporting nodes");
+                    showSnackbar(context, context.getResources()
+                        .getQuantityString(R.plurals.context_link_export_error, numberExport));
+                }
+            }
             return;
         }
 

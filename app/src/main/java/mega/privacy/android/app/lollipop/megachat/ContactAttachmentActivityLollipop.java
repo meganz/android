@@ -99,7 +99,10 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null) return;
 
-			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME) || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
 				updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
 			}
 		}
@@ -181,17 +184,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setTitle(getString(R.string.activity_title_contacts_attached));
 
-		if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
-			aB.setSubtitle(megaChatApi.getMyFullname());
-		}
-		else{
-			String fullNameAction = cC.getFullName(message.getMessage().getUserHandle(), chatId);
-
-			if(fullNameAction==null){
-				fullNameAction = "";
-			}
-			aB.setSubtitle(fullNameAction);
-		}
+		aB.setSubtitle(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() ? megaChatApi.getMyFullname()
+				: cC.getParticipantFullName(message.getMessage().getUserHandle()));
 
 		container = (RelativeLayout) findViewById(R.id.contact_attachment_chat);
 
@@ -257,6 +251,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
 		LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}

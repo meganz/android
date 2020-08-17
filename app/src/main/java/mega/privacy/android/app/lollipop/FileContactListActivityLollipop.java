@@ -157,7 +157,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null) return;
 
-			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME) || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
 				updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
 			}
 		}
@@ -449,27 +452,15 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
 		LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 
 	public void checkScroll() {
 		if (listView != null) {
-			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				changeActionBarElevation(true);
-			}
-			else if ((adapter != null && !adapter.isMultipleSelect())) {
-				changeActionBarElevation(false);
-			}
-		}
-	}
-
-	public void changeActionBarElevation(boolean whitElevation){
-		if (whitElevation) {
-			aB.setElevation(px2dp(4, outMetrics));
-		}
-		else {
-			aB.setElevation(0);
+			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
 	
