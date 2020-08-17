@@ -134,7 +134,7 @@ class PhotosRepository @Inject constructor(
         var mapKeyTitle = Long.MIN_VALUE
         var index = 0
 
-        for ((_, node) in getMegaNodesOfPhotos().withIndex()) {
+        for ((photoIndex, node) in getMegaNodesOfPhotos().withIndex()) {
             val thumbnail = getThumbnail(node)
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
@@ -146,13 +146,14 @@ class PhotosRepository @Inject constructor(
             ) {
                 lastModifyDate = modifyDate
                 photoNodesMap[mapKeyTitle++] =
-                    PhotoNode(PhotoNode.TYPE_TITLE, null, index++, dateString, null, false)
+                    PhotoNode(PhotoNode.TYPE_TITLE, -1,null, index++, dateString, null, false)
             }
 
             val selected = savedPhotoNodesMap[node.handle]?.selected ?: false
 
             photoNodesMap[node.handle] = PhotoNode(
                 PhotoNode.TYPE_PHOTO,
+                photoIndex,
                 node,
                 index++,
                 dateString,

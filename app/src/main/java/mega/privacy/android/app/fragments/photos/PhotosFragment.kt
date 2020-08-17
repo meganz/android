@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.photos
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,7 +21,12 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.Constants.*
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -71,6 +77,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         setupBrowseAdapter()
         setupFastScroller()
         setupActionMode()
+        setupNavigation()
         Log.i("Alex", "viewmodel:$viewModel")
 
         viewModel.items.observe(viewLifecycleOwner) {
@@ -78,6 +85,39 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
         }
         refresh()
+    }
+
+    private fun setupNavigation() {
+        viewModel.openPhotoEvent.observe(viewLifecycleOwner, EventObserver {
+            openPhoto(it)
+        })
+    }
+
+    private fun openPhoto(node: PhotoNode) {
+        listView.findViewHolderForLayoutPosition(node.index)?.itemView?.findViewById<ImageView>(
+            R.id.thumbnail
+        )?.also {
+            val topLeft = IntArray(2)
+            it.getLocationOnScreen(topLeft)
+            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
+            val thumbnailLocation = arrayOf(topLeft[0], topLeft[1], it.width, it.height)
+
+            intent.putExtra(INTENT_EXTRA_KEY_POSITION, node.photoIndex)
+            intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, MegaApiJava.ORDER_MODIFICATION_DESC)
+
+            val parentNode = megaApi.getParentNode(node.node)
+            if (parentNode == null || parentNode.type == MegaNode.TYPE_ROOT) {
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE);
+            } else {
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.handle);
+            }
+
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
+            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, thumbnailLocation);
+
+            startActivity(intent)
+            requireActivity().overridePendingTransition(0, 0)
+        }
     }
 
     override fun refresh() {

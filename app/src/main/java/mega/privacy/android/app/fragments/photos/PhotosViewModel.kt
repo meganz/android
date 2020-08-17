@@ -15,6 +15,9 @@ class PhotosViewModel @Inject constructor(
 
     private var _query = MutableLiveData<PhotoQuery>()
 
+    private val _openPhotoEvent = MutableLiveData<Event<PhotoNode>>()
+    val openPhotoEvent: LiveData<Event<PhotoNode>> = _openPhotoEvent
+
     val items: LiveData<List<PhotoNode>> = Transformations.switchMap(_query) { query ->
         viewModelScope.launch {
             photosRepository.getPhotos(query)
@@ -33,8 +36,8 @@ class PhotosViewModel @Inject constructor(
         }
     }
 
-    fun onPhotoClick() {
+    fun onPhotoClick(item: PhotoNode) {
         Log.i("Alex", "onClick:$this")
-        // TODO: Navigate to Photo Viewer
+        _openPhotoEvent.value = Event(item)
     }
 }

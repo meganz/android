@@ -861,7 +861,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				adapterType == INCOMING_SHARES_ADAPTER|| adapterType == OUTGOING_SHARES_ADAPTER ||
 				adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
 				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER ||
-				adapterType == LINKS_ADAPTER) {
+				adapterType == LINKS_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER) {
             // only for the first time
             if(savedInstanceState == null) {
                 positionG -= placeholderCount;

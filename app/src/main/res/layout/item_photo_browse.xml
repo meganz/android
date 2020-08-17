@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/photo_grid_margin"
-        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick() : actionModeViewModel.onPhotoClick(item))}"
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick(item) : actionModeViewModel.onPhotoClick(item))}"
         android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
 
         <com.google.android.material.imageview.ShapeableImageView
