@@ -323,6 +323,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
+			updateActionModeTitle();
 		}
 
 		@Override
@@ -1124,8 +1125,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 
                 actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
             }
-            
-            updateActionModeTitle();
         }
     }
     
