@@ -6151,9 +6151,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("The message selected is "+msgId);
         int position = INVALID_POSITION;
         for (AndroidMegaChatMessage message : messages) {
-            if (message.getMessage().getMsgId() == msgId) {
+            if (message != null && message.getMessage() != null && message.getMessage().getMsgId() == msgId) {
                 position = messages.indexOf(message);
             }
+        }
+
+        if (position == INVALID_POSITION) {
+            return;
         }
 
         if (messagesSelectedInChat.get(msgId) != null) {

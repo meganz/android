@@ -262,6 +262,7 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
@@ -425,7 +426,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
 
-    public enum FragmentTag {
+	public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
@@ -703,7 +704,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private Chronometer chronometerMenuItem;
 	private LinearLayout layoutCallMenuItem;
 
-	private int typesCameraPermission = -1;
+	private int typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 	AlertDialog enable2FADialog;
 	boolean isEnable2FADialogShown = false;
 	Button enable2FAButton;
@@ -771,7 +772,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private TextView openLinkErrorText;
 	private Button openLinkOpenButton;
 
-	private boolean isBusinessGraceAlertShown = false;
+	private boolean isBusinessGraceAlertShown;
 	private AlertDialog businessGraceAlert;
 	private boolean isBusinessCUAlertShown;
 	private AlertDialog businessCUAlert;
@@ -1551,7 +1552,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
 		switch(requestCode){
 			case REQUEST_READ_CONTACTS:{
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -1577,8 +1577,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		        		}
 		        		else{
 							checkTakePicture(this, TAKE_PHOTO_CODE);
-							typesCameraPermission = -1;
-		        		}
+							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+						}
 		        	}
 	        	} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
 					logDebug("TAKE_PROFILE_PICTURE");
@@ -1590,18 +1590,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 						else{
 							this.takeProfilePicture();
-							typesCameraPermission = -1;
+							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					}
-				}else if(typesCameraPermission == START_CALL_PERMISSIONS){
-					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-						if(checkPermissionsCall()){
-							returnCall(this);
-						}
-						typesCameraPermission = -1;
-					}
+				} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
+						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					controlCallPermissions();
 				}
-	        	break;
+				break;
 	        }
 			case REQUEST_READ_WRITE_STORAGE:{
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -1625,7 +1621,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 							else{
 								checkTakePicture(this, TAKE_PHOTO_CODE);
-								typesCameraPermission = -1;
+								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 							}
 						}
 						else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
@@ -1637,7 +1633,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 							else{
 								this.takeProfilePicture();
-								typesCameraPermission = -1;
+								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 							}
 						}
 		        	}
@@ -1652,7 +1648,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 						else{
 							checkTakePicture(this, TAKE_PHOTO_CODE);
-							typesCameraPermission = -1;
+							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					}
 					else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
@@ -1664,7 +1660,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 						else{
 							this.takeProfilePicture();
-							typesCameraPermission = -1;
+							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					}
 					else{
@@ -1724,19 +1720,35 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				break;
 			}
 
-			case RECORD_AUDIO: {
-				if(typesCameraPermission == START_CALL_PERMISSIONS && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-					if(checkPermissionsCall()){
-						returnCall(this);
-					}
-					typesCameraPermission = -1;
+			case RECORD_AUDIO:
+				if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
+						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					controlCallPermissions();
 				}
 				break;
-
-
-			}
         }
     }
+
+	/**
+	 * Method for checking the necessary actions when you have permission to start a call or return to one in progress.
+	 */
+	private void controlCallPermissions() {
+		if (checkPermissionsCall(this, typesCameraPermission)) {
+			switch (typesCameraPermission) {
+				case RETURN_CALL_PERMISSIONS:
+					returnCall(this);
+					break;
+
+				case START_CALL_PERMISSIONS:
+					MegaChatRoom chat = megaChatApi.getChatRoomByUser(MegaApplication.getUserWaitingForCall());
+					if (chat != null) {
+						startCallWithChatOnline(this, chat);
+					}
+					break;
+			}
+			typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+		}
+	}
 
 	public void setTypesCameraPermission(int typesCameraPermission) {
 		this.typesCameraPermission = typesCameraPermission;
@@ -1875,6 +1887,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			outState.putString(BUSINESS_CU_FRAGMENT, businessCUF);
 			outState.putBoolean(BUSINESS_CU_FIRST_TIME, businessCUFirstTime);
 		}
+
+		outState.putInt(TYPE_CALL_PERMISSION, typesCameraPermission);
 	}
 
 	@Override
@@ -1971,6 +1985,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				businessCUF = savedInstanceState.getString(BUSINESS_CU_FRAGMENT);
 				businessCUFirstTime = savedInstanceState.getBoolean(BUSINESS_CU_FIRST_TIME, false);
 			}
+
+			typesCameraPermission = savedInstanceState.getInt(TYPE_CALL_PERMISSION, INVALID_TYPE_PERMISSIONS);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -2883,8 +2899,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
-						int result = getIntent().getIntExtra("RESULT",-20);
-						if(result==0){
+						int result = getIntent().getIntExtra(RESULT, MegaError.API_OK);
+						if (result == MegaError.API_OK) {
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
 							selectDrawerItemPending=false;
@@ -3276,18 +3292,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		setContactStatus();
 
-        if (firstTimeAfterInstallation) {
-            //haven't verified phone number
-            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
-                askForSMSVerification();
-            } else {
-                askForAccess();
-            }
-        } else if (firstLogin && !newCreationAccount) {
-            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
-                askForSMSVerification();
-            }
-        }
+		checkInitialScreens();
 
 		if (openLinkDialogIsShown) {
 			showOpenLinkDialog();
@@ -3304,34 +3309,80 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showMKLayout();
 		}
 
-		checkBusinessStatus();
-
 		logDebug("END onCreate");
 	}
 
-    private void checkBusinessStatus() {
+	/**
+	 * Checks which screen should be shown when an user is logins.
+	 * There are three different screens or warnings:
+	 * - Business warning: it takes priority over the other two
+	 * - SMS verification screen: it takes priority over the other one
+	 * - Onboarding permissions screens: it has to be only shown when account is logged in after the installation,
+	 * 		some of the permissions required have not been granted
+	 * 		and the business warnings and SMS verification have not to be shown.
+	 */
+	private void checkInitialScreens() {
+    	if (checkBusinessStatus()) {
+			setBusinessAlertShown(true);
+			return;
+		}
+
+		if (firstTimeAfterInstallation) {
+			//haven't verified phone number
+			if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
+				askForSMSVerification();
+			} else {
+				askForAccess();
+			}
+		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+			askForSMSVerification();
+		}
+	}
+
+	/**
+	 * Updates the state of the flag indicating if there is a business alert shown.
+	 *
+	 * @param shown	true if there is any business alert shown, false otherwise.
+	 */
+	private void setBusinessAlertShown(boolean shown) {
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo != null) {
+			myAccountInfo.setBusinessAlertShown(shown);
+		}
+	}
+
+	/**
+	 * Checks if some business warning has to be shown due to the status of the account.
+	 *
+	 * @return True if some warning has been shown, false otherwise.
+	 */
+    private boolean checkBusinessStatus() {
         if (isBusinessGraceAlertShown) {
             showBusinessGraceAlert();
-            return;
+            return true;
         }
 
         if (isBusinessCUAlertShown) {
         	showBusinessCUAlert();
-        	return;
+        	return true;
 		}
 
-        MyAccountInfo myAccountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
 
         if (myAccountInfo != null && myAccountInfo.shouldShowBusinessAlert()) {
             int status = megaApi.getBusinessStatus();
             if (status == BUSINESS_STATUS_EXPIRED) {
                 myAccountInfo.setShouldShowBusinessAlert(false);
                 startActivity(new Intent(this, BusinessExpiredAlertActivity.class));
+                return true;
             } else if (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD) {
                 myAccountInfo.setShouldShowBusinessAlert(false);
                 showBusinessGraceAlert();
+                return true;
             }
         }
+
+        return false;
     }
 
     private void showBusinessGraceAlert() {
@@ -3346,17 +3397,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         builder.setView(v);
 
         Button dismissButton = v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            	isBusinessGraceAlertShown = false;
-                try {
-                    businessGraceAlert.dismiss();
-                } catch (Exception e) {
-                    logWarning("Exception dismissing businessGraceAlert", e);
-                }
-            }
-        });
+        dismissButton.setOnClickListener(view -> {
+			setBusinessAlertShown(isBusinessGraceAlertShown = false);
+			try {
+				businessGraceAlert.dismiss();
+			} catch (Exception e) {
+				logWarning("Exception dismissing businessGraceAlert", e);
+			}
+		});
 
         businessGraceAlert = builder.create();
         businessGraceAlert.setCanceledOnTouchOutside(false);
@@ -3389,7 +3437,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCU())
 				.setCancelable(false)
-				.setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
+				.setOnDismissListener(dialog -> setBusinessAlertShown(isBusinessCUAlertShown = false));
         businessCUAlert = builder.create();
         businessCUAlert.show();
         isBusinessCUAlertShown = true;
@@ -4420,6 +4468,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		};
 
 		inputFirstName.setSingleLine();
+		inputFirstName.setHint(R.string.first_name_text);
 		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -4450,6 +4499,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		inputFirstName.requestFocus();
 
 		inputLastName.setSingleLine();
+		inputLastName.setHint(R.string.lastname_text);
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
 		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -4480,6 +4530,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.setSingleLine();
+		inputMail.setHint(R.string.email_text);
 		inputMail.setText(megaApi.getMyUser().getEmail());
 		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -4755,6 +4806,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
+
+		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+		if (myAccountInfo != null && myAccountInfo.isBusinessAlertShown()) {
+			//The business alerts has priority over SMS verification
+			return;
+		}
+
         if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
             showSMSVerificationDialog();
         }
@@ -6760,7 +6818,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
-		typesCameraPermission = -1;
+		typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -6935,7 +6993,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		    }
 		    case R.id.action_take_picture:{
 		    	typesCameraPermission = TAKE_PICTURE_OPTION;
-		    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					boolean hasStoragePermission = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
@@ -7336,14 +7395,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case R.id.action_return_call:{
 				logDebug("Action menu return to call in progress pressed");
-				if(checkPermissionsCall()){
-					returnCall(this);
-				}
+				returnCallWithPermissions();
 				return true;
 			}
             default:{
 	            return super.onOptionsItemSelected(item);
             }
+		}
+	}
+
+	private void returnCallWithPermissions() {
+		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
+			returnCall(this);
 		}
 	}
 
@@ -9306,8 +9369,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void checkPermissions(){
-		logDebug("checkPermissionsCall");
-
 		typesCameraPermission = TAKE_PROFILE_PICTURE;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -10512,6 +10573,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
 		if (shares.size() == 1) {
 			showConfirmationRemoveAllSharingContacts(megaApi.getOutShares(shares.get(0)), shares.get(0));
+			return;
 		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -11341,9 +11403,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			case R.id.call_in_progress_layout:{
-				if(checkPermissionsCall()){
-					returnCall(this);
-				}
+				returnCallWithPermissions();
 				break;
 			}
 		}
@@ -12137,6 +12197,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			this.startActivity(intentOpenChat);
 		}
 	}
+
 
 	public void startGroupConversation(ArrayList<Long> userHandles){
 		logDebug("startGroupConversation");
@@ -15868,7 +15929,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		logDebug("Chat ID: " + chatid + ", New state: " + newState);
-
 		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
 			logDebug("Online Connection: " + chatid);
 			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
@@ -15878,6 +15938,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					rChatFL.setStatus();
 				}
 			}
+		}
+
+		MegaChatRoom chatRoom = api.getChatRoom(chatid);
+		if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+				&& chatRoom != null && chatRoom.getPeerHandle(0) == MegaApplication.getUserWaitingForCall()) {
+			startCallWithChatOnline(this, api.getChatRoom(chatid));
 		}
 	}
 
@@ -16687,26 +16753,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logDebug("Transfer panel not visible");
 		}
 	}
-
-	private boolean checkPermissionsCall(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-			if (!hasCameraPermission) {
-				typesCameraPermission = START_CALL_PERMISSIONS;
-
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-				return false;
-			}
-			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-			if (!hasRecordAudioPermission) {
-				typesCameraPermission = START_CALL_PERMISSIONS;
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
-				return false;
-			}
-		}
-		return true;
-	}
-
 
 	public String getSearchQuery() {
 		return searchQuery;

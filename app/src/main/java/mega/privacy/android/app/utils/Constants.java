@@ -70,6 +70,10 @@ public class Constants {
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
+    public static final String RESULT = "RESULT";
+    public static final String ACCOUNT_BLOCKED_STRING = "ACCOUNT_BLOCKED_STRING";
+    public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
+
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
     //MultipleRequestListener options
@@ -369,8 +373,7 @@ public class Constants {
     public static final int TAKE_PICTURE_OPTION = 0;
     public static final int TAKE_PROFILE_PICTURE = 1;
     public static final int START_CALL_PERMISSIONS = 2;
-
-
+    public static final int RETURN_CALL_PERMISSIONS = 3;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
@@ -456,9 +459,14 @@ public class Constants {
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
     public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
+    public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
+    public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
+    public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
+    public static final int INVALID_TYPE_PERMISSIONS = -1;
+
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
@@ -592,6 +600,11 @@ public class Constants {
     public static final String[] WEB_SESSION_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#sitetransfer!.+$",
             "^https://mega\\.nz/#sitetransfer!.+$"
+    };
+
+    public static final String[] BUSINESS_INVITE_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#businessinvite.+$",
+            "^https://mega\\.nz/#businessinvite.+$"
     };
 
     //Types of blocked accounts
