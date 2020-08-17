@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_cardview_white_top"
-    android:elevation="@dimen/elevation_low"
-    android:orientation="vertical"
-    app:layout_behavior="@string/homepage_bottom_sheet_behavior"
-    tools:viewBindingIgnore="true">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
-        style="@style/HomepageBottomTabLayout"
-        android:layout_width="300dp"
-        android:layout_height="?attr/actionBarSize" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_cardview_white_top"
+        android:elevation="@dimen/elevation_low"
+        android:orientation="vertical"
+        app:layout_behavior="@string/homepage_bottom_sheet_behavior"
+        tools:viewBindingIgnore="true">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            style="@style/HomepageBottomTabLayout"
+            android:layout_width="300dp"
+            android:layout_height="?attr/actionBarSize" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</layout>

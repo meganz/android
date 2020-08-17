@@ -3,29 +3,37 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/homepage"
-    app:startDestination="@id/homepage">
-  <fragment
-      android:id="@+id/homepage"
-      android:name="mega.privacy.android.app.lollipop.managerSections.HomepageFragment"
-      tools:layout="@layout/fragment_homepage">
-    <action
-        android:id="@+id/action_homepage_to_fullscreen_offline"
-        app:destination="@id/fullscreen_offline" />
-  </fragment>
-  <fragment
-      android:id="@+id/fullscreen_offline"
-      android:name="mega.privacy.android.app.fragments.offline.OfflineFragment"
-      tools:layout="@layout/fragment_offline">
-    <argument
-        android:name="path"
-        android:defaultValue="/"
-        app:argType="string" />
-    <argument
-        android:name="rootFolderOnly"
-        android:defaultValue="false"
-        app:argType="boolean" />
-    <action
-        android:id="@+id/action_homepage_to_fullscreen_offline"
-        app:destination="@id/fullscreen_offline" />
-  </fragment>
+    app:startDestination="@id/homepageFragment">
+    <fragment
+        android:id="@+id/homepageFragment"
+        android:name="mega.privacy.android.app.lollipop.managerSections.HomepageFragment"
+        android:label="fragment_homepage"
+        tools:layout="@layout/fragment_homepage">
+        <action
+            android:id="@+id/action_homepageFragment_to_photosFragment"
+            app:destination="@id/photosFragment" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
+    <fragment
+        android:id="@+id/photosFragment"
+        android:name="mega.privacy.android.app.fragments.photos.PhotosFragment"
+        android:label="@string/category_photos" />
+    <fragment
+        android:id="@+id/fullscreen_offline"
+        android:name="mega.privacy.android.app.fragments.offline.OfflineFragment"
+        tools:layout="@layout/fragment_offline">
+        <argument
+            android:name="path"
+            android:defaultValue="/"
+            app:argType="string" />
+        <argument
+            android:name="rootFolderOnly"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
 </navigation>

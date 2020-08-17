@@ -1,7 +1,5 @@
 package mega.privacy.android.app.components
 
-import android.util.SparseArray
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.fragments.offline.OfflineFragment
@@ -10,7 +8,6 @@ import mega.privacy.android.app.lollipop.managerSections.RecentsFragment
 import java.lang.ref.WeakReference
 
 class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    private val fragmentRefs: SparseArray<WeakReference<Fragment>> = SparseArray()
 
     private val tabFragmentMap = object : HashMap<Int, Class<*>>() {
         init {
@@ -32,7 +29,6 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
             if (position == OFFLINE_INDEX) {
                 OfflineFragment.setArgs(fragment as OfflineFragment, true)
             }
-            fragmentRefs.put(position, WeakReference(fragment))
         } catch (e: IllegalAccessException) {
             e.printStackTrace()
         } catch (e: InstantiationException) {
@@ -40,11 +36,6 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
         }
 
         return fragment!!
-    }
-
-    fun getViewAt(pos: Int): View? {
-        val weakReference = fragmentRefs.get(pos)
-        return weakReference?.get()?.view
     }
 
     companion object {

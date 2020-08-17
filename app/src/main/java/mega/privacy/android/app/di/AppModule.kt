@@ -40,7 +40,7 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideDatabaseHandler(@ApplicationContext context: Context): DatabaseHandler {
+    fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
         return DatabaseHandler.getDbHandler(context)
     }
 }

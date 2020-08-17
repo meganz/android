@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -15,6 +16,7 @@ import android.view.Window
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
@@ -30,21 +32,13 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
 
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
-
     private val viewModel: HomePageViewModel by viewModels()
 
+    private lateinit var activity: ManagerActivityLollipop
     private lateinit var viewDataBinding: FragmentHomepageBinding
     private lateinit var rootView: View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
@@ -56,12 +50,27 @@ class HomepageFragment : Fragment() {
 
     private var isFabExpanded = false
 
+    private val categoryClickListener = OnClickListener {
+        with (viewDataBinding.category) {
+            val direction = when (view) {
+                categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
+                else -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
+            }
+
+            findNavController().navigate(direction)
+            activity.showHideBottomNavigationView(true)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
+
+        activity = (getActivity() as ManagerActivityLollipop)
+
         return rootView
     }
 
@@ -70,6 +79,7 @@ class HomepageFragment : Fragment() {
 
         setupMask()
         setupSearchView()
+        setupCategories()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
@@ -78,7 +88,7 @@ class HomepageFragment : Fragment() {
     private fun setupSearchView() {
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
-            (activity as ManagerActivityLollipop).drawerLayout!!
+            activity.drawerLayout!!
         )
 
         viewModel.notification.observe(viewLifecycleOwner) {
@@ -92,13 +102,12 @@ class HomepageFragment : Fragment() {
         }
 
         searchInputView.setAvatarClickListener(
-            OnClickListener { (activity as ManagerActivityLollipop).showMyAccount() })
+            OnClickListener { activity.showMyAccount() })
     }
 
     private fun setupBottomSheetUI() {
         val viewPager = rootView.findViewById<ViewPager2>(R.id.view_pager)
         viewPager.adapter = BottomSheetPagerAdapter(this)
-
         // Attach the view pager to the tab layout
         val tabs = rootView.findViewById<TabLayout>(R.id.tabs)
         val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->
@@ -111,19 +120,24 @@ class HomepageFragment : Fragment() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 bottomSheetBehavior.invalidateScrollingChild(
-                    (viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position)
+                    // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
+                    childFragmentManager.findFragmentByTag("f$position")?.view
                 )
             }
         })
     }
 
     private fun setupMask() {
-        windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
+        windowContent = activity.window?.findViewById(Window.ID_ANDROID_CONTENT)
         fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
     }
 
+    private fun setupCategories() {
+        viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
+    }
+
     private fun getTabTitle(position: Int): String? {
-        val resources = activity?.resources
+        val resources = activity.resources
 
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources?.getString(R.string.tab_recents)
@@ -135,14 +149,15 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupBottomSheetBehavior() {
-        bottomSheetBehavior = HomepageBottomSheetBehavior.from(viewDataBinding.homepageBottomSheet)
+        bottomSheetBehavior =
+            HomepageBottomSheetBehavior.from(viewDataBinding.homepageBottomSheet.root)
         setBottomSheetPeekHeight()
         setBottomSheetExpandedTop()
     }
 
     private fun setBottomSheetPeekHeight() {
         rootView.viewTreeObserver?.addOnPreDrawListener {
-            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.banner.bottom
+            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.banner.root.bottom
             true
         }
     }
@@ -154,7 +169,7 @@ class HomepageFragment : Fragment() {
             val backgroundMask = rootView.findViewById<View>(R.id.background_mask)
             val dividend = 1.0f - SLIDE_OFFSET_CHANGE_BACKGROUND
             val bottomSheet = viewDataBinding.homepageBottomSheet
-            val maxElevation = bottomSheet.elevation
+            val maxElevation = bottomSheet.root.elevation
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 val layoutParams = bottomSheet.layoutParams
@@ -220,7 +235,7 @@ class HomepageFragment : Fragment() {
             rotateFab()
             showOut(fabChat, fabUpload, textChat, textUpload)
             // After animation completed, then remove mask.
-            runDelay(FAB_MASK_OUT_DELAY) {
+            runDelay {
                 removeMask()
                 fabMain.visibility = View.VISIBLE
                 isFabExpanded = !isFabExpanded
@@ -237,8 +252,8 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun runDelay(delayMs: Long, task: () -> Unit) {
-        Handler().postDelayed(task, delayMs)
+    private fun runDelay(task: () -> Unit) {
+        Handler().postDelayed(task, FAB_MASK_OUT_DELAY)
     }
 
     private fun showIn(vararg fabs: View) {
@@ -294,11 +309,6 @@ class HomepageFragment : Fragment() {
         view.animate()
             .setDuration(FAB_ANIM_DURATION)
             .translationY(0f)
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    super.onAnimationEnd(animation)
-                }
-            })
             .alpha(ALPHA_OPAQUE)
             .start()
     }

@@ -56,4 +56,16 @@
     <dimen name="label_margin_end">16dp</dimen>
     <dimen name="fab_margin_span">16dp</dimen>
 
+    <dimen name="icon_selected_size">23dp</dimen>
+    <dimen name="icon_selected_margin">7dp</dimen>
+
+    <dimen name="photo_item_width">86dp</dimen>
+    <dimen name="photo_grid_margin">1dp</dimen>
+    <dimen name="photo_selected_icon_width">16dp</dimen>
+    <dimen name="photo_selected_icon_margin">4dp</dimen>
+    <dimen name="photo_selected_icon_round_corner_radius">4dp</dimen>
+    <dimen name="photo_item_padding">2dp</dimen>
+    <dimen name="photo_selected_border_width">2dp</dimen>
+
+    <dimen name="empty_data_font_size">18sp</dimen>
 </resources>
