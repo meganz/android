@@ -150,11 +150,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             case MegaEvent.EVENT_ACCOUNT_BLOCKED:
                 logDebug("EVENT_ACCOUNT_BLOCKED: " + event.getNumber());
 
-                Intent intent = new Intent(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
-                intent.setAction(ACTION_EVENT_ACCOUNT_BLOCKED);
-                intent.putExtra(EVENT_NUMBER, event.getNumber());
-                intent.putExtra(EVENT_TEXT, event.getText());
-                LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                megaApplication.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
+                        .putExtra(EVENT_NUMBER, event.getNumber())
+                        .putExtra(EVENT_TEXT, event.getText()));
                 break;
 
             case MegaEvent.EVENT_BUSINESS_STATUS:

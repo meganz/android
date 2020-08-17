@@ -18,7 +18,6 @@ public class BroadcastConstants {
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
-    public static final String ACTION_EVENT_ACCOUNT_BLOCKED = "ACTION_EVENT_ACCOUNT_BLOCKED";
     public static final String ACTION_CALL_STATUS_UPDATE = "ACTION_CALL_STATUS_UPDATE";
     public static final String ACTION_CHANGE_LOCAL_AVFLAGS = "ACTION_CHANGE_LOCAL_AVFLAGS";
     public static final String ACTION_CHANGE_COMPOSITION = "ACTION_CHANGE_COMPOSITION";
@@ -58,4 +57,5 @@ public class BroadcastConstants {
     public static final String MUTE_CHATROOM_ID = "MUTE_CHATROOM_ID";
     public static final String TYPE_MUTE = "TYPE_MUTE";
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";
+    public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
 }

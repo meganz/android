@@ -242,17 +242,23 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     }
                 } else {
                     logWarning("Contact's email is empty!");
-                    megaContacts.remove(currentContactIndex);
                 }
             } else {
                 logWarning("Get contact's email faild with error code: " + e.getErrorCode());
-                megaContacts.remove(currentContactIndex);
             }
             // Get next contact's email.
             currentContactIndex++;
             // All the emails have been gotten.
             if (currentContactIndex >= megaContacts.size()) {
                 megaContacts.addAll(megaContactsWithEmail);
+                // Remove the contact who doesn't get email successfully.
+                Iterator<MegaContact> iterator = megaContacts.iterator();
+                while(iterator.hasNext()) {
+                    MegaContact contact = iterator.next();
+                    if(contact.getEmail() == null) {
+                        iterator.remove();
+                    }
+                }
                 processFinished(api, megaContacts);
             } else {
                 MegaContact nextContact = getCurrentContactIndex();
