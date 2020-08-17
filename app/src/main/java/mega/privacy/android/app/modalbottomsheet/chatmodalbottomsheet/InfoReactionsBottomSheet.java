@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import biz.laenger.android.vpbs.BottomSheetUtils;
-import biz.laenger.android.vpbs.ViewPagerBottomSheetDialogFragment;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.reaction.UserReactionListView;
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
+import mega.privacy.android.app.components.twemoji.reaction.ViewPagerBottomSheetDialogFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.InfoReactionPagerAdapter;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -63,6 +62,9 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     private String REACTION_SELECTED = "REACTION_SELECTED";
     private ArrayList<String> list;
 
+    public InfoReactionsBottomSheet() {
+    }
+
     public InfoReactionsBottomSheet(Context context, String reactionSelected) {
         this.context = context;
         this.reactionSelected = reactionSelected;
@@ -79,11 +81,9 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         }
 
         if (savedInstanceState != null) {
-            logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
             reactionSelected = savedInstanceState.getString(REACTION_SELECTED);
-
         } else {
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
@@ -209,20 +209,6 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         reactionImage.setEmoji(emojis.get(0).emoji, true);
         parent.addView(button);
         return button;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putLong(CHAT_ID, chatId);
-        outState.putLong(MESSAGE_ID, messageId);
-        outState.putString(REACTION_SELECTED, reactionSelected);
     }
 
     @Override
@@ -355,5 +341,19 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         public void onClick(final View v) {
             reactionsPager.setCurrentItem(position);
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(CHAT_ID, chatId);
+        outState.putLong(MESSAGE_ID, messageId);
+        outState.putString(REACTION_SELECTED, reactionSelected);
     }
 }
