@@ -77,20 +77,12 @@ class HomepageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        setupNavigation()
         setupMask()
         setupSearchView()
         setupCategories()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
-    }
-
-    private fun setupNavigation() {
-        // The legacy ManagerActivity code isn't compatible with Navigation component.
-        // Homepage has to use existed navigation system to compromise
-//        activity.attachNavController()
-//        activity.isFirstNavigationLevel = true
     }
 
     private fun setupSearchView() {
@@ -116,7 +108,6 @@ class HomepageFragment : Fragment() {
     private fun setupBottomSheetUI() {
         val viewPager = rootView.findViewById<ViewPager2>(R.id.view_pager)
         viewPager.adapter = BottomSheetPagerAdapter(this)
-
         // Attach the view pager to the tab layout
         val tabs = rootView.findViewById<TabLayout>(R.id.tabs)
         val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->

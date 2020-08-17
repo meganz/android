@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,12 +21,11 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Util
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
+
     @Inject
     lateinit var viewModel: PhotosViewModel
 
@@ -38,7 +36,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     private lateinit var listView: NewGridRecyclerView
 
     @Inject
-    lateinit var listAdapter: PhotosGridAdapter
+    lateinit var browseAdapter: PhotosBrowseAdapter
+
+    @Inject
+    lateinit var searchAdapter: PhotosSearchAdapter
 
     private var actionMode: ActionMode? = null
 
@@ -54,6 +55,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     ): View? {
         binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
             viewModel = this@PhotosFragment.viewModel
+            Log.i("Alex", "viewModel:$viewModel")
             actionModeViewModel = this@PhotosFragment.actionModeViewModel
         }
 
@@ -66,14 +68,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         activity = getActivity() as ManagerActivityLollipop
 
         setupListView()
-        setupListAdapter()
+        setupBrowseAdapter()
         setupFastScroller()
         setupActionMode()
-        setupNavigation()
         Log.i("Alex", "viewmodel:$viewModel")
 
         viewModel.items.observe(viewLifecycleOwner) {
             activity.invalidateOptionsMenu()
+            actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
         }
         refresh()
     }
@@ -103,24 +105,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
     private fun setupActionMode() {
         observeSelectedNodes()
-        observeSelectAll()
         observeAnimatedNodes()
         observeActionModeDestroy()
-    }
-
-    private fun setupNavigation() {
-//        activity = getActivity() as ManagerActivityLollipop
-//        activity.isFirstNavigationLevel = false
-
-//        activity.supportActionBar?.apply {
-//            title = resources.getString(R.string.category_photos)
-//            setHomeAsUpIndicator(
-//                Util.mutateIcon(
-//                    context,
-//                    R.drawable.ic_arrow_back_white,
-//                    R.color.black
-//                ))
-//        }
     }
 
     private fun observeSelectedNodes() =
@@ -141,13 +127,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
                 }
 
                 actionMode?.title = it.size.toString()
-            }
-        })
-
-    private fun observeSelectAll() =
-        actionModeViewModel.selectAllEvent.observe(viewLifecycleOwner, Observer {
-            viewModel.items.value?.run {
-                actionModeViewModel.selectAll(filter { it.node != null })
             }
         })
 
@@ -211,13 +190,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     private fun observeActionModeDestroy() =
-        actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, Observer {
+        actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
         })
 
     private fun updateUi() {
         viewModel.items.value?.let { it ->
-            listAdapter.submitList(ArrayList<PhotoNode>(it))
+            browseAdapter.submitList(ArrayList<PhotoNode>(it))
         }
     }
 
@@ -233,16 +212,16 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         binding.scroller.setRecyclerView(listView)
     }
 
-    private fun setupListAdapter() {
+    private fun setupBrowseAdapter() {
         listView.layoutManager?.apply {
-            spanSizeLookup = listAdapter.getSpanSizeLookup(spanCount)
+            spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
             val itemDimen =
                 outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
                     .toInt() * 2
-            listAdapter.setItemDimen(itemDimen)
+            browseAdapter.setItemDimen(itemDimen)
         }
 
-        listView.adapter = listAdapter
+        listView.adapter = browseAdapter
     }
 
     override fun shouldShowSearch(): Boolean {
@@ -255,8 +234,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     override fun searchReady() {
+        listView.adapter = searchAdapter
     }
 
     override fun exitSearch() {
+        listView.adapter = browseAdapter
     }
 }

@@ -34,12 +34,11 @@ class PhotosRepository @Inject constructor(
 ) {
     private var order = MegaApiJava.ORDER_MODIFICATION_DESC
 
-    private val selectedNodes: LongSparseArray<MegaNode> = LongSparseArray()
-
     // LinkedHashMap guarantees that the index order of elements is consistent with
     // the order of putting. Moreover, it has a quick element search[O(1)] (for
     // the callback of megaApi.getThumbnail())
     private val photoNodesMap: MutableMap<Long, PhotoNode> = LinkedHashMap()
+    private val savedPhotoNodesMap: MutableMap<Long, PhotoNode> = LinkedHashMap()
 
     private var waitingForRefresh = false
 
@@ -47,7 +46,7 @@ class PhotosRepository @Inject constructor(
     val photoNodes: LiveData<List<PhotoNode>> = _photoNodes
 
     suspend fun getPhotos(query: PhotoQuery) = withContext(Dispatchers.IO) {
-        photoNodesMap.clear()
+        saveAndClearData()
 
         if (query.order == MegaApiJava.ORDER_NONE) {
             getSortOrder()
@@ -61,6 +60,12 @@ class PhotosRepository @Inject constructor(
         withContext(Dispatchers.Main) {
             _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
         }
+    }
+
+    private fun saveAndClearData() {
+        savedPhotoNodesMap.clear()
+        photoNodesMap.toMap(savedPhotoNodesMap)
+        photoNodesMap.clear()
     }
 
     private fun getSortOrder(): Int {
@@ -144,13 +149,15 @@ class PhotosRepository @Inject constructor(
                     PhotoNode(PhotoNode.TYPE_TITLE, null, index++, dateString, null, false)
             }
 
+            val selected = savedPhotoNodesMap[node.handle]?.selected ?: false
+
             photoNodesMap[node.handle] = PhotoNode(
                 PhotoNode.TYPE_PHOTO,
                 node,
                 index++,
                 dateString,
                 thumbnail,
-                selectedNodes.containsKey(node.handle)
+                selected
             )
         }
     }

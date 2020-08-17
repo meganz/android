@@ -1,18 +1,19 @@
 package mega.privacy.android.app.fragments.photos
 
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
 import java.io.File
 
+@Suppress("UNCHECKED_CAST")
 @BindingAdapter("items")
 fun setItems(listView: RecyclerView, items: List<PhotoNode>?) {
     items?.let {
-        (listView.adapter as PhotosGridAdapter).submitList(items)
+        (listView.adapter as ListAdapter<PhotoNode, PhotoViewHolder>).submitList(items)
     }
 }
 

@@ -3,11 +3,13 @@ package mega.privacy.android.app.fragments.photos
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.scopes.FragmentScoped
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import javax.inject.Inject
 
-@FragmentScoped
+@ActivityRetainedScoped
 class ActionModeViewModel @Inject constructor() : ViewModel() {
+
+    private lateinit var nodesData: List<SelectableNode>
 
     private val _selectedNodes = MutableLiveData<List<SelectableNode>>()
     val selectedNodes: LiveData<List<SelectableNode>> = _selectedNodes
@@ -15,11 +17,8 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
     private val _animNodeIndices = MutableLiveData<Set<Int>>()
     val animNodeIndices: LiveData<Set<Int>> = _animNodeIndices
 
-    private val _selectAllEvent = MutableLiveData<Event<Unit>>()
-    val selectAllEvent = _selectAllEvent
-
     private val _actionModeDestroy = MutableLiveData<Event<Unit>>()
-    val actionModeDestroy = _actionModeDestroy
+    val actionModeDestroy: LiveData<Event<Unit>> = _actionModeDestroy
 
     private val selectedNodeList = mutableListOf<SelectableNode>()
 
@@ -56,14 +55,10 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
         _selectedNodes.value = selectedNodeList
     }
 
-    fun trySelectAll() {
-        _selectAllEvent.value = Event(Unit)
-    }
-
-    fun selectAll(nodes: List<SelectableNode>) {
+    fun selectAll() {
         val animNodeIndices = mutableSetOf<Int>()
 
-        nodes.forEach {
+        nodesData.forEach {
             if (!it.selected) {
                 it.selected = true
                 it.uiDirty = true
@@ -73,11 +68,21 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
         _animNodeIndices.value = animNodeIndices
         selectedNodeList.clear()
-        selectedNodeList.addAll(nodes)
+        selectedNodeList.addAll(nodesData)
         _selectedNodes.value = selectedNodeList
     }
 
     fun actionModeDestroy() {
         _actionModeDestroy.value = Event(Unit)
+    }
+
+    fun setNodesData(nodes: List<SelectableNode>) {
+        nodesData = nodes
+        selectedNodeList.clear()
+        nodesData.forEach {
+            if (it.selected) {
+                selectedNodeList.add(it)
+            }
+        }
     }
 }

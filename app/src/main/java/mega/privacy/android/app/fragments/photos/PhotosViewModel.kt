@@ -2,11 +2,11 @@ package mega.privacy.android.app.fragments.photos
 
 import android.util.Log
 import androidx.lifecycle.*
-import dagger.hilt.android.scopes.FragmentScoped
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@FragmentScoped
+@ActivityRetainedScoped
 // Use scoped @Inject instead of @ViewModelInject. Then the ViewModel object in PhotosFragment
 // and PhotosGridAdapter are identical
 class PhotosViewModel @Inject constructor(

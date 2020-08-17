@@ -77,7 +77,7 @@ class ActionModeCallback @Inject constructor(
                     nodesHandles
                 )
             }
-            R.id.cab_menu_select_all -> viewModel.trySelectAll()
+            R.id.cab_menu_select_all -> viewModel.selectAll()
         }
 
         return true

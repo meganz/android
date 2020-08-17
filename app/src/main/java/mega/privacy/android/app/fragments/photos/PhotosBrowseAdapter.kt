@@ -3,46 +3,22 @@ package mega.privacy.android.app.fragments.photos
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.databinding.ItemPhotoBinding
+import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import javax.inject.Inject
 
-class PhotosGridAdapter @Inject constructor(
+class PhotosBrowseAdapter @Inject constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
-) : ListAdapter<PhotoNode, PhotosGridAdapter.PhotoViewHolder>(PhotoDiffCallback()),
+) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
     private var itemDimen = 0
-
-    class PhotoViewHolder(private val binding: ViewDataBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(
-            viewModel: PhotosViewModel,
-            actionModeViewModel: ActionModeViewModel,
-            item: PhotoNode
-        ) {
-            binding.apply {
-                if (this is ItemPhotoBinding) {
-                    this.viewModel = viewModel
-                    this.actionModeViewModel = actionModeViewModel
-                    this.item = item
-                } else if (this is ItemPhotosTitleBinding) {
-                    this.item = item
-                }
-            }
-
-            item.uiDirty = false
-        }
-    }
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
@@ -59,7 +35,7 @@ class PhotosGridAdapter @Inject constructor(
                     false
                 )
             else ->  // TYPE_PHOTO
-                ItemPhotoBinding.inflate(
+                ItemPhotoBrowseBinding.inflate(
                     inflater,
                     parent,
                     false
@@ -70,7 +46,7 @@ class PhotosGridAdapter @Inject constructor(
             setItemLayoutParams(binding)
             // FastScroller would affect the normal process of RecyclerView that makes the "selected"
             // icon appear before binding the item. Therefore, hide the icon up front
-            (binding as ItemPhotoBinding).iconSelected.visibility = View.GONE
+            (binding as ItemPhotoBrowseBinding).iconSelected.visibility = View.GONE
         }
 
         return PhotoViewHolder(binding)
