@@ -104,7 +104,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.7_318";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.8_319";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -159,6 +159,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
 	private static boolean wasLocalVideoEnable = false;
+	private static boolean isWaitingForCall = false;
+	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -1740,5 +1742,21 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
 		MegaApplication.wasLocalVideoEnable = wasLocalVideoEnable;
+	}
+
+	public static boolean isWaitingForCall() {
+		return isWaitingForCall;
+	}
+
+	public static void setIsWaitingForCall(boolean isWaitingForCall) {
+		MegaApplication.isWaitingForCall = isWaitingForCall;
+	}
+
+	public static long getUserWaitingForCall() {
+		return userWaitingForCall;
+	}
+
+	public static void setUserWaitingForCall(long userWaitingForCall) {
+		MegaApplication.userWaitingForCall = userWaitingForCall;
 	}
 }

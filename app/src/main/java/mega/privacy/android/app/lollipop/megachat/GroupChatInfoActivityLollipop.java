@@ -1,11 +1,18 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -38,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GroupParticipantsDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
@@ -72,6 +80,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -1058,7 +1067,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+        logDebug("Chat ID: " + chatid + ", New state: " + newState);
 
+        MegaChatRoom chatRoom = api.getChatRoom(chatid);
+        if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+                && chatRoom != null && chatRoom.getPeerHandle(0) == MegaApplication.getUserWaitingForCall()) {
+            startCallWithChatOnline(this, api.getChatRoom(chatid));
+        }
     }
 
     public void showConfirmationPrivateChatDialog() {
@@ -1169,6 +1184,31 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         } else {
             logError("ERROR WHEN CREATING CHAT " + errorCode);
             showSnackbar(getString(R.string.create_chat_error));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case RECORD_AUDIO:
+            case REQUEST_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    controlCallPermissions();
+                }
+                break;
+        }
+    }
+
+    /**
+     * Method for checking the necessary actions when you have permission to start a call.
+     */
+    private void controlCallPermissions() {
+        if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
+            MegaChatRoom chat = megaChatApi.getChatRoomByUser(MegaApplication.getUserWaitingForCall());
+            if (chat != null) {
+                startCallWithChatOnline(this, chat);
+            }
         }
     }
 
