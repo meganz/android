@@ -100,6 +100,10 @@ class OfflineFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         managerActivity = requireActivity() as ManagerActivityLollipop
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         // TODO: workaround for navigation with ManagerActivity
         if (args.rootFolderOnly) {
@@ -126,8 +130,8 @@ class OfflineFragment : Fragment() {
             .unregisterReceiver(receiverRefreshOffline)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onStop() {
+        super.onStop()
 
         // TODO: workaround for navigation with ManagerActivity
         if (args.rootFolderOnly) {
@@ -157,7 +161,11 @@ class OfflineFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        setViewModelDisplayParam(args.path)
+        if (viewModel.path == "" || viewModel.path == args.path) {
+            setViewModelDisplayParam(args.path)
+        } else {
+            setViewModelDisplayParam(viewModel.path)
+        }
         setupView()
         observeLiveData()
     }

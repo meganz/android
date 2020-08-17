@@ -88,7 +88,7 @@ class OfflineViewModel @ViewModelInject constructor(
     val urlFileOpenAsUrl: LiveData<String> = _urlFileOpenAsUrl
     val urlFileOpenAsFile: LiveData<File> = _urlFileOpenAsFile
 
-    var path = "/"
+    var path = ""
         private set
     var selecting = false
         private set
@@ -258,7 +258,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun navigateOut(initPath: String): Int {
         // no search action in back stack, should dismiss OfflineFragment
-        if (path == initPath && searchQuery == null) {
+        if (path == "" || path == initPath && searchQuery == null) {
             return 0
         }
 
@@ -392,6 +392,9 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun loadOfflineNodes() {
+        if (path == "") {
+            return
+        }
         add(Single.fromCallable { repo.loadOfflineNodes(path, order, searchQuery) }
             .map {
                 val nodes = ArrayList<OfflineNode>()

@@ -6036,6 +6036,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void fullscreenOfflineFragmentClosed(OfflineFragment fragment) {
 		if (fragment == fullscreenOfflineFragment) {
+			setPathNavigationOffline("/");
 			fullscreenOfflineFragment = null;
 			abL.setVisibility(View.GONE);
 		}
