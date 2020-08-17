@@ -120,7 +120,8 @@ class HomepageFragment : Fragment() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 bottomSheetBehavior.invalidateScrollingChild(
-                    (viewPager.adapter as BottomSheetPagerAdapter).getViewAt(position)
+                    // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
+                    childFragmentManager.findFragmentByTag("f$position")?.view
                 )
             }
         })
