@@ -325,16 +325,18 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun setOrder(order: Int) {
-        this.order = order
-        loadOfflineNodes()
+        if (!rootFolderOnly) {
+            this.order = order
+            loadOfflineNodes()
+        }
     }
 
     fun getOrderDisplay(): String {
         val resId = when (order) {
             ORDER_MODIFICATION_ASC -> R.string.sortby_modification_date
             ORDER_MODIFICATION_DESC -> R.string.sortby_modification_date
-            ORDER_SIZE_ASC -> R.string.sortby_modification_date
-            ORDER_SIZE_DESC -> R.string.sortby_modification_date
+            ORDER_SIZE_ASC -> R.string.sortby_size
+            ORDER_SIZE_DESC -> R.string.sortby_size
             else -> R.string.sortby_name
         }
         return getApplication<MegaApplication>().resources.getString(resId)
@@ -353,11 +355,20 @@ class OfflineViewModel @ViewModelInject constructor(
         return searchQuery != null || historySearchQuery != null
     }
 
-    fun setDisplayParam(rootFolderOnly: Boolean, isList: Boolean, spanCount: Int, path: String) {
+    fun setDisplayParam(
+        rootFolderOnly: Boolean,
+        isList: Boolean,
+        spanCount: Int,
+        path: String,
+        order: Int
+    ) {
         this.rootFolderOnly = rootFolderOnly
         this.isList = isList
         gridSpanCount = spanCount
         this.path = path
+        if (!rootFolderOnly) {
+            this.order = order
+        }
 
         _actionBarTitle.value = titleFromPath(path)
         loadOfflineNodes()

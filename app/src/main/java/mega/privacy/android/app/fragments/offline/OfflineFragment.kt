@@ -54,6 +54,7 @@ import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import java.io.File
 
 @AndroidEntryPoint
@@ -173,7 +174,8 @@ class OfflineFragment : Fragment() {
     private fun setViewModelDisplayParam(path: String) {
         viewModel.setDisplayParam(
             args.rootFolderOnly, isList(),
-            if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path
+            if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path,
+            managerActivity?.orderCloud ?: ORDER_DEFAULT_ASC
         )
     }
 
