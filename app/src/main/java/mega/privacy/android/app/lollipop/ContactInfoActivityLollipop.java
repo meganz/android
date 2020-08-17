@@ -467,7 +467,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			userEmailExtra = extras.getString(NAME);
 
 			if (megaChatApi == null) {
-				megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
+				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 			}
 
 			if (chatHandle != -1) {
@@ -2385,6 +2385,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+		if(users == null || users.isEmpty())
+			return;
+
 		for (MegaUser updatedUser : users) {
 			if (updatedUser.getHandle() == user.getHandle()) {
 				user = updatedUser;

@@ -37,8 +37,6 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private Context context;
-    private long userHandle;
-    private String email;
     private ChatController chatC;
 
 
@@ -58,8 +56,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         DisplayMetrics outMetrics = MegaApplication.getInstance().getBaseContext().getResources().getDisplayMetrics();
-
-        userHandle = getItem(position);
+        long userHandle = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.user_reaction_item, parent, false);
         }
@@ -72,12 +69,11 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         layout.setTag(userHandle);
 
         String userName;
+        String email;
         chatC = new ChatController(context);
 
-        String userHandleString = MegaApiAndroid.userHandleToBase64(userHandle);
-        String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
-
-        if (userHandleString.equals(myUserHandleEncoded)) {
+        Boolean myUserHandle = isMyUserHandle(userHandle);
+        if (myUserHandle) {
             email = megaChatApi.getMyEmail();
             userName = megaChatApi.getMyFullname();
             if (isTextEmpty(userName)) {
@@ -105,14 +101,13 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         imageView.setImageBitmap(getDefaultAvatar(avatarColor, userName, AVATAR_SIZE, true));
 
         /*Avatar*/
-
-        if (userHandleString.equals(myUserHandleEncoded)) {
+        if (myUserHandle) {
             Bitmap bitmap = getAvatarBitmap(email);
             if (bitmap != null) {
                 imageView.setImageBitmap(bitmap);
             }
         } else {
-            String nameFileHandle = userHandleString;
+            String nameFileHandle = MegaApiAndroid.userHandleToBase64(userHandle);
             String nameFileEmail = email;
             Bitmap bitmap = isTextEmpty(nameFileEmail) ? getAvatarBitmap(nameFileHandle) : getUserAvatar(nameFileHandle, nameFileEmail);
             if (bitmap != null) {
@@ -133,9 +128,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                     break;
                 }
 
-                String userHandleString = MegaApiAndroid.userHandleToBase64(handle);
-                String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
-                if (!userHandleString.equals(myUserHandleEncoded)) {
+                if (!isMyUserHandle(handle)) {
                     String email = chatC.getParticipantEmail(handle);
                     MegaUser contact = megaApi.getContact(email);
                     if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
@@ -146,5 +139,9 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                 }
                 break;
         }
+    }
+
+    private boolean isMyUserHandle(long handle) {
+        return handle == megaChatApi.getMyUserHandle();
     }
 }

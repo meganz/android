@@ -5,18 +5,15 @@ import android.content.Context;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class ManageReactionListener extends ChatBaseListener {
-
 
     public ManageReactionListener(Context context) {
         super(context);

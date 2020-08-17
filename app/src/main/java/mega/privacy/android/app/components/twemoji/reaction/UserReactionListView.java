@@ -10,9 +10,6 @@ import nz.mega.sdk.MegaHandleList;
 
 public final class UserReactionListView extends ListView {
 
-    ArrayList<Long> arrayOfUsers = new ArrayList<>();
-    private UserReactionAdapter userArrayAdapter;
-
     public UserReactionListView(Context context) {
         super(context);
         setVerticalScrollBarEnabled(true);
@@ -26,6 +23,9 @@ public final class UserReactionListView extends ListView {
      * @param chatId   The chat ID.
      */
     public void updateUsers(String reaction, long msgId, long chatId) {
+        ArrayList<Long> arrayOfUsers = new ArrayList<>();
+        UserReactionAdapter userArrayAdapter;
+
         arrayOfUsers.clear();
 
         MegaHandleList listUsers = MegaApplication.getInstance().getMegaChatApi().getReactionUsers(chatId, msgId, reaction);

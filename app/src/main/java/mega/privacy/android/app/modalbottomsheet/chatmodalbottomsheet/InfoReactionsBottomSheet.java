@@ -17,14 +17,12 @@ import androidx.viewpager.widget.ViewPager;
 import java.util.ArrayList;
 import java.util.List;
 
-import biz.laenger.android.vpbs.BottomSheetUtils;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.twemoji.reaction.UserReactionListView;
+import mega.privacy.android.app.components.twemoji.reaction.*;
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
-import mega.privacy.android.app.components.twemoji.reaction.ViewPagerBottomSheetDialogFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.InfoReactionPagerAdapter;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -34,15 +32,12 @@ import nz.mega.sdk.MegaStringList;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
 
-    private static final int MIN_HEIGHT = 81;
-    private static final int MAX_HEIGHT_PORT = 359;
-    private static final int HEIGHT_REACTIONS = 60;
+    private static final int HEIGHT_HEADER = 60;
     private static final int HEIGHT_USERS = 56;
     private static final int MARGIN = 9;
 
@@ -61,6 +56,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     private String reactionSelected;
     private String REACTION_SELECTED = "REACTION_SELECTED";
     private ArrayList<String> list;
+    private int halfHeightDisplay;
 
     public InfoReactionsBottomSheet() {
     }
@@ -96,6 +92,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         super.setupDialog(dialog, style);
 
         outMetrics = MegaApplication.getInstance().getBaseContext().getResources().getDisplayMetrics();
+        halfHeightDisplay = outMetrics.heightPixels / 2;
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_info_reactions, null);
         RelativeLayout generalLayout = contentView.findViewById(R.id.general_layout);
         infoReactionsTab = contentView.findViewById(R.id.info_reactions_tabs);
@@ -127,14 +124,20 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         BottomSheetUtils.setupViewPager(infoReactionsPager);
 
         ViewGroup.LayoutParams params = generalLayout.getLayoutParams();
+        int height = getHeight();
+        if(height == 0)
+            return;
+
         if (params != null) {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            params.height = getHeight();
+            params.height = height;
         } else {
-            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getHeight());
+            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
         }
+        generalLayout.setLayoutParams(params);
 
-        dialog.setContentView(contentView, params);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setContentView(contentView);
     }
 
     /**
@@ -143,8 +146,9 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
      * @return Integer with the height.
      */
     private int getHeight() {
-        if (list == null || list.isEmpty())
-            return MIN_HEIGHT;
+        if (list == null || list.isEmpty()) {
+            return 0;
+        }
 
         ArrayList<Long> totalUsers = new ArrayList<>();
         for (String currentReaction : list) {
@@ -159,12 +163,17 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             }
         }
 
-        long totalSize = HEIGHT_REACTIONS + (HEIGHT_USERS * numMaxUsers);
-        if (totalSize > MAX_HEIGHT_PORT) {
-            return px2dp(MAX_HEIGHT_PORT, outMetrics);
-        }
+        int numOptions = (int) numMaxUsers;
+        int heightChild = px2dp(HEIGHT_USERS, outMetrics);
+        int peekHeight = px2dp(HEIGHT_HEADER, outMetrics);
 
-        return px2dp(totalSize, outMetrics);
+        int possibleHeight = peekHeight + (heightChild * numOptions);
+
+        if (possibleHeight < halfHeightDisplay) {
+            return possibleHeight;
+        }
+        int child = (heightChild / 3);
+        return peekHeight + (heightChild * (numOptions - 1)) + (child * 2);
     }
 
     /**
