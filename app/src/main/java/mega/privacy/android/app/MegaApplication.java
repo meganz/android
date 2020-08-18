@@ -155,6 +155,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
 
+	private static boolean verifyingCredentials;
+
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
@@ -1621,5 +1623,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
+	}
+
+	public static void setVerifyingCredentials(boolean verifyingCredentials) {
+		MegaApplication.verifyingCredentials = verifyingCredentials;
+	}
+
+	public static boolean isVerifyingCredentials() {
+		return MegaApplication.verifyingCredentials;
 	}
 }
