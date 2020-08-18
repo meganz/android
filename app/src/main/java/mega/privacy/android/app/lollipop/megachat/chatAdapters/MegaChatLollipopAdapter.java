@@ -1965,9 +1965,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String textToShow = "";
 
             if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
-                ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
-                if (((ChatActivityLollipop) context).isGroup()) {
-                    ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
+                holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
+                if (chatRoom != null && chatRoom.isGroup()) {
+                    holder.nameContactText.setVisibility(View.VISIBLE);
                 }
 
                 textToShow = context.getResources().getString(R.string.call_started_messages);
@@ -4051,7 +4051,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
-                if (((ChatActivityLollipop) context).isGroup()) {
+                if (chatRoom != null && chatRoom.isGroup()) {
                     String textToShow = String.format(context.getString(R.string.text_deleted_message_by), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#00BFA5\'>");
