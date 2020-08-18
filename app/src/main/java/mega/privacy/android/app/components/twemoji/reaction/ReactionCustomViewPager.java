@@ -27,8 +27,4 @@ public class ReactionCustomViewPager extends ViewPager {
     public boolean onInterceptTouchEvent(MotionEvent event) {
         return this.isPagingEnabled && super.onInterceptTouchEvent(event);
     }
-
-    public void setPagingEnabled(boolean isPagingEnabled) {
-        this.isPagingEnabled = isPagingEnabled;
-    }
 }

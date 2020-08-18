@@ -19,33 +19,19 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-
 import mega.privacy.android.app.R;
 
 public class ViewPagerBottomSheetDialog extends AppCompatDialog {
 
-    private ViewPagerBottomSheetBehavior<FrameLayout> mBehavior;
+    public ViewPagerBottomSheetBehavior<FrameLayout> mBehavior;
 
     boolean mCancelable = true;
     private boolean mCanceledOnTouchOutside = true;
     private boolean mCanceledOnTouchOutsideSet;
 
-    public ViewPagerBottomSheetDialog(@NonNull Context context) {
-        this(context, 0);
-    }
-
     public ViewPagerBottomSheetDialog(@NonNull Context context, @StyleRes int theme) {
         super(context, getThemeResId(context, theme));
-        // We hide the title bar for any style configuration. Otherwise, there will be a gap
-        // above the bottom sheet when it is expanded.
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-    }
-
-    protected ViewPagerBottomSheetDialog(@NonNull Context context, boolean cancelable,
-                                         OnCancelListener cancelListener) {
-        super(context, cancelable, cancelListener);
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        mCancelable = cancelable;
     }
 
     @Override
@@ -91,9 +77,6 @@ public class ViewPagerBottomSheetDialog extends AppCompatDialog {
     @Override
     protected void onStart() {
         super.onStart();
-        if (mBehavior != null) {
-            mBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
-        }
     }
 
     @Override
@@ -102,36 +85,36 @@ public class ViewPagerBottomSheetDialog extends AppCompatDialog {
         if (cancel && !mCancelable) {
             mCancelable = true;
         }
+
         mCanceledOnTouchOutside = cancel;
         mCanceledOnTouchOutsideSet = true;
     }
 
     private View wrapInBottomSheet(int layoutResId, View view, ViewGroup.LayoutParams params) {
-        final FrameLayout container = (FrameLayout) View.inflate(getContext(),
-                R.layout.design_view_pager_bottom_sheet_dialog, null);
+        final FrameLayout container = (FrameLayout) View.inflate(getContext(), R.layout.design_view_pager_bottom_sheet_dialog, null);
         final CoordinatorLayout coordinator = container.findViewById(R.id.coordinator);
+
         if (layoutResId != 0 && view == null) {
             view = getLayoutInflater().inflate(layoutResId, coordinator, false);
         }
-        FrameLayout bottomSheet = (FrameLayout) coordinator.findViewById(R.id.design_bottom_sheet);
+
+        FrameLayout bottomSheet = coordinator.findViewById(R.id.design_bottom_sheet);
         mBehavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
         mBehavior.setBottomSheetCallback(mBottomSheetCallback);
         mBehavior.setHideable(mCancelable);
+
         if (params == null) {
             bottomSheet.addView(view);
         } else {
             bottomSheet.addView(view, params);
         }
-        // We treat the CoordinatorLayout as outside the dialog though it is technically inside
-        coordinator.findViewById(R.id.touch_outside).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mCancelable && isShowing() && shouldWindowCloseOnTouchOutside()) {
-                    cancel();
-                }
+
+        coordinator.findViewById(R.id.touch_outside).setOnClickListener(view12 -> {
+            if (mCancelable && isShowing() && shouldWindowCloseOnTouchOutside()) {
+                cancel();
             }
         });
-        // Handle accessibility events
+
         ViewCompat.setAccessibilityDelegate(bottomSheet, new AccessibilityDelegateCompat() {
             @Override
             public void onInitializeAccessibilityNodeInfo(View host,
@@ -163,47 +146,34 @@ public class ViewPagerBottomSheetDialog extends AppCompatDialog {
 
     boolean shouldWindowCloseOnTouchOutside() {
         if (!mCanceledOnTouchOutsideSet) {
-            if (Build.VERSION.SDK_INT < 11) {
-                mCanceledOnTouchOutside = true;
-            } else {
-                TypedArray a = getContext().obtainStyledAttributes(
-                        new int[]{android.R.attr.windowCloseOnTouchOutside});
-                mCanceledOnTouchOutside = a.getBoolean(0, true);
-                a.recycle();
-            }
+            TypedArray a = getContext().obtainStyledAttributes(
+                    new int[]{android.R.attr.windowCloseOnTouchOutside});
+            mCanceledOnTouchOutside = a.getBoolean(0, true);
+            a.recycle();
             mCanceledOnTouchOutsideSet = true;
         }
+
         return mCanceledOnTouchOutside;
     }
 
     private static int getThemeResId(Context context, int themeId) {
         if (themeId == 0) {
-            // If the provided theme is 0, then retrieve the dialogTheme from our theme
             TypedValue outValue = new TypedValue();
-            if (context.getTheme().resolveAttribute(
-                    R.attr.bottomSheetDialogTheme, outValue, true)) {
-                themeId = outValue.resourceId;
-            } else {
-                // bottomSheetDialogTheme is not provided; we default to our light theme
-                themeId = R.style.Theme_Design_Light_BottomSheetDialog;
-            }
+            themeId = context.getTheme().resolveAttribute(R.attr.bottomSheetDialogTheme, outValue, true) ?
+                    outValue.resourceId : R.style.Theme_Design_Light_BottomSheetDialog;
         }
         return themeId;
     }
 
-    private ViewPagerBottomSheetBehavior.BottomSheetCallback mBottomSheetCallback
-            = new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
+    private ViewPagerBottomSheetBehavior.BottomSheetCallback mBottomSheetCallback = new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
         @Override
-        public void onStateChanged(@NonNull View bottomSheet,
-                                   @ViewPagerBottomSheetBehavior.State int newState) {
+        public void onStateChanged(@NonNull View bottomSheet, @ViewPagerBottomSheetBehavior.State int newState) {
             if (newState == ViewPagerBottomSheetBehavior.STATE_HIDDEN) {
                 cancel();
             }
         }
 
         @Override
-        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-        }
+        public void onSlide(@NonNull View bottomSheet, float slideOffset) { }
     };
-
 }

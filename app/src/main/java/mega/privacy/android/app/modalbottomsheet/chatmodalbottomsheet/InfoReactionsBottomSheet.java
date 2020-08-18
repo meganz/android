@@ -92,7 +92,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         super.setupDialog(dialog, style);
 
         outMetrics = MegaApplication.getInstance().getBaseContext().getResources().getDisplayMetrics();
-        halfHeightDisplay = outMetrics.heightPixels / 2;
+        halfHeightDisplay = isScreenInPortrait(context) ? outMetrics.heightPixels / 2 : (outMetrics.heightPixels / 3) * 2;
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_info_reactions, null);
         RelativeLayout generalLayout = contentView.findViewById(R.id.general_layout);
         infoReactionsTab = contentView.findViewById(R.id.info_reactions_tabs);
@@ -122,7 +122,6 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         infoReactionsPager.setCurrentItem(indexToStart);
         onPageSelected(indexToStart);
         BottomSheetUtils.setupViewPager(infoReactionsPager);
-
         ViewGroup.LayoutParams params = generalLayout.getLayoutParams();
         int height = getHeight();
         if(height == 0)
@@ -138,14 +137,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
 
         dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(contentView);
+        BottomSheetUtils.setBottomSheetBehavior(getTotalHeight(), height, halfHeightDisplay, infoReactionsPager);
     }
 
-    /**
-     * Method for obtaining the height of the dialogue.
-     *
-     * @return Integer with the height.
-     */
-    private int getHeight() {
+    private long getMaxUsers(){
         if (list == null || list.isEmpty()) {
             return 0;
         }
@@ -163,17 +158,44 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             }
         }
 
-        int numOptions = (int) numMaxUsers;
+        return numMaxUsers;
+    }
+
+    private int getTotalHeight(){
+        int numOptions = (int) getMaxUsers();
         int heightChild = px2dp(HEIGHT_USERS, outMetrics);
         int peekHeight = px2dp(HEIGHT_HEADER, outMetrics);
+        return peekHeight + heightChild * numOptions;
+    }
 
-        int possibleHeight = peekHeight + (heightChild * numOptions);
+    /**
+     * Method for obtaining the height of the dialogue.
+     *
+     * @return Integer with the height.
+     */
+    private int getHeight() {
+        int numOptions = (int) getMaxUsers();
 
-        if (possibleHeight < halfHeightDisplay) {
-            return possibleHeight;
+        if (numOptions > 0) {
+            int possibleHeight = getTotalHeight();
+
+            if (possibleHeight < halfHeightDisplay) {
+                return possibleHeight;
+            }
+
+            int heightChild = px2dp(HEIGHT_USERS, outMetrics);
+            int peekHeight = px2dp(HEIGHT_HEADER, outMetrics);
+            int halfHeightChild = heightChild / 2;
+
+            for (int i = 1; i <= numOptions; i++) {
+                int height = peekHeight + (heightChild * (numOptions - i)) + halfHeightChild;
+                if (height < halfHeightDisplay) {
+                    return height;
+                }
+            }
         }
-        int child = (heightChild / 3);
-        return peekHeight + (heightChild * (numOptions - 1)) + (child * 2);
+
+        return 0;
     }
 
     /**

@@ -10,9 +10,26 @@ import androidx.viewpager.widget.ViewPager;
 public class BottomSheetUtils {
 
     public static void setupViewPager(ViewPager viewPager) {
-        final View bottomSheetParent = findBottomSheetParent(viewPager);
+        final View bottomSheetParent = getParent(viewPager);
         if (bottomSheetParent != null) {
             viewPager.addOnPageChangeListener(new BottomSheetViewPagerListener(viewPager, bottomSheetParent));
+        }
+    }
+
+    private static View getParent(ViewPager viewPager) {
+        return findBottomSheetParent(viewPager);
+    }
+
+    public static void setBottomSheetBehavior(int totalHeight, int peekHeight, int halfHeightDisplay, ViewPager viewPager) {
+        final View bottomSheetParent = getParent(viewPager);
+        if (bottomSheetParent != null) {
+            final ViewPagerBottomSheetBehavior<View> mBehavior = ViewPagerBottomSheetBehavior.from(bottomSheetParent);
+            if (totalHeight < halfHeightDisplay) {
+                mBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+            } else {
+                mBehavior.setPeekHeight(peekHeight);
+                mBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+            }
         }
     }
 
@@ -26,6 +43,7 @@ public class BottomSheetUtils {
             final ViewParent parent = current.getParent();
             current = parent == null || !(parent instanceof View) ? null : (View) parent;
         }
+
         return null;
     }
 
