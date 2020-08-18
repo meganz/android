@@ -367,7 +367,7 @@ public class OfflineUtils {
 
         MegaNode parentNode = null;
         MegaNode nodeToInsert = null;
-        String path = "/";
+        String path;
         MegaOffline mOffParent = null;
         MegaOffline mOffNode = null;
 
@@ -404,7 +404,7 @@ public class OfflineUtils {
                         parentId = mOffParent.getId();
                     }
                 } else {
-                    path = "/";
+                    path = OFFLINE_ROOT;
                 }
             } else {
                 //If I am not the owner

@@ -2002,7 +2002,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
 			deepBrowserTreeLinks = 0;
-			this.setPathNavigationOffline("/");
+			this.setPathNavigationOffline(OFFLINE_ROOT);
 		}
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -4963,7 +4963,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					firstNavigationLevel = false;
 				} else if(pathNavigationOffline != null){
 					logDebug("AFTER PathNavigation is: " + pathNavigationOffline);
-					if (pathNavigationOffline.equals("/")){
+					if (pathNavigationOffline.equals(OFFLINE_ROOT)){
 						aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
 						firstNavigationLevel=true;
 					}
@@ -6346,8 +6346,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void offlineSearch() {
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if (oFLol != null) {
+		if (getOfflineFragment() != null) {
 			oFLol.filterOffline(searchQuery);
 		}
 	}
@@ -6396,7 +6395,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					levelsSearch = -1;
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
-				} else if (drawerItem == DrawerItem.CHAT){
+				} else {
 					resetActionBar(aB);
 				}
 				hideCallMenuItem();
@@ -6411,15 +6410,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setCallWidget();
 				setCallMenuItem();
 				if (drawerItem == DrawerItem.CHAT) {
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if (rChatFL != null) {
+					if (getChatsFragment() != null) {
 						rChatFL.closeSearch();
 						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-					if (oFLol != null) {
+					if (getOfflineFragment() != null) {
 						oFLol.closeSearch();
 						supportInvalidateOptionsMenu();
 					}
@@ -7953,11 +7950,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem, DrawerItem newDrawerItem) {
-    	if (!searchExpand || oldDrawerItem == newDrawerItem) return;
+	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem) {
+    	if (!searchExpand) return;
 
 		if (oldDrawerItem == DrawerItem.CHAT || oldDrawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
 			searchExpand = false;
+
+			if (oldDrawerItem == DrawerItem.SAVED_FOR_OFFLINE && getOfflineFragment() != null) {
+				oFLol.closeSearch();
+			}
 		}
 	}
 
@@ -7969,6 +7970,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			Menu nVMenu = nV.getMenu();
 			resetNavigationViewMenu(nVMenu);
 		}
+
+		checkOfflineSearch(menuItem.getItemId());
 
 		DrawerItem oldDrawerItem = drawerItem;
 
@@ -7999,8 +8002,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case R.id.bottom_navigation_item_offline: {
 				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-					if (!pathNavigationOffline.equals("/")){
-						pathNavigationOffline = "/";
+					if (!pathNavigationOffline.equals(OFFLINE_ROOT)){
+						pathNavigationOffline = OFFLINE_ROOT;
 						refreshFragment(FragmentTag.OFFLINE.getTag());
 					}
 				} else {
@@ -8037,7 +8040,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
-		checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+		checkIfShouldCloseSearchView(oldDrawerItem);
 		selectDrawerItemLollipop(drawerItem);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -11326,7 +11329,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = MY_ACCOUNT_FRAGMENT;
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+					checkIfShouldCloseSearchView(oldDrawerItem);
 					selectDrawerItemLollipop(drawerItem);
 				}
 				break;
@@ -11334,28 +11337,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.inbox_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.INBOX;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.CONTACTS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.NOTIFICATIONS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.settings_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.SETTINGS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -11366,7 +11369,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -16471,6 +16474,27 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        searchView.setQuery(searchQuery, true);
         }
     }
+
+	/**
+	 * Checks if it is necessary to close the search view on Offline section
+	 * when a bottom navigation item has been pressed before go to other section
+	 * or on the contrary to go to Offline root.
+	 *
+	 * @param itemClicked	bottom navigation view item clicked
+	 */
+	private void checkOfflineSearch(int itemClicked) {
+		if (drawerItem != DrawerItem.SAVED_FOR_OFFLINE || !searchExpand)
+			return;
+
+		if (itemClicked == R.id.bottom_navigation_item_offline) {
+			pathNavigationOffline = OFFLINE_ROOT;
+			if (getOfflineFragment() != null) {
+				oFLol.setPathNavigation(OFFLINE_ROOT);
+			}
+		}
+
+		closeSearchView();
+	}
 
 	public boolean isSearchOpen() {
 		return searchQuery != null && searchExpand;
