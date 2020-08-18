@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
+import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotoSearchBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import javax.inject.Inject
@@ -27,15 +28,30 @@ class PhotosSearchAdapter @Inject constructor(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
-        val binding = ItemPhotoSearchBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val inflater = LayoutInflater.from(parent.context)
 
-        // FastScroller would affect the normal process of RecyclerView that makes the "selected"
-        // icon appear before binding the item. Therefore, hide the icon up front
-//        binding.iconSelected.visibility = View.GONE
+        val binding = when (viewType) {
+            PhotoNode.TYPE_TITLE ->
+                ItemPhotosTitleBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+            else ->  // TYPE_PHOTO
+                ItemPhotoSearchBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+        }
+
+        // In
+        if (viewType == PhotoNode.TYPE_TITLE) {
+            val layoutParams = binding.root.layoutParams
+            layoutParams.width = 0
+            layoutParams.height = 0
+            binding.root.layoutParams = layoutParams
+        }
 
         return PhotoViewHolder(binding)
     }

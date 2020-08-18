@@ -63,6 +63,10 @@ class PhotosRepository @Inject constructor(
         }
     }
 
+    /**
+     * Save some field values (e.g. "selected") which do not exist in the raw MegaNode data.
+     * Restore these values in event of querying the raw data again
+     */
     private fun saveAndClearData() {
         savedPhotoNodesMap.clear()
         photoNodesMap.toMap(savedPhotoNodesMap)

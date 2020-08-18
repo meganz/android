@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -29,6 +28,7 @@ import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import java.lang.Exception
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -86,6 +86,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             activity.invalidateOptionsMenu()
             actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
         }
+
         refresh()
     }
 
@@ -126,6 +127,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     override fun refresh() {
+        Log.i("Alex", "refresh")
 //        viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
         viewModel.loadPhotos()
     }
@@ -217,9 +219,16 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
             it.forEach { pos ->
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
-                    viewHolder.itemView.findViewById<ImageView>(
-                        R.id.icon_selected
-                    )?.run {
+                    val imageView = if (viewModel.searchMode) {
+                            viewHolder.itemView.findViewById(R.id.thumbnail)
+                        } else {
+                            viewHolder.itemView.findViewById<ImageView>(
+                                R.id.icon_selected
+                            )
+                        }
+
+                    imageView?.run {
+                        setImageResource(R.drawable.ic_select_folder)
                         visibility = View.VISIBLE
 
                         val animator =
@@ -241,11 +250,17 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         })
 
     private fun updateUi() {
+        Log.i("Alex", "updateUi")
+        val e = Exception()
+        e.printStackTrace()
         viewModel.items.value?.let { it ->
             val newList = ArrayList<PhotoNode>(it)
-            if (viewModel.searchMode) searchAdapter.submitList(newList) else browseAdapter.submitList(
-                newList
-            )
+            if (viewModel.searchMode) {
+//                searchAdapter.submitList(newList.filter { it.type == PhotoNode.TYPE_PHOTO })
+                searchAdapter.submitList(newList)
+            } else {
+                browseAdapter.submitList(newList)
+            }
         }
     }
 
@@ -281,6 +296,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     override fun searchReady() {
+        if (viewModel.searchMode) return
+
         viewModel.searchMode = true
         listView.switchToLinear()
         listView.adapter = searchAdapter
@@ -288,6 +305,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     override fun exitSearch() {
+        if (!viewModel.searchMode) return
+
         viewModel.searchMode = false
         listView.switchBackToGrid()
         configureGridLayoutManager()

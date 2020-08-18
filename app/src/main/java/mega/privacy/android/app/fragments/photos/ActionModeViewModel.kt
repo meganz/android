@@ -8,12 +8,14 @@ import javax.inject.Inject
 
 @ActivityRetainedScoped
 class ActionModeViewModel @Inject constructor() : ViewModel() {
-
+    // The full set of nodes
     private lateinit var nodesData: List<SelectableNode>
 
+    // Which nodes have been selected so far
     private val _selectedNodes = MutableLiveData<List<SelectableNode>>()
     val selectedNodes: LiveData<List<SelectableNode>> = _selectedNodes
 
+    // Which nodes should play the animation for this time of selection
     private val _animNodeIndices = MutableLiveData<Set<Int>>()
     val animNodeIndices: LiveData<Set<Int>> = _animNodeIndices
 
