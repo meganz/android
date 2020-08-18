@@ -7,7 +7,7 @@ import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
@@ -15,43 +15,17 @@ import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 import mega.privacy.android.app.databinding.OfflineItemListBinding
 import mega.privacy.android.app.databinding.OfflineItemSortedByBinding
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-
-private const val TYPE_LIST = 1
-private const val TYPE_GRID_FOLDER = 2
-private const val TYPE_GRID_FILE = 3
-private const val TYPE_SORTED_BY_HEADER = 4
 
 class OfflineAdapter(
     var isList: Boolean,
     var sortedBy: String,
     private val listener: OfflineAdapterListener
-) : RecyclerView.Adapter<OfflineViewHolder>() {
-    private val nodes = ArrayList<OfflineNode>()
+) : ListAdapter<OfflineNode, OfflineViewHolder>(OfflineNodeDiffCallback()) {
 
-    fun setNodes(nodes: List<OfflineNode>) {
-        this.nodes.clear()
-        this.nodes.addAll(nodes)
-        notifyDataSetChanged()
-    }
+    fun getOfflineNodes(): List<MegaOffline> = currentList.map { it.node }
 
-    fun getOfflineNodes(): ArrayList<MegaOffline> {
-        val offlineNodes = ArrayList<MegaOffline>()
-        for (node in nodes) {
-            offlineNodes.add(node.node)
-        }
-        return offlineNodes
-    }
-
-    fun getNodePosition(handle: Long): Int {
-        for (i in 0 until nodes.size) {
-            if (nodes[i].node.handle == handle.toString()) {
-                return i
-            }
-        }
-
-        return INVALID_POSITION
-    }
+    fun getNodePosition(handle: Long): Int =
+        currentList.indexOfFirst { it.node.handle == handle.toString() }
 
     fun setThumbnailVisibility(holder: ViewHolder, visibility: Int) {
         if (holder is OfflineGridFileViewHolder) {
@@ -81,9 +55,9 @@ class OfflineAdapter(
         node: OfflineNode,
         holder: ViewHolder?
     ) {
-        if (holder == null || position < 0 || position >= nodes.size ||
-            nodes[position] == OfflineNode.PLACE_HOLDER ||
-            nodes[position].node.handle !== node.node.handle
+        if (holder == null || position < 0 || position >= itemCount ||
+            getItem(position) == OfflineNode.PLACE_HOLDER ||
+            getItem(position).node.handle !== node.node.handle
         ) {
             return
         }
@@ -145,32 +119,34 @@ class OfflineAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
+        val node = getItem(position)
         return when {
-            nodes[position] == OfflineNode.HEADER_SORTED_BY -> TYPE_SORTED_BY_HEADER
+            node == OfflineNode.HEADER_SORTED_BY -> TYPE_SORTED_BY_HEADER
             isList -> TYPE_LIST
-            nodes[position] == OfflineNode.PLACE_HOLDER
-                    || nodes[position].node.isFolder -> TYPE_GRID_FOLDER
+            node == OfflineNode.PLACE_HOLDER || node.node.isFolder -> TYPE_GRID_FOLDER
             else -> TYPE_GRID_FILE
         }
     }
 
     override fun getItemId(position: Int): Long {
-        return if (nodes[position] == OfflineNode.HEADER_SORTED_BY ||
-            nodes[position] == OfflineNode.PLACE_HOLDER
-        ) {
+        val node = getItem(position)
+        return if (node == OfflineNode.HEADER_SORTED_BY || node == OfflineNode.PLACE_HOLDER) {
             // id for real node should be positive integer, let's use negative for placeholders
             -position.toLong()
         } else {
-            nodes[position].node.id.toLong()
+            node.node.id.toLong()
         }
     }
 
-    override fun getItemCount(): Int {
-        return nodes.size
+    override fun onBindViewHolder(holder: OfflineViewHolder, position: Int) {
+        holder.bind(position, getItem(position), listener)
     }
 
-    override fun onBindViewHolder(holder: OfflineViewHolder, position: Int) {
-        holder.bind(position, nodes[position], listener)
+    companion object {
+        private const val TYPE_LIST = 1
+        private const val TYPE_GRID_FOLDER = 2
+        private const val TYPE_GRID_FILE = 3
+        private const val TYPE_SORTED_BY_HEADER = 4
     }
 }
 

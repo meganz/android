@@ -296,7 +296,7 @@ class OfflineFragment : Fragment() {
             recyclerView?.isVisible = it.isNotEmpty()
             binding.emptyHint.isVisible = it.isEmpty()
 
-            adapter?.setNodes(it)
+            adapter?.submitList(it)
 
             if (!args.rootFolderOnly) {
                 managerActivity?.updateFullscreenOfflineFragmentOptionMenu(false)
@@ -407,7 +407,9 @@ class OfflineFragment : Fragment() {
                 if (screenPosition != null) {
                     intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
                 }
-                intent.putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, adapter!!.getOfflineNodes())
+                intent.putExtra(
+                    INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
+                )
 
                 managerActivity?.startActivity(intent)
                 managerActivity?.overridePendingTransition(0, 0)
@@ -443,7 +445,9 @@ class OfflineFragment : Fragment() {
                 if (screenPosition != null) {
                     mediaIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
                 }
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, adapter!!.getOfflineNodes())
+                mediaIntent.putExtra(
+                    INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
+                )
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                 if (VERSION.SDK_INT >= VERSION_CODES.N) {

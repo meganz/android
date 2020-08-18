@@ -13,25 +13,25 @@ import mega.privacy.android.app.utils.OfflineUtils
 class OfflineActionModeCallback(
     private val managerActivity: ManagerActivityLollipop,
     private val fragment: OfflineFragment,
-    private val viewMode: OfflineViewModel
+    private val viewModel: OfflineViewModel
 ) : ActionMode.Callback {
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         logDebug("ActionBarCallBack::onActionItemClicked")
 
         when (item!!.itemId) {
             id.cab_menu_share_out -> {
-                OfflineUtils.shareOfflineNodes(managerActivity, viewMode.getSelectedNodes())
-                viewMode.clearSelection()
+                OfflineUtils.shareOfflineNodes(managerActivity, viewModel.getSelectedNodes())
+                viewModel.clearSelection()
             }
             id.cab_menu_delete -> {
-                managerActivity.showConfirmationRemoveSomeFromOffline(viewMode.getSelectedNodes())
-                viewMode.clearSelection()
+                managerActivity.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes())
+                viewModel.clearSelection()
             }
             id.cab_menu_select_all -> {
-                viewMode.selectAll()
+                viewModel.selectAll()
             }
             id.cab_menu_clear_selection -> {
-                viewMode.clearSelection()
+                viewModel.clearSelection()
             }
         }
         return false
@@ -51,15 +51,15 @@ class OfflineActionModeCallback(
         logDebug("ActionBarCallBack::onPrepareActionMode")
 
         menu!!.findItem(R.id.cab_menu_select_all).isVisible =
-            (viewMode.getSelectedNodesCount()
-                    < fragment.getItemCount() - viewMode.placeholderCount)
+            (viewModel.getSelectedNodesCount()
+                    < fragment.getItemCount() - viewModel.placeholderCount)
 
         return true
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         logDebug("ActionBarCallBack::onDestroyActionMode")
-        viewMode.clearSelection()
+        viewModel.clearSelection()
         managerActivity.showHideBottomNavigationView(false)
         managerActivity.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY)
         fragment.checkScroll()
