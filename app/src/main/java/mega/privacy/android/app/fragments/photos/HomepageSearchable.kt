@@ -1,7 +1,7 @@
 package mega.privacy.android.app.fragments.photos
 
 interface HomepageSearchable {
-    fun shouldShowSearch(): Boolean {
+    fun shouldShowSearchMenu(): Boolean {
         return true
     }
     fun searchReady() {}

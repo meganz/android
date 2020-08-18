@@ -56,7 +56,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
@@ -212,6 +211,7 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -6463,6 +6463,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (rChatFL != null) {
 						rChatFL.filterChats(newText);
 					}
+				} else if (drawerItem == DrawerItem.HOMEPAGE) {
+					if (!TextUtil.isTextEmpty(newText) && mHomepageSearchable != null) {
+						searchQuery = newText;
+						mHomepageSearchable.searchQuery(searchQuery);
+					}
 				} else {
 					getSearchFragment();
 
@@ -6770,7 +6775,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						openSearchView();
 					} else {
 						if (mHomepageSearchable != null) {
-							searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearch());
+							searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
 							if (mHomepageSearchable instanceof PhotosFragment) {
 								rubbishBinMenuItem.setVisible(true);
 							}

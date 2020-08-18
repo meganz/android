@@ -220,12 +220,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             it.forEach { pos ->
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val imageView = if (viewModel.searchMode) {
-                            viewHolder.itemView.findViewById(R.id.thumbnail)
-                        } else {
-                            viewHolder.itemView.findViewById<ImageView>(
-                                R.id.icon_selected
-                            )
-                        }
+                        viewHolder.itemView.findViewById(R.id.thumbnail)
+                    } else {
+                        viewHolder.itemView.findViewById<ImageView>(
+                            R.id.icon_selected
+                        )
+                    }
 
                     imageView?.run {
                         setImageResource(R.drawable.ic_select_folder)
@@ -286,7 +286,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         }
     }
 
-    override fun shouldShowSearch(): Boolean {
+    override fun shouldShowSearchMenu(): Boolean {
         val size = viewModel.items.value?.size
         if (size != null) {
             return size > 0
@@ -324,5 +324,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
                     .toInt() * 2
             browseAdapter.setItemDimen(itemDimen)
         }
+    }
+
+    override fun searchQuery(query: String) {
+        val filteredItems =
+            viewModel.items.value?.filter { node -> node.node?.name?.contains(query, true) == true }
+        searchAdapter.submitList(filteredItems)
     }
 }
