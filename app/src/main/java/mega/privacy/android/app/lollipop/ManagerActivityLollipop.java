@@ -6763,11 +6763,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case NOTIFICATIONS:
 					break;
 				case HOMEPAGE:
+					// Get the Searchable again at onCreateOptionsMenu() after screen rotation
 					mHomepageSearchable = findHomepageSearchable();
-					if (mHomepageSearchable != null) {
-						searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearch());
-						if (mHomepageSearchable instanceof PhotosFragment) {
-							rubbishBinMenuItem.setVisible(true);
+
+					if (searchExpand) {
+						openSearchView();
+					} else {
+						if (mHomepageSearchable != null) {
+							searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearch());
+							if (mHomepageSearchable instanceof PhotosFragment) {
+								rubbishBinMenuItem.setVisible(true);
+							}
 						}
 					}
 					break;

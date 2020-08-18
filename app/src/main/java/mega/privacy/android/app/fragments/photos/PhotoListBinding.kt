@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.photos
 
+import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,3 +38,9 @@ fun setThumbnail(imageView: ShapeableImageView, file: File?, selected: Boolean) 
             /*.transition(DrawableTransitionOptions.withCrossFade())*/.into(this)
     }
 }
+
+@BindingAdapter("thumbnail", "selected")
+fun setSearchThumbnail(imageView: ImageView, file: File?, selected: Boolean) {
+
+}
+

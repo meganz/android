@@ -13,24 +13,22 @@ class PhotosViewModel @Inject constructor(
     private val photosRepository: PhotosRepository
 ) : ViewModel() {
 
-    private var _query = MutableLiveData<PhotoQuery>()
+    private var _query = MutableLiveData<String>("")
 
     private val _openPhotoEvent = MutableLiveData<Event<PhotoNode>>()
     val openPhotoEvent: LiveData<Event<PhotoNode>> = _openPhotoEvent
 
-    val items: LiveData<List<PhotoNode>> = Transformations.switchMap(_query) { query ->
+    var searchMode = false
+
+    val items: LiveData<List<PhotoNode>> = Transformations.switchMap(_query) {
         viewModelScope.launch {
-            photosRepository.getPhotos(query)
+            photosRepository.getPhotos()
         }
 
         photosRepository.photoNodes
     }
 
-    fun loadPhotos(query: PhotoQuery) {
-        _query.value = query
-    }
-
-    fun refresh() {
+    fun loadPhotos() {
         _query.value?.let {
             _query.value = it
         }

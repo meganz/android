@@ -14,9 +14,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
@@ -74,7 +76,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         activity = getActivity() as ManagerActivityLollipop
 
         setupListView()
-        setupBrowseAdapter()
+        setupListAdapter()
         setupFastScroller()
         setupActionMode()
         setupNavigation()
@@ -103,7 +105,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             val thumbnailLocation = arrayOf(topLeft[0], topLeft[1], it.width, it.height)
 
             intent.putExtra(INTENT_EXTRA_KEY_POSITION, node.photoIndex)
-            intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, MegaApiJava.ORDER_MODIFICATION_DESC)
+            intent.putExtra(
+                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                MegaApiJava.ORDER_MODIFICATION_DESC
+            )
 
             val parentNode = megaApi.getParentNode(node.node)
             if (parentNode == null || parentNode.type == MegaNode.TYPE_ROOT) {
@@ -121,7 +126,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     override fun refresh() {
-        viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
+//        viewModel.loadPhotos(PhotoQuery(searchDate = LongArray(0)))
+        viewModel.loadPhotos()
     }
 
     private fun preventListItemBlink() {
@@ -236,7 +242,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
     private fun updateUi() {
         viewModel.items.value?.let { it ->
-            browseAdapter.submitList(ArrayList<PhotoNode>(it))
+            val newList = ArrayList<PhotoNode>(it)
+            if (viewModel.searchMode) searchAdapter.submitList(newList) else browseAdapter.submitList(
+                newList
+            )
         }
     }
 
@@ -252,16 +261,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         binding.scroller.setRecyclerView(listView)
     }
 
-    private fun setupBrowseAdapter() {
-        listView.layoutManager?.apply {
-            spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
-            val itemDimen =
-                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
-                    .toInt() * 2
-            browseAdapter.setItemDimen(itemDimen)
+    private fun setupListAdapter() {
+        if (viewModel.searchMode) {
+            listView.switchToLinear()
+            listView.adapter = searchAdapter
+        } else {
+            configureGridLayoutManager()
+            listView.adapter = browseAdapter
         }
-
-        listView.adapter = browseAdapter
     }
 
     override fun shouldShowSearch(): Boolean {
@@ -274,10 +281,29 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     override fun searchReady() {
+        viewModel.searchMode = true
+        listView.switchToLinear()
         listView.adapter = searchAdapter
+        updateUi()
     }
 
     override fun exitSearch() {
+        viewModel.searchMode = false
+        listView.switchBackToGrid()
+        configureGridLayoutManager()
         listView.adapter = browseAdapter
+        updateUi()
+    }
+
+    private fun configureGridLayoutManager() {
+        if (listView.layoutManager !is CustomizedGridLayoutManager) return
+
+        listView.layoutManager?.apply {
+            spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
+            val itemDimen =
+                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
+                    .toInt() * 2
+            browseAdapter.setItemDimen(itemDimen)
+        }
     }
 }

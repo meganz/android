@@ -9,6 +9,7 @@ import androidx.core.util.containsKey
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
@@ -45,14 +46,14 @@ class PhotosRepository @Inject constructor(
     private val _photoNodes = MutableLiveData<List<PhotoNode>>()
     val photoNodes: LiveData<List<PhotoNode>> = _photoNodes
 
-    suspend fun getPhotos(query: PhotoQuery) = withContext(Dispatchers.IO) {
+    suspend fun getPhotos() = withContext(Dispatchers.IO) {
         saveAndClearData()
 
-        if (query.order == MegaApiJava.ORDER_NONE) {
-            getSortOrder()
-        } else {
-            order = query.order
-        }
+//        if (query.order == MegaApiJava.ORDER_NONE) {
+//            getSortOrder()
+//        } else {
+//            order = query.order
+//        }
 
         getPhotoNodes()
 
