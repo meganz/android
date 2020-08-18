@@ -12,7 +12,7 @@ fi
 # LIST OF ARCHS TO BE BUILT.
 if [ -z "${BUILD_ARCHS}" ]; then
     # If no environment variable is defined, use all archs.
-    BUILD_ARCHS="armeabi-v7a arm64-v8a"
+    BUILD_ARCHS="x86 armeabi-v7a x86_64 arm64-v8a"
 fi
 ##################################################
 if [ ! -d "${NDK_ROOT}" ]; then
