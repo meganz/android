@@ -11,6 +11,8 @@ import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ActionMode
@@ -52,6 +54,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
@@ -60,7 +63,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import java.io.File
 
 @AndroidEntryPoint
-class OfflineFragment : Fragment() {
+class OfflineFragment : Fragment(), ActionMode.Callback {
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
@@ -305,12 +308,9 @@ class OfflineFragment : Fragment() {
 
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
             val actionModeVal = actionMode
-            val activity = managerActivity ?: return@observe
             if (visible) {
                 if (actionModeVal == null) {
-                    actionMode = managerActivity?.startSupportActionMode(
-                        OfflineActionModeCallback(activity, this, viewModel)
-                    )
+                    actionMode = managerActivity?.startSupportActionMode(this)
                 }
                 actionMode?.title = viewModel.getSelectedNodesCount().toString()
                 actionMode?.invalidate()
@@ -722,5 +722,55 @@ class OfflineFragment : Fragment() {
             fragment.setDraggingThumbnailVisibility(fragment.draggingNodeHandle, visibility)
         }
 
+    }
+
+    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+        logDebug("ActionBarCallBack::onActionItemClicked")
+
+        when (item!!.itemId) {
+            R.id.cab_menu_share_out -> {
+                OfflineUtils.shareOfflineNodes(requireContext(), viewModel.getSelectedNodes())
+                viewModel.clearSelection()
+            }
+            R.id.cab_menu_delete -> {
+                managerActivity?.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes())
+                viewModel.clearSelection()
+            }
+            R.id.cab_menu_select_all -> {
+                viewModel.selectAll()
+            }
+            R.id.cab_menu_clear_selection -> {
+                viewModel.clearSelection()
+            }
+        }
+        return false
+    }
+
+    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        logDebug("ActionBarCallBack::onCreateActionMode")
+        val inflater = mode!!.menuInflater
+        inflater.inflate(R.menu.offline_browser_action, menu)
+        managerActivity?.showHideBottomNavigationView(true)
+        managerActivity?.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT)
+        checkScroll()
+        return true
+    }
+
+    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        logDebug("ActionBarCallBack::onPrepareActionMode")
+
+        menu!!.findItem(R.id.cab_menu_select_all).isVisible =
+            (viewModel.getSelectedNodesCount()
+                    < getItemCount() - viewModel.placeholderCount)
+
+        return true
+    }
+
+    override fun onDestroyActionMode(mode: ActionMode?) {
+        logDebug("ActionBarCallBack::onDestroyActionMode")
+        viewModel.clearSelection()
+        managerActivity?.showHideBottomNavigationView(false)
+        managerActivity?.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY)
+        checkScroll()
     }
 }
