@@ -2897,6 +2897,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						else {
 							actionOpenFolder(handleIntent);
 						}
+
+						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
 						int result = getIntent().getIntExtra(RESULT, MegaError.API_OK);
@@ -5802,7 +5804,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		if (item != DrawerItem.CHAT) {
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
-			removeFragment(rChatFL);
+			removeFragment(getChatsFragment());
 		}
 
     	switch (item){
