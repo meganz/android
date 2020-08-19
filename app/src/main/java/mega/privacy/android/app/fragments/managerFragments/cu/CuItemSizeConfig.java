@@ -4,16 +4,16 @@ public class CuItemSizeConfig {
     private final boolean mSmallGrid;
     private final int mGridSize;
     private final int mIcSelectedSize;
-    private final int mSelectedPadding;
+    private final int mImagePadding;
     private final int mIcSelectedMargin;
     private final int mRoundCornerRadius;
 
     public CuItemSizeConfig(boolean smallGrid, int gridSize, int icSelectedSize,
-            int selectedPadding, int icSelectedMargin, int roundCornerRadius) {
+            int imagePadding, int icSelectedMargin, int roundCornerRadius) {
         mSmallGrid = smallGrid;
         mGridSize = gridSize;
         mIcSelectedSize = icSelectedSize;
-        mSelectedPadding = selectedPadding;
+        mImagePadding = imagePadding;
         mIcSelectedMargin = icSelectedMargin;
         mRoundCornerRadius = roundCornerRadius;
     }
@@ -30,8 +30,8 @@ public class CuItemSizeConfig {
         return mIcSelectedSize;
     }
 
-    public int getSelectedPadding() {
-        return mSelectedPadding;
+    public int getImagePadding() {
+        return mImagePadding;
     }
 
     public int getIcSelectedMargin() {

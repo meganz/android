@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.drawee.generic.RoundingParams;
@@ -42,9 +43,8 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         params.height = itemSizeConfig.getGridSize();
         grid.setLayoutParams(params);
 
-        int imageViewPadding = itemSizeConfig.getSelectedPadding();
-        imageView.setPadding(imageViewPadding, imageViewPadding, imageViewPadding,
-                imageViewPadding);
+        int imagePadding = itemSizeConfig.getImagePadding();
+        imageView.setPadding(imagePadding, imagePadding, imagePadding, imagePadding);
 
         FrameLayout.LayoutParams icSelectedParams =
                 (FrameLayout.LayoutParams) icSelected.getLayoutParams();
@@ -66,5 +66,12 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         thumbnail.getHierarchy()
                 .setRoundingParams(RoundingParams.fromCornersRadius(
                         node.isSelected() ? itemSizeConfig.getRoundCornerRadius() : 0));
+
+        if (node.isSelected()) {
+            thumbnail.setBackground(ContextCompat.getDrawable(thumbnail.getContext(),
+                    R.drawable.background_item_grid_selected));
+        } else {
+            thumbnail.setBackground(null);
+        }
     }
 }

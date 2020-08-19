@@ -42,6 +42,6 @@
     <dimen name="cu_fragment_ic_selected_size_small">16dp</dimen>
     <dimen name="cu_fragment_ic_selected_margin_small">4dp</dimen>
     <dimen name="cu_fragment_selected_round_corner_radius">4dp</dimen>
-    <dimen name="cu_fragment_selected_padding_small">1dp</dimen>
-    <dimen name="cu_fragment_selected_padding_large">2dp</dimen>
+    <dimen name="cu_fragment_image_padding_small">1dp</dimen>
+    <dimen name="cu_fragment_image_padding_large">2dp</dimen>
 </resources>

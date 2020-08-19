@@ -482,14 +482,14 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         int icSelectedWidth = getResources().getDimensionPixelSize(
                 smallGrid ? R.dimen.cu_fragment_ic_selected_size_small
                         : R.dimen.cu_fragment_ic_selected_size_large);
-        int selectedPadding = getResources().getDimensionPixelSize(
-                smallGrid ? R.dimen.cu_fragment_selected_padding_small
-                        : R.dimen.cu_fragment_selected_padding_large);
+        int imagePadding = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_image_padding_small
+                        : R.dimen.cu_fragment_image_padding_large);
         int icSelectedMargin = getResources().getDimensionPixelSize(
                 smallGrid ? R.dimen.cu_fragment_ic_selected_margin_small
                         : R.dimen.cu_fragment_ic_selected_margin_large);
         CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
-                icSelectedWidth, selectedPadding, icSelectedMargin,
+                icSelectedWidth, imagePadding, icSelectedMargin,
                 getResources().getDimensionPixelSize(
                         R.dimen.cu_fragment_selected_round_corner_radius));
 
