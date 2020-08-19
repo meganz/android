@@ -8,6 +8,8 @@
         android:id="@+id/item_reaction_layout"
         android:layout_width="wrap_content"
         android:layout_height="28dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="8dp"
         android:background="@drawable/contact_reaction_added">
 
         <mega.privacy.android.app.components.twemoji.reaction.ReactionImageView
@@ -15,7 +17,6 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
             android:layout_marginEnd="6dp"
             android:adjustViewBounds="true"
             android:background="@null" />
@@ -25,10 +26,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="8dp"
             android:layout_toEndOf="@id/item_emoji_reaction"
             android:textColor="@color/mail_my_account"
-            android:textSize="14sp" />
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeStepGranularity="2sp"/>
     </RelativeLayout>
 
     <RelativeLayout
