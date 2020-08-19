@@ -9,7 +9,6 @@
         android:layout_width="wrap_content"
         android:layout_height="28dp"
         android:paddingStart="10dp"
-        android:paddingEnd="8dp"
         android:background="@drawable/contact_reaction_added">
 
         <mega.privacy.android.app.components.twemoji.reaction.ReactionImageView
@@ -28,6 +27,7 @@
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/item_emoji_reaction"
             android:textColor="@color/mail_my_account"
+            android:layout_marginEnd="8dp"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="8sp"
             android:autoSizeMaxTextSize="14sp"
