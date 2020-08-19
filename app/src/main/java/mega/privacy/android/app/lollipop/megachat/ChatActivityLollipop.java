@@ -7468,11 +7468,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         hideKeyboard();
         if (intent != null){
             if (intent.getAction() != null){
-                if (intent.getAction().equals(ACTION_CLEAR_CHAT)){
-                    logDebug("Intent to Clear history");
-                    showConfirmationClearChat(chatRoom);
-                }
-                else if(intent.getAction().equals(ACTION_UPDATE_ATTACHMENT)){
+                if(intent.getAction().equals(ACTION_UPDATE_ATTACHMENT)){
                     logDebug("Intent to update an attachment with error");
 
                     long idPendMsg = intent.getLongExtra("ID_MSG", -1);
