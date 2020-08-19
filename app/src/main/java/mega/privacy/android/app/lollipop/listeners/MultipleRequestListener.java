@@ -136,8 +136,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                                 message = context.getString(R.string.number_correctly_leaved, max_items - error) + context.getString(R.string.number_no_leaved, error);
                             }
                         }
-                        else{
+                        else if (max_items > 1){
                             message = context.getString(R.string.number_correctly_leaved, max_items);
+                        } else {
+                            message = context.getString(R.string.share_left);
                         }
                     }
                     else{

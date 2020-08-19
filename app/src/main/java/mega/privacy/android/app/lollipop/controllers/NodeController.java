@@ -1341,17 +1341,9 @@ public class NodeController {
         logDebug("Leaving " + handleList.size() + " incoming shares");
 
         MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_LEAVE_SHARE, context);
-        if(handleList.size()>1){
-            logDebug("handleList.size()>1");
-            for (int i=0; i<handleList.size(); i++){
-                MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-                megaApi.remove(node, moveMultipleListener);
-            }
-        }
-        else{
-            logDebug("handleList.size()<=1");
-            MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
-            megaApi.remove(node, (ManagerActivityLollipop)context);
+        for (int i=0; i<handleList.size(); i++){
+            MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+            megaApi.remove(node, moveMultipleListener);
         }
     }
 
