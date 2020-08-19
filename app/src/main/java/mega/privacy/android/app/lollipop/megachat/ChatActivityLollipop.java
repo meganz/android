@@ -92,6 +92,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
+import mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -789,6 +790,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         participantsText = tB.findViewById(R.id.participants_text);
 
         textChat = findViewById(R.id.edit_text_chat);
+        TextFormatterViewCompat.applyFormatting(textChat);
         textChat.setVisibility(View.VISIBLE);
         textChat.setEnabled(true);
 
