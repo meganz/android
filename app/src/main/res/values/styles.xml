@@ -195,6 +195,13 @@
         <item name="android:windowMinWidthMinor">85%</item>
     </style>
 
+    <style name="MaterialAlertDialogStyle" parent="Theme.MaterialComponents.Light.Dialog.Alert.Bridge">
+        <item name="colorSurface">@color/white</item>
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="colorControlNormal">@color/mail_my_account</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
+
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">16sp</item>
     </style>
