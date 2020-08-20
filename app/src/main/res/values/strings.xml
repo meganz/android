@@ -2773,6 +2773,7 @@
     <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
     <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to add the nickname</string>
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+    <string name="phonenumber_title" context="Text related to verified phone number. Used as title or cell description.">Phone number</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back.</string>
@@ -2806,11 +2807,17 @@
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Leaving&#8230;</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully removed.">Your phone number has been removed successfully.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support@mega.nz</string>
+
+    <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
+    <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of ">This operation will remove your current phone number and start the process of associating a new phone number with your account.</string>
+    <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">This will remove your associated phone number from your account. If you later choose to add a phone number you will be required to verify it.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
