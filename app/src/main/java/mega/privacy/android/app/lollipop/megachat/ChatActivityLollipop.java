@@ -1597,6 +1597,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void setSubtitleVisibility() {
+        if(chatRoom == null){
+            chatRoom = megaChatApi.getChatRoom(idChat);
+        }
+
+        if(chatRoom == null)
+            return;
+
         boolean isGroup = chatRoom.isGroup();
 
         individualSubtitleToobar.setVisibility(isGroup ? View.GONE : View.VISIBLE);
@@ -1625,7 +1632,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         int width;
         if(isScreenInPortrait(this)){
-            if(isGroup()) {
+            if(chatRoom.isGroup()) {
                 width = scaleWidthPx(TITLE_TOOLBAR_PORT, getOutMetrics());
             }else {
                 width = scaleWidthPx(TITLE_TOOLBAR_IND_PORT, getOutMetrics());
@@ -6907,10 +6914,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public boolean isGroup(){
-        return chatRoom.isGroup();
-    }
-
     public void showMsgNotSentPanel(AndroidMegaChatMessage message, int position){
         logDebug("Position: " + position);
 
@@ -8359,18 +8362,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void showCallLayout() {
-        if (megaChatApi == null)
+        if (megaChatApi == null || chatRoom == null)
             return;
 
         MegaChatCall call = megaChatApi.getChatCall(idChat);
         if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat)))
             return;
 
-        logDebug("Call status "+callStatusToString(call.getStatus())+". Group chat: "+isGroup());
+        logDebug("Call status "+callStatusToString(call.getStatus()));
         switch (call.getStatus()){
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_RING_IN:
-                if (isGroup()) {
+                if (chatRoom.isGroup()) {
                     usersWithVideo();
 
                     long callerHandle = call.getCaller();
@@ -8450,7 +8453,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (call == null) return;
         showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
         callInProgressLayout.setOnClickListener(this);
-        if (isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup()) {
             subtitleCall.setVisibility(View.VISIBLE);
             individualSubtitleToobar.setVisibility(View.GONE);
             setGroupalSubtitleToolbarVisibility(false);
@@ -8462,7 +8465,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void usersWithVideo() {
-        if (megaChatApi == null || !isGroup() || subtitleCall.getVisibility() != View.VISIBLE)
+        if (megaChatApi == null || chatRoom == null || !chatRoom.isGroup() || subtitleCall.getVisibility() != View.VISIBLE)
             return;
 
         MegaChatCall call = megaChatApi.getChatCall(idChat);
