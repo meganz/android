@@ -866,8 +866,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                 actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
             }
-
-            updateActionModeTitle();
         }
     }
 
@@ -1812,6 +1810,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
                 ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
                 checkScroll();
+                updateActionModeTitle();
             } else if (context instanceof ArchivedChatsActivity) {
                 ((ArchivedChatsActivity) context).changeStatusBarColor(0);
             }

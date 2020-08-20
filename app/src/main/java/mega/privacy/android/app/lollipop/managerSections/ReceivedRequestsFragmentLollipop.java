@@ -130,6 +130,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			((ManagerActivityLollipop)context).showFabButton();
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
+			updateActionModeTitle();
 		}
 
 		@Override
@@ -226,8 +227,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 
 				actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
 			}
-
-			updateActionModeTitle();
 		}
 	}
 

@@ -377,6 +377,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			Util.changeStatusBarColorActionMode(context,
 					((ManagerActivityLollipop) context).getWindow(), handler, 2);
 			checkScroll();
+			updateActionModeTitle();
 			((ManagerActivityLollipop) context).setDrawerLockMode(false);
 		}
 
@@ -1164,9 +1165,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					
 					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 				}
-				
-				updateActionModeTitle();
-
 			}
 		}
 		else{

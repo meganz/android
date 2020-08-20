@@ -130,6 +130,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			((ManagerActivityLollipop)context).showFabButton();
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
+			updateActionModeTitle();
 		}
 
 		@Override
@@ -226,8 +227,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 				actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
 			}
-
-			updateActionModeTitle();
 		}
 	}
 	/////END Multiselect/////

@@ -278,6 +278,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
 			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
+			updateActionModeTitle();
 		}
 
 		@Override
@@ -1440,8 +1441,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				
 				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
-			
-			updateActionModeTitle();
 		}
 	}
 	

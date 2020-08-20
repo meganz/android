@@ -174,6 +174,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
+			updateActionModeTitle();
 		}
 
 		@Override
@@ -807,8 +808,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private void selectAll(){
 		if (adapter != null){
 			adapter.selectAll();
-
-			updateActionModeTitle();
 		}
 	}
 

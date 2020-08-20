@@ -179,6 +179,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
+			updateActionModeTitle();
 		}
 	}
 
@@ -582,8 +583,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
-
-		updateActionModeTitle();
 	}
 
 	private void updateActionModeTitle() {
