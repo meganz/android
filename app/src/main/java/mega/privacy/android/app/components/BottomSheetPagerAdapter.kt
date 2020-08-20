@@ -5,7 +5,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.lollipop.managerSections.FavouritesFragment
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment
-import java.lang.ref.WeakReference
 
 class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
@@ -26,9 +25,6 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
 
         try {
             fragment = tabFragmentMap[position]?.newInstance() as Fragment
-            if (position == OFFLINE_INDEX) {
-                OfflineFragment.setArgs(fragment as OfflineFragment, true)
-            }
         } catch (e: IllegalAccessException) {
             e.printStackTrace()
         } catch (e: InstantiationException) {

@@ -30,7 +30,7 @@
             app:argType="string" />
         <argument
             android:name="rootFolderOnly"
-            android:defaultValue="false"
+            android:defaultValue="true"
             app:argType="boolean" />
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"

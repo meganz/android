@@ -37,11 +37,13 @@ import mega.privacy.android.app.R.string
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
+import mega.privacy.android.app.fragments.photos.EventObserver
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
+import mega.privacy.android.app.lollipop.managerSections.HomepageFragmentDirections
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -63,7 +65,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import java.io.File
 
 @AndroidEntryPoint
-class OfflineFragment : Fragment(), ActionMode.Callback {
+class OfflineFragment() : Fragment(), ActionMode.Callback {
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
@@ -104,6 +106,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (arguments == null) {
+            arguments = HomepageFragmentDirections.actionHomepageToFullscreenOffline().arguments
+        }
 
         managerActivity = requireActivity() as ManagerActivityLollipop
     }
@@ -167,13 +173,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupView()
+        observeLiveData()
         if (viewModel.path == "" || viewModel.path == args.path) {
             setViewModelDisplayParam(args.path)
         } else {
             setViewModelDisplayParam(viewModel.path)
         }
-        setupView()
-        observeLiveData()
     }
 
     private fun setViewModelDisplayParam(path: String) {
@@ -305,8 +311,29 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 managerActivity?.updateFullscreenOfflineFragmentOptionMenu(false)
             }
         }
+        viewModel.openFolderFullscreen.observe(viewLifecycleOwner, EventObserver {
+            managerActivity?.openFullscreenOfflineFragment(it)
+        })
+        viewModel.showOptionsPanel.observe(viewLifecycleOwner, EventObserver {
+            managerActivity?.showOptionsPanel(it)
+        })
+        viewModel.nodeToOpen.observe(viewLifecycleOwner, EventObserver {
+            openNode(it.first, it.second)
+        })
+        viewModel.urlFileOpenAsUrl.observe(viewLifecycleOwner, EventObserver {
+            logDebug("Is URL - launch browser intent")
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(it)
+            startActivity(intent)
+        })
+        viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner, EventObserver {
+            openFile(it, MimeTypeList.typeForName(it.name))
+        })
+        if (args.rootFolderOnly) {
+            return
+        }
 
-        viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
+        viewModel.actionMode.observe(viewLifecycleOwner, EventObserver { visible ->
             val actionModeVal = actionMode
             if (visible) {
                 if (actionModeVal == null) {
@@ -320,7 +347,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                     actionMode = null
                 }
             }
-        }
+        })
         viewModel.actionBarTitle.observe(viewLifecycleOwner) {
             if (viewModel.selecting) {
                 managerActivity?.supportActionBar?.setTitle(it)
@@ -330,56 +357,34 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 )
             }
         }
-
-        viewModel.pathLiveData.observe(viewLifecycleOwner) {
+        viewModel.pathLiveData.observe(viewLifecycleOwner, EventObserver {
             managerActivity?.pathNavigationOffline = it
-        }
-        viewModel.submitSearchQuery.observe(viewLifecycleOwner) {
+        })
+        viewModel.submitSearchQuery.observe(viewLifecycleOwner, EventObserver {
             managerActivity?.setTextSubmitted()
-        }
-        viewModel.openFolderFullscreen.observe(viewLifecycleOwner) {
-            managerActivity?.openFullscreenOfflineFragment(it)
-        }
-
-        viewModel.showOptionsPanel.observe(viewLifecycleOwner) {
-            managerActivity?.showOptionsPanel(it)
-        }
-        viewModel.showSortedBy.observe(viewLifecycleOwner) {
+        })
+        viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             managerActivity?.showSortOptions(managerActivity, resources.displayMetrics)
-        }
-        viewModel.nodeToOpen.observe(viewLifecycleOwner) {
-            openNode(it.first, it.second)
-        }
-        viewModel.urlFileOpenAsUrl.observe(viewLifecycleOwner) {
-            logDebug("Is URL - launch browser intent")
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(it)
-            startActivity(intent)
-        }
-        viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner) {
-            openFile(it, MimeTypeList.typeForName(it.name))
-        }
-
-        viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
+        })
+        viewModel.nodeToAnimate.observe(viewLifecycleOwner, EventObserver {
             val rv = recyclerView
             val rvAdapter = adapter
             if (rv == null || rvAdapter == null || it.first < 0 ||
                 it.first >= rvAdapter.itemCount
             ) {
-                return@observe;
+                return@EventObserver
             }
 
             rvAdapter.showSelectionAnimation(
                 it.first, it.second, rv.findViewHolderForLayoutPosition(it.first)
             )
-        }
-
-        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner) {
+        })
+        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner, EventObserver {
             val layoutManager = recyclerView?.layoutManager
             if (layoutManager is LinearLayoutManager) {
                 layoutManager.scrollToPositionWithOffset(it, 0)
             }
-        }
+        })
     }
 
     private fun openNode(position: Int, node: OfflineNode) {

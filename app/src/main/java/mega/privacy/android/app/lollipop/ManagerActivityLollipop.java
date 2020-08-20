@@ -6857,7 +6857,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (fullscreenOfflineFragment.getItemCount() > 0) {
 				thumbViewMenuItem.setVisible(true);
 				setGridListIcon();
-				selectMenuItem.setVisible(true);
 				searchMenuItem.setVisible(true);
 			}
 		}
