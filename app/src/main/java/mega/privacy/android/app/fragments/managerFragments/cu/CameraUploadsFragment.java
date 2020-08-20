@@ -478,18 +478,20 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
         });
 
-        int gridWidth = outMetrics.widthPixels / spanCount;
+        int imageMargin = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_image_margin_small
+                        : R.dimen.cu_fragment_image_margin_large);
+        int gridWidth = (outMetrics.widthPixels - imageMargin * spanCount * 2) / spanCount;
         int icSelectedWidth = getResources().getDimensionPixelSize(
                 smallGrid ? R.dimen.cu_fragment_ic_selected_size_small
                         : R.dimen.cu_fragment_ic_selected_size_large);
-        int imagePadding = getResources().getDimensionPixelSize(
-                smallGrid ? R.dimen.cu_fragment_image_padding_small
-                        : R.dimen.cu_fragment_image_padding_large);
         int icSelectedMargin = getResources().getDimensionPixelSize(
                 smallGrid ? R.dimen.cu_fragment_ic_selected_margin_small
                         : R.dimen.cu_fragment_ic_selected_margin_large);
         CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
-                icSelectedWidth, imagePadding, icSelectedMargin,
+                icSelectedWidth, imageMargin,
+                getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
+                icSelectedMargin,
                 getResources().getDimensionPixelSize(
                         R.dimen.cu_fragment_selected_round_corner_radius));
 

@@ -83,7 +83,7 @@ class CuViewModel extends BaseRxViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mNodeToOpen::setValue, logErr("openNodeAction")));
 
-        add(mCreatingThumbnailFinished.throttleFirst(1, TimeUnit.SECONDS)
+        add(mCreatingThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
                 .subscribe(ignored -> loadCuNodes(), logErr("creatingThumbnailFinished")));
     }
 

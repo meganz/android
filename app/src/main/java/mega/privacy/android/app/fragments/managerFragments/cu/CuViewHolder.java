@@ -35,16 +35,16 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         return true;
     }
 
-    static void setViewSize(View grid, View icSelected, SimpleDraweeView imageView,
-            CuItemSizeConfig itemSizeConfig) {
+    static void setViewSize(View grid, View icSelected, CuItemSizeConfig itemSizeConfig) {
         GridLayoutManager.LayoutParams params =
                 (GridLayoutManager.LayoutParams) grid.getLayoutParams();
         params.width = itemSizeConfig.getGridSize();
         params.height = itemSizeConfig.getGridSize();
+        params.bottomMargin = itemSizeConfig.getImageMargin();
+        params.topMargin = itemSizeConfig.getImageMargin();
+        params.setMarginStart(itemSizeConfig.getImageMargin());
+        params.setMarginEnd(itemSizeConfig.getImageMargin());
         grid.setLayoutParams(params);
-
-        int imagePadding = itemSizeConfig.getImagePadding();
-        imageView.setPadding(imagePadding, imagePadding, imagePadding, imagePadding);
 
         FrameLayout.LayoutParams icSelectedParams =
                 (FrameLayout.LayoutParams) icSelected.getLayoutParams();
@@ -67,6 +67,8 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
                 .setRoundingParams(RoundingParams.fromCornersRadius(
                         node.isSelected() ? itemSizeConfig.getRoundCornerRadius() : 0));
 
+        int imagePadding = node.isSelected() ? itemSizeConfig.getImageSelectedPadding() : 0;
+        thumbnail.setPadding(imagePadding, imagePadding, imagePadding, imagePadding);
         if (node.isSelected()) {
             thumbnail.setBackground(ContextCompat.getDrawable(thumbnail.getContext(),
                     R.drawable.background_item_grid_selected));
