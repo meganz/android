@@ -655,24 +655,36 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     };
 
+    private BroadcastReceiver closeChatReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null) return;
+
+            if (intent.getAction().equals(ACTION_CLOSE_CHAT_AFTER_IMPORT)) {
+                finish();
+            }
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
-    public void openMegaLink(String url, boolean isFile){
+    public void openMegaLink(String url, boolean isFile) {
         logDebug("url: " + url + ", isFile: " + isFile);
-        if(isFile){
-            Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
-            openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
-            openFileIntent.setData(Uri.parse(url));
-            startActivity(openFileIntent);
-        }else{
-            Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
-            openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
-            openFolderIntent.setData(Uri.parse(url));
-            startActivity(openFolderIntent);
+        Intent openLink;
+
+        if (isFile) {
+            openLink = new Intent(this, FileLinkActivityLollipop.class);
+            openLink.setAction(ACTION_OPEN_MEGA_LINK);
+        } else {
+            openLink = new Intent(this, FolderLinkActivityLollipop.class);
+            openLink.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
         }
+
+        openLink.putExtra(OPENED_FROM_CHAT, true);
+        openLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        openLink.setData(Uri.parse(url));
+        startActivity(openLink);
     }
 
     public void showMessageInfo(int positionInAdapter){
@@ -770,6 +782,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
         leftChatFilter.addAction(ACTION_LEFT_CHAT);
         registerReceiver(leftChatReceiver, leftChatFilter);
+
+        registerReceiver(closeChatReceiver, new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT));
 
         changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
 
@@ -1360,6 +1374,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (prefs != null) {
             String written = prefs.getWrittenText();
             if (!TextUtils.isEmpty(written)) {
+                String editedMsgId = prefs.getEditedMsgId();
+                editingMessage = !isTextEmpty(editedMsgId);
+                messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(editedMsgId)) : null;
                 textChat.setText(written);
                 sendIcon.setVisibility(View.VISIBLE);
                 sendIcon.setEnabled(true);
@@ -1604,6 +1621,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void setSubtitleVisibility() {
+        if(chatRoom == null){
+            chatRoom = megaChatApi.getChatRoom(idChat);
+        }
+
+        if(chatRoom == null)
+            return;
+
         boolean isGroup = chatRoom.isGroup();
 
         individualSubtitleToobar.setVisibility(isGroup ? View.GONE : View.VISIBLE);
@@ -1632,7 +1656,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         int width;
         if(isScreenInPortrait(this)){
-            if(isGroup()) {
+            if(chatRoom.isGroup()) {
                 width = scaleWidthPx(TITLE_TOOLBAR_PORT, getOutMetrics());
             }else {
                 width = scaleWidthPx(TITLE_TOOLBAR_IND_PORT, getOutMetrics());
@@ -6950,10 +6974,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public boolean isGroup(){
-        return chatRoom.isGroup();
-    }
-
     public void showMsgNotSentPanel(AndroidMegaChatMessage message, int position){
         logDebug("Position: " + position);
 
@@ -7428,7 +7448,20 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if(textChat!=null){
                 String written = textChat.getText().toString();
                 if(written!=null){
-                    dbH.setWrittenTextItem(Long.toString(idChat), textChat.getText().toString());
+                    if (dbH == null) {
+                        dbH = MegaApplication.getInstance().getDbH();
+                    }
+
+                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+                    String editedMessageId = editingMessage && messageToEdit != null ? Long.toString(messageToEdit.getMsgId()) : "";
+                    if (prefs != null) {
+                        prefs.setEditedMsgId(editedMessageId);
+                        prefs.setWrittenText(written);
+                        dbH.setWrittenTextItem(Long.toString(idChat), written, editedMessageId);
+                    } else {
+                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), written, editedMessageId);
+                        dbH.setChatItemPreferences(prefs);
+                    }
                 }
             }
             else{
@@ -7500,6 +7533,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
         unregisterReceiver(leftChatReceiver);
+        unregisterReceiver(closeChatReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
@@ -8380,18 +8414,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void showCallLayout() {
-        if (megaChatApi == null)
+        if (megaChatApi == null || chatRoom == null)
             return;
 
         MegaChatCall call = megaChatApi.getChatCall(idChat);
         if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat)))
             return;
 
-        logDebug("Call status "+callStatusToString(call.getStatus())+". Group chat: "+isGroup());
+        logDebug("Call status "+callStatusToString(call.getStatus()));
         switch (call.getStatus()){
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_RING_IN:
-                if (isGroup()) {
+                if (chatRoom.isGroup()) {
                     usersWithVideo();
 
                     long callerHandle = call.getCaller();
@@ -8471,7 +8505,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (call == null) return;
         showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
         callInProgressLayout.setOnClickListener(this);
-        if (isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup()) {
             subtitleCall.setVisibility(View.VISIBLE);
             individualSubtitleToobar.setVisibility(View.GONE);
             setGroupalSubtitleToolbarVisibility(false);
@@ -8483,7 +8517,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void usersWithVideo() {
-        if (megaChatApi == null || !isGroup() || subtitleCall.getVisibility() != View.VISIBLE)
+        if (megaChatApi == null || chatRoom == null || !chatRoom.isGroup() || subtitleCall.getVisibility() != View.VISIBLE)
             return;
 
         MegaChatCall call = megaChatApi.getChatCall(idChat);

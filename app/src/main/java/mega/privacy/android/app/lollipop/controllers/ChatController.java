@@ -1836,6 +1836,11 @@ public class ChatController {
         nC.checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
 
         if (notOwnerNodes.size() == 0) {
+            //Copy the ownerNodes handles to use them in case they are not the original ones stored on handles list
+            for (int i=0; i< ownerNodes.size(); i++) {
+                handles[i] = ownerNodes.get(i).getHandle();
+            }
+
             if (context instanceof ContactInfoActivityLollipop) {
                 ((ContactInfoActivityLollipop) context).sendFilesToChat(handles, idChats[0]);
                 return;

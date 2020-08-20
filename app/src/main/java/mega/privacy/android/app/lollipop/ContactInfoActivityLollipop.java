@@ -2385,14 +2385,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		if(users == null || users.isEmpty())
-			return;
-
-		for (MegaUser updatedUser : users) {
-			if (updatedUser.getHandle() == user.getHandle()) {
-				user = updatedUser;
-				emailText.setText(user.getEmail());
-				break;
+		if (users != null && !users.isEmpty()) {
+			for (MegaUser updatedUser : users) {
+				if (updatedUser.getHandle() == user.getHandle()) {
+					user = updatedUser;
+					emailText.setText(user.getEmail());
+					break;
+				}
 			}
 		}
 	}
