@@ -1462,10 +1462,6 @@ public class NodeController {
             logDebug("Parent to check: " + parentNode.getName());
             checkParentDeletion(parentNode);
         }
-
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).updateOfflineView(null);
-        }
     }
 
     private void removeNodePhysically(MegaOffline megaOffline) {

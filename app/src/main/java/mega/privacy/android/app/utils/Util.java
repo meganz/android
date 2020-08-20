@@ -77,6 +77,10 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -452,6 +456,10 @@ public class Util {
 	 */
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
 	
+		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
+	}
+
+	public static int dp2px (float dp, DisplayMetrics outMetrics) {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
 	
@@ -1870,5 +1878,10 @@ public class Util {
 			throws Resources.NotFoundException {
 		return DrawableCompat.wrap(ResourcesCompat.getDrawable(context.getResources(),
 				resId, null));
+	}
+
+	public static LocalDate fromEpoch(long seconds) {
+		return LocalDate.from(
+				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
 }

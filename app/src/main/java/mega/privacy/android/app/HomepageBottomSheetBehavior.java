@@ -584,12 +584,10 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
             int type) {
         if (type == ViewCompat.TYPE_NON_TOUCH) {
             // Ignore fling here. The ViewDragHelper handles it.
-            Log.i("Alex", "onNestedPreScroll return 1");
             return;
         }
         View scrollingChild = getNestedScrollingChild();
         if (target != scrollingChild) {
-            Log.i("Alex", "onNestedPreScroll return 2");
             return;
         }
         int currentTop = child.getTop();

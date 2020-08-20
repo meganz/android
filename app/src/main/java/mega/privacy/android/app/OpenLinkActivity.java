@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
-import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -22,20 +21,17 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
-
-	private static final String REQUIRES_TRANSFER_SESSION = "fm/";
 
 	private DatabaseHandler dbH = null;
 
@@ -93,6 +89,12 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		// Web session link
 		if (matchRegexs(url, WEB_SESSION_LINK_REGEXS)) {
 			logDebug("Open web session link");
+			openWebLink(url);
+			return;
+		}
+
+		if (matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS)) {
+			logDebug("Open business invite link");
 			openWebLink(url);
 			return;
 		}
@@ -411,15 +413,9 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	}
 
 	private void checkIfRequiresTransferSession(String url) {
-		if (url.contains(REQUIRES_TRANSFER_SESSION)) {
-			int start = url.indexOf(REQUIRES_TRANSFER_SESSION);
-			if (start != -1) {
-				String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
-				megaApi.getSessionTransferURL(path, new SessionTransferURLListener(this));
-				return;
-			}
+		if (!requiresTransferSession(this, url)) {
+			openWebLink(url);
 		}
-		openWebLink(url);
 	}
 
 	public void openWebLink(String url) {

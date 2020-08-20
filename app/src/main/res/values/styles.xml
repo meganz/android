@@ -495,4 +495,13 @@
     <style name="MyCredentialsText" parent="CredentialsText">
         <item name="android:textSize">13sp</item>
     </style>
+
+    <style name="GalleryImageShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="GalleryImageShape.Selected">
+        <item name="cornerSize">@dimen/photo_selected_icon_round_corner_radius</item>
+    </style>
 </resources>

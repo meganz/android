@@ -109,8 +109,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	MegaApiAndroid megaApi;
 	@Inject
 	MegaChatApiAndroid megaChatApi;
-
+	@Inject
 	DatabaseHandler dbH;
+
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -492,6 +493,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	@Override
 	public void onCreate() {
+		singleApplicationInstance = this;
+
 		super.onCreate();
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -501,11 +504,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}
 		});
         isVerifySMSShowed = false;
-		singleApplicationInstance = this;
 
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		initLoggerSDK();
 		initLoggerKarere();

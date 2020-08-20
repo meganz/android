@@ -70,6 +70,10 @@ public class Constants {
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
+    public static final String RESULT = "RESULT";
+    public static final String ACCOUNT_BLOCKED_STRING = "ACCOUNT_BLOCKED_STRING";
+    public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
+
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
     //MultipleRequestListener options
@@ -255,6 +259,18 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
 
+    public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
+    public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
+    public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
+    public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
+    public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
+    public static final String INTENT_EXTRA_KEY_POSITION = "position";
+    public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
+    public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
+    public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
+
+    public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
+
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
     public static final int RUBBISH_BIN_ADAPTER = 2002;
@@ -280,6 +296,9 @@ public class Constants {
     public static final int GENERAL_OTHERS_ADAPTER = 2023;
     public static final int RECENTS_ADAPTER = 2024;
     public static final int LINKS_ADAPTER = 2025;
+    public static final int PHOTOS_BROWSE_ADAPTER = 2026;
+    public static final int PHOTOS_SEARCH_ADAPTER = 2027;
+
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -584,6 +603,11 @@ public class Constants {
             "^https://mega\\.nz/#sitetransfer!.+$"
     };
 
+    public static final String[] BUSINESS_INVITE_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#businessinvite.+$",
+            "^https://mega\\.nz/#businessinvite.+$"
+    };
+
     //Types of blocked accounts
     public static final String ACCOUNT_NOT_BLOCKED = "0";
     public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
@@ -592,6 +616,8 @@ public class Constants {
     public static final String REMOVED_ACCOUNT_BLOCK = "401";
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
     public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
+
+    public static final int INVALID_VALUE = -1;
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;

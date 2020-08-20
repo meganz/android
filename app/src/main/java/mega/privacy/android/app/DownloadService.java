@@ -40,12 +40,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -459,10 +459,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(total <= 0){
 			logDebug("onQueueComplete: reset total downloads");
 			if (megaApi.getTotalDownloads() > 0) {
-				Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
-				intent.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER);
-				intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
-				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+						.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER)
+						.putExtra(NUMBER_FILES, megaApi.getTotalDownloads()));
 			}
 
 			megaApi.resetTotalDownloads();
@@ -1878,7 +1877,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void refreshOfflineFragment(){
-		Intent intent = new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST);
+		Intent intent = new Intent(OfflineFragment.REFRESH_OFFLINE_FILE_LIST);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 

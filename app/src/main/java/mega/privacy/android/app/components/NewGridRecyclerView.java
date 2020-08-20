@@ -1,10 +1,9 @@
 package mega.privacy.android.app.components;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Point;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
@@ -12,6 +11,8 @@ import android.view.ViewGroup;
 public class NewGridRecyclerView extends RecyclerView {
     
     private CustomizedGridLayoutManager manager;
+    private LinearLayoutManager mLinearLayoutManager;
+
     public int columnWidth = -1;
     private boolean isWrapContent = false;
     private int widthTotal = 0;
@@ -50,6 +51,7 @@ public class NewGridRecyclerView extends RecyclerView {
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
         super.onMeasure(widthSpec, heightSpec);
+
         if(!isWrapContent){
             if (columnWidth > 0) {
                 calculateSpanCount();
@@ -65,15 +67,13 @@ public class NewGridRecyclerView extends RecyclerView {
         }
     }
     
-    private void calculateSpanCount() {
+    public void calculateSpanCount() {
         spanCount = Math.max(2, getScreenX() / columnWidth);
         manager.setSpanCount(spanCount);
     }
     
     private int getScreenX() {
-        Point point = new Point();
-        ((Activity)getContext()).getWindowManager().getDefaultDisplay().getSize(point);
-        return point.x;
+        return getResources().getDisplayMetrics().widthPixels;
     }
     
     public int getSpanCount() {
@@ -96,5 +96,26 @@ public class NewGridRecyclerView extends RecyclerView {
     @Override
     public CustomizedGridLayoutManager getLayoutManager() {
         return manager;
+    }
+
+    /**
+     * Empower the RecyclerView to change to Linear Layout as needed
+     */
+    public void switchToLinear() {
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
+        setLayoutManager(mLinearLayoutManager);
+    }
+
+    /**
+     * Turn back to use the well-configured CustomizedGridLayoutManager
+     */
+    public void switchBackToGrid() {
+        mLinearLayoutManager = null;
+        setLayoutManager(manager);
+        calculateSpanCount();
+    }
+
+    public LinearLayoutManager getLinearLayoutManager() {
+        return mLinearLayoutManager;
     }
 }
