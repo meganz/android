@@ -34,6 +34,8 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
+import androidx.navigation.NavOptions;
+import androidx.navigation.NavOptionsBuilder;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -148,6 +150,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.photos.HomepageRefreshable;
 import mega.privacy.android.app.fragments.photos.HomepageSearchable;
 import mega.privacy.android.app.fragments.photos.PhotosFragment;
@@ -175,12 +178,12 @@ import mega.privacy.android.app.lollipop.managerSections.CreditCardFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
@@ -279,7 +282,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
-	private static final String OFFLINE_SEARCH_PATHS = "OFFLINE_SEARCH_PATHS";
 	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
@@ -437,7 +439,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private List<SkuDetails> mSkuDetailsList;
 
     public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		CLOUD_DRIVE, HOMEPAGE, RECENTS, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -445,7 +447,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case HOMEPAGE: return "fragmentHomepage";
 				case RECENTS: return "rF";
 				case RUBBISH_BIN: return "rubbishBinFLol";
-				case OFFLINE: return "oFLol";
 				case CAMERA_UPLOADS: return "cuFLol";
 				case MEDIA_UPLOADS: return "muFLol";
 				case INBOX: return "iFLol";
@@ -477,7 +478,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, FULLSCREEN_OFFLINE, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -489,6 +490,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case CONTACTS: {
 					context.getString(R.string.section_contacts);
 				}
+				case FULLSCREEN_OFFLINE: return context.getString(R.string.tab_offline);
 				case SETTINGS: return context.getString(R.string.action_settings);
 				case ACCOUNT: return context.getString(R.string.section_account);
 				case SEARCH: return context.getString(R.string.action_search);
@@ -561,7 +563,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private TextView callInProgressText;
 
 	boolean firstTimeAfterInstallation = true;
-	private ArrayList<String> offlineSearchPaths = new ArrayList<>();
 	SearchView searchView;
 	public boolean searchExpand = false;
 	private String searchQuery = "";
@@ -636,7 +637,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private FileBrowserFragmentLollipop fbFLol;
     private RecentsFragment rF;
     private RubbishBinFragmentLollipop rubbishBinFLol;
-    private OfflineFragmentLollipop oFLol;
     private InboxFragmentLollipop iFLol;
     private IncomingSharesFragmentLollipop inSFLol;
 	private OutgoingSharesFragmentLollipop outSFLol;
@@ -662,6 +662,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
+
+	private OfflineFragment fullscreenOfflineFragment;
+	private OfflineFragment pagerOfflineFragment;
 
 	ProgressDialog statusDialog;
 
@@ -1271,24 +1274,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								muFLol.updateScrollPosition(position);
 							}
 						}
-					}
-					else if (adapterType == OFFLINE_ADAPTER){
-						oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-						if (oFLol != null){
-							if (actionType == UPDATE_IMAGE_DRAG) {
-								imageDrag = oFLol.getImageDrag(position + placeholderCount);
-								if (oFLol.imageDrag != null){
-									oFLol.imageDrag.setVisibility(View.VISIBLE);
-								}
-								if (imageDrag != null){
-									oFLol.imageDrag = imageDrag;
-									oFLol.imageDrag.setVisibility(View.GONE);
-								}
-							}
-							else if (actionType == SCROLL_TO_POSITION) {
-								oFLol.updateScrollPosition(position + placeholderCount);
-							}
-						}
 					} else if (adapterType == RECENTS_ADAPTER && rF != null) {
 						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
 						if (actionType == UPDATE_IMAGE_DRAG) {
@@ -1686,12 +1671,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							this.takeProfilePicture();
 							typesCameraPermission = -1;
 						}
-					}
-					else{
-						oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-						if(oFLol != null){
-							oFLol.notifyDataSetChanged();
-						}
+					} else {
+						refreshOfflineNodes();
 					}
 				}
 	        	break;
@@ -1824,19 +1805,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			indexContacts = viewPagerContacts.getCurrentItem();
 		}
 		outState.putInt("indexContacts", indexContacts);
-
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if(oFLol!=null){
-			pathNavigationOffline = oFLol.getPathNavigation();
-		}
 		outState.putString("pathNavigationOffline", pathNavigationOffline);
-//		outState.putParcelable("obj", myClass);
 		if(drawerItem==DrawerItem.ACCOUNT){
 			outState.putInt("accountFragment", accountFragment);
 		}
 		outState.putBoolean(MK_LAYOUT_VISIBLE, mkLayoutVisible);
 
-		outState.putStringArrayList(OFFLINE_SEARCH_PATHS, offlineSearchPaths);
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
 			outState.putString("searchQuery", searchQuery);
@@ -1954,7 +1928,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			mkLayoutVisible = savedInstanceState.getBoolean(MK_LAYOUT_VISIBLE, false);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
-			offlineSearchPaths = savedInstanceState.getStringArrayList(OFFLINE_SEARCH_PATHS);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
@@ -2301,6 +2274,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		notificationsSection.setOnClickListener(this);
 		notificationsSectionText = (TextView) findViewById(R.id.notification_section_text);
         contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
+		findViewById(R.id.offline_section).setOnClickListener(this);
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
@@ -2858,10 +2832,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (locationFileInfo){
 							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
 							if (offlineAdapter){
-								drawerItem = DrawerItem.HOMEPAGE;
-								// FIXME: Homepage: make the offline fragment in the hompage navigate to the path
-								String pathNavigation = getIntent().getStringExtra("pathNavigation");
-								setPathNavigationOffline(pathNavigation);
+								drawerItem = DrawerItem.FULLSCREEN_OFFLINE;
+								setPathNavigationOffline(
+										getIntent().getStringExtra("pathNavigation"));
 								selectDrawerItemLollipop(drawerItem);
 								selectDrawerItemPending=false;
 							}
@@ -4958,7 +4931,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				break;
 			}
-			// FIXME: for removed OFFLINE, how shall we set firstNavigationLevel?
 			case INBOX:{
 				aB.setSubtitle(null);
 				if(parentHandleInbox==megaApi.getInboxNode().getHandle()||parentHandleInbox==-1){
@@ -5083,6 +5055,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
+		updateNavigationToolbarIcon();
+	}
+
+	public void setToolbarTitleFromFullscreenOfflineFragment(String title,
+			boolean firstNavigationLevel) {
+		aB.setSubtitle(null);
+		aB.setTitle(title);
+		this.firstNavigationLevel = firstNavigationLevel;
 		updateNavigationToolbarIcon();
 	}
 
@@ -5820,7 +5800,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			removeFragment(rChatFL);
 		}
 
-		if (item != DrawerItem.HOMEPAGE) {
+		if (item != DrawerItem.HOMEPAGE && item != DrawerItem.FULLSCREEN_OFFLINE) {
 			mNavHostView.setVisibility(View.GONE);
 		}
 
@@ -5863,7 +5843,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				showFabButton();
 				break;
 			}
-			// FIXME: for removed OFFLINE, when should we do the checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)?
 			case HOMEPAGE: {
 				if (mHomepageScreen == HomepageScreen.HOMEPAGE) {
 					showBNVImmediate();
@@ -5976,6 +5955,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				showFabButton();
 				break;
 			}
+			case FULLSCREEN_OFFLINE: {
+				mNavHostView.setVisibility(View.VISIBLE);
+				openFullscreenOfflineFragment(getPathNavigationOffline());
+				break;
+			}
     		case SETTINGS:{
 				showHideBottomNavigationView(true);
 				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
@@ -6076,6 +6060,48 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
+	public void openFullscreenOfflineFragment(String path) {
+    	mNavController.navigate(
+    			HomepageFragmentDirections.Companion.actionHomepageToFullscreenOffline(path, false),
+				new NavOptions.Builder().setLaunchSingleTop(true).build());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+				&& !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			ActivityCompat.requestPermissions(this,
+					new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+					REQUEST_WRITE_STORAGE);
+		}
+	}
+
+	public void fullscreenOfflineFragmentOpened(OfflineFragment fragment) {
+    	fullscreenOfflineFragment = fragment;
+
+		showFabButton();
+		showHideBottomNavigationView(false);
+		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+		abL.setVisibility(View.VISIBLE);
+		setToolbarTitle();
+		supportInvalidateOptionsMenu();
+	}
+
+	public void fullscreenOfflineFragmentClosed(OfflineFragment fragment) {
+		if (fragment == fullscreenOfflineFragment) {
+			setPathNavigationOffline("/");
+			fullscreenOfflineFragment = null;
+			abL.setVisibility(View.GONE);
+		}
+	}
+
+	public void pagerOfflineFragmentOpened(OfflineFragment fragment) {
+    	pagerOfflineFragment = fragment;
+	}
+
+	public void pagerOfflineFragmentClosed(OfflineFragment fragment) {
+    	if (fragment == pagerOfflineFragment) {
+			pagerOfflineFragment = null;
+		}
+	}
+
 	private void showBNVImmediate() {
 		bNV.setTranslationY(0);
 		bNV.setVisibility(View.VISIBLE);
@@ -6144,6 +6170,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				else if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) rF.checkScroll();
                 break;
             }
+			case FULLSCREEN_OFFLINE: {
+				if (fullscreenOfflineFragment != null) {
+					fullscreenOfflineFragment.checkScroll();
+				}
+				break;
+			}
             case CAMERA_UPLOADS: {
 				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
                 if (cuFL != null) {
@@ -6389,7 +6421,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				searchQuery = "";
 				searchExpand = true;
 
-				if (drawerItem == DrawerItem.CHAT) {
+				if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
+					setFullscreenOfflineFragmentSearchQuery(searchQuery);
+				} else if (drawerItem == DrawerItem.CHAT) {
 					resetActionBar(aB);
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
 					resetActionBar(aB);
@@ -6423,6 +6457,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
+				} else if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
+					setFullscreenOfflineFragmentSearchQuery(null);
+					supportInvalidateOptionsMenu();
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
 					if (mHomepageSearchable != null) {
 						mHomepageSearchable.exitSearch();
@@ -6445,7 +6482,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			public boolean onQueryTextSubmit(String query) {
 				if (drawerItem == DrawerItem.CHAT) {
 					hideKeyboard(managerActivity, 0);
-				} else {    // FIXME: For removed OFFLINE: addOfflineSearchPath() should be called in the global search
+				} else if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
+					searchExpand = false;
+					textSubmitted = true;
+					hideKeyboard(managerActivity, 0);
+					if (fullscreenOfflineFragment != null) {
+						fullscreenOfflineFragment.onSearchQuerySubmitted();
+					}
+					setToolbarTitle();
+					supportInvalidateOptionsMenu();
+				} else {
 					searchExpand = false;
 					searchQuery = "" + query;
 					setToolbarTitle();
@@ -6466,6 +6512,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (rChatFL != null) {
 						rChatFL.filterChats(newText);
 					}
+				} else if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
+					if (textSubmitted) {
+						textSubmitted = false;
+						return true;
+					}
+
+					searchQuery = newText;
+					setFullscreenOfflineFragmentSearchQuery(searchQuery);
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
 					if (mHomepageSearchable != null) {
 						searchQuery = newText;
@@ -6572,7 +6626,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					break;
-
+				case FULLSCREEN_OFFLINE:
+					updateFullscreenOfflineFragmentOptionMenu(true);
+					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
 						thumbViewMenuItem.setVisible(true);
@@ -6796,6 +6852,30 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
+		if (fullscreenOfflineFragment != null) {
+			fullscreenOfflineFragment.setSearchQuery(searchQuery);
+		}
+	}
+
+	public void updateFullscreenOfflineFragmentOptionMenu(boolean openSearchView) {
+    	if (rubbishBinMenuItem == null || fullscreenOfflineFragment == null) {
+    		return;
+		}
+
+		if (searchExpand && openSearchView) {
+			openSearchView();
+		} else if (!searchExpand) {
+			rubbishBinMenuItem.setVisible(true);
+
+			if (fullscreenOfflineFragment.getItemCount() > 0) {
+				thumbViewMenuItem.setVisible(true);
+				setGridListIcon();
+				searchMenuItem.setVisible(true);
+			}
+		}
+	}
+
 	private HomepageSearchable findHomepageSearchable() {
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
@@ -6959,6 +7039,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					} else if (drawerItem == DrawerItem.HOMEPAGE) {
 						mNavController.navigateUp();
+					} else {
+						handleBackPressIfFullscreenOfflineFragmentOpened();
 					}
 				}
 		    	return true;
@@ -7193,7 +7275,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								break;
 						}
 						break;
-
+					case FULLSCREEN_OFFLINE:
+						if (fullscreenOfflineFragment != null) {
+							fullscreenOfflineFragment.selectAll();
+						}
+						break;
 					case CHAT:
 						if (getChatsFragment() != null) {
 							rChatFL.selectAll();
@@ -7441,7 +7527,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 
         //Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-        refreshFragment(FragmentTag.OFFLINE.getTag());
+        if (fullscreenOfflineFragment != null) {
+        	fullscreenOfflineFragment.refreshListGridView();
+		}
 
         //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
         refreshFragment(FragmentTag.CONTACTS.getTag());
@@ -7863,10 +7951,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (getSearchFragment() != null && sFLol.onBackPressed() == 0) {
 				closeSearchSection();
 				return;
-			}
-		} else {
+    		}
+    	} else {
+			handleBackPressIfFullscreenOfflineFragmentOpened();
+		}
+	}
+
+	private void handleBackPressIfFullscreenOfflineFragmentOpened() {
+		if (fullscreenOfflineFragment == null || fullscreenOfflineFragment.onBackPressed() == 0) {
 			super.onBackPressed();
-			return;
 		}
 	}
 
@@ -7925,7 +8018,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem, DrawerItem newDrawerItem) {
     	if (!searchExpand || oldDrawerItem == newDrawerItem) return;
 
-		if (oldDrawerItem == DrawerItem.CHAT/* || oldDrawerItem == DrawerItem.SAVED_FOR_OFFLINE*/) {
+		if (oldDrawerItem == DrawerItem.CHAT || oldDrawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
 			searchExpand = false;
 		}
 	}
@@ -7965,10 +8058,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 				}
 				break;
-			} // FIXME: for removed OFFLINE, should set pathNavigationOffline = "/" ?
+			}
 			case R.id.bottom_navigation_item_homepage: {
 				drawerItem = DrawerItem.HOMEPAGE;
-				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+				if (fullscreenOfflineFragment != null) {
+					super.onBackPressed();
+					return true;
+				} else {
+					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_camera_uploads: {
@@ -11063,8 +11161,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
-		if (getOfflineFragment() != null){
-			oFLol.setOrder(orderCloud);
+		if (fullscreenOfflineFragment != null) {
+			fullscreenOfflineFragment.setOrder(orderCloud);
 		}
 	}
 
@@ -11315,6 +11413,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
+			case R.id.offline_section: {
+				isFirstTimeCam();
+				drawerItem = DrawerItem.FULLSCREEN_OFFLINE;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				selectDrawerItemLollipop(drawerItem);
+				break;
+			}
 			case R.id.settings_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.SETTINGS;
@@ -11426,6 +11531,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff);
+						refreshOfflineNodes();
 
                         if(isCloudAdded()){
                             String handle = mOff.getHandle();
@@ -11466,14 +11572,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
+				switch (which) {
 					case DialogInterface.BUTTON_POSITIVE: {
-
 						NodeController nC = new NodeController(managerActivity);
-						for (int i=0;i<documents.size();i++){
+						for (int i=0;i<documents.size();i++) {
 							nC.deleteOffline(documents.get(i));
 						}
-						updateOfflineView(documents.get(0));
+						refreshOfflineNodes();
 						if (getSettingsFragment() != null) {
 							sttFLol.taskGetSizeOffline();
 						}
@@ -12924,18 +13029,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void updateOfflineView(MegaOffline mOff){
+	private void refreshOfflineNodes() {
 		logDebug("updateOfflineView");
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if(oFLol!=null){
-			oFLol.hideMultipleSelect();
-			if(mOff==null){
-				oFLol.refresh();
-			}
-			else{
-				oFLol.refreshPaths(mOff);
-			}
-			supportInvalidateOptionsMenu();
+		if (fullscreenOfflineFragment != null) {
+			fullscreenOfflineFragment.refreshNodes();
+		} else if (pagerOfflineFragment != null) {
+			pagerOfflineFragment.refreshNodes();
 		}
 	}
 
@@ -14183,9 +14282,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				else if (drawerItem == DrawerItem.INBOX){
 					refreshInboxList();
 				}
-                // FIXME: for removed OFFLINE, should we call oFLol.getRecyclerView().invalidate()?
 				else if (drawerItem == DrawerItem.SHARED_ITEMS){
     				onNodesSharedUpdate();
+				} else {
+					refreshOfflineNodes();
 				}
 			}
 			else{
@@ -14598,7 +14698,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		setNotificationsTitleSection();
 		notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
-		if(notificFragment!=null){
+		if (notificFragment!=null && userAlerts != null) {
             notificFragment.updateNotifications(userAlerts);
 		}
 
@@ -16493,35 +16593,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		drawerItem = DrawerItem.SEARCH;
 	}
 
-	public String getOfflineSearchPath() {
-		if (isOfflineSearchPathEmpty()) return null;
-
-		return offlineSearchPaths.get(offlineSearchPaths.size() - 1);
-	}
-
-	public String getInitialSearchPath() {
-		if (isOfflineSearchPathEmpty()) return null;
-
-		return offlineSearchPaths.get(0);
-	}
-
-	public void addOfflineSearchPath(String path) {
-		if (offlineSearchPaths == null) {
-			offlineSearchPaths = new ArrayList<>();
-		}
-		offlineSearchPaths.add(path);
-	}
-
-	public void removeOfflineSearchPath() {
-		if (isOfflineSearchPathEmpty()) return;
-
-		offlineSearchPaths.remove(offlineSearchPaths.size() - 1);
-	}
-
-	public boolean isOfflineSearchPathEmpty() {
-		return offlineSearchPaths == null || offlineSearchPaths.isEmpty();
-	}
-
     public DrawerItem getSearchDrawerItem(){
 		return searchDrawerItem;
 	}
@@ -16778,10 +16849,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private RubbishBinFragmentLollipop getRubbishBinFragment() {
 		return rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
-	}
-
-	private OfflineFragmentLollipop getOfflineFragment() {
-		return oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 	}
 
 	private CameraUploadFragmentLollipop getCameraUploadFragment() {

@@ -1,0 +1,25 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    >
+
+    <TextView
+        android:id="@+id/sorted_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="6dp"
+        android:textColor="@color/file_list_first_row"
+        android:textSize="14sp"
+        tools:text="Name"
+        />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:src="@drawable/ic_down"
+        />
+</LinearLayout>
