@@ -1354,6 +1354,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (prefs != null) {
             String written = prefs.getWrittenText();
             if (!TextUtils.isEmpty(written)) {
+                String editedMsgId = prefs.getEditedMsgId();
+                editingMessage = !isTextEmpty(editedMsgId);
+                messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(editedMsgId)) : null;
                 textChat.setText(written);
                 sendIcon.setVisibility(View.VISIBLE);
                 sendIcon.setEnabled(true);
@@ -7379,7 +7382,20 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if(textChat!=null){
                 String written = textChat.getText().toString();
                 if(written!=null){
-                    dbH.setWrittenTextItem(Long.toString(idChat), textChat.getText().toString());
+                    if (dbH == null) {
+                        dbH = MegaApplication.getInstance().getDbH();
+                    }
+
+                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+                    String editedMessageId = editingMessage && messageToEdit != null ? Long.toString(messageToEdit.getMsgId()) : "";
+                    if (prefs != null) {
+                        prefs.setEditedMsgId(editedMessageId);
+                        prefs.setWrittenText(written);
+                        dbH.setWrittenTextItem(Long.toString(idChat), written, editedMessageId);
+                    } else {
+                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), written, editedMessageId);
+                        dbH.setChatItemPreferences(prefs);
+                    }
                 }
             }
             else{
