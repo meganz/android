@@ -833,9 +833,10 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 
 			pathNavigation = ((ManagerActivityLollipop) context).getOfflineSearchPath();
-			if (((ManagerActivityLollipop) context).getOfflineSearchPath().equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
+			if (pathNavigation == null || pathNavigation.equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
 				((ManagerActivityLollipop) context).removeOfflineSearchPath();
 				((ManagerActivityLollipop) context).setSearchQuery(null);
+				pathNavigation = OFFLINE_ROOT;
 			}
 		} else {
 			pathNavigation = pathNavigation.substring(0, pathNavigation.length() - 1);
