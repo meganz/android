@@ -89,7 +89,6 @@
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
 
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
@@ -1671,7 +1670,6 @@
     <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again.</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">Uploading&#8230;</string>
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
@@ -1726,6 +1724,11 @@
     <plurals name="context_share_folders">
         <item context="menu item" quantity="one">Share folder</item>
         <item context="menu items" quantity="other">Share folders</item>
+    </plurals>
+
+    <plurals name="confirmation_leave_share_folder">
+        <item context="Confirmation message before leaving an incoming shared folder" quantity="one">If you leave the folder, you will not be able to see it again.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">If you leave the folders, you will not be able to see them again.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">No folders shared</string>

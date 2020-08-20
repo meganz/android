@@ -3,11 +3,9 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -18,6 +16,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 //Listener for  multiselect
 public class MultipleRequestListener implements MegaRequestListenerInterface {
@@ -136,10 +135,8 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                                 message = context.getString(R.string.number_correctly_leaved, max_items - error) + context.getString(R.string.number_no_leaved, error);
                             }
                         }
-                        else if (max_items > 1){
+                        else {
                             message = context.getString(R.string.number_correctly_leaved, max_items);
-                        } else {
-                            message = context.getString(R.string.share_left);
                         }
                     }
                     else{
@@ -151,8 +148,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             message = context.getString(R.string.number_correctly_removed, max_items);
                         }
 
-                        ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
-                        managerActivity.refreshAfterRemoving();
+                        if (context instanceof ManagerActivityLollipop) {
+                            ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                            managerActivity.refreshAfterRemoving();
+                        }
                         resetAccountDetailsTimeStamp();
                     }
 
@@ -251,23 +250,14 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                 default:
                     break;
             }
-            if(context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
-            }
-            else if(context instanceof ChatActivityLollipop){
+
+            if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).removeProgressDialog();
-                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
-            }
-            else if(context instanceof ContactAttachmentActivityLollipop){
-                ((ContactAttachmentActivityLollipop) context).showSnackbar(message);
-            }
-            else if(context instanceof AddContactActivityLollipop){
-                ((AddContactActivityLollipop) context).showSnackbar(message);
-            }
-            else if(context instanceof NodeAttachmentHistoryActivity){
+            } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
-                ((NodeAttachmentHistoryActivity) context).showSnackbar(SNACKBAR_TYPE, message);
             }
+
+            showSnackbar(context, message);
         }
     }
 }

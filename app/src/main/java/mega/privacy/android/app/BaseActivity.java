@@ -43,6 +43,7 @@ import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -125,6 +126,9 @@ public class BaseActivity extends AppCompatActivity {
         registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
+        registerReceiver(showSnackbarReceiver,
+                new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -172,6 +176,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
         unregisterReceiver(transferFinishedReceiver);
+        unregisterReceiver(showSnackbarReceiver);
 
         super.onDestroy();
     }
@@ -301,6 +306,20 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             Util.showSnackbar(baseActivity, message);
+        }
+    };
+
+    private BroadcastReceiver showSnackbarReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPaused || intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_SHOW_SNACKBAR))
+                return;
+
+            String message = intent.getStringExtra(SNACKBAR_TEXT);
+            if (!isTextEmpty(message)) {
+                Util.showSnackbar(baseActivity, message);
+            }
         }
     };
 

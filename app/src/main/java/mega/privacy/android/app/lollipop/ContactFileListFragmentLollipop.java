@@ -55,6 +55,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -145,7 +146,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						handleList.add(documents.get(i).getHandle());
 					}
 
-					((ContactFileListActivityLollipop) context).showConfirmationLeaveIncomingShare(handleList);
+					showConfirmationLeaveIncomingShares(context, handleList);
                     break;
 				}
                 case R.id.cab_menu_trash: {
@@ -174,7 +175,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
-			fab.setVisibility(View.GONE);
+			fab.hide();
 			changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
 			checkScroll();
 			return true;
@@ -185,7 +186,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			fab.setVisibility(View.VISIBLE);
+			setFabVisibility(megaApi.getNodeByHandle(parentHandle));
 			changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 3);
 			checkScroll();
 		}
@@ -312,7 +313,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 			fab = (FloatingActionButton) v.findViewById(R.id.floating_button_contact_file_list);
 			fab.setOnClickListener(new FabButtonListener(context));
-			fab.setVisibility(View.GONE);
+			fab.hide();
 
 			contact = megaApi.getContact(userEmail);
 			if(contact == null)
@@ -402,7 +403,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public void checkScroll() {
-		if (listView != null) {
+		if (listView != null && aB != null) {
 			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
@@ -811,15 +812,15 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
         }
 		if (parentHandleStack.isEmpty()) {
 			logDebug("return 0");
-			fab.setVisibility(View.GONE);
+			fab.hide();
 			return 0;
 		} else {
 			parentHandle = parentHandleStack.pop();
+			setFabVisibility(megaApi.getNodeByHandle(parentHandle));
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			if (parentHandle == -1) {
-				fab.setVisibility(View.GONE);
 				contactNodes = megaApi.getInShares(contact);
 				((ContactFileListActivityLollipop)context).setTitleActionBar(null);
 				((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -835,6 +836,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
+				((ContactFileListActivityLollipop) context).supportInvalidateOptionsMenu();
 				adapter.setParentHandle(parentHandle);
 				logDebug("return 2");
 				return 2;
@@ -942,19 +944,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public void showFabButton(MegaNode node){
-		if (node == null) {
-			return;
-		}
-
-		logDebug("Node handle: " + node.getHandle());
-		int accessLevel = megaApi.getAccess(node);
-
-		if(accessLevel== MegaShare.ACCESS_READ){
-			fab.setVisibility(View.GONE);
-		}
-		else{
-			fab.setVisibility(View.VISIBLE);
-		}
+		setFabVisibility(node);
 		((ContactFileListActivityLollipop) context).invalidateOptionsMenu();
 	}
 
@@ -977,5 +967,11 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
         return parentHandleStack.isEmpty();
     }
 
-
+	private void setFabVisibility(MegaNode node) {
+		if (megaApi.getAccess(node) == MegaShare.ACCESS_READ || node == null) {
+			fab.hide();
+		} else {
+			fab.show();
+		}
+	}
 }

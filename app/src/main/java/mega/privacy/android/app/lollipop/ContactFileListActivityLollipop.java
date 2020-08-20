@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
@@ -153,6 +154,20 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		}
 	};
 
+	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null
+					|| !intent.getAction().equals(BROADCAST_ACTION_DESTROY_ACTION_MODE))
+				return;
+
+			if (cflF != null && cflF.isVisible()) {
+				cflF.clearSelections();
+				cflF.hideMultipleSelect();
+			}
+		}
+	};
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		logDebug("onSaveInstanceState");
@@ -174,15 +189,8 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
 		startConversation.setVisible(false);
 
-		if (cflF != null && cflF.isVisible()) {
-			if (cflF.getFabVisibility() == View.VISIBLE) {
-				createFolderMenuItem.setVisible(true);
-			} else {
-				createFolderMenuItem.setVisible(false);
-			}
-		} else {
-			createFolderMenuItem.setVisible(false);
-		}
+		MegaNode n = megaApi.getNodeByHandle(parentHandle);
+		createFolderMenuItem.setVisible(n != null && megaApi.getAccess(n) > MegaShare.ACCESS_READ);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -544,6 +552,8 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+		registerReceiver(destroyActionModeReceiver,
+				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
 
 		handler = new Handler();
 		dbH = DatabaseHandler.getDbHandler(this);
@@ -667,64 +677,6 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		setIntent(intent);
 	}
 
-	public void showConfirmationLeaveIncomingShare(final MegaNode n) {
-		logDebug("showConfirmationLeaveIncomingShare");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which) {
-					case DialogInterface.BUTTON_POSITIVE: {
-						//TODO remove the incoming shares
-						megaApi.remove(n);
-						break;
-					}
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		String message = getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-			   .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
-	public void showConfirmationLeaveIncomingShare(final ArrayList<Long> handleList) {
-		logDebug("showConfirmationLeaveIncomingShare");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which) {
-					case DialogInterface.BUTTON_POSITIVE: {
-						//TODO remove the incoming shares
-						contactPropertiesMainActivity.leaveMultipleShares(handleList);
-						break;
-					}
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		String message = getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-			   .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
-	public void leaveMultipleShares(ArrayList<Long> handleList) {
-
-		for (int i = 0; i < handleList.size(); i++) {
-			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-			megaApi.remove(node);
-		}
-	}
-
 	public String getDescription(ArrayList<MegaNode> nodes) {
 		int numFolders = 0;
 		int numFiles = 0;
@@ -768,6 +720,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+		unregisterReceiver(destroyActionModeReceiver);
 	}
 
 	@Override

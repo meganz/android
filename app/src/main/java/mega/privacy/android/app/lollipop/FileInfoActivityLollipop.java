@@ -1350,10 +1350,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 				showRenameDialog();
 				break;
 			}
-			case R.id.cab_menu_file_info_leave: {
-				leaveIncomingShare();
+			case R.id.cab_menu_file_info_leave:
+				showConfirmationLeaveIncomingShare(this, node);
 				break;
-			}
+
 			case R.id.cab_menu_file_info_rubbish:
 			case R.id.cab_menu_file_info_delete: {
 				moveToTrash();
@@ -1807,32 +1807,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
 		}, 50);
-	}
-
-	public void leaveIncomingShare (){
-        logDebug("leaveIncomingShare");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	//TODO remove the incoming shares
-		    		megaApi.remove(node, fileInfoActivityLollipop);
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void showCopy(){
