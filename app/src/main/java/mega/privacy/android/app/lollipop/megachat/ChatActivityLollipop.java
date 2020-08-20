@@ -790,9 +790,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         participantsText = tB.findViewById(R.id.participants_text);
 
         textChat = findViewById(R.id.edit_text_chat);
-        TextFormatterViewCompat.applyFormatting(textChat);
         textChat.setVisibility(View.VISIBLE);
         textChat.setEnabled(true);
+        TextFormatterViewCompat.applyFormatting(textChat);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
         emptyTextView = findViewById(R.id.empty_text_chat_recent);
@@ -916,13 +916,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         observersNumberText = findViewById(R.id.observers_text);
 
         textChat.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) { }
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-
                 if (s != null && !s.toString().trim().isEmpty()) {
                     sendIcon.setEnabled(true);
                     sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
@@ -939,7 +937,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (getCurrentFocus() == textChat) {
                     // is only executed if the EditText was directly changed by the user
                     if (sendIsTyping) {
-                        logDebug("textChat:TextChangedListener:onTextChanged:sendIsTyping:sendTypingNotification");
                         sendIsTyping = false;
                         megaChatApi.sendTypingNotification(chatRoom.getChatId());
 
@@ -957,7 +954,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         megaChatApi.signalPresenceActivity();
                     }
                 } else {
-                    logDebug("textChat:TextChangedListener:onTextChanged:nonFocusTextChat:sendStopTypingNotification");
                     if (chatRoom != null) {
                         megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
                     }
@@ -965,48 +961,29 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         });
 
-        textChat.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //Hide fileStorageLayout
-                hideFileStorage();
-                showLetterKB();
-                return false;
-            }
+        textChat.setOnTouchListener((v, event) -> {
+            showLetterKB();
+            return false;
         });
 
-        textChat.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //Hide fileStorageLayout
-                hideFileStorage();
-                showLetterKB();
-                return false;
-            }
+        textChat.setOnLongClickListener(v -> {
+            showLetterKB();
+            return false;
         });
 
-        textChat.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    //Hide fileStorageLayout
-                    hideFileStorage();
-                    showLetterKB();
-                }
-                return false;
+        textChat.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                showLetterKB();
             }
+            return false;
         });
 
         /*
         *If the recording button (an arrow) is clicked, the recording will be sent to the chat
         */
-        recordButton.setOnRecordClickListener(new OnRecordClickListener() {
-            @Override
-            public void onClick(View v) {
-                logDebug("recordButton.setOnRecordClickListener:onClick");
-                recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
-                sendRecording();
-            }
+        recordButton.setOnRecordClickListener(v -> {
+            recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
+            sendRecording();
         });
 
         /*
@@ -1015,7 +992,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         recordView.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
-                logDebug("recordView.setOnRecordListener:onStart");
                 if (participatingInACall()) {
                     showSnackbar(SNACKBAR_TYPE, getApplicationContext().getString(R.string.not_allowed_recording_voice_clip), -1);
                     return;
@@ -1030,34 +1006,29 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             @Override
             public void onLessThanSecond() {
-                logDebug("recordView.setOnRecordListener:onLessThanSecond");
                 if (!isAllowedToRecord()) return;
                 showBubble();
             }
 
             @Override
             public void onCancel() {
-                logDebug("recordView.setOnRecordListener:onCancel");
                 recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 cancelRecording();
             }
 
             @Override
             public void onLock() {
-                logDebug("recordView.setOnRecordListener:onLock");
                 recordButtonStates(RECORD_BUTTON_SEND);
             }
 
             @Override
             public void onFinish(long recordTime) {
-                logDebug("recordView.setOnRecordListener:onFinish");
                 recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 sendRecording();
             }
 
             @Override
             public void finishedSound() {
-                logDebug("recordView.setOnRecordListener:finishedSound");
                 if (!isAllowedToRecord()) return;
                 startRecording();
             }
@@ -1068,20 +1039,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                    recordingChrono.setText(time);
                }
             }
-
         });
 
         recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
             @Override
             public void onAnimationEnd() {
-                logDebug("recordView.setOnBasketAnimationEndListener:onAnimationEnd");
                 recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 cancelRecording();
             }
 
             @Override
             public void deactivateRecordButton() {
-                logDebug("recordView.setOnBasketAnimationEndListener:desactivateRecordButton");
                 hideChatOptions();
                 recordView.setVisibility(View.VISIBLE);
                 recordLayout.setVisibility(View.VISIBLE);
@@ -1093,18 +1061,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         });
 
 
-        emojiKeyboard.setOnPlaceButtonListener(new OnPlaceButtonListener() {
-            @Override
-            public void needToPlace() {
-                logDebug("needTOPlaced");
-                if(sendIcon.getVisibility() != View.VISIBLE){
-                    recordLayout.setVisibility(View.VISIBLE);
-                    recordButtonLayout.setVisibility(View.VISIBLE);
-                }
-                recordView.setVisibility(View.INVISIBLE);
-                recordButton.activateOnTouchListener(true);
-                placeRecordButton(RECORD_BUTTON_DEACTIVATED);
+        emojiKeyboard.setOnPlaceButtonListener(() -> {
+            if(sendIcon.getVisibility() != View.VISIBLE){
+                recordLayout.setVisibility(View.VISIBLE);
+                recordButtonLayout.setVisibility(View.VISIBLE);
             }
+            recordView.setVisibility(View.INVISIBLE);
+            recordButton.activateOnTouchListener(true);
+            placeRecordButton(RECORD_BUTTON_DEACTIVATED);
         });
 
         messageJumpLayout.setOnClickListener(this);
@@ -1186,6 +1150,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void showLetterKB() {
+        hideFileStorage();
         if (emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown()) return;
         emojiKeyboard.showLetterKeyboard();
     }

@@ -9,12 +9,10 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
 import static mega.privacy.android.app.components.textFormatter.textFormatterUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-
 
 public class TextFormatterViewCompat {
 
@@ -22,8 +20,7 @@ public class TextFormatterViewCompat {
     private static final int GENERAL_FLAG = 18;
     private static final int COLOR_SPAN = -7829368;
 
-    public TextFormatterViewCompat() {
-    }
+    public TextFormatterViewCompat() { }
 
     public static void applyFormatting(final EditText editText, final TextWatcher... watchers) {
         TextWatcher mEditTextWatcher = new TextWatcher() {
@@ -45,9 +42,9 @@ public class TextFormatterViewCompat {
             }
         };
         String text = editText.getText().toString();
-        if (!isTextEmpty(text)) {
-            CharSequence formatted = extractFlagsForEditText(text);
-            editText.setText(formatted);
+        CharSequence formattedText = getFormattedText(text, false);
+        if (formattedText != null) {
+            editText.setText(formattedText);
         }
 
         editText.addTextChangedListener(mEditTextWatcher);
@@ -64,6 +61,13 @@ public class TextFormatterViewCompat {
         Editable formattedEditableText = editText.getText();
         sendAfterTextChanged(otherWatchers, formattedEditableText);
         addTextChangedListener(editText, mainWatcher);
+    }
+
+    public static CharSequence getFormattedText(String text, boolean isTextView) {
+        if (isTextEmpty(text))
+            return null;
+
+        return isTextView? extractFlagsForTextView(text): extractFlagsForEditText(text);
     }
 
     public static void applyFormatting(final TextView textView, final TextWatcher... watchers) {
@@ -86,9 +90,9 @@ public class TextFormatterViewCompat {
             }
         };
         String text = textView.getText().toString();
-        if (!isTextEmpty(text)) {
-            CharSequence formatted = extractFlagsForTextView(text);
-            textView.setText(formatted);
+        CharSequence formattedText = getFormattedText(text, true);
+        if (formattedText != null) {
+            textView.setText(formattedText);
         }
 
         textView.addTextChangedListener(mEditTextWatcher);
@@ -140,7 +144,7 @@ public class TextFormatterViewCompat {
 
         for (int j = 0; i < textChars.length; ++i) {
             char c = textChars[i];
-            switch (c){
+            switch (c) {
                 case BOLD_FLAG:
                     if (boldFlag.start != INVALID_INDEX) {
                         boldFlag.end = j;
@@ -223,8 +227,7 @@ public class TextFormatterViewCompat {
 
         for (int j = 0; i < textChars.length; ++i) {
             char c = textChars[i];
-
-            switch (c){
+            switch (c) {
                 case BOLD_FLAG:
                     if (boldFlag.start == INVALID_INDEX) {
                         if (hasFlagSameLine(text, BOLD_FLAG, i + 1)) {

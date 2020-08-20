@@ -14,15 +14,6 @@ public class textFormatterUtils {
     public textFormatterUtils() {
     }
 
-    public static boolean isFlagged(CharSequence text, int index) {
-        if (index > -1 && index < text.length()) {
-            char c = text.charAt(index);
-            return c == SPACE || c == NEW_LINE || c == BOLD_FLAG || c == ITALIC_FLAG || c == STRIKE_FLAG;
-        } else {
-            return true;
-        }
-    }
-
     public static String getText(ArrayList<Character> characters) {
         char[] chars = new char[characters.size()];
 
@@ -36,22 +27,13 @@ public class textFormatterUtils {
     public static boolean hasFlagSameLine(CharSequence sequence, char flag, int fromIndex) {
         for (int i = fromIndex; i < sequence.length(); ++i) {
             char c = sequence.charAt(i);
-
             if (c == NEW_LINE) {
                 return false;
             }
-
             if (c == flag) {
-                return i != fromIndex;
-            }else if(c == SPACE){
-                int previous = sequence.charAt(i-1);
-                if(previous!=-1 && previous == flag){
-                    return false;
-                }
-
-                if(i == sequence.length()-2 && sequence.charAt(sequence.length()-1) == flag){
-                    return false;
-                }
+                return i != fromIndex && sequence.charAt(i - 1) != SPACE;
+            } else if (c == SPACE && sequence.charAt(i - 1) == flag) {
+                return false;
             }
         }
 

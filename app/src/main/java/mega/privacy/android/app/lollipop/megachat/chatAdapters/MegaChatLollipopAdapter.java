@@ -3796,10 +3796,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.retryAlert.setVisibility(View.GONE);
                 }
 
-
-                    Spannable content = new SpannableString(messageContent);
-                    content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(content+" ");
+                CharSequence formattedText = TextFormatterViewCompat.getFormattedText(messageContent, true);
+                Spannable content = new SpannableString(formattedText);
+                content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.contentOwnMessageText.setText(content + " ");
 
                     Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                     edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -3888,10 +3888,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 checkEmojiSize(messageContent, holder.contentOwnMessageText);
-
-
-                    holder.contentOwnMessageText.setText(messageContent);
-                TextFormatterViewCompat.applyFormatting(holder.contentOwnMessageText);
+                holder.contentOwnMessageText.setText(TextFormatterViewCompat.getFormattedText(messageContent, true));
 
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
@@ -5692,9 +5689,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
             messageContent = "Attachment revoked";
-            ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(messageContent);
-
-
+            holder.contentOwnMessageText.setText(TextFormatterViewCompat.getFormattedText(messageContent, true));
         } else {
             long userHandle = message.getUserHandle();
             logDebug("Contact message!!: " + userHandle);
