@@ -1,9 +1,9 @@
 package mega.privacy.android.app.fragments.photos
 
-import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.utils.TextUtil
 import javax.inject.Inject
 
 @ActivityRetainedScoped
@@ -13,31 +13,53 @@ class PhotosViewModel @Inject constructor(
     private val photosRepository: PhotosRepository
 ) : ViewModel() {
 
-    private var _query = MutableLiveData<PhotoQuery>()
+    private var _query = MutableLiveData<String>("")
 
     private val _openPhotoEvent = MutableLiveData<Event<PhotoNode>>()
     val openPhotoEvent: LiveData<Event<PhotoNode>> = _openPhotoEvent
 
-    val items: LiveData<List<PhotoNode>> = Transformations.switchMap(_query) { query ->
+    var searchMode = false
+
+    private var forceUpdate = false
+
+    private var index = 0
+    private var photoIndex = 0
+
+    val items: LiveData<List<PhotoNode>> = _query.switchMap {
         viewModelScope.launch {
-            photosRepository.getPhotos(query)
+            photosRepository.getPhotos(forceUpdate)
         }
 
         photosRepository.photoNodes
+    }.map { nodes ->
+        var filteredNodes = nodes
+
+        if (!TextUtil.isTextEmpty(_query.value)) {
+            filteredNodes = nodes.filter {
+                it.node?.name?.contains(
+                    _query.value!!,
+                    true
+                ) ?: false
+            }
+        }
+
+        filteredNodes.forEach {
+            it.index = index++
+            if (it.type == PhotoNode.TYPE_PHOTO) it.photoIndex = photoIndex++
+        }
+
+        filteredNodes
     }
 
-    fun loadPhotos(query: PhotoQuery) {
+
+    fun loadPhotos(query: String, forceUpdate: Boolean = false) {
+        this.forceUpdate = forceUpdate
+        index = 0
+        photoIndex = 0
         _query.value = query
     }
 
-    fun refresh() {
-        _query.value?.let {
-            _query.value = it
-        }
-    }
-
     fun onPhotoClick(item: PhotoNode) {
-        Log.i("Alex", "onClick:$this")
         _openPhotoEvent.value = Event(item)
     }
 }

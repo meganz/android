@@ -5,10 +5,10 @@ import java.io.File
 
 data class PhotoNode(
     val type: Int,
-    val photoIndex: Int,
-    override val node: MegaNode?,
-    override val index: Int,
-    override val modifiedDate: String,
+    var photoIndex: Int,
+    override var node: MegaNode?,
+    override var index: Int,
+    override var modifiedDate: String,
     override var thumbnail: File?,
     override var selected: Boolean,
     override var uiDirty: Boolean = true   // Force refresh the newly created Node list item

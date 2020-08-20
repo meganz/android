@@ -58,7 +58,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
@@ -215,7 +214,9 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -6462,6 +6463,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
 					if (mHomepageSearchable != null) {
 						mHomepageSearchable.exitSearch();
+						searchQuery = "";
 						supportInvalidateOptionsMenu();
 					}
 				} else {
@@ -6474,6 +6476,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
 
 		searchView.setMaxWidth(Integer.MAX_VALUE);
+
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
@@ -6517,6 +6520,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					searchQuery = newText;
 					setFullscreenOfflineFragmentSearchQuery(searchQuery);
+				} else if (drawerItem == DrawerItem.HOMEPAGE) {
+					if (mHomepageSearchable != null) {
+						searchQuery = newText;
+						mHomepageSearchable.searchQuery(searchQuery);
+					}
 				} else {
 					getSearchFragment();
 
@@ -6819,11 +6827,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case NOTIFICATIONS:
 					break;
 				case HOMEPAGE:
+					// Get the Searchable again at onCreateOptionsMenu() after screen rotation
 					mHomepageSearchable = findHomepageSearchable();
-					if (mHomepageSearchable != null) {
-						searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearch());
-						if (mHomepageSearchable instanceof PhotosFragment) {
-							rubbishBinMenuItem.setVisible(true);
+
+					if (searchExpand) {
+						openSearchView();
+					} else {
+						if (mHomepageSearchable != null) {
+							searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
+							if (mHomepageSearchable instanceof PhotosFragment) {
+								rubbishBinMenuItem.setVisible(true);
+							}
 						}
 					}
 					break;
@@ -7933,10 +7947,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				backToDrawerItem(CLOUD_DRIVE_BNV);
 				return;
     		}
-    	}
-		else if (drawerItem == DrawerItem.SEARCH){
-			if (getSearchFragment() != null && sFLol.onBackPressed() == 0){
-    			closeSearchSection();
+    	} else if (drawerItem == DrawerItem.SEARCH) {
+			if (getSearchFragment() != null && sFLol.onBackPressed() == 0) {
+				closeSearchSection();
 				return;
     		}
     	} else {
@@ -16389,6 +16402,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if(drawerItem == ManagerActivityLollipop.DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
 				megaApi.acknowledgeUserAlerts();
 			}
+		}
+	}
+
+	public void showKeyboardForSearch() {
+		showKeyboardDelayed(searchView.findViewById(R.id.search_src_text));
+		if (searchView != null) {
+			searchView.requestFocus();
+		}
+	}
+
+	public void hideKeyboardSearch() {
+		hideKeyboard(this);
+		if (searchView != null) {
+			searchView.clearFocus();
 		}
 	}
 

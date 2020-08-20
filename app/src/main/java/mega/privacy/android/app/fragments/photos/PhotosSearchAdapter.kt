@@ -1,14 +1,9 @@
 package mega.privacy.android.app.fragments.photos
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoSearchBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
@@ -20,22 +15,35 @@ class PhotosSearchAdapter @Inject constructor(
 ) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
-    private var itemDimen = 0
-
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
-        val binding = ItemPhotoSearchBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val inflater = LayoutInflater.from(parent.context)
 
-        // FastScroller would affect the normal process of RecyclerView that makes the "selected"
-        // icon appear before binding the item. Therefore, hide the icon up front
-//        binding.iconSelected.visibility = View.GONE
+        val binding = when (viewType) {
+            PhotoNode.TYPE_TITLE ->
+                ItemPhotosTitleBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+            else ->  // TYPE_PHOTO
+                ItemPhotoSearchBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+        }
+
+        // TYPE_TITLE views take layout positions for facilitating the logic calculation
+        if (viewType == PhotoNode.TYPE_TITLE) {
+            val layoutParams = binding.root.layoutParams
+            layoutParams.width = 0
+            layoutParams.height = 0
+            binding.root.layoutParams = layoutParams
+        }
 
         return PhotoViewHolder(binding)
     }
@@ -55,7 +63,6 @@ class PhotosSearchAdapter @Inject constructor(
             }
 
             return true
-//            return oldItem.thumbnail == newItem.thumbnail
         }
     }
 

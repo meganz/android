@@ -22,21 +22,25 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp">
+        android:layout_height="72dp"
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick(item) : actionModeViewModel.onPhotoClick(item))}"
+        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
 
         <ImageView
-            android:id="@+id/photo_list_thumbnail"
+            android:id="@+id/thumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="12dp"
             android:scaleType="fitCenter"
+            app:thumbnail="@{item.thumbnail}"
+            app:selected="@{item.selected}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_image_thumbnail" />
 
         <TextView
-            android:id="@+id/photo_list_name"
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
@@ -45,12 +49,24 @@
             android:textColor="@color/file_list_first_row"
             android:textSize="16sp"
             android:text="@{item.node.name}"
-            app:layout_constraintStart_toEndOf="@id/photo_list_thumbnail"
-            app:layout_constraintTop_toTopOf="@id/photo_list_thumbnail"
+            app:layout_constraintStart_toEndOf="@id/thumbnail"
+            app:layout_constraintTop_toTopOf="@id/thumbnail"
             tools:text="2020-05-25 22.30.21.jpg" />
 
+        <ImageView
+            android:id="@+id/taken_down"
+            style="@style/taken_down_icon"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="6dp"
+            app:layout_constraintStart_toEndOf="@id/name"
+            app:layout_constraintTop_toTopOf="@id/name"
+            android:src="@drawable/ic_input_warning"
+            android:visibility="@{item.node.takenDown ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible"
+            />
+
         <TextView
-            android:id="@+id/photo_list_size"
+            android:id="@+id/size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -58,12 +74,12 @@
             android:textColor="@color/file_list_second_row"
             android:textSize="14sp"
             android:text="@{String.valueOf(item.node.size)}"
-            app:layout_constraintStart_toStartOf="@id/photo_list_name"
-            app:layout_constraintTop_toBottomOf="@id/photo_list_name"
+            app:layout_constraintStart_toStartOf="@id/name"
+            app:layout_constraintTop_toBottomOf="@id/name"
             tools:text="8.27 MB" />
 
         <TextView
-            android:id="@+id/photo_list_time"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
@@ -72,12 +88,12 @@
             android:textColor="@color/file_list_second_row"
             android:textSize="14sp"
             android:text="@{String.valueOf(item.node.modificationTime)}"
-            app:layout_constraintStart_toEndOf="@id/photo_list_size"
-            app:layout_constraintTop_toTopOf="@id/photo_list_size"
+            app:layout_constraintStart_toEndOf="@id/size"
+            app:layout_constraintTop_toTopOf="@id/size"
             tools:text="June 2020" />
 
         <ImageView
-            android:id="@+id/file_list_three_dots"
+            android:id="@+id/three_dots"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
@@ -85,8 +101,7 @@
             android:src="@drawable/ic_dots_vertical_grey"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="ContentDescription" />
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
 

@@ -74,7 +74,6 @@ class PhotosBrowseAdapter @Inject constructor(
             }
 
             return true
-//            return oldItem.thumbnail == newItem.thumbnail
         }
     }
 

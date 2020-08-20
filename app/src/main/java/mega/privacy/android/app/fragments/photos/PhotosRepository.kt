@@ -3,9 +3,6 @@ package mega.privacy.android.app.fragments.photos
 import android.content.Context
 import android.os.Handler
 import android.text.TextUtils
-import android.util.Log
-import android.util.LongSparseArray
-import androidx.core.util.containsKey
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -14,7 +11,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
@@ -45,39 +41,32 @@ class PhotosRepository @Inject constructor(
     private val _photoNodes = MutableLiveData<List<PhotoNode>>()
     val photoNodes: LiveData<List<PhotoNode>> = _photoNodes
 
-    suspend fun getPhotos(query: PhotoQuery) = withContext(Dispatchers.IO) {
-        saveAndClearData()
+    suspend fun getPhotos(forceUpdate: Boolean) {
+        if (forceUpdate) {
+            withContext(Dispatchers.IO) {
+                saveAndClearData()
+                getPhotoNodes()
 
-        if (query.order == MegaApiJava.ORDER_NONE) {
-            getSortOrder()
+                // Update LiveData must in main thread
+                withContext(Dispatchers.Main) {
+                    _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
+                }
+            }
         } else {
-            order = query.order
-        }
-
-        getPhotoNodes()
-
-        // Update LiveData must in main thread
-        withContext(Dispatchers.Main) {
-            _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
+            _photoNodes.value?.let {
+                _photoNodes.value = it
+            }
         }
     }
 
+    /**
+     * Save some field values (e.g. "selected") which do not exist in the raw MegaNode data.
+     * Restore these values in event of querying the raw data again
+     */
     private fun saveAndClearData() {
         savedPhotoNodesMap.clear()
         photoNodesMap.toMap(savedPhotoNodesMap)
         photoNodesMap.clear()
-    }
-
-    private fun getSortOrder(): Int {
-        try {
-            dbHandler.preferences.preferredSortCameraUpload?.let {
-                order = it.toInt()
-            }
-        } catch (exception: NumberFormatException) {
-            logWarning(exception.message)
-        }
-
-        return order
     }
 
     private fun getThumbnail(node: MegaNode): File? {
@@ -132,9 +121,8 @@ class PhotosRepository @Inject constructor(
     private fun getPhotoNodes() {
         var lastModifyDate: LocalDate? = null
         var mapKeyTitle = Long.MIN_VALUE
-        var index = 0
 
-        for ((photoIndex, node) in getMegaNodesOfPhotos().withIndex()) {
+        for (node in getMegaNodesOfPhotos()) {
             val thumbnail = getThumbnail(node)
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
@@ -146,16 +134,16 @@ class PhotosRepository @Inject constructor(
             ) {
                 lastModifyDate = modifyDate
                 photoNodesMap[mapKeyTitle++] =
-                    PhotoNode(PhotoNode.TYPE_TITLE, -1,null, index++, dateString, null, false)
+                    PhotoNode(PhotoNode.TYPE_TITLE, -1, null, -1, dateString, null, false)
             }
 
             val selected = savedPhotoNodesMap[node.handle]?.selected ?: false
 
             photoNodesMap[node.handle] = PhotoNode(
                 PhotoNode.TYPE_PHOTO,
-                photoIndex,
+                -1,
                 node,
-                index++,
+                -1,
                 dateString,
                 thumbnail,
                 selected

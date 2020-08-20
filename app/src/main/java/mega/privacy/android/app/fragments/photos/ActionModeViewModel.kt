@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.photos
 
+import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,12 +9,14 @@ import javax.inject.Inject
 
 @ActivityRetainedScoped
 class ActionModeViewModel @Inject constructor() : ViewModel() {
-
+    // The full set of nodes
     private lateinit var nodesData: List<SelectableNode>
 
+    // Which nodes have been selected so far
     private val _selectedNodes = MutableLiveData<List<SelectableNode>>()
     val selectedNodes: LiveData<List<SelectableNode>> = _selectedNodes
 
+    // Which nodes should play the animation for this time of selection
     private val _animNodeIndices = MutableLiveData<Set<Int>>()
     val animNodeIndices: LiveData<Set<Int>> = _animNodeIndices
 
@@ -78,11 +81,14 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     fun setNodesData(nodes: List<SelectableNode>) {
         nodesData = nodes
+
+        // Some selected nodes may have been removed, so refresh selectedNodeList
         selectedNodeList.clear()
         nodesData.forEach {
             if (it.selected) {
                 selectedNodeList.add(it)
             }
         }
+        _selectedNodes.value = selectedNodeList
     }
 }
