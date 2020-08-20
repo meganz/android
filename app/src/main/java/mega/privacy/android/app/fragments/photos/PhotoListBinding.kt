@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.photos
 
-import android.util.Log
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
@@ -16,15 +15,8 @@ import java.io.File
 @Suppress("UNCHECKED_CAST")
 @BindingAdapter("items")
 fun setItems(listView: RecyclerView, items: List<PhotoNode>?) {
-    Log.i("Alex", "submitlist")
     items?.let {
-        val adapter = listView.adapter
-        if (adapter is PhotosBrowseAdapter) {
-            adapter.submitList(it)
-        } else if (adapter is PhotosSearchAdapter) {
-//            adapter.submitList(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
-            adapter.submitList(it)
-        }
+        (listView.adapter as ListAdapter<PhotoNode, PhotoViewHolder>).submitList(it)
     }
 }
 

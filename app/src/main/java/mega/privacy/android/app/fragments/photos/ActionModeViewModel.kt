@@ -80,11 +80,14 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     fun setNodesData(nodes: List<SelectableNode>) {
         nodesData = nodes
+
+        // Some selected nodes may have been removed, so refresh selectedNodeList
         selectedNodeList.clear()
         nodesData.forEach {
             if (it.selected) {
                 selectedNodeList.add(it)
             }
         }
+        _selectedNodes.value = selectedNodeList
     }
 }

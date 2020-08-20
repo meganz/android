@@ -21,8 +21,6 @@ class PhotosSearchAdapter @Inject constructor(
 ) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
-    private var itemDimen = 0
-
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
     }
@@ -45,7 +43,7 @@ class PhotosSearchAdapter @Inject constructor(
                 )
         }
 
-        // In
+        // TYPE_TITLE views take layout positions for facilitating the logic calculation
         if (viewType == PhotoNode.TYPE_TITLE) {
             val layoutParams = binding.root.layoutParams
             layoutParams.width = 0
@@ -71,7 +69,6 @@ class PhotosSearchAdapter @Inject constructor(
             }
 
             return true
-//            return oldItem.thumbnail == newItem.thumbnail
         }
     }
 

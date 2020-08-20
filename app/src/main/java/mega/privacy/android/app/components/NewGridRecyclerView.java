@@ -12,10 +12,13 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 
 import dagger.hilt.android.internal.managers.ViewComponentManager;
+import mega.privacy.android.app.components.flowlayoutmanager.cache.Line;
 
 public class NewGridRecyclerView extends RecyclerView {
     
     private CustomizedGridLayoutManager manager;
+    private LinearLayoutManager mLinearLayoutManager;
+
     public int columnWidth = -1;
     private boolean isWrapContent = false;
     private int widthTotal = 0;
@@ -115,14 +118,20 @@ public class NewGridRecyclerView extends RecyclerView {
      * Empower the RecyclerView to change to Linear Layout as needed
      */
     public void switchToLinear() {
-        setLayoutManager(new LinearLayoutManager(getContext()));
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
+        setLayoutManager(mLinearLayoutManager);
     }
 
     /**
      * Turn back to use the well-configured CustomizedGridLayoutManager
      */
     public void switchBackToGrid() {
+        mLinearLayoutManager = null;
         setLayoutManager(manager);
         calculateSpanCount();
+    }
+
+    public LinearLayoutManager getLinearLayoutManager() {
+        return mLinearLayoutManager;
     }
 }

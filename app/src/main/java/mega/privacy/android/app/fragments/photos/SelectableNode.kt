@@ -4,9 +4,9 @@ import nz.mega.sdk.MegaNode
 import java.io.File
 
 interface SelectableNode {
-    val node: MegaNode?
-    val index: Int
-    val modifiedDate: String
+    var node: MegaNode?
+    var index: Int
+    var modifiedDate: String
     var thumbnail: File?
     var selected: Boolean
     var uiDirty: Boolean
