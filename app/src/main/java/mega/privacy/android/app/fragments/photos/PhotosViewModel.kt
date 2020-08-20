@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.photos
 
-import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch

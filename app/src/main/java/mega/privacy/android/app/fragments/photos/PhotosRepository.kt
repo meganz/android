@@ -3,21 +3,14 @@ package mega.privacy.android.app.fragments.photos
 import android.content.Context
 import android.os.Handler
 import android.text.TextUtils
-import android.util.Log
-import android.util.LongSparseArray
-import androidx.core.util.containsKey
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
@@ -129,7 +122,7 @@ class PhotosRepository @Inject constructor(
         var lastModifyDate: LocalDate? = null
         var mapKeyTitle = Long.MIN_VALUE
 
-        for ((_, node) in getMegaNodesOfPhotos().withIndex()) {
+        for (node in getMegaNodesOfPhotos()) {
             val thumbnail = getThumbnail(node)
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)

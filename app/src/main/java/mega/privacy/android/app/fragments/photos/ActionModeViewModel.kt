@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.photos
 
+import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

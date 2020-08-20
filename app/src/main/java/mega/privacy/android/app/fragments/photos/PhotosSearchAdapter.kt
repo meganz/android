@@ -1,16 +1,10 @@
 package mega.privacy.android.app.fragments.photos
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotoSearchBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import javax.inject.Inject

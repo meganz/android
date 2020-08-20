@@ -5,11 +5,9 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -18,7 +16,6 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_homepage.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
@@ -28,11 +25,9 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.lang.Exception
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -118,13 +113,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
             val parentNode = megaApi.getParentNode(node.node)
             if (parentNode == null || parentNode.type == MegaNode.TYPE_ROOT) {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE);
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
             } else {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.handle);
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.handle)
             }
 
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
-            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, thumbnailLocation);
+            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, thumbnailLocation)
 
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
@@ -324,7 +319,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     private fun configureGridLayoutManager() {
         if (listView.layoutManager !is CustomizedGridLayoutManager) return
 
-        (listView.layoutManager as CustomizedGridLayoutManager)?.apply {
+        (listView.layoutManager as CustomizedGridLayoutManager).apply {
             spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
             val itemDimen =
                 outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
