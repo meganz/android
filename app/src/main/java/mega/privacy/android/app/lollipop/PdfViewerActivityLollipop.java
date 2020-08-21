@@ -85,13 +85,13 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
@@ -650,7 +650,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
         }
         else if (type == OFFLINE_ADAPTER){
-            OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+            OfflineFragment.getDraggingThumbnailLocationOnScreen(location);
         }
         else if (type == ZIP_ADAPTER) {
             ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);

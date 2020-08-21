@@ -71,6 +71,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -79,7 +80,6 @@ import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLol
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
@@ -108,7 +108,6 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
-import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -945,7 +944,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		if (adapterType == OFFLINE_ADAPTER){
 			//OFFLINE
-			mOffList = intent.getParcelableArrayListExtra(ARRAY_OFFLINE);
+			mOffList = intent.getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE);
 			logDebug ("mOffList.size() = " + mOffList.size());
 
 			for(int i=0; i<mOffList.size();i++){
@@ -1138,7 +1137,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		viewPager.setCurrentItem(positionG);
 		viewPager.addOnPageChangeListener(this);
 
-		if (savedInstanceState == null && adapterMega!= null){
+		if (savedInstanceState == null) {
 			ViewTreeObserver observer = viewPager.getViewTreeObserver();
 			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 				@Override
@@ -1242,9 +1241,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER) {
-			if (OfflineFragmentLollipop.imageDrag != null){
-				OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
-			}
+			OfflineFragment.setDraggingThumbnailVisibility(visibility);
 		}
 		else if (adapterType == ZIP_ADAPTER) {
 			if (ZipBrowserActivityLollipop.imageDrag != null) {
@@ -1311,9 +1308,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER){
-			if (OfflineFragmentLollipop.imageDrag != null){
-				OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
-			}
+			OfflineFragment.getDraggingThumbnailLocationOnScreen(location);
 		}
 		else if (adapterType == ZIP_ADAPTER) {
 			if (ZipBrowserActivityLollipop.imageDrag != null) {
@@ -1388,7 +1383,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
             for (int i=0; i<mOffList.size(); i++){
 				logDebug("Name: " + name + " mOfflist name: " + mOffList.get(i).getName());
                 if (mOffList.get(i).getName().equals(name)){
-                    getImageView(i, -1);
+                    getImageView(i, Long.parseLong(mOffList.get(i).getHandle()));
                     break;
                 }
             }
@@ -1461,7 +1456,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
             for (int i=0; i<mOffList.size(); i++){
 				logDebug("Name: " + name + " mOfflist name: " + mOffList.get(i).getName());
                 if (mOffList.get(i).getName().equals(name)){
-                    scrollToPosition(i, -1);
+                    scrollToPosition(i, Long.parseLong(mOffList.get(i).getHandle()));
                     break;
                 }
             }

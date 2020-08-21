@@ -1,18 +1,12 @@
 package mega.privacy.android.app.components;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Point;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
-
-import dagger.hilt.android.internal.managers.ViewComponentManager;
-import mega.privacy.android.app.components.flowlayoutmanager.cache.Line;
 
 public class NewGridRecyclerView extends RecyclerView {
     
@@ -79,17 +73,7 @@ public class NewGridRecyclerView extends RecyclerView {
     }
     
     private int getScreenX() {
-        Point point = new Point();
-        Context context = getContext();
-        Activity activity = null;
-        if (context instanceof ViewComponentManager.FragmentContextWrapper) {
-            activity = ((ViewComponentManager.FragmentContextWrapper) getContext()).fragment.getActivity();
-        } else {
-            activity = ((Activity)context);
-        }
-
-        activity.getWindowManager().getDefaultDisplay().getSize(point);
-        return point.x;
+        return getResources().getDisplayMetrics().widthPixels;
     }
     
     public int getSpanCount() {

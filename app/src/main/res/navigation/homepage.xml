@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/homepage"
@@ -13,9 +12,28 @@
         <action
             android:id="@+id/action_homepageFragment_to_photosFragment"
             app:destination="@id/photosFragment" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
         android:name="mega.privacy.android.app.fragments.photos.PhotosFragment"
         android:label="@string/category_photos" />
+    <fragment
+        android:id="@+id/fullscreen_offline"
+        android:name="mega.privacy.android.app.fragments.offline.OfflineFragment"
+        tools:layout="@layout/fragment_offline">
+        <argument
+            android:name="path"
+            android:defaultValue="/"
+            app:argType="string" />
+        <argument
+            android:name="rootFolderOnly"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
 </navigation>

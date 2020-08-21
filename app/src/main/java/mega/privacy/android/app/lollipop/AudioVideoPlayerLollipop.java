@@ -114,6 +114,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -122,7 +123,6 @@ import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLol
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
@@ -154,7 +154,6 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
-import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -835,7 +834,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             MegaNode parentNode;
 
             if (adapterType == OFFLINE_ADAPTER){
-                offList = getIntent().getParcelableArrayListExtra(ARRAY_OFFLINE);
+                offList = getIntent().getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE);
                 logDebug ("offList.size() = " + offList.size());
 
                 for(int i=0; i<offList.size();i++){
@@ -1404,7 +1403,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             for (int i=0; i<offList.size(); i++){
                 logDebug("Name: "+fileName+" mOfflist name: "+offList.get(i).getName());
                 if (offList.get(i).getName().equals(fileName)){
-                    getImageView(i, -1);
+                    getImageView(i, Long.parseLong(offList.get(i).getHandle()));
                     break;
                 }
             }
@@ -1460,7 +1459,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             for (int i=0; i<offList.size(); i++){
                 logDebug("Name: " + fileName + " mOfflist name: " + offList.get(i).getName());
                 if (offList.get(i).getName().equals(fileName)){
-                    scrollToPosition(i, -1);
+                    scrollToPosition(i, Long.parseLong(offList.get(i).getHandle()));
                     break;
                 }
             }
@@ -1559,9 +1558,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == OFFLINE_ADAPTER) {
-            if (OfflineFragmentLollipop.imageDrag != null){
-                OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
+            OfflineFragment.setDraggingThumbnailVisibility(visibility);
         }
         else if (adapterType == ZIP_ADAPTER) {
             if (ZipBrowserActivityLollipop.imageDrag != null){
@@ -1623,9 +1620,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == OFFLINE_ADAPTER){
-            if (OfflineFragmentLollipop.imageDrag != null){
-                OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
+            OfflineFragment.getDraggingThumbnailLocationOnScreen(location);
         }
         else if (adapterType == ZIP_ADAPTER){
             if (ZipBrowserActivityLollipop.imageDrag != null){
