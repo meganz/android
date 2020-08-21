@@ -16,6 +16,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
 
+/**
+ * Credit: https://github.com/FutureMind/recycler-fast-scroll
+ */
 public class FastScroller extends LinearLayout{
 
 
@@ -70,6 +73,9 @@ public class FastScroller extends LinearLayout{
         handle = viewProvider.provideHandleView(this);
         addView(handle);
 
+        bubbleOffset = viewProvider.getBubbleOffset();
+        initHandleMovement();
+        applyStyling();
     }
 
     public void setRecyclerView(RecyclerView recyclerView) {
@@ -106,22 +112,6 @@ public class FastScroller extends LinearLayout{
 
     public void addScrollerListener(RecyclerViewScrollListener.ScrollerListener listener) {
         scrollListener.addScrollerListener(listener);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-
-        initHandleMovement();
-        bubbleOffset = viewProvider.getBubbleOffset();
-
-        applyStyling();
-        if (!isInEditMode()) {
-            if(recyclerView!=null){
-                scrollListener.updateHandlePosition(recyclerView);
-
-            }
-        }
     }
 
     private void applyStyling() {
