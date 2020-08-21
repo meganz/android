@@ -7916,6 +7916,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			// of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
 			if (bottomNavigationCurrentItem != HOMEPAGE_BNV) {
 				backToDrawerItem(bottomNavigationCurrentItem);
+			} else {
+				drawerItem = DrawerItem.HOMEPAGE;
 			}
 			super.onBackPressed();
 		}
