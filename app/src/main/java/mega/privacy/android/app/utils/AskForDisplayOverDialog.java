@@ -5,10 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
-import androidx.appcompat.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
@@ -22,20 +23,18 @@ public class AskForDisplayOverDialog {
     public AskForDisplayOverDialog(final Context context) {
         this.context = context;
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        LayoutInflater inflater = LayoutInflater.from(context);
-        final View dialogView = inflater.inflate(R.layout.ask_for_display_over_dialog_layout, null);
-        dialogBuilder.setView(dialogView);
-
-        dialogView.findViewById(R.id.btn_not_now).setOnClickListener(v -> {
-            dismiss();
-            Toast.makeText(context, R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show();
-        });
-        dialogView.findViewById(R.id.btn_ok).setOnClickListener(v -> {
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        dialogBuilder.setView(R.layout.ask_for_display_over_dialog_layout);
+        dialogBuilder.setPositiveButton(R.string.general_allow, (dialog, which) -> {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
             context.startActivity(intent);
             dismiss();
         });
+        dialogBuilder.setNegativeButton(R.string.verify_account_not_now_button, (dialog, which) -> {
+            Toast.makeText(context, R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show();
+            dismiss();
+        });
+
         if (dialog == null) {
             dialog = dialogBuilder.create();
             dialog.setCancelable(false);

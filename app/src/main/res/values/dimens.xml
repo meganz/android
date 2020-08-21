@@ -37,4 +37,12 @@
     <dimen name="emoji_grid_view_column_width">35dp</dimen>
     <dimen name="emoji_grid_view_spacing">6dp</dimen>
 
+    <dimen name="cu_fragment_ic_selected_size_large">23dp</dimen>
+    <dimen name="cu_fragment_ic_selected_margin_large">8dp</dimen>
+    <dimen name="cu_fragment_ic_selected_size_small">16dp</dimen>
+    <dimen name="cu_fragment_ic_selected_margin_small">4dp</dimen>
+    <dimen name="cu_fragment_selected_padding">2dp</dimen>
+    <dimen name="cu_fragment_selected_round_corner_radius">4dp</dimen>
+    <dimen name="cu_fragment_image_margin_small">1dp</dimen>
+    <dimen name="cu_fragment_image_margin_large">2dp</dimen>
 </resources>

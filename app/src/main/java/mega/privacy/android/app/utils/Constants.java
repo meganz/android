@@ -221,6 +221,7 @@ public class Constants {
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
     public static final String ACTION_LOG_OUT = "ACTION_LOG_OUT";
 
+    public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
     public static final String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
@@ -265,6 +266,10 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
+    public static final String INTENT_EXTRA_KEY_POSITION = "position";
+    public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
+    public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
+    public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -617,4 +622,6 @@ public class Constants {
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
+
+    public static final String OFFLINE_ROOT = "/";
 }

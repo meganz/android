@@ -311,7 +311,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 logDebug("Show TOUR_FRAGMENT");
 
                 if (tourFragment == null) {
-                    tourFragment = new TourFragmentLollipop();
+                    tourFragment = TourFragmentLollipop.newInstance(intentReceived.getDataString());
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

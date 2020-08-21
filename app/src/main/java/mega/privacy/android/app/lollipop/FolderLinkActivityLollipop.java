@@ -86,6 +86,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -2064,6 +2065,9 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	}
 
 	public void successfulCopy(){
+		if (getIntent() != null && getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+			sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_IMPORT));
+		}
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
 		if(toHandle!=-1){
