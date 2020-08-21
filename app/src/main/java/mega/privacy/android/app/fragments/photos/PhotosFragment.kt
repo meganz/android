@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +29,7 @@ import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,6 +56,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     lateinit var actionModeCallback: ActionModeCallback
 
     private lateinit var activity: ManagerActivityLollipop
+
+    private var draggingNodeHandle = INVALID_HANDLE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,36 +100,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         })
     }
 
-    private fun openPhoto(node: PhotoNode) {
-        listView.findViewHolderForLayoutPosition(node.index)?.itemView?.findViewById<ImageView>(
-            R.id.thumbnail
-        )?.also {
-            val topLeft = IntArray(2)
-            it.getLocationOnScreen(topLeft)
-            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-            val thumbnailLocation = arrayOf(topLeft[0], topLeft[1], it.width, it.height)
-
-            intent.putExtra(INTENT_EXTRA_KEY_POSITION, node.photoIndex)
-            intent.putExtra(
-                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                MegaApiJava.ORDER_MODIFICATION_DESC
-            )
-
-            val parentNode = megaApi.getParentNode(node.node)
-            if (parentNode == null || parentNode.type == MegaNode.TYPE_ROOT) {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
-            } else {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.handle)
-            }
-
-            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
-            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, thumbnailLocation)
-
-            startActivity(intent)
-            requireActivity().overridePendingTransition(0, 0)
-        }
-    }
-
     override fun refresh() {
         viewModel.loadPhotos(activity.searchQuery, true)
     }
@@ -162,7 +136,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
                     finish()
                 }
             } else {
-                actionModeCallback.nodeCount = getRealNodeCount()
+                actionModeCallback.nodeCount = viewModel.getRealNodeCount()
 
                 if (actionMode == null) {
                     activity.hideKeyboardSearch()
@@ -249,28 +223,16 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             activity.showKeyboardForSearch()
         })
 
-    private fun updateUi() {
-        viewModel.items.value?.let { it ->
-            val newList = ArrayList<PhotoNode>(it)
-            if (viewModel.searchMode) {
-                searchAdapter.submitList(newList)
-            } else {
-                browseAdapter.submitList(newList)
-            }
+    private fun updateUi() = viewModel.items.value?.let { it ->
+        val newList = ArrayList<PhotoNode>(it)
+        if (viewModel.searchMode) {
+            searchAdapter.submitList(newList)
+        } else {
+            browseAdapter.submitList(newList)
         }
     }
 
-    private fun getRealNodeCount(): Int {
-        viewModel.items.value?.filter { it.type == PhotoNode.TYPE_PHOTO }?.let {
-            return it.size
-        }
-
-        return 0
-    }
-
-    private fun setupFastScroller() {
-        binding.scroller.setRecyclerView(listView)
-    }
+    private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -288,14 +250,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         }
     }
 
-    override fun shouldShowSearchMenu(): Boolean {
-        val size = viewModel.items.value?.size
-        if (size != null) {
-            return size > 0
-        }
-
-        return false
-    }
+    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
 
     override fun searchReady() {
         if (viewModel.searchMode) return
@@ -328,7 +283,113 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         }
     }
 
-    override fun searchQuery(query: String) {
-        viewModel.loadPhotos(query)
+    override fun searchQuery(query: String) = viewModel.loadPhotos(query)
+
+    private fun openPhoto(node: PhotoNode) {
+        listView.findViewHolderForLayoutPosition(node.index)?.itemView?.findViewById<ImageView>(
+            R.id.thumbnail
+        )?.also {
+            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
+
+            intent.putExtra(INTENT_EXTRA_KEY_POSITION, node.photoIndex)
+            intent.putExtra(
+                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                MegaApiJava.ORDER_MODIFICATION_DESC
+            )
+
+            val parentNode = megaApi.getParentNode(node.node)
+            if (parentNode == null || parentNode.type == MegaNode.TYPE_ROOT) {
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
+            } else {
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.handle)
+            }
+
+            if (viewModel.searchMode) {
+                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_SEARCH_ADAPTER);
+                intent.putExtra(
+                    INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
+                    viewModel.getHandlesOfPhotos()
+                )
+            } else {
+                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
+            }
+
+            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it))
+
+            FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
+                DraggingThumbnailCallback(
+                    WeakReference(this)
+                )
+            )
+
+            startActivity(intent)
+            requireActivity().overridePendingTransition(0, 0)
+
+            node.node?.let { node ->
+                draggingNodeHandle = node.handle
+            }
+        }
+    }
+
+    /** All below methods are for supporting functions of FullScreenImageViewer */
+
+    fun scrollToNode(handle: Long) {
+        val position = viewModel.getNodePositionByHandle(handle)
+        if (position == INVALID_POSITION) return
+
+        listView.scrollToPosition(position)
+        notifyThumbnailLocationOnScreen()
+    }
+
+    private fun getThumbnailLocationOnScreen(imageView: ImageView): IntArray {
+        val topLeft = IntArray(2)
+        imageView.getLocationOnScreen(topLeft)
+        return intArrayOf(topLeft[0], topLeft[1], imageView.width, imageView.height)
+    }
+
+    private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
+        val thumbnailView = getThumbnailViewByHandle(draggingNodeHandle) ?: return null
+        return getThumbnailLocationOnScreen(thumbnailView)
+    }
+
+    private fun notifyThumbnailLocationOnScreen() {
+        val location = getDraggingThumbnailLocationOnScreen() ?: return
+        location[0] += location[2] / 2
+        location[1] += location[3] / 2
+
+        val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
+        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+    }
+
+    private fun getThumbnailViewByHandle(handle: Long): ImageView? {
+        val position = viewModel.getNodePositionByHandle(handle)
+        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
+        return viewHolder.itemView.findViewById(R.id.thumbnail)
+    }
+
+    fun hideDraggingThumbnail(handle: Long) {
+        getThumbnailViewByHandle(draggingNodeHandle)?.apply { visibility = View.VISIBLE }
+        getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
+        draggingNodeHandle = handle
+        notifyThumbnailLocationOnScreen()
+    }
+
+    companion object {
+        private class DraggingThumbnailCallback(private val fragmentRef: WeakReference<PhotosFragment>) :
+            FullScreenImageViewerLollipop.DraggingThumbnailCallback {
+
+            override fun setVisibility(visibility: Int) {
+                val fragment = fragmentRef.get() ?: return
+                fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
+                    ?.apply { this.visibility = visibility }
+            }
+
+            override fun getLocationOnScreen(location: IntArray) {
+                val fragment = fragmentRef.get() ?: return
+                val result = fragment.getDraggingThumbnailLocationOnScreen() ?: return
+                result.copyInto(location, 0, 0, 2)
+            }
+        }
     }
 }

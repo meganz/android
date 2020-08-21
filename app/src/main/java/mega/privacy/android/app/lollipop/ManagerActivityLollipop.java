@@ -1274,6 +1274,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								muFLol.updateScrollPosition(position);
 							}
 						}
+					}
+					else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
+						Long handle = intent.getLongExtra("handle", -1);
+						if (mHomepageSearchable != null) {
+							PhotosFragment fragment = (PhotosFragment)mHomepageSearchable;
+							switch (actionType) {
+								case SCROLL_TO_POSITION:
+									fragment.scrollToNode(handle);
+									break;
+								case UPDATE_IMAGE_DRAG:
+									fragment.hideDraggingThumbnail(handle);
+									break;
+								default:
+									break;
+							}
+						}
 					} else if (adapterType == RECENTS_ADAPTER && rF != null) {
 						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
 						if (actionType == UPDATE_IMAGE_DRAG) {
@@ -5756,6 +5772,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			int destinationId = destination.getId();
+			mHomepageSearchable = null;
 
 			switch (destinationId) {
 				case R.id.homepageFragment:
