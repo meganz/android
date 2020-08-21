@@ -578,7 +578,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					break;
 
 				case 4:
-					typeAccount.setText(getString(R.string.prolite_account));
+					typeAccount.setText(getString(R.string.lite_account));
 					break;
 			}
 		}

@@ -85,11 +85,13 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeAttachmentHistoryActivity extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>> {
 
@@ -823,6 +825,12 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			logDebug("onActionItemClicked");
 			final ArrayList<MegaChatMessage> messagesSelected = adapter.getSelectedMessages();
+
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL &&
+					item.getItemId() != R.id.cab_menu_select_all || item.getItemId() != R.id.cab_menu_unselect_all) {
+				showOverDiskQuotaPaywallWarning();
+				return false;
+			}
 
 			switch (item.getItemId()) {
 				case R.id.cab_menu_select_all: {

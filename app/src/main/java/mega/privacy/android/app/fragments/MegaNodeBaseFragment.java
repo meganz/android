@@ -53,6 +53,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -196,6 +197,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_send_to_chat:
+                    if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                        showOverDiskQuotaPaywallWarning();
+                        break;
+                    }
                     nC.checkIfNodesAreMineAndSelectChatsToSendNodes(adapter.getArrayListSelectedNodes());
                     hideActionMode();
                     break;

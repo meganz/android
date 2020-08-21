@@ -170,6 +170,7 @@ import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -184,6 +185,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
@@ -1805,7 +1807,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void setBottomLayout(int show) {
-        if (joiningOrLeaving) {
+        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            show = SHOW_NOTHING_LAYOUT;
+        } else if (joiningOrLeaving) {
             show = SHOW_JOINING_OR_LEFTING_LAYOUT;
         }
 
@@ -2274,6 +2278,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         logDebug("onOptionsItemSelected");
+
+        if (app.getStorageState() == STORAGE_STATE_PAYWALL &&
+                (item.getItemId() == R.id.cab_menu_call_chat || item.getItemId() == R.id.cab_menu_video_chat)) {
+            showOverDiskQuotaPaywallWarning();
+            return false;
+        }
 
         if (joiningOrLeaving && item.getItemId() != android.R.id.home) {
             return false;
@@ -2968,6 +2978,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
         logDebug("forwardMessages");
+
+        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
         //Prevent trigger multiple forwarding messages screens in multiple clicks
         if (isForwardingMessage) {
             logDebug("Forwarding message is on going");
@@ -3994,6 +4010,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
+
+            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                showOverDiskQuotaPaywallWarning();
+                return false;
+            }
 
             switch(item.getItemId()){
                 case R.id.chat_cab_menu_edit:
@@ -8046,7 +8067,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             lastMessage = messages.get(index);
                         }
 
-                        if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
+                        if (lastMessage.getMessage() != null && app.isActivityVisible()) {
                             boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                             logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                         }
@@ -8069,7 +8090,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 lastMessage = messages.get(index);
                             }
 
-                            if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
+                            if (lastMessage.getMessage() != null && app.isActivityVisible()) {
                                 boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                                 logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                             }

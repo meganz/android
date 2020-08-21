@@ -4,6 +4,10 @@ package mega.privacy.android.app.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import mega.privacy.android.app.MegaApplication;
+
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+
 public class LastShowSMSDialogTimeChecker {
 
     private static final long WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -75,6 +79,11 @@ public class LastShowSMSDialogTimeChecker {
     }
 
     public boolean shouldShow() {
+        // If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            return false;
+        }
+
         int type = sp.getInt(TYPE, TYPE_WEEK);
         long currentTime = System.currentTimeMillis();
         switch (type) {

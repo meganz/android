@@ -239,7 +239,9 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -466,7 +468,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS, ASK_PERMISSIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -573,6 +575,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
+	private boolean askPermissions = false;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -798,7 +801,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 if (ACTION_STORAGE_STATE_CHANGED.equals(intent.getAction())) {
                     storageStateFromBroadcast = intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
                     if (!showStorageAlertWithDelay) {
-                        checkStorageStatus(storageStateFromBroadcast, false);
+                        checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
+								storageStateFromBroadcast : app.getStorageState(), false);
                     }
                     updateAccountDetailsVisibleInfo();
                     return;
@@ -1703,7 +1707,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		outState.putSerializable("drawerItem", drawerItem);
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
-		outState.putBoolean("firstLogin", firstLogin);
+		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -1862,7 +1866,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
 			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			searchDate = savedInstanceState.getLongArray("searchDate");
-			firstLogin = savedInstanceState.getBoolean("firstLogin");
+			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
+			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
@@ -2002,7 +2007,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		transfersInProgress = new ArrayList<Integer>();
 
 		//sync local contacts to see who's on mega.
-		if (hasPermissions(this, Manifest.permission.READ_CONTACTS)) {
+		if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
 			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
@@ -3038,24 +3043,33 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
 	        	Intent intent = getIntent();
 	        	if (intent != null){
-	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
-					newAccount = getIntent().getBooleanExtra("newAccount", false);
+	        		boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
+					newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
 					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
+					firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+					askPermissions = getIntent().getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
 
                     //reset flag to fix incorrect view loaded when orientation changes
-                    getIntent().removeExtra("newAccount");
-                    getIntent().removeExtra("upgradeAccount");
+                    getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
+                    getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
+					getIntent().removeExtra(EXTRA_FIRST_LOGIN);
+					getIntent().removeExtra(EXTRA_ASK_PERMISSIONS);
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
-						int accountType = getIntent().getIntExtra("accountType", 0);
+						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						switch (accountType){
-							case 0:{
-								logDebug("Intent firstTimeAfterInstallation==true");
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
+							case FREE:{
+								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+									logDebug("First login. Go to Camera Uploads configuration.");
+									drawerItem = DrawerItem.CAMERA_UPLOADS;
+								} else {
+									drawerItem = DrawerItem.ACCOUNT;
+									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+									displayedAccountType = -1;
+								}
 								setIntent(null);
-								displayedAccountType = -1;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case PRO_I:{
@@ -3093,9 +3107,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 	        		}
 	        		else{
-						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
-                        if (firstLogin){
-							logDebug("intent firstLogin==true");
+						if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+							logDebug("First login. Go to Camera Uploads configuration.");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -3106,25 +3119,30 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("DRAWERITEM NOT NULL: " + drawerItem);
 				Intent intentRec = getIntent();
 	        	if (intentRec != null){
-					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
-					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
+					newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
                     newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 					//reset flag to fix incorrect view loaded when orientation changes
-                    getIntent().removeExtra("newAccount");
-                    getIntent().removeExtra("upgradeAccount");
-					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
+                    getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
+                    getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
+					firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+					askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
-						int accountType = getIntent().getIntExtra("accountType", 0);
+						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						switch (accountType){
 							case FREE:{
-								logDebug("Intent firstTimeAfterInstallation==true");
-
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
-								displayedAccountType = -1;
+								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+									logDebug("First login. Go to Camera Uploads configuration.");
+									drawerItem = DrawerItem.CAMERA_UPLOADS;
+								} else {
+									drawerItem = DrawerItem.ACCOUNT;
+									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+									displayedAccountType = -1;
+								}
 								setIntent(null);
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case PRO_I:{
@@ -3164,18 +3182,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					else{
 						if (firstLogin && !joiningToChatLink) {
 							logDebug("Intent firstTimeCam==true");
-							if (prefs != null){
-								if (prefs.getCamSyncEnabled() != null){
-									firstLogin = false;
-								}
-								else{
-									firstLogin = true;
+							if (prefs != null && prefs.getCamSyncEnabled() != null) {
+								firstLogin = false;
+							} else {
+								firstLogin = true;
+								if (app.getStorageState() != STORAGE_STATE_PAYWALL) {
 									drawerItem = DrawerItem.CAMERA_UPLOADS;
 								}
-							}
-							else{
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
 							}
 							setIntent(null);
 						}
@@ -3247,11 +3260,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			return;
 		}
 
-		if (firstTimeAfterInstallation) {
+		if (firstTimeAfterInstallation || askPermissions) {
 			//haven't verified phone number
 			if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
 				askForSMSVerification();
 			} else {
+				drawerItem = DrawerItem.ASK_PERMISSIONS;
 				askForAccess();
 			}
 		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
@@ -3430,7 +3444,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     }
 
 	public void askForAccess () {
-        showStorageAlertWithDelay = true;
+        askPermissions = false;
+    	showStorageAlertWithDelay = true;
     	//If mobile device, only portrait mode is allowed
 		if (!isTablet(this)) {
 			logDebug("Mobile only portrait mode");
@@ -3507,6 +3522,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			drawerItem = DrawerItem.CLOUD_DRIVE;
+		} else {
+			firstLogin = true;
+			drawerItem = DrawerItem.CAMERA_UPLOADS;
+		}
+
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -4672,7 +4695,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("selectDrawerItemCloudDrive");
         if (showStorageAlertWithDelay) {
             showStorageAlertWithDelay = false;
-            checkStorageStatus(storageStateFromBroadcast, false);
+            checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
+					storageStateFromBroadcast : app.getStorageState(), false);
         }
 		tB.setVisibility(View.VISIBLE);
 
@@ -7819,6 +7843,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		selectDrawerItemLollipop(drawerItem);
+
+        // Hide fragment (required to check if show ODQ Paywall)
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.hide(upAFL);
+        ft.commitNow();
 	}
 
 	public void backToDrawerItem(int item) {
@@ -10927,6 +10956,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
+			case MegaApiJava.STORAGE_STATE_PAYWALL:
 				((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
 				usedSpacePB.setProgressDrawable(getResources().getDrawable(
 						R.drawable.custom_progress_bar_horizontal_exceed));
@@ -11208,7 +11238,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				isEnable2FADialogShown = false;
 				Intent intent = new Intent(this, TwoFactorAuthenticationActivity.class);
-				intent.putExtra("newAccount", true);
+				intent.putExtra(EXTRA_NEW_ACCOUNT, true);
 				startActivity(intent);
 				break;
 			}
@@ -11548,6 +11578,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 							REQUEST_WRITE_STORAGE);
 				}
+			}
+
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
 			}
 
 			Uri treeUri = intent.getData();
@@ -12115,6 +12150,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				parentNode = megaApi.getRootNode();
 			}
 
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()), -1);
 			for (String path : paths) {
 				try {
@@ -12522,12 +12562,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				break;
 
+			case MegaApiJava.STORAGE_STATE_PAYWALL:
+				logWarning("STORAGE STATE PAYWALL");
+				break;
+
 			default:
 				return;
 		}
 
-		app.setStorageState(storageState);
 		storageState = newStorageState;
+		app.setStorageState(storageState);
 	}
 
 	/**
@@ -12950,6 +12994,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
 
 			for (ShareInfo info : infos) {
@@ -13039,6 +13088,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void createFile(String name, String data, MegaNode parentNode){
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
 
 		File file = createTemporalTextFile(this, name, data);
 		if(file!=null){
@@ -15146,6 +15200,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 	public void setFirstLogin(boolean flag){
 		firstLogin = flag;
+	}
+
+	public boolean getAskPermissions() {
+		return askPermissions;
 	}
 
 	public void setOrderCloud(int orderCloud) {

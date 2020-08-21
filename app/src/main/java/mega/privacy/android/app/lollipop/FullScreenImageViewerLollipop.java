@@ -110,6 +110,7 @@ import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -608,6 +609,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 
 			case R.id.full_image_viewer_chat:{
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					break;
+				}
 
 //				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
@@ -2187,6 +2192,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 							REQUEST_WRITE_STORAGE);
 				}
+			}
+
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
 			}
 
 			Uri treeUri = intent.getData();
