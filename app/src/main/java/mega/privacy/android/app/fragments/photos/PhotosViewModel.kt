@@ -1,9 +1,12 @@
 package mega.privacy.android.app.fragments.photos
 
+import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
 @ActivityRetainedScoped
@@ -22,9 +25,6 @@ class PhotosViewModel @Inject constructor(
 
     private var forceUpdate = false
 
-    private var index = 0
-    private var photoIndex = 0
-
     val items: LiveData<List<PhotoNode>> = _query.switchMap {
         viewModelScope.launch {
             photosRepository.getPhotos(forceUpdate)
@@ -32,6 +32,8 @@ class PhotosViewModel @Inject constructor(
 
         photosRepository.photoNodes
     }.map { nodes ->
+        var index = 0
+        var photoIndex = 0
         var filteredNodes = nodes
 
         if (!TextUtil.isTextEmpty(_query.value)) {
@@ -54,12 +56,42 @@ class PhotosViewModel @Inject constructor(
 
     fun loadPhotos(query: String, forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
-        index = 0
-        photoIndex = 0
         _query.value = query
     }
 
     fun onPhotoClick(item: PhotoNode) {
+        Log.i("Alex", "viewmodel onclick")
         _openPhotoEvent.value = Event(item)
+    }
+
+    fun getRealNodeCount(): Int {
+        items.value?.filter { it.type == PhotoNode.TYPE_PHOTO }?.let {
+            return it.size
+        }
+
+        return 0
+    }
+
+    fun shouldShowSearchMenu(): Boolean {
+        val size = items.value?.size
+        if (size != null) {
+            return size > 0
+        }
+
+        return false
+    }
+
+    fun getNodePositionByHandle(handle: Long): Int {
+        return items.value?.find {
+            it.node?.handle == handle
+        }?.index ?: INVALID_POSITION
+    }
+
+    fun getHandlesOfPhotos(): LongArray? {
+        val list = items.value?.filter {
+            it.type == PhotoNode.TYPE_PHOTO
+        }?.map { node -> node.node?.handle ?: INVALID_HANDLE }
+
+        return list?.toLongArray()
     }
 }
