@@ -28,18 +28,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -68,6 +56,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -103,9 +104,10 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -122,7 +124,6 @@ import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -136,6 +137,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1009,6 +1011,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return false;
             }
         });
+
+        textChat.setMediaListener(path -> uploadPictureOrVoiceClip(path));
 
         /*
         *If the recording button (an arrow) is clicked, the recording will be sent to the chat
@@ -8223,19 +8227,21 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     public void uploadPictureOrVoiceClip(String path){
         if(path == null) return;
 
-        File selfie;
-        if(isVoiceClip(path)) {
-            selfie = buildVoiceClipFile(this, outputFileName);
-            if (!isFileAvailable(selfie)) return;
-        }else{
-            selfie = new File(path);
-            if (!MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage()) return;
+        File file;
+        if (path.startsWith("content:")) {
+            file = FileUtils.getFileFromContentUri(this, Uri.parse(path));
+        } else if (isVoiceClip(path)) {
+            file = buildVoiceClipFile(this, outputFileName);
+            if (!isFileAvailable(file)) return;
+        } else {
+            file = new File(path);
+            if (!MimeTypeList.typeForName(file.getAbsolutePath()).isImage()) return;
         }
 
         Intent intent = new Intent(this, ChatUploadService.class);
         PendingMessageSingle pMsgSingle = new PendingMessageSingle();
         pMsgSingle.setChatId(idChat);
-        if(isVoiceClip(selfie.getAbsolutePath())){
+        if(isVoiceClip(file.getAbsolutePath())){
             pMsgSingle.setType(TYPE_VOICE_CLIP);
             intent.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
         }
@@ -8243,9 +8249,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         long timestamp = System.currentTimeMillis()/1000;
         pMsgSingle.setUploadTimestamp(timestamp);
 
-        String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
-        pMsgSingle.setFilePath(selfie.getAbsolutePath());
-        pMsgSingle.setName(selfie.getName());
+        String fingerprint = megaApi.getFingerprint(file.getAbsolutePath());
+        pMsgSingle.setFilePath(file.getAbsolutePath());
+        pMsgSingle.setName(file.getName());
         pMsgSingle.setFingerprint(fingerprint);
         long idMessage = dbH.addPendingMessage(pMsgSingle);
         pMsgSingle.setId(idMessage);

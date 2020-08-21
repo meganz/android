@@ -71,6 +71,10 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -1803,5 +1807,10 @@ public class Util {
 		} else {
 			aB.setElevation(0);
 		}
+	}
+
+	public static LocalDate fromEpoch(long seconds) {
+		return LocalDate.from(
+				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
 }
