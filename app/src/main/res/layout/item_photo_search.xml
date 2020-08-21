@@ -6,6 +6,8 @@
     <data>
 
         <import type="android.view.View" />
+        <import type="mega.privacy.android.app.utils.Util" />
+        <import type="mega.privacy.android.app.utils.TimeUtils" />
 
         <variable
             name="viewModel"
@@ -22,9 +24,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:layout_marginTop="1dp"
         android:layout_height="72dp"
         android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick(item) : actionModeViewModel.onPhotoClick(item)}"
-        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
+        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}"
+        android:background="@{item.selected ? @color/new_multiselect_color : @color/transparent}">
 
         <ImageView
             android:id="@+id/thumbnail"
@@ -65,31 +69,17 @@
             tools:visibility="visible" />
 
         <TextView
-            android:id="@+id/size"
+            android:id="@+id/node_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="@{String.valueOf(item.node.size)}"
+            android:text='@{String.format("%s . %s", Util.getSizeString(item.node.size), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
             android:textColor="@color/file_list_second_row"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/name"
             app:layout_constraintTop_toBottomOf="@id/name"
-            tools:text="8.27 MB" />
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text="@{String.valueOf(item.node.modificationTime)}"
-            android:textColor="@color/file_list_second_row"
-            android:textSize="14sp"
-            app:layout_constraintStart_toEndOf="@id/size"
-            app:layout_constraintTop_toTopOf="@id/size"
-            tools:text="June 2020" />
+            tools:text="8.27 MB . June 2020 10:39:12" />
 
         <ImageView
             android:id="@+id/three_dots"

@@ -3,8 +3,12 @@ package mega.privacy.android.app.fragments.photos
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.content.Context
 import android.content.Intent
+import android.graphics.Canvas
 import android.os.Bundle
+import android.os.Handler
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -59,6 +64,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     private lateinit var activity: ManagerActivityLollipop
 
     private var draggingPhotoHandle = INVALID_HANDLE
+
+    private lateinit var itemDecoration: ItemDecoration
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -124,6 +131,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         listView = binding.photoList
         preventListItemBlink()
         elevateToolbarWhenScrolling()
+        itemDecoration = ItemDecoration(context, resources.displayMetrics)
     }
 
     private fun setupActionMode() {
@@ -271,11 +279,16 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
 
     override fun searchReady() {
+        // Rotate screen in action mode, the keyboard would pop up again, hide it
+        if (actionMode != null) {
+            Handler().post { activity.hideKeyboardSearch() }
+        }
         if (viewModel.searchMode) return
 
         viewModel.searchMode = true
         listView.switchToLinear()
         listView.adapter = searchAdapter
+        listView.addItemDecoration(itemDecoration)
     }
 
     override fun exitSearch() {
@@ -285,6 +298,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         listView.switchBackToGrid()
         configureGridLayoutManager()
         listView.adapter = browseAdapter
+        listView.removeItemDecoration(itemDecoration)
 
         viewModel.loadPhotos("")
     }
@@ -345,6 +359,22 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
             node.node?.let { node ->
                 draggingPhotoHandle = node.handle
+            }
+        }
+    }
+
+    private class ItemDecoration(context: Context?, outMetrics: DisplayMetrics?) :
+        SimpleDividerItemDecoration(context, outMetrics) {
+        override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+            initItemDecoration(parent)
+
+            for (i in 0 until childCount) {
+                parent.adapter?.let {
+                    val viewType = it.getItemViewType(i)
+                    if (viewType == PhotoNode.TYPE_PHOTO) {
+                        drawDivider(canvas, parent.getChildAt(i))
+                    }
+                }
             }
         }
     }
