@@ -41,6 +41,7 @@ import mega.privacy.android.app.fragments.photos.EventObserver
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem.FULLSCREEN_OFFLINE
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.managerSections.HomepageFragmentDirections
@@ -312,6 +313,7 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
             }
         }
         viewModel.openFolderFullscreen.observe(viewLifecycleOwner, EventObserver {
+            ManagerActivityLollipop.setDrawerItem(FULLSCREEN_OFFLINE)
             managerActivity?.openFullscreenOfflineFragment(it)
         })
         viewModel.showOptionsPanel.observe(viewLifecycleOwner, EventObserver {
@@ -329,6 +331,7 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
         viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner, EventObserver {
             openFile(it, MimeTypeList.typeForName(it.name))
         })
+
         if (args.rootFolderOnly) {
             return
         }
@@ -774,7 +777,6 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
     override fun onDestroyActionMode(mode: ActionMode?) {
         logDebug("ActionBarCallBack::onDestroyActionMode")
         viewModel.clearSelection()
-        managerActivity?.showHideBottomNavigationView(false)
         managerActivity?.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY)
         checkScroll()
     }

@@ -40,8 +40,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -1457,7 +1455,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
     private void toCloudDrive() {
         ((ManagerActivityLollipop)context).setFirstLogin(false);
         dbH.setCamSyncEnabled(false);
-        ((ManagerActivityLollipop)context).setInitialCloudDrive();
+        ((ManagerActivityLollipop)context).skipInitialCUSetup();
     }
 
     
