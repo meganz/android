@@ -617,4 +617,6 @@ public class Constants {
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
+
+    public static final String OFFLINE_ROOT = "/";
 }
