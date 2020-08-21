@@ -336,7 +336,7 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
             return
         }
 
-        viewModel.actionMode.observe(viewLifecycleOwner, EventObserver { visible ->
+        viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
             val actionModeVal = actionMode
             if (visible) {
                 if (actionModeVal == null) {
@@ -350,7 +350,7 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
                     actionMode = null
                 }
             }
-        })
+        }
         viewModel.actionBarTitle.observe(viewLifecycleOwner) {
             if (viewModel.selecting) {
                 managerActivity?.supportActionBar?.setTitle(it)
@@ -360,34 +360,34 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
                 )
             }
         }
-        viewModel.pathLiveData.observe(viewLifecycleOwner, EventObserver {
+        viewModel.pathLiveData.observe(viewLifecycleOwner) {
             managerActivity?.pathNavigationOffline = it
-        })
-        viewModel.submitSearchQuery.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.submitSearchQuery.observe(viewLifecycleOwner) {
             managerActivity?.setTextSubmitted()
-        })
-        viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.showSortedBy.observe(viewLifecycleOwner) {
             managerActivity?.showSortOptions(managerActivity, resources.displayMetrics)
-        })
-        viewModel.nodeToAnimate.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
             val rv = recyclerView
             val rvAdapter = adapter
             if (rv == null || rvAdapter == null || it.first < 0 ||
                 it.first >= rvAdapter.itemCount
             ) {
-                return@EventObserver
+                return@observe
             }
 
             rvAdapter.showSelectionAnimation(
                 it.first, it.second, rv.findViewHolderForLayoutPosition(it.first)
             )
-        })
-        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner) {
             val layoutManager = recyclerView?.layoutManager
             if (layoutManager is LinearLayoutManager) {
                 layoutManager.scrollToPositionWithOffset(it, 0)
             }
-        })
+        }
     }
 
     private fun openNode(position: Int, node: OfflineNode) {

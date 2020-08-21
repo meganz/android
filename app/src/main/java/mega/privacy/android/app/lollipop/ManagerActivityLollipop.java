@@ -5949,10 +5949,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				showFabButton();
 				break;
 			}
-			case FULLSCREEN_OFFLINE: {
-				openFullscreenOfflineFragment(getPathNavigationOffline());
-				break;
-			}
     		case SETTINGS:{
 				showHideBottomNavigationView(true);
 				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
@@ -11378,7 +11374,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				isFirstTimeCam();
 				drawerItem = DrawerItem.FULLSCREEN_OFFLINE;
 				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
-				selectDrawerItemLollipop(drawerItem);
+				drawerLayout.closeDrawer(Gravity.LEFT);
+				openFullscreenOfflineFragment(getPathNavigationOffline());
 				break;
 			}
 			case R.id.settings_section: {
