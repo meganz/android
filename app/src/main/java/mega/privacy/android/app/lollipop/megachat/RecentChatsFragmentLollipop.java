@@ -129,6 +129,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private RecyclerView contactsList;
     private TextView moreContactsTitle;
     private TextView actionBarTitle, actionBarSubtitle;
+    private ImageView actionBarSubtitleArrow;
     private View bannerDivider;
 
     private AppBarLayout appBarLayout;
@@ -505,9 +506,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
                         if (isOnline(context)) {
                             showEmptyChatScreen();
-                            if (context instanceof ManagerActivityLollipop) {
-                                ((ManagerActivityLollipop) context).showFabButton();
-                            }
+                            showFab();
                         } else {
                             showNoConnectionScreen();
                         }
@@ -533,9 +532,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         listView.setVisibility(View.VISIBLE);
                         emptyLayout.setVisibility(View.GONE);
 
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showFabButton();
-                        }
+                        showFab();
                     }
                 } else {
                     logDebug("Show chat screen connecting...");
@@ -586,14 +583,22 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     visibilityFastScroller();
                     adapterList.setPositionClicked(-1);
 
-                    if (context instanceof ManagerActivityLollipop) {
-                        ((ManagerActivityLollipop) context).showFabButton();
-                    }
+                    showFab();
                 }
             } else {
                 logDebug("Show chat screen connecting...");
                 showConnectingChatScreen();
             }
+        }
+    }
+
+    private void showFab() {
+        if (adapterList == null || adapterList.isMultipleSelect()) {
+            return;
+        }
+
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).showFabButton();
         }
     }
 
@@ -1468,34 +1473,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
-    public String getParticipantFullName(MegaChatRoom chat, long i) {
-
-        String nickname = getNicknameContact(chat.getPeerHandle(i));
-        if(nickname != null) return nickname;
-
-        String participantFirstName = chat.getPeerFirstname(i);
-        String participantLastName = chat.getPeerLastname(i);
-
-        if (participantFirstName == null) {
-            participantFirstName = "";
-        }
-        if (participantLastName == null) {
-            participantLastName = "";
-        }
-
-        if (participantFirstName.trim().length() <= 0) {
-            return participantLastName;
-        } else {
-            return participantFirstName + " " + participantLastName;
-        }
-    }
-
     public void updateCacheForNonContacts(MegaChatRoom chatToCheck) {
         if (chatToCheck != null) {
             long peers = chatToCheck.getPeerCount();
             for (int i = 0; i < peers; i++) {
 //                    long peerHandle = chatToCheck.getPeerHandle(i);
-                String fullName = getParticipantFullName(chatToCheck, i);
+                String fullName = new ChatController(context).getParticipantFullName(chatToCheck.getPeerHandle(i));
                 if (fullName != null) {
                     if (fullName.trim().length() <= 0) {
                         logDebug("Ask for name!");
@@ -2049,11 +2032,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             actionBarTitle = v.findViewById(R.id.ab_title);
             setCustomisedActionBarTitle(adjustForLargeFont(getString(R.string.section_chat).toUpperCase()));
             actionBarSubtitle = v.findViewById(R.id.ab_subtitle);
+            actionBarSubtitleArrow = v.findViewById(R.id.ab_subtitle_arrow);
             setStatus();
             v.findViewById(R.id.ab_subtitle_container).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (context != null && context instanceof ManagerActivityLollipop) {
+                    if (context != null && context instanceof ManagerActivityLollipop
+                        && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
+                        && isOnline(context)) {
                         ((ManagerActivityLollipop) context).showPresenceStatusDialog();
                     }
                 }
@@ -2067,9 +2053,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
-    private void setCustomisedActionBarSubtitle(SpannableString subtitle){
-        if(actionBarSubtitle != null){
+    private void setCustomisedActionBarSubtitle(SpannableString subtitle) {
+        if(actionBarSubtitle != null) {
             actionBarSubtitle.setText(subtitle);
+        }
+        if (actionBarSubtitleArrow != null) {
+            boolean showArrow = megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
+                && isOnline(context);
+            actionBarSubtitleArrow.setVisibility(showArrow ? View.VISIBLE : View.GONE);
         }
     }
 }

@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.OfflineUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -240,100 +241,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			List<MegaOffline> documents = adapter.getSelectedOfflineNodes();
 			
 			switch(item.getItemId()){
-				case R.id.cab_menu_download:{
-					
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);	
-						if(n == null)
-						{
-							continue;
-						}
-						handleList.add(n.getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, false);
-					break;
-				}
-				case R.id.cab_menu_rename:{
-
-					if (documents.size()==1){
-						String path = documents.get(0).getPath() + documents.get(0).getName();
-						MegaNode n = megaApi.getNodeByPath(path);
-						if(n == null)
-						{
-							break;
-						}
-						((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
-					}
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_share_link:{
-
-					if (documents.size()==1){
-						String path = documents.get(0).getPath() + documents.get(0).getName();
-						MegaNode n = megaApi.getNodeByPath(path);
-						if(n == null)
-						{
-							break;
-						}
-						NodeController nC = new NodeController(context);
-						nC.exportLink(n);
-					}
-
-					break;
-				}
-				case R.id.cab_menu_share:{
-					//Check that all the selected options are folders
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);
-						if(n == null)
-						{
-							continue;
-						}
-						handleList.add(n.getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.selectContactToShareFolders(handleList);
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_move:{					
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);			
-						if(n == null)
-						{
-							continue;
-						}
-						handleList.add(n.getHandle());
-					}
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToMoveNodes(handleList);
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_copy:{
-					ArrayList<Long> handleList = new ArrayList<Long>();					
-					for (int i=0;i<documents.size();i++){
-						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);
-						if(n == null)
-						{
-							continue;
-						}
-						handleList.add(n.getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToCopyNodes(handleList);
+				case R.id.cab_menu_share_out: {
+					OfflineUtils.shareOfflineNodes(context, documents);
 					hideMultipleSelect();
 					break;
 				}
@@ -346,7 +255,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 					selectAll();
 					break;
 				}
-				case R.id.cab_menu_unselect_all:{
+				case R.id.cab_menu_clear_selection:{
 					hideMultipleSelect();
 					break;
 				}				
@@ -378,60 +287,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			logDebug("ActionBarCallBack::onPrepareActionMode");
-//			ContextCompat.getDrawable(context, R.drawable.ic_arrow_back_white)
-			List<MegaOffline> selected = adapter.getSelectedOfflineNodes();
-			
-			if (isOnline(context)){
-				if (selected.size() != 0) {
-					menu.findItem(R.id.cab_menu_download).setVisible(false);
-					menu.findItem(R.id.cab_menu_share).setVisible(false);
 
-					if(selected.size() == adapter.getItemCount()){
-						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-					}else{
-						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-					}
+			menu.findItem(R.id.cab_menu_select_all)
+					.setVisible(adapter.getSelectedOfflineNodes().size()
+							< adapter.getItemCount() - adapter.getPlaceholderCount());
 
-				}else{
-
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_download).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-				}
-				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-				menu.findItem(R.id.cab_menu_copy).setVisible(false);
-				menu.findItem(R.id.cab_menu_move).setVisible(false);				
-				menu.findItem(R.id.cab_menu_delete).setVisible(true);
-				menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-				menu.findItem(R.id.cab_menu_rename).setVisible(false);
-			}
-			else{
-				if (selected.size() != 0) {
-					menu.findItem(R.id.cab_menu_delete).setVisible(true);
-					menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-					if(selected.size()==adapter.getItemCount()){
-						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
-					}else{
-						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-					}	
-				}else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-				}
-
-				menu.findItem(R.id.cab_menu_download).setVisible(false);			
-				menu.findItem(R.id.cab_menu_copy).setVisible(false);
-				menu.findItem(R.id.cab_menu_move).setVisible(false);
-				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-				menu.findItem(R.id.cab_menu_rename).setVisible(false);
-			}
-			return false;
+			return true;
 		}
 		
 	}
@@ -955,7 +816,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 
-		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || (pathNavigation.equals("/") && !isSearching())) {
+		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || (pathNavigation.equals(OFFLINE_ROOT) && !isSearching())) {
 			return 0;
 		}
 
@@ -972,9 +833,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 
 			pathNavigation = ((ManagerActivityLollipop) context).getOfflineSearchPath();
-			if (((ManagerActivityLollipop) context).getOfflineSearchPath().equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
+			if (pathNavigation == null || pathNavigation.equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
 				((ManagerActivityLollipop) context).removeOfflineSearchPath();
 				((ManagerActivityLollipop) context).setSearchQuery(null);
+				if (pathNavigation == null) {
+					pathNavigation = OFFLINE_ROOT;
+				}
 			}
 		} else {
 			pathNavigation = pathNavigation.substring(0, pathNavigation.length() - 1);
@@ -1093,7 +957,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 
 		if (pNav.length() == 0) {
-			mOffList = dbH.findByPath("/");
+			mOffList = dbH.findByPath(OFFLINE_ROOT);
 		} else {
 			findPath(pNav);
 		}
@@ -1112,36 +976,30 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	
 	private void findPath (String pNav){
 		MegaOffline nodeToShow;
-		
-		if(!pNav.equals("/")){
-			
+
+		if (!pNav.equals(OFFLINE_ROOT)) {
 			if (pNav.endsWith("/")) {
 				pNav = pNav.substring(0, pNav.length() - 1);
 			}
-			
-			int index=pNav.lastIndexOf("/");	
-			String pathToShow = pNav.substring(0, index+1);
-			String nameToShow = pNav.substring(index+1, pNav.length());
-			
+
+			int index = pNav.lastIndexOf("/");
+			String pathToShow = pNav.substring(0, index + 1);
+			String nameToShow = pNav.substring(index + 1, pNav.length());
+
 			nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
-			if(nodeToShow!=null){
+			if (nodeToShow != null) {
 				//Show the node
-				pathNavigation=pathToShow+nodeToShow.getName()+"/";
+				pathNavigation = pathToShow + nodeToShow.getName() + "/";
 				return;
+			} else if (pathNavigation.equals(OFFLINE_ROOT)) {
+				logDebug("Return Path /");
+				return;
+			} else {
+				findPath(pathToShow);
 			}
-			else{
-				if(pathNavigation.equals("/")){
-					logDebug("Return Path /");
-					return;
-				}
-				else{
-					findPath(pathToShow);
-				}				
-			}
+		} else {
+			pathNavigation = OFFLINE_ROOT;
 		}
-		else{
-			pathNavigation="/";
-		}		
 	}
 
 	public void setPathNavigation(String _pathNavigation){

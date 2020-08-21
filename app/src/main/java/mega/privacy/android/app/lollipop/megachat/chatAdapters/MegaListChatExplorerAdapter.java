@@ -415,4 +415,13 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     public void setSearchSelectedItems (SparseBooleanArray searchSelectedItems) {
         this.searchSelectedItems = searchSelectedItems;
     }
+
+    /**
+     * Clears all the selected items.
+     */
+    public void clearSelections() {
+        if (selectedItems != null) {
+            selectedItems.clear();
+        }
+    }
 }

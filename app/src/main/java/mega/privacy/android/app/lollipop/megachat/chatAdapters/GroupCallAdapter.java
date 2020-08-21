@@ -144,10 +144,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
 
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
-        }
+        statusBarHeight = getStatusBarHeight();
         maxScreenHeight = (int)heightScreenPX - statusBarHeight;
         maxScreenWidth = (int)widthScreenPX;
 

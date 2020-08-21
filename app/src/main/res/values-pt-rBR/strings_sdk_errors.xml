@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="api_ok" context="Label to show that an SDK operation has been complete successfully.">Nenhum erro</string>
+    <string name="api_einternal" context="Label to show that an Internal error occurs during a SDK operation.">Erro interno</string>
+    <string name="api_eargs" context="Label to show that an error of Invalid argument occurs during a SDK operation.">Argumento inválido</string>
+    <string name="api_eagain" context="Label to show that a request error occurs during a SDK operation.">Solicitação falhou, tentando novamente</string>
+    <string name="api_eratelimit" context="Label to show that the rate limit has been reached during a SDK operation.">Limite de transferências excedido</string>
+    <string name="api_efailed" context="Label to show that a SDK operation has failed permanently.">Falhou permanentemente</string>
+    <string name="api_etoomany_ec_download" context="Error shown when terms of service are breached during download.">Infração dos termos de serviço</string>
+    <string name="api_etoomay" context="Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation.">Muitas conexões ou transferências</string>
+    <string name="api_erange" context="Label to show that an error of Out of range occurs during a SDK operation.">Fora de alcance</string>
+    <string name="api_eexpired" context="State to indicate something has expired (achivements of business status account for instance)">Expirado</string>
+    <string name="api_enoent" context="Label to show that an error related with a resource Not found occurs during a SDK operation.">Não encontrado</string>
+    <string name="api_ecircular_ec_upload" context="Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation.">Não foi possível fazer a transferência devido a uma estrutura de diretório recursiva</string>
+    <string name="api_ecircular" context="Label to show that an error related with a circular linkage occurs during a SDK operation.">Ligação circular detectada</string>
+    <string name="api_eaccess" context="Label to show that an error related with an denied access occurs during a SDK operation.">Acesso negado</string>
+    <string name="api_eexist" context="Label to show that an error related with an existent resource occurs during a SDK operation.">Já existe</string>
+    <string name="api_eincomplete" context="Label to show that an error related with an Incomplete SDK operation.">Incompleto</string>
+    <string name="api_ekey" context="Label to show that an error related with the decryption process of a node occurs during a SDK operation.">Chave inválida/Erro de decodificação</string>
+    <string name="api_esid" context="Label to show that an error related with a bad session ID occurs during a SDK operation.">ID de sessão inválido</string>
+    <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">Não acessível por infringir os termos de serviço</string>
+    <string name="api_eblocked" context="Label to show that an error related with a blocked account occurs during a SDK operation.">Bloqueado</string>
+    <string name="api_eoverquota" context="Label to show that an error related with an over quota occurs during a SDK operation.">Limite excedido</string>
+    <string name="api_etempunavail" context="Label to show that an error related with a temporary problem occurs during a SDK operation.">Temporariamente não disponível</string>
+    <string name="api_etoomanyconnections" context="Label to show that an error related with too many connections occurs during a SDK operation.">Conexão sobrecarregada</string>
+    <string name="api_ewrite" context="Label to show that an error related with an write error occurs during a SDK operation.">Erro de escrita</string>
+    <string name="api_eread" context="Label to show that an error related with an read error occurs during a SDK operation.">Erro de leitura</string>
+    <string name="api_eappkey" context="Label to show that an error related with an invalid or missing application key occurs during a SDK operation.">Chave de aplicação inválida</string>
+    <string name="api_essl" context="Error shown when SSL check has failed">Falha na verificação SSL</string>
+    <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Cota insuficiente</string>
+    <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Autenticação de dois fatores necessária.</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Acesso negado para usuários sem permissão de administrador</string>
+    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">A sua conta business expirou</string>
+    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Cartão de crédito recusado</string>
+    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Erro na cobrança</string>
+    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Recusado pelo sistema de antifraude</string>
+    <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Solicitações em excesso.</string>
+    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Erro no saldo</string>
+    <string name="payment_egeneric_api_error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">Erro desconhecido</string>
+    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">Erro HTTP</string>
+</resources>

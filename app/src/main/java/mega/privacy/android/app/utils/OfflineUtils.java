@@ -1,19 +1,15 @@
 package mega.privacy.android.app.utils;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.StatFs;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -46,16 +42,6 @@ public class OfflineUtils {
     private static final String DB_FOLDER = "1";
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(activity,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-            }
-        }
-
         destination.mkdirs();
 
         double availableFreeSpace = Double.MAX_VALUE;
@@ -381,7 +367,7 @@ public class OfflineUtils {
 
         MegaNode parentNode = null;
         MegaNode nodeToInsert = null;
-        String path = "/";
+        String path;
         MegaOffline mOffParent = null;
         MegaOffline mOffNode = null;
 
@@ -418,7 +404,7 @@ public class OfflineUtils {
                         parentId = mOffParent.getId();
                     }
                 } else {
-                    path = "/";
+                    path = OFFLINE_ROOT;
                 }
             } else {
                 //If I am not the owner
@@ -657,6 +643,40 @@ public class OfflineUtils {
             }
         } else {
             shareFile(context, getOfflineFile(context, offline));
+        }
+    }
+
+    /**
+     * Shares multiple offline nodes. If any node is a folder and the app has network connection,
+     * then share links, otherwise share files.
+     *
+     * @param context the current Context
+     * @param offlineNodes offline nodes to share
+     */
+    public static void shareOfflineNodes(Context context, List<MegaOffline> offlineNodes) {
+        boolean allFiles = true;
+        for (MegaOffline offlineNode : offlineNodes) {
+            if (offlineNode.isFolder()) {
+                allFiles = false;
+                break;
+            }
+        }
+        if (allFiles) {
+            List<File> files = new ArrayList<>();
+            for (MegaOffline offlineNode : offlineNodes) {
+                files.add(getOfflineFile(context, offlineNode));
+            }
+            shareFiles(context, files);
+        } else if (isOnline(context)) {
+            List<MegaNode> nodes = new ArrayList<>();
+            for (MegaOffline offlineNode : offlineNodes) {
+                MegaNode node = MegaApplication.getInstance().getMegaApi()
+                    .getNodeByHandle(Long.parseLong(offlineNode.getHandle()));
+                if (node != null) {
+                    nodes.add(node);
+                }
+            }
+            shareNodes(context, nodes);
         }
     }
 }

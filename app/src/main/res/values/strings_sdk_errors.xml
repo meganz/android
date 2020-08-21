@@ -9,9 +9,9 @@
     <string name="api_etoomany_ec_download" context="Error shown when terms of service are breached during download.">Terms of Service breached</string>
     <string name="api_etoomay" context="Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation.">Too many concurrent connections or transfers</string>
     <string name="api_erange" context="Label to show that an error of Out of range occurs during a SDK operation.">Out of range</string>
-    <string name="api_eexpired" context="Label to show that an error related with expiration occurs during a SDK operation.">Expired</string>
+    <string name="api_eexpired" context="State to indicate something has expired (achivements of business status account for instance)">Expired</string>
     <string name="api_enoent" context="Label to show that an error related with a resource Not found occurs during a SDK operation.">Not found</string>
-    <string name="api_ecircular_ec_upload" context="Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation.">Upload produces recursivity</string>
+    <string name="api_ecircular_ec_upload" context="Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation.">Transfer failed due to a recursive directory structure</string>
     <string name="api_ecircular" context="Label to show that an error related with a circular linkage occurs during a SDK operation.">Circular linkage detected</string>
     <string name="api_eaccess" context="Label to show that an error related with an denied access occurs during a SDK operation.">Access denied</string>
     <string name="api_eexist" context="Label to show that an error related with an existent resource occurs during a SDK operation.">Already exists</string>
@@ -28,9 +28,9 @@
     <string name="api_eappkey" context="Label to show that an error related with an invalid or missing application key occurs during a SDK operation.">Invalid application key</string>
     <string name="api_essl" context="Error shown when SSL check has failed">SSL verification failed</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Not enough quota</string>
-    <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Multi-factor authentication required</string>
-    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
-    <string name="api_ebusinesspastdue" context="Label to show that an error of Business account has expired occurs during a SDK operation.">Business account has expired</string>
+    <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Two-Factor Authentication required.</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for non-admin users</string>
+    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Your business account is expired</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Billing failed</string>
     <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Rejected by fraud protection</string>

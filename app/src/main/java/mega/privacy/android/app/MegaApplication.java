@@ -31,6 +31,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
@@ -96,11 +97,12 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.6_314";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.8_319";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -154,6 +156,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     private static boolean isBlockedDueToWeakAccount = false;
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
+	private static boolean isWaitingForCall = false;
+	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -594,6 +598,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         clearPublicCache(this);
 
 		ContextUtils.initialize(getApplicationContext());
+
+		Fresco.initialize(this);
 	}
 
 
@@ -1621,5 +1627,21 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
+	}
+
+	public static boolean isWaitingForCall() {
+		return isWaitingForCall;
+	}
+
+	public static void setIsWaitingForCall(boolean isWaitingForCall) {
+		MegaApplication.isWaitingForCall = isWaitingForCall;
+	}
+
+	public static long getUserWaitingForCall() {
+		return userWaitingForCall;
+	}
+
+	public static void setUserWaitingForCall(long userWaitingForCall) {
+		MegaApplication.userWaitingForCall = userWaitingForCall;
 	}
 }
