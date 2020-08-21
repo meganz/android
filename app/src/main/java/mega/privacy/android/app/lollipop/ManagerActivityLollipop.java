@@ -211,9 +211,7 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
-import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -1278,7 +1276,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							PhotosFragment fragment = (PhotosFragment)mHomepageSearchable;
 							switch (actionType) {
 								case SCROLL_TO_POSITION:
-									fragment.scrollToNode(handle);
+									fragment.scrollToPhoto(handle);
 									break;
 								case UPDATE_IMAGE_DRAG:
 									fragment.hideDraggingThumbnail(handle);
@@ -6787,21 +6785,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				case NOTIFICATIONS:
 					break;
-				case HOMEPAGE:
-					// Get the Searchable again at onCreateOptionsMenu() after screen rotation
-					mHomepageSearchable = findHomepageSearchable();
+			}
+		}
 
-					if (searchExpand) {
-						openSearchView();
-					} else {
-						if (mHomepageSearchable != null) {
-							searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
-							if (mHomepageSearchable instanceof PhotosFragment) {
-								rubbishBinMenuItem.setVisible(true);
-							}
-						}
+		if (drawerItem == DrawerItem.HOMEPAGE) {
+			// Get the Searchable again at onCreateOptionsMenu() after screen rotation
+			mHomepageSearchable = findHomepageSearchable();
+
+			if (searchExpand) {
+				openSearchView();
+			} else {
+				if (mHomepageSearchable != null) {
+					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
+					if (mHomepageSearchable instanceof PhotosFragment && isOnline(this)) {
+						rubbishBinMenuItem.setVisible(true);
 					}
-					break;
+				}
 			}
 		}
 

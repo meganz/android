@@ -26,6 +26,7 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -57,7 +58,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
     private lateinit var activity: ManagerActivityLollipop
 
-    private var draggingNodeHandle = INVALID_HANDLE
+    private var draggingPhotoHandle = INVALID_HANDLE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,15 +95,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         refresh()
     }
 
-    private fun setupNavigation() {
+    private fun setupNavigation() =
         viewModel.openPhotoEvent.observe(viewLifecycleOwner, EventObserver {
             openPhoto(it)
         })
-    }
 
-    override fun refresh() {
-        viewModel.loadPhotos(activity.searchQuery, true)
-    }
+    override fun refresh() = viewModel.loadPhotos(activity.searchQuery, true)
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
@@ -124,12 +122,27 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     private fun setupActionMode() {
-        observeSelectedNodes()
-        observeAnimatedNodes()
+        observePhotoLongClick()
+        observeSelectedPhotos()
+        observeAnimatedPhotos()
         observeActionModeDestroy()
     }
 
-    private fun observeSelectedNodes() =
+    private fun observePhotoLongClick() =
+        actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
+            if (!Util.isOnline(context)) {
+                activity.hideKeyboardSearch()  // Make the snack bar visible to the user
+                activity.showSnackbar(
+                    SNACKBAR_TYPE,
+                    context.getString(R.string.error_server_connection_problem),
+                    -1
+                )
+            } else {
+                actionModeViewModel.enterActionMode(it)
+            }
+        })
+
+    private fun observeSelectedPhotos() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()) {
                 actionMode?.apply {
@@ -151,7 +164,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             }
         })
 
-    private fun observeAnimatedNodes() {
+    private fun observeAnimatedPhotos() {
         var animatorSet: AnimatorSet? = null
 
         actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {
@@ -326,14 +339,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             requireActivity().overridePendingTransition(0, 0)
 
             node.node?.let { node ->
-                draggingNodeHandle = node.handle
+                draggingPhotoHandle = node.handle
             }
         }
     }
 
     /** All below methods are for supporting functions of FullScreenImageViewer */
 
-    fun scrollToNode(handle: Long) {
+    fun scrollToPhoto(handle: Long) {
         val position = viewModel.getNodePositionByHandle(handle)
         if (position == INVALID_POSITION) return
 
@@ -348,7 +361,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
-        val thumbnailView = getThumbnailViewByHandle(draggingNodeHandle) ?: return null
+        val thumbnailView = getThumbnailViewByHandle(draggingPhotoHandle) ?: return null
         return getThumbnailLocationOnScreen(thumbnailView)
     }
 
@@ -369,9 +382,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
     }
 
     fun hideDraggingThumbnail(handle: Long) {
-        getThumbnailViewByHandle(draggingNodeHandle)?.apply { visibility = View.VISIBLE }
+        getThumbnailViewByHandle(draggingPhotoHandle)?.apply { visibility = View.VISIBLE }
         getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
-        draggingNodeHandle = handle
+        draggingPhotoHandle = handle
         notifyThumbnailLocationOnScreen()
     }
 
@@ -381,7 +394,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
             override fun setVisibility(visibility: Int) {
                 val fragment = fragmentRef.get() ?: return
-                fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
+                fragment.getThumbnailViewByHandle(fragment.draggingPhotoHandle)
                     ?.apply { this.visibility = visibility }
             }
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.photos
 
-import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch
@@ -60,7 +59,6 @@ class PhotosViewModel @Inject constructor(
     }
 
     fun onPhotoClick(item: PhotoNode) {
-        Log.i("Alex", "viewmodel onclick")
         _openPhotoEvent.value = Event(item)
     }
 
@@ -72,14 +70,7 @@ class PhotosViewModel @Inject constructor(
         return 0
     }
 
-    fun shouldShowSearchMenu(): Boolean {
-        val size = items.value?.size
-        if (size != null) {
-            return size > 0
-        }
-
-        return false
-    }
+    fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
     fun getNodePositionByHandle(handle: Long): Int {
         return items.value?.find {

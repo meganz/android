@@ -1,16 +1,20 @@
 package mega.privacy.android.app.fragments.photos
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.scopes.ActivityRetainedScoped
+import mega.privacy.android.app.utils.Util
 import javax.inject.Inject
 
 @ActivityRetainedScoped
 class ActionModeViewModel @Inject constructor() : ViewModel() {
     // The full set of nodes
     private lateinit var nodesData: List<SelectableNode>
+
+    // Notify the fragment that the user intends to enter action mode by long click
+    private val _longClick = MutableLiveData<Event<SelectableNode>>()
+    val longClick: LiveData<Event<SelectableNode>> = _longClick
 
     // All nodes have been selected so far
     private val _selectedNodes = MutableLiveData<List<SelectableNode>>()
@@ -25,15 +29,14 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     private val selectedNodeList = mutableListOf<SelectableNode>()
 
-    fun onPhotoClick(node: SelectableNode) {
-        Log.i("Alex", "actionmode onclick")
-        updateSelectedNodeList(node)
-    }
+    fun onPhotoClick(node: SelectableNode) = updateSelectedNodeList(node)
 
     fun onPhotoLongClick(node: SelectableNode): Boolean {
-        updateSelectedNodeList(node)
+        _longClick.value = Event(node)
         return true
     }
+
+    fun enterActionMode(node: SelectableNode) = updateSelectedNodeList(node)
 
     private fun updateSelectedNodeList(node: SelectableNode) {
         node.selected = !node.selected
