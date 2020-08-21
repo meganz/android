@@ -2690,7 +2690,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					if(body.length()>0){
 						body.append("\n");
 					}
-					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
+//					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
 					body.append(sharedText);
 				}
 				String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
