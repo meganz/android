@@ -1187,18 +1187,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.chat_contact_properties_clear_layout: {
-				logDebug("Clear chat option");
-				if(fromContacts){
-					showConfirmationClearChat();
-				}
-				else{
-					intentToClearChat();
-					finish();
-				}
-
+			case R.id.chat_contact_properties_clear_layout:
+				showConfirmationClearChat();
 				break;
-			}
+
 			case R.id.chat_contact_properties_remove_contact_layout: {
 				logDebug("Remove contact chat option");
 
@@ -1819,13 +1811,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
-	public void intentToClearChat(){
-		Intent clearChat = new Intent(this, ChatActivityLollipop.class);
-		clearChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		clearChat.setAction(ACTION_CLEAR_CHAT);
-		startActivity(clearChat);
 	}
 
 	@Override

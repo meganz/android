@@ -225,7 +225,6 @@ public class Constants {
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
     public static final String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
-    public static final String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
     public static final String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
     public static final String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
     public static final String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
