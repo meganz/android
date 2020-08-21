@@ -351,10 +351,6 @@ class OfflineViewModel @ViewModelInject constructor(
         _actionBarTitle.value = titleFromPath(path)
     }
 
-    fun isSearching(): Boolean {
-        return searchQuery != null || historySearchQuery != null
-    }
-
     fun setDisplayParam(
         rootFolderOnly: Boolean,
         isList: Boolean,

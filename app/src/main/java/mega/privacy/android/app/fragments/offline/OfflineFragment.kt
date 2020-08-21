@@ -355,9 +355,7 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
             if (viewModel.selecting) {
                 managerActivity?.supportActionBar?.setTitle(it)
             } else {
-                managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(
-                    it, viewModel.path == "/" && !viewModel.isSearching()
-                )
+                managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(it, false)
             }
         }
         viewModel.pathLiveData.observe(viewLifecycleOwner) {
