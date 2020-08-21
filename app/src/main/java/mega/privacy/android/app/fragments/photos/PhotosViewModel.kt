@@ -20,6 +20,9 @@ class PhotosViewModel @Inject constructor(
     private val _openPhotoEvent = MutableLiveData<Event<PhotoNode>>()
     val openPhotoEvent: LiveData<Event<PhotoNode>> = _openPhotoEvent
 
+    private val _showFileInfoEvent = MutableLiveData<Event<PhotoNode>>()
+    val showFileInfoEvent: LiveData<Event<PhotoNode>> = _showFileInfoEvent
+
     var searchMode = false
 
     private var forceUpdate = false
@@ -84,5 +87,9 @@ class PhotosViewModel @Inject constructor(
         }?.map { node -> node.node?.handle ?: INVALID_HANDLE }
 
         return list?.toLongArray()
+    }
+
+    fun showFileInfo(item: PhotoNode) {
+        _showFileInfoEvent.value = Event(item)
     }
 }

@@ -95,10 +95,15 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         refresh()
     }
 
-    private fun setupNavigation() =
+    private fun setupNavigation() {
         viewModel.openPhotoEvent.observe(viewLifecycleOwner, EventObserver {
             openPhoto(it)
         })
+
+        viewModel.showFileInfoEvent.observe(viewLifecycleOwner, EventObserver {
+            activity.showNodeOptionsPanel(it.node)
+        })
+    }
 
     override fun refresh() = viewModel.loadPhotos(activity.searchQuery, true)
 
