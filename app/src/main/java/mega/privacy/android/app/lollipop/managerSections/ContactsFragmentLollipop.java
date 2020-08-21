@@ -648,13 +648,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 				case R.id.cab_menu_select_all:{
 					selectAll();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
 					hideMultipleSelect();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{

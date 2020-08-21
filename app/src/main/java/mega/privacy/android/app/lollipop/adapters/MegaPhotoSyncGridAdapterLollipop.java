@@ -14,6 +14,9 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -421,7 +424,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 		actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
-		updateActionModeTitle();
+		new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		notifyDataSetChanged();
 	}
 	

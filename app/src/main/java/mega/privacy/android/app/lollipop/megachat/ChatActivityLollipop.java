@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -4501,7 +4502,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 actionMode = startSupportActionMode(new ActionBarCallBack());
             }
 
-            updateActionModeTitle();
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
 
