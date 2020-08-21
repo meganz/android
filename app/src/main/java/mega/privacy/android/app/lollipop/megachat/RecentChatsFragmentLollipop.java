@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
@@ -866,6 +867,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                 actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
             }
+
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
 
@@ -1810,7 +1813,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
                 ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
                 checkScroll();
-                updateActionModeTitle();
             } else if (context instanceof ArchivedChatsActivity) {
                 ((ArchivedChatsActivity) context).changeStatusBarColor(0);
             }

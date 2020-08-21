@@ -27,6 +27,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SwitchCompat;
+
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -377,7 +379,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			Util.changeStatusBarColorActionMode(context,
 					((ManagerActivityLollipop) context).getWindow(), handler, 2);
 			checkScroll();
-			updateActionModeTitle();
 			((ManagerActivityLollipop) context).setDrawerLockMode(false);
 		}
 
@@ -1165,6 +1166,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					
 					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 				}
+
+				new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 			}
 		}
 		else{

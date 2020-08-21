@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.StatFs;
 import android.text.Html;
 import android.text.Spanned;
@@ -278,7 +279,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
 			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
-			updateActionModeTitle();
 		}
 
 		@Override
@@ -1441,6 +1441,8 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				
 				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	

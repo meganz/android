@@ -17,6 +17,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -323,7 +326,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
-			updateActionModeTitle();
 		}
 
 		@Override
@@ -1125,6 +1127,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 
                 actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
             }
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
     
@@ -1155,8 +1159,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 folders++;
             }
         }
-        
-        Resources res = getActivity().getResources();
         
         String title;
         int sum = files + folders;

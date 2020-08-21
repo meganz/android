@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -174,7 +176,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
-			updateActionModeTitle();
 		}
 
 		@Override
@@ -808,6 +809,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private void selectAll(){
 		if (adapter != null){
 			adapter.selectAll();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 
