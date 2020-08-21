@@ -142,6 +142,8 @@ class OfflineViewModel @ViewModelInject constructor(
         return selectedNodes.size()
     }
 
+    fun getDisplayedNodesCount(): Int = nodes.value?.size ?: 0
+
     fun selectAll() {
         val nodeList = nodes.value ?: return
 

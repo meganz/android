@@ -626,7 +626,7 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
     }
 
     fun getItemCount(): Int {
-        return adapter?.itemCount ?: 0
+        return viewModel.getDisplayedNodesCount()
     }
 
     fun scrollToNode(handle: Long) {
