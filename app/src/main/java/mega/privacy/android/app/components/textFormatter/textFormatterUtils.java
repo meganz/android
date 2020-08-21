@@ -8,7 +8,7 @@ public class textFormatterUtils {
     public static final char BOLD_FLAG = '*';
     public static final char STRIKE_FLAG = '~';
     public static final char ITALIC_FLAG = '_';
-    public static final String MONOSPACE_FLAG = "```";
+    public static final char MONOSPACE_FLAG = '`';
     public static final int INVALID_INDEX = -1;
 
     public textFormatterUtils() {

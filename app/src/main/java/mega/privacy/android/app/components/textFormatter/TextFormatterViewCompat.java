@@ -1,5 +1,6 @@
 package mega.privacy.android.app.components.textFormatter;
 
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
@@ -11,6 +12,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import java.util.ArrayList;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.components.CustomTypefaceSpan;
+
 import static mega.privacy.android.app.components.textFormatter.textFormatterUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
@@ -19,6 +23,7 @@ public class TextFormatterViewCompat {
     private static final long DELAY_MILLIS = 220L;
     private static final int GENERAL_FLAG = 18;
     private static final int COLOR_SPAN = -7829368;
+    private static final Typeface font = Typeface.createFromAsset(MegaApplication.getInstance().getBaseContext().getAssets(), "font/RobotoMono-Regular.ttf");
 
     public TextFormatterViewCompat() { }
 
@@ -138,6 +143,8 @@ public class TextFormatterViewCompat {
         ArrayList<Character> characters = new ArrayList();
         ArrayList<Flag> flags = new ArrayList();
         Flag boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
+        Flag quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
+
         Flag strikeFlag = new Flag(INVALID_INDEX, INVALID_INDEX, STRIKE_FLAG);
         Flag italicFlag = new Flag(INVALID_INDEX, INVALID_INDEX, ITALIC_FLAG);
         int i = 0;
@@ -185,6 +192,19 @@ public class TextFormatterViewCompat {
                         continue;
                     }
                     break;
+
+                case MONOSPACE_FLAG:
+                    if (quoteFlag.start != INVALID_INDEX) {
+                        quoteFlag.end = j;
+                        flags.add(quoteFlag);
+                        quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
+                        continue;
+                    }
+                    if (hasFlagSameLine(text, MONOSPACE_FLAG, i + 1)) {
+                        quoteFlag.start = j;
+                        continue;
+                    }
+                    break;
             }
 
             characters.add(c);
@@ -210,6 +230,10 @@ public class TextFormatterViewCompat {
                     iss = new StyleSpan(2);
                     builder.setSpan(iss, flag.start, flag.end, GENERAL_FLAG);
                     break;
+
+                case MONOSPACE_FLAG:
+                    builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end, GENERAL_FLAG);
+                    break;
             }
         }
 
@@ -221,6 +245,7 @@ public class TextFormatterViewCompat {
         ArrayList<Character> characters = new ArrayList();
         ArrayList<Flag> flags = new ArrayList();
         Flag boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
+        Flag quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
         Flag strikeFlag = new Flag(INVALID_INDEX, INVALID_INDEX, STRIKE_FLAG);
         Flag italicFlag = new Flag(INVALID_INDEX, INVALID_INDEX, ITALIC_FLAG);
         int i = 0;
@@ -264,6 +289,18 @@ public class TextFormatterViewCompat {
                         italicFlag = new Flag(INVALID_INDEX, INVALID_INDEX, ITALIC_FLAG);
                     }
                     break;
+                case MONOSPACE_FLAG:
+                    if (quoteFlag.start == INVALID_INDEX) {
+                        if (hasFlagSameLine(text, MONOSPACE_FLAG, i + 1)) {
+                            quoteFlag.start = j + 1;
+
+                        }
+                    } else {
+                        quoteFlag.end = j;
+                        flags.add(quoteFlag);
+                        quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
+                    }
+                    break;
             }
 
             characters.add(c);
@@ -287,6 +324,10 @@ public class TextFormatterViewCompat {
             } else if (flag.flag == ITALIC_FLAG) {
                 iss = new StyleSpan(2);
                 builder.setSpan(iss, flag.start, flag.end, GENERAL_FLAG);
+                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.start - 1, flag.start, GENERAL_FLAG);
+                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.end, flag.end + 1, GENERAL_FLAG);
+            }else if(flag.flag == MONOSPACE_FLAG){
+                builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end, GENERAL_FLAG);
                 builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.start - 1, flag.start, GENERAL_FLAG);
                 builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.end, flag.end + 1, GENERAL_FLAG);
             }
