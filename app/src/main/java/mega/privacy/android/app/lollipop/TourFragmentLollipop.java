@@ -2,27 +2,46 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputLayout;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.utils.TextUtil;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
+import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
+
+    private static final String EXTRA_RECOVERY_KEY_URL = "EXTRA_RECOVERY_KEY_URL";
 
     Context context;
     private TourImageAdapter adapter;
@@ -34,6 +53,16 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private Button bRegister;
     private Button bLogin;
     private ScrollView baseContainer;
+
+    public static TourFragmentLollipop newInstance(@Nullable String recoveryKeyUrl) {
+        TourFragmentLollipop fragment = new TourFragmentLollipop();
+        if (recoveryKeyUrl != null && !recoveryKeyUrl.isEmpty()) {
+            Bundle arguments = new Bundle();
+            arguments.putString(EXTRA_RECOVERY_KEY_URL, recoveryKeyUrl);
+            fragment.setArguments(arguments);
+        }
+        return fragment;
+    }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -158,6 +187,69 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         });
 
         return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (getArguments() != null) {
+            String recoveryKeyUrl = getArguments().getString(EXTRA_RECOVERY_KEY_URL, null);
+            if (recoveryKeyUrl != null) {
+                logDebug("Link to resetPass: " + recoveryKeyUrl);
+                showRecoveryKeyDialog(recoveryKeyUrl);
+            }
+        }
+    }
+
+    public void showRecoveryKeyDialog(String recoveryKeyUrl) {
+        logDebug("link: " + recoveryKeyUrl);
+
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        dialogBuilder.setView(R.layout.dialog_recovery_key);
+        dialogBuilder.setTitle(R.string.title_dialog_insert_MK);
+        dialogBuilder.setMessage(R.string.text_dialog_insert_MK);
+        dialogBuilder.setPositiveButton(R.string.general_ok, null);
+        dialogBuilder.setNegativeButton(android.R.string.cancel, null);
+
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+
+        TextInputLayout editInputLayout = dialog.findViewById(R.id.input_recovery_key);
+        EditText editText = dialog.findViewById(R.id.edit_recovery_key);
+        editText.setOnEditorActionListener((view, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                String key = editText.getText().toString();
+                if (TextUtil.isTextEmpty(key)) {
+                    editInputLayout.setError(getString(R.string.invalid_string));
+                    view.requestFocus();
+                } else {
+                    startChangePasswordActivity(recoveryKeyUrl, key.trim());
+                    dialog.dismiss();
+                }
+            } else {
+                logDebug("Other IME" + actionId);
+            }
+            return false;
+        });
+
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
+            String key = editText.getText().toString();
+            if (TextUtil.isTextEmpty(key)) {
+                editInputLayout.setError(getString(R.string.invalid_string));
+                editText.requestFocus();
+            } else {
+                startChangePasswordActivity(recoveryKeyUrl, key.trim());
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void startChangePasswordActivity(String recoveryKeyUrl, String key) {
+        Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
+        intent.setAction(ACTION_RESET_PASS_FROM_LINK);
+        intent.setData(Uri.parse(recoveryKeyUrl));
+        intent.putExtra("MK", key);
+        startActivity(intent);
     }
 
     @Override

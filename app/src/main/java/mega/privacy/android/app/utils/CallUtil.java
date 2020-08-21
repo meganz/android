@@ -1,35 +1,49 @@
 package mega.privacy.android.app.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.SystemClock;
+
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class CallUtil {
+
+    public static final int MAX_PARTICIPANTS_IN_CALL = 20;
 
     /**
      * Retrieve if there's a call in progress that you're participating in.
@@ -380,4 +394,128 @@ public class CallUtil {
         builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
+    /**
+     * Method to control when a call should be started, whether the chat room should be created or is already created.
+     *
+     * @param activity The Activity.
+     * @param user    The mega User.
+     */
+    public static void startNewCall(Activity activity, MegaUser user) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+
+        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+        if (chat == null) {
+            ArrayList<MegaChatRoom> chats = new ArrayList<>();
+            ArrayList<MegaUser> usersNoChat = new ArrayList<>();
+            usersNoChat.add(user);
+            CreateChatListener listener = new CreateChatListener(chats, usersNoChat, -1, activity, CreateChatListener.START_AUDIO_CALL);
+            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+            megaChatApi.createChat(false, peers, listener);
+        } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
+            Intent i = new Intent(activity, ChatCallActivity.class);
+            i.putExtra(CHAT_ID, chat.getChatId());
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            activity.startActivity(i);
+        } else if (isStatusConnected(activity, chat.getChatId())) {
+            MegaApplication.setUserWaitingForCall(user.getHandle());
+            startCallWithChatOnline(activity, chat);
+        }
+    }
+
+    /**
+     * Method to control if the chat is online in order to start a call.
+     *
+     * @param activity  The Activity.
+     * @param chatRoom The chatRoom.
+     */
+    public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
+        if (checkPermissionsCall(activity, START_CALL_PERMISSIONS)) {
+            MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
+            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, (MegaChatRequestListenerInterface) activity);
+            MegaApplication.setIsWaitingForCall(false);
+        }
+    }
+
+    /**
+     * Method for obtaining the necessary permissions in one call.
+     *
+     * @param activity       The activity.
+     * @param typePermission The type of permission
+     * @return True, if you have both permits. False, otherwise.
+     */
+    public static boolean checkPermissionsCall(Activity activity, int typePermission) {
+        boolean hasCameraPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+        if (!hasCameraPermission) {
+            if (activity instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            }
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            return false;
+        }
+
+        boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+        if (!hasRecordAudioPermission) {
+            if (activity instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            }
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if it cannot join to call because has reached the maximum number of participants.
+     * If so, shows a snackbar with a warning.
+     *
+     * @param context   current Context
+     * @param call      MegaChatCall to check
+     * @param chat      MegaChatRoom to check
+     * @return True if cannot joint to call, false otherwise
+     */
+    public static boolean canNotJoinCall(Context context, MegaChatCall call, MegaChatRoom chat) {
+        if (call == null || call.getNumParticipants(MegaChatCall.ANY_FLAG) >= MAX_PARTICIPANTS_IN_CALL) {
+            showSnackbar(context, context.getString(R.string.call_error_too_many_participants));
+            return true;
+        } else if (canNotStartCall(context, chat, true)) {
+            showSnackbar(context, context.getString(R.string.call_error_too_many_participants_join));
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if it cannot start a call because has reached the maximum number of participants.
+     * If so, shows a snackbar with a warning.
+     *
+     * @param context   current Context
+     * @param chat      MegaChatRoom to check
+     * @return True if cannot start a call, false otherwise
+     */
+    public static boolean canNotStartCall(Context context, MegaChatRoom chat) {
+        return canNotStartCall(context, chat, false);
+    }
+
+    /**
+     * Checks if it cannot start a call because has reached the maximum number of participants.
+     * If so, shows a snackbar with a warning.
+     *
+     * @param context   current Context
+     * @param chat      MegaChatRoom to check
+     * @param joining   true if it is related to a join request, false otherwise
+     * @return True if cannot start a call, false otherwise
+     */
+    public static boolean canNotStartCall(Context context, MegaChatRoom chat, boolean joining) {
+        if (chat == null || (chat.isPublic() && chat.getPeerCount() + 1 > MAX_PARTICIPANTS_IN_CALL)) {
+            if (!joining) {
+                showSnackbar(context, context.getString(R.string.call_error_too_many_participants_start));
+            }
+            return true;
+        }
+
+        return false;
+    }
 }

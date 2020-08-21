@@ -93,11 +93,18 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
+		if (matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS)) {
+			logDebug("Open business invite link");
+			openWebLink(url);
+			return;
+		}
+
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
 			logDebug("Open link url");
 
 			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
+			openFileIntent.putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false));
 			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
 			openFileIntent.setData(Uri.parse(url));
@@ -124,6 +131,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			logDebug("Folder link url");
 
 			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
+			openFolderIntent.putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false));
 			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 			openFolderIntent.setData(Uri.parse(url));
