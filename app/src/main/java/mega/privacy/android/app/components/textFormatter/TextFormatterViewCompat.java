@@ -16,6 +16,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.components.CustomTypefaceSpan;
 
 import static mega.privacy.android.app.components.textFormatter.textFormatterUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 public class TextFormatterViewCompat {
@@ -71,7 +72,6 @@ public class TextFormatterViewCompat {
     public static CharSequence getFormattedText(String text, boolean isTextView) {
         if (isTextEmpty(text))
             return null;
-
         return isTextView? extractFlagsForTextView(text): extractFlagsForEditText(text);
     }
 
@@ -144,7 +144,6 @@ public class TextFormatterViewCompat {
         ArrayList<Flag> flags = new ArrayList();
         Flag boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
         Flag quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
-
         Flag strikeFlag = new Flag(INVALID_INDEX, INVALID_INDEX, STRIKE_FLAG);
         Flag italicFlag = new Flag(INVALID_INDEX, INVALID_INDEX, ITALIC_FLAG);
         int i = 0;
@@ -194,19 +193,31 @@ public class TextFormatterViewCompat {
                     break;
 
                 case MONOSPACE_FLAG:
-                    if (quoteFlag.start != INVALID_INDEX) {
-                        quoteFlag.end = j;
-                        flags.add(quoteFlag);
-                        quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
-                        continue;
-                    }
-                    if (hasFlagSameLine(text, MONOSPACE_FLAG, i + 1)) {
-                        quoteFlag.start = j;
-                        continue;
+                    if(textChars.length > 6){
+                        if(textChars.length > i+2){
+
+                            if(quoteFlag.start != INVALID_INDEX){
+                                if(quoteFlag.end == INVALID_INDEX && textChars[i+1] == MONOSPACE_FLAG && textChars[i+2] == MONOSPACE_FLAG){
+                                    quoteFlag.end = j;
+                                    flags.add(quoteFlag);
+                                    quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
+                                    i = i + 2;
+                                    j = j + 2;
+                                    continue;
+                                }
+                            }else {
+                                if (textChars[i + 1] == MONOSPACE_FLAG && textChars[i + 2] == MONOSPACE_FLAG) {
+                                    quoteFlag.start = j;
+                                    i = i + 2;
+                                    j = j + 2;
+                                    continue;
+
+                                }
+                            }
+                        }
                     }
                     break;
             }
-
             characters.add(c);
             ++j;
         }
@@ -232,7 +243,7 @@ public class TextFormatterViewCompat {
                     break;
 
                 case MONOSPACE_FLAG:
-                    builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end, GENERAL_FLAG);
+                    builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end-2 , GENERAL_FLAG);
                     break;
             }
         }
