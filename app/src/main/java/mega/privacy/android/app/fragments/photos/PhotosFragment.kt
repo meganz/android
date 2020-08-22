@@ -20,6 +20,8 @@ import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.shape.ShapeAppearanceModel
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -200,12 +202,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
-                    // Refresh the Ui here is necessary. The reason is certain cache mechanism of
-                    // RecyclerView would cause a couple of selected icons failed to be updated even
-                    // though listView.setItemViewCacheSize(0) (some ItemViews just out of
-                    // the screen are already generated but get ViewHolders return null,
-                    // and their bind() wouldn't be invoked via scrolling). Plus adding round corner
-                    // for thumbnails
                     updateUi()
                 }
 
@@ -218,10 +214,22 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
             it.forEach { pos ->
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                    val itemView = viewHolder.itemView
+
                     val imageView = if (viewModel.searchMode) {
-                        viewHolder.itemView.findViewById(R.id.thumbnail)
+                        itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        itemView.findViewById(R.id.thumbnail)
                     } else {
-                        viewHolder.itemView.findViewById<ImageView>(
+                        // Draw the green outline for the thumbnail view at once
+                        val thumbnailView = itemView.findViewById<ShapeableImageView>(R.id.thumbnail)
+                        val strokeWidth = resources.getDimension(R.dimen.photo_selected_border_width)
+                        val shapeId = R.style.GalleryImageShape_Selected
+                        thumbnailView.strokeWidth = strokeWidth
+                        thumbnailView.shapeAppearanceModel = ShapeAppearanceModel.builder(
+                            context, shapeId, 0
+                        ).build()
+
+                        itemView.findViewById<ImageView>(
                             R.id.icon_selected
                         )
                     }
