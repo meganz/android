@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.StatFs;
 import android.text.Html;
 import android.text.Spanned;
@@ -1447,8 +1448,8 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				
 				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
-			
-			updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	

@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.Looper;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -218,12 +220,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				}
 				case R.id.cab_menu_select_all:{
 					selectAll();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
-					actionMode.invalidate();
 					break;
 				}
 			}
@@ -563,7 +563,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				
 				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
-			updateActionModeTitle();
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	

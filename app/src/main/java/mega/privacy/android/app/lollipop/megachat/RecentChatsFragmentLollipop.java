@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
@@ -867,7 +868,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
             }
 
-            updateActionModeTitle();
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
 
@@ -1736,13 +1737,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             switch (item.getItemId()) {
                 case R.id.cab_menu_select_all: {
                     selectAll();
-                    actionMode.invalidate();
                     break;
                 }
                 case R.id.cab_menu_unselect_all: {
                     clearSelections();
                     hideMultipleSelect();
-                    actionMode.invalidate();
                     break;
                 }
                 case R.id.cab_menu_mute: {
