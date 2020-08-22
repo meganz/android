@@ -11,14 +11,20 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 
-import com.bumptech.glide.Glide;
+import androidx.annotation.Nullable;
+
+import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
 
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 import nz.mega.sdk.AndroidGfxProcessor;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ImageProcessor {
 
@@ -26,34 +32,84 @@ public class ImageProcessor {
 
     private static final int THUMBNAIL_SIZE = 200;
 
-    public static boolean createThumbnail(Context context, File origin, File thumbnail) {
-        if (!origin.exists()) return false;
+    public static void createThumbnail(File origin, File thumbnail) {
+        if (!origin.exists()) return;
         if (thumbnail.exists()) thumbnail.delete();
 
-        try {
-            Bitmap bitmap = Glide.with(context).asBitmap().load(origin).centerCrop().submit(THUMBNAIL_SIZE, THUMBNAIL_SIZE).get();
-            return AndroidGfxProcessor.saveBitmap(bitmap, thumbnail);
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-            logError("Create image thumbnail failed.", e);
-        }
-        return false;
+        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+        ImageRequest imageRequest = ImageRequest.fromFile(origin);
+
+        DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, null);
+
+        dataSource.subscribe(new BaseBitmapDataSubscriber() {
+
+            @Override
+            public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                if(bitmap != null) {
+                    String path = origin.getAbsolutePath();
+
+                    int orientation = AndroidGfxProcessor.getExifOrientation(path);
+                    Rect rect = AndroidGfxProcessor.getImageDimensions(path, orientation);
+                    if (rect.isEmpty()) return;
+
+                    int w = rect.right;
+                    int h = rect.bottom;
+
+                    if ((w == 0) || (h == 0)) return;
+
+                    if (w < h) {
+                        h = h * THUMBNAIL_SIZE / w;
+                        w = THUMBNAIL_SIZE;
+                    } else {
+                        w = w * THUMBNAIL_SIZE / h;
+                        h = THUMBNAIL_SIZE;
+                    }
+
+                    if ((w == 0) || (h == 0)) return;
+
+                    int px = (w - THUMBNAIL_SIZE) / 2;
+                    int py = (h - THUMBNAIL_SIZE) / 3;
+
+                    bitmap =  Bitmap.createScaledBitmap(bitmap, w, h, true);
+                    bitmap = AndroidGfxProcessor.extractRect(bitmap, px, py, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+                    AndroidGfxProcessor.saveBitmap(bitmap, thumbnail);
+                }
+            }
+
+            @Override
+            public void onFailureImpl(DataSource dataSource) {
+                // No cleanup required here.
+            }
+        }, CallerThreadExecutor.getInstance());
+
     }
 
-    public static boolean createImagePreview(Context context, File img, File preview) {
+    public static void createImagePreview(File img, File preview) {
         int[] wh = calculatePreviewWidthAndHeight(img);
         int w = wh[0];
         int h = wh[1];
 
-        if (w == 0 || h == 0) return false;
-        try {
-            Bitmap bitmap = Glide.with(context).asBitmap().load(img).submit(w, h).get();
-            return AndroidGfxProcessor.saveBitmap(bitmap, preview);
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-            logError("Create image prview failed.", e);
-        }
-        return false;
+        if (w == 0 || h == 0) return;
+
+        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+        ImageRequest imageRequest = ImageRequest.fromFile(img);
+
+        DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, null);
+
+        dataSource.subscribe(new BaseBitmapDataSubscriber() {
+            @Override
+            public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                if(bitmap != null) {
+                    bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+                    AndroidGfxProcessor.saveBitmap(bitmap, preview);
+                }
+            }
+
+            @Override
+            public void onFailureImpl(DataSource dataSource) {
+                // No cleanup required here.
+            }
+        }, CallerThreadExecutor.getInstance());
     }
 
     private static int[] calculatePreviewWidthAndHeight(File origin) {
@@ -174,7 +230,7 @@ public class ImageProcessor {
 
         try {
             if (bmThumbnail != null) {
-                return Glide.with(context).asBitmap().load(bmThumbnail).submit(w, h).get();
+                return Bitmap.createScaledBitmap(bmThumbnail, w, h, true);
             }
         } catch (Exception e) {
         }

@@ -1567,14 +1567,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             if (!preview.exists()) {
                                 createVideoPreview(CameraUploadsService.this, img, preview);
                             }
-                            createThumbnail(CameraUploadsService.this, img, thumb);
+                            createThumbnail(img, thumb);
                         });
                     } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
                         threadPool.execute(() -> {
                             if (!preview.exists()) {
-                                ImageProcessor.createImagePreview(CameraUploadsService.this, src, preview);
+                                createImagePreview(src, preview);
                             }
-                            ImageProcessor.createThumbnail(CameraUploadsService.this, src, thumb);
+                            createThumbnail(src, thumb);
                         });
                     }
                 }
