@@ -1,10 +1,10 @@
 package mega.privacy.android.app.fragments.photos
 
-import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.scopes.ActivityRetainedScoped
+import mega.privacy.android.app.utils.Util
 import javax.inject.Inject
 
 @ActivityRetainedScoped
@@ -12,11 +12,15 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
     // The full set of nodes
     private lateinit var nodesData: List<SelectableNode>
 
-    // Which nodes have been selected so far
+    // Notify the fragment that the user intends to enter action mode by long click
+    private val _longClick = MutableLiveData<Event<SelectableNode>>()
+    val longClick: LiveData<Event<SelectableNode>> = _longClick
+
+    // All nodes have been selected so far
     private val _selectedNodes = MutableLiveData<List<SelectableNode>>()
     val selectedNodes: LiveData<List<SelectableNode>> = _selectedNodes
 
-    // Which nodes should play the animation for this time of selection
+    // Nodes should play the animation for this time of selection
     private val _animNodeIndices = MutableLiveData<Set<Int>>()
     val animNodeIndices: LiveData<Set<Int>> = _animNodeIndices
 
@@ -25,14 +29,14 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     private val selectedNodeList = mutableListOf<SelectableNode>()
 
-    fun onPhotoClick(node: SelectableNode) {
-        updateSelectedNodeList(node)
-    }
+    fun onPhotoClick(node: SelectableNode) = updateSelectedNodeList(node)
 
     fun onPhotoLongClick(node: SelectableNode): Boolean {
-        updateSelectedNodeList(node)
+        _longClick.value = Event(node)
         return true
     }
+
+    fun enterActionMode(node: SelectableNode) = updateSelectedNodeList(node)
 
     private fun updateSelectedNodeList(node: SelectableNode) {
         node.selected = !node.selected
@@ -82,7 +86,8 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
     fun setNodesData(nodes: List<SelectableNode>) {
         nodesData = nodes
 
-        // Some selected nodes may have been removed, so refresh selectedNodeList
+        // Some selected nodes may have been removed(e.g. by another Mega client),
+        // so refresh selectedNodeList
         selectedNodeList.clear()
         nodesData.forEach {
             if (it.selected) {

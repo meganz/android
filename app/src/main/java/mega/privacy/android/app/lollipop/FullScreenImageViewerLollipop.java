@@ -231,6 +231,17 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
+	private static DraggingThumbnailCallback draggingThumbnailCallback;
+
+	public interface DraggingThumbnailCallback {
+		void setVisibility(int visibility);
+		void getLocationOnScreen(int[] location);
+	}
+
+	public static void setDraggingThumbnailCallback(DraggingThumbnailCallback cb) {
+		draggingThumbnailCallback = cb;
+	}
+
 	@Override
 	public void onDestroy(){
 
@@ -243,6 +254,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+
+		draggingThumbnailCallback = null;
 
 		super.onDestroy();
 	}
@@ -860,7 +873,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				adapterType == INCOMING_SHARES_ADAPTER|| adapterType == OUTGOING_SHARES_ADAPTER ||
 				adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
 				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER ||
-				adapterType == LINKS_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER) {
+				adapterType == LINKS_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
+				|| adapterType == PHOTOS_SEARCH_ADAPTER ) {
             // only for the first time
             if(savedInstanceState == null) {
                 positionG -= placeholderCount;
@@ -1048,7 +1062,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		else if(adapterType == SEARCH_ADAPTER){
 			ArrayList<String> handles = intent.getStringArrayListExtra(ARRAY_SEARCH);
 			getImageHandles(getSearchedNodes(handles), savedInstanceState);
-		}else if(adapterType == SEARCH_BY_ADAPTER){
+		}else if(adapterType == SEARCH_BY_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER){
 			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
 
 			ArrayList<MegaNode> nodes = new ArrayList<>();
@@ -1239,6 +1253,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
 			RecentsFragment.imageDrag.setVisibility(visibility);
+		} else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
+			if (draggingThumbnailCallback != null) {
+				draggingThumbnailCallback.setVisibility(visibility);
+			}
 		}
 	}
 
@@ -1302,6 +1320,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
 			RecentsFragment.imageDrag.getLocationOnScreen(location);
+		} else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
+			if (draggingThumbnailCallback != null) {
+				draggingThumbnailCallback.getLocationOnScreen(location);
+			}
 		}
 	}
 
@@ -1365,12 +1387,9 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
                     break;
                 }
             }
-        }
-        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-	    	Long handle = adapterMega.getImageHandle(positionG);
-			getImageView(0, handle);
-		}
-		else if (adapterType == SEARCH_ADAPTER){
+		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
+				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
+				|| adapterType == PHOTOS_SEARCH_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			getImageView(0, handle);
 		}
@@ -1441,12 +1460,9 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
                     break;
                 }
             }
-        }
-		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-			Long handle = adapterMega.getImageHandle(positionG);
-			scrollToPosition(0, handle);
-		}
-		else if (adapterType == SEARCH_ADAPTER){
+		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
+				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
+				|| adapterType == PHOTOS_SEARCH_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			scrollToPosition(0, handle);
 		}

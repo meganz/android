@@ -37,7 +37,8 @@ class PhotosSearchAdapter @Inject constructor(
                 )
         }
 
-        // TYPE_TITLE views take layout positions for facilitating the logic calculation
+        // TYPE_TITLE views take layout positions but is invisible,
+        // just for facilitating the calculation logic
         if (viewType == PhotoNode.TYPE_TITLE) {
             val layoutParams = binding.root.layoutParams
             layoutParams.width = 0

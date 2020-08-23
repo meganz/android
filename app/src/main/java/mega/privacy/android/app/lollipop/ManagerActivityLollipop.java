@@ -214,9 +214,7 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
-import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -1272,6 +1270,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 							else if (actionType == SCROLL_TO_POSITION) {
 								muFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
+						Long handle = intent.getLongExtra("handle", -1);
+						if (mHomepageSearchable != null) {
+							PhotosFragment fragment = (PhotosFragment)mHomepageSearchable;
+							switch (actionType) {
+								case SCROLL_TO_POSITION:
+									fragment.scrollToPhoto(handle);
+									break;
+								case UPDATE_IMAGE_DRAG:
+									fragment.hideDraggingThumbnail(handle);
+									break;
+								default:
+									break;
 							}
 						}
 					} else if (adapterType == RECENTS_ADAPTER && rF != null) {
@@ -5756,6 +5770,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			int destinationId = destination.getId();
+			mHomepageSearchable = null;
 
 			switch (destinationId) {
 				case R.id.homepageFragment:
@@ -6491,6 +6506,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					setToolbarTitle();
 					supportInvalidateOptionsMenu();
+				} else if (drawerItem == DrawerItem.HOMEPAGE) {
+					hideKeyboardSearch();
 				} else {
 					searchExpand = false;
 					searchQuery = "" + query;
@@ -6826,21 +6843,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				case NOTIFICATIONS:
 					break;
-				case HOMEPAGE:
-					// Get the Searchable again at onCreateOptionsMenu() after screen rotation
-					mHomepageSearchable = findHomepageSearchable();
+			}
+		}
 
-					if (searchExpand) {
-						openSearchView();
-					} else {
-						if (mHomepageSearchable != null) {
-							searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
-							if (mHomepageSearchable instanceof PhotosFragment) {
-								rubbishBinMenuItem.setVisible(true);
-							}
-						}
+		if (drawerItem == DrawerItem.HOMEPAGE) {
+			// Get the Searchable again at onCreateOptionsMenu() after screen rotation
+			mHomepageSearchable = findHomepageSearchable();
+
+			if (searchExpand) {
+				openSearchView();
+			} else {
+				if (mHomepageSearchable != null) {
+					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
+					if (mHomepageSearchable instanceof PhotosFragment && isOnline(this)) {
+						rubbishBinMenuItem.setVisible(true);
 					}
-					break;
+				}
 			}
 		}
 
