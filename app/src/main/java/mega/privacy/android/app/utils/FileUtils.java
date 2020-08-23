@@ -59,6 +59,8 @@ public class FileUtils {
 
     public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
 
+    public static final String JPG_EXTENSION = ".jpg";
+
     private static final String VOLUME_EXTERNAL = "external";
     private static final String VOLUME_INTERNAL = "internal";
 
@@ -780,6 +782,37 @@ public class FileUtils {
      */
     public static boolean isBasedOnFileStorage() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
+    }
+
+    public static File getFileFromContentUri(Context context, Uri uri) {
+        File file = new File(context.getCacheDir(), uri.getLastPathSegment());
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            in = context.getContentResolver().openInputStream(uri);
+            out = new FileOutputStream(file);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return file;
     }
 }
 

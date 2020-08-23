@@ -524,7 +524,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			switch (account){
 				case PRO_LITE:{
 					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_orange));
-					paymentTitle.setText(getString(R.string.prolite_account));
+					paymentTitle.setText(getString(R.string.lite_account));
 					break;
 				}
 				case PRO_I:{
@@ -1252,7 +1252,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 4: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.prolite_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.lite_account).toUpperCase());
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ffa500\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");

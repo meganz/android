@@ -1,0 +1,794 @@
+package mega.privacy.android.app.fragments.managerFragments.cu;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Locale;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
+import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
+import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.repo.MegaNodeRepo;
+import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.MegaPreferences.MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
+import static mega.privacy.android.app.utils.CameraUploadUtil.resetCUTimestampsAndCache;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
+import static mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
+import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.FileUtils.findVideoLocalPath;
+import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
+import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.Util.checkFingerprint;
+import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
+public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
+    public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
+    public static final int TYPE_MEDIA = MegaNodeRepo.CU_TYPE_MEDIA;
+
+    private static final String ARG_TYPE = "type";
+
+    // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 7.
+    private static final int SPAN_LARGE_GRID = 3;
+    private static final int SPAN_SMALL_GRID = 7;
+
+    @SuppressLint("StaticFieldLeak") private static CameraUploadsFragment sInstanceForDragging;
+
+    private int mCamera = TYPE_CAMERA;
+
+    private ManagerActivityLollipop mManagerActivity;
+
+    private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
+    private FragmentCameraUploadsBinding mBinding;
+    private CameraUploadsAdapter mAdapter;
+    private ActionMode mActionMode;
+
+    private CuViewModel mViewModel;
+    private long mDraggingNodeHandle = INVALID_HANDLE;
+
+    public static CameraUploadsFragment newInstance(int type) {
+        CameraUploadsFragment fragment = new CameraUploadsFragment();
+
+        Bundle args = new Bundle();
+        args.putInt(ARG_TYPE, type);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    /**
+     * Get the location on screen of the dragging node thumbnail.
+     *
+     * TODO: we need figure out a better way to implement the drag feature, this kind of static hack
+     * should be avoided.
+     *
+     * @param location out param for location
+     */
+    public static void getDraggingThumbnailLocationOnScreen(int[] location) {
+        CameraUploadsFragment fragment = sInstanceForDragging;
+        if (fragment == null) {
+            return;
+        }
+        int position = fragment.mAdapter.getNodePosition(fragment.mDraggingNodeHandle);
+        RecyclerView.ViewHolder viewHolder =
+                fragment.mBinding.cuList.findViewHolderForLayoutPosition(position);
+        if (viewHolder == null) {
+            return;
+        }
+        int[] res = fragment.mAdapter.getThumbnailLocationOnScreen(viewHolder);
+        System.arraycopy(res, 0, location, 0, 2);
+    }
+
+    public static void setDraggingThumbnailVisibility(int visibility) {
+        CameraUploadsFragment fragment = sInstanceForDragging;
+        if (fragment == null) {
+            return;
+        }
+        fragment.setDraggingThumbnailVisibility(fragment.mDraggingNodeHandle, visibility);
+    }
+
+    public int getItemCount() {
+        return mAdapter == null ? 0 : mAdapter.getItemCount();
+    }
+
+    public void setOrderBy(int orderBy) {
+        reloadNodes(orderBy);
+    }
+
+    public void setSearchDate(long[] searchDate, int orderBy) {
+        mViewModel.setSearchDate(searchDate, orderBy);
+    }
+
+    public void reloadNodes(int orderBy) {
+        mViewModel.loadCuNodes(orderBy);
+    }
+
+    public void checkScroll() {
+        if (mViewModel == null || mBinding == null) {
+            return;
+        }
+
+        if (mViewModel.isSelecting() || mBinding.cuList.canScrollVertically(-1)) {
+            mManagerActivity.changeActionBarElevation(true);
+        } else {
+            mManagerActivity.changeActionBarElevation(false);
+        }
+    }
+
+    public void selectAll() {
+        mViewModel.selectAll();
+    }
+
+    public int onBackPressed() {
+        if (mManagerActivity.getFirstLogin()) {
+            mViewModel.setCamSyncEnabled(false);
+            mManagerActivity.setFirstLogin(false);
+            mManagerActivity.refreshMenu();
+        }
+
+        if (mManagerActivity.isFirstNavigationLevel()) {
+            return 0;
+        } else {
+            reloadNodes(mManagerActivity.orderCamera);
+            mManagerActivity.invalidateOptionsMenu();
+            mManagerActivity.setIsSearchEnabled(false);
+            mManagerActivity.setToolbarTitle();
+            return 1;
+        }
+    }
+
+    public void onStoragePermissionRefused() {
+        showSnackbar(context, getString(R.string.on_refuse_storage_permission));
+        navigateToCloudDrive();
+    }
+
+    public void scrollToNode(long handle) {
+        logDebug("scrollToNode, handle " + handle);
+        if (mBinding != null) {
+            int position = mAdapter.getNodePosition(handle);
+            logDebug("scrollToNode, handle " + handle + ", position " + position);
+            if (position != INVALID_POSITION) {
+                mBinding.cuList.scrollToPosition(position);
+                notifyThumbnailLocationOnScreen();
+            }
+        }
+    }
+
+    public void hideDraggingThumbnail(long handle) {
+        logDebug("hideDraggingThumbnail: " + handle);
+
+        if (mViewModel != null) {
+            setDraggingThumbnailVisibility(mDraggingNodeHandle, View.VISIBLE);
+            setDraggingThumbnailVisibility(handle, View.GONE);
+            mDraggingNodeHandle = handle;
+            notifyThumbnailLocationOnScreen();
+        }
+    }
+
+    private void setDraggingThumbnailVisibility(long handle, int visibility) {
+        int position = mAdapter.getNodePosition(handle);
+        RecyclerView.ViewHolder viewHolder =
+                mBinding.cuList.findViewHolderForLayoutPosition(position);
+        if (viewHolder == null) {
+            return;
+        }
+        mAdapter.setThumbnailVisibility(viewHolder, visibility);
+    }
+
+    private void notifyThumbnailLocationOnScreen() {
+        int position = mAdapter.getNodePosition(mDraggingNodeHandle);
+        RecyclerView.ViewHolder viewHolder =
+                mBinding.cuList.findViewHolderForLayoutPosition(position);
+        if (viewHolder == null) {
+            return;
+        }
+        int[] res = mAdapter.getThumbnailLocationOnScreen(viewHolder);
+        res[0] += res[2] / 2;
+        res[1] += res[3] / 2;
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+        intent.putExtra("screenPosition", res);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    private void navigateToCloudDrive() {
+        mViewModel.setCamSyncEnabled(false);
+        mManagerActivity.setFirstLogin(false);
+        mManagerActivity.setInitialCloudDrive();
+    }
+
+    private void requestCameraUploadPermission(String[] permissions, int requestCode) {
+        ActivityCompat.requestPermissions(mManagerActivity, permissions,
+                requestCode);
+    }
+
+    public void enableCuForBusinessFirstTime() {
+        if (mFirstLoginBinding == null) {
+            return;
+        }
+
+        boolean enableCellularSync = mFirstLoginBinding.cellularConnectionSwitch.isChecked();
+        boolean syncVideo = mFirstLoginBinding.uploadVideosSwitch.isChecked();
+
+        mViewModel.enableCuForBusinessFirstTime(enableCellularSync, syncVideo);
+
+        mManagerActivity.setFirstLogin(false);
+        startCU();
+    }
+
+    /**
+     * This function is kept almost the same as it was in CameraUploadFragmentLollipop#cameraOnOff.
+     */
+    public void enableCuForBusiness() {
+        MegaPreferences prefs = dbH.getPreferences();
+        boolean isEnabled = false;
+        if (prefs != null) {
+            if (prefs.getCamSyncEnabled() != null) {
+                if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+                    isEnabled = true;
+                }
+            }
+        }
+
+        if (isEnabled) {
+            resetCUTimestampsAndCache();
+            dbH.setCamSyncEnabled(false);
+            dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+            stopRunningCameraUploadService(context);
+            mManagerActivity.refreshCameraUpload();
+        } else {
+            prefs = dbH.getPreferences();
+            if (prefs != null &&
+                    !TextUtils.isEmpty(prefs.getCamSyncLocalPath()) &&
+                    !TextUtils.isEmpty(prefs.getCamSyncFileUpload()) &&
+                    !TextUtils.isEmpty(prefs.getCamSyncWifi())
+            ) {
+                resetCUTimestampsAndCache();
+                dbH.setCamSyncEnabled(true);
+                dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+
+                //video quality
+                saveCompressionSettings();
+                startCU();
+
+                return;
+            }
+
+            final ListAdapter adapter =
+                    new ArrayAdapter<>(context, R.layout.select_dialog_singlechoice,
+                            android.R.id.text1,
+                            new String[] {
+                                    getResources().getString(R.string.cam_sync_wifi),
+                                    getResources().getString(R.string.cam_sync_data)
+                            });
+            new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle)
+                    .setTitle(getString(R.string.section_photo_sync))
+                    .setSingleChoiceItems(adapter, -1, (dialog, which) -> {
+                        resetCUTimestampsAndCache();
+                        dbH.setCamSyncEnabled(true);
+                        dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+                        File localFile =
+                                Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_DCIM);
+                        String localPath = localFile.getAbsolutePath();
+                        dbH.setCamSyncLocalPath(localPath);
+                        dbH.setCameraFolderExternalSDCard(false);
+
+                        switch (which) {
+                            case 0: {
+                                dbH.setCamSyncWifi(true);
+                                break;
+                            }
+                            case 1: {
+                                dbH.setCamSyncWifi(false);
+                                break;
+                            }
+                        }
+
+                        startCU();
+                        dialog.dismiss();
+                    })
+                    .setPositiveButton(context.getString(R.string.general_cancel),
+                            (dialog, which) -> dialog.dismiss())
+                    .create()
+                    .show();
+        }
+    }
+
+    private void saveCompressionSettings() {
+        dbH.setCameraUploadVideoQuality(MEDIUM);
+        dbH.setConversionOnCharging(true);
+
+        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+    }
+
+    private void startCU() {
+        mManagerActivity.refreshCameraUpload();
+
+        new Handler().postDelayed(() -> {
+            logDebug("Starting CU");
+            startCameraUploadService(context);
+        }, 1000);
+    }
+
+    public void resetSwitchButtonLabel() {
+        if (mBinding == null) {
+            return;
+        }
+
+        mBinding.turnOnCuLayout.setVisibility(View.VISIBLE);
+        mBinding.turnOnCuText.setText(
+                getString(R.string.settings_camera_upload_turn_on).toUpperCase(
+                        Locale.getDefault()));
+    }
+
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            mCamera = getArguments().getInt(ARG_TYPE, TYPE_CAMERA);
+        }
+
+        mManagerActivity = (ManagerActivityLollipop) context;
+    }
+
+    @Nullable @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+
+        CuViewModelFactory viewModelFactory =
+                new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context), mCamera);
+        mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
+
+        if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {
+            return createCameraUploadsViewForFirstLogin(inflater, container);
+        } else {
+            mBinding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
+            return mBinding.getRoot();
+        }
+    }
+
+    private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container) {
+        mManagerActivity.showHideBottomNavigationView(true);
+        mViewModel.setInitialPreferences();
+
+        mFirstLoginBinding =
+                FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
+
+        new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
+                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                    if (mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)) {
+                        mManagerActivity.changeActionBarElevation(true);
+                    } else {
+                        mManagerActivity.changeActionBarElevation(false);
+                    }
+                });
+
+        mFirstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
+            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+            if (hasPermissions(context, permissions)) {
+                mManagerActivity.checkIfShouldShowBusinessCUAlert(
+                        BUSINESS_CU_FRAGMENT_CU, true);
+            } else {
+                requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
+            }
+            mManagerActivity.showHideBottomNavigationView(false);
+        });
+        mFirstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
+            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+            navigateToCloudDrive();
+        });
+
+        return mFirstLoginBinding.getRoot();
+    }
+
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (mBinding == null) {
+            return;
+        }
+
+        setupRecyclerView();
+        setupOtherViews();
+        observeLiveData();
+    }
+
+    private void setupRecyclerView() {
+        boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
+        int spanCount = smallGrid ? SPAN_SMALL_GRID : SPAN_LARGE_GRID;
+
+        mBinding.cuList.setHasFixedSize(true);
+        GridLayoutManager layoutManager = new GridLayoutManager(context, spanCount);
+        mBinding.cuList.setLayoutManager(layoutManager);
+        mBinding.cuList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
+
+        int imageMargin = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_image_margin_small
+                        : R.dimen.cu_fragment_image_margin_large);
+        int gridWidth = (outMetrics.widthPixels - imageMargin * spanCount * 2) / spanCount;
+        int icSelectedWidth = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_ic_selected_size_small
+                        : R.dimen.cu_fragment_ic_selected_size_large);
+        int icSelectedMargin = getResources().getDimensionPixelSize(
+                smallGrid ? R.dimen.cu_fragment_ic_selected_margin_small
+                        : R.dimen.cu_fragment_ic_selected_margin_large);
+        CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
+                icSelectedWidth, imageMargin,
+                getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
+                icSelectedMargin,
+                getResources().getDimensionPixelSize(
+                        R.dimen.cu_fragment_selected_round_corner_radius));
+
+        mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
+        mAdapter.setHasStableIds(true);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override public int getSpanSize(int position) {
+                return mAdapter.getSpanSize(position);
+            }
+        });
+
+        mBinding.cuList.setAdapter(mAdapter);
+        mBinding.scroller.setRecyclerView(mBinding.cuList);
+    }
+
+    private void setupOtherViews() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mBinding.emptyHintImage.setImageResource(R.drawable.uploads_empty_landscape);
+        } else {
+            mBinding.emptyHintImage.setImageResource(R.drawable.ic_empty_camera_uploads);
+        }
+
+        if (mCamera == TYPE_CAMERA) {
+            mBinding.turnOnCuText.setText(
+                    getString(R.string.settings_camera_upload_turn_on).toUpperCase(
+                            Locale.getDefault()));
+        } else {
+            mBinding.turnOnCuText.setText(
+                    getString(R.string.settings_set_up_automatic_uploads).toUpperCase(
+                            Locale.getDefault()));
+        }
+
+        mBinding.turnOnCuLayout.setOnClickListener(v -> {
+            ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+
+            if (mCamera == TYPE_CAMERA) {
+                if (hasPermissions(context, permissions)) {
+                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
+                            BUSINESS_CU_FRAGMENT_CU, false);
+                } else {
+                    requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
+                }
+            } else {
+                mManagerActivity.moveToSettingsSection();
+            }
+        });
+    }
+
+    private void observeLiveData() {
+        mViewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
+            boolean showScroller = nodes.size() >= (mManagerActivity.isSmallGridCameraUploads
+                    ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
+            mBinding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
+            mAdapter.setNodes(nodes);
+            mManagerActivity.updateCuFragmentOptionsMenu();
+
+            mBinding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
+            mBinding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
+            mBinding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
+            if (nodes.isEmpty()) {
+                mBinding.emptyHintImage.setVisibility(
+                        mViewModel.isSearchMode() ? View.GONE : View.VISIBLE);
+                if (mViewModel.isSearchMode()) {
+                    mBinding.emptyHintText.setText(R.string.no_results_found);
+                } else {
+                    String textToShow = getString(R.string.context_empty_camera_uploads);
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception ignored) {
+                    }
+                    Spanned result;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    mBinding.emptyHintText.setText(result);
+                }
+            }
+        });
+
+        mViewModel.nodeToOpen()
+                .observe(getViewLifecycleOwner(), pair -> openNode(pair.first, pair.second));
+
+        mViewModel.nodeToAnimate().observe(getViewLifecycleOwner(), pair -> {
+            if (pair.first < 0 || pair.first >= mAdapter.getItemCount()) {
+                return;
+            }
+
+            mAdapter.showSelectionAnimation(pair.first, pair.second,
+                    mBinding.cuList.findViewHolderForLayoutPosition(pair.first));
+        });
+
+        mViewModel.actionBarTitle().observe(getViewLifecycleOwner(), title -> {
+            ActionBar actionBar = ((AppCompatActivity) context).getSupportActionBar();
+            if (actionBar != null && mViewModel.isSearchMode()) {
+                actionBar.setTitle(title);
+            }
+        });
+
+        mViewModel.actionMode().observe(getViewLifecycleOwner(), visible -> {
+            if (visible) {
+                if (mActionMode == null) {
+                    mActionMode = ((AppCompatActivity) context).startSupportActionMode(
+                            new CuActionModeCallback(context, this, mViewModel, megaApi));
+                }
+
+                mActionMode.setTitle(String.valueOf(mViewModel.getSelectedNodesCount()));
+                mActionMode.invalidate();
+            } else {
+                if (mActionMode != null) {
+                    mActionMode.finish();
+                    mActionMode = null;
+                }
+            }
+        });
+
+        mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
+            mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
+            if (!enabled) {
+                FrameLayout.LayoutParams params =
+                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
+                params.bottomMargin = px2dp(48, outMetrics);
+                mBinding.cuList.setLayoutParams(params);
+
+                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
+                params.bottomMargin = px2dp(48, outMetrics);
+                mBinding.scroller.setLayoutParams(params);
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_CAMERA_ON_OFF: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
+                            BUSINESS_CU_FRAGMENT_CU, false);
+                }
+                break;
+            }
+            case REQUEST_CAMERA_ON_OFF_FIRST_TIME: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mManagerActivity.checkIfShouldShowBusinessCUAlert(
+                            BUSINESS_CU_FRAGMENT_CU, true);
+                }
+                break;
+            }
+        }
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+
+        reloadNodes(mManagerActivity.orderCamera);
+        sInstanceForDragging = null;
+    }
+
+    private void openNode(int position, CuNode cuNode) {
+        if (position < 0 || position >= mAdapter.getItemCount()) {
+            return;
+        }
+
+        int[] thumbnailLocation = mAdapter.getThumbnailLocationOnScreen(
+                mBinding.cuList.findViewHolderForLayoutPosition(position));
+        if (thumbnailLocation == null) {
+            return;
+        }
+
+        MegaNode node = cuNode.getNode();
+        if (node == null) {
+            return;
+        }
+
+        MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
+        if (mime.isImage()) {
+            Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+            putExtras(intent, cuNode.getIndex(), node, thumbnailLocation);
+            launchNodeViewer(intent, node.getHandle());
+        } else if (mime.isVideoReproducible()) {
+            String mimeType = mime.getType();
+
+            Intent mediaIntent;
+            boolean internalIntent;
+            if (mime.isVideoNotSupported()) {
+                mediaIntent = new Intent(Intent.ACTION_VIEW);
+                internalIntent = false;
+            } else {
+                internalIntent = true;
+                mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+            }
+
+            putExtras(mediaIntent, cuNode.getIndex(), node, thumbnailLocation);
+
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+            mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
+
+            String localPath = null;
+            try {
+                localPath = findVideoLocalPath(context, node);
+            } catch (Exception e) {
+                logWarning(e.getMessage());
+            }
+            if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
+                File mediaFile = new File(localPath);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(
+                        Environment.getExternalStorageDirectory().getPath())) {
+                    mediaIntent.setDataAndType(FileProvider.getUriForFile(context,
+                            "mega.privacy.android.app.providers.fileprovider", mediaFile),
+                            MimeTypeList
+                                    .typeForName(node.getName()).getType());
+                } else {
+                    mediaIntent.setDataAndType(Uri.fromFile(mediaFile), mime.getType());
+                }
+                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else {
+                if (megaApi.httpServerIsRunning() == 0) {
+                    megaApi.httpServerStart();
+                }
+
+                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                ActivityManager activityManager
+                        = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                if (activityManager != null) {
+                    activityManager.getMemoryInfo(mi);
+                }
+
+                megaApi.httpServerSetMaxBufferSize(
+                        mi.totalMem > BUFFER_COMP ? MAX_BUFFER_32MB : MAX_BUFFER_16MB);
+
+                String url = megaApi.httpServerGetLocalLink(node);
+                mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+            }
+            if (internalIntent) {
+                launchNodeViewer(mediaIntent, node.getHandle());
+            } else {
+                if (isIntentAvailable(context, mediaIntent)) {
+                    launchNodeViewer(mediaIntent, node.getHandle());
+                } else {
+                    mManagerActivity.showSnackbar(SNACKBAR_TYPE,
+                            getString(R.string.intent_not_available), -1);
+                }
+            }
+        }
+    }
+
+    private void putExtras(Intent intent, int index, MegaNode node, int[] thumbnailLocation) {
+        intent.putExtra(INTENT_EXTRA_KEY_POSITION, index);
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, mManagerActivity.orderCamera);
+
+        MegaNode parentNode = megaApi.getParentNode(node);
+        if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {
+            intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE);
+        } else {
+            intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.getHandle());
+        }
+
+        if (mViewModel.isSearchMode()) {
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER);
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
+                    mViewModel.getSearchResultNodeHandles());
+        } else {
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
+        }
+
+        logDebug("openNode screenPosition " + Arrays.toString(thumbnailLocation));
+        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, thumbnailLocation);
+    }
+
+    private void launchNodeViewer(Intent intent, long handle) {
+        context.startActivity(intent);
+        requireActivity().overridePendingTransition(0, 0);
+        sInstanceForDragging = this;
+        mDraggingNodeHandle = handle;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mBinding = null;
+    }
+
+    @Override public void onNodeClicked(int position, CuNode node) {
+        mViewModel.onNodeClicked(position, node);
+    }
+
+    @Override public void onNodeLongClicked(int position, CuNode node) {
+        mViewModel.onNodeLongClicked(position, node);
+    }
+}

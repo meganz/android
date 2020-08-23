@@ -79,6 +79,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -86,6 +87,7 @@ import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class ContactFileListActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface, UploadBottomSheetDialogActionListener {
 
@@ -1199,6 +1201,11 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				parentNode = megaApi.getRootNode();
 			}
 
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()));
 			for (String path : paths) {
 				Intent uploadServiceIntent = new Intent(this, UploadService.class);
@@ -1259,6 +1266,10 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			showErrorAlertDialog(getString(R.string.upload_can_not_open),
 					false, this);
 		} else {
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);

@@ -113,7 +113,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
                         boolean isIdle = pm.isDeviceIdleMode();
-                        if ((!MegaApplication.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
+                        if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
                             logDebug("Launch foreground service!");
                             awakeCpu(false);
                             app.startService(new Intent(app, IncomingCallService.class));
@@ -136,7 +136,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
                     }
                 } else if (TYPE_CHAT.equals(messageType)) {
                     logDebug("CHAT notification");
-                    if (MegaApplication.isActivityVisible()) {
+                    if(app.isActivityVisible()){
                         logDebug("App on foreground --> return");
                         retryPendingConnections();
                         return;

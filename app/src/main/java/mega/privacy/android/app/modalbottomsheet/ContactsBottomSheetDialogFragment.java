@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,11 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -28,6 +32,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 
 public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -74,6 +79,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_contact_list_thumbnail);
 
         LinearLayout optionInfoContact = contentView.findViewById(R.id.contact_list_info_contact_layout);
+        LinearLayout optionStartCall = contentView.findViewById(R.id.contact_list_option_call_layout);
         LinearLayout optionStartConversation = contentView.findViewById(R.id.contact_list_option_start_conversation_layout);
         LinearLayout optionSendFile = contentView.findViewById(R.id.contact_list_option_send_file_layout);
         LinearLayout optionSendContact = contentView.findViewById(R.id.contact_list_option_send_contact_layout);
@@ -109,10 +115,12 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
             titleMailContactPanel.setVisibility(View.GONE);
         }
 
-        setImageAvatar(contact.getMegaUser(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
+        setImageAvatar(contact.getMegaUser().getHandle(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
 
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);
+        optionStartCall.setVisibility(View.VISIBLE);
+        optionStartCall.setOnClickListener(participatingInACall() ? null : this);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -120,6 +128,13 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
     @Override
     public void onClick(View v) {
+
+        if (app.getStorageState() == STORAGE_STATE_PAYWALL && v.getId() != R.id.contact_list_info_contact_layout) {
+            showOverDiskQuotaPaywallWarning();
+            setStateBottomSheetBehaviorHidden();
+            return;
+        }
+
         if (contact == null) {
             logWarning("Selected contact NULL");
             return;
@@ -137,6 +152,10 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
             case R.id.contact_list_option_start_conversation_layout:
                 ((ManagerActivityLollipop) context).startOneToOneChat(contact.getMegaUser());
+                break;
+
+            case R.id.contact_list_option_call_layout:
+                startNewCall(((ManagerActivityLollipop) context), contact.getMegaUser());
                 break;
 
             case R.id.contact_list_option_send_file_layout:

@@ -147,7 +147,8 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         if (node == null) return;
 
         ((RecentsFragment) fragment).setBucketSelected(bucket);
-        ((RecentsFragment) fragment).openFile(node, true);
+        ((RecentsFragment) fragment).openFile(node, true, v.findViewById(R.id.thumbnail_view),
+            RecentsFragment.OPEN_FROM_ROOT_MULTI);
 
     }
 }

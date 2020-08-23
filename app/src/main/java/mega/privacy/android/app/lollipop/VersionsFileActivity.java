@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -144,12 +146,10 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			switch(item.getItemId()){
 				case R.id.cab_menu_select_all:{
 					selectAll();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.action_download_versions:{
@@ -387,23 +387,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	void checkScroll (){
 		if (listView != null) {
-			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				changeActionBarElevation(true);
-			}
-			else if (adapter != null && !adapter.isMultipleSelect()) {
-				changeActionBarElevation(false);
-			}
-		}
-	}
-
-	public void changeActionBarElevation(boolean whitElevation){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (whitElevation) {
-				aB.setElevation(px2dp(4, outMetrics));
-			}
-			else {
-				aB.setElevation(0);
-			}
+			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
 	
@@ -525,8 +509,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				adapter.selectAll();
 				
 				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}		
-			updateActionModeTitle();		
+			}
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	

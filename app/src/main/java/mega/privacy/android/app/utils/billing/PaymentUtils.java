@@ -96,7 +96,7 @@ public class PaymentUtils {
         switch (sku) {
             case SKU_PRO_LITE_MONTH:
             case SKU_PRO_LITE_YEAR:
-                return context.getString(R.string.prolite_account);
+                return context.getString(R.string.lite_account);
             case SKU_PRO_I_MONTH:
             case SKU_PRO_I_YEAR:
                 return context.getString(R.string.pro1_account);

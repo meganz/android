@@ -32,6 +32,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
@@ -107,6 +109,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -124,6 +127,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
@@ -459,12 +463,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 }
                 case R.id.cab_menu_select_all:{
                     selectAll();
-                    actionMode.invalidate();
                     break;
                 }
                 case R.id.cab_menu_unselect_all:{
                     clearSelections();
-                    actionMode.invalidate();
                     break;
                 }
             }
@@ -581,17 +583,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
 
         nestedScrollView = (NestedScrollView) findViewById(R.id.nested_layout);
-        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if ((v.canScrollVertically(-1) && v.getVisibility() == View.VISIBLE)) {
-                    aB.setElevation(px2dp(4, outMetrics));
-                }
-                else {
-                    aB.setElevation(0);
-                }
-            }
-        });
+        nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeViewElevation(aB, v.canScrollVertically(-1) && v.getVisibility() == View.VISIBLE, outMetrics));
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -1371,6 +1363,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 			}
             case R.id.cab_menu_file_info_send_to_chat: {
                 logDebug("Send chat option");
+                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning();
+                    break;
+                }
                 // Have the flag to stop triggering multiple selection page
                 if (!isSelectingChat) {
                     sendToChat();
@@ -1703,7 +1699,13 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 startActivity(i);
                 break;
 			case R.id.file_properties_switch:{
-				boolean isChecked = offlineSwitch.isChecked();
+                boolean isChecked = offlineSwitch.isChecked();
+
+                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning();
+                    offlineSwitch.setChecked(!isChecked);
+                    return;
+                }
 
 				if(owner){
                     logDebug("Owner: me");
@@ -3186,7 +3188,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 
                 actionMode = startSupportActionMode(new ActionBarCallBack());
             }
-            updateActionModeTitle();
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
 

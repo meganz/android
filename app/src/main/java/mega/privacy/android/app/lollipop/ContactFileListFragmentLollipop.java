@@ -18,6 +18,8 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.TypedValue;
@@ -403,22 +405,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 	public void checkScroll() {
 		if (listView != null) {
-			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				changeActionBarElevation(true);
-			}
-			else if ((adapter != null && !adapter.isMultipleSelect())) {
-				changeActionBarElevation(false);
-			}
-		}
-	}
-
-	public void changeActionBarElevation(boolean whitElevation){
-		if (aB == null) return;
-		if (whitElevation) {
-			aB.setElevation(px2dp(4, outMetrics));
-		}
-		else {
-			aB.setElevation(0);
+			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
 
@@ -895,7 +882,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 			}
 
-			updateActionModeTitle();
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 

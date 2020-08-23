@@ -51,6 +51,7 @@ public class MyAccountInfo {
     boolean getPaymentMethodsBoolean = false;
     private boolean businessStatusReceived = false;
     private boolean shouldShowBusinessAlert = false;
+    private boolean isBusinessAlertShown;
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -614,5 +615,13 @@ public class MyAccountInfo {
 
     public void setAvailableSkus(List<MegaSku> skuDetailsList) {
         this.availableSkus = skuDetailsList;
+    }
+
+    public boolean isBusinessAlertShown() {
+        return isBusinessAlertShown;
+    }
+
+    public void setBusinessAlertShown(boolean businessAlertShown) {
+        isBusinessAlertShown = businessAlertShown;
     }
 }

@@ -106,13 +106,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				}
 			}
 
-			control.move().setVisible(true);
-			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			} else {
-				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-			}
-
 			control.copy().setVisible(true);
 			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
