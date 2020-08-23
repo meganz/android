@@ -6506,6 +6506,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					setToolbarTitle();
 					supportInvalidateOptionsMenu();
+				} else if (drawerItem == DrawerItem.HOMEPAGE) {
+					hideKeyboardSearch();
 				} else {
 					searchExpand = false;
 					searchQuery = "" + query;

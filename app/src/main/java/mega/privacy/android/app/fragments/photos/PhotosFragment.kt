@@ -123,7 +123,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         })
     }
 
-    override fun refresh() = viewModel.loadPhotos(activity.searchQuery, true)
+    override fun refresh() = viewModel.loadPhotos(viewModel.searchQuery, true)
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator

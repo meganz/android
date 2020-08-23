@@ -24,6 +24,7 @@ class PhotosViewModel @Inject constructor(
     val showFileInfoEvent: LiveData<Event<PhotoNode>> = _showFileInfoEvent
 
     var searchMode = false
+    var searchQuery = ""
 
     private var forceUpdate = false
 
@@ -58,6 +59,7 @@ class PhotosViewModel @Inject constructor(
 
     fun loadPhotos(query: String, forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
+        searchQuery = query
         _query.value = query
     }
 
