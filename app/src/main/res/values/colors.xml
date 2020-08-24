@@ -57,6 +57,7 @@
     <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="black_87_opacity">#DE000000</color>
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
     <color name="upgrade_grey">#8d8d8d</color>

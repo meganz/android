@@ -112,6 +112,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -125,6 +126,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
@@ -864,6 +866,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void sendFileToChat(){
 		logDebug("sendFileToChat");
 
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		if(user==null){
 			logWarning("Selected contact NULL");
 			return;
@@ -876,6 +883,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	public void sendMessageToChat(){
 		logDebug("sendMessageToChat");
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		if(user!=null){
 			MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chat==null){
@@ -1158,6 +1171,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startingACall(boolean withVideo) {
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		startVideo = withVideo;
 		if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
 			startCall();
@@ -1168,18 +1187,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.chat_contact_properties_clear_layout: {
-				logDebug("Clear chat option");
-				if(fromContacts){
-					showConfirmationClearChat();
-				}
-				else{
-					intentToClearChat();
-					finish();
-				}
-
+			case R.id.chat_contact_properties_clear_layout:
+				showConfirmationClearChat();
 				break;
-			}
+
 			case R.id.chat_contact_properties_remove_contact_layout: {
 				logDebug("Remove contact chat option");
 
@@ -1206,6 +1217,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
 				logDebug("Share contact option");
+
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					return;
+				}
+
 				if(user==null){
 					logDebug("Selected contact NULL");
 					return;
@@ -1796,13 +1813,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void intentToClearChat(){
-		Intent clearChat = new Intent(this, ChatActivityLollipop.class);
-		clearChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		clearChat.setAction(ACTION_CLEAR_CHAT);
-		startActivity(clearChat);
-	}
-
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -2381,11 +2391,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		for (MegaUser updatedUser : users) {
-			if (updatedUser.getHandle() == user.getHandle()) {
-				user = updatedUser;
-				emailText.setText(user.getEmail());
-				break;
+		if (users != null && !users.isEmpty()) {
+			for (MegaUser updatedUser : users) {
+				if (updatedUser.getHandle() == user.getHandle()) {
+					user = updatedUser;
+					emailText.setText(user.getEmail());
+					break;
+				}
 			}
 		}
 	}

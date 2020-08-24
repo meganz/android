@@ -232,7 +232,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 }
                 else if(remoteMessageType.equals("2")){
                     logDebug("CHAT notification");
-                    if(MegaApplication.isActivityVisible()){
+                    if(app.isActivityVisible()){
                         logDebug("App on foreground --> return");
                         retryPendingConnections();
                         return;

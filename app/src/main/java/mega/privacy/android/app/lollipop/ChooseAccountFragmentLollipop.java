@@ -22,6 +22,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 
+import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -133,34 +134,34 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
     public void onClick(View v) {
 
         Intent intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("firstLogin", true);
-        intent.putExtra("newAccount", true);
+        intent.putExtra(EXTRA_FIRST_LOGIN, true);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
 
         switch (v.getId()){
             case R.id.choose_account_free_layout:
-                intent.putExtra("upgradeAccount", false);
-                intent.putExtra("accountType", FREE);
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, false);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, FREE);
                 break;
             case R.id.choose_account_prolite_layout:
-                intent.putExtra("upgradeAccount", true);
-                intent.putExtra("accountType", PRO_LITE);
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_LITE);
                 break;
             case R.id.choose_account_pro_i_layout:
-                intent.putExtra("upgradeAccount", true);
-                intent.putExtra("accountType", PRO_I);
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_I);
                 break;
             case R.id.choose_account_pro_ii_layout:
-                intent.putExtra("upgradeAccount", true);
-                intent.putExtra("accountType", PRO_II);
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_II);
                 break;
             case R.id.choose_account_pro_iii_layout:
-                intent.putExtra("upgradeAccount", true);
-                intent.putExtra("accountType", PRO_III);
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_III);
                 break;
             case R.id.choose_account_business_layout:
-                intent.putExtra("upgradeAccount", true);
-                intent.putExtra("accountType", BUSINESS);
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, BUSINESS);
                 break;
         }
 
@@ -170,10 +171,10 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
 
     void onFreeClick() {
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
-        intent.putExtra("firstLogin", true);
-        intent.putExtra("upgradeAccount", false);
-        intent.putExtra("accountType", FREE);
-        intent.putExtra("newAccount", true);
+        intent.putExtra(EXTRA_FIRST_LOGIN, true);
+        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, false);
+        intent.putExtra(EXTRA_ACCOUNT_TYPE, FREE);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop) context).finish();

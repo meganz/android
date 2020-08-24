@@ -12,6 +12,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,6 +58,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -198,6 +202,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_send_to_chat:
+                    if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                        showOverDiskQuotaPaywallWarning();
+                        break;
+                    }
                     nC.checkIfNodesAreMineAndSelectChatsToSendNodes(adapter.getArrayListSelectedNodes());
                     hideActionMode();
                     break;
@@ -335,7 +343,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             adapter.selectAll();
 
-            updateActionModeTitle();
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
 

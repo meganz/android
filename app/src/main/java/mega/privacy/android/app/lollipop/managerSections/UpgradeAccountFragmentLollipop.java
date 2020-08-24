@@ -1052,11 +1052,12 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				case PRO_LITE:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.prolite_account).toUpperCase());
 					color = String.valueOf(ContextCompat.getColor(context, R.color.lite_account));
+
 					break;
 			}
 
 			try {
-				textToShow = textToShow.replace("[A]", "<font color=\'" + color + "\'>");
+				textToShow = textToShow.replace("[A]", "<font color='" + color + "'>");
 				textToShow = textToShow.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logWarning("Exception formatting string", e);

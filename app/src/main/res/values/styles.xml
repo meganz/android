@@ -59,7 +59,17 @@
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/background_bottomsheet_round_top</item>
+    </style>
+
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
@@ -193,6 +203,13 @@
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:windowMinWidthMajor">85%</item>
         <item name="android:windowMinWidthMinor">85%</item>
+    </style>
+
+    <style name="MaterialAlertDialogStyle" parent="Theme.MaterialComponents.Light.Dialog.Alert.Bridge">
+        <item name="colorSurface">@color/white</item>
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="colorControlNormal">@color/mail_my_account</item>
+        <item name="android:textColorPrimary">@color/black</item>
     </style>
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
@@ -494,5 +511,14 @@
 
     <style name="MyCredentialsText" parent="CredentialsText">
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="GalleryImageShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="GalleryImageShape.Selected">
+        <item name="cornerSize">@dimen/cu_fragment_selected_round_corner_radius</item>
     </style>
 </resources>
