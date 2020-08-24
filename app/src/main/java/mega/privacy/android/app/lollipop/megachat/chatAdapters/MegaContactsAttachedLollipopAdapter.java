@@ -445,7 +445,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		if (contact.getHandle().equals(megaApi.getMyUserHandle())) {
 			color = getColorAvatar(megaApi.getMyUser());
 		} else {
-			color = getColorAvatar(Long.parseLong(contact.getHandle()));
+			color = getColorAvatar(MegaApiJava.base64ToUserHandle(contact.getHandle()));
 		}
 		String fullName = contact.getName();
 		if (holder instanceof ViewHolderContactsList) {
