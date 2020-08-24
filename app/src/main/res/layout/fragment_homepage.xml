@@ -47,14 +47,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/searchView" />
 
-            <include
-                android:id="@+id/banner"
-                layout="@layout/homepage_banner"
-                android:layout_width="0dp"
-                android:layout_height="150dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/category" />
+            <!-- The banner layout will be shown in next version of Homepage -->
+<!--            <include-->
+<!--                android:id="@+id/banner"-->
+<!--                layout="@layout/homepage_banner"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="150dp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/category" />-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

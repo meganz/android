@@ -157,7 +157,7 @@ class HomepageFragment : Fragment() {
 
     private fun setBottomSheetPeekHeight() {
         rootView.viewTreeObserver?.addOnPreDrawListener {
-            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.banner.root.bottom
+            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.category.root.bottom
             true
         }
     }
