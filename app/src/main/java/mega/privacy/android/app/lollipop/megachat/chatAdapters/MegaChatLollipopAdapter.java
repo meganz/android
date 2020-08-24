@@ -2734,7 +2734,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.urlContactMessageTitleLayout.setGravity(Gravity.LEFT);
                     }
 
-
                 if (bitmapIcon != null) {
                     holder.urlContactMessageIcon.setImageBitmap(bitmapIcon);
                     holder.urlContactMessageIcon.setVisibility(View.VISIBLE);
@@ -3297,15 +3296,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.append(edited);
-
 
                 checkEmojiSize(messageContent, holder.contentOwnMessageText);
 
             } else {
-
-
                 int status = message.getStatus();
 
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
@@ -3471,10 +3466,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     CharSequence indexedText = TextUtils.concat(messageContent, edited);
                     ((ViewHolderMessageChat) holder).urlContactMessageText.setText(indexedText);
-
-
             } else {
-                //Color always status SENT
                 ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                 holder.urlContactMessageText.setText(getFormattedText(messageContent));
             }
@@ -3796,7 +3788,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat) holder).contentOwnMessageText.append(edited);
 
-
                 checkEmojiSize(messageContent, holder.contentOwnMessageText);
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
@@ -3851,8 +3842,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
                 holder.contentOwnMessageContactLayout.setVisibility(View.GONE);
 
-
-
                 int status = message.getStatus();
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
                     logDebug("Show triangle retry!");
@@ -3877,7 +3866,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 checkEmojiSize(messageContent, holder.contentOwnMessageText);
                 holder.contentOwnMessageText.setText(getFormattedText(messageContent));
-
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
                         holder.contentOwnMessageText.setLinksClickable(false);
@@ -3949,10 +3937,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 
                 if (message.getContent() != null) {
-                        messageContent = message.getContent();
-                    }
-
-
+                    messageContent = message.getContent();
+                }
                         messageContent = messageContent + " ";
                         Spannable content = new SpannableString(messageContent);
                         content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
