@@ -10478,31 +10478,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	}
 
-	public void showConfirmationLeaveMultipleShares (final ArrayList<Long> handleList){
-		logDebug("showConfirmationleaveMultipleShares");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	nC.leaveMultipleIncomingShares(handleList);
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
 		if (shares.size() == 1) {
 			showConfirmationRemoveAllSharingContacts(megaApi.getOutShares(shares.get(0)), shares.get(0));
@@ -10572,32 +10547,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.show();
 
 		refreshAfterMovingToRubbish();
-	}
-
-	public void showConfirmationLeaveIncomingShare (final MegaNode n){
-		logDebug("showConfirmationLeaveIncomingShare");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE: {
-					nC.leaveIncomingShare(managerActivity, n);
-					break;
-				}
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
 	}
 
 	public void showConfirmationLeaveChat (final MegaChatRoom c){
