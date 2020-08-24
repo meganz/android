@@ -611,13 +611,13 @@ public class MegaNodeUtil {
     }
 
     /**
-     * Shows a confirmation warning before leave one or mode incoming shares.
+     * Shows a confirmation warning before leave one or more incoming shares.
      *
      * @param context       current Context
      * @param n             if only one incoming share to leave, its node, null otherwise
      * @param handleList    if mode than one incoming shares to leave, list of its handles, null otherwise
      */
-    public static void showConfirmationLeaveIncomingShares (Context context, MegaNode n, ArrayList<Long> handleList) {
+    private static void showConfirmationLeaveIncomingShares (Context context, MegaNode n, ArrayList<Long> handleList) {
         boolean onlyOneIncomingShare = n != null && handleList == null;
         int numIncomingShares = onlyOneIncomingShare ? 1 : handleList.size();
 
