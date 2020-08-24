@@ -160,7 +160,7 @@ public class TextFormatterViewCompat {
 
                             if (quoteFlag.start != INVALID_INDEX) {
                                 if (quoteFlag.end == INVALID_INDEX && textChars[i + 1] == MONOSPACE_FLAG && textChars[i + 2] == MONOSPACE_FLAG) {
-                                    quoteFlag.end = j -3;
+                                    quoteFlag.end = j;
                                     flags.add(quoteFlag);
                                     quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
                                     i = i + 2;
@@ -205,11 +205,10 @@ public class TextFormatterViewCompat {
                     break;
 
                 case MONOSPACE_FLAG:
-                    builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end, GENERAL_FLAG);
+                    builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end-3, GENERAL_FLAG);
                     break;
             }
         }
-
         return builder;
     }
 }
