@@ -10,6 +10,7 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -26,53 +27,14 @@ public class TextFormatterViewCompat {
     private static final int COLOR_SPAN = -7829368;
     private static final Typeface font = Typeface.createFromAsset(MegaApplication.getInstance().getBaseContext().getAssets(), "font/RobotoMono-Regular.ttf");
 
-    public TextFormatterViewCompat() { }
-
-    public static void applyFormatting(final EditText editText, final TextWatcher... watchers) {
-        TextWatcher mEditTextWatcher = new TextWatcher() {
-            final TextWatcher mainWatcher = this;
-            Handler handler = new Handler();
-            private Runnable formatRunnable = () -> TextFormatterViewCompat.format(editText, mainWatcher, watchers);
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                TextFormatterViewCompat.sendBeforeTextChanged(watchers, s, start, count, after);
-            }
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                TextFormatterViewCompat.sendOnTextChanged(watchers, s, start, before, count);
-            }
-
-            public void afterTextChanged(Editable s) {
-                this.handler.removeCallbacks(this.formatRunnable);
-                this.handler.postDelayed(this.formatRunnable, DELAY_MILLIS);
-            }
-        };
-        String text = editText.getText().toString();
-        CharSequence formattedText = getFormattedText(text, false);
-        if (formattedText != null) {
-            editText.setText(formattedText);
-        }
-
-        editText.addTextChangedListener(mEditTextWatcher);
+    public TextFormatterViewCompat() {
     }
 
-    private static void format(EditText editText, TextWatcher mainWatcher, TextWatcher[] otherWatchers) {
-        Editable text = editText.getText();
-        CharSequence formatted = extractFlagsForEditText(text);
-        removeTextChangedListener(editText, mainWatcher);
-        int selectionEnd = editText.getSelectionEnd();
-        int selectionStart = editText.getSelectionStart();
-        editText.setText(formatted);
-        editText.setSelection(selectionStart, selectionEnd);
-        Editable formattedEditableText = editText.getText();
-        sendAfterTextChanged(otherWatchers, formattedEditableText);
-        addTextChangedListener(editText, mainWatcher);
-    }
-
-    public static CharSequence getFormattedText(String text, boolean isTextView) {
+    public static CharSequence getFormattedText(String text) {
         if (isTextEmpty(text))
             return null;
-        return isTextView? extractFlagsForTextView(text): extractFlagsForEditText(text);
+
+        return extractFlagsForTextView(text);
     }
 
     public static void applyFormatting(final TextView textView, final TextWatcher... watchers) {
@@ -95,7 +57,7 @@ public class TextFormatterViewCompat {
             }
         };
         String text = textView.getText().toString();
-        CharSequence formattedText = getFormattedText(text, true);
+        CharSequence formattedText = getFormattedText(text);
         if (formattedText != null) {
             textView.setText(formattedText);
         }
@@ -193,19 +155,19 @@ public class TextFormatterViewCompat {
                     break;
 
                 case MONOSPACE_FLAG:
-                    if(textChars.length > 6){
-                        if(textChars.length > i+2){
+                    if (textChars.length > 6) {
+                        if (textChars.length > i + 2) {
 
-                            if(quoteFlag.start != INVALID_INDEX){
-                                if(quoteFlag.end == INVALID_INDEX && textChars[i+1] == MONOSPACE_FLAG && textChars[i+2] == MONOSPACE_FLAG){
-                                    quoteFlag.end = j;
+                            if (quoteFlag.start != INVALID_INDEX) {
+                                if (quoteFlag.end == INVALID_INDEX && textChars[i + 1] == MONOSPACE_FLAG && textChars[i + 2] == MONOSPACE_FLAG) {
+                                    quoteFlag.end = j -3;
                                     flags.add(quoteFlag);
                                     quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
                                     i = i + 2;
                                     j = j + 2;
                                     continue;
                                 }
-                            }else {
+                            } else {
                                 if (textChars[i + 1] == MONOSPACE_FLAG && textChars[i + 2] == MONOSPACE_FLAG) {
                                     quoteFlag.start = j;
                                     i = i + 2;
@@ -243,104 +205,8 @@ public class TextFormatterViewCompat {
                     break;
 
                 case MONOSPACE_FLAG:
-                    builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end-2 , GENERAL_FLAG);
+                    builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end, GENERAL_FLAG);
                     break;
-            }
-        }
-
-        return builder;
-    }
-
-    public static CharSequence extractFlagsForEditText(CharSequence text) {
-        char[] textChars = text.toString().toCharArray();
-        ArrayList<Character> characters = new ArrayList();
-        ArrayList<Flag> flags = new ArrayList();
-        Flag boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
-        Flag quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
-        Flag strikeFlag = new Flag(INVALID_INDEX, INVALID_INDEX, STRIKE_FLAG);
-        Flag italicFlag = new Flag(INVALID_INDEX, INVALID_INDEX, ITALIC_FLAG);
-        int i = 0;
-
-        for (int j = 0; i < textChars.length; ++i) {
-            char c = textChars[i];
-            switch (c) {
-                case BOLD_FLAG:
-                    if (boldFlag.start == INVALID_INDEX) {
-                        if (hasFlagSameLine(text, BOLD_FLAG, i + 1)) {
-                            boldFlag.start = j + 1;
-
-                        }
-                    } else {
-                        boldFlag.end = j;
-                        flags.add(boldFlag);
-                        boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
-                    }
-                    break;
-
-                case STRIKE_FLAG:
-                    if (strikeFlag.start == INVALID_INDEX) {
-                        if (hasFlagSameLine(text, STRIKE_FLAG, i + 1)) {
-                            strikeFlag.start = j + 1;
-                        }
-                    } else {
-                        strikeFlag.end = j;
-                        flags.add(strikeFlag);
-                        strikeFlag = new Flag(INVALID_INDEX, INVALID_INDEX, STRIKE_FLAG);
-                    }
-                    break;
-
-                case ITALIC_FLAG:
-                    if (italicFlag.start == INVALID_INDEX) {
-                        if (hasFlagSameLine(text, ITALIC_FLAG, i + 1)) {
-                            italicFlag.start = j + 1;
-                        }
-                    } else {
-                        italicFlag.end = j;
-                        flags.add(italicFlag);
-                        italicFlag = new Flag(INVALID_INDEX, INVALID_INDEX, ITALIC_FLAG);
-                    }
-                    break;
-                case MONOSPACE_FLAG:
-                    if (quoteFlag.start == INVALID_INDEX) {
-                        if (hasFlagSameLine(text, MONOSPACE_FLAG, i + 1)) {
-                            quoteFlag.start = j + 1;
-
-                        }
-                    } else {
-                        quoteFlag.end = j;
-                        flags.add(quoteFlag);
-                        quoteFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
-                    }
-                    break;
-            }
-
-            characters.add(c);
-            ++j;
-        }
-
-        String formatted = getText(characters);
-        SpannableStringBuilder builder = new SpannableStringBuilder(formatted);
-
-        for (Flag flag : flags) {
-            StyleSpan iss;
-            if (flag.flag == BOLD_FLAG) {
-                iss = new StyleSpan(1);
-                builder.setSpan(iss, flag.start, flag.end, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.start - 1, flag.start, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.end, flag.end + 1, GENERAL_FLAG);
-            } else if (flag.flag == STRIKE_FLAG) {
-                builder.setSpan(new StrikethroughSpan(), flag.start, flag.end, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.start - 1, flag.start, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.end, flag.end + 1, GENERAL_FLAG);
-            } else if (flag.flag == ITALIC_FLAG) {
-                iss = new StyleSpan(2);
-                builder.setSpan(iss, flag.start, flag.end, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.start - 1, flag.start, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.end, flag.end + 1, GENERAL_FLAG);
-            }else if(flag.flag == MONOSPACE_FLAG){
-                builder.setSpan(new CustomTypefaceSpan("", font), flag.start, flag.end, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.start - 1, flag.start, GENERAL_FLAG);
-                builder.setSpan(new ForegroundColorSpan(COLOR_SPAN), flag.end, flag.end + 1, GENERAL_FLAG);
             }
         }
 
