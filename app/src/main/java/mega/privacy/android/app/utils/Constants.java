@@ -221,10 +221,10 @@ public class Constants {
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
     public static final String ACTION_LOG_OUT = "ACTION_LOG_OUT";
 
+    public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
     public static final String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
     public static final String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
-    public static final String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
     public static final String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
     public static final String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
     public static final String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
@@ -258,6 +258,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
@@ -268,7 +269,6 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
     public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
-
     public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
@@ -378,8 +378,7 @@ public class Constants {
     public static final int TAKE_PICTURE_OPTION = 0;
     public static final int TAKE_PROFILE_PICTURE = 1;
     public static final int START_CALL_PERMISSIONS = 2;
-
-
+    public static final int RETURN_CALL_PERMISSIONS = 3;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
@@ -465,9 +464,14 @@ public class Constants {
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
     public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
+    public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
+    public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
+    public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
+    public static final int INVALID_TYPE_PERMISSIONS = -1;
+
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
@@ -621,4 +625,6 @@ public class Constants {
 
     public static final int LOCATION_INDEX_LEFT = 0;
     public static final int LOCATION_INDEX_TOP = 1;
+
+    public static final String OFFLINE_ROOT = "/";
 }

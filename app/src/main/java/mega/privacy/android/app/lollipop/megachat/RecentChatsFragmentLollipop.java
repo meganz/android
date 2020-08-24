@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
@@ -506,9 +507,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
                         if (isOnline(context)) {
                             showEmptyChatScreen();
-                            if (context instanceof ManagerActivityLollipop) {
-                                ((ManagerActivityLollipop) context).showFabButton();
-                            }
+                            showFab();
                         } else {
                             showNoConnectionScreen();
                         }
@@ -534,9 +533,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         listView.setVisibility(View.VISIBLE);
                         emptyLayout.setVisibility(View.GONE);
 
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showFabButton();
-                        }
+                        showFab();
                     }
                 } else {
                     logDebug("Show chat screen connecting...");
@@ -587,14 +584,22 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     visibilityFastScroller();
                     adapterList.setPositionClicked(-1);
 
-                    if (context instanceof ManagerActivityLollipop) {
-                        ((ManagerActivityLollipop) context).showFabButton();
-                    }
+                    showFab();
                 }
             } else {
                 logDebug("Show chat screen connecting...");
                 showConnectingChatScreen();
             }
+        }
+    }
+
+    private void showFab() {
+        if (adapterList == null || adapterList.isMultipleSelect()) {
+            return;
+        }
+
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).showFabButton();
         }
     }
 
@@ -863,7 +868,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
             }
 
-            updateActionModeTitle();
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
 
@@ -1732,13 +1737,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             switch (item.getItemId()) {
                 case R.id.cab_menu_select_all: {
                     selectAll();
-                    actionMode.invalidate();
                     break;
                 }
                 case R.id.cab_menu_unselect_all: {
                     clearSelections();
                     hideMultipleSelect();
-                    actionMode.invalidate();
                     break;
                 }
                 case R.id.cab_menu_mute: {

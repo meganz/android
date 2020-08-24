@@ -18,8 +18,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 318
-        versionName "3.7.7 (318)"
+        versionCode 319
+        versionName "3.7.8 (319)"
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
@@ -58,6 +58,7 @@ android {
     }
 
     compileOptions {
+        // Flag to enable support for the new language APIs
         coreLibraryDesugaringEnabled true
         // Sets Java compatibility to Java 8
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -154,6 +155,8 @@ dependencies {
 
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
+    implementation "com.facebook.fresco:fresco:$frescoVersion"
+    implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
 

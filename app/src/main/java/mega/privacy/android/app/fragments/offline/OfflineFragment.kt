@@ -54,6 +54,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -66,7 +67,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import java.io.File
 
 @AndroidEntryPoint
-class OfflineFragment() : Fragment(), ActionMode.Callback {
+class OfflineFragment : Fragment(), ActionMode.Callback {
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
@@ -699,10 +700,6 @@ class OfflineFragment() : Fragment(), ActionMode.Callback {
         const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
 
         var instanceForDragging: OfflineFragment? = null
-
-        fun setArgs(fragment: OfflineFragment, rootFolderOnly: Boolean) {
-            fragment.arguments = OfflineFragmentArgs("/", rootFolderOnly).toBundle()
-        }
 
         /**
          * Get the location on screen of the dragging node thumbnail.

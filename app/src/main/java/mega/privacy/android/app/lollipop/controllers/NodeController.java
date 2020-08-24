@@ -57,6 +57,7 @@ import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -64,6 +65,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeController {
 
@@ -633,6 +635,12 @@ public class NodeController {
 
     public void download(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         logDebug("files to download: "+hashes.length);
+
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
@@ -1616,6 +1624,12 @@ public class NodeController {
 
     public void downloadTo(MegaNode currentDocument, String parentPath, String url){
         logDebug("downloadTo");
+
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;

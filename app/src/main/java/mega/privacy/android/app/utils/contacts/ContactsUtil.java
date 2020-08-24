@@ -8,9 +8,9 @@ import android.provider.ContactsContract;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -147,6 +147,8 @@ public class ContactsUtil {
             while (emails.moveToNext()) {
                 long id = emails.getLong(0);
                 String email = emails.getString(1);
+                // Check if it's a valid email.
+                if(!TextUtil.isEmail(email)) continue;
 
                 for (LocalContact temp : localContacts) {
                     if (temp.getId() == id) {
@@ -156,13 +158,7 @@ public class ContactsUtil {
             }
             emails.close();
         }
-        Collections.sort(localContacts, new Comparator<LocalContact>() {
-
-            @Override
-            public int compare(LocalContact o1, LocalContact o2) {
-                return o1.name.compareToIgnoreCase(o2.name);
-            }
-        });
+        Collections.sort(localContacts, (o1, o2) -> o1.name.compareToIgnoreCase(o2.name));
         return localContacts;
     }
 }
