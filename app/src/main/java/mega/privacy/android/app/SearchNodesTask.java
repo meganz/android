@@ -129,6 +129,9 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                 if (drawerItem == null) return;
 
                 switch (drawerItem) {
+                    case HOMEPAGE:
+                        parent = megaApi.getRootNode();
+                        break;
                     case CLOUD_DRIVE: {
                         parent = megaApi.getNodeByHandle(managerA.getParentHandleBrowser());
                         break;
