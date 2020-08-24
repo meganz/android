@@ -213,9 +213,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		actionButton = (Button) findViewById(R.id.contact_attachment_chat_option_button);
 		actionButton.setOnClickListener(this);
 
-		actionButton = (Button) findViewById(R.id.contact_attachment_chat_option_button);
-		actionButton.setOnClickListener(this);
-
 		for (MegaContactDB contactDB : contacts) {
 			MegaUser checkContact = megaApi.getContact(contactDB.getMail());
 
