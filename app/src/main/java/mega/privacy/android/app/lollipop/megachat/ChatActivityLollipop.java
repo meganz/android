@@ -191,7 +191,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
-    private static final int MAX_NAMES_PARTICIPANTS = 4;
+    private static final int MAX_NAMES_PARTICIPANTS = 3;
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -1864,38 +1864,43 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("setCustomSubtitle");
 
         long participantsCount = chatRoom.getPeerCount();
+
+        if (participantsCount == 0 && !chatRoom.isPreview()) {
+            groupalSubtitleToolbar.setText(R.string.bucket_word_me);
+            return;
+        }
+
         StringBuilder customSubtitle = new StringBuilder();
 
         for (int i = 0; i < participantsCount; i++) {
             if ((i == 1 || i == 2) && areMoreParticipants(i)) {
                 customSubtitle.append(", ");
             }
-
             String participantName = chatC.getParticipantFullName(chatRoom.getPeerHandle(i));
             if (isTextEmpty(participantName)) {
                 sendGetPeerAttributesRequest(participantsCount);
                 return;
             } else if (i == 0 && !areMoreParticipants(i)) {
-                groupalSubtitleToolbar.setText(adjustForLargeFont(participantName));
+                if (!chatRoom.isPreview()) {
+                    customSubtitle.append(participantName)
+                            .append(", ").append(getString(R.string.bucket_word_me));
+                    groupalSubtitleToolbar.setText(adjustForLargeFont(customSubtitle.toString()));
+                } else {
+                    groupalSubtitleToolbar.setText(adjustForLargeFont(participantName));
+                }
             } else if (areMoreParticipantsThanMaxAllowed(i)) {
                 String firstNames = customSubtitle.append(participantName).toString();
-                if (!isTextEmpty(firstNames)) {
-                    groupalSubtitleToolbar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.custom_subtitle_of_group_chat, 4, firstNames, participantsCount - 3)));
-                }
-
+                groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.custom_subtitle_of_group_chat, firstNames, participantsCount - 2)));
                 break;
-            } else if (areSameParticipantsAsMaxAllowed(i)) {
-                String firstNames = customSubtitle.toString();
-                if (!isTextEmpty(firstNames)) {
-                    groupalSubtitleToolbar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.custom_subtitle_of_group_chat, 1, firstNames, participantName)));
-                }
             } else {
                 customSubtitle.append(participantName);
+
                 if (i == participantsCount - 1) {
-                    String firstNames = customSubtitle.toString();
-                    if (!isTextEmpty(firstNames)) {
-                        groupalSubtitleToolbar.setText(adjustForLargeFont(firstNames));
+                    if (!chatRoom.isPreview()) {
+                        customSubtitle.append(", ").append(getString(R.string.bucket_word_me));
                     }
+
+                    groupalSubtitleToolbar.setText(adjustForLargeFont(customSubtitle.toString()));
                 }
             }
         }
@@ -1917,20 +1922,20 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     /**
-     * Checks if there only four participants in the group chat.
+     * Checks if there only three participants in the group chat.
      *
      * @param position  position to check
-     * @return  True if there are four participants, false otherwise.
+     * @return  True if there are three participants, false otherwise.
      */
     private boolean areSameParticipantsAsMaxAllowed(long position) {
-        return chatRoom.getPeerCount() == MAX_NAMES_PARTICIPANTS && position == 3;
+        return chatRoom.getPeerCount() == MAX_NAMES_PARTICIPANTS && position == 2;
     }
 
     /**
-     * Checks if there are more than four participants in the group chat.
+     * Checks if there are more than three participants in the group chat.
      *
      * @param position  position to check
-     * @return True if there are more than four participants, false otherwise.
+     * @return True if there are more than three participants, false otherwise.
      */
     private boolean areMoreParticipantsThanMaxAllowed(long position) {
         return chatRoom.getPeerCount() > MAX_NAMES_PARTICIPANTS && position == 2;
