@@ -17,6 +17,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -67,11 +70,13 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileBrowserFragmentLollipop extends RotatableFragment{
 
@@ -268,6 +273,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_send_to_chat:{
 					logDebug("Send files to chat");
+					if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+						showOverDiskQuotaPaywallWarning();
+						break;
+					}
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
@@ -294,6 +303,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					hideMultipleSelect();
 					break;
 				}
+
+				case R.id.cab_menu_remove_share:
+					((ManagerActivityLollipop) context).showConfirmationRemoveAllSharingContacts(documents);
+					break;
 			}
 			return true;
 		}
@@ -340,10 +353,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 						control.removeLink().setVisible(true);
-						if (selected.get(0).isFolder()
-								&& MegaNodeUtil.isOutShare(selected.get(0))) {
-							control.removeShare().setVisible(true);
-						}
 					} else {
 						control.getLink().setVisible(true)
 								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -359,6 +368,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			boolean showSendToChat = true;
 			boolean showShareFolder = true;
 			boolean showTrash = true;
+			boolean showRemoveShare = true;
+
 			for (MegaNode node : selected) {
 				if (!node.isFile()) {
 					showSendToChat = false;
@@ -370,7 +381,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						!= MegaError.API_OK) {
 					showTrash = false;
 				}
+
+				if (!node.isFolder() ||  !MegaNodeUtil.isOutShare(node)) {
+					showRemoveShare = false;
+				}
 			}
+
 			if (showSendToChat) {
 				menu.findItem(R.id.cab_menu_send_to_chat)
 						.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
@@ -379,10 +395,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				control.sendToChat().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
+
 			if (showShareFolder) {
 				control.shareFolder().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
+
+			if (showRemoveShare) {
+				control.removeShare().setVisible(true);
+			}
+
 			control.trash().setVisible(showTrash);
 
 			control.shareOut().setVisible(true)
@@ -1111,8 +1133,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 
                 actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
             }
-            
-            updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
     
@@ -1143,8 +1165,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 folders++;
             }
         }
-        
-        Resources res = getActivity().getResources();
         
         String title;
         int sum = files + folders;

@@ -29,13 +29,13 @@
     <string name="api_essl" context="Error shown when SSL check has failed">SSL検証に失敗しました</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">容量が足りません</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">二要素認証が必要です。</string>
-    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">管理者以外のユーザーはアクセスを拒否されています</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">あなたのビジネスアカウントは期限切れです</string>
-    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>
-    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Billing failed</string>
-    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Rejected by fraud protection</string>
-    <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Too many requests</string>
-    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Balance error</string>
+    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">クレジットカードが拒否されました</string>
+    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">請求できませんでした</string>
+    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">不正防止により拒否されました</string>
+    <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">要求が多すぎます</string>
+    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">残高エラー</string>
     <string name="payment_egeneric_api_error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">未知のエラー</string>
-    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">HTTP Error</string>
+    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">HTTPエラー</string>
 </resources>

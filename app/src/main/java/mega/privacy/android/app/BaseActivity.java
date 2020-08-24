@@ -96,7 +96,6 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
 
         baseActivity = this;
 
@@ -142,21 +141,18 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        logDebug("onPause");
         checkMegaObjects();
-        MegaApplication.activityPaused();
         isPaused = true;
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        logDebug("onResume");
         super.onResume();
+
         setAppFontSize(this);
 
         checkMegaObjects();
-        MegaApplication.activityResumed();
         isPaused = false;
 
         retryConnectionsAndSignalPresence();
@@ -164,7 +160,6 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        logDebug("onDestroy");
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);

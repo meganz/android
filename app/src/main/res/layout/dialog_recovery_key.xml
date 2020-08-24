@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    >
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_recovery_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/recovery_key_bottom_sheet"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_recovery_key"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:imeActionLabel="@string/general_add"
+            android:imeOptions="actionDone"
+            android:inputType="textVisiblePassword"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</FrameLayout>

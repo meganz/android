@@ -76,7 +76,7 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
             }
 
             if(context instanceof GroupChatInfoActivityLollipop){
-                ((GroupChatInfoActivityLollipop) context).setParticipants();
+                ((GroupChatInfoActivityLollipop) context).updateParticipants();
                 ((GroupChatInfoActivityLollipop) context).showSnackbar(message);
             }
             else if(context instanceof ChatActivityLollipop){

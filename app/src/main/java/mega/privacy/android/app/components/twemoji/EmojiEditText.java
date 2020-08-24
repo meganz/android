@@ -3,23 +3,31 @@ package mega.privacy.android.app.components.twemoji;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
+import android.os.Build;
+import android.text.InputFilter;
+import android.util.AttributeSet;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.DimenRes;
 import androidx.annotation.Px;
 import androidx.appcompat.widget.AppCompatEditText;
-import android.text.InputFilter;
-import android.util.AttributeSet;
-import android.view.KeyEvent;
+import androidx.core.view.inputmethod.EditorInfoCompat;
+import androidx.core.view.inputmethod.InputConnectionCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+
+import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
 
 public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
     private float emojiSize;
     private Context mContext;
+    private MediaListener listener;
 
     public EmojiEditText(final Context context) {
         this(context, null);
@@ -117,5 +125,39 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     @Override
     public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
         setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
+    }
+
+    @Override
+    public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
+        final InputConnection ic = super.onCreateInputConnection(editorInfo);
+        EditorInfoCompat.setContentMimeTypes(editorInfo, new String[]{"image/gif"});
+
+        final InputConnectionCompat.OnCommitContentListener callback =
+                (inputContentInfo, flags, opts) -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 &&
+                            (flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
+                        try {
+                            inputContentInfo.requestPermission();
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    }
+
+                    if (listener != null) {
+                        listener.onGifSelected(inputContentInfo.getContentUri().toString());
+                    }
+
+                    inputContentInfo.releasePermission();
+                    return true;
+                };
+        return InputConnectionCompat.createWrapper(ic, editorInfo, callback);
+    }
+
+    public void setMediaListener(MediaListener listener) {
+        this.listener = listener;
+    }
+
+    public interface MediaListener {
+        void onGifSelected(String path);
     }
 }

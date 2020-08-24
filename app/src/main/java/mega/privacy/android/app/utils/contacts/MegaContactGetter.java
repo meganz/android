@@ -217,9 +217,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     }
                 }
             } else {
-                logWarning("Get registered contacts faild with error code: " + e.getErrorCode());
-                //current account has requested mega contacts too many times and reached the limitation, no need to re-try.
-                if (e.getErrorCode() == MegaError.API_ETOOMANY) {
+                logWarning("Get registered contacts failed with error code: " + e.getErrorCode());
+                // API_ETOOMANY: Current account has requested mega contacts too many times and reached the limitation, no need to re-try.
+                // API_EPAYWALL: Need to call "updateLastSyncTimestamp()" to avoid fall in an infinite loop to dismiss the ODQ Paywall warning.
+                if (e.getErrorCode() == MegaError.API_ETOOMANY || e.getErrorCode() == MegaError.API_EPAYWALL) {
                     updateLastSyncTimestamp();
                 }
                 if (updater != null) {
@@ -242,17 +243,23 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     }
                 } else {
                     logWarning("Contact's email is empty!");
-                    megaContacts.remove(currentContactIndex);
                 }
             } else {
                 logWarning("Get contact's email faild with error code: " + e.getErrorCode());
-                megaContacts.remove(currentContactIndex);
             }
             // Get next contact's email.
             currentContactIndex++;
             // All the emails have been gotten.
             if (currentContactIndex >= megaContacts.size()) {
                 megaContacts.addAll(megaContactsWithEmail);
+                // Remove the contact who doesn't get email successfully.
+                Iterator<MegaContact> iterator = megaContacts.iterator();
+                while(iterator.hasNext()) {
+                    MegaContact contact = iterator.next();
+                    if(contact.getEmail() == null) {
+                        iterator.remove();
+                    }
+                }
                 processFinished(api, megaContacts);
             } else {
                 MegaContact nextContact = getCurrentContactIndex();
