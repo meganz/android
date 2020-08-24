@@ -54,6 +54,7 @@
     <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="black_87_opacity">#DE000000</color>
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
     <color name="upgrade_orange">#ffa500</color>
@@ -220,4 +221,8 @@
 
     <color name="homepage_background">#EEF2F1</color>
     <color name="fab_upload_background_tint">#333333</color>
+
+    <color name="sort_by_title_color">#89000000</color>
+    <color name="sort_by_selected_color">#00bfa5</color>
+    <color name="sort_by_unselected_color">#dd000000</color>
 </resources>

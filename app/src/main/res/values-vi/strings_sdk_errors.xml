@@ -18,7 +18,7 @@
     <string name="api_eincomplete" context="Label to show that an error related with an Incomplete SDK operation.">Chưa hoàn thoành</string>
     <string name="api_ekey" context="Label to show that an error related with the decryption process of a node occurs during a SDK operation.">Khóa không hợp lệ/Lỗi giải mã</string>
     <string name="api_esid" context="Label to show that an error related with a bad session ID occurs during a SDK operation.">Bad session ID</string>
-    <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">Không truy cập được do vi phạm Điều Khoản Sử Dụng và Dịch Vụ</string>
+    <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">Không truy cập được do vi phạm ĐKDV/CSSD</string>
     <string name="api_eblocked" context="Label to show that an error related with a blocked account occurs during a SDK operation.">Bị chặn</string>
     <string name="api_eoverquota" context="Label to show that an error related with an over quota occurs during a SDK operation.">Quá giới hạn</string>
     <string name="api_etempunavail" context="Label to show that an error related with a temporary problem occurs during a SDK operation.">Tạm thời không khả dụng</string>
@@ -29,7 +29,7 @@
     <string name="api_essl" context="Error shown when SSL check has failed">Xác thực SSL bị thất bại</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Không đủ băng thông</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Two-Factor Authentication required.</string>
-    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for non-admin users</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Tài khoản doanh nghiệp của quý khách đã hết hạn</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Billing failed</string>

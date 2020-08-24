@@ -23,12 +23,12 @@ buildscript {
 
 allprojects {
     repositories {
+        jcenter()
         google()
         mavenCentral()
         maven {
             url "https://jitpack.io"
         }
-        jcenter()
     }
 }
 
@@ -63,4 +63,6 @@ ext {
     hiltAndroidXVersion = '1.0.0-alpha01'
     rxJavaVersion = '3.0.4'
     rxAndroidVersion = '3.0.0'
+    ankoVersion = '0.10.8'
+    frescoVersion = '2.3.0'
 }

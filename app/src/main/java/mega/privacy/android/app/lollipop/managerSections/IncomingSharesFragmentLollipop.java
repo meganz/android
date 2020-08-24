@@ -65,8 +65,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 					control.sendToChat().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
-
-				control.move().setVisible(allHaveFullAccess(selected));
 			}
 
 			if (selected.size() == 1

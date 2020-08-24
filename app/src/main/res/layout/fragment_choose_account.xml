@@ -190,7 +190,7 @@
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
 								android:textColor="@color/upgrade_orange"
-								android:text="@string/prolite_account"
+								android:text="@string/lite_account"
 								android:layout_below="@+id/image_lite"
 								android:textAllCaps="true"
 								android:textSize="18sp"/>

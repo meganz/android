@@ -19,6 +19,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.photos.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RxUtil.logErr
@@ -307,7 +308,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 getApplication<MegaApplication>().getString(R.string.action_search)
                     .toUpperCase(Locale.ROOT) + ": " + query
             }
-            path == "/" -> {
+            path == OFFLINE_ROOT -> {
                 getApplication<MegaApplication>().getString(R.string.tab_offline)
                     .toUpperCase(Locale.ROOT)
             }

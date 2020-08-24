@@ -119,7 +119,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
-import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -127,6 +126,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -155,6 +155,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -166,6 +167,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Util.isOnline;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
@@ -1553,9 +1555,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-            if (CameraUploadFragmentLollipop.imageDrag != null){
-                CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
-            }
+            CameraUploadsFragment.setDraggingThumbnailVisibility(visibility);
         }
         else if (adapterType == OFFLINE_ADAPTER) {
             OfflineFragment.setDraggingThumbnailVisibility(visibility);
@@ -1614,10 +1614,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
             }
         }
-        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-            if (CameraUploadFragmentLollipop.imageDrag != null) {
-                CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
-            }
+        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
+            CameraUploadsFragment.getDraggingThumbnailLocationOnScreen(location);
         }
         else if (adapterType == OFFLINE_ADAPTER){
             OfflineFragment.getDraggingThumbnailLocationOnScreen(location);
@@ -2315,6 +2313,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
             case R.id.full_video_viewer_chat:{
                 logDebug("Chat option");
+
+                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning();
+                    break;
+                }
+
                 long[] longArray = new long[1];
                 longArray[0] = handle;
 
