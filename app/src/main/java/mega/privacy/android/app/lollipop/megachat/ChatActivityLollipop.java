@@ -69,7 +69,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
 import java.io.FileInputStream;
