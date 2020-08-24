@@ -373,6 +373,13 @@ class OfflineViewModel @ViewModelInject constructor(
         loadOfflineNodes()
     }
 
+    fun refreshActionBarTitle() {
+        val title = _actionBarTitle.value
+        if (title != null) {
+            _actionBarTitle.value = title
+        }
+    }
+
     fun processUrlFile(file: File) {
         add(Single
             .fromCallable {

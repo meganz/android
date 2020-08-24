@@ -41,7 +41,6 @@ import mega.privacy.android.app.fragments.photos.EventObserver
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem.FULLSCREEN_OFFLINE
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.managerSections.HomepageFragmentDirections
@@ -54,7 +53,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -314,7 +312,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             }
         }
         viewModel.openFolderFullscreen.observe(viewLifecycleOwner, EventObserver {
-            ManagerActivityLollipop.setDrawerItem(FULLSCREEN_OFFLINE)
             managerActivity?.openFullscreenOfflineFragment(it)
         })
         viewModel.showOptionsPanel.observe(viewLifecycleOwner, EventObserver {
@@ -651,6 +648,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
     fun refreshNodes() {
         viewModel.loadOfflineNodes()
+    }
+
+    fun refreshActionBarTitle() {
+        viewModel.refreshActionBarTitle()
     }
 
     fun refreshListGridView() {

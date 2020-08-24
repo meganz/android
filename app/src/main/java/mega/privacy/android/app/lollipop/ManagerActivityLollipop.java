@@ -476,7 +476,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public enum DrawerItem {
 		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS,
-		ACCOUNT, CONTACTS, NOTIFICATIONS, FULLSCREEN_OFFLINE, SETTINGS,
+		ACCOUNT, CONTACTS, NOTIFICATIONS, SETTINGS,
 		INBOX, SEARCH, TRANSFERS, MEDIA_UPLOADS, RUBBISH_BIN,
 		ASK_PERMISSIONS;
 
@@ -490,7 +490,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case CONTACTS: {
 					context.getString(R.string.section_contacts);
 				}
-				case FULLSCREEN_OFFLINE: return context.getString(R.string.tab_offline);
 				case SETTINGS: return context.getString(R.string.action_settings);
 				case ACCOUNT: return context.getString(R.string.section_account);
 				case SEARCH: return context.getString(R.string.action_search);
@@ -2777,11 +2776,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (locationFileInfo){
 							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
 							if (offlineAdapter){
-								drawerItem = DrawerItem.FULLSCREEN_OFFLINE;
-								setPathNavigationOffline(
-										getIntent().getStringExtra("pathNavigation"));
+								drawerItem = DrawerItem.HOMEPAGE;
 								selectDrawerItemLollipop(drawerItem);
 								selectDrawerItemPending=false;
+								openFullscreenOfflineFragment(
+										getIntent().getStringExtra("pathNavigation"));
 							}
 							else {
 								long fragmentHandle = getIntent().getLongExtra("fragmentHandle", -1);
@@ -5695,7 +5694,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				viewPagerTransfers.setVisibility(View.VISIBLE);
 				break;
 			}
-			case FULLSCREEN_OFFLINE:
 			case HOMEPAGE:
 				mNavHostView.setVisibility(View.VISIBLE);
 				break;
@@ -6033,6 +6031,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void openFullscreenOfflineFragment(String path) {
+		drawerItem = DrawerItem.HOMEPAGE;
     	mNavController.navigate(
     			HomepageFragmentDirections.Companion.actionHomepageToFullscreenOffline(path, false),
 				new NavOptions.Builder().setLaunchSingleTop(true).build());
@@ -6147,7 +6146,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				else if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) rF.checkScroll();
                 break;
             }
-			case FULLSCREEN_OFFLINE: {
+			case HOMEPAGE: {
 				if (fullscreenOfflineFragment != null) {
 					fullscreenOfflineFragment.checkScroll();
 				}
@@ -6400,13 +6399,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				searchQuery = "";
 				searchExpand = true;
 
-				if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
-					setFullscreenOfflineFragmentSearchQuery(searchQuery);
-				} else if (drawerItem == DrawerItem.CHAT) {
-					resetActionBar(aB);
-				} else if (drawerItem == DrawerItem.HOMEPAGE) {
-					resetActionBar(aB);
-					if (mHomepageSearchable != null) {
+				resetActionBar(aB);
+				if (drawerItem == DrawerItem.HOMEPAGE) {
+					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+						setFullscreenOfflineFragmentSearchQuery(searchQuery);
+					} else if (mHomepageSearchable != null) {
 						mHomepageSearchable.searchReady();
 					}
 				} else {
@@ -6416,7 +6413,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					levelsSearch = -1;
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
-					resetActionBar(aB);
 				}
 
 				hideCallMenuItem();
@@ -6436,11 +6432,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
-				} else if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
-					setFullscreenOfflineFragmentSearchQuery(null);
-					supportInvalidateOptionsMenu();
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
-					if (mHomepageSearchable != null) {
+					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+						setFullscreenOfflineFragmentSearchQuery(null);
+						supportInvalidateOptionsMenu();
+					} else if (mHomepageSearchable != null) {
 						mHomepageSearchable.exitSearch();
 						searchQuery = "";
 						supportInvalidateOptionsMenu();
@@ -6461,17 +6457,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			public boolean onQueryTextSubmit(String query) {
 				if (drawerItem == DrawerItem.CHAT) {
 					hideKeyboard(managerActivity, 0);
-				} else if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
-					searchExpand = false;
-					textSubmitted = true;
-					hideKeyboard(managerActivity, 0);
-					if (fullscreenOfflineFragment != null) {
-						fullscreenOfflineFragment.onSearchQuerySubmitted();
-					}
-					setToolbarTitle();
-					supportInvalidateOptionsMenu();
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
-					hideKeyboardSearch();
+					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+						searchExpand = false;
+						textSubmitted = true;
+						hideKeyboard(managerActivity, 0);
+						if (fullscreenOfflineFragment != null) {
+							fullscreenOfflineFragment.onSearchQuerySubmitted();
+						}
+						setToolbarTitle();
+						supportInvalidateOptionsMenu();
+					} else {
+						hideKeyboardSearch();
+					}
 				} else {
 					searchExpand = false;
 					searchQuery = "" + query;
@@ -6493,16 +6491,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (rChatFL != null) {
 						rChatFL.filterChats(newText);
 					}
-				} else if (drawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
-					if (textSubmitted) {
-						textSubmitted = false;
-						return true;
-					}
-
-					searchQuery = newText;
-					setFullscreenOfflineFragmentSearchQuery(searchQuery);
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
-					if (mHomepageSearchable != null) {
+					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+						if (textSubmitted) {
+							textSubmitted = false;
+							return true;
+						}
+
+						searchQuery = newText;
+						setFullscreenOfflineFragmentSearchQuery(searchQuery);
+					} else if (mHomepageSearchable != null) {
 						searchQuery = newText;
 						mHomepageSearchable.searchQuery(searchQuery);
 					}
@@ -6607,8 +6605,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					break;
-				case FULLSCREEN_OFFLINE:
-					updateFullscreenOfflineFragmentOptionMenu(true);
+				case HOMEPAGE:
+					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+						updateFullscreenOfflineFragmentOptionMenu(true);
+					}
 					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
@@ -6833,6 +6833,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setGridListIcon();
 				searchMenuItem.setVisible(true);
 			}
+			fullscreenOfflineFragment.refreshActionBarTitle();
 		}
 	}
 
@@ -7018,9 +7019,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								return true;
 						}
 					} else if (drawerItem == DrawerItem.HOMEPAGE) {
-						mNavController.navigateUp();
+						if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+							handleBackPressIfFullscreenOfflineFragmentOpened();
+						} else {
+							mNavController.navigateUp();
+						}
 					} else {
-						handleBackPressIfFullscreenOfflineFragmentOpened();
+						super.onBackPressed();
 					}
 				}
 		    	return true;
@@ -7256,7 +7261,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								break;
 						}
 						break;
-					case FULLSCREEN_OFFLINE:
+					case HOMEPAGE:
 						if (fullscreenOfflineFragment != null) {
 							fullscreenOfflineFragment.selectAll();
 						}
@@ -7948,7 +7953,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem) {
     	if (!searchExpand) return;
 
-		if (oldDrawerItem == DrawerItem.CHAT || oldDrawerItem == DrawerItem.FULLSCREEN_OFFLINE) {
+		if (oldDrawerItem == DrawerItem.CHAT
+				|| (oldDrawerItem == DrawerItem.HOMEPAGE
+				&& mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE)) {
 			searchExpand = false;
 		}
 	}
@@ -11340,7 +11347,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case R.id.offline_section: {
 				isFirstTimeCam();
-				drawerItem = DrawerItem.FULLSCREEN_OFFLINE;
 				checkIfShouldCloseSearchView(oldDrawerItem);
 				drawerLayout.closeDrawer(Gravity.LEFT);
 				setTabsVisibility();
