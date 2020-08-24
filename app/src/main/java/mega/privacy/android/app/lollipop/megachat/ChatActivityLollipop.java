@@ -2123,7 +2123,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("onPrepareOptionsMenu");
 
         if (chatRoom != null && !joiningOrLeaving) {
-            selectMenuItem.setVisible(true);
+            checkSelectOption();
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
             if (chatRoom.isGroup()) {
@@ -6298,8 +6298,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void clearHistory(AndroidMegaChatMessage androidMsg){
-        logDebug("clearHistory");
-
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
 
         int indexToChange=-1;
@@ -6346,6 +6344,26 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         }
 
+        updateMessages();
+    }
+
+    /**
+     * Method to control the visibility of the select option.
+     */
+    private void checkSelectOption() {
+        if (selectMenuItem == null)
+            return;
+
+        if ((messages != null && chatRoom != null && !joiningOrLeaving && messages != null && messages.size() > 0)) {
+            selectMenuItem.setVisible(messages.size() != 1 || messages.get(0).getMessage().getType() != MegaChatMessage.TYPE_TRUNCATE);
+        } else {
+            selectMenuItem.setVisible(false);
+        }
+    }
+
+
+    private void updateMessages(){
+        checkSelectOption();
         adapter.setMessages(messages);
     }
 
@@ -6450,7 +6468,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public void appendMessageAnotherMS(AndroidMegaChatMessage msg){
         logDebug("appendMessageAnotherMS");
-
         messages.add(msg);
         int lastIndex = messages.size()-1;
 
@@ -6469,7 +6486,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if(lastIndex==0){
                 logDebug("Arrives the first message of the chat");
-                adapter.setMessages(messages);
+                updateMessages();
             }
             else{
                 adapter.addMessage(messages, lastIndex+1);
@@ -6516,7 +6533,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }else{
             if(lastIndex<0){
                 logDebug("Arrives the first message of the chat");
-                adapter.setMessages(messages);
+                updateMessages();
             }
             else{
                 adapter.addMessage(messages, lastIndex+1);
@@ -6527,7 +6544,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public int appendMessagePosition(AndroidMegaChatMessage msg){
         logDebug("appendMessagePosition: " + messages.size() + " messages");
-
         int lastIndex = messages.size()-1;
         if(messages.size()==0){
             msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
@@ -6602,7 +6618,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("Update adapter with last index: " + lastIndex);
             if(lastIndex<0){
                 logDebug("Arrives the first message of the chat");
-                adapter.setMessages(messages);
+                updateMessages();
             }else{
                 adapter.addMessage(messages, lastIndex+1);
                 adapter.notifyItemChanged(lastIndex);
@@ -7078,7 +7094,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (adapter == null) {
             createAdapter();
         } else {
-            adapter.setMessages(messages);
+            updateMessages();
         }
     }
 
@@ -7089,7 +7105,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         adapter.setHasStableIds(true);
         listView.setLayoutManager(mLayoutManager);
         listView.setAdapter(adapter);
-        adapter.setMessages(messages);
+        updateMessages();
     }
 
     @Override
