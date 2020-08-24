@@ -185,22 +185,22 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         //Currently the API side doesn't return this value, so we have to hardcode.
         String textToShowFreeStorage = "[A] 50 GB [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
         try {
-            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'#000000\'>");
+            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color='#000000'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
         }
-        storageSectionFree.setText(getSpannedHtmlText(textToShowFreeStorage + "<sup><small><font color=\'#ff333a\'>1</font></small></sup>"));
+        storageSectionFree.setText(getSpannedHtmlText(textToShowFreeStorage + "<sup><small><font color='#ff333a'>1</font></small></sup>"));
 
         String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith).toUpperCase() + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
         try {
-            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'#000000\'>");
+            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color='#000000'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
         }
         bandwidthSectionFree.setText(getSpannedHtmlText(textToShowFreeBandwidth));
-        achievementsSectionFree.setText(getSpannedHtmlText("<sup><small><font color=\'#ff333a\'>1</font></small></sup> " + getString(R.string.footnote_achievements)));
+        achievementsSectionFree.setText(getSpannedHtmlText("<sup><small><font color='#ff333a'>1</font></small></sup> " + getString(R.string.footnote_achievements)));
 
         super.setPricingInfo();
     }

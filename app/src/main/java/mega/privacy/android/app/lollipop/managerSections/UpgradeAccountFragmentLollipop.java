@@ -183,7 +183,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		labelCustomPlan.setOnClickListener(this);
 		String strColor = getHexValue(getResources().getColor(R.color.accentColor));
 		String textToShowB = getString(R.string.label_custom_plan);
-		textToShowB = textToShowB.replace("[A]", "<font color=\'" + strColor + "\'>");
+		textToShowB = textToShowB.replace("[A]", "<font color='" + strColor + "'>");
 		textToShowB = textToShowB.replace("[/A]", "</font>");
 		Spanned resultB = getSpannedHtmlText(textToShowB);
 		labelCustomPlan.setText(resultB);
@@ -274,9 +274,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
 
 						try {
-							unlimitedSpace = unlimitedSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
+							unlimitedSpace = unlimitedSpace.replace("[A]", "<font color='#7a7a7a'>");
 							unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
-							unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color=\'#7a7a7a\'>");
+							unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color='#7a7a7a'>");
 							unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
 						} catch (Exception e) {
 							logError("Exception formatting string", e);
@@ -349,7 +349,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		}
 
 		try {
-			stringPrice = stringPrice.replace("[A]", "<font color=\'" + color + "\'>");
+			stringPrice = stringPrice.replace("[A]", "<font color='" + color + "'>");
 			stringPrice = stringPrice.replace("[/A]", "</font>");
 		} catch (Exception e) {
 			logError("Exception formatting string", e);
@@ -437,7 +437,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
             String textGoogleWallet = getString(R.string.payment_method_google_wallet);
             try{
-                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'#000000\'>");
+                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color='#000000'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -455,7 +455,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			TextView creditCardText = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_text);
 			String textCreditCardText = getString(R.string.payment_method_credit_card);
 			try{
-				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'#000000\'>");
+				textCreditCardText = textCreditCardText.replace("[A]", "<font color='#000000'>");
 				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -473,7 +473,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			String textFortumoText = getString(R.string.payment_method_fortumo);
 			try{
-				textFortumoText = textFortumoText.replace("[A]", "<font color=\'#000000\'>");
+				textFortumoText = textFortumoText.replace("[A]", "<font color='#000000'>");
 				textFortumoText = textFortumoText.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -491,7 +491,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			String textCentiliText = getString(R.string.payment_method_centili);
 			try{
-				textCentiliText = textCentiliText.replace("[A]", "<font color=\'#000000\'>");
+				textCentiliText = textCentiliText.replace("[A]", "<font color='#000000'>");
 				textCentiliText = textCentiliText.replace("[/A]", "</font>");
 			} catch (Exception e) {
 				logError("Exception formatting string", e);
@@ -577,7 +577,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		String textToShow = "[A] " + getSizeStringGBBased(gb) + " [/A] " + storageOrTransferLabel(labelType);
 
 		try {
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color='#000000'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 		} catch (Exception e) {
 			logError("Exception formatting string", e);
