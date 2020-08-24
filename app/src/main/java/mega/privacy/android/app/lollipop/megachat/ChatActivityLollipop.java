@@ -1917,7 +1917,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     /**
-     * Checks if there only four participants in the group chat.
+     * Checks if there only three participants in the group chat.
      *
      * @param position  position to check
      * @return  True if there are three participants, false otherwise.
@@ -1927,7 +1927,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     /**
-     * Checks if there are more than four participants in the group chat.
+     * Checks if there are more than three participants in the group chat.
      *
      * @param position  position to check
      * @return True if there are more than three participants, false otherwise.
