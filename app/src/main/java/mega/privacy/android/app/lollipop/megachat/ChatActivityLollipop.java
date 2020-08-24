@@ -6355,7 +6355,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
 
         if ((messages != null && chatRoom != null && !joiningOrLeaving && messages != null && messages.size() > 0)) {
-            selectMenuItem.setVisible(messages.size() != 1 || messages.get(0).getMessage().getType() != MegaChatMessage.TYPE_TRUNCATE);
+            boolean selectableMessages = false;
+            for (AndroidMegaChatMessage msg : messages) {
+                switch (msg.getMessage().getType()) {
+                    case MegaChatMessage.TYPE_CONTAINS_META:
+                    case MegaChatMessage.TYPE_NORMAL:
+                    case MegaChatMessage.TYPE_NODE_ATTACHMENT:
+                    case MegaChatMessage.TYPE_VOICE_CLIP:
+                    case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
+                        selectableMessages = true;
+                        break;
+                }
+            }
+            selectMenuItem.setVisible(selectableMessages);
         } else {
             selectMenuItem.setVisible(false);
         }
