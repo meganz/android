@@ -337,8 +337,8 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun getOrderDisplay(): String {
         val resId = when (order) {
-            ORDER_MODIFICATION_ASC -> R.string.sortby_modification_date
-            ORDER_MODIFICATION_DESC -> R.string.sortby_modification_date
+            ORDER_MODIFICATION_ASC -> R.string.sortby_date
+            ORDER_MODIFICATION_DESC -> R.string.sortby_date
             ORDER_SIZE_ASC -> R.string.sortby_size
             ORDER_SIZE_DESC -> R.string.sortby_size
             else -> R.string.sortby_name
