@@ -7981,9 +7981,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (holder.ownReactionsAdapter.getItemCount() > 0) {
                     holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-                    ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
-                    holder.ownMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
-                    holder.ownMessageReactionsRecycler.setHasFixedSize(true);
                 } else {
                     holder.ownMessageReactionsLayout.setVisibility(View.GONE);
                     holder.ownReactionsAdapter = null;
@@ -8002,9 +7999,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (holder.contactReactionsAdapter.getItemCount() > 0) {
                     holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
-                    ((SimpleItemAnimator) holder.contactMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
-                    holder.contactMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
-                    holder.contactMessageReactionsRecycler.setHasFixedSize(true);
                 } else {
                     holder.contactMessageReactionsLayout.setVisibility(View.GONE);
                     holder.contactReactionsAdapter = null;

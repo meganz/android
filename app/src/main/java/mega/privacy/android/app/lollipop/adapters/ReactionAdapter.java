@@ -89,7 +89,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
         if(numUsers > 0 ){
-            String text = numUsers == 1? numUsers + "": numUsers*100 + "";
+            String text = numUsers + "";
             holder.itemNumUsersReaction.setText(text);
 
             boolean ownReaction = false;
@@ -148,10 +148,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      * @param reaction The reaction.
      */
     public void updateItem(String reaction) {
-        if (isListReactionsEmpty() ) {
+        if (isListReactionsEmpty()) {
             return;
         }
-
         int position = INVALID_POSITION;
 
         for (String item : listReactions) {
@@ -160,18 +159,16 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 break;
             }
         }
-
         if (position == INVALID_POSITION) {
             int positionToAdd = listReactions.size() - 1;
             listReactions.add(positionToAdd, reaction);
-//            notifyItemInserted(positionToAdd);
-//            notifyItemRangeChanged(positionToAdd, listReactions.size());
+            notifyItemInserted(positionToAdd);
+            notifyItemRangeChanged(positionToAdd, listReactions.size());
         } else {
-//            notifyItemChanged(position);
-//            notifyItemRangeChanged(position, listReactions.size());
-
+            notifyDataSetChanged();
+            //notifyItemChanged(position);//
+//            notifyItemRangeChanged(position+1, listReactions.size()+1);
         }
-        notifyDataSetChanged();
     }
 
     /**
