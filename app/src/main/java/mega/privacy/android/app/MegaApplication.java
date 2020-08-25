@@ -162,7 +162,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
     private AppRTCAudioManager rtcAudioManager = null;
-    private AppRTCAudioManager rtcAudioManagerRingInCall = null;
+    private AppRTCAudioManager rtcAudioManagerRingInCall;
 
     private static MegaApplication singleApplicationInstance;
 

@@ -226,12 +226,15 @@ public class AppRTCAudioManager {
         audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL), 0);
         Resources res = MegaApplication.getInstance().getBaseContext().getResources();
         AssetFileDescriptor afd = res.openRawResourceFd(R.raw.outgoing_voice_video_call);
+
         if (mediaPlayer != null) {
             stopSound();
         }
+
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
         mediaPlayer.setLooping(true);
+
         try {
             mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             logDebug("Preparing mediaPlayer");
@@ -241,6 +244,7 @@ public class AppRTCAudioManager {
             logError("Error preparing mediaPlayer", e);
             return;
         }
+
         logDebug("Start outgoing call sound");
         mediaPlayer.start();
     }
@@ -432,7 +436,7 @@ public class AppRTCAudioManager {
             if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
                 typeStream = AudioManager.STREAM_RING;
                 typeFocus = AUDIOFOCUS_DEFAULT;
-            }else{
+            } else {
                 typeStream = AudioManager.STREAM_VOICE_CALL;
                 typeFocus = AudioManager.AUDIOFOCUS_GAIN;
             }
@@ -745,9 +749,11 @@ public class AppRTCAudioManager {
             // If BT is not available, it can't be the user selection.
             userSelectedAudioDevice = AudioDevice.NONE;
         }
+
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice == AudioDevice.EARPIECE) {
             userSelectedAudioDevice = AudioDevice.NONE;
         }
+
         if (hasWiredHeadset && userSelectedAudioDevice == AudioDevice.SPEAKER_PHONE) {
             // If user selected speaker phone, but then plugged wired headset then make
             // wired headset as user selected device.
@@ -809,19 +815,19 @@ public class AppRTCAudioManager {
             // If a Bluetooth is connected, then it should be used as output audio
             // device. Note that it is not sufficient that a headset is available;
             // an active SCO channel must also be up and running.
-            if(userSelectedAudioDevice == AudioDevice.SPEAKER_PHONE){
+            if (userSelectedAudioDevice == AudioDevice.SPEAKER_PHONE) {
                 newAudioDevice = AudioDevice.SPEAKER_PHONE;
-            }else {
+            } else {
                 newAudioDevice = AudioDevice.BLUETOOTH;
             }
         } else if (hasWiredHeadset) {
             // If a wired headset is connected, but Bluetooth is not, then wired headset is used as
             // audio device.
             newAudioDevice = AudioDevice.WIRED_HEADSET;
-        } else if(userSelectedAudioDevice == AudioDevice.NONE){
-            if(typeStatus == MegaChatCall.CALL_STATUS_RING_IN){
+        } else if (userSelectedAudioDevice == AudioDevice.NONE) {
+            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
                 newAudioDevice = AudioDevice.SPEAKER_PHONE;
-            }else{
+            } else {
                 newAudioDevice = defaultAudioDevice;
             }
         } else {

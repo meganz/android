@@ -1212,7 +1212,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                     displayLinearFAB(false);
 
-                    application.setSpeakerStatus(callChat.getChatid(), true);
+                    MegaApplication.setSpeakerStatus(callChat.getChatid(), true);
                     megaChatApi.answerChatCall(chatId, true, this);
                     clearHandlers();
                     answerCallFAB.clearAnimation();
@@ -1262,7 +1262,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if (canNotJoinCall(this, callChat, chat)) break;
 
                     displayLinearFAB(false);
-                    application.setSpeakerStatus(callChat.getChatid(), false);
+                    MegaApplication.setSpeakerStatus(callChat.getChatid(), false);
                     megaChatApi.answerChatCall(chatId, false, this);
                     clearHandlers();
                     answerCallFAB.clearAnimation();
