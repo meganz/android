@@ -89,7 +89,6 @@
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
 
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
@@ -363,6 +362,8 @@
         <item context="Message when a download finishes. Singular 1 file" quantity="one">Upload has finished</item>
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
     </plurals>
+
+    <string name="folder_empty" context="Warning shown when it tries to download an empty folder">Folder is empty</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -507,6 +508,7 @@
     <string name="number_correctly_removed" context="success message when moving a node">%d items removed successfully from MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d items are not removed successfully</string>
     <string name="number_correctly_leaved" context="success message when moving a node">%d folders left successfully</string>
+    <string name="share_left" context="Message shown when a share has been left">Share left</string>
     <string name="number_no_leaved" context="error message when moving a node">%d folders were not left successfully</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">File sent to %d contacts successfully</string>
     <string name="number_no_sent" context="error message when sending multiple files">File was not sent to %d contacts</string>
@@ -1669,7 +1671,6 @@
     <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again.</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">Uploading&#8230;</string>
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
@@ -1724,6 +1725,11 @@
     <plurals name="context_share_folders">
         <item context="menu item" quantity="one">Share folder</item>
         <item context="menu items" quantity="other">Share folders</item>
+    </plurals>
+
+    <plurals name="confirmation_leave_share_folder">
+        <item context="Confirmation message before leaving an incoming shared folder" quantity="one">If you leave the folder, you will not be able to see it again.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">If you leave the folders, you will not be able to see them again.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">No folders shared</string>
@@ -2449,10 +2455,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
-    <plurals name="custom_subtitle_of_group_chat">
-        <item context="Subtitle chat screen for groups with permissions, not archived and custom titles. When there are up to 4 participants in the chat. Example: user1, user2, user3 and user4" quantity="one">%1$s and %2$s</item>
-        <item context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more" quantity="other">%1$s and %2$d more</item>
-    </plurals>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s and %2$d more</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Before you can generate a link for this chat, you need to set a description:</string>
 
@@ -2795,6 +2798,25 @@
     <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select messages</string>
+
+    <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Storage Full</string>
+    <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Your data is at risk!</string>
+    <plurals name="over_disk_quota_paywall_text">
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have %5$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">We have contacted you by email to %1$s on %2$s and %3$s, but you still have %4$s files taking up %5$s in your MEGA account, which requires you to have %6$s.</item>
+    </plurals>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
+    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left">[B]You must act immediately to save your data[/B].</string>
+
+    <plurals name="label_time_in_days_full">
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 day</item>
+        <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d days</item>
+    </plurals>
+    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
+    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
+    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
 
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verify credentials</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Not verified</string>

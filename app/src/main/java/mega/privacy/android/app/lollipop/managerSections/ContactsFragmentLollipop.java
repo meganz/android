@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -71,6 +74,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -591,6 +595,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL &&
+					item.getItemId() != R.id.cab_menu_select_all && item.getItemId() != R.id.cab_menu_unselect_all) {
+				showOverDiskQuotaPaywallWarning();
+				return false;
+			}
+
 			ArrayList<MegaUser> users = adapter.getSelectedUsers();
 
 			switch(item.getItemId()){
@@ -643,13 +653,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 				case R.id.cab_menu_select_all:{
 					selectAll();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
 					hideMultipleSelect();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{
@@ -752,8 +760,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 			}
-			
-			updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	

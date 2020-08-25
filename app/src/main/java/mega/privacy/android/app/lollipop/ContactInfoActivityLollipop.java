@@ -112,6 +112,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -125,6 +126,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
@@ -277,6 +279,20 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
 				checkNickname(user.getHandle());
 				updateAvatar();
+			}
+		}
+	};
+
+	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null
+					|| !intent.getAction().equals(BROADCAST_ACTION_DESTROY_ACTION_MODE))
+				return;
+
+			if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+				sharedFoldersFragment.clearSelections();
+				sharedFoldersFragment.hideMultipleSelect();
 			}
 		}
 	};
@@ -635,6 +651,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, userNameUpdateFilter);
+
+		registerReceiver(destroyActionModeReceiver,
+				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
 	}
 
 	private void visibilityStateIcon() {
@@ -865,6 +884,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void sendFileToChat(){
 		logDebug("sendFileToChat");
 
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		if(user==null){
 			logWarning("Selected contact NULL");
 			return;
@@ -877,6 +901,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	public void sendMessageToChat(){
 		logDebug("sendMessageToChat");
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		if(user!=null){
 			MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chat==null){
@@ -1162,6 +1192,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startingACall(boolean withVideo) {
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		startVideo = withVideo;
 		if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
 			startCall();
@@ -1172,18 +1208,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.chat_contact_properties_clear_layout: {
-				logDebug("Clear chat option");
-				if(fromContacts){
-					showConfirmationClearChat();
-				}
-				else{
-					intentToClearChat();
-					finish();
-				}
-
+			case R.id.chat_contact_properties_clear_layout:
+				showConfirmationClearChat();
 				break;
-			}
+
 			case R.id.chat_contact_properties_remove_contact_layout: {
 				logDebug("Remove contact chat option");
 
@@ -1210,6 +1238,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
 				logDebug("Share contact option");
+
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					return;
+				}
+
 				if(user==null){
 					logDebug("Selected contact NULL");
 					return;
@@ -1738,6 +1772,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
+		unregisterReceiver(destroyActionModeReceiver);
 	}
 
 	@Override
@@ -1798,13 +1833,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
-	public void intentToClearChat(){
-		Intent clearChat = new Intent(this, ChatActivityLollipop.class);
-		clearChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		clearChat.setAction(ACTION_CLEAR_CHAT);
-		startActivity(clearChat);
 	}
 
 	@Override
@@ -1927,54 +1955,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 		nC.prepareForDownload(handleList, true);
 	}
-    
-    public void showConfirmationLeaveIncomingShare (final MegaNode n){
-		logDebug("Node handle: " + n.getHandle());
-        
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        megaApi.remove(n);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-        
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message= getResources().getString(R.string.confirmation_leave_share_folder);
-        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
-    
-    public void showConfirmationLeaveIncomingShare (final ArrayList<Long> handleList){
-		logDebug("showConfirmationLeaveIncomingShare");
-        
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        leaveMultipleShares(handleList);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-        
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message= getResources().getString(R.string.confirmation_leave_share_folder);
-        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
     
     public void leaveMultipleShares (ArrayList<Long> handleList){
         

@@ -32,6 +32,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaPricing;
 
+import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -178,7 +179,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         proLiteLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_layout);
         proLiteLayout.setOnClickListener(this);
         titleProLite = (TextView) v.findViewById(R.id.choose_account_prolite_title_text);
-        titleProLite.setText(getString(R.string.prolite_account).toUpperCase());
+        titleProLite.setText(getString(R.string.lite_account).toUpperCase());
         monthSectionProLite = (TextView) v.findViewById(R.id.month_lite);
         storageSectionProLite = (TextView) v.findViewById(R.id.storage_lite);
         bandwidthSectionProLite = (TextView) v.findViewById(R.id.bandwidth_lite);
@@ -263,9 +264,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("firstLogin", true);
-        intent.putExtra("upgradeAccount", false);
-        intent.putExtra("newAccount", true);
+        intent.putExtra(EXTRA_FIRST_LOGIN, true);
+        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, false);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
@@ -277,9 +278,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_I);
-        intent.putExtra("newAccount", true);
+        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_I);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
@@ -291,9 +292,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_II);
-        intent.putExtra("newAccount", true);
+        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_II);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
@@ -305,9 +306,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_III);
-        intent.putExtra("newAccount", true);
+        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_III);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
@@ -319,9 +320,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_LITE);
-        intent.putExtra("newAccount", true);
+        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_LITE);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
