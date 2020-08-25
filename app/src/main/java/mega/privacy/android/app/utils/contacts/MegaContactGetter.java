@@ -217,9 +217,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     }
                 }
             } else {
-                logWarning("Get registered contacts faild with error code: " + e.getErrorCode());
-                //current account has requested mega contacts too many times and reached the limitation, no need to re-try.
-                if (e.getErrorCode() == MegaError.API_ETOOMANY) {
+                logWarning("Get registered contacts failed with error code: " + e.getErrorCode());
+                // API_ETOOMANY: Current account has requested mega contacts too many times and reached the limitation, no need to re-try.
+                // API_EPAYWALL: Need to call "updateLastSyncTimestamp()" to avoid fall in an infinite loop to dismiss the ODQ Paywall warning.
+                if (e.getErrorCode() == MegaError.API_ETOOMANY || e.getErrorCode() == MegaError.API_EPAYWALL) {
                     updateLastSyncTimestamp();
                 }
                 if (updater != null) {

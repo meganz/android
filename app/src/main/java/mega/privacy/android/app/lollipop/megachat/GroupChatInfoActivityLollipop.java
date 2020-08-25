@@ -268,7 +268,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
     }
 
-    public void setParticipants() {
+    private void setParticipants() {
         //Set the first element = me
         participantsCount = chat.getPeerCount();
         logDebug("Participants count: " + participantsCount);
@@ -790,8 +790,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                     chat = megaChatApi.getChatRoom(chatHandle);
                     logDebug("Peers after onChatListItemUpdate: " + chat.getPeerCount());
-                    participants.clear();
-                    setParticipants();
+                    updateParticipants();
                     showSnackbar(getString(R.string.remove_participant_success));
                 }
             } else if (request.getUserHandle() == -1) {
@@ -829,8 +828,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     logDebug("Changes in my chat");
                     chat = megaChatApi.getChatRoom(chatHandle);
                     logDebug("Peers after onChatListItemUpdate: " + chat.getPeerCount());
-                    participants.clear();
-                    setParticipants();
+                    updateParticipants();
                 } else {
                     logWarning("Changes NOT interested in");
                 }
@@ -993,13 +991,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
             logDebug("Change participants");
-            participants.clear();
-            setParticipants();
+            updateParticipants();
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
             logDebug("Change status: CHANGE_TYPE_OWN_PRIV");
             updateAdapterHeader();
-            participants.clear();
-            setParticipants();
+            updateParticipants();
             supportInvalidateOptionsMenu();
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
             logDebug("Change status: CHANGE_TYPE_TITLE");
@@ -1420,5 +1416,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public ChatController getChatC() {
         return chatC;
+    }
+
+    public void updateParticipants() {
+        participants.clear();
+        setParticipants();
     }
 }

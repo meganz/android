@@ -42,41 +42,6 @@
             android:lineSpacingMultiplier="1.27"
             android:textAlignment="textStart"/>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginTop="50dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_not_now"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:background="@android:color/transparent"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:stateListAnimator="@null"
-                android:textAllCaps="true"
-                android:text="@string/verify_account_not_now_button"/>
-
-            <Button
-                android:id="@+id/btn_ok"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="22dp"
-                android:background="@android:color/transparent"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:stateListAnimator="@null"
-                android:textAllCaps="true"
-                android:text="@string/general_allow"/>
-
-        </LinearLayout>
-
     </LinearLayout>
 
 </ScrollView>

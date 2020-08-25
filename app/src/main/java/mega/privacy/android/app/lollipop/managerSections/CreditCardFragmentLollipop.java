@@ -51,7 +51,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		PRO_1(1, R.drawable.ic_pro_1, R.string.pro1_account),
 		PRO_2(2, R.drawable.ic_pro_2, R.string.pro2_account),
 		PRO_3(3, R.drawable.ic_pro_3, R.string.pro3_account),
-		PRO_LITE(4, R.drawable.ic_pro_lite, R.string.prolite_account);
+		PRO_LITE(4, R.drawable.ic_pro_lite, R.string.lite_account);
 		
 		private int id;
 		private int resource;
@@ -503,7 +503,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 					Product account = accounts.get(i);
 	
 					if(account.getLevel()==4){
-						aB.setTitle(getString(R.string.prolite_account));
+						aB.setTitle(getString(R.string.lite_account));
 	
 						if (paymentMonth == 1){
 							if(account.getMonths()==1){

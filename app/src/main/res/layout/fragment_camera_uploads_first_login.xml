@@ -1,0 +1,123 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    >
+
+  <ScrollView
+      android:id="@+id/cam_sync_scroll_view"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+      <ImageView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="32dp"
+          android:src="@drawable/camera_upload"
+          />
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="29dp"
+          android:layout_marginEnd="8dp"
+          android:layout_marginStart="16dp"
+          android:orientation="horizontal"
+          >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_weight="5"
+            android:text="@string/camera_uploads_upload_videos"
+            android:textColor="@color/name_my_account"
+            android:textSize="16sp"
+            />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/upload_videos_switch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_weight="1"
+            android:gravity="end"
+            />
+      </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="32dp"
+          android:layout_marginEnd="8dp"
+          android:layout_marginStart="16dp"
+          android:orientation="horizontal"
+          >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_weight="5"
+            android:text="@string/camera_uploads_cellular_connection"
+            android:textColor="@color/name_my_account"
+            android:textSize="16sp"
+            />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/cellular_connection_switch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_weight="1"
+            android:gravity="end"
+            />
+      </LinearLayout>
+    </LinearLayout>
+  </ScrollView>
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="end"
+      android:orientation="horizontal"
+      >
+
+    <Button
+        android:id="@+id/cam_sync_button_skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/white_rounded_corners_button"
+        android:elevation="@dimen/elevation_upgrade_low"
+        android:stateListAnimator="@anim/button_upgrade_elevation"
+        android:text="@string/general_skip"
+        android:textColor="@color/name_my_account"
+        />
+
+    <Button
+        android:id="@+id/cam_sync_button_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/ripple_upgrade"
+        android:elevation="@dimen/elevation_upgrade_low"
+        android:stateListAnimator="@anim/button_upgrade_elevation"
+        android:text="@string/general_ok"
+        android:textColor="@color/white"
+        android:tint="@android:color/white"
+        />
+  </LinearLayout>
+</LinearLayout>
