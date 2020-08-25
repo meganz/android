@@ -6354,8 +6354,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (selectMenuItem == null)
             return;
 
-        if ((messages != null && chatRoom != null && !joiningOrLeaving && messages != null && messages.size() > 0)) {
-            boolean selectableMessages = false;
+        boolean selectableMessages = false;
+        if ((messages != null && chatRoom != null && !joiningOrLeaving && messages.size() > 0)) {
             for (AndroidMegaChatMessage msg : messages) {
                 switch (msg.getMessage().getType()) {
                     case MegaChatMessage.TYPE_CONTAINS_META:
@@ -6367,10 +6367,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         break;
                 }
             }
-            selectMenuItem.setVisible(selectableMessages);
-        } else {
-            selectMenuItem.setVisible(false);
         }
+        selectMenuItem.setVisible(selectableMessages);
     }
 
 
