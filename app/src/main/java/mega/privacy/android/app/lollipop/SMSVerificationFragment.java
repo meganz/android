@@ -128,7 +128,7 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
 
     private void fadeOut() {
         managerActivity.destroySMSVerificationFragment();
-        if (managerActivity.firstTimeAfterInstallation) {
+        if (managerActivity.firstTimeAfterInstallation || managerActivity.getAskPermissions()) {
             managerActivity.askForAccess();
         }
     }

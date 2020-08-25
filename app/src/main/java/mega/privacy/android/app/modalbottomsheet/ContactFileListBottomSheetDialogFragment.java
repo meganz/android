@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -251,11 +252,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 break;
 
             case R.id.option_leave_layout:
-                if (context instanceof ContactFileListActivityLollipop) {
-                    contactFileListActivity.showConfirmationLeaveIncomingShare(node);
-                } else if (context instanceof ContactInfoActivityLollipop) {
-                    contactInfoActivity.showConfirmationLeaveIncomingShare(node);
-                }
+                showConfirmationLeaveIncomingShare(context, node);
                 break;
 
             case R.id.option_rename_layout:
