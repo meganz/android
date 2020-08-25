@@ -1,17 +1,18 @@
 package mega.privacy.android.app.fragments.offline
 
+import android.content.Context
 import android.util.Base64
 import androidx.collection.SparseArrayCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
@@ -21,6 +22,7 @@ import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
+import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
@@ -41,6 +43,7 @@ import java.util.Stack
 import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
+    @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo
 ) : BaseRxViewModel() {
     private var order = ORDER_DEFAULT_ASC
@@ -186,7 +189,7 @@ class OfflineViewModel @ViewModelInject constructor(
         if (selecting) {
             handleSelection(position, node)
         } else {
-            val nodeFile = getOfflineFile(getApplication(), node.node)
+            val nodeFile = getOfflineFile(context, node.node)
             if (isFileAvailable(nodeFile) && nodeFile.isDirectory) {
                 firstVisiblePositionStack
                     .push(if (firstVisiblePosition >= 0) firstVisiblePosition else 0)
@@ -304,12 +307,10 @@ class OfflineViewModel @ViewModelInject constructor(
         val query = searchQuery
         return when {
             query != null -> {
-                getApplication<MegaApplication>().getString(R.string.action_search)
-                    .toUpperCase(Locale.ROOT) + ": " + query
+                context.getString(R.string.action_search).toUpperCase(Locale.ROOT) + ": " + query
             }
             path == OFFLINE_ROOT -> {
-                getApplication<MegaApplication>().getString(R.string.tab_offline)
-                    .toUpperCase(Locale.ROOT)
+                context.getString(R.string.tab_offline).toUpperCase(Locale.ROOT)
             }
             else -> {
                 val pathWithoutLastSlash = path.substring(0, path.length - 1)
@@ -342,7 +343,7 @@ class OfflineViewModel @ViewModelInject constructor(
             ORDER_SIZE_DESC -> R.string.sortby_size
             else -> R.string.sortby_name
         }
-        return getApplication<MegaApplication>().resources.getString(resId)
+        return context.resources.getString(resId)
     }
 
     fun setSearchQuery(query: String?) {
@@ -466,10 +467,10 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun getNodeInfo(node: MegaOffline): String {
-        val file = getOfflineFile(getApplication(), node)
+        val file = getOfflineFile(context, node)
 
         return if (file.isDirectory) {
-            getFolderInfo(file)
+            getFolderInfo(context.resources, file)
         } else {
             String.format(
                 "%s . %s",
@@ -479,34 +480,10 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun getFolderInfo(file: File): String {
-        val files = file.listFiles() ?: return " "
-
-        var folderNum = 0
-        var fileNum = 0
-        for (f in files) {
-            if (f.isDirectory) {
-                folderNum++
-            } else {
-                fileNum++
-            }
-        }
-        val res = getApplication<MegaApplication>().resources
-
-        return if (folderNum > 0 && fileNum > 0) {
-            "$folderNum " + res.getQuantityString(R.plurals.general_num_folders, folderNum) +
-                    ", $fileNum " + res.getQuantityString(R.plurals.general_num_files, folderNum)
-        } else if (folderNum > 0) {
-            "$folderNum " + res.getQuantityString(R.plurals.general_num_folders, folderNum)
-        } else {
-            "$fileNum " + res.getQuantityString(R.plurals.general_num_files, fileNum)
-        }
-    }
-
     private fun createThumbnails(nodes: List<MegaOffline>) {
         add(Observable.fromIterable(nodes)
             .subscribeOn(Schedulers.io())
-            .map { Pair(getOfflineFile(getApplication(), it), getThumbnailFile(it)) }
+            .map { Pair(getOfflineFile(context, it), getThumbnailFile(it)) }
             .filter { it.first.exists() }
             .map { createThumbnail(it.first, it.second) }
             .throttleLatest(1, SECONDS, true)
@@ -515,7 +492,7 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun getThumbnailFile(node: MegaOffline): File {
-        val thumbDir = ThumbnailUtilsLollipop.getThumbFolder(getApplication())
+        val thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context)
         val thumbName = Base64.encodeToString(node.handle.toByteArray(), Base64.DEFAULT)
         return File(thumbDir, "$thumbName.jpg")
     }

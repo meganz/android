@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.io.File;
 
 import java.util.ArrayList;
@@ -164,10 +165,14 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         switch (v.getId()) {
             case R.id.option_delete_offline_layout:
             case R.id.available_offline_switch:
+                ((SwitchMaterial) contentView.findViewById(R.id.available_offline_switch))
+                        .setChecked(true);
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
+                    ((ManagerActivityLollipop) context)
+                            .showConfirmationRemoveFromOffline(nodeOffline,
+                                    this::setStateBottomSheetBehaviorHidden);
                 }
-                break;
+                return;
             case R.id.option_open_with_layout:
                 openWith();
                 break;
@@ -180,10 +185,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 new NodeController(context).prepareForDownload(handleList, false);
                 break;
             case R.id.option_properties_layout:
-                Intent intent = new Intent(context, FileInfoActivityLollipop.class);
-                intent.putExtra(HANDLE, Long.parseLong(nodeOffline.getHandle()));
-                intent.putExtra(NAME, nodeOffline.getName());
-                ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_FILE_INFO);
+                ((ManagerActivityLollipop) requireActivity()).showOfflineFileInfo(nodeOffline);
                 break;
             default:
                 break;

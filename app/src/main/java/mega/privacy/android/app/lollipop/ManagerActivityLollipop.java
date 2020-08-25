@@ -596,7 +596,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 	private enum HomepageScreen {
-       HOMEPAGE, PHOTOS, FULLSCREEN_OFFLINE,
+       	HOMEPAGE, PHOTOS,
+       	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO,
 	}
 
 	//	private boolean isListCloudDrive = true;
@@ -5745,6 +5746,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case R.id.fullscreen_offline:
 					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
 					break;
+				case R.id.offline_file_info:
+					mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+					abL.setVisibility(View.GONE);
+					showHideBottomNavigationView(true);
+					return;
 			}
 
 			abL.setVisibility(View.VISIBLE);
@@ -6049,7 +6055,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     	fullscreenOfflineFragment = fragment;
 
 		showFabButton();
-		showHideBottomNavigationView(false);
 		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
 		abL.setVisibility(View.VISIBLE);
 		setToolbarTitle();
@@ -10901,6 +10906,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				bottomSheetDialogFragment.getTag());
 	}
 
+	public void showOfflineFileInfo(MegaOffline node) {
+		mNavController.navigate(HomepageFragmentDirections.Companion
+				.actionHomepageToOfflineFileInfo(node.getHandle()));
+	}
+
 	public void showContactOptionsPanel(MegaContactAdapter user){
 		logDebug("showContactOptionsPanel");
 
@@ -11458,7 +11468,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	}
 
-	public void showConfirmationRemoveFromOffline(){
+	public void showConfirmationRemoveFromOffline(MegaOffline node, Runnable onConfirmed) {
 		logDebug("showConfirmationRemoveFromOffline");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -11473,14 +11483,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
-						MegaOffline mOff = getSelectedOfflineNode();
-
 						NodeController nC = new NodeController(managerActivity);
-						nC.deleteOffline(mOff);
+						nC.deleteOffline(node);
+						onConfirmed.run();
 						refreshOfflineNodes();
 
                         if(isCloudAdded()){
-                            String handle = mOff.getHandle();
+                            String handle = node.getHandle();
                             if(handle != null && !handle.equals("")){
                                 fbFLol.refresh(Long.parseLong(handle));
                             }
@@ -14720,6 +14729,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			} else {
 				refreshRubbishBin();
 			}
+		}
+		if (pagerOfflineFragment != null) {
+			pagerOfflineFragment.refreshNodes();
 		}
 
 		refreshCloudDrive();

@@ -225,4 +225,7 @@
     <color name="sort_by_title_color">#89000000</color>
     <color name="sort_by_selected_color">#00bfa5</color>
     <color name="sort_by_unselected_color">#dd000000</color>
+
+    <color name="homepage_title">#dd000000</color>
+    <color name="homepage_content">#89000000</color>
 </resources>
