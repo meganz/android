@@ -363,7 +363,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             managerActivity?.setTextSubmitted()
         }
         viewModel.showSortedBy.observe(viewLifecycleOwner) {
-            managerActivity?.showSortOptions(managerActivity, resources.displayMetrics)
+            managerActivity?.showNewSortByPanel()
         }
         viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
             val rv = recyclerView

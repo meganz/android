@@ -883,6 +883,11 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Photos</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Videos</string>
 
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
 

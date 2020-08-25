@@ -221,4 +221,8 @@
 
     <color name="homepage_background">#EEF2F1</color>
     <color name="fab_upload_background_tint">#333333</color>
+
+    <color name="sort_by_title_color">#89000000</color>
+    <color name="sort_by_selected_color">#00bfa5</color>
+    <color name="sort_by_unselected_color">#dd000000</color>
 </resources>
