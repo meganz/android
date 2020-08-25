@@ -7981,10 +7981,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (holder.ownReactionsAdapter.getItemCount() > 0) {
                     holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
+                    ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+                    holder.ownMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
+                    holder.ownMessageReactionsRecycler.setHasFixedSize(true);
                 } else {
                     holder.ownMessageReactionsLayout.setVisibility(View.GONE);
-                    holder.ownMessageReactionsRecycler.setAdapter(null);
                     holder.ownReactionsAdapter = null;
+                    holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
                 }
             }
         } else {
@@ -7999,10 +8002,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (holder.contactReactionsAdapter.getItemCount() > 0) {
                     holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
+                    ((SimpleItemAnimator) holder.contactMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+                    holder.contactMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
+                    holder.contactMessageReactionsRecycler.setHasFixedSize(true);
                 } else {
                     holder.contactMessageReactionsLayout.setVisibility(View.GONE);
-                    holder.contactMessageReactionsRecycler.setAdapter(null);
                     holder.contactReactionsAdapter = null;
+                    holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
                 }
             }
         }
@@ -8043,12 +8049,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (listReactions == null || listReactions.size() <= 0) {
             if (isMyMessage(message)) {
                 holder.ownMessageReactionsLayout.setVisibility(View.GONE);
-                holder.ownMessageReactionsRecycler.setAdapter(null);
                 holder.ownReactionsAdapter = null;
+                holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
             } else {
                 holder.contactMessageReactionsLayout.setVisibility(View.GONE);
-                holder.contactMessageReactionsRecycler.setAdapter(null);
                 holder.contactReactionsAdapter = null;
+                holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
             }
 
             return true;

@@ -53,6 +53,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     public ReactionAdapter.ViewHolderReaction onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reaction, parent, false);
         ViewHolderReaction holder = new ViewHolderReaction(v);
+        holder.generalLayout = v.findViewById(R.id.general_rl);
         holder.moreReactionsLayout = v.findViewById(R.id.more_reactions_layout);
         holder.moreReactionsLayout.setTag(holder);
         holder.itemReactionLayout = v.findViewById(R.id.item_reaction_layout);
@@ -107,7 +108,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             holder.moreReactionsLayout.setVisibility(View.GONE);
             holder.itemReactionLayout.setVisibility(View.GONE);
         }
-
     }
 
     private boolean isListReactionsEmpty() {
@@ -131,10 +131,10 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             if (item.equals(reaction)) {
                 int position = listReactions.indexOf(item);
                 listReactions.remove(position);
+                notifyItemRemoved(position);
                 if (listReactions.size() == 1 && listReactions.get(0).equals(INVALID_REACTION)) {
                     listReactions.clear();
                 } else {
-                    notifyItemRemoved(position);
                     notifyItemRangeChanged(position, listReactions.size());
                 }
                 break;
@@ -164,13 +164,14 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         if (position == INVALID_POSITION) {
             int positionToAdd = listReactions.size() - 1;
             listReactions.add(positionToAdd, reaction);
-            notifyItemInserted(positionToAdd);
-            notifyItemRangeChanged(positionToAdd, listReactions.size());
+//            notifyItemInserted(positionToAdd);
+//            notifyItemRangeChanged(positionToAdd, listReactions.size());
         } else {
-            notifyItemChanged(position);
-            notifyItemRangeChanged(position, listReactions.size());
+//            notifyItemChanged(position);
+//            notifyItemRangeChanged(position, listReactions.size());
 
         }
+        notifyDataSetChanged();
     }
 
     /**
@@ -227,6 +228,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
     public class ViewHolderReaction extends RecyclerView.ViewHolder {
 
+        private RelativeLayout generalLayout;
         private RelativeLayout moreReactionsLayout;
         private RelativeLayout itemReactionLayout;
         private ReactionImageView itemEmojiReaction;
