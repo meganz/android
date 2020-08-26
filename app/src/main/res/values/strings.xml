@@ -2580,7 +2580,6 @@
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Preparing files</string>
     <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as a message.</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Error. The file has not been sent to any of the selected chats</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">Delete previous versions</string>
     <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete previous versions?</string>
