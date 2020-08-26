@@ -9,6 +9,8 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +34,7 @@ import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -207,8 +210,8 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                 
                 actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
             }
-            
-            updateActionModeTitle();
+
+            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
     
@@ -288,7 +291,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                         handleList.add(documents.get(i).getHandle());
                     }
                     
-                    ((ContactInfoActivityLollipop) context).showConfirmationLeaveIncomingShare(handleList);
+                    showConfirmationLeaveIncomingShares(context, handleList);
                     break;
                 }
                 case R.id.cab_menu_trash: {

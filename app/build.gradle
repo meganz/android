@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 29
@@ -114,6 +116,8 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
 }
 
 apply plugin: 'com.google.gms.google-services'
