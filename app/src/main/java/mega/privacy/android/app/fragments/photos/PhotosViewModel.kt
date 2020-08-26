@@ -56,7 +56,6 @@ class PhotosViewModel @Inject constructor(
         filteredNodes
     }
 
-
     fun loadPhotos(query: String, forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
         searchQuery = query

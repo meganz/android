@@ -6,8 +6,12 @@
     <data>
 
         <import type="android.view.View" />
+
         <import type="mega.privacy.android.app.utils.Util" />
+
         <import type="mega.privacy.android.app.utils.TimeUtils" />
+
+        <import type="mega.privacy.android.app.utils.OfflineUtils" />
 
         <variable
             name="viewModel"
@@ -20,23 +24,39 @@
         <variable
             name="item"
             type="mega.privacy.android.app.fragments.photos.PhotoNode" />
+
+        <variable
+            name="megaApi"
+            type="nz.mega.sdk.MegaApiJava" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
+        android:background="@{item.selected ? @color/new_multiselect_color : @color/transparent}"
         android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick(item) : actionModeViewModel.onPhotoClick(item)}"
-        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}"
-        android:background="@{item.selected ? @color/new_multiselect_color : @color/transparent}">
+        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
+
+        <ImageView
+            android:id="@+id/saved_offline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@drawable/ic_cloud_saved_offline"
+            android:visibility="@{OfflineUtils.availableOffline(context, item.node) ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/thumbnail"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="12dp"
+            android:layout_width="36dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="18dp"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
             app:selected="@{item.selected}"
             app:thumbnail="@{item.thumbnail}"
@@ -46,15 +66,30 @@
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="15dp"
+            android:ellipsize="middle"
             android:singleLine="true"
             android:text="@{item.node.name}"
             android:textColor="@color/file_list_first_row"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@id/thumbnail"
-            app:layout_constraintTop_toTopOf="@id/thumbnail"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="2020-05-25 22.30.21.jpg" />
+
+        <ImageView
+            android:id="@+id/public_link"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:alpha="0.35"
+            android:background="@null"
+            android:src="@drawable/link_ic"
+            android:visibility="@{item.node.exported ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintStart_toEndOf="@id/name"
+            app:layout_constraintTop_toTopOf="@id/name" />
 
         <ImageView
             android:id="@+id/taken_down"
@@ -67,18 +102,39 @@
             app:layout_constraintTop_toTopOf="@id/name"
             tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/node_info"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text='@{String.format("%s . %s", Util.getSizeString(item.node.size), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
-            android:textColor="@color/file_list_second_row"
-            android:textSize="14sp"
+            android:layout_marginStart="1dp"
             app:layout_constraintStart_toStartOf="@id/name"
-            app:layout_constraintTop_toBottomOf="@id/name"
-            tools:text="8.27 MB . June 2020 10:39:12" />
+            app:layout_constraintTop_toBottomOf="@id/name">
+
+            <ImageView
+                android:id="@+id/versions_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:alpha="0.76"
+                android:background="@null"
+                android:src="@drawable/ic_versions_small"
+                android:visibility="@{megaApi.hasVersions(item.node) ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/node_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text='@{String.format("%s . %s", Util.getSizeString(item.node.size), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
+                android:textColor="@color/file_list_second_row"
+                android:textSize="14sp"
+                app:layout_constraintStart_toEndOf="@id/versions_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="8.27 MB . June 2020 10:39:12" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/three_dots"
