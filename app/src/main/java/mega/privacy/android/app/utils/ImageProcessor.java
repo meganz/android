@@ -23,6 +23,7 @@ import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 
 import java.io.File;
+import java.util.concurrent.Executors;
 
 import nz.mega.sdk.AndroidGfxProcessor;
 
@@ -32,6 +33,14 @@ public class ImageProcessor {
 
     private static final int THUMBNAIL_SIZE = 200;
 
+    /**
+     * Create a thumbnail file based on a local image file and store it to target location.
+     * The process is load the file as Bitmap in memory then resize and crop it, finally store it.
+     * The thumbnail size should be {@link #THUMBNAIL_SIZE} * {@link #THUMBNAIL_SIZE}.
+     *
+     * @param origin The local image file.
+     * @param thumbnail Target location where the created thumbnail will be stored.
+     */
     public static void createThumbnail(File origin, File thumbnail) {
         if (!origin.exists()) return;
         if (thumbnail.exists()) thumbnail.delete();
@@ -84,15 +93,23 @@ public class ImageProcessor {
 
     }
 
-    public static void createImagePreview(File img, File preview) {
-        int[] wh = calculatePreviewWidthAndHeight(img);
+    /**
+     * Create a preview file based on a local image file and store it to target location.
+     * The process is load the file as Bitmap in memory then resize it, finally store it.
+     * The preview's longest side size should be {@link #PREVIEW_SIZE}.
+     *
+     * @param origin The local image file.
+     * @param preview Target location where the created preview will be stored.
+     */
+    public static void createImagePreview(File origin, File preview) {
+        int[] wh = calculatePreviewWidthAndHeight(origin);
         int w = wh[0];
         int h = wh[1];
 
         if (w == 0 || h == 0) return;
 
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        ImageRequest imageRequest = ImageRequest.fromFile(img);
+        ImageRequest imageRequest = ImageRequest.fromFile(origin);
 
         DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, null);
 
@@ -112,6 +129,14 @@ public class ImageProcessor {
         }, CallerThreadExecutor.getInstance());
     }
 
+    /**
+     * Calculate the preview's width and height, base on its orientation.
+     * The longest side should be {@link #PREVIEW_SIZE}.
+     *
+     * @param origin The local image file.
+     * @return Preview's width and height, stored in a int array.
+     *         The first element is witdth, the second one is height.
+     */
     private static int[] calculatePreviewWidthAndHeight(File origin) {
         int[] wh = new int[2];
         String path = origin.getAbsolutePath();
