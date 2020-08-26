@@ -598,7 +598,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 	private enum HomepageScreen {
-       HOMEPAGE, PHOTOS
+       HOMEPAGE, PHOTOS, RECENT_BUCKET
 	}
 
 	//	private boolean isListCloudDrive = true;
@@ -1235,7 +1235,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						} else if (actionType == SCROLL_TO_POSITION) {
 							rF.updateScrollPosition(handle);
 						}
-					}
+					} else if(adapterType == RECENTS_BUCKET_ADAPTER) {
+                        long handle = intent.getLongExtra("handle", INVALID_HANDLE);
+                        if (actionType == UPDATE_IMAGE_DRAG) {
+                            imageDrag = rF.getImageDrag(handle);
+                            if (rF.imageDrag != null) {
+                                rF.imageDrag.setVisibility(View.VISIBLE);
+                            }
+                            if (imageDrag != null) {
+                                rF.imageDrag = imageDrag;
+                                rF.imageDrag.setVisibility(View.INVISIBLE);
+                            }
+                        } else if (actionType == SCROLL_TO_POSITION) {
+                            rF.updateScrollPosition(handle);
+                        }
+                    }
 
 					if (imageDrag != null){
 						int[] positionDrag = new int[2];
@@ -4775,6 +4789,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     }
 
+    public void setToolbarTitle(String title) {
+        aB.setTitle(title);
+    }
+
 	public void setToolbarTitle(){
 		logDebug("setToolbarTitle");
 		if(drawerItem==null){
@@ -5748,6 +5766,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case R.id.photosFragment:
 					mHomepageScreen = HomepageScreen.PHOTOS;
 					break;
+                case R.id.recentBucketFragment:
+                    mHomepageScreen = HomepageScreen.RECENT_BUCKET;
+                    break;
 			}
 
 			abL.setVisibility(View.VISIBLE);
@@ -6056,6 +6077,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					REQUEST_WRITE_STORAGE);
 		}
 	}
+
+    public void openRecentBucketFragment(String[] serializedNodes, BucketSaved bucket) {
+        mNavController.navigate(
+                HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(serializedNodes, bucket),
+                new NavOptions.Builder().build());
+    }
 
 	public void fullscreenOfflineFragmentOpened(OfflineFragment fragment) {
     	fullscreenOfflineFragment = fragment;

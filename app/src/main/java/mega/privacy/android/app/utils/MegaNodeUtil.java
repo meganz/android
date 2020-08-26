@@ -32,6 +32,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
+import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -586,5 +588,19 @@ public class MegaNodeUtil {
             }
         }
         return true;
+    }
+
+    public static String[] getSerializedNodesFromBucket(MegaRecentActionBucket bucket) {
+        if (bucket != null) {
+            MegaNodeList nodeList = bucket.getNodes();
+            if (nodeList != null) {
+                String[] serailizedNodes = new String[nodeList.size()];
+                for (int i = 0; i < nodeList.size(); i++) {
+                    serailizedNodes[i] = nodeList.get(i).serialize();
+                }
+                return serailizedNodes;
+            }
+        }
+        return null;
     }
 }

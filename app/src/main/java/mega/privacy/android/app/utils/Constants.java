@@ -298,6 +298,7 @@ public class Constants {
     public static final int LINKS_ADAPTER = 2025;
     public static final int PHOTOS_BROWSE_ADAPTER = 2026;
     public static final int PHOTOS_SEARCH_ADAPTER = 2027;
+    public static final int RECENTS_BUCKET_ADAPTER = 2028;
 
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;

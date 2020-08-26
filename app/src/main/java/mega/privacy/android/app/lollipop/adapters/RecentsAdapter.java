@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -25,6 +26,7 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -338,8 +340,13 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                         v.findViewById(R.id.thumbnail_view), RecentsFragment.OPEN_FROM_ROOT_SINGLE);
                     break;
                 }
-                if (item.getBucket() == null) break;
-                ((RecentsFragment) fragment).openMultipleBucket(item.getBucket());
+                MegaRecentActionBucket bucket = item.getBucket();
+                if (bucket == null) break;
+                if(ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
+                    ((ManagerActivityLollipop) context).openRecentBucketFragment(MegaNodeUtil.getSerializedNodesFromBucket(bucket), new BucketSaved(bucket));
+                } else {
+                    ((RecentsFragment) fragment).openMultipleBucket(bucket);
+                }
                 break;
             }
         }

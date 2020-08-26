@@ -15,11 +15,24 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_recentBucket"
+            app:destination="@id/recentBucketFragment"/>
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
         android:name="mega.privacy.android.app.fragments.photos.PhotosFragment"
         android:label="@string/category_photos" />
+    <fragment
+        android:id="@+id/recentBucketFragment"
+        android:name="mega.privacy.android.app.fragments.recent.RecentsBucketFragment">
+        <argument
+            android:name="serializedNodes"
+            app:argType="string[]" />
+        <argument
+            android:name="bucket"
+            app:argType="mega.privacy.android.app.BucketSaved" />
+    </fragment>
     <fragment
         android:id="@+id/fullscreen_offline"
         android:name="mega.privacy.android.app.fragments.offline.OfflineFragment"

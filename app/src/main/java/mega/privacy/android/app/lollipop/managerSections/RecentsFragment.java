@@ -80,7 +80,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
     private ArrayList<MegaRecentActionBucket> buckets;
     private MegaRecentActionBucket bucketSelected;
-    private ArrayList<RecentsItem> recentsItems = new ArrayList<>();
+    private ArrayList<RecentsItem> recentsItems;
     private RecentsAdapter adapter;
 
     private RelativeLayout emptyLayout;
@@ -134,6 +134,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         if (megaApi.getRootNode() == null) return null;
 
         dbH = DatabaseHandler.getDbHandler(context);
+        recentsItems = new ArrayList<>();
 
         buckets = megaApi.getRecentActions();
 
