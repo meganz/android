@@ -1652,7 +1652,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         switch (messageType) {
-
             case MegaChatMessage.TYPE_ALTER_PARTICIPANTS: {
                 logDebug("ALTER PARTICIPANT MESSAGE!!");
                 bindAlterParticipantsMessage((ViewHolderMessageChat) holder, androidMessage, position);

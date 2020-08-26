@@ -56,7 +56,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     public ReactionAdapter.ViewHolderReaction onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reaction, parent, false);
         ViewHolderReaction holder = new ViewHolderReaction(v);
-        holder.generalLayout = v.findViewById(R.id.general_rl);
         holder.moreReactionsLayout = v.findViewById(R.id.more_reactions_layout);
         holder.moreReactionsLayout.setTag(holder);
         holder.itemReactionLayout = v.findViewById(R.id.item_reaction_layout);
@@ -98,16 +97,16 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         holder.moreReactionsLayout.setVisibility(View.GONE);
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
-        holder.emojiReaction = emojis.get(0).emoji;
+        Emoji emoji = emojis.get(0).emoji;
         holder.reaction = reaction;
 
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
-        if (numUsers > 0) {
+        if (numUsers > 0 && emoji != null) {
             String text = numUsers + "";
             if (!holder.itemNumUsersReaction.getText().equals(text)) {
                 holder.itemNumUsersReaction.setText(text);
             }
-            holder.itemEmojiReaction.addEmojiReaction(holder.emojiReaction);
+            holder.itemEmojiReaction.addEmojiReaction(emoji);
 
             boolean ownReaction = false;
             MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
@@ -221,7 +220,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 ((ChatActivityLollipop) context).openReactionBottomSheet(chatId, megaMessage);
                 break;
             case R.id.item_reaction_layout:
-                addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.emojiReaction, false);
+                addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReaction.getEmoji(), false);
                 break;
         }
     }
@@ -248,13 +247,10 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     }
 
     public class ViewHolderReaction extends RecyclerView.ViewHolder {
-
-        private RelativeLayout generalLayout;
         private RelativeLayout moreReactionsLayout;
         private RelativeLayout itemReactionLayout;
         private ReactionImageView itemEmojiReaction;
         private TextView itemNumUsersReaction;
-        private Emoji emojiReaction;
         private String reaction;
 
         public ViewHolderReaction(View itemView) {
