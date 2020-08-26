@@ -38,9 +38,12 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     private ArrayList<String> listReactions;
     private AndroidMegaChatMessage megaMessage;
     private MegaChatRoom chatRoom;
+    private RecyclerView recyclerViewFragment;
 
-    public ReactionAdapter(Context context, long chatid, AndroidMegaChatMessage megaMessage, ArrayList<String> listReactions) {
+
+    public ReactionAdapter(Context context, RecyclerView recyclerView, long chatid, AndroidMegaChatMessage megaMessage, ArrayList<String> listReactions) {
         this.context = context;
+        this.recyclerViewFragment = recyclerView;
         this.listReactions = listReactions;
         this.chatId = chatid;
         this.megaMessage = megaMessage;
@@ -68,11 +71,22 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         return holder;
     }
 
+    public RecyclerView getListFragment() {
+        return recyclerViewFragment;
+    }
+
+    public void setListFragment(RecyclerView recyclerViewFragment) {
+        this.recyclerViewFragment = recyclerViewFragment;
+    }
+
     @Override
     public void onBindViewHolder(ReactionAdapter.ViewHolderReaction holder, int position) {
         String reaction = getItemAtPosition(position);
-        if (reaction == null)
+        if (reaction == null) {
+            holder.moreReactionsLayout.setVisibility(View.GONE);
+            holder.itemReactionLayout.setVisibility(View.GONE);
             return;
+        }
 
         if (reaction.equals(INVALID_REACTION)) {
             holder.moreReactionsLayout.setVisibility(View.VISIBLE);
@@ -88,9 +102,12 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         holder.reaction = reaction;
 
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
-        if(numUsers > 0 ){
+        if (numUsers > 0) {
             String text = numUsers + "";
-            holder.itemNumUsersReaction.setText(text);
+            if (!holder.itemNumUsersReaction.getText().equals(text)) {
+                holder.itemNumUsersReaction.setText(text);
+            }
+            holder.itemEmojiReaction.addEmojiReaction(holder.emojiReaction);
 
             boolean ownReaction = false;
             MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
@@ -103,8 +120,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
             holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
             holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
-            holder.itemEmojiReaction.setEmoji(holder.emojiReaction);
-        }else{
+        } else {
             holder.moreReactionsLayout.setVisibility(View.GONE);
             holder.itemReactionLayout.setVisibility(View.GONE);
         }
@@ -123,18 +139,20 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      *
      * @param reaction The reaction.
      */
-    public void removeItem(String reaction) {
-        if (isListReactionsEmpty())
+    public void removeItem(String reaction, long receivedChatId, long receivedMessageId) {
+        if(isListReactionsEmpty() || receivedChatId != this.chatId || receivedMessageId != this.messageId){
             return;
+        }
 
         for (String item : listReactions) {
             if (item.equals(reaction)) {
                 int position = listReactions.indexOf(item);
                 listReactions.remove(position);
-                notifyItemRemoved(position);
                 if (listReactions.size() == 1 && listReactions.get(0).equals(INVALID_REACTION)) {
                     listReactions.clear();
+                    notifyDataSetChanged();
                 } else {
+                    notifyItemRemoved(position);
                     notifyItemRangeChanged(position, listReactions.size());
                 }
                 break;
@@ -147,12 +165,12 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      *
      * @param reaction The reaction.
      */
-    public void updateItem(String reaction) {
-        if (isListReactionsEmpty()) {
+    public void updateItem(String reaction, long receivedChatId, long receivedMessageId) {
+        if(isListReactionsEmpty() || receivedChatId != this.chatId || receivedMessageId != this.messageId){
             return;
         }
-        int position = INVALID_POSITION;
 
+        int position = INVALID_POSITION;
         for (String item : listReactions) {
             if (item.equals(reaction)) {
                 position = listReactions.indexOf(item);
@@ -165,10 +183,12 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             notifyItemInserted(positionToAdd);
             notifyItemRangeChanged(positionToAdd, listReactions.size());
         } else {
-            notifyDataSetChanged();
-            //notifyItemChanged(position);//
-//            notifyItemRangeChanged(position+1, listReactions.size()+1);
+            notifyItemChanged(position);
         }
+    }
+
+    public boolean isSameAdapter(long receivedChatId, long receivedMsgId) {
+        return this.chatId == receivedChatId && this.messageId == receivedMsgId;
     }
 
     /**
@@ -176,7 +196,11 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
      *
      * @param listReactions The reactions list.
      */
-    public void setReactions(ArrayList<String> listReactions) {
+    public void setReactions(ArrayList<String> listReactions, long receivedChatId, long receivedMessageId) {
+        if(receivedChatId != this.chatId || receivedMessageId != this.messageId){
+            return;
+        }
+
         this.listReactions = listReactions;
         notifyDataSetChanged();
     }
@@ -206,12 +230,12 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     public boolean onLongClick(View v) {
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
         if (holder == null)
-            return false;
+            return true;
 
         int currentPosition = holder.getAdapterPosition();
         if (currentPosition < 0) {
             logWarning("Current position error - not valid value");
-            return false;
+            return true;
         }
 
         switch (v.getId()) {
@@ -220,7 +244,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 break;
         }
 
-        return false;
+        return true;
     }
 
     public class ViewHolderReaction extends RecyclerView.ViewHolder {

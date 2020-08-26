@@ -19,6 +19,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
@@ -128,13 +129,19 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                     break;
                 }
 
-                if (!isMyUserHandle(handle)) {
-                    String email = chatC.getParticipantEmail(handle);
-                    MegaUser contact = megaApi.getContact(email);
-                    if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                        Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                        i.putExtra(NAME, email);
-                        context.startActivity(i);
+                if (context instanceof ChatActivityLollipop) {
+                    if (!isMyUserHandle(handle)) {
+                        String email = chatC.getParticipantEmail(handle);
+                        MegaUser contact = megaApi.getContact(email);
+                        if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                            ((ChatActivityLollipop) context).hideBottomSheet();
+                            Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+                            i.putExtra(NAME, email);
+                            context.startActivity(i);
+                        }
+                    } else {
+                        ((ChatActivityLollipop) context).hideBottomSheet();
+                        ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.contact_is_me), -1);
                     }
                 }
                 break;

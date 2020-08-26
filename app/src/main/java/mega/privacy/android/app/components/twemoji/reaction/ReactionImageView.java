@@ -51,15 +51,18 @@ public class ReactionImageView extends AppCompatImageView {
 
     public void setEmoji(@NonNull final Emoji emoji) {
         if (!emoji.equals(currentEmoji)) {
-            setImageDrawable(null);
-            currentEmoji = emoji;
-
-            if (imageLoadingTask != null) {
-                imageLoadingTask.cancel(true);
-            }
-
-            imageLoadingTask = new ImageLoadingTask(this);
-            imageLoadingTask.execute(emoji);
+            addEmojiReaction(emoji);
         }
+    }
+    public void addEmojiReaction(@NonNull final Emoji emoji){
+        setImageDrawable(null);
+        currentEmoji = emoji;
+
+        if (imageLoadingTask != null) {
+            imageLoadingTask.cancel(true);
+        }
+
+        imageLoadingTask = new ImageLoadingTask(this);
+        imageLoadingTask.execute(emoji);
     }
 }
