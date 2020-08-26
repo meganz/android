@@ -6827,13 +6827,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (searchExpand && openSearchView) {
 			openSearchView();
 		} else if (!searchExpand) {
-			rubbishBinMenuItem.setVisible(true);
+			if (isOnline(this)) {
+				rubbishBinMenuItem.setVisible(true);
 
-			if (fullscreenOfflineFragment.getItemCount() > 0) {
-				thumbViewMenuItem.setVisible(true);
-				setGridListIcon();
-				searchMenuItem.setVisible(true);
+				if (fullscreenOfflineFragment.getItemCount() > 0) {
+					thumbViewMenuItem.setVisible(true);
+					setGridListIcon();
+					searchMenuItem.setVisible(true);
+				}
+			} else {
+				supportInvalidateOptionsMenu();
 			}
+
 			fullscreenOfflineFragment.refreshActionBarTitle();
 		}
 	}
