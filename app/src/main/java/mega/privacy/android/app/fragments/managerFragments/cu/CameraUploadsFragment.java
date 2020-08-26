@@ -260,7 +260,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private void navigateToCloudDrive() {
         mViewModel.setCamSyncEnabled(false);
         mManagerActivity.setFirstLogin(false);
-        mManagerActivity.setInitialCloudDrive();
+        mManagerActivity.skipInitialCUSetup();
     }
 
     private void requestCameraUploadPermission(String[] permissions, int requestCode) {
