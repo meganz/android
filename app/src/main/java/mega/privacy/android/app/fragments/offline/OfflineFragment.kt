@@ -53,7 +53,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -330,11 +329,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner, EventObserver {
             openFile(it, MimeTypeList.typeForName(it.name))
         })
+
         if (args.rootFolderOnly) {
             return
         }
 
-        viewModel.actionMode.observe(viewLifecycleOwner, EventObserver { visible ->
+        viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
             val actionModeVal = actionMode
             if (visible) {
                 if (actionModeVal == null) {
@@ -348,44 +348,42 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                     actionMode = null
                 }
             }
-        })
+        }
         viewModel.actionBarTitle.observe(viewLifecycleOwner) {
             if (viewModel.selecting) {
                 managerActivity?.supportActionBar?.setTitle(it)
             } else {
-                managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(
-                    it, viewModel.path == OFFLINE_ROOT && !viewModel.isSearching()
-                )
+                managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(it, false)
             }
         }
-        viewModel.pathLiveData.observe(viewLifecycleOwner, EventObserver {
+        viewModel.pathLiveData.observe(viewLifecycleOwner) {
             managerActivity?.pathNavigationOffline = it
-        })
-        viewModel.submitSearchQuery.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.submitSearchQuery.observe(viewLifecycleOwner) {
             managerActivity?.setTextSubmitted()
-        })
-        viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.showSortedBy.observe(viewLifecycleOwner) {
             managerActivity?.showNewSortByPanel()
-        })
-        viewModel.nodeToAnimate.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
             val rv = recyclerView
             val rvAdapter = adapter
             if (rv == null || rvAdapter == null || it.first < 0 ||
                 it.first >= rvAdapter.itemCount
             ) {
-                return@EventObserver
+                return@observe
             }
 
             rvAdapter.showSelectionAnimation(
                 it.first, it.second, rv.findViewHolderForLayoutPosition(it.first)
             )
-        })
-        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner, EventObserver {
+        }
+        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner) {
             val layoutManager = recyclerView?.layoutManager
             if (layoutManager is LinearLayoutManager) {
                 layoutManager.scrollToPositionWithOffset(it, 0)
             }
-        })
+        }
     }
 
     private fun openNode(position: Int, node: OfflineNode) {
@@ -626,7 +624,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     }
 
     fun getItemCount(): Int {
-        return adapter?.itemCount ?: 0
+        return viewModel.getDisplayedNodesCount()
     }
 
     fun scrollToNode(handle: Long) {
@@ -650,6 +648,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
     fun refreshNodes() {
         viewModel.loadOfflineNodes()
+    }
+
+    fun refreshActionBarTitle() {
+        viewModel.refreshActionBarTitle()
     }
 
     fun refreshListGridView() {
@@ -771,7 +773,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     override fun onDestroyActionMode(mode: ActionMode?) {
         logDebug("ActionBarCallBack::onDestroyActionMode")
         viewModel.clearSelection()
-        managerActivity?.showHideBottomNavigationView(false)
         managerActivity?.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY)
         checkScroll()
     }

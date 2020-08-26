@@ -58,11 +58,11 @@ class OfflineViewModel @ViewModelInject constructor(
     private val _nodes = MutableLiveData<List<OfflineNode>>()
     private val _nodeToOpen = MutableLiveData<Event<Pair<Int, OfflineNode>>>()
     private val _actionBarTitle = MutableLiveData<String>()
-    private val _actionMode = MutableLiveData<Event<Boolean>>()
-    private val _nodeToAnimate = MutableLiveData<Event<Pair<Int, OfflineNode>>>()
-    private val _pathLiveData = MutableLiveData<Event<String>>()
-    private val _submitSearchQuery = MutableLiveData<Event<Boolean>>()
-    private val _scrollToPositionWhenNavigateOut = MutableLiveData<Event<Int>>()
+    private val _actionMode = MutableLiveData<Boolean>()
+    private val _nodeToAnimate = MutableLiveData<Pair<Int, OfflineNode>>()
+    private val _pathLiveData = MutableLiveData<String>()
+    private val _submitSearchQuery = MutableLiveData<Boolean>()
+    private val _scrollToPositionWhenNavigateOut = MutableLiveData<Int>()
     private val _openFolderFullscreen = MutableLiveData<Event<String>>()
     private val _showOptionsPanel = MutableLiveData<Event<MegaOffline>>()
     private val _showSortedBy = MutableLiveData<Event<Boolean>>()
@@ -78,11 +78,11 @@ class OfflineViewModel @ViewModelInject constructor(
     val nodes: LiveData<List<OfflineNode>> = _nodes
     val nodeToOpen: LiveData<Event<Pair<Int, OfflineNode>>> = _nodeToOpen
     val actionBarTitle: LiveData<String> = _actionBarTitle
-    val actionMode: LiveData<Event<Boolean>> = _actionMode
-    val nodeToAnimate: LiveData<Event<Pair<Int, OfflineNode>>> = _nodeToAnimate
-    val pathLiveData: LiveData<Event<String>> = _pathLiveData
-    val submitSearchQuery: LiveData<Event<Boolean>> = _submitSearchQuery
-    val scrollToPositionWhenNavigateOut: LiveData<Event<Int>> = _scrollToPositionWhenNavigateOut
+    val actionMode: LiveData<Boolean> = _actionMode
+    val nodeToAnimate: LiveData<Pair<Int, OfflineNode>> = _nodeToAnimate
+    val pathLiveData: LiveData<String> = _pathLiveData
+    val submitSearchQuery: LiveData<Boolean> = _submitSearchQuery
+    val scrollToPositionWhenNavigateOut: LiveData<Int> = _scrollToPositionWhenNavigateOut
     val openFolderFullscreen: LiveData<Event<String>> = _openFolderFullscreen
     val showOptionsPanel: LiveData<Event<MegaOffline>> = _showOptionsPanel
     val showSortedBy: LiveData<Event<Boolean>> = _showSortedBy
@@ -143,6 +143,8 @@ class OfflineViewModel @ViewModelInject constructor(
         return selectedNodes.size()
     }
 
+    fun getDisplayedNodesCount(): Int = nodes.value?.size ?: 0
+
     fun selectAll() {
         val nodeList = nodes.value ?: return
 
@@ -151,14 +153,14 @@ class OfflineViewModel @ViewModelInject constructor(
                 continue
             }
             if (!node.selected) {
-                _nodeToAnimate.value = Event(Pair(position, node))
+                _nodeToAnimate.value = Pair(position, node)
             }
             node.selected = true
             selectedNodes.put(node.node.id, node.node)
         }
         selecting = true
         _nodes.value = nodeList
-        _actionMode.value = Event(true)
+        _actionMode.value = true
     }
 
     fun clearSelection() {
@@ -167,13 +169,13 @@ class OfflineViewModel @ViewModelInject constructor(
         }
 
         selecting = false
-        _actionMode.value = Event(false)
+        _actionMode.value = false
         selectedNodes.clear()
 
         val nodeList = nodes.value ?: return
         for ((position, node) in nodeList.withIndex()) {
             if (node.selected) {
-                _nodeToAnimate.value = Event(Pair(position, node))
+                _nodeToAnimate.value = Pair(position, node)
             }
             node.selected = false
         }
@@ -231,9 +233,9 @@ class OfflineViewModel @ViewModelInject constructor(
             selectedNodes.remove(node.node.id)
         }
         selecting = !selectedNodes.isEmpty
-        _actionMode.value = Event(selecting)
+        _actionMode.value = selecting
 
-        _nodeToAnimate.value = Event(Pair(position, node))
+        _nodeToAnimate.value = Pair(position, node)
     }
 
     private fun navigateIn(folder: MegaOffline) {
@@ -244,17 +246,14 @@ class OfflineViewModel @ViewModelInject constructor(
             historySearchQuery = query
             historySearchPath = path
             navigationDepthInSearch++
-            _submitSearchQuery.value = Event(true)
+            _submitSearchQuery.value = true
         } else if (historySearchQuery != null) {
             navigationDepthInSearch++
         }
 
         if (rootFolderOnly) {
-            _pathLiveData.value = Event(folder.path + folder.name + "/")
-            val event = _pathLiveData.value
-            if (event != null) {
-                openFolderFullscreenAction.onNext(event.peekContent())
-            }
+            _pathLiveData.value = folder.path + folder.name + "/"
+            openFolderFullscreenAction.onNext(_pathLiveData.value)
         } else {
             navigateTo(folder.path + folder.name + "/", folder.name)
         }
@@ -295,7 +294,7 @@ class OfflineViewModel @ViewModelInject constructor(
         navigateTo(path, titleFromPath(path))
 
         if (firstVisiblePositionStack.isNotEmpty()) {
-            _scrollToPositionWhenNavigateOut.value = Event(firstVisiblePositionStack.pop())
+            _scrollToPositionWhenNavigateOut.value = firstVisiblePositionStack.pop()
         }
 
         return 2
@@ -323,7 +322,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     private fun navigateTo(path: String, title: String) {
         this.path = path
-        _pathLiveData.value = Event(path)
+        _pathLiveData.value = path
         _actionBarTitle.value = title
         loadOfflineNodes()
     }
@@ -355,10 +354,6 @@ class OfflineViewModel @ViewModelInject constructor(
         _actionBarTitle.value = titleFromPath(path)
     }
 
-    fun isSearching(): Boolean {
-        return searchQuery != null || historySearchQuery != null
-    }
-
     fun setDisplayParam(
         rootFolderOnly: Boolean,
         isList: Boolean,
@@ -376,6 +371,13 @@ class OfflineViewModel @ViewModelInject constructor(
 
         _actionBarTitle.value = titleFromPath(path)
         loadOfflineNodes()
+    }
+
+    fun refreshActionBarTitle() {
+        val title = _actionBarTitle.value
+        if (title != null) {
+            _actionBarTitle.value = title
+        }
     }
 
     fun processUrlFile(file: File) {
