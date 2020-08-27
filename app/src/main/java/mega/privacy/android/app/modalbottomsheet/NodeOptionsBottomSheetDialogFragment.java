@@ -686,6 +686,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case SEARCH:
+            case HOMEPAGE:
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
@@ -1039,6 +1040,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case SEARCH:
                 ((ManagerActivityLollipop) context).onNodesSearchUpdate();
+                break;
+
+            case HOMEPAGE:
+                ((ManagerActivityLollipop)context).refreshHomepageRefreshable(false);
                 break;
         }
     }

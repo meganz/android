@@ -4,26 +4,35 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.view.Window
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_homepage.view.*
-import kotlinx.android.synthetic.main.homepage_fabs.view.*
+import kotlinx.android.synthetic.main.fragment_homepage.view.fab_home_main
+import kotlinx.android.synthetic.main.homepage_fabs.view.fab_chat
+import kotlinx.android.synthetic.main.homepage_fabs.view.fab_main
+import kotlinx.android.synthetic.main.homepage_fabs.view.fab_upload
+import kotlinx.android.synthetic.main.homepage_fabs.view.text_chat
+import kotlinx.android.synthetic.main.homepage_fabs.view.text_upload
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.BottomSheetPagerAdapter
@@ -32,6 +41,11 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
+import mega.privacy.android.app.utils.Constants.GO_OFFLINE
+import mega.privacy.android.app.utils.Constants.GO_ONLINE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ACTION_TYPE
+import mega.privacy.android.app.utils.Util.isOnline
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -46,20 +60,42 @@ class HomepageFragment : Fragment() {
     private lateinit var fabMain: FloatingActionButton
     private lateinit var fabMaskMain: FloatingActionButton
     private lateinit var fabMaskLayout: View
+    private lateinit var viewPager: ViewPager2
+    private lateinit var tabs: TabLayout
+    private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
+
+    private val networkReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent == null) {
+                return
+            }
+            when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
+                GO_OFFLINE -> showOfflineMode()
+                GO_ONLINE -> showOnlineMode()
+            }
+        }
+    }
 
     private var isFabExpanded = false
 
     private val categoryClickListener = OnClickListener {
-        with (viewDataBinding.category) {
+        with(viewDataBinding.category) {
             val direction = when (view) {
                 categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
                 else -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
             }
 
             findNavController().navigate(direction)
-            activity.showHideBottomNavigationView(true)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+            networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
+        )
     }
 
     override fun onCreateView(
@@ -85,6 +121,49 @@ class HomepageFragment : Fragment() {
         setupFabs()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (!isOnline(context)) {
+            showOfflineMode()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(networkReceiver)
+    }
+
+    private fun showOnlineMode() {
+        viewPager.isUserInputEnabled = true
+        rootView.findViewById<View>(R.id.category).isVisible = true
+        //rootView.findViewById<View>(R.id.banner).isVisible = true
+
+        tabsChildren.forEach { tab ->
+            tab.isEnabled = true
+        }
+    }
+
+    private fun showOfflineMode() {
+        viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
+        viewPager.isUserInputEnabled = false
+        rootView.findViewById<View>(R.id.category).isVisible = false
+        //rootView.findViewById<View>(R.id.banner).isVisible = false
+        bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_COLLAPSED
+
+        if (tabsChildren.isEmpty()) {
+            tabs.touchables.forEach { tab ->
+                tab.isEnabled = false
+                tabsChildren.add(tab)
+            }
+        } else {
+            tabsChildren.forEach { tab ->
+                tab.isEnabled = false
+            }
+        }
+    }
+
     private fun setupSearchView() {
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
@@ -106,10 +185,10 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupBottomSheetUI() {
-        val viewPager = rootView.findViewById<ViewPager2>(R.id.view_pager)
+        viewPager = rootView.findViewById(R.id.view_pager)
         viewPager.adapter = BottomSheetPagerAdapter(this)
         // Attach the view pager to the tab layout
-        val tabs = rootView.findViewById<TabLayout>(R.id.tabs)
+        tabs = rootView.findViewById(R.id.tabs)
         val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->
             tab.text = getTabTitle(position)
         }

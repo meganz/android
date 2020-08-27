@@ -97,7 +97,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
         }
 
-        refresh()
+        forceUpdate()
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -123,7 +123,31 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         })
     }
 
-    override fun refresh() = viewModel.loadPhotos(viewModel.searchQuery, true)
+    override fun refreshUi() {
+        // Callbacks of nodes change may provide the specific changed nodes, here
+        // refresh all items for simplicity
+        viewModel.items.value?.forEach {
+            it.uiDirty = true
+        }
+
+        updateUi()
+    }
+
+    override fun forceUpdate() {
+        viewModel.loadPhotos(viewModel.searchQuery, true)
+    }
+
+    /**
+     * Only refresh the list items of uiDirty = true
+     */
+    private fun updateUi() = viewModel.items.value?.let { it ->
+        val newList = ArrayList<PhotoNode>(it)
+        if (viewModel.searchMode) {
+            searchAdapter.submitList(newList)
+        } else {
+            browseAdapter.submitList(newList)
+        }
+    }
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
@@ -259,15 +283,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             activity.showKeyboardForSearch()
         })
 
-    private fun updateUi() = viewModel.items.value?.let { it ->
-        val newList = ArrayList<PhotoNode>(it)
-        if (viewModel.searchMode) {
-            searchAdapter.submitList(newList)
-        } else {
-            browseAdapter.submitList(newList)
-        }
-    }
-
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
@@ -299,6 +314,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         listView.switchToLinear()
         listView.adapter = searchAdapter
         listView.addItemDecoration(itemDecoration)
+
+        viewModel.loadPhotos("")
     }
 
     override fun exitSearch() {
@@ -325,7 +342,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         }
     }
 
-    override fun searchQuery(query: String) = viewModel.loadPhotos(query)
+    override fun searchQuery(query: String) {
+        if (viewModel.searchQuery == query) return
+        viewModel.loadPhotos(query)
+    }
 
     private fun openPhoto(node: PhotoNode) {
         listView.findViewHolderForLayoutPosition(node.index)?.itemView?.findViewById<ImageView>(
