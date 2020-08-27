@@ -56,6 +56,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -317,7 +318,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
     			intent.setAction(null);
     		}
     	}
-    	setIntent(null);
 	}
 
 	private void importLink(String url) {
@@ -848,6 +848,10 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	}
 
 	public void successfulCopy(){
+		if (getIntent() != null && getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+			sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_IMPORT));
+		}
+
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
 		if(toHandle!=-1){
 			startIntent.setAction(ACTION_OPEN_FOLDER);

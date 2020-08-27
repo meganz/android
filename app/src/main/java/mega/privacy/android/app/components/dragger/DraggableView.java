@@ -55,6 +55,8 @@ public class DraggableView extends FrameLayout{
     float originalViewY = 0;
     float touchInterceptSensibility = 100;
 
+    private int[] selfInitialLocationOnWindow;
+
     public DraggableView(Context context) {
         this(context, null);
     }
@@ -344,6 +346,16 @@ public class DraggableView extends FrameLayout{
         this.originalViewY = ViewCompat.getTranslationY(this);
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if (selfInitialLocationOnWindow == null) {
+            selfInitialLocationOnWindow = new int[2];
+            getLocationOnScreen(selfInitialLocationOnWindow);
+        }
+    }
+
     public boolean animateExit(Direction direction) {
         logDebug("animateExit");
         boolean animateExit = false;
@@ -359,7 +371,10 @@ public class DraggableView extends FrameLayout{
 
             } else {
                 Activity activity = (Activity) getContext();
-                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection, activity, screenPosition, currentView);
+                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection,
+                    activity, screenPosition, currentView,
+                    selfInitialLocationOnWindow == null ? new int[] {0, 0}
+                    : selfInitialLocationOnWindow);
 
                 if (draggableListener != null){
                     draggableListener.onDragActivated(true);
@@ -509,8 +524,7 @@ public class DraggableView extends FrameLayout{
             }
         });
 
-        this.viewAnimator = new ReturnOriginViewAnimator<DraggableView>() {
-        };
+        this.viewAnimator = new ReturnOriginViewAnimator<>();
     }
 
     public interface DraggableViewListener {

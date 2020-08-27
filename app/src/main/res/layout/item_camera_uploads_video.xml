@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="110dp"
+    android:layout_height="110dp"
+    >
+
+  <com.facebook.drawee.view.SimpleDraweeView
+      android:id="@+id/thumbnail"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:scaleType="centerCrop"
+      app:placeholderImage="@drawable/ic_image_thumbnail"
+      />
+
+  <FrameLayout
+      android:id="@+id/video_info"
+      android:layout_width="match_parent"
+      android:layout_height="55dp"
+      android:layout_gravity="bottom"
+      android:layout_margin="2dp"
+      tools:background="@drawable/gradient_cam_uploads"
+      >
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="bottom"
+        android:src="@drawable/ic_play_arrow_white_24dp"
+        />
+
+    <TextView
+        android:id="@+id/video_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="9dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        tools:text="00:00"
+        />
+  </FrameLayout>
+
+  <ImageView
+      android:id="@+id/ic_selected"
+      android:layout_width="23dp"
+      android:layout_height="23dp"
+      android:layout_marginStart="@dimen/cu_fragment_ic_selected_margin_large"
+      android:layout_marginTop="@dimen/cu_fragment_ic_selected_margin_large"
+      android:src="@drawable/ic_select_folder"
+      android:visibility="gone"
+      tools:visibility="visible"
+      />
+</FrameLayout>

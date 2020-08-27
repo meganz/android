@@ -101,6 +101,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -108,6 +109,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -1721,6 +1723,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				return;
 			}
 			else {
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					return;
+				}
+
 				long parentHandle;
 				if (cDriveExplorer != null){
 					parentHandle = cDriveExplorer.getParentHandle();
@@ -1965,6 +1972,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
     }
 
     private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		File file;
 		if (isURL){
 			file = createTemporalURLFile(this, name, data);
@@ -2682,7 +2694,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					if(body.length()>0){
 						body.append("\n");
 					}
-					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
+//					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
 					body.append(sharedText);
 				}
 				String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);

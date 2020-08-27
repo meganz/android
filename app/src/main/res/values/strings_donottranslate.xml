@@ -2,9 +2,11 @@
 <resources>
     <string name="app_name" context="Name of the app" translatable="false">MEGA</string>
     <string name="app_version" context="Version number of the app" translatable="false">3.7.8 (320)</string>
-    <string name="sdk_version" context="SDK version" translatable="false">3cc68f5</string>
-    <string name="karere_version" context="MEGAchat SDK version" translatable="false">9011921</string>
-    <string name="prolite_account" context="PRO Lite account" translatable="false">Lite</string>
+    <string name="sdk_version" context="SDK version" translatable="false">435bf70</string>
+    <string name="karere_version" context="MEGAchat SDK version" translatable="false">0b21fd8</string>
+    <string name="lite_account" context="PRO Lite account" translatable="false">Lite</string>
+    <string name="pro_account" context="PRO account" translatable="false">PRO</string>
+    <string name="prolite_account" context="PRO Lite account" translatable="false">PRO Lite</string>
     <string name="pro1_account" context="PRO I account" translatable="false">PRO I</string>
     <string name="pro2_account" context="PRO II account" translatable="false">PRO II</string>
     <string name="pro3_account" context="PRO III account" translatable="false">PRO III</string>

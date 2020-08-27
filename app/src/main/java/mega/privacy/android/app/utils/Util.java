@@ -71,6 +71,10 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -116,6 +120,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class Util {
 
@@ -162,28 +167,22 @@ public class Util {
 		
 		try{ 
 			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(
-				activity.getString(android.R.string.ok),
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
 						dialog.dismiss();
 						if (finish) {
 							activity.finish();
 						}
-					}
-				});
-			dialogBuilder.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					if (finish) {
-						activity.finish();
-					}
+					});
+			dialogBuilder.setOnCancelListener(dialog -> {
+				if (finish) {
+					activity.finish();
 				}
 			});
 		
 		
 			AlertDialog dialog = dialogBuilder.create();
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.setCancelable(false);
 			dialog.show(); 
 			brandAlertDialog(dialog);
 		}
@@ -432,7 +431,17 @@ public class Util {
 		
 	    return scale;
 	}
-	
+
+	/**
+	 * Convert dp to px.
+	 *
+	 * Note: the name of this function is wrong since the beginning, we should rename it in
+	 * the future.
+	 *
+	 * @param dp dp value
+	 * @param outMetrics display metrics
+	 * @return corresponding px value
+	 */
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
 	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
@@ -1256,6 +1265,11 @@ public class Util {
 	}
 
 	public static boolean canVoluntaryVerifyPhoneNumber() {
+		// If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
+		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+			return false;
+		}
+
         MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
 	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
 	    boolean allowVerify = api.smsAllowedState() == 2;
@@ -1397,6 +1411,15 @@ public class Util {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(context, colorId));
     }
+
+	public static int getStatusBarHeight() {
+		Context context = MegaApplication.getInstance().getBaseContext();
+		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+				"android");
+
+		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
+				: px2dp(24, context.getResources().getDisplayMetrics());
+	}
 
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
@@ -1790,5 +1813,10 @@ public class Util {
 		} else {
 			aB.setElevation(0);
 		}
+	}
+
+	public static LocalDate fromEpoch(long seconds) {
+		return LocalDate.from(
+				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
 }

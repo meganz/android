@@ -100,7 +100,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         }
 
         titleNameContactPanel.setText(fullName);
-        setImageAvatar(contact, contact != null ? contact.getEmail() : nonContactEmail, fullName, contactImageView);
+        setImageAvatar(contact != null ? contact.getHandle() : INVALID_ID, contact != null ? contact.getEmail() : nonContactEmail, fullName, contactImageView);
 
         if (share != null) {
             int accessLevel = share.getAccess();
@@ -132,11 +132,6 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
 
     @Override
     public void onClick(View v) {
-        if (contact == null) {
-            logWarning("Selected contact NULL");
-            return;
-        }
-
         switch (v.getId()) {
             case R.id.file_contact_list_option_permissions_layout:
                 if (context instanceof FileContactListActivityLollipop) {
@@ -167,7 +162,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        String email = contact.getEmail();
+        String email = contact == null ? nonContactEmail : contact.getEmail();
         outState.putString(EMAIL, email);
     }
 }

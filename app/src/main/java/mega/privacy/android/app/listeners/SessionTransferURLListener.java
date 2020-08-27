@@ -10,6 +10,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class SessionTransferURLListener extends BaseListener {
@@ -39,7 +40,7 @@ public class SessionTransferURLListener extends BaseListener {
             logError("Error MegaRequest.TYPE_GET_SESSION_TRANSFER_URL: link is NULL");
         } else {
             logError("Error MegaRequest.TYPE_GET_SESSION_TRANSFER_URL: " + e.getErrorString());
-            showSnackbar(context, e.getErrorString());
+            showSnackbar(context, getTranslatedErrorString(e));
         }
     }
 }
