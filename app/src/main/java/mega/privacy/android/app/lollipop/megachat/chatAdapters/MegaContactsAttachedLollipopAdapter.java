@@ -441,16 +441,19 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void createDefaultAvatar(ViewHolderContacts holder, MegaContactDB contact){
-		int color = getColorAvatar(Long.parseLong(contact.getHandle()));
-		String fullName = getContactNameDB(contact);
-
-		if (holder instanceof ViewHolderContactsList){
-			Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
-			((ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
+		int color;
+		if (contact.getHandle().equals(megaApi.getMyUserHandle())) {
+			color = getColorAvatar(megaApi.getMyUser());
+		} else {
+			color = getColorAvatar(MegaApiJava.base64ToUserHandle(contact.getHandle()));
 		}
-		else if (holder instanceof ViewHolderContactsGrid){
+		String fullName = contact.getName();
+		if (holder instanceof ViewHolderContactsList) {
+			Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
+			((ViewHolderContactsList) holder).imageView.setImageBitmap(bitmap);
+		} else if (holder instanceof ViewHolderContactsGrid) {
 			Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE_GRID, false);
-			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
+			((ViewHolderContactsGrid) holder).imageView.setImageBitmap(bitmap);
 		}
 	}
 
