@@ -25,7 +25,7 @@ allprojects {
             url "https://jitpack.io"
         }
         flatDir {
-            dirs "$rootProject.projectDir/app/libs"
+            dirs "$rootProject.projectDir/app/src/main/jni/ExoPlayer/"
         }
     }
 }
