@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.photos
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,8 +8,7 @@ import dagger.hilt.android.scopes.ActivityRetainedScoped
 import mega.privacy.android.app.utils.Util
 import javax.inject.Inject
 
-@ActivityRetainedScoped
-class ActionModeViewModel @Inject constructor() : ViewModel() {
+class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
     // The full set of nodes
     private lateinit var nodesData: List<SelectableNode>
 

@@ -6475,7 +6475,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						setToolbarTitle();
 						supportInvalidateOptionsMenu();
 					} else {
-						hideKeyboardSearch();
+						hideKeyboard(ManagerActivityLollipop.this);
 					}
 				} else {
 					searchExpand = false;
@@ -6513,7 +6513,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 				} else {
 					getSearchFragment();
-
 					if (textSubmitted) {
 						if (sFLol != null) {
 							sFLol.setAllowedMultiselect(true);
@@ -6861,12 +6860,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return null;
 	}
 
-	private void refreshHomepageRefreshable() {
+	public void refreshHomepageRefreshable(boolean forceUpdate) {
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
 		for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
 			if (fragment instanceof HomepageRefreshable) {
-				((HomepageRefreshable)fragment).refresh();
+				HomepageRefreshable refreshable = (HomepageRefreshable) fragment;
+				if (forceUpdate) {
+					refreshable.forceUpdate();
+				} else {
+					refreshable.refreshUi();
+				}
+
+				return;
 			}
 		}
 	}
@@ -7584,6 +7590,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			onNodesSharedUpdate();
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
+		} else if (drawerItem == DrawerItem.HOMEPAGE) {
+			refreshHomepageRefreshable(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -11502,6 +11510,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         if (getSettingsFragment() != null) {
                         	sttFLol.taskGetSizeOffline();
                         }
+
+						refreshHomepageRefreshable(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -14856,7 +14866,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		refreshHomepageRefreshable();
+		if (drawerItem == DrawerItem.HOMEPAGE) {
+			refreshHomepageRefreshable(true);
+			// Invalidate the menu will collapse/expand the search view and set the query text to ""
+			// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
+			// text changed to "" for once)
+			return;
+		}
 
 		setToolbarTitle();
 		supportInvalidateOptionsMenu();
@@ -15096,7 +15112,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		logDebug("onTransferFinish: " + transfer.getNodeHandle() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
-
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
@@ -15173,6 +15188,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
+				refreshHomepageRefreshable(false);
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){

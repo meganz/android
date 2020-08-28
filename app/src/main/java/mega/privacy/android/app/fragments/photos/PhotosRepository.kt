@@ -53,9 +53,7 @@ class PhotosRepository @Inject constructor(
                 }
             }
         } else {
-            _photoNodes.value?.let {
-                _photoNodes.value = it
-            }
+            _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
         }
     }
 

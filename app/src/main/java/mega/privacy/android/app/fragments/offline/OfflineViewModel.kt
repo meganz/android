@@ -147,6 +147,15 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun getDisplayedNodesCount(): Int = nodes.value?.size ?: 0
 
+    fun folderSelected(): Boolean {
+        for (i in 0 until selectedNodes.size()) {
+            if (selectedNodes.valueAt(i).isFolder) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun selectAll() {
         val nodeList = nodes.value ?: return
 

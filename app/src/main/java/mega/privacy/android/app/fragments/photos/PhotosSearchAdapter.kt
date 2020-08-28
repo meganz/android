@@ -1,15 +1,17 @@
 package mega.privacy.android.app.fragments.photos
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
+import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotoSearchBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import javax.inject.Inject
 
-class PhotosSearchAdapter @Inject constructor(
+class PhotosSearchAdapter constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
 ) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),
@@ -44,6 +46,12 @@ class PhotosSearchAdapter @Inject constructor(
             layoutParams.width = 0
             layoutParams.height = 0
             binding.root.layoutParams = layoutParams
+        } else {  // For avoiding the flashing of these icons when scrolling by the fast scroller
+            val itemSearch = binding as ItemPhotoSearchBinding
+            itemSearch.publicLink.visibility = View.GONE
+            itemSearch.savedOffline.visibility = View.GONE
+            itemSearch.takenDown.visibility = View.GONE
+            itemSearch.versionsIcon.visibility = View.GONE
         }
 
         return PhotoViewHolder(binding)

@@ -40,7 +40,6 @@ import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.photos.EventObserver
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.managerSections.HomepageFragmentDirections
@@ -60,6 +59,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import java.io.File
@@ -70,7 +70,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
 
-    private var managerActivity: ManagerActivityLollipop? = null
     private var recyclerView: RecyclerView? = null
     private var adapter: OfflineAdapter? = null
     private var actionMode: ActionMode? = null
@@ -110,18 +109,18 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         if (arguments == null) {
             arguments = HomepageFragmentDirections.actionHomepageToFullscreenOffline().arguments
         }
-
-        managerActivity = requireActivity() as ManagerActivityLollipop
     }
 
     override fun onStart() {
         super.onStart()
 
         // TODO: workaround for navigation with ManagerActivity
-        if (args.rootFolderOnly) {
-            managerActivity?.pagerOfflineFragmentOpened(this)
-        } else {
-            managerActivity?.fullscreenOfflineFragmentOpened(this)
+        callManager {
+            if (args.rootFolderOnly) {
+                it.pagerOfflineFragmentOpened(this)
+            } else {
+                it.fullscreenOfflineFragmentOpened(this)
+            }
         }
     }
 
@@ -147,10 +146,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         super.onStop()
 
         // TODO: workaround for navigation with ManagerActivity
-        if (args.rootFolderOnly) {
-            managerActivity?.pagerOfflineFragmentClosed(this)
-        } else {
-            managerActivity?.fullscreenOfflineFragmentClosed(this)
+        callManager {
+            if (args.rootFolderOnly) {
+                it.pagerOfflineFragmentClosed(this)
+            } else {
+                it.fullscreenOfflineFragmentClosed(this)
+            }
         }
     }
 
@@ -187,7 +188,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         viewModel.setDisplayParam(
             args.rootFolderOnly, isList(),
             if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path,
-            managerActivity?.orderCloud ?: ORDER_DEFAULT_ASC
+            callManager { it.orderCloud } ?: ORDER_DEFAULT_ASC
         )
     }
 
@@ -309,14 +310,20 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             adapter?.submitList(it)
 
             if (!args.rootFolderOnly) {
-                managerActivity?.updateFullscreenOfflineFragmentOptionMenu(false)
+                callManager { manager ->
+                    manager.updateFullscreenOfflineFragmentOptionMenu(false)
+                }
             }
         }
         viewModel.openFolderFullscreen.observe(viewLifecycleOwner, EventObserver {
-            managerActivity?.openFullscreenOfflineFragment(it)
+            callManager { manager ->
+                manager.openFullscreenOfflineFragment(it)
+            }
         })
         viewModel.showOptionsPanel.observe(viewLifecycleOwner, EventObserver {
-            managerActivity?.showOptionsPanel(it)
+            callManager { manager ->
+                manager.showOptionsPanel(it)
+            }
         })
         viewModel.nodeToOpen.observe(viewLifecycleOwner, EventObserver {
             openNode(it.first, it.second)
@@ -339,7 +346,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             val actionModeVal = actionMode
             if (visible) {
                 if (actionModeVal == null) {
-                    actionMode = managerActivity?.startSupportActionMode(this)
+                    actionMode = callManager { it.startSupportActionMode(this) }
                 }
                 actionMode?.title = viewModel.getSelectedNodesCount().toString()
                 actionMode?.invalidate()
@@ -351,20 +358,28 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             }
         }
         viewModel.actionBarTitle.observe(viewLifecycleOwner) {
-            if (viewModel.selecting) {
-                managerActivity?.supportActionBar?.setTitle(it)
-            } else {
-                managerActivity?.setToolbarTitleFromFullscreenOfflineFragment(it, false)
+            callManager { manager ->
+                if (viewModel.selecting) {
+                    manager.supportActionBar?.setTitle(it)
+                } else {
+                    manager.setToolbarTitleFromFullscreenOfflineFragment(it, false)
+                }
             }
         }
         viewModel.pathLiveData.observe(viewLifecycleOwner) {
-            managerActivity?.pathNavigationOffline = it
+            callManager { manager ->
+                manager.pathNavigationOffline = it
+            }
         }
         viewModel.submitSearchQuery.observe(viewLifecycleOwner) {
-            managerActivity?.setTextSubmitted()
+            callManager { manager ->
+                manager.setTextSubmitted()
+            }
         }
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
-            managerActivity?.showNewSortByPanel()
+            callManager { manager ->
+                manager.showNewSortByPanel()
+            }
         })
         viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
             val rv = recyclerView
@@ -416,8 +431,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
                 )
 
-                managerActivity?.startActivity(intent)
-                managerActivity?.overridePendingTransition(0, 0)
+                callManager {
+                    it.startActivity(intent)
+                    it.overridePendingTransition(0, 0)
+                }
                 instanceForDragging = this
                 draggingNodeHandle = node.node.handle.toLong()
             }
@@ -475,11 +492,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                     if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
                         startActivity(mediaIntent)
                     } else {
-                        managerActivity?.showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.intent_not_available),
-                            -1
-                        )
+                        callManager {
+                            it.showSnackbar(
+                                Constants.SNACKBAR_TYPE,
+                                getString(R.string.intent_not_available),
+                                -1
+                            )
+                        }
                         val intentShare = Intent(Intent.ACTION_SEND)
                         if (VERSION.SDK_INT >= VERSION_CODES.N) {
                             intentShare.setDataAndType(
@@ -499,7 +518,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                         }
                     }
                 }
-                managerActivity?.overridePendingTransition(0, 0)
+                callManager { it.overridePendingTransition(0, 0) }
                 instanceForDragging = this
                 draggingNodeHandle = node.node.handle.toLong()
             }
@@ -530,7 +549,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 }
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 startActivity(pdfIntent)
-                managerActivity?.overridePendingTransition(0, 0)
+                callManager { it.overridePendingTransition(0, 0) }
                 instanceForDragging = this
                 draggingNodeHandle = node.node.handle.toLong()
             }
@@ -590,15 +609,15 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     }
 
     private fun isList(): Boolean {
-        return managerActivity?.isList ?: true || args.rootFolderOnly
+        return callManager { it.isList } ?: true || args.rootFolderOnly
     }
 
     fun checkScroll() {
         val rv = recyclerView
         if (rv != null) {
-            managerActivity?.changeActionBarElevation(
-                rv.canScrollVertically(-1) || viewModel.selecting
-            )
+            callManager {
+                it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
+            }
         }
     }
 
@@ -738,7 +757,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 viewModel.clearSelection()
             }
             R.id.cab_menu_delete -> {
-                managerActivity?.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes())
+                callManager { it.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes()) }
                 viewModel.clearSelection()
             }
             R.id.cab_menu_select_all -> {
@@ -755,8 +774,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         logDebug("ActionBarCallBack::onCreateActionMode")
         val inflater = mode!!.menuInflater
         inflater.inflate(R.menu.offline_browser_action, menu)
-        managerActivity?.showHideBottomNavigationView(true)
-        managerActivity?.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT)
+        callManager {
+            it.showHideBottomNavigationView(true)
+            it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT)
+        }
         checkScroll()
         return true
     }
@@ -767,6 +788,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         menu!!.findItem(R.id.cab_menu_select_all).isVisible =
             (viewModel.getSelectedNodesCount()
                     < getItemCount() - viewModel.placeholderCount)
+        menu.findItem(R.id.cab_menu_share_out).isVisible = !viewModel.folderSelected()
 
         return true
     }
@@ -774,7 +796,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     override fun onDestroyActionMode(mode: ActionMode?) {
         logDebug("ActionBarCallBack::onDestroyActionMode")
         viewModel.clearSelection()
-        managerActivity?.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY)
+        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY) }
         checkScroll()
     }
 }
