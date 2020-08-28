@@ -362,7 +362,7 @@
             android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
         <activity
-            android:name=".fragments.offline.OfflineFileInfoActivity"
+            android:name=".activities.OfflineFileInfoActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
