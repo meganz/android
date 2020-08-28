@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.offline
 
 import android.content.Context
-import android.util.Base64
 import androidx.collection.SparseArrayCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
@@ -24,8 +23,8 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.logErr
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -216,9 +215,7 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun onSortedByClicked() {
-        if (!selecting) {
-            showSortedByAction.onNext(true)
-        }
+        showSortedByAction.onNext(true)
     }
 
     private fun handleSelection(position: Int, node: OfflineNode) {
@@ -422,7 +419,7 @@ class OfflineViewModel @ViewModelInject constructor(
                     if (node.isFolder) {
                         folderCount++
                     }
-                    val thumbnail = getThumbnailFile(node)
+                    val thumbnail = getThumbnailFile(context, node)
                     nodes.add(
                         OfflineNode(
                             node, if (isFileAvailable(thumbnail)) thumbnail else null,
@@ -439,23 +436,25 @@ class OfflineViewModel @ViewModelInject constructor(
                     }
                 }
 
+                var placeholders = 0
                 if (!isList && gridSpanCount != 0) {
-                    placeholderCount = if (folderCount % gridSpanCount == 0) {
+                    placeholders = if (folderCount % gridSpanCount == 0) {
                         0
                     } else {
                         gridSpanCount - (folderCount % gridSpanCount)
                     }
-                    if (placeholderCount != 0) {
-                        for (i in 0 until placeholderCount) {
+                    if (placeholders != 0) {
+                        for (i in 0 until placeholders) {
                             nodes.add(folderCount + i, OfflineNode.PLACE_HOLDER)
                         }
                     }
                 }
 
                 if (nodes.isNotEmpty() && !rootFolderOnly) {
-                    placeholderCount++
+                    placeholders++
                     nodes.add(0, OfflineNode.HEADER_SORTED_BY)
                 }
+                placeholderCount = placeholders
 
                 createThumbnails(nodesWithoutThumbnail)
                 nodes
@@ -483,17 +482,11 @@ class OfflineViewModel @ViewModelInject constructor(
     private fun createThumbnails(nodes: List<MegaOffline>) {
         add(Observable.fromIterable(nodes)
             .subscribeOn(Schedulers.io())
-            .map { Pair(getOfflineFile(context, it), getThumbnailFile(it)) }
+            .map { Pair(getOfflineFile(context, it), getThumbnailFile(context, it)) }
             .filter { it.first.exists() }
             .map { createThumbnail(it.first, it.second) }
             .throttleLatest(1, SECONDS, true)
             .subscribe(Consumer { loadOfflineNodes() }, logErr("createThumbnail"))
         )
-    }
-
-    private fun getThumbnailFile(node: MegaOffline): File {
-        val thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context)
-        val thumbName = Base64.encodeToString(node.handle.toByteArray(), Base64.DEFAULT)
-        return File(thumbDir, "$thumbName.jpg")
     }
 }

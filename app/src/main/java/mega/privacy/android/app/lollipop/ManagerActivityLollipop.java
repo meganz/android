@@ -148,6 +148,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.photos.HomepageRefreshable;
 import mega.privacy.android.app.fragments.photos.HomepageSearchable;
@@ -10907,8 +10908,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void showOfflineFileInfo(MegaOffline node) {
-		mNavController.navigate(HomepageFragmentDirections.Companion
-				.actionHomepageToOfflineFileInfo(node.getHandle()));
+		Intent intent = new Intent(this, OfflineFileInfoActivity.class);
+		intent.putExtra(HANDLE, node.getHandle());
+		startActivity(intent);
 	}
 
 	public void showContactOptionsPanel(MegaContactAdapter user){
