@@ -28,11 +28,12 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
 import static mega.privacy.android.app.utils.FrescoUtils.loadGif;
+import static mega.privacy.android.app.utils.FrescoUtils.loadImage;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
 public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener {
-	
+
 	private Activity activity;
 	private ArrayList<MegaOffline> mOffList;
 	private ArrayList<String> paths;
@@ -40,7 +41,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	DatabaseHandler dbH = null;
 	private boolean zipImage = false;
     Context context;
-		
+
 	/*view holder class*/
     public class ViewHolderOfflineFullImage {
         TouchImageView imgDisplay;
@@ -51,7 +52,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
         int position;
         boolean isGIF;
     }
-	
+
 	// constructor
 	public MegaOfflineFullScreenImageAdapterLollipop(Context context, Activity activity, ArrayList<MegaOffline> mOffList) {
 		this.activity = activity;
@@ -60,7 +61,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		this.zipImage = false;
         this.context = context;
     }
-	
+
 	// constructor
 	public MegaOfflineFullScreenImageAdapterLollipop(Context context, Activity activity, ArrayList<String> paths, boolean zipImage) {
 
@@ -86,7 +87,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	public boolean isViewFromObject(View view, Object object) {
         return view == ((RelativeLayout) object);
 	}
-	
+
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
 
@@ -99,7 +100,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
             path = mOffList.get(position).getPath();
             imageFile = getOfflineFile(context, mOffList.get(position));
         }
-        
+
 		ViewHolderOfflineFullImage holder = new ViewHolderOfflineFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
@@ -109,7 +110,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		final ProgressBar pb = holder.progressBar;
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
-		
+
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setOnClickListener(this);
 		holder.gifImgDisplay = viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
@@ -124,25 +125,24 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
         } else {
             holder.imgDisplay.setVisibility(View.VISIBLE);
             holder.gifImgDisplay.setVisibility(View.GONE);
-            pb.setVisibility(View.GONE);
 
-            holder.imgDisplay.setImageURI(UriUtil.getUriForFile(imageFile));
+            loadImage(holder.imgDisplay, pb,UriUtil.getUriForFile(imageFile));
         }
 
         visibleImgs.put(position, holder);
 
         ((ViewPager) container).addView(viewLayout);
-		
+
 		return viewLayout;
 	}
-	
+
 	@Override
     public void destroyItem(ViewGroup container, int position, Object object) {
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
 		logDebug ("DESTROY POSITION " + position + " SIZE SPARSE: " + visibleImgs.size());
- 
+
     }
 
 	public ImageView getVisibleImage(int position){
@@ -165,7 +165,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
                 RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
 				activityLayout.invalidate();
-				
+
 				break;
 			}
 		}
