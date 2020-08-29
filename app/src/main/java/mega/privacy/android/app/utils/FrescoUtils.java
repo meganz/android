@@ -10,14 +10,13 @@ import androidx.annotation.Nullable;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 
-import java.io.File;
-
-import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
@@ -33,7 +32,12 @@ public class FrescoUtils {
      * @param uri The uri of GIF/WEBP. May be from url or local path.
      */
     public static void loadGif(SimpleDraweeView gifImgDisplay, ProgressBar pb, @Nullable Drawable drawable, Uri uri) {
-        gifImgDisplay.getHierarchy().setPlaceholderImage(drawable);
+        // Set placeholder and its scale type here rather than in xml.
+        if (drawable == null) {
+            gifImgDisplay.getHierarchy().setPlaceholderImage(R.drawable.ic_image_thumbnail, ScalingUtils.ScaleType.CENTER_INSIDE);
+        } else {
+            gifImgDisplay.getHierarchy().setPlaceholderImage(drawable, ScalingUtils.ScaleType.CENTER_INSIDE);
+        }
         ImageRequest imageRequest = ImageRequest.fromUri(uri);
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageRequest)
@@ -53,14 +57,5 @@ public class FrescoUtils {
                 })
                 .build();
         gifImgDisplay.setController(controller);
-    }
-
-    public static void loadImage(TouchImageView imageView, File file) {
-//        ImageRequest imageRequest = ImageRequest.;
-//        DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                .setImageRequest(imageRequest)
-//                .build();
-//        imageView.setController(controller);
-        imageView.setImageURI(Uri.fromFile(file));
     }
 }

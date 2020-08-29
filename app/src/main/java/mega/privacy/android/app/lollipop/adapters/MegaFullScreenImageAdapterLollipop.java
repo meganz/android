@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.facebook.common.util.UriUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
@@ -418,7 +419,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		holder.document = imageHandles.get(position);
 		
-		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
+		holder.imgDisplay = viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setOnClickListener(this);
 		holder.gifImgDisplay = viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
 		holder.gifImgDisplay.setOnClickListener(this);
@@ -466,7 +467,6 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
                 String url = megaApi.httpServerGetLocalLink(fileLink);
                 if (url != null) {
                     loadGif(holder.gifImgDisplay, pb, drawable, Uri.parse(url));
-
                 }
             } else {
                 setImageHolder(holder, fileLink);
@@ -489,7 +489,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 
 				String localPath = getLocalFile(context, node.getName(), node.getSize());
                 if (localPath != null) {
-                    loadGif(holder.gifImgDisplay, pb, drawable, Uri.fromFile(new File(localPath)));
+                    loadGif(holder.gifImgDisplay, pb, drawable, UriUtil.getUriForFile(new File(localPath)));
                 } else {
 					holder.progressBar.setVisibility(View.VISIBLE);
                     if (dbH == null) {

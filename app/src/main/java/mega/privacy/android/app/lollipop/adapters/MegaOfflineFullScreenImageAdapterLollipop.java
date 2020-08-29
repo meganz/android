@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.RelativeLayout;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.facebook.common.util.UriUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
@@ -28,7 +28,6 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
 import static mega.privacy.android.app.utils.FrescoUtils.loadGif;
-import static mega.privacy.android.app.utils.FrescoUtils.loadImage;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
@@ -121,13 +120,13 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
         if (MimeTypeThumbnail.typeForName(imageFile.getName()).isGIF()) {
             holder.imgDisplay.setVisibility(View.GONE);
             holder.gifImgDisplay.setVisibility(View.VISIBLE);
-            // For offline file, no need to set placeholder, the loading is fast.
-            loadGif(holder.gifImgDisplay, pb, null, Uri.fromFile(imageFile));
+            loadGif(holder.gifImgDisplay, pb, null, UriUtil.getUriForFile(imageFile));
         } else {
             holder.imgDisplay.setVisibility(View.VISIBLE);
             holder.gifImgDisplay.setVisibility(View.GONE);
             pb.setVisibility(View.GONE);
-            loadImage(holder.imgDisplay, imageFile);
+
+            holder.imgDisplay.setImageURI(UriUtil.getUriForFile(imageFile));
         }
 
         visibleImgs.put(position, holder);

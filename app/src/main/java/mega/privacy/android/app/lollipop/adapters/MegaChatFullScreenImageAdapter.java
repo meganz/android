@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.facebook.common.util.UriUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
@@ -322,7 +323,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			String localPath = getLocalFile(context, node.getName(), node.getSize());
 
             if (localPath != null) {
-                loadGif(holder.gifImgDisplay, pb, drawable, Uri.fromFile(new File(localPath)));
+                loadGif(holder.gifImgDisplay, pb, drawable, UriUtil.getUriForFile(new File(localPath)));
             } else {
 				holder.progressBar.setVisibility(View.VISIBLE);
 
