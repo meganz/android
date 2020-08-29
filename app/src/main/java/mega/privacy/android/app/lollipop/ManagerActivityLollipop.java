@@ -149,8 +149,8 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.photos.HomepageRefreshable;
 import mega.privacy.android.app.fragments.photos.HomepageSearchable;
+import mega.privacy.android.app.fragments.photos.NodesChangeNotifierKt;
 import mega.privacy.android.app.fragments.photos.PhotosFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
@@ -6854,23 +6854,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return null;
 	}
 
-	public void refreshHomepageRefreshable(boolean forceUpdate) {
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
-		for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
-			if (fragment instanceof HomepageRefreshable) {
-				HomepageRefreshable refreshable = (HomepageRefreshable) fragment;
-				if (forceUpdate) {
-					refreshable.forceUpdate();
-				} else {
-					refreshable.refreshUi();
-				}
-
-				return;
-			}
-		}
-	}
-
 	public void updateCuFragmentOptionsMenu() {
 		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
 			return;
@@ -7585,7 +7568,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
 		} else if (drawerItem == DrawerItem.HOMEPAGE) {
-			refreshHomepageRefreshable(false);
+			NodesChangeNotifierKt.notifyNodesChange(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -11500,7 +11483,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         	sttFLol.taskGetSizeOffline();
                         }
 
-						refreshHomepageRefreshable(false);
+						NodesChangeNotifierKt.notifyNodesChange(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -14853,7 +14836,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		if (drawerItem == DrawerItem.HOMEPAGE) {
-			refreshHomepageRefreshable(true);
+			NodesChangeNotifierKt.notifyNodesChange(true);
 			// Invalidate the menu will collapse/expand the search view and set the query text to ""
 			// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
 			// text changed to "" for once)
@@ -15174,7 +15157,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
-				refreshHomepageRefreshable(false);
+				NodesChangeNotifierKt.notifyNodesChange(false);
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){

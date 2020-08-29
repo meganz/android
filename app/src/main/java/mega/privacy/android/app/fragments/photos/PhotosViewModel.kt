@@ -1,14 +1,11 @@
 package mega.privacy.android.app.fragments.photos
 
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import javax.inject.Inject
 
 class PhotosViewModel @ViewModelInject constructor(
     private val photosRepository: PhotosRepository
@@ -26,6 +23,7 @@ class PhotosViewModel @ViewModelInject constructor(
     var searchQuery = ""
 
     private var forceUpdate = false
+    private var ignoredFirst = false
 
     val items: LiveData<List<PhotoNode>> = _query.switchMap {
         viewModelScope.launch {
@@ -55,10 +53,36 @@ class PhotosViewModel @ViewModelInject constructor(
         filteredNodes
     }
 
+    private val nodesChangeObserver = Observer<Boolean> {
+        if (!ignoredFirst) {
+            ignoredFirst = true
+            return@Observer
+        }
+
+        if (it) {
+            loadPhotos(searchQuery, true)
+        } else {
+            refreshUi(searchQuery)
+        }
+    }
+
+    init {
+        loadPhotos(searchQuery, true)
+        nodesChange.observeForever(nodesChangeObserver)
+    }
+
     fun loadPhotos(query: String, forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
         searchQuery = query
         _query.value = query
+    }
+
+    fun refreshUi(searchQuery: String) {
+        items.value?.forEach {photoNode ->
+            photoNode.uiDirty = true
+        }
+
+        loadPhotos(searchQuery, false)
     }
 
     fun onPhotoClick(item: PhotoNode) {
@@ -94,7 +118,6 @@ class PhotosViewModel @ViewModelInject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
-        Log.i("Alex", "onCleared")
+        nodesChange.removeObserver(nodesChangeObserver)
     }
 }

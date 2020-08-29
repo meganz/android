@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.photos
 
+import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
@@ -53,6 +54,11 @@ fun setSearchThumbnail(imageView: ImageView, file: File?, selected: Boolean) {
                 .into(this)
         }
     }
+}
+
+@BindingAdapter("visibleGone")
+fun showHide(view: View, show: Boolean) {
+    view.visibility = if (show) View.VISIBLE else View.GONE
 }
 
 private const val ROUND_RADIUS = 10

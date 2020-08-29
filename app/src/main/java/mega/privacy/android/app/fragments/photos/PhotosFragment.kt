@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
-import android.drm.DrmStore
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -15,10 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.imageview.ShapeableImageView
@@ -38,10 +35,9 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
+class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private val viewModel by viewModels<PhotosViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
@@ -93,8 +89,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
             actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
         }
-
-        forceUpdate()
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -118,20 +112,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         viewModel.showFileInfoEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { activity.showNodeOptionsPanel(it.node) }
         })
-    }
-
-    override fun refreshUi() {
-        // Callbacks of nodes change may provide the specific changed nodes, here
-        // refresh all items for simplicity
-        viewModel.items.value?.forEach {
-            it.uiDirty = true
-        }
-
-        updateUi()
-    }
-
-    override fun forceUpdate() {
-        viewModel.loadPhotos(viewModel.searchQuery, true)
     }
 
     /**
@@ -317,7 +297,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         listView.adapter = searchAdapter
         listView.addItemDecoration(itemDecoration)
 
-        viewModel.loadPhotos("")
+        viewModel.refreshUi("")
     }
 
     override fun exitSearch() {
@@ -329,7 +309,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         listView.adapter = browseAdapter
         listView.removeItemDecoration(itemDecoration)
 
-        viewModel.loadPhotos("")
+        viewModel.refreshUi("")
     }
 
     private fun configureGridLayoutManager() {
