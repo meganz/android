@@ -9,10 +9,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
@@ -25,12 +21,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,14 +49,30 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.PREVIEW_FOLDER;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.TOUR_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.FileUtils.getDownloadLocation;
+import static mega.privacy.android.app.utils.FileUtils.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.FrescoUtils.loadGif;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.PreviewUtils.getBitmapForCacheFullImage;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromCache;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolderFullImage;
+import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
 
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
@@ -89,7 +100,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	/*view holder class*/
     public class ViewHolderFullImage {
     	public TouchImageView imgDisplay;
-    	public ImageView gifImgDisplay;
+    	public SimpleDraweeView gifImgDisplay;
     	public ProgressBar progressBar;
     	public ProgressBar downloadProgressBar;
     	public long document;
@@ -409,7 +420,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setOnClickListener(this);
-		holder.gifImgDisplay = (ImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
+		holder.gifImgDisplay = viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
 		holder.gifImgDisplay.setOnClickListener(this);
 
 		Bitmap thumb = null;
@@ -452,55 +463,15 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
 					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 				}
-				String url = megaApi.httpServerGetLocalLink(fileLink);
-				if (url != null) {
+                String url = megaApi.httpServerGetLocalLink(fileLink);
+                if (url != null) {
+                    loadGif(holder.gifImgDisplay, pb, drawable, Uri.parse(url));
 
-					if (drawable != null) {
-						Glide.with(context)
-								.load(Uri.parse(url.toString()))
-								.listener(new RequestListener<Drawable>() {
-									@Override
-									public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-										return false;
-									}
-
-									@Override
-									public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-										pb.setVisibility(View.GONE);
-										return false;
-									}
-								})
-								.placeholder(drawable)
-								.diskCacheStrategy(DiskCacheStrategy.ALL)
-								.transition(withCrossFade())
-								.into(holder.gifImgDisplay);
-					}
-					else {
-						Glide.with(context)
-								.load(Uri.parse(url.toString()))
-								.listener(new RequestListener<Drawable>() {
-									@Override
-									public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-										return false;
-									}
-
-									@Override
-									public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-										pb.setVisibility(View.GONE);
-										return false;
-									}
-								})
-								.diskCacheStrategy(DiskCacheStrategy.ALL)
-								.transition(withCrossFade())
-								.into(holder.gifImgDisplay);
-					}
-				}
-			}
-			else {
-				setImageHolder(holder, fileLink);
-			}
-		}
-		else {
+                }
+            } else {
+                setImageHolder(holder, fileLink);
+            }
+        } else if (node != null) {
 			if (MimeTypeList.typeForName(node.getName()).isGIF()) {
 				holder.isGIF = true;
 				holder.imgDisplay.setVisibility(View.GONE);
@@ -517,30 +488,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 
 				String localPath = getLocalFile(context, node.getName(), node.getSize());
-				if (localPath != null) {
-
-					if (drawable != null) {
-						Glide.with(context)
-								.load(new File(localPath))
-								.listener(new RequestListener<Drawable>() {
-									@Override
-									public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-										return false;
-									}
-
-									@Override
-									public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-										pb.setVisibility(View.GONE);
-										return false;
-									}
-								})
-								.placeholder(drawable)
-								.diskCacheStrategy(DiskCacheStrategy.ALL)
-								.transition(withCrossFade())
-								.into(holder.gifImgDisplay);
-					}
-				}
-				else {
+                if (localPath != null) {
+                    loadGif(holder.gifImgDisplay, pb, drawable, Uri.fromFile(new File(localPath)));
+                } else {
 					holder.progressBar.setVisibility(View.VISIBLE);
                     if (dbH == null) {
                         dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -585,48 +535,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
                         url = megaApiFolder.httpServerGetLocalLink(node);
                     }
 
-					if (url != null) {
-
-						if (drawable != null) {
-							Glide.with(context)
-									.load(Uri.parse(url))
-									.listener(new RequestListener<Drawable>() {
-										@Override
-										public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-											return false;
-										}
-
-										@Override
-										public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-											pb.setVisibility(View.GONE);
-											return false;
-										}
-									})
-									.placeholder(drawable)
-									.diskCacheStrategy(DiskCacheStrategy.ALL)
-									.transition(withCrossFade())
-									.into(holder.gifImgDisplay);
-						}
-						else {
-							Glide.with(context)
-									.load(Uri.parse(url))
-									.listener(new RequestListener<Drawable>() {
-										@Override
-										public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-											return false;
-										}
-
-										@Override
-										public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-											pb.setVisibility(View.GONE);
-											return false;
-										}
-									})
-									.diskCacheStrategy(DiskCacheStrategy.ALL)
-									.transition(withCrossFade())
-									.into(holder.gifImgDisplay);
-						}
-					}
+                    if (url != null) {
+                        loadGif(holder.gifImgDisplay, pb, drawable, Uri.parse(url));
+                    }
 				}
 			}
 			else {
@@ -640,7 +551,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		return viewLayout;
 	}
 
-	public void setImageHolder (ViewHolderFullImage holder, MegaNode node) {
+    public void setImageHolder (ViewHolderFullImage holder, MegaNode node) {
 		Bitmap thumb = null;
 		Bitmap preview = null;
 
