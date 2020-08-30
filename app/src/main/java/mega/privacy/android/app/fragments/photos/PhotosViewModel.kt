@@ -1,5 +1,7 @@
 package mega.privacy.android.app.fragments.photos
 
+import android.util.Log
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch
@@ -8,10 +10,7 @@ import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
-@ActivityRetainedScoped
-// Use scoped @Inject instead of @ViewModelInject. Then the ViewModel object in PhotosFragment
-// and PhotosGridAdapter are identical
-class PhotosViewModel @Inject constructor(
+class PhotosViewModel @ViewModelInject constructor(
     private val photosRepository: PhotosRepository
 ) : ViewModel() {
 
@@ -92,5 +91,10 @@ class PhotosViewModel @Inject constructor(
 
     fun showFileInfo(item: PhotoNode) {
         _showFileInfoEvent.value = Event(item)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.i("Alex", "onCleared")
     }
 }

@@ -11,7 +11,7 @@ import mega.privacy.android.app.databinding.ItemPhotoSearchBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import javax.inject.Inject
 
-class PhotosSearchAdapter @Inject constructor(
+class PhotosSearchAdapter constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
 ) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),

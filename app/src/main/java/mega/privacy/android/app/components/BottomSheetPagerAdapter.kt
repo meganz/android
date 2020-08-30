@@ -8,13 +8,11 @@ import mega.privacy.android.app.lollipop.managerSections.RecentsFragment
 
 class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
-    private val tabFragmentMap = object : HashMap<Int, Class<*>>() {
-        init {
-            put(RECENT_INDEX, RecentsFragment::class.java)
-            put(FAVOURITES_INDEX, FavouritesFragment::class.java)
-            put(OFFLINE_INDEX, OfflineFragment::class.java)
-        }
-    }
+    private val tabFragmentMap = hashMapOf(
+        RECENT_INDEX to RecentsFragment::class.java,
+        FAVOURITES_INDEX to FavouritesFragment::class.java,
+        OFFLINE_INDEX to OfflineFragment::class.java
+    )
 
     override fun getItemCount(): Int {
         return tabFragmentMap.size

@@ -4,7 +4,9 @@ import android.content.Context
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -19,9 +21,8 @@ import nz.mega.sdk.MegaShare
 import java.util.*
 import javax.inject.Inject
 
-// ActionMode callback belongs to UI layer, same to the Fragment
-class ActionModeCallback @Inject constructor(
-    @ActivityContext private val context: Context,
+class ActionModeCallback constructor(
+    private val context: Context,
     private val viewModel: ActionModeViewModel,
     private val megaApi: MegaApiAndroid
 ) : ActionMode.Callback {
