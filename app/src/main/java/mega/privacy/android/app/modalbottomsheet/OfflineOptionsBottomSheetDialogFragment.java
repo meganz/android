@@ -180,9 +180,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 shareOfflineNode(context, nodeOffline);
                 break;
             case R.id.option_download_layout:
-                ArrayList<Long> handleList = new ArrayList<>();
-                handleList.add(Long.parseLong(nodeOffline.getHandle()));
-                new NodeController(context).prepareForDownload(handleList, false);
+                ((ManagerActivityLollipop) context).saveOfflineNodeToDevice(nodeOffline);
                 break;
             case R.id.option_properties_layout:
                 ((ManagerActivityLollipop) requireActivity()).showOfflineFileInfo(nodeOffline);

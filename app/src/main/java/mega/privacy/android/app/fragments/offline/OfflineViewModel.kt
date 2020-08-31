@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.offline
 
 import android.content.Context
+import android.content.Intent
 import androidx.collection.SparseArrayCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
@@ -16,6 +17,7 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.fragments.photos.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -43,7 +45,8 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context,
-    private val repo: MegaNodeRepo
+    private val repo: MegaNodeRepo,
+    private val nodeSaver: OfflineNodeSaver
 ) : BaseRxViewModel() {
     private var order = ORDER_DEFAULT_ASC
     private var searchQuery: String? = null
@@ -131,6 +134,12 @@ class OfflineViewModel @ViewModelInject constructor(
                     logErr("OfflineViewModel showSortedByAction")
                 )
         )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        nodeSaver.destroy()
     }
 
     fun getSelectedNodes(): List<MegaOffline> {
@@ -385,6 +394,14 @@ class OfflineViewModel @ViewModelInject constructor(
         if (title != null) {
             _actionBarTitle.value = title
         }
+    }
+
+    fun saveNodeToDevice(node: MegaOffline, activityStarter: (Intent, Int) -> Unit) {
+        nodeSaver.save(node, false, activityStarter)
+    }
+
+    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return nodeSaver.handleActivityResult(requestCode, resultCode, data)
     }
 
     fun processUrlFile(file: File) {

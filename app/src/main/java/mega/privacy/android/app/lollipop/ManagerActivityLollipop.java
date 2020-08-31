@@ -11496,6 +11496,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void saveOfflineNodeToDevice(MegaOffline node) {
+		if (fullscreenOfflineFragment != null) {
+			fullscreenOfflineFragment.saveNodeToDevice(node);
+		} else if (pagerOfflineFragment != null) {
+			pagerOfflineFragment.saveNodeToDevice(node);
+		}
+	}
+
 	@Override
 	public void showConfirmationEnableLogsSDK(){
 		if(getSettingsFragment() != null){
