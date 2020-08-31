@@ -182,8 +182,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static boolean verifyingCredentials;
 
-	MegaChatApiAndroid megaChatApi = null;
-
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
 	private ChatAudioManager chatAudioManager = null;
