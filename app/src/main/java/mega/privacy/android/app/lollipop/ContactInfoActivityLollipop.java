@@ -316,10 +316,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_DESTROYED:
 					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
-							setCallWidget();
-						} else {
-							supportInvalidateOptionsMenu();
+						if (callStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT || MegaApplication.getCallLayoutStatus(chatIdReceived)) {
+							checkScreenRotationToShowCall();
 						}
 						break;
 				}
@@ -330,11 +328,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
 					return;
 
-				if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
-					setCallWidget();
-				} else {
-					supportInvalidateOptionsMenu();
-				}
+				checkScreenRotationToShowCall();
 			}
 		}
 	};
@@ -351,11 +345,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				return;
 
 			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-				if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
-					setCallWidget();
-				} else {
-					supportInvalidateOptionsMenu();
-				}
+				checkScreenRotationToShowCall();
 			}
 		}
 	};
@@ -389,7 +379,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
 		contactInfoActivityLollipop = this;
 		if (megaApi == null) {
 			MegaApplication app = (MegaApplication) getApplication();
@@ -630,7 +619,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 
 			updateVerifyCredentialsLayout();
-			setCallWidget();
+			checkScreenRotationToShowCall();
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
@@ -1896,10 +1885,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	protected void onResume() {
-		logDebug("onResume");
 		super.onResume();
 
 		updateVerifyCredentialsLayout();
+		checkScreenRotationToShowCall();
 		setContactPresenceStatus();
 		requestLastGreen(-1);
 	}
@@ -2575,6 +2564,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
+		MegaApplication.setCallLayoutStatus(chatRoom.getChatId(), false);
 		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
 		MegaApplication.setIsWaitingForCall(false);
@@ -2608,6 +2598,17 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		if (callInProgressLayout.getVisibility() == View.VISIBLE) {
 			appBarLayout.setExpanded(false);
+		}
+	}
+
+	/**
+	 * Method to check the rotation of the screen to display the call properly.
+	 */
+	private void checkScreenRotationToShowCall() {
+		if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
+			setCallWidget();
+		} else {
+			supportInvalidateOptionsMenu();
 		}
 	}
 
