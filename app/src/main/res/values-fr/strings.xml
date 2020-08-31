@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Échec de suppression de certains liens. Veuillez ressayer ultérieurement.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Échec de création du lien. Veuillez ressayer plus tard.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">Échec de création de certains liens. Veuillez ressayer plus tard.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Le lien a été supprimé avec succès.</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Déplacer vers la corbeille ?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Voulez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements de l\'appareil photo sera désactivée.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Voulez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements des médias sera désactivée.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Voulez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements des médias secondaires sera désactivée.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Déplacer vers la corbeille ?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Supprimer de MEGA ?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si vous quittez le dossier, vous ne pourrez plus le voir.</string>
@@ -2732,7 +2732,7 @@
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Quand vous vous déconnectez, les transferts en cours sont annulés.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil et les transferts en cours sont annulés.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil et les transferts en cours sont annulés.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nom inconnu</string>
 
@@ -2789,11 +2789,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Votre numéro d\'identification</string>
     <string name="action_reset" context="Button to reset credentials">Réinitialiser</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Supprimer votre numéro de téléphone ?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Votre numéro de téléphone a été supprimé avec succès.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Échec de suppression de votre numéro de téléphone.</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Visualiser</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Numéro d\'identification de %s</string>
 
 </resources>

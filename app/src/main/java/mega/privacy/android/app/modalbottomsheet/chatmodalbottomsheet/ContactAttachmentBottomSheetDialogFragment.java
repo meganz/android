@@ -252,7 +252,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 optionInfo.getVisibility() == View.VISIBLE) && (optionStartConversation.getVisibility() == View.VISIBLE ||
                 optionInvite.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
 
-
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
     }

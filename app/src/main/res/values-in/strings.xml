@@ -690,8 +690,8 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Meng-upload file atau folder media</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Memeriksa file yang akan diunggah</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Inisialisasi Unggahan Kamera</string>
-	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads have been disabled. Your local folder is unavailable.</string>
-	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads have been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Unggahan Kamera telah dinonaktifkan. Folder lokal Anda tidak tersedia.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Unggahan Media telah dinonaktifkan. Folder lokal Anda tidak tersedia.</string>
 
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
@@ -917,7 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs sekarang diaktifkan</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs telah di nonaktifkan</string>
-    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Unable to setup MEGA Camera Uploads folder</string>
+    <string name="error_unable_to_setup_cloud_folder" context="Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page">Tidak dapat mengatur folder Unggah Kamera MEGA</string>
     <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Log belum diaktifkan karena anda menolak izin yang diperlukan</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Buka lokasi</string>
@@ -1543,7 +1543,7 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Import</string>
     <string name="save_for_offline" context="Menu option">Simpan untuk offline</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Tambah ke Cloud Drive</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">Save to Offline</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">Simpan untuk offline</string>
 
     <string name="general_view_contacts" context="Menu option">Lihat kontak</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Gagal menghapus beberapa tautan. Silakan coba lagi nanti.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Pembuatan tautan gagal. Silakan coba lagi nanti.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">Gagal membuat beberapa tautan. Silakan coba lagi nanti.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Tautan berhasil dihapus.</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Pindahkan ke Sampah?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Anda yakin ingin memindahkan folder ini ke Bin Sampah? Ini akan menonaktifkan Unggahan Kamera.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Anda yakin ingin memindahkan folder ini ke Bin Sampah? Ini akan menonaktifkan Unggahan Media Sekunder.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Pindahkan ke Sampah?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Hapus dari MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Jika anda meninggalkan folder, anda tidak akan dapat untuk melihatnya kembali</string>
@@ -1858,9 +1858,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">Kuota penyimpanan terlewati</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Link tidak valid, harap minta link baru yang valid</string>
-    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Invalid link password</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Kata sandi tautan tidak valid</string>
 
-    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">The link you are trying to open is not a valid MEGA link.</string>
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">Tautan yang Anda coba buka bukanlah tautan MEGA yang valid.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Memproses tautan &#8230;</string>
 
@@ -1884,7 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Akun Anda telah ditangguhkan karena beberapa pelanggaran Persyaratan Layanan MEGA. Silakan periksa kotak masuk email Anda.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Akun Anda dihentikan karena pelanggaran Ketentuan Layanan MEGA, seperti penyalahgunaan hak orang lain; berbagi dan / atau mengimpor data ilegal; atau penyalahgunaan sistem.</string>
 
-    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Loading files</string>
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Memuat file</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Tidak ada data</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -2584,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Anda tidak memiliki kontak MEGA. Silakan undang teman dari bagian Kontak.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Undang lebih banyak &#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Undang lebih banyak</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Anda memegang kunci</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Keamanan adalah alasan kami ada, file Anda aman bersama kami di belakang mesin enkripsi yang diminyaki di mana hanya Anda yang dapat mengakses file Anda.</string>
@@ -2778,22 +2778,22 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Selalu simpan ke lokasi ini?</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Lampirkan dari &#8230;</string>
-    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
-    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select messages</string>
+    <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Obrolan dibuat pada %s</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Pilih pesan</string>
 
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verifikasi kredential</string>
-    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Not verified</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Tidak diverifikasi</string>
     <string name="label_verified" context="Action indicating something was verified.">Ter-verifikasi</string>
     <string name="authenticity_credentials_label" context="”Verify user” dialog title">Kredensial Autentikasi</string>
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Ini dapat dilakukan pada kehidupan nyata melalui bertemu langsung. Jika ana memiliki channel lain yang sudah ter-verifikasi seperti OTR atau PGP, anda mungkin mau menggunakan itu.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Kredensial Anda</string>
     <string name="action_reset" context="Button to reset credentials">Ubah</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Hapus nomor telepon Anda?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Nomor telepon anda telah berhasil dihapus.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Penghapusan nomor telepon Anda gagal.</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Lihat</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s kredensial</string>
 
 </resources>
