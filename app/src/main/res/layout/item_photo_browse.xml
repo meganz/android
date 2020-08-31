@@ -29,18 +29,17 @@
         android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick(item) : actionModeViewModel.onPhotoClick(item))}"
         android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/photo_item_padding"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:placeholderImage="@drawable/ic_image_thumbnail"
             app:selected="@{item.selected}"
-            app:strokeColor="@color/accentColor"
             app:thumbnail="@{item.thumbnail}"
             tools:src="@drawable/ic_image_thumbnail" />
 
@@ -51,8 +50,8 @@
             android:layout_marginStart="@dimen/icon_selected_margin"
             android:layout_marginTop="@dimen/icon_selected_margin"
             android:src="@drawable/ic_select_folder"
-            app:visibleGone="@{item.selected}"
             app:layout_constraintStart_toStartOf="@id/thumbnail"
-            app:layout_constraintTop_toTopOf="@id/thumbnail" />
+            app:layout_constraintTop_toTopOf="@id/thumbnail"
+            app:visibleGone="@{item.selected}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

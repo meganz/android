@@ -18,6 +18,7 @@ import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.ShapeAppearanceModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -226,14 +227,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                     } else {
                         // Draw the green outline for the thumbnail view at once
                         val thumbnailView =
-                            itemView.findViewById<ShapeableImageView>(R.id.thumbnail)
-                        val strokeWidth =
-                            resources.getDimension(R.dimen.photo_selected_border_width)
-                        val shapeId = R.style.GalleryImageShape_Selected
-                        thumbnailView.strokeWidth = strokeWidth
-                        thumbnailView.shapeAppearanceModel = ShapeAppearanceModel.builder(
-                            context, shapeId, 0
-                        ).build()
+                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
+                        thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
 
                         itemView.findViewById<ImageView>(
                             R.id.icon_selected

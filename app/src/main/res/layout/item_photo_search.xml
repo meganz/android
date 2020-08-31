@@ -48,17 +48,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"
             android:layout_width="36dp"
             android:layout_height="0dp"
             android:layout_marginTop="18dp"
             android:layout_marginBottom="18dp"
             android:scaleType="fitCenter"
+            app:roundedCornerRadius="2dp"
+            app:placeholderImage="@drawable/ic_image_thumbnail"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
-            app:selected="@{item.selected}"
+            app:item_selected="@{item.selected}"
             app:thumbnail="@{item.thumbnail}"
             tools:src="@drawable/ic_image_thumbnail" />
 
