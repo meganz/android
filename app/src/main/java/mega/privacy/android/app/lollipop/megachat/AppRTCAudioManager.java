@@ -694,6 +694,8 @@ public class AppRTCAudioManager {
      * TODO(henrika): add unit test to verify all state transitions.
      */
     public void updateAudioDeviceState() {
+        startBluetooth();
+
         Log.d(TAG, "updateAudioDeviceState()");
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "--- updateAudioDeviceState: "
