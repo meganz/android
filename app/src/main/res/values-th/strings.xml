@@ -1543,7 +1543,7 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">นำเข้า</string>
     <string name="save_for_offline" context="Menu option">บันทึกไว้สำหรับออฟไลน์</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">บันทึกเป็นออฟไลน์</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">บันทึกไว้สำหรับออฟไลน์</string>
 
     <string name="general_view_contacts" context="Menu option">ดูรายชื่อติดต่อ</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">ไม่สามารถลบลิงก์บางรายการได้ กรุณาลองใหม่อีกครั้งในภายหลัง</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">สร้างลิงก์ล้มเหลว กรุณาลองอีกครั้งในภายหลัง</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">สร้างลิงก์ไม่สำเร็จ กรุณาลองอีกครั้งในภายหลัง</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">ลบลิงก์สำเร็จแล้ว</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">ย้ายไปถังขยะหรือไม่</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">คุณแน่ใจหรือไม่ว่าต้องการย้ายโฟลเดอร์นี้ไปที่ถังขยะ วิธีนี้จะปิดใช้งานการอัปโหลดจากกล้อง</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">คุณแน่ใจหรือไม่ว่าต้องการย้ายโฟลเดอร์นี้ไปที่ถังขยะ วิธีนี้จะปิดใช้งานการอัปโหลดสื่อ</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">คุณแน่ใจหรือไม่ว่าต้องการย้ายโฟลเดอร์นี้ไปที่ถังขยะ วิธีนี้จะปิดใช้งานการอัปโหลดมีเดียสำรอง</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">ย้ายไปถังขยะหรือไม่</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">ลบออกจาก MEGA หรือไม่</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">หากคุณออกจากโฟลเดอร์ นี้คุณจะไม่สามารถดูได้อีก</string>
@@ -2789,11 +2789,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">ข้อมูลรับรองของคุณ</string>
     <string name="action_reset" context="Button to reset credentials">รีเซ็ต</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">ลบหมายเลขโทรศัพท์ของคุณหรือไม่</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">หมายเลขโทรศัพท์ของคุณถูกลบเรียบร้อยแล้ว</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">การลบหมายเลขโทรศัพท์ของคุณล้มเหลว</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">ดู</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">ข้อมูลรับรองของ %s</string>
 
 </resources>
