@@ -2084,25 +2084,51 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         return output;
     }
 
-    private MegaNode getPossibleNodeFromCloud(String localFingerPrint, MegaNode uploadNode) {
-        logDebug("getPossibleNodeFromCloud");
-        MegaNode preferNode = null;
+    /**
+     * Check if there's a node with the same fingerprint in cloud drive. In order to avoid uploading duplicate file.
+     * 
+     * NOTE: only looking for the node by original fingerprint is not enough,
+     * because some old nodes don't have the attribute[OriginalFingerprint].
+     * In this case, should also looking for the node by attribute[Fingerprint].
+     *
+     * @param localFingerPrint Fingerprint of the local file.
+     * @param parentNode Prefered parent node, could be null for searching all the place in cloud drive.
+     * @return A node with the same fingerprint, or null when cannot find.
+     */
+    private MegaNode getPossibleNodeFromCloud(String localFingerPrint, MegaNode parentNode) {
+        MegaNode preferNode;
 
-        MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, uploadNode);
-        if(possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
-            // the desired node, do nothing.
-            logDebug("Found node with same fingerprint in the same folder!");
-            return getFirstNodeFromList(possibleNodeListFPO);
+        // Try to find the node by original fingerprint from the selected parent folder.
+        MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, parentNode);
+        preferNode = getFirstNodeFromList(possibleNodeListFPO);
+        if (preferNode != null) {
+            logDebug("Found node by original fingerprint with the same local fingerprint in " + parentNode.getName() + ", node name: " + preferNode.getName());
+            return preferNode;
         }
 
+        // Try to find the node by fingerprint from the selected parent folder.
+        preferNode = megaApi.getNodeByFingerprint(localFingerPrint, parentNode);
+        if (preferNode != null) {
+            logDebug("Found node by fingerprint with the same local fingerprint in " + parentNode.getName() + ", node name: " + preferNode.getName());
+            return preferNode;
+        }
+
+        // Try to find the node by original fingerprint in the account.
         possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
-        if(possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
-            // node with same fingerprint but in different folder, copy.
-            preferNode =  getFirstNodeFromList(possibleNodeListFPO);
+        preferNode = getFirstNodeFromList(possibleNodeListFPO);
+        if (preferNode != null) {
+            logDebug("Found node by original fingerprint with the same local fingerprint in the account, node name: " + preferNode.getName());
+            return preferNode;
         }
 
-        logDebug("No possibile node found");
-        return preferNode;
+        // Try to find the node by fingerprint in the account.
+        preferNode = megaApi.getNodeByFingerprint(localFingerPrint);
+        if (preferNode != null) {
+            logDebug("Found node by fingerprint with the same local fingerprint in the account, node name: " + preferNode.getName());
+            return preferNode;
+        }
+
+        return null;
     }
 
     private MegaNode getFirstNodeFromList(MegaNodeList megaNodeList) {
