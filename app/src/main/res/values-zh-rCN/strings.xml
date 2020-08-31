@@ -1543,7 +1543,7 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">输入</string>
     <string name="save_for_offline" context="Menu option">离线储存</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">增加至云盘</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">保存到离线</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">离线储存</string>
 
     <string name="general_view_contacts" context="Menu option">查看联系人</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">链接删除失败。请稍后再试。</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">链接创建失败。请稍后再试。</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">创建链接失败。请稍后再试。</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">已成功删除链接。</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">要移至垃圾桶吗？</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">您确定要将此文件夹移到“垃圾桶”吗？这将禁用相机上传功能。</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">您确定要将此文件夹移至“垃圾桶”吗？ 此操作将禁用媒体上传。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">您确定要将此文件夹移至垃圾桶吗？这将禁用辅助媒体上传。</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">要移至垃圾桶吗？</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">确定从MEGA删除吗？</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">离开此文件夹后将无法再次查看</string>
@@ -2789,11 +2789,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">您的凭证</string>
     <string name="action_reset" context="Button to reset credentials">重置密码</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">您是否要移除手机号码？</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">您的手机号已成功解除绑定。</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">您的手机号码移除失败。</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">查看</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s的凭证</string>
 
 </resources>

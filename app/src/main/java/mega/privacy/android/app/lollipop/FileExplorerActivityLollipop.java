@@ -130,7 +130,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
-	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
 	public static String ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE";
 	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
@@ -676,13 +675,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				mode = IMPORT;
 
 				importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
-
-				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
-				setView(SHOW_TABS, false, CHAT_TAB);
-			}
-			else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
-				logDebug("action = ACTION_SELECT_FOLDER");
-				mode = SELECT;
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
@@ -3320,8 +3312,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					currentAction.equals(ACTION_PICK_MOVE_FOLDER) ||
 					currentAction.equals(ACTION_PICK_COPY_FOLDER) ||
 					currentAction.equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC) ||
-					currentAction.equals(ACTION_PICK_IMPORT_FOLDER) ||
-					currentAction.equals(ACTION_SELECT_FOLDER)) {
+					currentAction.equals(ACTION_PICK_IMPORT_FOLDER)) {
 				updateAdapterExplorer(false, CHAT_TAB);
 			} else if (isChatFirst) {
 				updateAdapterExplorer(true, DEFAULT_TAB_TO_REMOVE);
