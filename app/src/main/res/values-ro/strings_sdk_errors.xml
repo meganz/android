@@ -33,7 +33,7 @@
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Contul tău business a expirat</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Card de credit respins</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Facturare eșuată</string>
-    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Rejected by fraud protection</string>
+    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Respins(ă) de protecția împotriva fraudelor</string>
     <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Prea multe cereri</string>
     <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Eroare privind soldul</string>
     <string name="payment_egeneric_api_error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">Eroare necunoscută</string>

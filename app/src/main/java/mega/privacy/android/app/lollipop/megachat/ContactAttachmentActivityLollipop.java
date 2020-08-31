@@ -161,7 +161,16 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			contacts = new ArrayList<>();
 
 			for (int i = 0; i < message.getMessage().getUsersCount(); i++) {
-				contacts.add(dbH.findContactByEmail(message.getMessage().getUserEmail(i)));
+				String email = message.getMessage().getUserEmail(i);
+				MegaContactDB contactDB = dbH.findContactByEmail(email);
+				if (contactDB != null) {
+					contacts.add(contactDB);
+				} else {
+					long handle = message.getMessage().getUserHandle(i);
+					String handleString = handle == megaApi.getMyUserHandleBinary() ? megaApi.getMyUserHandle() : MegaApiJava.userHandleToBase64(handle);
+					MegaContactDB newContactDB = new MegaContactDB(handleString, email, message.getMessage().getUserName(i), "");
+					contacts.add(newContactDB);
+				}
 			}
 		} else {
 			finish();
@@ -195,40 +204,17 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		actionButton = (Button) findViewById(R.id.contact_attachment_chat_option_button);
 		actionButton.setOnClickListener(this);
 
-		//Check owner of the message
-		if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
-			logDebug("My message, show START CONVERSATION button");
-			actionButton.setText(R.string.group_chat_start_conversation_label);
-		}
-		else{
-			//Check if any contact is not my own contact
+		for (MegaContactDB contactDB : contacts) {
+			MegaUser checkContact = megaApi.getContact(contactDB.getMail());
 
-			for(int i=0; i<contacts.size();i++){
-				MegaUser checkContact =  megaApi.getContact(contacts.get(i).getMail());
-				if(checkContact==null){
-					logDebug("NULL contact - The user " + contacts.get(i).getHandle() + " is NOT my CONTACT");
-					inviteAction = true;
-					break;
-				}
-				else{
-					if(checkContact.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
-						logDebug("The user " + checkContact.getHandle() + " is NOT my CONTACT");
-						inviteAction = true;
-						break;
-					}
-				}
-
-			}
-
-			if(inviteAction){
-				logDebug("NOT my message, show INVITE button");
-				actionButton.setText(R.string.menu_add_contact);
-			}
-			else{
-				logDebug("NOT my message, show START CONVERSATION button");
-				actionButton.setText(R.string.group_chat_start_conversation_label);
+			if (!contactDB.getMail().equals(megaApi.getMyEmail()) &&
+					(checkContact == null || checkContact.getVisibility() != MegaUser.VISIBILITY_VISIBLE)) {
+				inviteAction = true;
+				break;
 			}
 		}
+
+		actionButton.setText(inviteAction ? R.string.menu_add_contact : R.string.group_chat_start_conversation_label);
 
 		cancelButton = (Button) findViewById(R.id.contact_attachment_chat_cancel_button);
 		cancelButton.setOnClickListener(this);
@@ -382,17 +368,9 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 					for(int i=0;i<contacts.size();i++){
 						MegaContactDB contact = contacts.get(i);
 						MegaUser checkContact = megaApi.getContact(contact.getMail());
-						if(checkContact==null){
-							String userMail = contact.getMail();
-							contactEmails.add(userMail);
+						if (!contact.getMail().equals(megaApi.getMyEmail()) && (checkContact == null || checkContact.getVisibility() != MegaUser.VISIBILITY_VISIBLE)) {
+							contactEmails.add(contact.getMail());
 						}
-						else{
-							if(checkContact.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
-								String userMail = contact.getMail();
-								contactEmails.add(userMail);
-							}
-						}
-
 					}
 					if(contactEmails!=null){
 						if(!contactEmails.isEmpty()){

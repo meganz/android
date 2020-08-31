@@ -1543,7 +1543,7 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">استيراد</string>
     <string name="save_for_offline" context="Menu option">احفظ دون اتصال</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">الإضافة الي محرك السحابة</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">حفظ في قسم وضع عدم الاتصال</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">احفظ دون اتصال</string>
 
     <string name="general_view_contacts" context="Menu option">عرض جهات الاتصال</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">فشل إنشاء الرابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">تمت إزالة الرابط بنجاح.</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">هل أنت متأكد أنك تريد إرسال هذا المجلد إلى سلة المهملات؟ سيؤدي هذا إلى تعطيل تحميلات الكاميرا.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">هل أنت متأكد أنك تريد نقل هذا المجلد إلى سلة المهملات؟ سيؤدي هذا إلى تعطيل ترفيعات الوسائط.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">هل أنت متأكد أنك تريد نقل هذا المجلد إلى سلة المهملات؟ سيؤدي هذا إلى تعطيل تحميلات الوسائط الثانوية.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">الحذف من MEGA؟</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">إذا تركت المجلد، لن تكون قادراً على الوصول إليه مرة أخرى.</string>
@@ -1868,7 +1868,7 @@
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">كلمة السر جيدة بما فيه الكفاية للمضي قدما، ولكن من المستحسن تعزيز كلمة المرور الخاصة بك أكثر من ذلك.</string>
     <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">كلمة السر هذه تستطيع تحمل الهجمات القوية وأكثرها تطورا. يرجى التأكد من أنك سوف تتذكرها.</string>
     <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">كلمة السر هذه تستطيع تحمل الهجمات القوية وأكثرها تطورا. يرجى التأكد من أنك سوف تتذكرها.</string>
-    <string name="pass_very_weak" context="Password very weak">ضعيف جدا</string>
+    <string name="pass_very_weak" context="Password very weak">ضعيفة جداً</string>
     <string name="pass_weak" context="Password weak">ضعيف</string>
     <string name="pass_medium" context="Password medium">متوسط</string>
     <string name="pass_good" context="Password good">جيد</string>
@@ -2789,11 +2789,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">بياناتك</string>
     <string name="action_reset" context="Button to reset credentials">إعادة تعيين</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">هل تريد إزالة رقم هاتفك؟</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">تمت إزالة رقم هاتفك بنجاح.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">فشل إزالة رقم هاتفك.</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">انظر</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">شهادات %s</string>
 
 </resources>

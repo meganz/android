@@ -110,7 +110,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.8_319";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.8_320";
 
 	@Inject
 	MegaApiAndroid megaApi;
@@ -179,6 +179,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isLoggingRunning = false;
 	private static boolean isWaitingForCall = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
+
+	private static boolean verifyingCredentials;
+
+	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
@@ -1664,6 +1668,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
+	}
+
+	public static void setVerifyingCredentials(boolean verifyingCredentials) {
+		MegaApplication.verifyingCredentials = verifyingCredentials;
+	}
+
+	public static boolean isVerifyingCredentials() {
+		return MegaApplication.verifyingCredentials;
 	}
 
 	public Activity getCurrentActivity() {
