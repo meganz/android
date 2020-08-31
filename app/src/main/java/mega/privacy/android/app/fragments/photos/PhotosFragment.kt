@@ -144,6 +144,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         preventListItemBlink()
         elevateToolbarWhenScrolling()
         itemDecoration = DividerDecoration(context)
+        if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
     }
 
     private fun setupActionMode() {
@@ -292,24 +293,26 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
         if (viewModel.searchMode) return
 
-        viewModel.searchMode = true
         listView.switchToLinear()
         listView.adapter = searchAdapter
         listView.addItemDecoration(itemDecoration)
 
-        viewModel.refreshUi("")
+        viewModel.searchMode = true
+        viewModel.searchQuery = ""
+        viewModel.refreshUi()
     }
 
     override fun exitSearch() {
         if (!viewModel.searchMode) return
 
-        viewModel.searchMode = false
         listView.switchBackToGrid()
         configureGridLayoutManager()
         listView.adapter = browseAdapter
         listView.removeItemDecoration(itemDecoration)
 
-        viewModel.refreshUi("")
+        viewModel.searchMode = false
+        viewModel.searchQuery = ""
+        viewModel.refreshUi()
     }
 
     private fun configureGridLayoutManager() {
@@ -326,7 +329,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
-        viewModel.loadPhotos(query)
+        viewModel.searchQuery = query
+        viewModel.loadPhotos()
     }
 
     private fun openPhoto(node: PhotoNode) {

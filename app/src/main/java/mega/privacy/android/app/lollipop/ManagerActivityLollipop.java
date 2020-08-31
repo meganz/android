@@ -14835,13 +14835,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		if (drawerItem == DrawerItem.HOMEPAGE) {
-			NodesChangeNotifierKt.notifyNodesChange(true);
-			// Invalidate the menu will collapse/expand the search view and set the query text to ""
-			// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
-			// text changed to "" for once)
-			return;
-		}
+		NodesChangeNotifierKt.notifyNodesChange(true);
+
+		// Invalidate the menu will collapse/expand the search view and set the query text to ""
+		// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
+		// text changed to "" for once)
+		if (drawerItem == DrawerItem.HOMEPAGE) return;
 
 		setToolbarTitle();
 		supportInvalidateOptionsMenu();

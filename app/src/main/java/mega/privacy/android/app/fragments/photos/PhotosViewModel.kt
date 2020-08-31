@@ -45,6 +45,12 @@ class PhotosViewModel @ViewModelInject constructor(
             }
         }
 
+        if (searchMode) {
+            filteredNodes = filteredNodes.filter {
+                it.type == PhotoNode.TYPE_PHOTO
+            }
+        }
+
         filteredNodes.forEach {
             it.index = index++
             if (it.type == PhotoNode.TYPE_PHOTO) it.photoIndex = photoIndex++
@@ -60,29 +66,36 @@ class PhotosViewModel @ViewModelInject constructor(
         }
 
         if (it) {
-            loadPhotos(searchQuery, true)
+            loadPhotos(true)
         } else {
-            refreshUi(searchQuery)
+            refreshUi()
         }
     }
 
     init {
-        loadPhotos(searchQuery, true)
+        loadPhotos(true)
         nodesChange.observeForever(nodesChangeObserver)
     }
 
-    fun loadPhotos(query: String, forceUpdate: Boolean = false) {
+    /**
+     * Load photos by calling Mega Api or just filter loaded nodes
+     * @param forceUpdate True if retrieve all nodes by calling API
+     * , false if filter current nodes by searchQuery
+     */
+    fun loadPhotos(forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
-        searchQuery = query
-        _query.value = query
+        _query.value = searchQuery
     }
 
-    fun refreshUi(searchQuery: String) {
+    /**
+     * Make the list adapter to rebind all item views with data since
+     * the underlying data may have been changed.
+     */
+    fun refreshUi() {
         items.value?.forEach {photoNode ->
             photoNode.uiDirty = true
         }
-
-        loadPhotos(searchQuery, false)
+        loadPhotos()
     }
 
     fun onPhotoClick(item: PhotoNode) {

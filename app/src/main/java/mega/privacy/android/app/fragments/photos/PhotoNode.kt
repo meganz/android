@@ -7,7 +7,7 @@ data class PhotoNode(
     val type: Int,
     var photoIndex: Int,       // Index of real photo node
     override var node: MegaNode?,
-    override var index: Int,   // Index of Node including TYPE_TITLE node
+    override var index: Int,   // Index of Node including TYPE_TITLE node (RecyclerView Layout position)
     override var modifiedDate: String,
     override var thumbnail: File?,
     override var selected: Boolean,
