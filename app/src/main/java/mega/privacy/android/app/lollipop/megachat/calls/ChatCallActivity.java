@@ -1826,7 +1826,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         anotherCallTitle.setText(anotherChat.getTitle());
         anotherCallSubtitle.setText(getString(isOnHold ? R.string.call_on_hold : R.string.call_in_progress_layout));
         anotherCallSubtitle.setAlpha(1f);
-        anotherCallLayout.setBackgroundColor(ContextCompat.getColor(this, isOnHold ? R.color.turn_on_notifications_statusbar : R.color.accentColor));
+        anotherCallLayout.setBackgroundColor(ContextCompat.getColor(this, isOnHold ? R.color.another_call_on_hold : R.color.accentColor));
         anotherCallLayout.setVisibility(View.VISIBLE);
     }
 
