@@ -18,6 +18,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -309,8 +312,8 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 			}
-			
-			updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	
@@ -816,7 +819,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 
-		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || (pathNavigation.equals("/") && !isSearching())) {
+		if (adapter == null || pathNavigation == null || pathNavigation.isEmpty() || (pathNavigation.equals(OFFLINE_ROOT) && !isSearching())) {
 			return 0;
 		}
 
@@ -833,9 +836,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 
 			pathNavigation = ((ManagerActivityLollipop) context).getOfflineSearchPath();
-			if (((ManagerActivityLollipop) context).getOfflineSearchPath().equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
+			if (pathNavigation == null || pathNavigation.equals(((ManagerActivityLollipop) context).getInitialSearchPath())) {
 				((ManagerActivityLollipop) context).removeOfflineSearchPath();
 				((ManagerActivityLollipop) context).setSearchQuery(null);
+				if (pathNavigation == null) {
+					pathNavigation = OFFLINE_ROOT;
+				}
 			}
 		} else {
 			pathNavigation = pathNavigation.substring(0, pathNavigation.length() - 1);
@@ -954,7 +960,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}
 
 		if (pNav.length() == 0) {
-			mOffList = dbH.findByPath("/");
+			mOffList = dbH.findByPath(OFFLINE_ROOT);
 		} else {
 			findPath(pNav);
 		}
@@ -973,36 +979,30 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	
 	private void findPath (String pNav){
 		MegaOffline nodeToShow;
-		
-		if(!pNav.equals("/")){
-			
+
+		if (!pNav.equals(OFFLINE_ROOT)) {
 			if (pNav.endsWith("/")) {
 				pNav = pNav.substring(0, pNav.length() - 1);
 			}
-			
-			int index=pNav.lastIndexOf("/");	
-			String pathToShow = pNav.substring(0, index+1);
-			String nameToShow = pNav.substring(index+1, pNav.length());
-			
+
+			int index = pNav.lastIndexOf("/");
+			String pathToShow = pNav.substring(0, index + 1);
+			String nameToShow = pNav.substring(index + 1, pNav.length());
+
 			nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
-			if(nodeToShow!=null){
+			if (nodeToShow != null) {
 				//Show the node
-				pathNavigation=pathToShow+nodeToShow.getName()+"/";
+				pathNavigation = pathToShow + nodeToShow.getName() + "/";
 				return;
+			} else if (pathNavigation.equals(OFFLINE_ROOT)) {
+				logDebug("Return Path /");
+				return;
+			} else {
+				findPath(pathToShow);
 			}
-			else{
-				if(pathNavigation.equals("/")){
-					logDebug("Return Path /");
-					return;
-				}
-				else{
-					findPath(pathToShow);
-				}				
-			}
+		} else {
+			pathNavigation = OFFLINE_ROOT;
 		}
-		else{
-			pathNavigation="/";
-		}		
 	}
 
 	public void setPathNavigation(String _pathNavigation){

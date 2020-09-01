@@ -1703,7 +1703,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void checkTransferOverQuota(boolean isCurrentOverQuota) {
 		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 
-		if (MegaApplication.isActivityVisible()) {
+		if (app.isActivityVisible()) {
 			if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
 				transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
 				transfersManagement.setTransferOverQuotaTimestamp();

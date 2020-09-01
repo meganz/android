@@ -6,6 +6,7 @@ import android.content.Intent;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
+import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -19,8 +20,17 @@ public class VerifyCredentialsListener extends BaseListener {
     }
 
     @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        if (request.getType() != MegaRequest.TYPE_VERIFY_CREDENTIALS) return;
+
+        MegaApplication.setVerifyingCredentials(true);
+    }
+
+    @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() != MegaRequest.TYPE_VERIFY_CREDENTIALS) return;
+
+        MegaApplication.setVerifyingCredentials(false);
 
         context.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
                 .setAction(ACTION_UPDATE_CREDENTIALS)

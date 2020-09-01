@@ -122,12 +122,14 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
@@ -1098,8 +1100,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (infos == null) {
             logError("Error: infos is NULL");
             return;
-        }
-        else {
+        } else {
+            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                showOverDiskQuotaPaywallWarning();
+                return;
+            }
 
             MegaNode parentNode = megaApi.getRootNode();
             showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
@@ -1580,6 +1585,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 break;
             }
             case R.id.pdf_viewer_chat: {
+                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning();
+                    break;
+                }
 
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);

@@ -63,6 +63,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -1070,6 +1071,11 @@ public class ChatController {
             }
         }
 
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         for (int i = 0; i < nodeList.size(); i++) {
 
@@ -1351,6 +1357,11 @@ public class ChatController {
                 }
                 return;
             }
+        }
+
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
         }
 
         if (nodeList == null) {
@@ -1802,6 +1813,11 @@ public class ChatController {
         nC.checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
 
         if (notOwnerNodes.size() == 0) {
+            //Copy the ownerNodes handles to use them in case they are not the original ones stored on handles list
+            for (int i=0; i< ownerNodes.size(); i++) {
+                handles[i] = ownerNodes.get(i).getHandle();
+            }
+
             if (context instanceof ContactInfoActivityLollipop) {
                 ((ContactInfoActivityLollipop) context).sendFilesToChat(handles, idChats[0]);
                 return;

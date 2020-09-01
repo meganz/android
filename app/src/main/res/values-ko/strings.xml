@@ -1102,7 +1102,7 @@
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">입력한 폴더 링크의 해독 키가 잘못 되었습니다.</string>
 
-    <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">내 개인 정보</string>
+    <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">내 자격증명</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">제한됨</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">대화</string>
@@ -1228,7 +1228,7 @@
     <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat"><![CDATA[<font color=\'#060000\'>%1$s</font> <font color=\'#868686\'> cleared the chat history</font>]]></string>
     -->
 
-    <string name="group_chat_label" context="Label for the sliding panel of a group chat">그룹 대화</string>
+    <string name="group_chat_label" context="Label for the sliding panel of a group chat">단체 대화</string>
     <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">그룹 정보</string>
     <string name="group_chat_start_conversation_label" context="Label for the option of the sliding panel to start a one to one chat">대화 시작</string>
     <string name="group_chat_edit_profile_label" context="Label for the option of the sliding panel to edit the profile">프로필 수정</string>
@@ -1248,7 +1248,7 @@
     <string name="change_title_option" context="Option in menu to change title of a chat group.">제목 변경</string>
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">떠나면 더 이상 메시지를 읽거나 전송할 수 없습니다.</string>
-    <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">그룹 대화를 떠날까요?</string>
+    <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">단체 대화를 떠날까요?</string>
 
     <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">이 대화 안의 모든 메시지와 미디어가 삭제됩니다.</string>
     <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">기록을 삭제할까요?</string>
@@ -1265,7 +1265,7 @@
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s님이[/A][B] 그룹 대화 이름을 [/B][C]"%2$s"[/C](으)로 변경하였습니다.</string>
 
-    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s님이[/A][B] 그룹 대화를 떠났습니다[/B]</string>
+    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s님이[/A][B] 단체 대화를 떠났습니다[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">메시지가 발송되지 않았습니다. 옵션을 보려면 탭하세요</string>
     <!--
@@ -1311,11 +1311,11 @@
     -->
     <string name="non_format_message_permissions_changed" context="chat message when the permissions for a user has been changed">%1$s님이 %3$s님에 의해 %2$s(으)로 변경되었습니다</string>
     <string name="non_format_message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">%1$s님이 %2$s님의 초대에 의해 이 그룹 대화에 추가되었습니다</string>
-    <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s님이 %2$s님에 의해 그룹 대화에 제거되었습니다</string>
+    <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s님이 %2$s님에 의해 단체 대화에 제거되었습니다</string>
 
-    <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s님이 그룹 대화 이름을 "%2$s"로 변경하였습니다</string>
+    <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s님이 단체 대화 이름을 ”%2$s”로 변경하였습니다</string>
 
-    <string name="non_format_message_participant_left_group_chat" context="chat message when a participant left a group chat">%1$s님이 그룹 대화를 떠났습니다</string>
+    <string name="non_format_message_participant_left_group_chat" context="chat message when a participant left a group chat">%1$s님이 단체 대화를 떠났습니다</string>
 
     <string name="messages_copied_clipboard" context="success alert when the user copy some messages to the clipboard">클립보드에 복사됨</string>
 
@@ -1543,7 +1543,7 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">들여오기</string>
     <string name="save_for_offline" context="Menu option">오프라인용으로 저장</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">클라우드 드라이브에 추가</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">오프라인에 저장</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">오프라인용으로 저장</string>
 
     <string name="general_view_contacts" context="Menu option">연락처 보기</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">일부 링크의 제거를 실패하였습니다. 나중에 다시 시도하세요.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">링크 생성 실패. 다시 시도하세요.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">일부 링크 생성 실패. 다시 시도하세요.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">링크가 성공적으로 제거되었습니다.</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">휴지통으로 옮길까요?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">이 폴더를 휴지통에 버리시겠습니까? 이로 인해 카메라 업로드가 해제됩니다.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">이 폴더를 휴지통으로 이동하시겠습니까? 미디어 업로드가 해제됩니다.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">이 폴더를 휴지통으로 이동하시겠습니까? 보조 미디어 업로드가 해제됩니다.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">휴지통으로 옮길까요?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">MEGA에서 삭제할까요?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">폴더를 떠나면, 다시 볼 수 없습니다.</string>
@@ -2198,7 +2198,7 @@
     <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">연락처 %s은(는) 이미 추가되어 있습니다.</string>
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">연락처 %s은(는) 이미 추가되어 있습니다.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">%s와(과) 공유할까요?</string>
-    <string name="new_group_chat_label" context="Text button for init a group chat">새 그룹 대화</string>
+    <string name="new_group_chat_label" context="Text button for init a group chat">새 단체 대화</string>
     <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">연락처 추가</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">로그아웃됨</string>
@@ -2781,19 +2781,19 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">%s에 생성된 대화</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">메시지 선택</string>
 
-    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">자격증명 검증중</string>
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">자격증명 인증중</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">인증되지 않음</string>
     <string name="label_verified" context="Action indicating something was verified.">확인됨</string>
-    <string name="authenticity_credentials_label" context="”Verify user” dialog title">인증 정보</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">진위 증명</string>
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">현실에서 가장 확실한 방법은 직접 만나는 것입니다. 만약 증명된 OTR이나 PGP 같은 이미 증명된 다른 방법이 있다면, 그것을 사용해도 좋습니다.</string>
-    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">당신의 개인정보</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">당신의 자격증명</string>
     <string name="action_reset" context="Button to reset credentials">재설정</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">전화번호를 제거할까요?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">전화번호가 성공적으로 삭제되었습니다.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">전화 번호 삭제 실패</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">보기</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s님의 자격증명</string>
 
 </resources>

@@ -50,6 +50,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -308,7 +309,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 logDebug("Show TOUR_FRAGMENT");
 
                 if (tourFragment == null) {
-                    tourFragment = new TourFragmentLollipop();
+                    tourFragment = TourFragmentLollipop.newInstance(intentReceived.getDataString());
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -389,7 +390,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         logDebug("firstTimeCam: " + firstNameTemp + "time: " + time);
         if (firstTimeCam) {
             Intent intent = new Intent(this, ManagerActivityLollipop.class);
-            intent.putExtra("firstLogin", true);
+            intent.putExtra(EXTRA_FIRST_LOGIN, true);
             startActivity(intent);
             finish();
         } else {

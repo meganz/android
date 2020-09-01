@@ -79,10 +79,13 @@ import nz.mega.sdk.MegaUser;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
@@ -1814,7 +1817,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (firstTime){
                         logDebug("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
-                        intent.putExtra("firstLogin", true);
+                        intent.putExtra(EXTRA_FIRST_LOGIN, true);
                         if (action != null){
                             logDebug("Action not NULL");
                             if (action.equals(ACTION_EXPORT_MASTER_KEY)){
@@ -1850,7 +1853,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                         else{
                             intent = new Intent(context,ManagerActivityLollipop.class);
-                            intent.putExtra("firstLogin", true);
+                            intent.putExtra(EXTRA_FIRST_LOGIN, true);
                             initialCam = true;
                         }
 
@@ -1927,7 +1930,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         intent.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                     }
 
-                    loginActivityLollipop.startActivity(intent);
+                    if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+                        showOverDiskQuotaPaywallWarning(true);
+                    } else {
+                        loginActivityLollipop.startActivity(intent);
+                    }
                     loginActivityLollipop.finish();
                 }
             }

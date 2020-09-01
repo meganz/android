@@ -17,6 +17,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -68,12 +71,14 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileBrowserFragmentLollipop extends RotatableFragment{
 
@@ -273,6 +278,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_send_to_chat:{
 					logDebug("Send files to chat");
+					if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+						showOverDiskQuotaPaywallWarning();
+						break;
+					}
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
@@ -1139,8 +1148,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 
                 actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
             }
-            
-            updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
         }
     }
     
@@ -1171,8 +1180,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 folders++;
             }
         }
-        
-        Resources res = getActivity().getResources();
         
         String title;
         int sum = files + folders;
@@ -1470,7 +1477,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	public void setTransferOverQuotaBannerVisibility() {
     	if (MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()) {
     		transferOverQuotaBanner.setVisibility(View.VISIBLE);
-    		transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, formatTimeDDHHMMSS(megaApi.getBandwidthOverquotaDelay() * 1000)));
+    		transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())));
 			createAndShowCountDownTimer(R.string.current_text_depleted_transfer_overquota, transferOverQuotaBanner, transferOverQuotaBannerText);
 		} else {
     		transferOverQuotaBanner.setVisibility(View.GONE);

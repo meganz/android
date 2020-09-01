@@ -14,6 +14,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 
 import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
+import static mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
@@ -84,7 +85,8 @@ public class LinksUtil {
                         return;
                     }
 
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    context.startActivity(new Intent(Intent.ACTION_VIEW, uri)
+                            .putExtra(OPENED_FROM_CHAT, true));
                 }
             }
         };

@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.ExportListener;
+import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -55,6 +56,7 @@ import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DownloadUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -63,6 +65,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeController {
 
@@ -623,6 +626,11 @@ public class NodeController {
 
     public void download(String parentPath, String url, long size, long[] hashes, boolean highPriority) {
         logDebug("files to download: " + hashes.length);
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
         SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath);
         if (sdCardOperator == null) {
             requestLocalFolder(new DownloadInfo(highPriority, size, hashes), context.getString(R.string.no_external_SD_card_detected));
@@ -694,7 +702,7 @@ public class NodeController {
                         }
                         mediaIntent.putExtra(IS_PLAYLIST, false);
                         mediaIntent.putExtra("HANDLE", tempNode.getHandle());
-                        mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY, MegaApplication.isActivityVisible());
+                        mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY, MegaApplication.getInstance().isActivityVisible());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             mediaIntent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
 
@@ -1233,32 +1241,23 @@ public class NodeController {
         return -1;
     }
 
-    public void leaveIncomingShare (Context context, final MegaNode n){
+    public void leaveIncomingShare (final MegaNode n){
         logDebug("Node handle: " + n.getHandle());
-
-        if (context instanceof ManagerActivityLollipop) {
-            megaApi.remove(n, (ManagerActivityLollipop) context);
-            return;
-        }
-
-        megaApi.remove(n);
+        megaApi.remove(n, new RemoveListener(context, true));
     }
 
     public void leaveMultipleIncomingShares (final ArrayList<Long> handleList){
         logDebug("Leaving " + handleList.size() + " incoming shares");
 
-        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_LEAVE_SHARE, context);
-        if(handleList.size()>1){
-            logDebug("handleList.size()>1");
-            for (int i=0; i<handleList.size(); i++){
-                MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-                megaApi.remove(node, moveMultipleListener);
-            }
+        if (handleList.size() == 1) {
+            leaveIncomingShare(megaApi.getNodeByHandle(handleList.get(0)));
+            return;
         }
-        else{
-            logDebug("handleList.size()<=1");
-            MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
-            megaApi.remove(node, (ManagerActivityLollipop)context);
+
+        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_LEAVE_SHARE, context);
+        for (int i = 0; i < handleList.size(); i++) {
+            MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+            megaApi.remove(node, moveMultipleListener);
         }
     }
 
@@ -1516,6 +1515,12 @@ public class NodeController {
 
     public void downloadTo(MegaNode currentDocument, String parentPath, String url){
         logDebug("downloadTo");
+
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
         SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath);
         if(sdCardOperator == null) {
             intentPickFolder(currentDocument, url);

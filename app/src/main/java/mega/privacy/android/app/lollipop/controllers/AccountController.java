@@ -444,7 +444,9 @@ public class AccountController {
         new LastShowSMSDialogTimeChecker(context).reset();
 
         //Clear MyAccountInfo
-        MegaApplication.getInstance().getMyAccountInfo().clear();
+        MegaApplication app = MegaApplication.getInstance();
+        app.getMyAccountInfo().clear();
+        app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
     }
 
     public static void removeFolder(Context context, File folder) {

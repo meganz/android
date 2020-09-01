@@ -101,6 +101,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -108,6 +109,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -128,7 +130,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
-	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
 	public static String ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE";
 	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
@@ -674,13 +675,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				mode = IMPORT;
 
 				importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
-
-				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
-				setView(SHOW_TABS, false, CHAT_TAB);
-			}
-			else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
-				logDebug("action = ACTION_SELECT_FOLDER");
-				mode = SELECT;
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
@@ -1729,6 +1723,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				return;
 			}
 			else {
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					return;
+				}
+
 				long parentHandle;
 				if (cDriveExplorer != null){
 					parentHandle = cDriveExplorer.getParentHandle();
@@ -1973,6 +1972,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
     }
 
     private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		File file;
 		if (isURL){
 			file = createTemporalURLFile(this, name, data);
@@ -2690,7 +2694,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					if(body.length()>0){
 						body.append("\n");
 					}
-					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
+//					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
 					body.append(sharedText);
 				}
 				String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
@@ -3308,8 +3312,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					currentAction.equals(ACTION_PICK_MOVE_FOLDER) ||
 					currentAction.equals(ACTION_PICK_COPY_FOLDER) ||
 					currentAction.equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC) ||
-					currentAction.equals(ACTION_PICK_IMPORT_FOLDER) ||
-					currentAction.equals(ACTION_SELECT_FOLDER)) {
+					currentAction.equals(ACTION_PICK_IMPORT_FOLDER)) {
 				updateAdapterExplorer(false, CHAT_TAB);
 			} else if (isChatFirst) {
 				updateAdapterExplorer(true, DEFAULT_TAB_TO_REMOVE);

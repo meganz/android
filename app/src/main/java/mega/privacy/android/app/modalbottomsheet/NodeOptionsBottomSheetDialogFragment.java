@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -40,6 +41,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -967,10 +969,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_leave_share_layout:
-                ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
+                showConfirmationLeaveIncomingShare(context, node);
                 break;
 
             case R.id.option_send_chat_layout:
+                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning();
+                    break;
+                }
                 nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
                 dismissAllowingStateLoss();
                 break;

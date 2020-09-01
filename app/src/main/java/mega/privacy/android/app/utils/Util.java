@@ -71,6 +71,10 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -116,6 +120,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class Util {
 
@@ -1249,6 +1254,11 @@ public class Util {
 	}
 
 	public static boolean canVoluntaryVerifyPhoneNumber() {
+		// If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
+		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+			return false;
+		}
+
         MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
 	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
 	    boolean allowVerify = api.smsAllowedState() == 2;
@@ -1800,5 +1810,10 @@ public class Util {
 		} else {
 			aB.setElevation(0);
 		}
+	}
+
+	public static LocalDate fromEpoch(long seconds) {
+		return LocalDate.from(
+				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
 }

@@ -818,7 +818,7 @@
     <string name="settings_about_terms_of_service" context="">利用規約</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">アプリ用</string>
-    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK版</string>
+    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDKバージョン</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDKバージョン</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">ソースコードを見る</string>
 
@@ -1543,7 +1543,7 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">インポート</string>
     <string name="save_for_offline" context="Menu option">オフラインで保存</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">クラウドドライブに追加する</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">オフラインに保存</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">オフラインで保存</string>
 
     <string name="general_view_contacts" context="Menu option">連絡先を表示</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">一部のリンクを削除できませんでした。後でもう一度お試しください。</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">リンクの作成に失敗しました。後でもう一度お試しください。</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">一部のリンクの作成に失敗しました。後でもう一度お試しください。</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">リンクを削除しました。</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">ゴミ箱に移しますか？</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">このフォルダをごみ箱に移動してもよろしいですか？　これによりカメラアップロードが無効になります。</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">このフォルダをごみ箱に移動してもよろしいですか？　これによりメディアアップロードが無効になります。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">このフォルダをごみ箱に移動してもよろしいですか？　これによりセカンダリメディアアップロードが無効になります。</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">ゴミ箱に移しますか？</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">MEGAから削除しますか？</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">当該フォルダから去ると、再度それを見ることはできません。</string>
@@ -2789,11 +2789,11 @@
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">本人確認</string>
     <string name="action_reset" context="Button to reset credentials">リセット</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">あなたの電話番号を削除しますか？</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">お使いの電話番号が正常に削除されました。</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">電話番号を削除できませんでした。</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">確認</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%sさんの資格情報</string>
 
 </resources>

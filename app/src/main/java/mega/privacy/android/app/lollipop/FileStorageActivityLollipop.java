@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -296,8 +297,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				
 				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
-			
-			updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	

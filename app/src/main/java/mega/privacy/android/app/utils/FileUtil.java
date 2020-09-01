@@ -693,5 +693,36 @@ public class FileUtil {
         if ((split.length >= 2) && (split[1] != null)) return split[1];
         else return File.separator;
     }
+
+    public static File getFileFromContentUri(Context context, Uri uri) {
+        File file = new File(context.getCacheDir(), uri.getLastPathSegment());
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            in = context.getContentResolver().openInputStream(uri);
+            out = new FileOutputStream(file);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return file;
+    }
 }
 

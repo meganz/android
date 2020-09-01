@@ -15,6 +15,8 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_TRANSFER_UPDATE = "BROADCAST_ACTION_INTENT_TRANSFER_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR = "INTENT_PROXIMITY_SENSOR";
     public static final String BROADCAST_ACTION_INTENT_LEFT_CHAT = "INTENT_LEFT_CHAT";
+    public static final String BROADCAST_ACTION_SHOW_SNACKBAR = "INTENT_SHOW_SNACKBAR";
+    public static final String BROADCAST_ACTION_DESTROY_ACTION_MODE = "INTENT_DESTROY_ACTION_MODE";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -32,6 +34,7 @@ public class BroadcastConstants {
     public static final String ACTION_UPDATE_LAST_NAME = "ACTION_UPDATE_LAST_NAME";
     public static final String ACTION_UPDATE_CREDENTIALS = "ACTION_UPDATE_CREDENTIALS";
     public static final String ACTION_LEFT_CHAT = "ACTION_LEFT_CHAT";
+    public static final String ACTION_CLOSE_CHAT_AFTER_IMPORT = "ACTION_CLOSE_CHAT_AFTER_IMPORT";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
@@ -57,4 +60,5 @@ public class BroadcastConstants {
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";
     public static final int EXTRA_BROADCAST_INVALID_VALUE = -1;
     public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
+    public static final String SNACKBAR_TEXT = "SNACKBAR_TEXT";
 }

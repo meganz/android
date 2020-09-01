@@ -75,7 +75,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLoll
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -84,6 +83,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -110,6 +110,7 @@ import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -608,6 +609,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			case R.id.full_image_viewer_chat:{
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					break;
+				}
 
 //				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
@@ -1223,9 +1228,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-			if (CameraUploadFragmentLollipop.imageDrag != null){
-				CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
-			}
+			CameraUploadsFragment.setDraggingThumbnailVisibility(visibility);
 		}
 		else if (adapterType == OFFLINE_ADAPTER) {
 			if (OfflineFragmentLollipop.imageDrag != null){
@@ -1287,10 +1290,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
 			}
 		}
-		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-			if (CameraUploadFragmentLollipop.imageDrag != null) {
-				CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
-			}
+		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
+			CameraUploadsFragment.getDraggingThumbnailLocationOnScreen(location);
 		}
 		else if (adapterType == OFFLINE_ADAPTER){
 			if (OfflineFragmentLollipop.imageDrag != null){
@@ -2189,6 +2190,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 							REQUEST_WRITE_STORAGE);
 				}
+			}
+
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
 			}
 
 			Uri treeUri = intent.getData();

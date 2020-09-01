@@ -15,9 +15,11 @@ import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -42,6 +44,11 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         File qrFile = buildQrFile(getActivity(), myEmail + QR_IMAGE_FILE_NAME);
 
         if (isFileAvailable(qrFile)) {
+            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                showOverDiskQuotaPaywallWarning();
+                return;
+            }
+
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
             Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
             intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
