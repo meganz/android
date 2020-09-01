@@ -126,7 +126,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -376,6 +376,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
     };
+
+    private static DraggingThumbnailCallback sDraggingThumbnailCallback;
+
+    public static void setDraggingThumbnailCallback(DraggingThumbnailCallback cb) {
+        sDraggingThumbnailCallback = cb;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1556,7 +1562,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-            CameraUploadsFragment.setDraggingThumbnailVisibility(visibility);
+            DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
         else if (adapterType == OFFLINE_ADAPTER) {
             if (OfflineFragmentLollipop.imageDrag != null){
@@ -1618,7 +1627,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-            CameraUploadsFragment.getDraggingThumbnailLocationOnScreen(location);
+            DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
         else if (adapterType == OFFLINE_ADAPTER){
             if (OfflineFragmentLollipop.imageDrag != null){
@@ -3410,6 +3422,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+
+        sDraggingThumbnailCallback = null;
 
         super.onDestroy();
     }

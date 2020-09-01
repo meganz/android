@@ -83,7 +83,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -233,6 +233,12 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
+	private static DraggingThumbnailCallback sDraggingThumbnailCallback;
+
+	public static void setDraggingThumbnailCallback(DraggingThumbnailCallback cb) {
+		sDraggingThumbnailCallback = cb;
+	}
+
 	@Override
 	public void onDestroy(){
 
@@ -245,6 +251,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+
+		sDraggingThumbnailCallback = null;
 
 		super.onDestroy();
 	}
@@ -1228,7 +1236,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-			CameraUploadsFragment.setDraggingThumbnailVisibility(visibility);
+			DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+			if (callback != null) {
+				callback.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER) {
 			if (OfflineFragmentLollipop.imageDrag != null){
@@ -1291,7 +1302,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-			CameraUploadsFragment.getDraggingThumbnailLocationOnScreen(location);
+			DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+			if (callback != null) {
+				callback.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER){
 			if (OfflineFragmentLollipop.imageDrag != null){

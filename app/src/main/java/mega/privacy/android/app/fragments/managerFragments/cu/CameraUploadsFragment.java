@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -34,6 +33,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
@@ -51,6 +51,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
@@ -99,8 +100,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private static final int SPAN_LARGE_GRID = 3;
     private static final int SPAN_SMALL_GRID = 7;
 
-    @SuppressLint("StaticFieldLeak") private static CameraUploadsFragment sInstanceForDragging;
-
     private int mCamera = TYPE_CAMERA;
 
     private ManagerActivityLollipop mManagerActivity;
@@ -121,37 +120,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         fragment.setArguments(args);
 
         return fragment;
-    }
-
-    /**
-     * Get the location on screen of the dragging node thumbnail.
-     *
-     * TODO: we need figure out a better way to implement the drag feature, this kind of static hack
-     * should be avoided.
-     *
-     * @param location out param for location
-     */
-    public static void getDraggingThumbnailLocationOnScreen(int[] location) {
-        CameraUploadsFragment fragment = sInstanceForDragging;
-        if (fragment == null) {
-            return;
-        }
-        int position = fragment.mAdapter.getNodePosition(fragment.mDraggingNodeHandle);
-        RecyclerView.ViewHolder viewHolder =
-                fragment.mBinding.cuList.findViewHolderForLayoutPosition(position);
-        if (viewHolder == null) {
-            return;
-        }
-        int[] res = fragment.mAdapter.getThumbnailLocationOnScreen(viewHolder);
-        System.arraycopy(res, 0, location, 0, 2);
-    }
-
-    public static void setDraggingThumbnailVisibility(int visibility) {
-        CameraUploadsFragment fragment = sInstanceForDragging;
-        if (fragment == null) {
-            return;
-        }
-        fragment.setDraggingThumbnailVisibility(fragment.mDraggingNodeHandle, visibility);
     }
 
     public int getItemCount() {
@@ -461,6 +429,18 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupRecyclerView();
         setupOtherViews();
         observeLiveData();
+
+        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
+                new CuDraggingThumbnailCallback(this));
+        AudioVideoPlayerLollipop.setDraggingThumbnailCallback(
+                new CuDraggingThumbnailCallback(this));
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+
+        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(null);
+        AudioVideoPlayerLollipop.setDraggingThumbnailCallback(null);
     }
 
     private void setupRecyclerView() {
@@ -656,7 +636,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         super.onResume();
 
         reloadNodes(mManagerActivity.orderCamera);
-        sInstanceForDragging = null;
     }
 
     private void openNode(int position, CuNode cuNode) {
@@ -774,7 +753,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private void launchNodeViewer(Intent intent, long handle) {
         context.startActivity(intent);
         requireActivity().overridePendingTransition(0, 0);
-        sInstanceForDragging = this;
         mDraggingNodeHandle = handle;
     }
 
@@ -790,5 +768,34 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     @Override public void onNodeLongClicked(int position, CuNode node) {
         mViewModel.onNodeLongClicked(position, node);
+    }
+
+    private static class CuDraggingThumbnailCallback implements DraggingThumbnailCallback {
+        private final WeakReference<CameraUploadsFragment> mFragment;
+
+        private CuDraggingThumbnailCallback(CameraUploadsFragment fragment) {
+            mFragment = new WeakReference<>(fragment);
+        }
+
+        @Override public void setVisibility(int visibility) {
+            CameraUploadsFragment fragment = mFragment.get();
+            if (fragment != null) {
+                fragment.setDraggingThumbnailVisibility(fragment.mDraggingNodeHandle, visibility);
+            }
+        }
+
+        @Override public void getLocationOnScreen(int[] location) {
+            CameraUploadsFragment fragment = mFragment.get();
+            if (fragment != null) {
+                int position = fragment.mAdapter.getNodePosition(fragment.mDraggingNodeHandle);
+                RecyclerView.ViewHolder viewHolder =
+                        fragment.mBinding.cuList.findViewHolderForLayoutPosition(position);
+                if (viewHolder == null) {
+                    return;
+                }
+                int[] res = fragment.mAdapter.getThumbnailLocationOnScreen(viewHolder);
+                System.arraycopy(res, 0, location, 0, 2);
+            }
+        }
     }
 }
