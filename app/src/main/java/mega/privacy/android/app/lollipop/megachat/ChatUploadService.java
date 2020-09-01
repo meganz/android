@@ -90,6 +90,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private boolean isForeground = false;
 	private boolean canceled;
 
+    private String editedFileName;
+
 	boolean sendOriginalAttachments=false;
 
 	//0 - not overquota, not pre-overquota
@@ -245,6 +247,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
 		parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE));
+        editedFileName = intent.getStringExtra(EXTRA_NAME_EDITED);
 
 		if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
 			fileExplorerUpload = true;
@@ -378,7 +381,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				uploadPath = pendingMsg.getFilePath();
 			}
 
-			megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+			if (editedFileName != null) {
+                megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, editedFileName);
+            } else {
+                megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+            }
 		} else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
 			logDebug("DATA connection is Mp4Video");
 
@@ -419,7 +426,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						pendingMessages.add(pendMsg);
 					}
 
-					megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+                    if (editedFileName != null) {
+                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, editedFileName);
+                    } else {
+                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+                    }
 				}
 				else{
 					for (PendingMessageSingle pendMsg : pendingMsgs) {
@@ -438,7 +449,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					pendingMessages.add(pendMsg);
 				}
 
-				megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+                if (editedFileName != null) {
+                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, editedFileName);
+                } else {
+                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+                }
 				logError("EXCEPTION: Video cannot be downsampled", throwable);
 			}
 		}
@@ -450,7 +465,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if((type!=null)&&(type.equals(EXTRA_VOICE_CLIP))){
 				data = EXTRA_VOICE_CLIP+"-"+data;
 			}
-			megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
+            if (editedFileName != null) {
+                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false, editedFileName);
+            } else {
+                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
+            }
 		}
 	}
 
@@ -575,9 +594,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		if(downFile!=null){
-			megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+idPendingMessage, false);
-		}
+        if (downFile != null) {
+            if (editedFileName != null) {
+                megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + idPendingMessage, false, editedFileName);
+            } else {
+                megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + idPendingMessage, false);
+            }
+        }
 	}
 
 	private void showOverquotaNotification(){
