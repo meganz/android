@@ -670,6 +670,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     displayAvatar(position, holder, peer);
                     showOnHoldImage(holder.avatarLayout, holder.avatarImage, holder.avatarImageCallOnHold, peer);
                 }
+                checkParticipantAudio(position, holder, peer);
             } else {
                 notifyItemChanged(position);
             }

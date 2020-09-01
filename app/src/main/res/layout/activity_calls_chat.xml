@@ -200,47 +200,59 @@
                 android:layout_gravity="center_vertical"
                 android:paddingTop="10dp"
                 android:paddingBottom="5dp"
-                android:background="@color/accentColor"
                 android:gravity="center_vertical"
+                android:background="@color/accentColor"
                 android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/another_call_layout_layer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="72dp"
-                    android:gravity="left"
-                    android:orientation="vertical">
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/another_call_title"
+                    android:layout_gravity="center_vertical"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentTop="true"
+                    android:minHeight="36dp"
+                    android:gravity="center_vertical"
+                    android:visibility="visible">
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:background="@null"
+                        android:layout_marginLeft="72dp"
                         android:gravity="left"
-                        android:ellipsize="end"
-                        android:fontFamily="roboto"
-                        android:maxLines="1"
-                        android:text="@string/call_on_hold"
-                        android:textAlignment="gravity"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        app:emojiSize="18sp" />
-                    <TextView
-                        android:id="@+id/another_call_subtitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:gravity="left"
-                        android:ellipsize="end"
-                        android:fontFamily="roboto"
-                        android:maxLines="1"
-                        android:text="@string/call_on_hold"
-                        android:textAlignment="gravity"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:textStyle="normal"/>
-                </LinearLayout>
+                        android:orientation="vertical">
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
+                            android:id="@+id/another_call_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:background="@null"
+                            android:gravity="left"
+                            android:ellipsize="end"
+                            android:fontFamily="roboto"
+                            android:maxLines="1"
+                            android:text="@string/call_on_hold"
+                            android:textAlignment="gravity"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            app:emojiSize="18sp" />
+                        <TextView
+                            android:id="@+id/another_call_subtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:gravity="left"
+                            android:ellipsize="end"
+                            android:fontFamily="roboto"
+                            android:maxLines="1"
+                            android:text="@string/call_on_hold"
+                            android:textAlignment="gravity"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:textStyle="normal"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+
 
             </RelativeLayout>
 

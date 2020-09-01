@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -126,6 +127,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private EmojiTextView infoUsersBar;
     private RelativeLayout reconnectingLayout;
     private RelativeLayout anotherCallLayout;
+    private RelativeLayout anotherCallLayoutLayer;
     private EmojiTextView anotherCallTitle;
     private TextView anotherCallSubtitle;
     private TextView reconnectingText;
@@ -524,7 +526,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
 
             if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-                logDebug("The call on hold change");
                 checkCallOnHold();
             }
 
@@ -718,6 +719,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         anotherCallLayout = findViewById(R.id.another_call_layout);
         anotherCallLayout.setOnClickListener(this);
+        anotherCallLayoutLayer = findViewById(R.id.another_call_layout_layer);
         anotherCallTitle = findViewById(R.id.another_call_title);
         anotherCallSubtitle = findViewById(R.id.another_call_subtitle);
         anotherCallLayout.setVisibility(View.GONE);
@@ -1826,7 +1828,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         anotherCallTitle.setText(anotherChat.getTitle());
         anotherCallSubtitle.setText(getString(isOnHold ? R.string.call_on_hold : R.string.call_in_progress_layout));
         anotherCallSubtitle.setAlpha(1f);
-        anotherCallLayout.setBackgroundColor(ContextCompat.getColor(this, isOnHold ? R.color.another_call_on_hold : R.color.accentColor));
+        if (isOnHold) {
+            anotherCallLayout.setAlpha(0.9f);
+            anotherCallLayoutLayer.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_black2));
+        } else {
+            anotherCallLayout.setAlpha(1f);
+            anotherCallLayoutLayer.setBackgroundColor(Color.TRANSPARENT);
+        }
         anotherCallLayout.setVisibility(View.VISIBLE);
     }
 

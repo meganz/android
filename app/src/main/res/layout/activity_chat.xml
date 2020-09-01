@@ -171,9 +171,10 @@
                     <RelativeLayout
                         android:id="@+id/call_on_hold_layout"
                         android:layout_width="wrap_content"
-                        android:layout_height="50dp"
+                        android:layout_height="48dp"
                         android:gravity="center_horizontal"
                         android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="12dp"
                         android:layout_marginBottom="12dp"
                         android:animateLayoutChanges="true"
                         android:background="@drawable/border_call_on_hold"
