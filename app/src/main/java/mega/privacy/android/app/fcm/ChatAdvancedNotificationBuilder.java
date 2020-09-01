@@ -915,6 +915,16 @@ public final class ChatAdvancedNotificationBuilder {
         String numberButtons = getNumberButtons();
 
         if (!numberButtons.equals(THREE_BUTTONS) && !numberButtons.equals(VERTICAL_TWO_BUTTONS)) {
+            collapsedViews.setViewVisibility(R.id.arrow, GONE);
+            expandedView.setViewVisibility(R.id.arrow, GONE);
+        } else {
+            collapsedViews.setViewVisibility(R.id.arrow, View.VISIBLE);
+            collapsedViews.setOnClickPendingIntent(R.id.arrow, null);
+            expandedView.setViewVisibility(R.id.arrow, View.VISIBLE);
+            expandedView.setOnClickPendingIntent(R.id.arrow, null);
+        }
+
+        if (!numberButtons.equals(THREE_BUTTONS) && !numberButtons.equals(VERTICAL_TWO_BUTTONS)) {
             expandedView.setViewVisibility(R.id.small_layout, View.VISIBLE);
             expandedView.setViewVisibility(R.id.big_layout, GONE);
 
@@ -1064,6 +1074,7 @@ public final class ChatAdvancedNotificationBuilder {
             collapsedViews.setImageViewBitmap(R.id.avatar_image, avatarIcon);
             collapsedViews.setViewVisibility(R.id.avatar_layout, View.VISIBLE);
         }
+        collapsedViews.setViewVisibility(R.id.arrow, GONE);
 
         /*Expanded*/
         RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications_expanded);
@@ -1076,6 +1087,7 @@ public final class ChatAdvancedNotificationBuilder {
             expandedView.setImageViewBitmap(R.id.avatar_image, avatarIcon);
             expandedView.setViewVisibility(R.id.avatar_layout, View.VISIBLE);
         }
+        expandedView.setViewVisibility(R.id.arrow, GONE);
 
         expandedView.setViewVisibility(R.id.small_layout, View.VISIBLE);
         expandedView.setViewVisibility(R.id.big_layout, GONE);

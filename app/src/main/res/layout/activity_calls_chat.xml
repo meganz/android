@@ -198,8 +198,6 @@
                 android:layout_below="@id/call_toolbar"
                 android:minHeight="36dp"
                 android:layout_gravity="center_vertical"
-                android:paddingTop="10dp"
-                android:paddingBottom="5dp"
                 android:gravity="center_vertical"
                 android:background="@color/accentColor"
                 android:visibility="gone">
@@ -208,8 +206,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentTop="true"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="5dp"
                     android:minHeight="36dp"
                     android:gravity="center_vertical"
                     android:visibility="visible">
