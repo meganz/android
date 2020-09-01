@@ -129,9 +129,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
         instanceForDragging = null
 
-        val filter = IntentFilter(REFRESH_OFFLINE_FILE_LIST)
         LocalBroadcastManager.getInstance(requireContext())
-            .registerReceiver(receiverRefreshOffline, filter)
+            .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
+
+        refreshNodes()
     }
 
     override fun onPause() {
@@ -375,11 +376,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 manager.setTextSubmitted()
             }
         }
-        viewModel.showSortedBy.observe(viewLifecycleOwner) {
+        viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
                 manager.showNewSortByPanel()
             }
-        }
+        })
         viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
             val rv = recyclerView
             val rvAdapter = adapter
