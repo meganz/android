@@ -82,6 +82,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -113,6 +114,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         viewModel.showFileInfoEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { activity.showNodeOptionsPanel(it.node) }
         })
+    }
+
+    private fun setupDraggingThumbnailCallback() {
+        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
+            DraggingThumbnailCallback(
+                WeakReference(this)
+            )
+        )
     }
 
     /**
@@ -358,12 +367,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             }
 
             intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it))
-
-            FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
-                DraggingThumbnailCallback(
-                    WeakReference(this)
-                )
-            )
 
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
