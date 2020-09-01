@@ -690,12 +690,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     //compare size
                     MegaNode node = checkExsitBySize(parent, toUpload.length());
                     if (node != null && node.getOriginalFingerprint() == null) {
-                        logDebug(node.getName() + " already exists, , delete record from database.");
+                        logDebug(node.getName() + " already exists, delete record from database.");
                         dbH.deleteSyncRecordByPath(path, isSec);
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        logDebug("Upload file from: " + path + ", last modify timestamp is: " + lastModified);
+                        logDebug("Upload file from: " + path + ", name is:" + file.getFileName() + ", last modify timestamp is: " + lastModified);
                         megaApi.startUpload(path, parent, file.getFileName(), lastModified / 1000, this);
                     }
                 } else {
@@ -1125,7 +1125,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         boolean needToSetSecondary = false;
         // Only check MU folder when secondary upload is enabled.
         if (secondaryEnabled) {
-            logDebug("the secondary uploads are enabled");
+            logDebug("Secondary uploads are enabled.");
             // If MU folder in local setting is deleted, then need to reset.
             needToSetSecondary = isNodeInRubbishOrDeleted(secondaryUploadHandle);
             if (needToSetSecondary) {
@@ -1456,7 +1456,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-        logDebug("onTransferStart: " + transfer.getFileName());
         cuTransfers.add(transfer);
     }
 
@@ -1496,9 +1495,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-        logDebug("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
-        logDebug("transfer.getPath:" + transfer.getPath());
-        logDebug("transfer.getNodeHandle:" + transfer.getNodeHandle());
+        logDebug("Image sync finished: " + transfer.getFileName() + ", size: " + transfer.getTransferredBytes());
+        logDebug("Path: " + transfer.getPath());
+        logDebug("Node handle: " + transfer.getNodeHandle());
 
         try {
             transferFinished(api, transfer, e);
@@ -1521,7 +1520,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {
-            logDebug("Image Sync OK: " + transfer.getFileName() + " IMAGESYNCFILE: " + path);
+            logDebug("Image Sync OK: " + transfer.getFileName() + ", path is : " + path);
             MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
             boolean isSecondary = (node.getParentHandle() == secondaryUploadHandle);
             SyncRecord record = dbH.findSyncRecordByNewPath(path);
@@ -1806,7 +1805,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public void onCompressFinished(String currentIndexString) {
         if (!canceled) {
-            logDebug("Preparing to upload compressed video");
+            logDebug("Preparing to upload compressed video.");
             ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(STATUS_PENDING));
             if (compressedList.size() > 0) {
                 logDebug("Start to upload " + compressedList.size() + " compressed videos.");
