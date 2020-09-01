@@ -54,7 +54,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,6 +73,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -233,10 +236,15 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
-	private static DraggingThumbnailCallback sDraggingThumbnailCallback;
+	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+			= new HashMap<>(3);
 
-	public static void setDraggingThumbnailCallback(DraggingThumbnailCallback cb) {
-		sDraggingThumbnailCallback = cb;
+	public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
+		DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
+	}
+
+	public static void removeDraggingThumbnailCallback(Class<?> clazz) {
+		DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
 	}
 
 	@Override
@@ -252,7 +260,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
 
-		sDraggingThumbnailCallback = null;
+		DRAGGING_THUMBNAIL_CALLBACKS.clear();
 
 		super.onDestroy();
 	}
@@ -1236,7 +1244,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-			DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
 			if (callback != null) {
 				callback.setVisibility(visibility);
 			}
@@ -1302,7 +1311,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-			DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
 			if (callback != null) {
 				callback.getLocationOnScreen(location);
 			}

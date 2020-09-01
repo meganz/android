@@ -429,18 +429,21 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupRecyclerView();
         setupOtherViews();
         observeLiveData();
+        setDraggingThumbnailCallback();
+    }
 
-        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
+    private void setDraggingThumbnailCallback() {
+        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(CameraUploadsFragment.class,
                 new CuDraggingThumbnailCallback(this));
-        AudioVideoPlayerLollipop.setDraggingThumbnailCallback(
+        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(CameraUploadsFragment.class,
                 new CuDraggingThumbnailCallback(this));
     }
 
     @Override public void onDestroy() {
         super.onDestroy();
 
-        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(null);
-        AudioVideoPlayerLollipop.setDraggingThumbnailCallback(null);
+        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(CameraUploadsFragment.class);
+        AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(CameraUploadsFragment.class);
     }
 
     private void setupRecyclerView() {
@@ -658,6 +661,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         if (mime.isImage()) {
             Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
             putExtras(intent, cuNode.getIndex(), node, thumbnailLocation);
+            setDraggingThumbnailCallback();
             launchNodeViewer(intent, node.getHandle());
         } else if (mime.isVideoReproducible()) {
             String mimeType = mime.getType();
@@ -715,6 +719,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 mediaIntent.setDataAndType(Uri.parse(url), mimeType);
             }
             if (internalIntent) {
+                setDraggingThumbnailCallback();
                 launchNodeViewer(mediaIntent, node.getHandle());
             } else {
                 if (isIntentAvailable(context, mediaIntent)) {

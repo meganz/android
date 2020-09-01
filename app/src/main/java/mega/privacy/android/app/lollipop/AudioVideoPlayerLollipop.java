@@ -100,7 +100,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,6 +116,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -377,10 +380,15 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     };
 
-    private static DraggingThumbnailCallback sDraggingThumbnailCallback;
+    private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+            = new HashMap<>(3);
 
-    public static void setDraggingThumbnailCallback(DraggingThumbnailCallback cb) {
-        sDraggingThumbnailCallback = cb;
+    public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
+        DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
+    }
+
+    public static void removeDraggingThumbnailCallback(Class<?> clazz) {
+        DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
     }
 
     @Override
@@ -1562,7 +1570,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-            DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
             if (callback != null) {
                 callback.setVisibility(visibility);
             }
@@ -1627,7 +1636,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-            DraggingThumbnailCallback callback = sDraggingThumbnailCallback;
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
             if (callback != null) {
                 callback.getLocationOnScreen(location);
             }
@@ -3423,7 +3433,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 
-        sDraggingThumbnailCallback = null;
+        DRAGGING_THUMBNAIL_CALLBACKS.clear();
 
         super.onDestroy();
     }
