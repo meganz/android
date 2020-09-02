@@ -8,16 +8,19 @@ import android.content.Intent;
 
 import java.io.File;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
 import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class UploadUtil {
 
@@ -32,6 +35,11 @@ public class UploadUtil {
 
     public static void uploadFile(Context context, String filePath, long parentHandle, MegaApiAndroid megaApi) {
         logDebug("uploadTakePicture, parentHandle: " + parentHandle);
+
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
 
         if (parentHandle == -1) {
             parentHandle = megaApi.getRootNode().getHandle();

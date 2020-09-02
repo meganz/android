@@ -13,12 +13,16 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
+import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT;
+import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
 
     @Override
-    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, final Activity activity, final int[] screenPosition, final View currentView) {
+    public boolean animateExit(@NonNull final D draggableView, final Direction direction,
+        int duration, final Activity activity, final int[] screenPosition, final View currentView,
+        final int[] draggableViewLocationOnScreen) {
         logDebug("animateExit");
         draggableView.setAnimating(true);
 
@@ -51,8 +55,10 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
                 ViewCompat.animate(draggableView)
                         .withLayer()
-                        .translationX(screenPosition[0] - (draggableView.getWidth() / 2))
-                        .translationY(screenPosition[1] - (draggableView.getHeight() / 2))
+                        .translationX(screenPosition[LOCATION_INDEX_LEFT]
+                            - (draggableViewLocationOnScreen[LOCATION_INDEX_LEFT] + draggableView.getWidth() / 2))
+                        .translationY(screenPosition[LOCATION_INDEX_TOP]
+                            - (draggableViewLocationOnScreen[LOCATION_INDEX_TOP] + draggableView.getHeight() / 2))
                         .scaleX(scaleX)
                         .scaleY(scaleY)
                         .rotation(0f)

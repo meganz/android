@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -98,5 +99,15 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
                 break;
             }
         }
+    }
+
+    @Override
+    public void finish() {
+        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
+        if (myAccountInfo != null) {
+            myAccountInfo.setBusinessAlertShown(false);
+        }
+
+        super.finish();
     }
 }
