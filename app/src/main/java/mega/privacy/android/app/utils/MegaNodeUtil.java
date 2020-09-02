@@ -28,6 +28,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -36,6 +37,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -588,6 +590,51 @@ public class MegaNodeUtil {
             }
         }
         return true;
+    }
+
+    /**
+     * Shows a confirmation warning before leave an incoming share.
+     *
+     * @param context   current Context
+     * @param n         incoming share to leave
+     */
+    public static void showConfirmationLeaveIncomingShare(Context context, MegaNode n) {
+        showConfirmationLeaveIncomingShares(context, n, null);
+    }
+
+    /**
+     * Shows a confirmation warning before leave some incoming shares.
+     *
+     * @param context       current Context
+     * @param handleList    handles list of the incoming shares to leave
+     */
+    public static void showConfirmationLeaveIncomingShares (Context context, ArrayList<Long> handleList){
+        showConfirmationLeaveIncomingShares(context, null, handleList);
+    }
+
+    /**
+     * Shows a confirmation warning before leave one or more incoming shares.
+     *
+     * @param context       current Context
+     * @param n             if only one incoming share to leave, its node, null otherwise
+     * @param handleList    if mode than one incoming shares to leave, list of its handles, null otherwise
+     */
+    private static void showConfirmationLeaveIncomingShares (Context context, MegaNode n, ArrayList<Long> handleList) {
+        boolean onlyOneIncomingShare = n != null && handleList == null;
+        int numIncomingShares = onlyOneIncomingShare ? 1 : handleList.size();
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        builder.setMessage(context.getResources().getQuantityString(R.plurals.confirmation_leave_share_folder, numIncomingShares))
+                .setPositiveButton(R.string.general_leave, (dialog, which) -> {
+                    if (onlyOneIncomingShare) {
+                        new NodeController(context).leaveIncomingShare(n);
+                    } else {
+                        new NodeController(context).leaveMultipleIncomingShares(handleList);
+                    }
+
+                    MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_DESTROY_ACTION_MODE));
+                })
+                .setNegativeButton(R.string.general_cancel, null).show();
     }
 
     public static String[] getSerializedNodesFromBucket(MegaRecentActionBucket bucket) {

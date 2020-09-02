@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -45,8 +46,9 @@ import static mega.privacy.android.app.utils.Util.fromEpoch;
 class CuViewModel extends BaseRxViewModel {
     private final MegaApiAndroid mMegaApi;
     private final DatabaseHandler mDbHandler;
-    private final int mType;
     private final MegaNodeRepo mRepo;
+    private final Context mAppContext;
+    private final int mType;
 
     private final MutableLiveData<List<CuNode>> mCuNodes = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToOpen = new MutableLiveData<>();
@@ -57,15 +59,7 @@ class CuViewModel extends BaseRxViewModel {
     private final Subject<Pair<Integer, CuNode>> mOpenNodeAction = PublishSubject.create();
     private final Subject<Object> mCreatingThumbnailFinished = PublishSubject.create();
 
-    private final MegaRequestListenerInterface mCreateThumbnailRequest =
-            new BaseListener(getApplication()) {
-                @Override
-                public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-                    if (e.getErrorCode() == MegaError.API_OK) {
-                        mCreatingThumbnailFinished.onNext(true);
-                    }
-                }
-            };
+    private final MegaRequestListenerInterface mCreateThumbnailRequest;
 
     private boolean mSelecting;
     private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
@@ -74,11 +68,21 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, MegaNodeRepo repo,
-            int type) {
+            Context context, int type) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
-        mType = type;
         mRepo = repo;
+        mAppContext = context.getApplicationContext();
+        mType = type;
+
+        mCreateThumbnailRequest = new BaseListener(mAppContext) {
+            @Override
+            public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    mCreatingThumbnailFinished.onNext(true);
+                }
+            }
+        };
 
         loadCuNodes();
 
@@ -259,7 +263,7 @@ class CuViewModel extends BaseRxViewModel {
 
                     mDbHandler.setFirstTime(false);
                     mDbHandler.setStorageAskAlways(true);
-                    File defaultDownloadLocation = buildDefaultDownloadDir(getApplication());
+                    File defaultDownloadLocation = buildDefaultDownloadDir(mAppContext);
                     defaultDownloadLocation.mkdirs();
 
                     mDbHandler.setStorageDownloadLocation(
@@ -361,7 +365,7 @@ class CuViewModel extends BaseRxViewModel {
         int index = 0;
         for (MegaNode node : mRepo.getCuChildren(mType, orderBy, mSearchDate)) {
             File thumbnail =
-                    new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
+                    new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
             String dateString = DateTimeFormatter.ofPattern("MMMM uuuu").format(modifyDate);
 
@@ -383,7 +387,7 @@ class CuViewModel extends BaseRxViewModel {
 
         for (MegaNode node : nodesWithoutThumbnail) {
             File thumbnail =
-                    new File(getThumbFolder(getApplication()), node.getBase64Handle() + ".jpg");
+                    new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
             mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
         }
 

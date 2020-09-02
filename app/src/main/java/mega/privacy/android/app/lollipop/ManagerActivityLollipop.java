@@ -148,9 +148,10 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.photos.HomepageRefreshable;
 import mega.privacy.android.app.fragments.photos.HomepageSearchable;
+import mega.privacy.android.app.fragments.photos.NodesChangeNotifierKt;
 import mega.privacy.android.app.fragments.photos.PhotosFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
@@ -596,7 +597,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 	private enum HomepageScreen {
-       HOMEPAGE, PHOTOS, FULLSCREEN_OFFLINE, RECENT_BUCKET
+       	HOMEPAGE, PHOTOS, RECENT_BUCKET,
+       	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO,
 	}
 
 	//	private boolean isListCloudDrive = true;
@@ -5763,6 +5765,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case R.id.fullscreen_offline:
 					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
 					break;
+				case R.id.offline_file_info:
+					mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+					abL.setVisibility(View.GONE);
+					showHideBottomNavigationView(true);
+					return;
                 case R.id.recentBucketFragment:
                     mHomepageScreen = HomepageScreen.RECENT_BUCKET;
                     break;
@@ -6076,7 +6083,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     	fullscreenOfflineFragment = fragment;
 
 		showFabButton();
-		showHideBottomNavigationView(false);
 		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
 		abL.setVisibility(View.VISIBLE);
 		setToolbarTitle();
@@ -6881,23 +6887,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return null;
 	}
 
-	public void refreshHomepageRefreshable(boolean forceUpdate) {
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
-		for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
-			if (fragment instanceof HomepageRefreshable) {
-				HomepageRefreshable refreshable = (HomepageRefreshable) fragment;
-				if (forceUpdate) {
-					refreshable.forceUpdate();
-				} else {
-					refreshable.refreshUi();
-				}
-
-				return;
-			}
-		}
-	}
-
 	public void updateCuFragmentOptionsMenu() {
 		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
 			return;
@@ -7612,7 +7601,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
 		} else if (drawerItem == DrawerItem.HOMEPAGE) {
-			refreshHomepageRefreshable(false);
+			NodesChangeNotifierKt.notifyNodesChange(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -10583,31 +10572,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	}
 
-	public void showConfirmationLeaveMultipleShares (final ArrayList<Long> handleList){
-		logDebug("showConfirmationleaveMultipleShares");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	nC.leaveMultipleIncomingShares(handleList);
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
 		if (shares.size() == 1) {
 			showConfirmationRemoveAllSharingContacts(megaApi.getOutShares(shares.get(0)), shares.get(0));
@@ -10677,32 +10641,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.show();
 
 		refreshAfterMovingToRubbish();
-	}
-
-	public void showConfirmationLeaveIncomingShare (final MegaNode n){
-		logDebug("showConfirmationLeaveIncomingShare");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE: {
-					nC.leaveIncomingShare(managerActivity, n);
-					break;
-				}
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
 	}
 
 	public void showConfirmationLeaveChat (final MegaChatRoom c){
@@ -10934,6 +10872,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		bottomSheetDialogFragment = new SortByBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),
 				bottomSheetDialogFragment.getTag());
+	}
+
+	public void showOfflineFileInfo(MegaOffline node) {
+		Intent intent = new Intent(this, OfflineFileInfoActivity.class);
+		intent.putExtra(HANDLE, node.getHandle());
+		startActivity(intent);
 	}
 
 	public void showContactOptionsPanel(MegaContactAdapter user){
@@ -11493,7 +11437,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	}
 
-	public void showConfirmationRemoveFromOffline(){
+	public void showConfirmationRemoveFromOffline(MegaOffline node, Runnable onConfirmed) {
 		logDebug("showConfirmationRemoveFromOffline");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -11508,14 +11452,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
-						MegaOffline mOff = getSelectedOfflineNode();
-
 						NodeController nC = new NodeController(managerActivity);
-						nC.deleteOffline(mOff);
+						nC.deleteOffline(node);
+						onConfirmed.run();
 						refreshOfflineNodes();
 
                         if(isCloudAdded()){
-                            String handle = mOff.getHandle();
+                            String handle = node.getHandle();
                             if(handle != null && !handle.equals("")){
                                 fbFLol.refresh(Long.parseLong(handle));
                             }
@@ -11527,7 +11470,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         	sttFLol.taskGetSizeOffline();
                         }
 
-						refreshHomepageRefreshable(false);
+						NodesChangeNotifierKt.notifyNodesChange(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -14758,6 +14701,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				refreshRubbishBin();
 			}
 		}
+		if (pagerOfflineFragment != null) {
+			pagerOfflineFragment.refreshNodes();
+		}
 
 		refreshCloudDrive();
 	}
@@ -14879,13 +14825,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		if (drawerItem == DrawerItem.HOMEPAGE) {
-			refreshHomepageRefreshable(true);
-			// Invalidate the menu will collapse/expand the search view and set the query text to ""
-			// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
-			// text changed to "" for once)
-			return;
-		}
+		NodesChangeNotifierKt.notifyNodesChange(true);
+
+		// Invalidate the menu will collapse/expand the search view and set the query text to ""
+		// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
+		// text changed to "" for once)
+		if (drawerItem == DrawerItem.HOMEPAGE) return;
 
 		setToolbarTitle();
 		supportInvalidateOptionsMenu();
@@ -15201,7 +15146,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
-				refreshHomepageRefreshable(false);
+				NodesChangeNotifierKt.notifyNodesChange(false);
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){

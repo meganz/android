@@ -281,11 +281,17 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             }
         }
 
-        optionSelect.setVisibility((optionSelect.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+        selectSeparator.setVisibility((optionSelect.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
 
-        viewSeparator.setVisibility((optionInfo.getVisibility() == View.GONE && optionView.getVisibility() == View.GONE) ? View.GONE : View.VISIBLE);
+        viewSeparator.setVisibility(((optionSelect.getVisibility() == View.GONE &&
+                optionForward.getVisibility() == View.GONE) ||
+                (optionView.getVisibility() == View.GONE &&
+                        optionInfo.getVisibility() == View.GONE)) ? View.GONE : View.VISIBLE);
 
-        separatorInfo.setVisibility((optionStartConversation.getVisibility() == View.GONE && optionInvite.getVisibility() == View.GONE) ? View.GONE : View.VISIBLE);
+        separatorInfo.setVisibility((optionView.getVisibility() == View.GONE &&
+                optionInfo.getVisibility() == View.GONE) ||
+                (optionStartConversation.getVisibility() == View.GONE &&
+                        optionInvite.getVisibility() == View.GONE) ? View.GONE : View.VISIBLE);
 
         deleteMessageSeparator.setVisibility(optionDeleteMessage.getVisibility());
 

@@ -328,10 +328,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleCloud();
 
-		if(modeCloud==FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
+		if (modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER) {
 			setParentHandle(-1);
-		}
-		else if (parentHandle == -1) {
+		} else if (parentHandle == -1) {
 			setParentHandle(megaApi.getRootNode().getHandle());
 		}
 
@@ -347,45 +346,38 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		setParentHandle(parentHandle);
 
 		switch (modeCloud) {
-			case FileExplorerActivityLollipop.MOVE: {
+			case FileExplorerActivityLollipop.MOVE:
 				optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
 
-				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
-				activateButton(parent == null || parent.getHandle() != parentHandle);
+				MegaNode parentMove= ((FileExplorerActivityLollipop) context).parentMoveCopy();
+				activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
 
 				nodeHandleMoveCopy = ((FileExplorerActivityLollipop) context).getNodeHandleMoveCopy();
 				setDisableNodes(nodeHandleMoveCopy);
 				break;
-			}
 
-			case FileExplorerActivityLollipop.COPY: {
+			case FileExplorerActivityLollipop.COPY:
 				optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 
-				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
-				activateButton(parent == null || parent.getHandle() != parentHandle);
+				MegaNode parentCopy = ((FileExplorerActivityLollipop) context).parentMoveCopy();
+				activateButton(parentCopy == null || parentCopy.getHandle() != parentHandle);
 				break;
-			}
 
-			case FileExplorerActivityLollipop.UPLOAD: {
+			case FileExplorerActivityLollipop.UPLOAD:
 				optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 				break;
-			}
 
-			case FileExplorerActivityLollipop.IMPORT: {
+			case FileExplorerActivityLollipop.IMPORT:
 				optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 				break;
-			}
 
-			case FileExplorerActivityLollipop.SELECT: {
-				separator.setVisibility(View.GONE);
-				optionsBar.setVisibility(View.GONE);
-				break;
-			}
+			case FileExplorerActivityLollipop.SELECT:
+				activateButton(shouldShowOptionsBar(megaApi.getNodeByHandle(parentHandle)));
+				//No break; needed: the text should be set with SELECT mode
 
-			default: {
+			default:
 				optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 				break;
-			}
 		}
 
 		if (adapter == null){
@@ -577,7 +569,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			lastPositionStack.push(lastFirstVisiblePosition);
 
 			if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-				activateButton(false);
+				activateButton(!selectFile);
 			}
 
 			setParentHandle(n.getHandle());
@@ -621,6 +613,15 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		shouldResetNodes = true;
 	}
 
+	private boolean shouldShowOptionsBar(MegaNode parentNode) {
+		if (selectFile) {
+			return false;
+		}
+
+		MegaNode rootNode = megaApi.getRootNode();
+		return rootNode != null && parentNode != null && parentNode.getHandle() != rootNode.getHandle();
+	}
+
 	public int onBackPressed(){
 		logDebug("onBackPressed");
 		if(selectFile) {
@@ -635,7 +636,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		if (parentNode != null){
 			if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-				activateButton(false);
+				activateButton(shouldShowOptionsBar(parentNode));
 			}
 
             setParentHandle(parentNode.getHandle());
@@ -813,7 +814,14 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	private void activateButton(boolean show) {
 		if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-			fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
+			int visibility = show ? View.VISIBLE : View.GONE;
+
+			if (selectFile) {
+				fabSelect.setVisibility(visibility);
+			} else {
+				separator.setVisibility(visibility);
+				optionsBar.setVisibility(visibility);
+			}
 		} else {
 			optionButton.setEnabled(show);
 			optionButton.setTextColor(ContextCompat.getColor(context, show ? R.color.accentColor : R.color.invite_button_deactivated));

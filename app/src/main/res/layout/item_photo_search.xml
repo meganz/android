@@ -48,17 +48,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"
             android:layout_width="36dp"
             android:layout_height="0dp"
             android:layout_marginTop="18dp"
             android:layout_marginBottom="18dp"
             android:scaleType="fitCenter"
+            app:roundedCornerRadius="2dp"
+            app:placeholderImage="@drawable/ic_image_thumbnail"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
-            app:selected="@{item.selected}"
+            app:item_selected="@{item.selected}"
             app:thumbnail="@{item.thumbnail}"
             tools:src="@drawable/ic_image_thumbnail" />
 
@@ -97,7 +99,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="6dp"
             android:src="@drawable/ic_input_warning"
-            android:visibility="@{item.node.takenDown ? View.VISIBLE : View.GONE}"
+            app:visibleGone="@{item.node.takenDown}"
             app:layout_constraintStart_toEndOf="@id/name"
             app:layout_constraintTop_toTopOf="@id/name"
             tools:visibility="visible" />
@@ -117,7 +119,7 @@
                 android:alpha="0.76"
                 android:background="@null"
                 android:src="@drawable/ic_versions_small"
-                android:visibility="@{megaApi.hasVersions(item.node) ? View.VISIBLE : View.GONE}"
+                app:visibleGone="@{megaApi.hasVersions(item.node)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

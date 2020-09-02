@@ -1,9 +1,11 @@
 package mega.privacy.android.app.fragments.managerFragments.homepage
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Consumer
@@ -19,11 +21,22 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.Util.getCircleAvatar
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaChatApi.*
-import java.util.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApi.STATUS_AWAY
+import nz.mega.sdk.MegaChatApi.STATUS_BUSY
+import nz.mega.sdk.MegaChatApi.STATUS_OFFLINE
+import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaUserAlert
+import java.util.ArrayList
 
 class HomePageViewModel @ViewModelInject constructor(
+    @ApplicationContext private val context: Context,
     private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid
 ) : BaseRxViewModel(), DefaultMegaGlobalListener, DefaultMegaChatListener {
@@ -56,7 +69,7 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     private fun loadAvatar() {
-        add(Single.fromCallable { getCircleAvatar(getApplication(), megaApi.myEmail) }
+        add(Single.fromCallable { getCircleAvatar(context, megaApi.myEmail) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
@@ -72,7 +85,7 @@ class HomePageViewModel @ViewModelInject constructor(
     private fun createAvatar() {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            buildAvatarFile(getApplication(), megaApi.myEmail + ".jpg").absolutePath,
+            buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
             object : DefaultMegaRequestListener {
                 override fun onRequestFinish(
                     api: MegaApiJava,
