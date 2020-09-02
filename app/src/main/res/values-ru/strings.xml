@@ -104,7 +104,7 @@
 
     <string name="action_settings" context="Menu item">Настройки</string>
     <string name="action_search" context="Search button">Поиск</string>
-    <string name="action_search_country" context="Select country page title">Выберите страну</string>
+    <string name="action_search_country" context="Select country page title">Выберите регион</string>
     <string name="action_play" context="Search button">Проиграть</string>
     <string name="action_pause" context="Search button">Пауза</string>
     <string name="action_refresh" context="Menu item">Обновить</string>
@@ -724,8 +724,8 @@
     <string name="general_back_button" context="Button label - go to previous page">Назад</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Не сейчас</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Подтвердить</string>
-	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Пожалуйста, выберите код страны</string>
-    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Коды стран не могут быть получены.</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Пожалуйста, выберите код региона</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Коды регионов не могут быть получены.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Пожалуйста, укажите действительный номер телефона.</string>
 	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Пожалуйста, введите отправленный проверочный код</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Подтвердить аккаунт</string>
@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">Просмотр файлов</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Импортировать</string>
-    <string name="save_for_offline" context="Menu option">Сохранить локально</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">Сохранить локально</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Добавить на облачный диск</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">Сохранить локально</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Не удалось удалить некоторые ссылки. Пожалуйста, попробуйте позже.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Ссылка успешно удалена.</item>
@@ -1868,7 +1868,7 @@
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">Ваш пароль достаточно надежен для продолжения, но мы рекомендуем все же усилить надежность пароля.</string>
     <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">Этот пароль не поддастся самым распространённым атакам с применением полного перебора. Убедитесь, что запомнили его.</string>
     <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">Этот пароль не поддастся самым самым мощным атакам с применением полного перебора. Убедитесь, что запомнили его.</string>
-    <string name="pass_very_weak" context="Password very weak">Очень ненадёжный</string>
+    <string name="pass_very_weak" context="Password very weak">Очень слабый</string>
     <string name="pass_weak" context="Password weak">Ненадёжный</string>
     <string name="pass_medium" context="Password medium">Средний</string>
     <string name="pass_good" context="Password good">Хороший</string>
@@ -2779,7 +2779,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Прикрепить из&#8230;</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Чат создан %s</string>
-    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Выбор сообщения</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Выберите сообщения</string>
 
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Подтвердить учётные данные</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Не подтверждено</string>
@@ -2788,12 +2788,13 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Лучше всего это сделать в реальной жизни, встречаясь лицом к лицу. Если у вас есть другой проверенный канал, например, проверенный OTR или PGP, вы также можете его использовать.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Ваши Учетные Данные</string>
     <string name="action_reset" context="Button to reset credentials">Сбросить</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Удалить ваш номер телефона?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Номер телефона успешно удалён.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Не удалось удалить номер телефона.</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Посмотреть</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Учётные данные %s</string>
 
 </resources>

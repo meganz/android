@@ -104,7 +104,7 @@
 
     <string name="action_settings" context="Menu item">設定</string>
     <string name="action_search" context="Search button">搜尋</string>
-    <string name="action_search_country" context="Select country page title">選擇國家</string>
+    <string name="action_search_country" context="Select country page title">選擇您的國家地區</string>
     <string name="action_play" context="Search button">播放</string>
     <string name="action_pause" context="Search button">暫停</string>
     <string name="action_refresh" context="Menu item">刷新</string>
@@ -724,8 +724,8 @@
     <string name="general_back_button" context="Button label - go to previous page">返回</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">稍後再說</string>
     <string name="general_confirm_button" context="Button label - confirm some action">確認</string>
-	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">請選擇您的國碼</string>
-    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">無法獲取國碼。</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">請選擇國家地區代碼</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">無法獲取國家地區代碼。</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">請填寫正確的電話號碼。</string>
 	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">請輸入傳送至以下手機門號的驗證碼</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">驗證您的帳戶</string>
@@ -819,7 +819,7 @@
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">資料保護條例</string>
     <string name="settings_about_app_version" context="App means “Application”">App 版本</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK軟體開發包版本</string>
-    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGA聊天 SDK版本</string>
+    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK版本</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">檢視來源碼</string>
 
     <string name="january">一月</string>
@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">查看檔案</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">匯入</string>
-    <string name="save_for_offline" context="Menu option">離線儲存</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">離線儲存</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">增加至雲端硬碟</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">離線儲存</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">刪除某些連結失敗。請稍後再試。</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">連結建立失敗。請稍後再試。</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">連結建立失敗。請稍後再試。</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">連結刪除成功</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">要移至垃圾桶嗎？</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">您確定要將此資料夾移至垃圾筒嗎？這將會停用相機上傳。</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">您確定要將此資料夾移至垃圾筒嗎？這將會停用相機上傳。</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">您確定要將此資料夾移至垃圾筒嗎？這將會停用第二媒體上傳。</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">要移至垃圾桶嗎？</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">確定從MEGA刪除嗎？</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">如果您離開此資料夾，您將無法再看到它。</string>
@@ -2118,7 +2118,7 @@
     <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]未接聽電話[/A]</string>
 
     <string name="contact_email" context="Indicates that can type a contact email">聯絡人電子郵件</string>
-    <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">您已新增過此聯絡人。</string>
+    <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">您已加入此連絡人。</string>
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">訊息格式無效</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">訊息簽名無效</string>
@@ -2198,7 +2198,7 @@
     <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">您已新增聯繫人%s。</string>
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">您已新增聯繫人%s。</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">與%s分享？</string>
-    <string name="new_group_chat_label" context="Text button for init a group chat">新聊天群組</string>
+    <string name="new_group_chat_label" context="Text button for init a group chat">新群組聊天</string>
     <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">新增聯絡人</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">已登出</string>
@@ -2732,7 +2732,7 @@
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">當您登出時，您離線下載到裝置中的檔案將會被刪除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">當您登出時，正在進行中的傳輸將取消。</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">當您登出時，您離線下載到裝置中的檔案將會被刪除，而且正在進行中的傳輸將取消。</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">當您登出時，您裝置上可離線存取的檔案將會被刪除，而且正在進行中的傳輸將被取消。</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">未知的名稱</string>
 
@@ -2788,12 +2788,13 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">這最好由實際面對面來完成。如您有其他已驗證管道，如已驗證的OTR或PGP，也可以使採用。</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">您的憑證</string>
     <string name="action_reset" context="Button to reset credentials">重設</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">要移除您的手機號碼？</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">您的手機號碼已成功移除。</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">您的手機號碼移除失敗。</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">查看</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s的憑證</string>
 
 </resources>

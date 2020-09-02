@@ -104,7 +104,7 @@
 
     <string name="action_settings" context="Menu item">Impostazioni</string>
     <string name="action_search" context="Search button">Cerca</string>
-    <string name="action_search_country" context="Select country page title">Seleziona nazione</string>
+    <string name="action_search_country" context="Select country page title">Seleziona la tua nazione</string>
     <string name="action_play" context="Search button">Gioca</string>
     <string name="action_pause" context="Search button">Pausa</string>
     <string name="action_refresh" context="Menu item">Aggiorna</string>
@@ -373,7 +373,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Condividi foto usando</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Condividi link</string>
-    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Ottieni link</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Ottieni il link</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
 
@@ -724,7 +724,7 @@
     <string name="general_back_button" context="Button label - go to previous page">Indietro</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Non ora</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Conferma</string>
-	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Per favore seleziona un prefisso internazionale</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Per favore, seleziona un prefisso internazionale</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">I prefissi internazionali non sono stati caricati.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Per favore, fornisci un numero di telefono valido.</string>
 	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Per favore, inserisci il codice di verifica inviato a</string>
@@ -1541,9 +1541,9 @@
 
     <string name="general_view" context="Menu option">Vedi file</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importa</string>
-    <string name="save_for_offline" context="Menu option">Salva per l\'Offline</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">Salva per l\'Offline</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Aggiungi al Cloud Drive</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">Salva per Offline</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">Salva per l\'Offline</string>
 
     <string name="general_view_contacts" context="Menu option">Vedi contatti</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">La rimozione di alcuni link è fallita. Per favore, riprova più tardi.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Creazione del link fallita. Per favore, riprova più tardi.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">Creazione di alcuni link fallita. Per favore, riprova più tardi.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link rimosso con successo.</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Spostare nel Cestino?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti da fotocamera.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti dei media.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Sei sicuro di voler spostare questa cartella nel Cestino? Questo disabiliterà i Caricamenti dei media secondari.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Spostare nel Cestino?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Eliminare da MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Se lasci la cartella, non sarai in grado di vederla di nuovo.</string>
@@ -2779,7 +2779,7 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Allega da&#8230;</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat creata con %s</string>
-    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Seleziona messaggio</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Seleziona messaggi</string>
 
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verifica credenziali</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Non verificato</string>
@@ -2788,12 +2788,13 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Sarebbe meglio farlo faccia a faccia nella vita reale. Se hai un altro canale di comunicazione verificato come OTR o PGP, puoi utilizzarlo.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Le tue credenziali</string>
     <string name="action_reset" context="Button to reset credentials">Reset</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Rimuovere il tuo numero di telefono?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Il tuo numero di telefono è stato rimosso con successo.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">La rimozione del tuo numero di telefono è fallita.</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Vedi</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenziali di %s</string>
 
 </resources>

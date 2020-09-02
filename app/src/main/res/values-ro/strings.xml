@@ -21,7 +21,7 @@
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
-    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descarcă</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descărcare</string>
     <string name="general_add" context="button">Adaugă</string>
     <string name="general_move" context="Item menu option upon right click on one or multiple files.">Mută</string>
     <string name="general_remove" context="Menu option to delete one or multiple selected items.">Elimină</string>
@@ -48,7 +48,7 @@
     <string name="general_forwarding" context="state while importing the file">Se redirecționează</string>
     <string name="general_import" context="Menu option to choose to add file or folders to Cloud Drive">Importă</string>
     <string name="general_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
-    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer.">Cotă de transferuri</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer.">Cotă de transfer</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Abonează-te</string>
     <!--
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
@@ -391,7 +391,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Deschide</string>
     <string name="context_renaming" context="while renaming a file or folder">Se redenumește</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Se pregătește fișierul</string>
-    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Descarcă</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Descărcare</string>
 
     <!--
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
@@ -818,7 +818,7 @@
     <string name="settings_about_terms_of_service" context="">Termenii de utilizare a serviciului</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Versiunea aplicației</string>
-    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versiune MEGA SDK</string>
+    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versiunea MEGA SDK</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versiunea SDK MEGAchat</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Vezi codul sursă</string>
 
@@ -1364,12 +1364,12 @@
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
     <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
-    <string name="label_transfer_quota_upgrade_account" context="Title of the section about the transfer quota in the storage tab in My Account Section">Cotă de transferuri</string>
-    <string name="label_transfer_quota_achievements" context="Title of the section about the transfer quota in the storage tab in My Account Section">Cotă de transferuri</string>
+    <string name="label_transfer_quota_upgrade_account" context="Title of the section about the transfer quota in the storage tab in My Account Section">Cotă de transfer</string>
+    <string name="label_transfer_quota_achievements" context="Title of the section about the transfer quota in the storage tab in My Account Section">Cotă de transfer</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Spațiu de stocare</string>
-    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Cotă de transferuri</string>
+    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Cotă de transfer</string>
 
     <string name="available_space" context="Label in section the storage tab in My Account Section">Disponibil</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">indisponibil</string>
@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">Vezi fișierele</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importă</string>
-    <string name="save_for_offline" context="Menu option">Salvează pentru offline</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">Salvează pentru offline</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Adaugă în unitatea cloud</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">Salvează pentru offline</string>
 
@@ -1571,8 +1571,8 @@
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Eșec la eliminarea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
     </plurals>
     <plurals name="context_link_export_error">
-        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
-        <item context="Error message when create public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Crearea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">Eșec la crearea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link eliminat cu succes.</item>
@@ -1664,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Muți în coșul de gunoi?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Sigur vrei să muți acest folder în coșul de gunoi? Acest lucru va dezactiva Încărcări cameră.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Sigur vrei să muți acest folder în coșul de gunoi? Acest lucru va dezactiva Încărcări media.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Sigur vrei să muți acest folder în coșul de gunoi? Acest lucru va dezactiva Încărcări media secundare.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Muți în coșul de gunoi?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Ștergi de pe MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Dacă părăsești folderul, nu vei putea să îl vezi din nou.</string>
@@ -2726,9 +2726,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Deși MEGA nu are acces la datele tale, administratorii organizației tale pot controla și vedea încărcările cameră din contul tău de utilizator</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ceva a mers prost</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactează administratorul contului business pentru a rezolva problema și pentru a-ți activa contul.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Pentru scopurile de afaceri autentice</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Pentru scopurile de afaceri autentice.</string>
     <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Spațiu de stocare[/A] NELIMITAT**</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Cotă de transferuri[/A] NELIMITATĂ **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Cotă de transfer[/A] NELIMITATĂ **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Când te deconectezi, transferurile în curs vor fi anulate.</string>
@@ -2788,12 +2788,13 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Acest lucru este realizat cel mai bine întâlnindu-vă față în față. Dacă ai un alt canal verificat deja precum OTR sau PGP verificat, l-ai putea folosi și pe acela.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Credențialele tale</string>
     <string name="action_reset" context="Button to reset credentials">Resetează</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
-    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
-    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been reset successfully.</string>
-    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number reset failed.</string>
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Elimini numărul de telefon?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Numărul tău de telefon a fost eliminat cu succes.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Eliminarea numărului tău de telefon a eșuat.</string>
 
-    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Vezi</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credențialele lui %s</string>
 
 </resources>
