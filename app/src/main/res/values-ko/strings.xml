@@ -104,7 +104,7 @@
 
     <string name="action_settings" context="Menu item">설정</string>
     <string name="action_search" context="Search button">검색</string>
-    <string name="action_search_country" context="Select country page title">국가 선택</string>
+    <string name="action_search_country" context="Select country page title">국가를 선택하세요</string>
     <string name="action_play" context="Search button">재생</string>
     <string name="action_pause" context="Search button">일시정지</string>
     <string name="action_refresh" context="Menu item">새로 고침</string>
@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">파일 보기</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">들여오기</string>
-    <string name="save_for_offline" context="Menu option">오프라인용으로 저장</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">오프라인용으로 저장</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">클라우드 드라이브에 추가</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">오프라인용으로 저장</string>
 
@@ -2788,6 +2788,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">현실에서 가장 확실한 방법은 직접 만나는 것입니다. 만약 증명된 OTR이나 PGP 같은 이미 증명된 다른 방법이 있다면, 그것을 사용해도 좋습니다.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">당신의 자격증명</string>
     <string name="action_reset" context="Button to reset credentials">재설정</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">전화번호를 제거할까요?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">전화번호가 성공적으로 삭제되었습니다.</string>
