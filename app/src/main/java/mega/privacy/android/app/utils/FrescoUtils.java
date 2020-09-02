@@ -67,6 +67,13 @@ public class FrescoUtils {
         gifImgDisplay.setController(controller);
     }
 
+    /**
+     * Load a local file into a ordinary ImageView.
+     *
+     * @param imageView An ordinary ImageView used to display the image.
+     * @param pb Progress bar, should be dismissed after the image is displayed.
+     * @param uri Uri of the local image file.
+     */
     public static void loadImage(ImageView imageView, ProgressBar pb, Uri uri) {
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
         ImageRequest imageRequest = ImageRequest.fromUri(uri);
@@ -75,6 +82,7 @@ public class FrescoUtils {
         DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, null);
 
         dataSource.subscribe(new BaseBitmapDataSubscriber() {
+
             @Override
             public void onNewResultImpl(@Nullable Bitmap bitmap) {
                 if (bitmap != null && !bitmap.isRecycled()) {
