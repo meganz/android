@@ -27,8 +27,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
-import static mega.privacy.android.app.utils.FrescoUtils.loadGif;
-import static mega.privacy.android.app.utils.FrescoUtils.loadImage;
+import static mega.privacy.android.app.utils.FrescoUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
