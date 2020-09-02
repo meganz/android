@@ -179,6 +179,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
 
+    private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+            = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
+
     private boolean fromChatSavedInstance = false;
     private int[] screenPosition;
     private int mLeftDelta;
@@ -379,9 +382,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
     };
-
-    private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
-            = new HashMap<>(3);
 
     public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
         DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);

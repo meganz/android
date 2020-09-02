@@ -125,6 +125,9 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 
+	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
+
 	int[] screenPosition;
 	int mLeftDelta;
 	int mTopDelta;
@@ -235,9 +238,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 	ArrayList<File> zipFiles = new ArrayList<>();
 
 	private long parentNodeHandle = INVALID_HANDLE;
-
-	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
-			= new HashMap<>(3);
 
 	public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
 		DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
