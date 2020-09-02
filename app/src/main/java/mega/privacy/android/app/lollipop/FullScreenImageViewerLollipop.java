@@ -1100,6 +1100,9 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
+		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
+			// TODO: use constants
+			getImageHandles(megaApi.searchByType(null, null, null, true, orderGetChildren, 1, 3), savedInstanceState);
 		} else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){

@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.empty_result_files.view.*
+import kotlinx.android.synthetic.main.empty_result_files.view.empty_hint_text
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
@@ -31,11 +31,19 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.PHOTOS_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.PHOTOS_SEARCH_ADAPTER
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
@@ -349,13 +357,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
                 MegaApiJava.ORDER_MODIFICATION_DESC
             )
-
-            val parentNode = megaApi.getParentNode(nodeItem.node)
-            if (parentNode == null || parentNode.type == MegaNode.TYPE_ROOT) {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
-            } else {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.handle)
-            }
 
             if (viewModel.searchMode) {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_SEARCH_ADAPTER);
