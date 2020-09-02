@@ -1,17 +1,13 @@
 package mega.privacy.android.app.fragments.photos
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import javax.inject.Inject
 
-@ActivityRetainedScoped
-// Use scoped @Inject instead of @ViewModelInject. Then the ViewModel object in PhotosFragment
-// and PhotosGridAdapter are identical
-class PhotosViewModel @Inject constructor(
+class PhotosViewModel @ViewModelInject constructor(
     private val photosRepository: PhotosRepository
 ) : ViewModel() {
 
@@ -27,6 +23,7 @@ class PhotosViewModel @Inject constructor(
     var searchQuery = ""
 
     private var forceUpdate = false
+    private var ignoredFirst = false
 
     val items: LiveData<List<PhotoNode>> = _query.switchMap {
         viewModelScope.launch {
@@ -48,6 +45,12 @@ class PhotosViewModel @Inject constructor(
             }
         }
 
+        if (searchMode) {
+            filteredNodes = filteredNodes.filter {
+                it.type == PhotoNode.TYPE_PHOTO
+            }
+        }
+
         filteredNodes.forEach {
             it.index = index++
             if (it.type == PhotoNode.TYPE_PHOTO) it.photoIndex = photoIndex++
@@ -56,11 +59,43 @@ class PhotosViewModel @Inject constructor(
         filteredNodes
     }
 
+    private val nodesChangeObserver = Observer<Boolean> {
+        if (!ignoredFirst) {
+            ignoredFirst = true
+            return@Observer
+        }
 
-    fun loadPhotos(query: String, forceUpdate: Boolean = false) {
+        if (it) {
+            loadPhotos(true)
+        } else {
+            refreshUi()
+        }
+    }
+
+    init {
+        loadPhotos(true)
+        nodesChange.observeForever(nodesChangeObserver)
+    }
+
+    /**
+     * Load photos by calling Mega Api or just filter loaded nodes
+     * @param forceUpdate True if retrieve all nodes by calling API
+     * , false if filter current nodes by searchQuery
+     */
+    fun loadPhotos(forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
-        searchQuery = query
-        _query.value = query
+        _query.value = searchQuery
+    }
+
+    /**
+     * Make the list adapter to rebind all item views with data since
+     * the underlying data may have been changed.
+     */
+    fun refreshUi() {
+        items.value?.forEach {photoNode ->
+            photoNode.uiDirty = true
+        }
+        loadPhotos()
     }
 
     fun onPhotoClick(item: PhotoNode) {
@@ -93,5 +128,9 @@ class PhotosViewModel @Inject constructor(
 
     fun showFileInfo(item: PhotoNode) {
         _showFileInfoEvent.value = Event(item)
+    }
+
+    override fun onCleared() {
+        nodesChange.removeObserver(nodesChangeObserver)
     }
 }

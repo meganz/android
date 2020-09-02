@@ -260,7 +260,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private void navigateToCloudDrive() {
         mViewModel.setCamSyncEnabled(false);
         mManagerActivity.setFirstLogin(false);
-        mManagerActivity.setInitialCloudDrive();
+        mManagerActivity.skipInitialCUSetup();
     }
 
     private void requestCameraUploadPermission(String[] permissions, int requestCode) {
@@ -405,7 +405,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         CuViewModelFactory viewModelFactory =
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), mCamera);
+                        new MegaNodeRepo(context, megaApi, dbH), context, mCamera);
         mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         if (mCamera == TYPE_CAMERA && mManagerActivity.getFirstLogin()) {

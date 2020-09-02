@@ -12,11 +12,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.ShapeAppearanceModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,30 +36,22 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
+class PhotosFragment : BaseFragment(), HomepageSearchable {
 
-    @Inject
-    lateinit var viewModel: PhotosViewModel
-
-    @Inject
-    lateinit var actionModeViewModel: ActionModeViewModel
+    private val viewModel by viewModels<PhotosViewModel>()
+    private val actionModeViewModel by viewModels<ActionModeViewModel>()
 
     private lateinit var binding: FragmentPhotosBinding
+
     private lateinit var listView: NewGridRecyclerView
 
-    @Inject
-    lateinit var browseAdapter: PhotosBrowseAdapter
-
-    @Inject
-    lateinit var searchAdapter: PhotosSearchAdapter
+    private lateinit var browseAdapter: PhotosBrowseAdapter
+    private lateinit var searchAdapter: PhotosSearchAdapter
 
     private var actionMode: ActionMode? = null
-
-    @Inject
-    lateinit var actionModeCallback: ActionModeCallback
+    private lateinit var actionModeCallback: ActionModeCallback
 
     private lateinit var activity: ManagerActivityLollipop
 
@@ -88,6 +82,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -96,8 +91,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
 
             actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
         }
-
-        refresh()
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -123,7 +116,25 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         })
     }
 
-    override fun refresh() = viewModel.loadPhotos(viewModel.searchQuery, true)
+    private fun setupDraggingThumbnailCallback() {
+        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
+            DraggingThumbnailCallback(
+                WeakReference(this)
+            )
+        )
+    }
+
+    /**
+     * Only refresh the list items of uiDirty = true
+     */
+    private fun updateUi() = viewModel.items.value?.let { it ->
+        val newList = ArrayList<PhotoNode>(it)
+        if (viewModel.searchMode) {
+            searchAdapter.submitList(newList)
+        } else {
+            browseAdapter.submitList(newList)
+        }
+    }
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
@@ -143,9 +154,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         preventListItemBlink()
         elevateToolbarWhenScrolling()
         itemDecoration = DividerDecoration(context)
+        if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
     }
 
     private fun setupActionMode() {
+        actionModeCallback = ActionModeCallback(context, actionModeViewModel, megaApi)
+
         observePhotoLongClick()
         observeSelectedPhotos()
         observeAnimatedPhotos()
@@ -222,14 +236,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
                     } else {
                         // Draw the green outline for the thumbnail view at once
                         val thumbnailView =
-                            itemView.findViewById<ShapeableImageView>(R.id.thumbnail)
-                        val strokeWidth =
-                            resources.getDimension(R.dimen.photo_selected_border_width)
-                        val shapeId = R.style.GalleryImageShape_Selected
-                        thumbnailView.strokeWidth = strokeWidth
-                        thumbnailView.shapeAppearanceModel = ShapeAppearanceModel.builder(
-                            context, shapeId, 0
-                        ).build()
+                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
+                        thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
 
                         itemView.findViewById<ImageView>(
                             R.id.icon_selected
@@ -259,18 +267,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             activity.showKeyboardForSearch()
         })
 
-    private fun updateUi() = viewModel.items.value?.let { it ->
-        val newList = ArrayList<PhotoNode>(it)
-        if (viewModel.searchMode) {
-            searchAdapter.submitList(newList)
-        } else {
-            browseAdapter.submitList(newList)
-        }
-    }
-
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
+        browseAdapter = PhotosBrowseAdapter(viewModel, actionModeViewModel)
+        searchAdapter = PhotosSearchAdapter(viewModel, actionModeViewModel)
+
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 listView.linearLayoutManager?.scrollToPosition(0)
@@ -295,22 +297,26 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         }
         if (viewModel.searchMode) return
 
-        viewModel.searchMode = true
         listView.switchToLinear()
         listView.adapter = searchAdapter
         listView.addItemDecoration(itemDecoration)
+
+        viewModel.searchMode = true
+        viewModel.searchQuery = ""
+        viewModel.refreshUi()
     }
 
     override fun exitSearch() {
         if (!viewModel.searchMode) return
 
-        viewModel.searchMode = false
         listView.switchBackToGrid()
         configureGridLayoutManager()
         listView.adapter = browseAdapter
         listView.removeItemDecoration(itemDecoration)
 
-        viewModel.loadPhotos("")
+        viewModel.searchMode = false
+        viewModel.searchQuery = ""
+        viewModel.refreshUi()
     }
 
     private fun configureGridLayoutManager() {
@@ -325,7 +331,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
         }
     }
 
-    override fun searchQuery(query: String) = viewModel.loadPhotos(query)
+    override fun searchQuery(query: String) {
+        if (viewModel.searchQuery == query) return
+        viewModel.searchQuery = query
+        viewModel.loadPhotos()
+    }
 
     private fun openPhoto(node: PhotoNode) {
         listView.findViewHolderForLayoutPosition(node.index)?.itemView?.findViewById<ImageView>(
@@ -357,12 +367,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable, HomepageRefreshable {
             }
 
             intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it))
-
-            FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
-                DraggingThumbnailCallback(
-                    WeakReference(this)
-                )
-            )
 
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)

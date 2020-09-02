@@ -1,15 +1,14 @@
 package mega.privacy.android.app.fragments.photos
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoSearchBinding
-import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
-import javax.inject.Inject
 
-class PhotosSearchAdapter @Inject constructor(
+class PhotosSearchAdapter constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
 ) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),
@@ -22,29 +21,16 @@ class PhotosSearchAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
-        val binding = when (viewType) {
-            PhotoNode.TYPE_TITLE ->
-                ItemPhotosTitleBinding.inflate(
-                    inflater,
-                    parent,
-                    false
-                )
-            else ->  // TYPE_PHOTO
-                ItemPhotoSearchBinding.inflate(
-                    inflater,
-                    parent,
-                    false
-                )
-        }
+        val binding = ItemPhotoSearchBinding.inflate(
+            inflater,
+            parent,
+            false
+        )
 
-        // TYPE_TITLE views take layout positions but is invisible,
-        // just for facilitating the calculation logic
-        if (viewType == PhotoNode.TYPE_TITLE) {
-            val layoutParams = binding.root.layoutParams
-            layoutParams.width = 0
-            layoutParams.height = 0
-            binding.root.layoutParams = layoutParams
-        }
+        binding.publicLink.visibility = View.GONE
+        binding.savedOffline.visibility = View.GONE
+        binding.takenDown.visibility = View.GONE
+        binding.versionsIcon.visibility = View.GONE
 
         return PhotoViewHolder(binding)
     }

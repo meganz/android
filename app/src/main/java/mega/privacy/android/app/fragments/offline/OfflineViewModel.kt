@@ -1,17 +1,17 @@
 package mega.privacy.android.app.fragments.offline
 
-import android.util.Base64
+import android.content.Context
 import androidx.collection.SparseArrayCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
@@ -21,9 +21,10 @@ import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
+import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.logErr
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -41,6 +42,7 @@ import java.util.Stack
 import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
+    @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo
 ) : BaseRxViewModel() {
     private var order = ORDER_DEFAULT_ASC
@@ -58,11 +60,11 @@ class OfflineViewModel @ViewModelInject constructor(
     private val _nodes = MutableLiveData<List<OfflineNode>>()
     private val _nodeToOpen = MutableLiveData<Event<Pair<Int, OfflineNode>>>()
     private val _actionBarTitle = MutableLiveData<String>()
-    private val _actionMode = MutableLiveData<Event<Boolean>>()
-    private val _nodeToAnimate = MutableLiveData<Event<Pair<Int, OfflineNode>>>()
-    private val _pathLiveData = MutableLiveData<Event<String>>()
-    private val _submitSearchQuery = MutableLiveData<Event<Boolean>>()
-    private val _scrollToPositionWhenNavigateOut = MutableLiveData<Event<Int>>()
+    private val _actionMode = MutableLiveData<Boolean>()
+    private val _nodeToAnimate = MutableLiveData<Pair<Int, OfflineNode>>()
+    private val _pathLiveData = MutableLiveData<String>()
+    private val _submitSearchQuery = MutableLiveData<Boolean>()
+    private val _scrollToPositionWhenNavigateOut = MutableLiveData<Int>()
     private val _openFolderFullscreen = MutableLiveData<Event<String>>()
     private val _showOptionsPanel = MutableLiveData<Event<MegaOffline>>()
     private val _showSortedBy = MutableLiveData<Event<Boolean>>()
@@ -78,11 +80,11 @@ class OfflineViewModel @ViewModelInject constructor(
     val nodes: LiveData<List<OfflineNode>> = _nodes
     val nodeToOpen: LiveData<Event<Pair<Int, OfflineNode>>> = _nodeToOpen
     val actionBarTitle: LiveData<String> = _actionBarTitle
-    val actionMode: LiveData<Event<Boolean>> = _actionMode
-    val nodeToAnimate: LiveData<Event<Pair<Int, OfflineNode>>> = _nodeToAnimate
-    val pathLiveData: LiveData<Event<String>> = _pathLiveData
-    val submitSearchQuery: LiveData<Event<Boolean>> = _submitSearchQuery
-    val scrollToPositionWhenNavigateOut: LiveData<Event<Int>> = _scrollToPositionWhenNavigateOut
+    val actionMode: LiveData<Boolean> = _actionMode
+    val nodeToAnimate: LiveData<Pair<Int, OfflineNode>> = _nodeToAnimate
+    val pathLiveData: LiveData<String> = _pathLiveData
+    val submitSearchQuery: LiveData<Boolean> = _submitSearchQuery
+    val scrollToPositionWhenNavigateOut: LiveData<Int> = _scrollToPositionWhenNavigateOut
     val openFolderFullscreen: LiveData<Event<String>> = _openFolderFullscreen
     val showOptionsPanel: LiveData<Event<MegaOffline>> = _showOptionsPanel
     val showSortedBy: LiveData<Event<Boolean>> = _showSortedBy
@@ -143,6 +145,17 @@ class OfflineViewModel @ViewModelInject constructor(
         return selectedNodes.size()
     }
 
+    fun getDisplayedNodesCount(): Int = nodes.value?.size ?: 0
+
+    fun folderSelected(): Boolean {
+        for (i in 0 until selectedNodes.size()) {
+            if (selectedNodes.valueAt(i).isFolder) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun selectAll() {
         val nodeList = nodes.value ?: return
 
@@ -151,14 +164,14 @@ class OfflineViewModel @ViewModelInject constructor(
                 continue
             }
             if (!node.selected) {
-                _nodeToAnimate.value = Event(Pair(position, node))
+                _nodeToAnimate.value = Pair(position, node)
             }
             node.selected = true
             selectedNodes.put(node.node.id, node.node)
         }
         selecting = true
         _nodes.value = nodeList
-        _actionMode.value = Event(true)
+        _actionMode.value = true
     }
 
     fun clearSelection() {
@@ -167,13 +180,13 @@ class OfflineViewModel @ViewModelInject constructor(
         }
 
         selecting = false
-        _actionMode.value = Event(false)
+        _actionMode.value = false
         selectedNodes.clear()
 
         val nodeList = nodes.value ?: return
         for ((position, node) in nodeList.withIndex()) {
             if (node.selected) {
-                _nodeToAnimate.value = Event(Pair(position, node))
+                _nodeToAnimate.value = Pair(position, node)
             }
             node.selected = false
         }
@@ -184,7 +197,7 @@ class OfflineViewModel @ViewModelInject constructor(
         if (selecting) {
             handleSelection(position, node)
         } else {
-            val nodeFile = getOfflineFile(getApplication(), node.node)
+            val nodeFile = getOfflineFile(context, node.node)
             if (isFileAvailable(nodeFile) && nodeFile.isDirectory) {
                 firstVisiblePositionStack
                     .push(if (firstVisiblePosition >= 0) firstVisiblePosition else 0)
@@ -211,9 +224,7 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun onSortedByClicked() {
-        if (!selecting) {
-            showSortedByAction.onNext(true)
-        }
+        showSortedByAction.onNext(true)
     }
 
     private fun handleSelection(position: Int, node: OfflineNode) {
@@ -231,9 +242,9 @@ class OfflineViewModel @ViewModelInject constructor(
             selectedNodes.remove(node.node.id)
         }
         selecting = !selectedNodes.isEmpty
-        _actionMode.value = Event(selecting)
+        _actionMode.value = selecting
 
-        _nodeToAnimate.value = Event(Pair(position, node))
+        _nodeToAnimate.value = Pair(position, node)
     }
 
     private fun navigateIn(folder: MegaOffline) {
@@ -244,17 +255,14 @@ class OfflineViewModel @ViewModelInject constructor(
             historySearchQuery = query
             historySearchPath = path
             navigationDepthInSearch++
-            _submitSearchQuery.value = Event(true)
+            _submitSearchQuery.value = true
         } else if (historySearchQuery != null) {
             navigationDepthInSearch++
         }
 
         if (rootFolderOnly) {
-            _pathLiveData.value = Event(folder.path + folder.name + "/")
-            val event = _pathLiveData.value
-            if (event != null) {
-                openFolderFullscreenAction.onNext(event.peekContent())
-            }
+            _pathLiveData.value = folder.path + folder.name + "/"
+            openFolderFullscreenAction.onNext(_pathLiveData.value)
         } else {
             navigateTo(folder.path + folder.name + "/", folder.name)
         }
@@ -295,7 +303,7 @@ class OfflineViewModel @ViewModelInject constructor(
         navigateTo(path, titleFromPath(path))
 
         if (firstVisiblePositionStack.isNotEmpty()) {
-            _scrollToPositionWhenNavigateOut.value = Event(firstVisiblePositionStack.pop())
+            _scrollToPositionWhenNavigateOut.value = firstVisiblePositionStack.pop()
         }
 
         return 2
@@ -305,12 +313,10 @@ class OfflineViewModel @ViewModelInject constructor(
         val query = searchQuery
         return when {
             query != null -> {
-                getApplication<MegaApplication>().getString(R.string.action_search)
-                    .toUpperCase(Locale.ROOT) + ": " + query
+                context.getString(R.string.action_search).toUpperCase(Locale.ROOT) + ": " + query
             }
             path == OFFLINE_ROOT -> {
-                getApplication<MegaApplication>().getString(R.string.tab_offline)
-                    .toUpperCase(Locale.ROOT)
+                context.getString(R.string.tab_offline).toUpperCase(Locale.ROOT)
             }
             else -> {
                 val pathWithoutLastSlash = path.substring(0, path.length - 1)
@@ -323,7 +329,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     private fun navigateTo(path: String, title: String) {
         this.path = path
-        _pathLiveData.value = Event(path)
+        _pathLiveData.value = path
         _actionBarTitle.value = title
         loadOfflineNodes()
     }
@@ -337,13 +343,13 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun getOrderDisplay(): String {
         val resId = when (order) {
-            ORDER_MODIFICATION_ASC -> R.string.sortby_modification_date
-            ORDER_MODIFICATION_DESC -> R.string.sortby_modification_date
+            ORDER_MODIFICATION_ASC -> R.string.sortby_date
+            ORDER_MODIFICATION_DESC -> R.string.sortby_date
             ORDER_SIZE_ASC -> R.string.sortby_size
             ORDER_SIZE_DESC -> R.string.sortby_size
             else -> R.string.sortby_name
         }
-        return getApplication<MegaApplication>().resources.getString(resId)
+        return context.resources.getString(resId)
     }
 
     fun setSearchQuery(query: String?) {
@@ -353,10 +359,6 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun onSearchQuerySubmitted() {
         _actionBarTitle.value = titleFromPath(path)
-    }
-
-    fun isSearching(): Boolean {
-        return searchQuery != null || historySearchQuery != null
     }
 
     fun setDisplayParam(
@@ -376,6 +378,13 @@ class OfflineViewModel @ViewModelInject constructor(
 
         _actionBarTitle.value = titleFromPath(path)
         loadOfflineNodes()
+    }
+
+    fun refreshActionBarTitle() {
+        val title = _actionBarTitle.value
+        if (title != null) {
+            _actionBarTitle.value = title
+        }
     }
 
     fun processUrlFile(file: File) {
@@ -419,7 +428,7 @@ class OfflineViewModel @ViewModelInject constructor(
                     if (node.isFolder) {
                         folderCount++
                     }
-                    val thumbnail = getThumbnailFile(node)
+                    val thumbnail = getThumbnailFile(context, node)
                     nodes.add(
                         OfflineNode(
                             node, if (isFileAvailable(thumbnail)) thumbnail else null,
@@ -436,23 +445,25 @@ class OfflineViewModel @ViewModelInject constructor(
                     }
                 }
 
+                var placeholders = 0
                 if (!isList && gridSpanCount != 0) {
-                    placeholderCount = if (folderCount % gridSpanCount == 0) {
+                    placeholders = if (folderCount % gridSpanCount == 0) {
                         0
                     } else {
                         gridSpanCount - (folderCount % gridSpanCount)
                     }
-                    if (placeholderCount != 0) {
-                        for (i in 0 until placeholderCount) {
+                    if (placeholders != 0) {
+                        for (i in 0 until placeholders) {
                             nodes.add(folderCount + i, OfflineNode.PLACE_HOLDER)
                         }
                     }
                 }
 
                 if (nodes.isNotEmpty() && !rootFolderOnly) {
-                    placeholderCount++
+                    placeholders++
                     nodes.add(0, OfflineNode.HEADER_SORTED_BY)
                 }
+                placeholderCount = placeholders
 
                 createThumbnails(nodesWithoutThumbnail)
                 nodes
@@ -464,10 +475,10 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun getNodeInfo(node: MegaOffline): String {
-        val file = getOfflineFile(getApplication(), node)
+        val file = getOfflineFile(context, node)
 
         return if (file.isDirectory) {
-            getFolderInfo(file)
+            getFolderInfo(context.resources, file)
         } else {
             String.format(
                 "%s . %s",
@@ -477,44 +488,14 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun getFolderInfo(file: File): String {
-        val files = file.listFiles() ?: return " "
-
-        var folderNum = 0
-        var fileNum = 0
-        for (f in files) {
-            if (f.isDirectory) {
-                folderNum++
-            } else {
-                fileNum++
-            }
-        }
-        val res = getApplication<MegaApplication>().resources
-
-        return if (folderNum > 0 && fileNum > 0) {
-            "$folderNum " + res.getQuantityString(R.plurals.general_num_folders, folderNum) +
-                    ", $fileNum " + res.getQuantityString(R.plurals.general_num_files, folderNum)
-        } else if (folderNum > 0) {
-            "$folderNum " + res.getQuantityString(R.plurals.general_num_folders, folderNum)
-        } else {
-            "$fileNum " + res.getQuantityString(R.plurals.general_num_files, fileNum)
-        }
-    }
-
     private fun createThumbnails(nodes: List<MegaOffline>) {
         add(Observable.fromIterable(nodes)
             .subscribeOn(Schedulers.io())
-            .map { Pair(getOfflineFile(getApplication(), it), getThumbnailFile(it)) }
+            .map { Pair(getOfflineFile(context, it), getThumbnailFile(context, it)) }
             .filter { it.first.exists() }
             .map { createThumbnail(it.first, it.second) }
             .throttleLatest(1, SECONDS, true)
             .subscribe(Consumer { loadOfflineNodes() }, logErr("createThumbnail"))
         )
-    }
-
-    private fun getThumbnailFile(node: MegaOffline): File {
-        val thumbDir = ThumbnailUtilsLollipop.getThumbFolder(getApplication())
-        val thumbName = Base64.encodeToString(node.handle.toByteArray(), Base64.DEFAULT)
-        return File(thumbDir, "$thumbName.jpg")
     }
 }

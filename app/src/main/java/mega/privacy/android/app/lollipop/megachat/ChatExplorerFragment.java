@@ -200,7 +200,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
 
-        String textToShow = String.format(context.getString(R.string.chat_explorer_empty));
+        String textToShow = String.format(context.getString(R.string.recent_chat_empty));
         try{
             textToShow = textToShow.replace("[A]", "<font color=\'#7a7a7a\'>");
             textToShow = textToShow.replace("[/A]", "</font>");

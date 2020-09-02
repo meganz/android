@@ -1,11 +1,10 @@
 package mega.privacy.android.app.arch
 
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
-import mega.privacy.android.app.MegaApplication
 
-abstract class BaseRxViewModel : AndroidViewModel(MegaApplication.getInstance()) {
+abstract class BaseRxViewModel : ViewModel() {
 
     protected var composite = CompositeDisposable()
 

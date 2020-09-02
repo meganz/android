@@ -15,6 +15,10 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_offline_file_info"
+            app:destination="@id/offline_file_info"
+            />
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
@@ -35,5 +39,19 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+        <action
+            android:id="@+id/action_homepage_to_offline_file_info"
+            app:destination="@id/offline_file_info"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/offline_file_info"
+        android:name="mega.privacy.android.app.fragments.offline.OfflineFileInfoFragment"
+        tools:layout="@layout/fragment_offline_file_info"
+        >
+        <argument
+            android:name="handle"
+            app:argType="string"
+            />
     </fragment>
 </navigation>

@@ -12,7 +12,7 @@ import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import javax.inject.Inject
 
-class PhotosBrowseAdapter @Inject constructor(
+class PhotosBrowseAdapter constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
 ) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),

@@ -283,6 +283,20 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	};
 
+	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null
+					|| !intent.getAction().equals(BROADCAST_ACTION_DESTROY_ACTION_MODE))
+				return;
+
+			if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+				sharedFoldersFragment.clearSelections();
+				sharedFoldersFragment.hideMultipleSelect();
+			}
+		}
+	};
+
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
 		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
@@ -636,6 +650,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, userNameUpdateFilter);
+
+		registerReceiver(destroyActionModeReceiver,
+				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
 	}
 
 	private void visibilityStateIcon() {
@@ -1751,6 +1768,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
+		unregisterReceiver(destroyActionModeReceiver);
 	}
 
 	@Override
@@ -1933,54 +1951,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 		nC.prepareForDownload(handleList, true);
 	}
-    
-    public void showConfirmationLeaveIncomingShare (final MegaNode n){
-		logDebug("Node handle: " + n.getHandle());
-        
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        megaApi.remove(n);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-        
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message= getResources().getString(R.string.confirmation_leave_share_folder);
-        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
-    
-    public void showConfirmationLeaveIncomingShare (final ArrayList<Long> handleList){
-		logDebug("showConfirmationLeaveIncomingShare");
-        
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        leaveMultipleShares(handleList);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-        
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message= getResources().getString(R.string.confirmation_leave_share_folder);
-        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
     
     public void leaveMultipleShares (ArrayList<Long> handleList){
         

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.photos.NodesChangeNotifierKt;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -686,6 +687,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case SEARCH:
+            case HOMEPAGE:
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
@@ -969,7 +971,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_leave_share_layout:
-                ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
+                showConfirmationLeaveIncomingShare(context, node);
                 break;
 
             case R.id.option_send_chat_layout:
@@ -1039,6 +1041,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case SEARCH:
                 ((ManagerActivityLollipop) context).onNodesSearchUpdate();
+                break;
+
+            case HOMEPAGE:
+                NodesChangeNotifierKt.notifyNodesChange(false);
                 break;
         }
     }

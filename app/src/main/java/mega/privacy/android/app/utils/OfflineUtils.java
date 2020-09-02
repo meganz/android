@@ -3,8 +3,10 @@ package mega.privacy.android.app.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.StatFs;
 
+import android.util.Base64;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -242,6 +244,41 @@ public class OfflineUtils {
         }
 
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
+    }
+
+    public static File getThumbnailFile(Context context, MegaOffline node) {
+        File thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context);
+        String thumbName = Base64.encodeToString(node.getHandle().getBytes(), Base64.DEFAULT);
+        return new File(thumbDir, thumbName + ".jpg");
+    }
+
+    public static String getFolderInfo(Resources res, File file) {
+        File[] files = file.listFiles();
+        if (files == null) {
+            return " ";
+        }
+
+        int folderNum = 0;
+        int fileNum = 0;
+        for (File f : files) {
+            if (f.isDirectory()) {
+                folderNum++;
+            } else {
+                fileNum++;
+            }
+        }
+
+        if (folderNum > 0 && fileNum > 0) {
+            return folderNum + " "
+                    + res.getQuantityString(R.plurals.general_num_folders, folderNum)
+                    + ", " + fileNum + " "
+                    + res.getQuantityString(R.plurals.general_num_files, folderNum);
+        } else if (folderNum > 0) {
+            return folderNum + " " + res.getQuantityString(R.plurals.general_num_folders,
+                    folderNum);
+        } else {
+            return fileNum + " " + res.getQuantityString(R.plurals.general_num_files, fileNum);
+        }
     }
 
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
@@ -655,8 +692,7 @@ public class OfflineUtils {
     }
 
     /**
-     * Shares multiple offline nodes. If any node is a folder and the app has network connection,
-     * then share links, otherwise share files.
+     * Shares multiple offline nodes, only files are supported.
      *
      * @param context the current Context
      * @param offlineNodes offline nodes to share
@@ -675,16 +711,6 @@ public class OfflineUtils {
                 files.add(getOfflineFile(context, offlineNode));
             }
             shareFiles(context, files);
-        } else if (isOnline(context)) {
-            List<MegaNode> nodes = new ArrayList<>();
-            for (MegaOffline offlineNode : offlineNodes) {
-                MegaNode node = MegaApplication.getInstance().getMegaApi()
-                    .getNodeByHandle(Long.parseLong(offlineNode.getHandle()));
-                if (node != null) {
-                    nodes.add(node);
-                }
-            }
-            shareNodes(context, nodes);
         }
     }
 }
