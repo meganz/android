@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.documents
 
 import android.content.Context
 import android.os.Handler
@@ -10,20 +10,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.File
-import java.time.LocalDate
-import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 
-class PhotosRepository @Inject constructor(
+class DocumentsRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
     @ApplicationContext private val context: Context
@@ -33,13 +33,13 @@ class PhotosRepository @Inject constructor(
     // LinkedHashMap guarantees that the index order of elements is consistent with
     // the order of putting. Moreover, it has a quick element search[O(1)] (for
     // the callback of megaApi.getThumbnail())
-    private val photoNodesMap: MutableMap<Long, PhotoNode> = LinkedHashMap()
-    private val savedPhotoNodesMap: MutableMap<Long, PhotoNode> = LinkedHashMap()
+    private val photoNodesMap: MutableMap<Long, NodeItem> = LinkedHashMap()
+    private val savedPhotoNodesMap: MutableMap<Long, NodeItem> = LinkedHashMap()
 
     private var waitingForRefresh = false
 
-    private val _photoNodes = MutableLiveData<List<PhotoNode>>()
-    val photoNodes: LiveData<List<PhotoNode>> = _photoNodes
+    private val _photoNodes = MutableLiveData<List<NodeItem>>()
+    val photoNodes: LiveData<List<NodeItem>> = _photoNodes
 
     suspend fun getPhotos(forceUpdate: Boolean) {
         if (forceUpdate) {
@@ -49,11 +49,11 @@ class PhotosRepository @Inject constructor(
 
                 // Update LiveData must in main thread
                 withContext(Dispatchers.Main) {
-                    _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
+                    _photoNodes.value = ArrayList<NodeItem>(photoNodesMap.values)
                 }
             }
         } else {
-            _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
+            _photoNodes.value = ArrayList<NodeItem>(photoNodesMap.values)
         }
     }
 
@@ -111,49 +111,33 @@ class PhotosRepository @Inject constructor(
         Handler().postDelayed(
             {
                 waitingForRefresh = false
-                _photoNodes.value = ArrayList<PhotoNode>(photoNodesMap.values)
+                _photoNodes.value = ArrayList<NodeItem>(photoNodesMap.values)
             }, UPDATE_DATA_THROTTLE_TIME
         )
     }
 
     private fun getPhotoNodes() {
-        var lastModifyDate: LocalDate? = null
-        var mapKeyTitle = Long.MIN_VALUE
-
         for (node in getMegaNodesOfPhotos()) {
             val thumbnail = getThumbnail(node)
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
 
-            if (lastModifyDate == null
-                || YearMonth.from(lastModifyDate) != YearMonth.from(
-                    modifyDate
-                )
-            ) {
-                lastModifyDate = modifyDate
-                photoNodesMap[mapKeyTitle++] =
-                    PhotoNode(PhotoNode.TYPE_TITLE, -1, null, -1, dateString, null, false)
-            }
-
             val selected = savedPhotoNodesMap[node.handle]?.selected ?: false
 
-            photoNodesMap[node.handle] = PhotoNode(
-                PhotoNode.TYPE_PHOTO,
-                -1,
+            photoNodesMap[node.handle] = NodeItem(
                 node,
                 -1,
                 dateString,
                 thumbnail,
-                selected
+                selected,
+                true
             )
         }
     }
 
-    /*
-     * TODO: This is a temp mock function for upcoming:
-     * MegaNodeList* MegaApi::searchByType(const char *searchString, MegaCancelToken *cancelToken, int order, int type)
-     */
     private fun getMegaNodesOfPhotos(): List<MegaNode> {
+//        return megaApi.searchByType(null, null, null,
+//            true, order, 4, 3)
         var cuHandle: Long = -1
         val pref = dbHandler.preferences
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage
 
 interface HomepageSearchable {
     fun shouldShowSearchMenu(): Boolean {

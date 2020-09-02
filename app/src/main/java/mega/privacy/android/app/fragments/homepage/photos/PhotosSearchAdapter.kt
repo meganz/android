@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.photos
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.databinding.ItemPhotoSearchBinding
+import mega.privacy.android.app.databinding.ItemNodeListBinding
 
 class PhotosSearchAdapter constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
-) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),
+) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
     override fun getItemViewType(position: Int): Int {
@@ -21,7 +21,7 @@ class PhotosSearchAdapter constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
-        val binding = ItemPhotoSearchBinding.inflate(
+        val binding = ItemNodeListBinding.inflate(
             inflater,
             parent,
             false
@@ -39,12 +39,12 @@ class PhotosSearchAdapter constructor(
         holder.bind(viewModel, actionModeViewModel, getItem(position))
     }
 
-    private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNode>() {
-        override fun areItemsTheSame(oldItem: PhotoNode, newItem: PhotoNode): Boolean {
+    private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNodeItem>() {
+        override fun areItemsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
             return oldItem.node?.handle == newItem.node?.handle
         }
 
-        override fun areContentsTheSame(oldItem: PhotoNode, newItem: PhotoNode): Boolean {
+        override fun areContentsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
             if (newItem.uiDirty) {
                 return false
             }

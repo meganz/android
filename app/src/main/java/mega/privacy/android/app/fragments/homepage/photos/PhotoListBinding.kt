@@ -1,31 +1,23 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.photos
 
 import android.content.Context
-import android.graphics.Color
 import android.net.Uri
 import android.view.View
-import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.facebook.drawee.generic.RoundingParams
-import com.facebook.drawee.view.DraweeView
 import com.facebook.drawee.view.SimpleDraweeView
-import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.shape.ShapeAppearanceModel
-import kotlinx.android.synthetic.main.item_photo_browse.view.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.Util
 import java.io.File
 
 @Suppress("UNCHECKED_CAST")
 @BindingAdapter("items")
-fun setItems(listView: RecyclerView, items: List<PhotoNode>?) {
+fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
     items?.let {
-        (listView.adapter as ListAdapter<PhotoNode, PhotoViewHolder>).submitList(it)
+        (listView.adapter as ListAdapter<NodeItem, PhotoViewHolder>).submitList(it)
     }
 }
 

@@ -1,23 +1,28 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.photos
 
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.fragments.homepage.ItemOperation
+import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 class PhotosViewModel @ViewModelInject constructor(
     private val photosRepository: PhotosRepository
-) : ViewModel() {
+) : ViewModel(), ItemOperation {
 
     private var _query = MutableLiveData<String>("")
 
-    private val _openPhotoEvent = MutableLiveData<Event<PhotoNode>>()
-    val openPhotoEvent: LiveData<Event<PhotoNode>> = _openPhotoEvent
+    private val _openPhotoEvent = MutableLiveData<Event<PhotoNodeItem>>()
+    val openPhotoEventItem: LiveData<Event<PhotoNodeItem>> = _openPhotoEvent
 
-    private val _showFileInfoEvent = MutableLiveData<Event<PhotoNode>>()
-    val showFileInfoEvent: LiveData<Event<PhotoNode>> = _showFileInfoEvent
+    private val _showNodeOptionsEvent = MutableLiveData<Event<NodeItem>>()
+    val showNodeItemOptionsEvent: LiveData<Event<NodeItem>> = _showNodeOptionsEvent
 
     var searchMode = false
     var searchQuery = ""
@@ -25,12 +30,12 @@ class PhotosViewModel @ViewModelInject constructor(
     private var forceUpdate = false
     private var ignoredFirst = false
 
-    val items: LiveData<List<PhotoNode>> = _query.switchMap {
+    val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
         viewModelScope.launch {
             photosRepository.getPhotos(forceUpdate)
         }
 
-        photosRepository.photoNodes
+        photosRepository.photoNodesItem
     }.map { nodes ->
         var index = 0
         var photoIndex = 0
@@ -47,13 +52,13 @@ class PhotosViewModel @ViewModelInject constructor(
 
         if (searchMode) {
             filteredNodes = filteredNodes.filter {
-                it.type == PhotoNode.TYPE_PHOTO
+                it.type == PhotoNodeItem.TYPE_PHOTO
             }
         }
 
         filteredNodes.forEach {
             it.index = index++
-            if (it.type == PhotoNode.TYPE_PHOTO) it.photoIndex = photoIndex++
+            if (it.type == PhotoNodeItem.TYPE_PHOTO) it.photoIndex = photoIndex++
         }
 
         filteredNodes
@@ -98,12 +103,12 @@ class PhotosViewModel @ViewModelInject constructor(
         loadPhotos()
     }
 
-    fun onPhotoClick(item: PhotoNode) {
-        _openPhotoEvent.value = Event(item)
+    override fun onItemClick(item: NodeItem) {
+        _openPhotoEvent.value = Event(item as PhotoNodeItem)
     }
 
     fun getRealNodeCount(): Int {
-        items.value?.filter { it.type == PhotoNode.TYPE_PHOTO }?.let {
+        items.value?.filter { it.type == PhotoNodeItem.TYPE_PHOTO }?.let {
             return it.size
         }
 
@@ -120,14 +125,14 @@ class PhotosViewModel @ViewModelInject constructor(
 
     fun getHandlesOfPhotos(): LongArray? {
         val list = items.value?.filter {
-            it.type == PhotoNode.TYPE_PHOTO
+            it.type == PhotoNodeItem.TYPE_PHOTO
         }?.map { node -> node.node?.handle ?: INVALID_HANDLE }
 
         return list?.toLongArray()
     }
 
-    fun showFileInfo(item: PhotoNode) {
-        _showFileInfoEvent.value = Event(item)
+    override fun showNodeOptionsInfo(item: NodeItem) {
+        _showNodeOptionsEvent.value = Event(item)
     }
 
     override fun onCleared() {
