@@ -1625,7 +1625,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
 
         AndroidMegaChatMessage androidMessage = messages.get(position - 1);
-        MegaChatMessage message =androidMessage.getMessage();
+        MegaChatMessage message = androidMessage.getMessage();
         ((ViewHolderMessageChat) holder).userHandle = message.getUserHandle();
 
         int messageType = message.getType();

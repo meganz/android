@@ -33,6 +33,12 @@ public class BottomSheetUtils {
         }
     }
 
+    /**
+     * Method for locating the parent of the current view
+     *
+     * @param view The current view.
+     * @return The view parent.
+     */
     private static View findBottomSheetParent(final View view) {
         View current = view;
         while (current != null) {
@@ -41,7 +47,7 @@ public class BottomSheetUtils {
                 return current;
             }
             final ViewParent parent = current.getParent();
-            current = parent == null || !(parent instanceof View) ? null : (View) parent;
+            current = !(parent instanceof View) ? null : (View) parent;
         }
 
         return null;

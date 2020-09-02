@@ -8,8 +8,6 @@ import androidx.viewpager.widget.ViewPager;
 
 public class ReactionCustomViewPager extends ViewPager {
 
-    private boolean isPagingEnabled = true;
-
     public ReactionCustomViewPager(Context context) {
         super(context);
     }
@@ -20,11 +18,11 @@ public class ReactionCustomViewPager extends ViewPager {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return this.isPagingEnabled && super.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        return this.isPagingEnabled && super.onInterceptTouchEvent(event);
+        return super.onInterceptTouchEvent(event);
     }
 }

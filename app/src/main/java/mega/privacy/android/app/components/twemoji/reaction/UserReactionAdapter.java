@@ -33,8 +33,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnClickListener {
 
-    private static final int MAX_WIDTH_PORT = 180;
-    private static final int MAX_WIDTH_LAND = 260;
+    private static final int MAX_WIDTH_PORT = 270;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private Context context;
@@ -65,7 +64,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         RelativeLayout layout = convertView.findViewById(R.id.layout);
         RoundedImageView imageView = convertView.findViewById(R.id.contact_list_thumbnail);
         EmojiTextView name = convertView.findViewById(R.id.contact_list_name);
-        name.setMaxWidthEmojis(scaleWidthPx(isScreenInPortrait(context) ? MAX_WIDTH_PORT : MAX_WIDTH_LAND, outMetrics));
+        name.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_PORT, outMetrics));
         layout.setOnClickListener(this);
         layout.setTag(userHandle);
 
@@ -73,7 +72,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         String email;
         chatC = new ChatController(context);
 
-        Boolean myUserHandle = isMyUserHandle(userHandle);
+        boolean myUserHandle = isMyUserHandle(userHandle);
         if (myUserHandle) {
             email = megaChatApi.getMyEmail();
             userName = megaChatApi.getMyFullname();
@@ -109,8 +108,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
             }
         } else {
             String nameFileHandle = MegaApiAndroid.userHandleToBase64(userHandle);
-            String nameFileEmail = email;
-            Bitmap bitmap = isTextEmpty(nameFileEmail) ? getAvatarBitmap(nameFileHandle) : getUserAvatar(nameFileHandle, nameFileEmail);
+            Bitmap bitmap = isTextEmpty(email) ? getAvatarBitmap(nameFileHandle) : getUserAvatar(nameFileHandle, email);
             if (bitmap != null) {
                 imageView.setImageBitmap(bitmap);
             }
@@ -141,7 +139,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                         }
                     } else {
                         ((ChatActivityLollipop) context).hideBottomSheet();
-                        ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.contact_is_me), -1);
+                        ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.contact_is_me), MEGACHAT_INVALID_HANDLE);
                     }
                 }
                 break;
