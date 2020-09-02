@@ -8,10 +8,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -28,12 +26,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_homepage.view.fab_home_main
-import kotlinx.android.synthetic.main.homepage_fabs.view.fab_chat
-import kotlinx.android.synthetic.main.homepage_fabs.view.fab_main
-import kotlinx.android.synthetic.main.homepage_fabs.view.fab_upload
-import kotlinx.android.synthetic.main.homepage_fabs.view.text_chat
-import kotlinx.android.synthetic.main.homepage_fabs.view.text_upload
+import kotlinx.android.synthetic.main.fragment_homepage.view.*
+import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.BottomSheetPagerAdapter
@@ -43,15 +37,12 @@ import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
-import mega.privacy.android.app.utils.Constants.GO_OFFLINE
-import mega.privacy.android.app.utils.Constants.GO_ONLINE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ACTION_TYPE
-import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 @AndroidEntryPoint
@@ -310,7 +301,7 @@ class HomepageFragment : Fragment() {
         fabChat.setOnClickListener {
             fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
             runDelay(FAB_MASK_OUT_DELAY) {
-                toChat()
+                openChatActivity()
             }
         }
 
@@ -322,7 +313,7 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun toChat() {
+    private fun openChatActivity() {
         val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
             putExtra(KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
         }

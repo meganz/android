@@ -6408,25 +6408,29 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				logDebug("onMenuItemActionExpand");
-				searchQuery = "";
-				searchExpand = true;
-
-				resetActionBar(aB);
-				if (drawerItem == DrawerItem.HOMEPAGE) {
-					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
-						setFullscreenOfflineFragmentSearchQuery(searchQuery);
-					} else if (mHomepageSearchable != null) {
-						mHomepageSearchable.searchReady();
-					} else {
-                        toSearch();
+                searchQuery = "";
+                searchExpand = true;
+                if (drawerItem == DrawerItem.HOMEPAGE) {
+                    if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+                        setFullscreenOfflineFragmentSearchQuery(searchQuery);
+                    } else if (mHomepageSearchable != null) {
+                        mHomepageSearchable.searchReady();
+                    } else {
+                        openSearchOnHomepage();
                     }
-				} else {
-                    toSearch();
+                } else if (drawerItem != DrawerItem.CHAT) {
+                    textsearchQuery = false;
+                    firstNavigationLevel = true;
+                    parentHandleSearch = -1;
+                    levelsSearch = -1;
+                    setSearchDrawerItem();
+                    selectDrawerItemLollipop(drawerItem);
+                } else {
+                    resetActionBar(aB);
                 }
-
-				hideCallMenuItem();
-				hideCallWidget();
-				return true;
+                hideCallMenuItem();
+                hideCallWidget();
+                return true;
 			}
 
 			@Override
@@ -6820,7 +6824,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return super.onCreateOptionsMenu(menu);
 	}
 
-    private void toSearch() {
+    private void openSearchOnHomepage() {
         textsearchQuery = false;
         firstNavigationLevel = true;
         parentHandleSearch = -1;
