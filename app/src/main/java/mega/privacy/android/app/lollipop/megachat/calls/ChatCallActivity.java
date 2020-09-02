@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.app.ActivityCompat;
@@ -109,6 +110,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int TYPE_JOIN = 1;
     final private static int TYPE_LEFT = -1;
     private final static int TITLE_TOOLBAR = 250;
+    private static final int TIMEOUT = 5000;
     private float widthScreenPX, heightScreenPX;
     private long chatId;
     private MegaChatRoom chat;
@@ -193,6 +195,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private MenuItem cameraSwapMenuItem;
     private MegaApplication application =  MegaApplication.getInstance();
     private boolean inTemporaryState = false;
+    private CountDownTimer countDownTimer;
 
     private ChatController chatC;
 
@@ -302,7 +305,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Check the initial state of the call and update UI.
      */
     private void checkInitialCallStatus() {
-        if (chatId == -1 || megaChatApi == null || getCall() == null) return;
+        if (chatId == -1 || megaChatApi == null || getCall() == null)
+            return;
 
         chat = megaChatApi.getChatRoom(chatId);
         int callStatus = callChat.getStatus();
@@ -1879,6 +1883,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     public void remoteCameraClick() {
+        stopCountDownTimer();
+
         if (getCall() == null || (callChat.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS && callChat.getStatus() != MegaChatCall.CALL_STATUS_JOINING && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING))
             return;
 
@@ -2416,6 +2422,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Perform the necessary actions when the status of the call is CALL_STATUS_IN_PROGRESS.
      */
     private void checkInProgressCall() {
+        logDebug("checkInProgressCall");
+
         if (getCall() == null)
             return;
 
@@ -2441,6 +2449,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         showInitialFABConfiguration();
         updateSubtitleNumberOfVideos();
         updateLocalSpeakerStatus();
+        stopCountDownTimer();
+
+        if (!isOnlyAudioCall()) {
+            countDownTimer = new CountDownTimer(TIMEOUT, 1000) {
+                public void onTick(long millisUntilFinished) {
+                }
+
+                public void onFinish() {
+                    remoteCameraClick();
+                }
+            }.start();
+        }
     }
 
     /**
@@ -2820,6 +2840,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         } else if (megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
             megaChatApi.enableAudioLevelMonitor(false, chatId);
+        }
+    }
+
+    /**
+     * Stop the countdown timer.
+     */
+    private void stopCountDownTimer() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
         }
     }
 }
