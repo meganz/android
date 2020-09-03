@@ -16,7 +16,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.TextUtils;
@@ -45,6 +44,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -59,6 +59,7 @@ public class BaseActivity extends AppCompatActivity {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
+    private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
 
     private BaseActivity baseActivity;
 
@@ -104,6 +105,9 @@ public class BaseActivity extends AppCompatActivity {
     //Indicates when the activity should finish due to some error
     private static boolean finishActivityAtError;
 
+    private boolean isResumeTransfersWarningShown;
+    private AlertDialog resumeTransfersWarning;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -141,6 +145,9 @@ public class BaseActivity extends AppCompatActivity {
         registerReceiver(showSnackbarReceiver,
                 new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
 
+        registerReceiver(resumeTransfersReceiver,
+                new IntentFilter(BROADCAST_ACTION_RESUME_TRANSFERS));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -151,6 +158,11 @@ public class BaseActivity extends AppCompatActivity {
             if (isGeneralTransferOverQuotaWarningShown) {
                 showGeneralTransferOverQuotaWarning();
             }
+
+            isResumeTransfersWarningShown = savedInstanceState.getBoolean(RESUME_TRANSFERS_WARNING_SHOWN, false);
+            if (isResumeTransfersWarningShown) {
+                showResumeTransfersWarning(this);
+            }
         }
     }
 
@@ -158,6 +170,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
         outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
+        outState.putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown);
 
         super.onSaveInstanceState(outState);
     }
@@ -204,6 +217,10 @@ public class BaseActivity extends AppCompatActivity {
 
         if (transferGeneralOverQuotaWarning != null) {
             transferGeneralOverQuotaWarning.dismiss();
+        }
+
+        if (resumeTransfersWarning != null) {
+            resumeTransfersWarning.dismiss();
         }
 
         super.onDestroy();
@@ -364,6 +381,24 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             showGeneralTransferOverQuotaWarning();
+        }
+    };
+
+    /**
+     * Broadcast to show a warning when it tries to upload files to a chat conversation
+     * and the transfers are paused.
+     */
+    private BroadcastReceiver resumeTransfersReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_RESUME_TRANSFERS)
+                    || isResumeTransfersWarningShown()
+                    || !isActivityInForeground()) {
+                return;
+            }
+
+            showResumeTransfersWarning(baseActivity);
         }
     };
 
@@ -872,5 +907,21 @@ public class BaseActivity extends AppCompatActivity {
         } catch (IllegalArgumentException e) {
             logWarning("IllegalArgumentException unregistering transfersUpdateReceiver", e);
         }
+    }
+
+    public boolean isResumeTransfersWarningShown() {
+        return isResumeTransfersWarningShown;
+    }
+
+    public void setIsResumeTransfersWarningShown(boolean isResumeTransfersWarningShown) {
+        this.isResumeTransfersWarningShown = isResumeTransfersWarningShown;
+    }
+
+    public void setResumeTransfersWarning(AlertDialog resumeTransfersWarning) {
+        this.resumeTransfersWarning = resumeTransfersWarning;
+    }
+
+    public AlertDialog getResumeTransfersWarning() {
+        return resumeTransfersWarning;
     }
 }

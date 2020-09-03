@@ -1,7 +1,11 @@
 package mega.privacy.android.app.utils
 
+import android.content.Context
 import android.content.Intent
+import androidx.appcompat.app.AlertDialog
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -47,6 +51,38 @@ class AlertsAndWarnings {
             val intent = Intent(app.applicationContext, OverDiskQuotaPaywallActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             app.startActivity(intent)
+        }
+
+        @JvmStatic
+        fun showResumeTransfersWarning(context: Context) {
+            if (context is BaseActivity
+                    && context.resumeTransfersWarning != null
+                    && context.resumeTransfersWarning.isShowing) {
+                return
+            }
+
+            val resumeTransfersDialogBuilder = AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle)
+
+            resumeTransfersDialogBuilder.setTitle(R.string.warning_resume_transfers)
+                    .setMessage(R.string.warning_message_resume_transfers)
+                    .setPositiveButton(R.string.button_resume_individual_transfer) { dialog, which ->
+                        MegaApplication.getInstance().megaApi.pauseTransfers(false)
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton(R.string.general_cancel) { dialog, which ->
+                        dialog.dismiss()
+                    }.setOnDismissListener { dialog ->
+                        if (context is BaseActivity) {
+                            context.setIsResumeTransfersWarningShown(false)
+                        }
+                    }
+
+            if (context is BaseActivity) {
+                context.setIsResumeTransfersWarningShown(true)
+                context.setResumeTransfersWarning(resumeTransfersDialogBuilder.create())
+            }
+
+            resumeTransfersDialogBuilder.show()
         }
     }
 }

@@ -17,6 +17,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_LEFT_CHAT = "INTENT_LEFT_CHAT";
     public static final String BROADCAST_ACTION_SHOW_SNACKBAR = "INTENT_SHOW_SNACKBAR";
     public static final String BROADCAST_ACTION_DESTROY_ACTION_MODE = "INTENT_DESTROY_ACTION_MODE";
+    public static final String BROADCAST_ACTION_RESUME_TRANSFERS = "INTENT_RESUME_TRANSFERS";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";

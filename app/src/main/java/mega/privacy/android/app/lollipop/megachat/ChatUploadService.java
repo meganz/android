@@ -59,6 +59,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -920,6 +921,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 			logDebug("onTransferUpdate: " + transfer.getNodeHandle());
+
+			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+				sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
+			}
 
 			String appData = transfer.getAppData();
 

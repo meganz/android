@@ -93,6 +93,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
@@ -1348,6 +1349,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).errorUploadingRichLink.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).retryAlert.setText(R.string.manual_retry_alert);
 
         ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
 
@@ -1505,6 +1507,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     logDebug("State of the message: " + message.getPendingMessage().getState());
                     if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
                         ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
+                    } else if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+                        ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_paused);
                     } else {
                         ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
                     }

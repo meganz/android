@@ -1635,6 +1635,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Read and write</string>
 
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
     <string name="attachment_uploading_state_uploading">Uploading&#8230;</string>
     <string name="attachment_uploading_state_error">Error. Not sent.</string>
 
@@ -2876,4 +2877,6 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
+    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
 </resources>
