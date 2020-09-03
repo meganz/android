@@ -415,6 +415,7 @@ class HomepageFragment : Fragment() {
         view.animate()
             .setDuration(FAB_ANIM_DURATION)
             .translationY(0f)
+            .setListener(object : AnimatorListenerAdapter() {/* No need to override any methods here. */})
             .alpha(ALPHA_OPAQUE)
             .start()
     }
