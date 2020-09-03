@@ -33,8 +33,9 @@ public class CallNotificationIntentService extends IntentService implements Mega
     MegaApiAndroid megaApi;
     MegaApplication app;
 
-    long chatIdIncomingCall;
-    long chatIdCurrentCall;
+    private long chatIdIncomingCall;
+    private long chatIdCurrentCall;
+    private boolean hasVideoInitialCall;
 
     public CallNotificationIntentService() {
         super("CallNotificationIntentService");
@@ -53,6 +54,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
         logDebug("onHandleIntent");
         chatIdCurrentCall = intent.getExtras().getLong(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
         chatIdIncomingCall = intent.getExtras().getLong(CHAT_ID_OF_INCOMING_CALL, MEGACHAT_INVALID_HANDLE);
+        hasVideoInitialCall = intent.getExtras().getBoolean(INCOMING_VIDEO_CALL, false);
         clearIncomingCallNotification(chatIdIncomingCall);
 
         final String action = intent.getAction();
