@@ -16654,10 +16654,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void setTextSubmitted () {
 	    if (searchView != null) {
-	    	if (!isValidSearchQuery()) {
-				searchExpand = false;
-				return;
-			}
+	    	if (!isValidSearchQuery()) return;
 	        searchView.setQuery(searchQuery, true);
         }
     }
