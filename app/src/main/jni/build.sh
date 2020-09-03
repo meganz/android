@@ -22,7 +22,6 @@ fi
 
 NDK_BUILD=${NDK_ROOT}/ndk-build
 JNI_PATH=`pwd`
-CC=`${NDK_ROOT}/ndk-which gcc`
 LIBDIR=${JNI_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${JNI_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
