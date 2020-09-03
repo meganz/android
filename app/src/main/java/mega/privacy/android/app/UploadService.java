@@ -258,7 +258,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         acquireLock();
 
         rxSubscriptions.add(Single.just(true)
-            .observeOn(Schedulers.io())
+            .observeOn(Schedulers.single())
             .subscribe(ignored -> doHandleIntent(intent, filePath),
                 throwable -> logError("doHandleIntent onError", throwable)));
     }
@@ -550,7 +550,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
     private void updateProgressNotification(boolean isFolderTransfer) {
       rxSubscriptions.add(Single.just(isFolderTransfer)
-          .observeOn(Schedulers.io())
+          .observeOn(Schedulers.single())
           .subscribe(this::doUpdateProgressNotification,
               throwable -> logError("doUpdateProgressNotification onError", throwable)));
     }
@@ -643,7 +643,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
       rxSubscriptions.add(Single.just(transfer)
-          .observeOn(Schedulers.io())
+          .observeOn(Schedulers.single())
           .subscribe(this::doOnTransferStart,
               throwable -> logError("doOnTransferStart onError", throwable)));
     }
@@ -678,7 +678,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferFinish(final MegaApiJava api, final MegaTransfer transfer, MegaError error) {
       rxSubscriptions.add(Single.just(true)
-          .observeOn(Schedulers.io())
+          .observeOn(Schedulers.single())
           .subscribe(ignored -> doOnTransferFinish(transfer, error),
               throwable -> logError("doOnTransferFinish onError", throwable)));
     }
@@ -929,7 +929,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
       rxSubscriptions.add(Single.just(transfer)
-          .observeOn(Schedulers.io())
+          .observeOn(Schedulers.single())
           .subscribe(this::doOnTransferUpdate,
               throwable -> logError("doOnTransferUpdate onError", throwable)));
     }
@@ -973,7 +973,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
       rxSubscriptions.add(Single.just(true)
-          .observeOn(Schedulers.io())
+          .observeOn(Schedulers.single())
           .subscribe(ignored -> doOnTransferTemporaryError(transfer, e),
               throwable -> logError("doOnTransferTemporaryError onError", throwable)));
     }

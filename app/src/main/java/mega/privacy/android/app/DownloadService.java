@@ -259,7 +259,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		rxSubscriptions.add(Single.just(intent)
-			.observeOn(Schedulers.io())
+			.observeOn(Schedulers.single())
 			.subscribe(this::onHandleIntent,
 					throwable -> logError("onHandleIntent onError", throwable)));
 		return START_NOT_STICKY;
@@ -1366,7 +1366,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		rxSubscriptions.add(Single.just(transfer)
-				.observeOn(Schedulers.io())
+				.observeOn(Schedulers.single())
 				.subscribe(this::doOnTransferStart,
 						throwable -> logError("doOnTransferStart onError", throwable)));
 	}
@@ -1385,7 +1385,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
 		rxSubscriptions.add(Single.just(true)
-				.observeOn(Schedulers.io())
+				.observeOn(Schedulers.single())
 				.subscribe(ignored -> doOnTransferFinish(transfer, error),
 						throwable -> logError("doOnTransferFinish onError", throwable)));
 	}
@@ -1636,7 +1636,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		rxSubscriptions.add(Single.just(transfer)
-				.observeOn(Schedulers.io())
+				.observeOn(Schedulers.single())
 				.subscribe(this::doOnTransferUpdate,
 						throwable -> logError("doOnTransferUpdate onError", throwable)));
 	}
@@ -1672,7 +1672,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		rxSubscriptions.add(Single.just(true)
-				.observeOn(Schedulers.io())
+				.observeOn(Schedulers.single())
 				.subscribe(ignored -> doOnTransferTemporaryError(transfer, e),
 						throwable -> logError("doOnTransferTemporaryError onError", throwable)));
 	}

@@ -104,7 +104,7 @@
 
     <string name="action_settings" context="Menu item">设定</string>
     <string name="action_search" context="Search button">搜索</string>
-    <string name="action_search_country" context="Select country page title">选择国家</string>
+    <string name="action_search_country" context="Select country page title">选择您的国家</string>
     <string name="action_play" context="Search button">播放</string>
     <string name="action_pause" context="Search button">暂停</string>
     <string name="action_refresh" context="Menu item">刷新</string>
@@ -818,8 +818,8 @@
     <string name="settings_about_terms_of_service" context="">服务条款</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">数据保护条例</string>
     <string name="settings_about_app_version" context="App means “Application”">App 版本</string>
-    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK软件开发包版本</string>
-    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat软件开发包版本</string>
+    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK版本</string>
+    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK版本</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">检视来源码</string>
 
     <string name="january">一月</string>
@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">查看文件</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">输入</string>
-    <string name="save_for_offline" context="Menu option">离线储存</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">离线储存</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">增加至云盘</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">离线储存</string>
 
@@ -2732,7 +2732,7 @@
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，“离线”中的文件将从您的设备中删除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">登出帐户后，正在进行的传输将被取消。</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">登出帐户后，“离线”中的文件将从您的设备中删除，传输中的文件将被取消。</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">登出帐户后，离线中的文件将从您的设备中删除，传输中的文件将取消。</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">未知名称</string>
 
@@ -2788,6 +2788,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">这最好由实际面对面来完成。如您有其他已验证管道，如已验证的OTR或PGP，也可以使采用。</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">您的凭证</string>
     <string name="action_reset" context="Button to reset credentials">重置密码</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">您是否要移除手机号码？</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">您的手机号已成功解除绑定。</string>

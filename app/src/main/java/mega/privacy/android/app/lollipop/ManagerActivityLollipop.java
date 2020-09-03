@@ -5006,11 +5006,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case SEARCH:{
 				aB.setSubtitle(null);
-				if(textsearchQuery){
-					if (getSearchFragment() != null) {
-						sFLol.setAllowedMultiselect(true);
-					}
-				}
 				if(parentHandleSearch==-1){
 					firstNavigationLevel = true;
 					if(searchQuery!=null){
@@ -6501,21 +6496,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					searchQuery = newText;
 					offlineSearch();
+				} else if (textSubmitted) {
+					textSubmitted = false;
 				} else {
-					getSearchFragment();
-
-					if (textSubmitted) {
-						if (sFLol != null) {
-							sFLol.setAllowedMultiselect(true);
-						}
-						textSubmitted = false;
-					} else {
-						if (!textsearchQuery) {
-							searchQuery = newText;
-						}
-						if (sFLol != null) {
-							sFLol.newSearchNodesTask();
-						}
+					if (!textsearchQuery) {
+						searchQuery = newText;
+					}
+					if (getSearchFragment() != null) {
+						sFLol.newSearchNodesTask();
 					}
 				}
 				return true;
