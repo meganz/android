@@ -1659,17 +1659,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	    this.storageState = state;
 	}
 
-    @Override
-    public void unregisterReceiver(BroadcastReceiver receiver) {
-        super.unregisterReceiver(receiver);
-		try {
-			//If the receiver is not registered, it throws an IllegalArgumentException
-			unregisterReceiver(logoutReceiver);
-		} catch (IllegalArgumentException e) {
-			logWarning("IllegalArgumentException unregistering transfersUpdateReceiver", e);
-		}
-	}
-
     public static boolean isVerifySMSShowed() {
 		return isVerifySMSShowed;
 	}
