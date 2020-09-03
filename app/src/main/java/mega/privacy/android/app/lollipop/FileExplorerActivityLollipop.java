@@ -1401,12 +1401,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void finishActivity(){
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			super.finishAndRemoveTask();
-		}
-		else {
-			super.finish();
-		}
+		finishAndRemoveTask();
 	}
 
 	@Override
@@ -1958,6 +1953,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		logDebug("handle: " + handle);
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class)
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
 				.putExtra(NUMBER_UPLOADS, numberUploads);
 		if(handle!=-1){
