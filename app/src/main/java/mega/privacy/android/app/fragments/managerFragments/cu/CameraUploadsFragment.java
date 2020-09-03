@@ -526,10 +526,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void observeLiveData() {
         mViewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
-            if (!isResumed()) {
-                // don't update UI if CU fragment isn't resumed, e.g. CU folder updated or thumbnail
-                // created while dragging FullscreenImageViewer/AudioVideoPlayer, to not cause
-                // the hidden thumbnail be shown.
+            if (mDraggingNodeHandle != INVALID_HANDLE && !isResumed()) {
+                // don't update UI while dragging FullscreenImageViewer/AudioVideoPlayer,
+                // to not cause the hidden thumbnail be shown.
                 return;
             }
 
@@ -645,6 +644,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     @Override public void onResume() {
         super.onResume();
 
+        mDraggingNodeHandle = INVALID_HANDLE;
         reloadNodes(mManagerActivity.orderCamera);
     }
 
@@ -667,7 +667,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
         if (mime.isImage()) {
             Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            putExtras(intent, cuNode.getIndexInParent(), node, thumbnailLocation);
+            putExtras(intent, cuNode.getIndexForViewer(), node, thumbnailLocation);
             setDraggingThumbnailCallback();
             launchNodeViewer(intent, node.getHandle());
         } else if (mime.isVideoReproducible()) {
@@ -683,7 +683,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
             }
 
-            putExtras(mediaIntent, cuNode.getIndexInParent(), node, thumbnailLocation);
+            putExtras(mediaIntent, cuNode.getIndexForViewer(), node, thumbnailLocation);
 
             mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
             mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
@@ -739,9 +739,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
     }
 
-    private void putExtras(Intent intent, int indexInParent, MegaNode node,
+    private void putExtras(Intent intent, int indexForViewer, MegaNode node,
             int[] thumbnailLocation) {
-        intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexInParent);
+        intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer);
         intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, mManagerActivity.orderCamera);
 
         MegaNode parentNode = megaApi.getParentNode(node);

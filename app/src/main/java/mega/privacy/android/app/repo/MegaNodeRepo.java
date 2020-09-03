@@ -45,8 +45,8 @@ public class MegaNodeRepo {
      * 1 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
      * 2 means search for nodes between two days, filter[3] and filter[4] are start and end day in
      * millis.
-     * @return list of pairs, whose first value is index in parent, second value is the node, and
-     * the index of parent is used for FullscreenImageViewer/AudioVideoPlayer
+     * @return list of pairs, whose first value is index used for
+     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
      */
     public List<Pair<Integer, MegaNode>> getCuChildren(int type, int orderBy, long[] filter) {
         long cuHandle = -1;
@@ -100,6 +100,8 @@ public class MegaNodeRepo {
             }
             MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
             if (mime.isImage() || mime.isVideoReproducible()) {
+                // when not in search mode, index used by viewer is index in all siblings,
+                // including non image/video nodes
                 nodes.add(Pair.create(i, node));
             }
         }
@@ -138,9 +140,13 @@ public class MegaNodeRepo {
             return result;
         }
 
+        // when in search mode, index used by viewer is also index in all siblings,
+        // but all siblings are image/video, non image/video nodes are filtered by previous step
+        int indexInSiblings = 0;
         for (Pair<Integer, MegaNode> pair : nodes) {
             if (filterFunction.apply(pair.second)) {
-                result.add(pair);
+                result.add(Pair.create(indexInSiblings, pair.second));
+                indexInSiblings++;
             }
         }
 
