@@ -526,6 +526,13 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void observeLiveData() {
         mViewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
+            if (!isResumed()) {
+                // don't update UI if CU fragment isn't resumed, e.g. CU folder updated or thumbnail
+                // created while dragging FullscreenImageViewer/AudioVideoPlayer, to not cause
+                // the hidden thumbnail be shown.
+                return;
+            }
+
             boolean showScroller = nodes.size() >= (mManagerActivity.isSmallGridCameraUploads
                     ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             mBinding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
@@ -660,7 +667,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
         if (mime.isImage()) {
             Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            putExtras(intent, cuNode.getIndex(), node, thumbnailLocation);
+            putExtras(intent, cuNode.getIndexInParent(), node, thumbnailLocation);
             setDraggingThumbnailCallback();
             launchNodeViewer(intent, node.getHandle());
         } else if (mime.isVideoReproducible()) {
@@ -676,7 +683,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
             }
 
-            putExtras(mediaIntent, cuNode.getIndex(), node, thumbnailLocation);
+            putExtras(mediaIntent, cuNode.getIndexInParent(), node, thumbnailLocation);
 
             mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
             mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
@@ -732,8 +739,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
     }
 
-    private void putExtras(Intent intent, int index, MegaNode node, int[] thumbnailLocation) {
-        intent.putExtra(INTENT_EXTRA_KEY_POSITION, index);
+    private void putExtras(Intent intent, int indexInParent, MegaNode node,
+            int[] thumbnailLocation) {
+        intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexInParent);
         intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, mManagerActivity.orderCamera);
 
         MegaNode parentNode = megaApi.getParentNode(node);
