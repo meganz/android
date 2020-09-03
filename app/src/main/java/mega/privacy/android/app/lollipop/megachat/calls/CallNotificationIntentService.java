@@ -72,11 +72,11 @@ public class CallNotificationIntentService extends IntentService implements Mega
                         logDebug("Answering incoming call with status " + callStatusToString(call.getStatus()));
                         if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                             MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
-                            megaChatApi.answerChatCall(chatIdIncomingCall, false, this);
+                            megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
 
                         } else if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                             MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
-                            megaChatApi.startChatCall(chatIdIncomingCall, false, this);
+                            megaChatApi.startChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
                         }
                     }
                 } else {
@@ -107,7 +107,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 if (currentCall.isOnHold()) {
                     logDebug("Answering incoming call ...");
                     MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
-                    megaChatApi.answerChatCall(chatIdIncomingCall, false, this);
+                    megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
                 } else {
                     logDebug("Putting the current call on hold...");
                     megaChatApi.setCallOnHold(chatIdCurrentCall, true, this);
@@ -127,7 +127,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
      */
     public void clearIncomingCallNotification(long chatIdIncomingCall) {
         logDebug("Clear the notification in chat: " + chatIdIncomingCall);
-
         try {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (megaChatApi == null)
@@ -166,7 +165,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 } else if (request.getChatHandle() == chatIdCurrentCall) {
                     logDebug("Current call hung up. Answering incoming call ...");
                     MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
-                    megaChatApi.answerChatCall(chatIdIncomingCall, false, this);
+                    megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
                 }
 
             } else {
@@ -189,7 +188,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(i);
                 clearIncomingCallNotification(chatIdIncomingCall);
-
                 stopSelf();
             } else {
                 logError("Error answering the call" + e.getErrorCode());
@@ -198,7 +196,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("Current call on hold. Answering incoming call ...");
                 MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
-                megaChatApi.answerChatCall(chatIdIncomingCall, false, this);
+                megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
             } else {
                 logError("Error putting the call on hold" + e.getErrorCode());
             }

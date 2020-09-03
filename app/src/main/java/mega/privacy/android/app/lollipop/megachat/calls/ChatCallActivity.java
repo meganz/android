@@ -2817,6 +2817,24 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
 
         logDebug("Network quality changed");
+        int participantsWithPoorConnection = 1;
+        int totalParticipants = peersOnCall.size();
+        for (InfoPeerGroupCall participant : peersOnCall) {
+            if (participant.getPeerId() != megaChatApi.getMyUserHandle() || participant.getClientId() != megaChatApi.getMyClientidHandle(chatId)) {
+                MegaChatSession participantSession = getSessionCall(participant.getPeerId(), participant.getClientId());
+                if (participantSession != null && session.getNetworkQuality() == 0) {
+                    participantsWithPoorConnection++;
+                }
+            }
+        }
+
+        if (participantsWithPoorConnection == totalParticipants) {
+            reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
+            reconnectingText.setText(getString(R.string.poor_internet_connection_message));
+            reconnectingLayout.setVisibility(View.VISIBLE);
+            reconnectingLayout.setAlpha(1);
+        }
+
         int qualityLevel = session.getNetworkQuality();
         for (int i = 0; i < peersOnCall.size(); i++) {
             if (peersOnCall.get(i).getPeerId() == session.getPeerid() && peersOnCall.get(i).getClientId() == session.getClientid()) {
@@ -2837,6 +2855,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 } else {
                     updateUI();
                 }
+                break;
             }
         }
     }
