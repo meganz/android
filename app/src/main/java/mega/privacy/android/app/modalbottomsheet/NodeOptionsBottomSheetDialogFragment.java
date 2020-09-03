@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.photos.NodesChangeNotifierKt;
+import mega.privacy.android.app.fragments.homepage.NodesChangeNotifierKt;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;

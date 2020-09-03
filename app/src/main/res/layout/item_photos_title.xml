@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="mega.privacy.android.app.fragments.photos.PhotoNode" />
+            type="mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem" />
     </data>
 
     <TextView

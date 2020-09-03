@@ -1,12 +1,9 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.photos
 
 import android.content.Context
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -19,7 +16,6 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaShare
 import java.util.*
-import javax.inject.Inject
 
 class ActionModeCallback constructor(
     private val context: Context,
