@@ -414,24 +414,24 @@ echo "* PdfViewer is ready"
 echo "* Setting up ExoPlayer"
 if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${EXOPLAYER_DOWNLOAD_URL} ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE} ${EXOPLAYER_SHA1} ${EXOPLAYER}
-    cd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}
-    export EXOPLAYER_ROOT="$(pwd)"
-    export FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main/jni"
+    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
+    EXOPLAYER_ROOT="$(pwd)"
+    FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main/jni"
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        export HOST_PLATFORM="darwin-x86_64"
+        HOST_PLATFORM="darwin-x86_64"
     else
-        export HOST_PLATFORM="linux-x86_64"
+        HOST_PLATFORM="linux-x86_64"
     fi
-    export ENABLED_DECODERS=(ac3)
-    cd "${FFMPEG_EXT_PATH}" && \
-    ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" && \
-    cd "${FFMPEG_EXT_PATH}" && \
-    ${NDK_BUILD} APP_ABI="armeabi-v7a arm64-v8a x86 x86_64" && \
-    cd "${EXOPLAYER_ROOT}" && \
-    ./gradlew extension-ffmpeg:assembleRelease && \
-    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar \
-        ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar && \
-    touch ../${EXOPLAYER_SOURCE_FILE}.ready
+    ENABLED_DECODERS=(ac3)
+    cd "${FFMPEG_EXT_PATH}"
+    ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
+    cd "${FFMPEG_EXT_PATH}"
+    ${NDK_BUILD} APP_ABI="${BUILD_ARCHS}" &>> ${LOG_FILE}
+    cd "${EXOPLAYER_ROOT}"
+    ./gradlew extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
+    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
+    popd &>> ${LOG_FILE}
+    touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 fi
 echo "* ExoPlayer is ready"
 
