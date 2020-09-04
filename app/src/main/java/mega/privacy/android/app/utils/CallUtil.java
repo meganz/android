@@ -361,7 +361,6 @@ public class CallUtil {
             chronometerMenuItem.stop();
         }
         if (returnCallMenuItem != null) {
-            logDebug("***************** returnCallMenuItem GONE");
             returnCallMenuItem.setVisible(false);
         }
     }

@@ -8504,8 +8504,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (callInProgressText != null) {
             callInProgressText.setText(text);
         }
-        activateChrono(chrono, callInProgressChrono, call);
 
+        activateChrono(chrono, callInProgressChrono, call);
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setAlpha(1);
             callInProgressLayout.setVisibility(View.VISIBLE);
@@ -8580,7 +8580,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
         MegaChatCall anotherActiveCall = getAnotherActiveCall(idChat);
-
         MegaChatCall callInThisChat = megaChatApi.getChatCall(idChat);
         if (callInThisChat == null || (callInThisChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat))){
             if(anotherActiveCall != null){
@@ -8602,7 +8601,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-        if (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid())) {
+        if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS && (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid()))) {
             if(anotherActiveCall != null){
                 updateCallInProgressLayout(anotherActiveCall, isSessionOnHold(callInThisChat.getChatid()) ?
                         getString(R.string.call_on_hold) : getString(R.string.call_in_progress_layout));
