@@ -373,7 +373,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Deel afbeelding door middel van</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Deel koppeling</string>
-    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Haal de koppeling op</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Haal Link op</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
 
@@ -818,7 +818,7 @@
     <string name="settings_about_terms_of_service" context="">Algemene Voorwaarden</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Applicatie versie</string>
-    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK versie</string>
+    <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK Versie</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK versie</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Bekijk broncode</string>
 
@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">Bestanden weergeven</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importeren</string>
-    <string name="save_for_offline" context="Menu option">Opslaan voor offline</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">Opslaan voor offline</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Toevoegen aan Cloud Schijf</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">Opslaan voor offline</string>
 
@@ -2732,7 +2732,7 @@
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u uitlogt, worden bestanden van uw Offline sectie verwijderd van uw apparaat.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u uitlogt, worden voortgaande overdrachten geannuleerd.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Wanneer u uitlogt, worden bestanden van uw Offline sectie verwijderd van uw apparaat en voortgaande overdrachten worden geannuleerd.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Wanneer u uitlogt, worden bestanden vanuit uw Offline sectie verwijderd van uw apparaat en voortgaande overdrachten worden geannuleerd.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Onbekende naam</string>
 
@@ -2788,6 +2788,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Dit kan het beste gebeuren door elkaar in het echte leven, face to face te ontmoeten. Als u een andere al geverifieerde kanaal heeft, zoals geverifieerd OTR of PGP, dan kunt u deze ook gebruiken.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Uw Identiteit</string>
     <string name="action_reset" context="Button to reset credentials">Reset</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Uw telefoonnummer verwijderen?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Uw telefoonnummer is succesvol verwijderd.</string>

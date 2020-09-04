@@ -113,8 +113,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	private boolean allFiles = true;
 	private String downloadLocationDefaultPath;
 
-	private boolean multiselectBoolean=false;
-
     private int placeholderCount;
 
 	private NewHeaderItemDecoration headerItemDecoration;
@@ -297,6 +295,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
+			((ManagerActivityLollipop) context).setTextSubmitted();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
@@ -1298,14 +1297,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
-	}
-
-	public boolean isAllowedMultiselect(){
-		return multiselectBoolean;
-	}
-
-	public void setAllowedMultiselect(boolean option){
-		multiselectBoolean = option;
 	}
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
