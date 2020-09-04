@@ -8,6 +8,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
+import android.os.Handler
+import android.os.Looper
 import android.os.StatFs
 import android.text.TextUtils
 import android.widget.CheckBox
@@ -52,6 +54,7 @@ abstract class NodeSaver(
     protected val dbHandler: DatabaseHandler
 ) {
     private val compositeDisposable = CompositeDisposable()
+    private val uiHandler = Handler(Looper.getMainLooper())
     protected var saving = Saving.NOTHING
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
@@ -68,7 +71,9 @@ abstract class NodeSaver(
                 return true
             }
 
-            checkSizeBeforeDownload(parentPath)
+            add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
         }
 
 
@@ -90,7 +95,7 @@ abstract class NodeSaver(
                     if (fs.size <= 1 || fs[1] == null) {
                         requestLocalFolder(null, null, activityStarter)
                     } else {
-                        showSelectDownloadLocationDialog(activityStarter)
+                        runOnUiThread { showSelectDownloadLocationDialog(activityStarter) }
                     }
                 } else {
                     logDebug("NOT askMe")
@@ -103,16 +108,17 @@ abstract class NodeSaver(
     }
 
     private fun showSelectDownloadLocationDialog(activityStarter: (Intent, Int) -> Unit) {
-        val dialogBuilder = Builder(context)
-        dialogBuilder.setTitle(R.string.title_select_download_location)
-        dialogBuilder.setNegativeButton(R.string.general_cancel) { dialog, _ -> dialog.cancel() }
-        dialogBuilder.setItems(R.array.settings_storage_download_location_array) { _, which ->
-            when (which) {
-                0 -> requestLocalFolder(null, null, activityStarter)
-                1 -> handleSdCard(activityStarter)
+        Builder(context)
+            .setTitle(R.string.title_select_download_location)
+            .setNegativeButton(R.string.general_cancel) { dialog, _ -> dialog.cancel() }
+            .setItems(R.array.settings_storage_download_location_array) { _, which ->
+                when (which) {
+                    0 -> requestLocalFolder(null, null, activityStarter)
+                    1 -> handleSdCard(activityStarter)
+                }
             }
-        }
-        dialogBuilder.create().show()
+            .create()
+            .show()
     }
 
     private fun handleSdCard(activityStarter: (Intent, Int) -> Unit) {
@@ -151,6 +157,7 @@ abstract class NodeSaver(
         intent.putExtra(EXTRA_FROM_SETTINGS, false)
         intent.setClass(context, FileStorageActivityLollipop::class.java)
         if (sdRoot != null) {
+            saving.externalSDCard = true
             intent.putExtra(EXTRA_SD_ROOT, sdRoot)
         }
         if (prompt != null) {
@@ -169,7 +176,7 @@ abstract class NodeSaver(
         logDebug("availableFreeSpace: $availableFreeSpace, totalSize: ${saving.totalSize}")
 
         if (availableFreeSpace < saving.totalSize) {
-            showNotEnoughSpaceSnackbar(context)
+            runOnUiThread { showNotEnoughSpaceSnackbar(context) }
             logWarning("Not enough space")
             return
         }
@@ -221,6 +228,10 @@ abstract class NodeSaver(
     abstract fun download(parentPath: String)
 
     private fun showConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
+        runOnUiThread { doShowConfirmationDialog(message, onConfirmed) }
+    }
+
+    private fun doShowConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
         val confirmationLayout = LinearLayout(context)
         confirmationLayout.orientation = LinearLayout.VERTICAL
         val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -268,13 +279,18 @@ abstract class NodeSaver(
         compositeDisposable.dispose()
     }
 
+    private fun runOnUiThread(task: () -> Unit) {
+        uiHandler.post(task)
+    }
+
     companion object {
         const val CONFIRM_SIZE_MIN_BYTES = 100 * 1024 * 1024L
     }
 
     abstract class Saving(
         val totalSize: Long,
-        val highPriority: Boolean
+        val highPriority: Boolean,
+        var externalSDCard: Boolean = false
     ) {
         var unsupportedFileName = ""
             protected set
