@@ -399,6 +399,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         avatarLayout.setVisibility(View.VISIBLE);
         MegaChatCall call = ((ChatCallActivity) context).getCall();
         MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peer.getPeerId(), peer.getClientId());
+        if(call == null)
+            return;
 
         boolean shouldBeShown = (call.isOnHold() && isItMe(chatId, peer.getPeerId(), peer.getClientId()))
                 || (session != null && session.isOnHold());

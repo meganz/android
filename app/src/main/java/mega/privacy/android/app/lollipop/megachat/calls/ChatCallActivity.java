@@ -404,8 +404,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         createSmallFragment();
         createFullScreenFragment();
 
-        if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT || callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-            app.setCallLayoutStatus(chatId, true);
+        if ((callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT &&
+                callStatus <= MegaChatCall.CALL_STATUS_IN_PROGRESS) ||
+                (callStatus >= MegaChatCall.CALL_STATUS_USER_NO_PRESENT &&
+                        callStatus <= MegaChatCall.CALL_STATUS_RECONNECTING)) {
+            MegaApplication.setCallLayoutStatus(chatId, true);
         }
 
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {

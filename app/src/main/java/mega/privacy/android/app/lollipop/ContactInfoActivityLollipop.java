@@ -2564,8 +2564,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
-		MegaApplication.setCallLayoutStatus(chatRoom.getChatId(), false);
-		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+		addChecksForACall(chatRoom.getChatId(), startVideo);
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
 		MegaApplication.setIsWaitingForCall(false);
 	}

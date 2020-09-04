@@ -1633,9 +1633,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		i.putExtra(CALL_ID, call.getId());
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(i);
-		if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-			setCallLayoutStatus(call.getChatid(), true);
-		}
 	}
 
 	public void clearIncomingCallNotification(long chatCallId) {
@@ -1723,6 +1720,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (entryExists) {
 			return hashMapSpeaker.get(chatId);
 		}
+
 		setSpeakerStatus(chatId, false);
 		return false;
 	}

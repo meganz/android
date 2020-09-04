@@ -262,7 +262,7 @@ public class CallUtil {
         }
 
         MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if(call == null)
+        if(call == null || !MegaApplication.getCallLayoutStatus(chatId))
             return;
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
@@ -911,6 +911,7 @@ public class CallUtil {
      */
     public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
         if (checkPermissionsCall(activity, START_CALL_PERMISSIONS)) {
+            MegaApplication.setCallLayoutStatus(chatRoom.getChatId(), false);
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
             MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, (MegaChatRequestListenerInterface) activity);
             MegaApplication.setIsWaitingForCall(false);
@@ -997,5 +998,10 @@ public class CallUtil {
         }
 
         return false;
+    }
+
+    public static void addChecksForACall(long chatId, boolean speakerStatus){
+        MegaApplication.setCallLayoutStatus(chatId, false);
+        MegaApplication.setSpeakerStatus(chatId, speakerStatus);
     }
 }
