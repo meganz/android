@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.photos;
+package mega.privacy.android.app.fragments.homepage.photos;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -36,7 +36,7 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
         int position = parent.getChildAdapterPosition(view);
         if (position == -1 ) return;
         int viewType = parent.getAdapter().getItemViewType(position);
-        if (viewType == PhotoNode.TYPE_PHOTO) {
+        if (viewType == PhotoNodeItem.TYPE_PHOTO) {
             outRect.set(0, 0, 0, mHeightDp);
         } else {
             outRect.setEmpty();
@@ -50,7 +50,7 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
             int position = parent.getChildAdapterPosition(view);
             if (position == -1) return;
             int viewType = parent.getAdapter().getItemViewType(position);
-            if (viewType == PhotoNode.TYPE_PHOTO) {
+            if (viewType == PhotoNodeItem.TYPE_PHOTO) {
                 c.drawRect(left, view.getBottom(), view.getRight(), view.getBottom() + mHeightDp, mPaint);
             }
         }

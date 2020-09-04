@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

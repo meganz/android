@@ -256,8 +256,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
 
-		draggingThumbnailCallback = null;
-
 		super.onDestroy();
 	}
 

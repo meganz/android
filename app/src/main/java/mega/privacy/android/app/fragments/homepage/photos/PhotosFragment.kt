@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.photos
 
 import android.animation.Animator
 import android.animation.AnimatorInflater
@@ -19,15 +19,16 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.facebook.drawee.view.SimpleDraweeView
-import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.shape.ShapeAppearanceModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.empty_result_files.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
@@ -76,19 +77,21 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         activity = getActivity() as ManagerActivityLollipop
+        binding.root.empty_hint_text.text = getString(R.string.photos_no_photos)
 
         setupListView()
         setupListAdapter()
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
                 activity.invalidateOptionsMenu()  // Hide the search icon if no photo
             }
 
-            actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNode.TYPE_PHOTO })
+            actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNodeItem.TYPE_PHOTO })
         }
     }
 
@@ -106,20 +109,27 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupNavigation() {
-        viewModel.openPhotoEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.openPhotoEventItem.observe(viewLifecycleOwner, EventObserver {
             openPhoto(it)
         })
 
-        viewModel.showFileInfoEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { activity.showNodeOptionsPanel(it.node) }
         })
     }
+
+    private fun setupDraggingThumbnailCallback() =
+        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
+            DraggingThumbnailCallback(
+                WeakReference(this)
+            )
+        )
 
     /**
      * Only refresh the list items of uiDirty = true
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
-        val newList = ArrayList<PhotoNode>(it)
+        val newList = ArrayList<PhotoNodeItem>(it)
         if (viewModel.searchMode) {
             searchAdapter.submitList(newList)
         } else {
@@ -328,19 +338,19 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         viewModel.loadPhotos()
     }
 
-    private fun openPhoto(node: PhotoNode) {
-        listView.findViewHolderForLayoutPosition(node.index)?.itemView?.findViewById<ImageView>(
+    private fun openPhoto(nodeItem: PhotoNodeItem) {
+        listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.also {
             val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
 
-            intent.putExtra(INTENT_EXTRA_KEY_POSITION, node.photoIndex)
+            intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
             intent.putExtra(
                 INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
                 MegaApiJava.ORDER_MODIFICATION_DESC
             )
 
-            val parentNode = megaApi.getParentNode(node.node)
+            val parentNode = megaApi.getParentNode(nodeItem.node)
             if (parentNode == null || parentNode.type == MegaNode.TYPE_ROOT) {
                 intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
             } else {
@@ -359,19 +369,18 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
             intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it))
 
-            FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
-                DraggingThumbnailCallback(
-                    WeakReference(this)
-                )
-            )
-
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
 
-            node.node?.let { node ->
+            nodeItem.node?.let { node ->
                 draggingPhotoHandle = node.handle
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(null)
     }
 
     /** All below methods are for supporting functions of FullScreenImageViewer */

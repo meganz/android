@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage
 
 import androidx.lifecycle.Observer
 

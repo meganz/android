@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections
+package mega.privacy.android.app.fragments.homepage
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -39,7 +39,6 @@ import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.fragments.managerFragments.homepage.HomePageViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
 import mega.privacy.android.app.utils.Constants.GO_OFFLINE
@@ -81,9 +80,9 @@ class HomepageFragment : Fragment() {
 
     private val categoryClickListener = OnClickListener {
         with(viewDataBinding.category) {
-            val direction = when (view) {
+            val direction = when (it) {
                 categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
-                else -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
+                else -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
             }
 
             findNavController().navigate(direction)
@@ -213,6 +212,7 @@ class HomepageFragment : Fragment() {
 
     private fun setupCategories() {
         viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
     }
 
     private fun getTabTitle(position: Int): String? {

@@ -2865,4 +2865,5 @@
     <string name="tab_offline">Offline</string>
 
     <string name="photos_no_photos">NO PHOTOS TO SHOW</string>
+    <string name="documents_no_documents">NO DOCUMENTS TO SHOW</string>
 </resources>

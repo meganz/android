@@ -1,24 +1,23 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.photos
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.scopes.ActivityRetainedScoped
-import mega.privacy.android.app.utils.Util
-import javax.inject.Inject
+import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.fragments.homepage.NodeItem
 
 class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
     // The full set of nodes
-    private lateinit var nodesData: List<SelectableNode>
+    private lateinit var nodesData: List<NodeItem>
 
     // Notify the fragment that the user intends to enter action mode by long click
-    private val _longClick = MutableLiveData<Event<SelectableNode>>()
-    val longClick: LiveData<Event<SelectableNode>> = _longClick
+    private val _longClick = MutableLiveData<Event<NodeItem>>()
+    val longClick: LiveData<Event<NodeItem>> = _longClick
 
     // All nodes have been selected so far
-    private val _selectedNodes = MutableLiveData<List<SelectableNode>>()
-    val selectedNodes: LiveData<List<SelectableNode>> = _selectedNodes
+    private val _selectedNodes = MutableLiveData<List<NodeItem>>()
+    val selectedNodes: LiveData<List<NodeItem>> = _selectedNodes
 
     // Nodes should play the animation for this time of selection
     private val _animNodeIndices = MutableLiveData<Set<Int>>()
@@ -27,23 +26,23 @@ class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
     private val _actionModeDestroy = MutableLiveData<Event<Unit>>()
     val actionModeDestroy: LiveData<Event<Unit>> = _actionModeDestroy
 
-    private val selectedNodeList = mutableListOf<SelectableNode>()
+    private val selectedNodeList = mutableListOf<NodeItem>()
 
-    fun onPhotoClick(node: SelectableNode) = updateSelectedNodeList(node)
+    fun onPhotoClick(nodeItem: NodeItem) = updateSelectedNodeList(nodeItem)
 
-    fun onPhotoLongClick(node: SelectableNode): Boolean {
-        _longClick.value = Event(node)
+    fun onPhotoLongClick(nodeItem: NodeItem): Boolean {
+        _longClick.value = Event(nodeItem)
         return true
     }
 
-    fun enterActionMode(node: SelectableNode) = updateSelectedNodeList(node)
+    fun enterActionMode(nodeItem: NodeItem) = updateSelectedNodeList(nodeItem)
 
-    private fun updateSelectedNodeList(node: SelectableNode) {
-        node.selected = !node.selected
-        node.uiDirty = true
+    private fun updateSelectedNodeList(nodeItem: NodeItem) {
+        nodeItem.selected = !nodeItem.selected
+        nodeItem.uiDirty = true
 
-        _animNodeIndices.value = hashSetOf(node.index)
-        if (node.selected) selectedNodeList.add(node) else selectedNodeList.remove(node)
+        _animNodeIndices.value = hashSetOf(nodeItem.index)
+        if (nodeItem.selected) selectedNodeList.add(nodeItem) else selectedNodeList.remove(nodeItem)
         _selectedNodes.value = selectedNodeList
     }
 
@@ -83,8 +82,8 @@ class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
         _actionModeDestroy.value = Event(Unit)
     }
 
-    fun setNodesData(nodes: List<SelectableNode>) {
-        nodesData = nodes
+    fun setNodesData(nodeItems: List<NodeItem>) {
+        nodesData = nodeItems
 
         // Some selected nodes may have been removed(e.g. by another Mega client),
         // so refresh selectedNodeList
