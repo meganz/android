@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
@@ -14,6 +15,8 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.NODE_PHOTO
 import nz.mega.sdk.MegaApiJava.TARGET_ROOTNODES
+import nz.mega.sdk.MegaNode.TYPE_RUBBISH
+import okhttp3.Dispatcher
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
@@ -37,6 +40,7 @@ class TypedFilesRepository @Inject constructor(
 
     private val _fileNodeItems = MutableLiveData<List<NodeItem>>()
     val fileNodeItems: LiveData<List<NodeItem>> = _fileNodeItems
+//    private val counterContext = newSingleThreadContext("CounterContext")
 
     suspend fun getFiles(type: Int, order: Int = MegaApiJava.ORDER_MODIFICATION_DESC) {
         this.type = type
@@ -162,7 +166,7 @@ class TypedFilesRepository @Inject constructor(
         return megaApi.searchByType(
             null, null, null,
             true, order, type, TARGET_ROOTNODES
-        )
+        ).filter { node -> !megaApi.isInRubbish(node)}
     }
 
     companion object {

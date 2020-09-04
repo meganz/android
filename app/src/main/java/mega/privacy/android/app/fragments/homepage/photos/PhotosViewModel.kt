@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
@@ -27,6 +26,11 @@ class PhotosViewModel @ViewModelInject constructor(
 
     private var forceUpdate = false
     private var ignoredFirst = false
+
+    // Whether a photo loading is in progress
+    private var loadInProgress = false
+    // Whether another photo loading should be executed after current loading
+    private var pendingLoad = false
 
     val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
         if (forceUpdate) {
@@ -81,9 +85,18 @@ class PhotosViewModel @ViewModelInject constructor(
         }
     }
 
+    private val loadFinishedObserver = Observer<List<PhotoNodeItem>> {
+        loadInProgress = false
+
+        if (pendingLoad) {
+            loadPhotos(true)
+        }
+    }
+
     init {
-        loadPhotos(true)
+        items.observeForever(loadFinishedObserver)
         nodesChange.observeForever(nodesChangeObserver)
+        loadPhotos(true)
     }
 
     /**
@@ -93,7 +106,14 @@ class PhotosViewModel @ViewModelInject constructor(
      */
     fun loadPhotos(forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
-        _query.value = searchQuery
+
+        if (loadInProgress) {
+            pendingLoad = true
+        } else {
+            pendingLoad = false
+            loadInProgress = true
+            _query.value = searchQuery
+        }
     }
 
     /**
@@ -141,5 +161,6 @@ class PhotosViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)
+        items.removeObserver(loadFinishedObserver)
     }
 }
