@@ -16522,7 +16522,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
 			if (node == null) {
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.warning_folder_not_exists), MEGACHAT_INVALID_HANDLE);
+				showSnackbar(SNACKBAR_TYPE, getString(!isOnline(this) ? R.string.error_server_connection_problem
+						: R.string.warning_folder_not_exists), MEGACHAT_INVALID_HANDLE);
 				return;
 			}
 

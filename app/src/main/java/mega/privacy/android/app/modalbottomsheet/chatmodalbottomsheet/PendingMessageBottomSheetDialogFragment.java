@@ -65,11 +65,13 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
                 titleSlidingPanel.setText(R.string.attachment_uploading_state_paused);
                 TextView resumeText = optionRetryLayout.findViewById(R.id.msg_not_sent_retry_text);
-                resumeText.setText(R.string.button_resume_individual_transfer);
+                resumeText.setText(R.string.option_resume_transfers);
                 ImageView resumeIcon = optionRetryLayout.findViewById(R.id.msg_not_sent_retry_image);
                 resumeIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_resume_transfers));
                 resumeIcon.setAlpha(1F);
                 optionRetryLayout.setOnClickListener(this);
+                TextView deleteText = optionDeleteLayout.findViewById(R.id.msg_not_sent_delete_text);
+                deleteText.setText(R.string.option_cancel_transfer);
             } else {
                 optionRetryLayout.setVisibility(View.GONE);
                 titleSlidingPanel.setText(getString(R.string.title_message_uploading_options));

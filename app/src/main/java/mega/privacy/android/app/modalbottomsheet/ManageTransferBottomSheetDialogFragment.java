@@ -20,8 +20,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MimeTypeList.*;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaTransfer.*;
 
 public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -158,6 +160,11 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case R.id.option_get_link_layout:
+                if (!isOnline(context)) {
+                    managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+                    break;
+                }
+
                 managerActivity.showGetLinkActivity(handle);
                 break;
 
@@ -166,6 +173,11 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case R.id.option_retry_layout:
+                if (!isOnline(context)) {
+                    managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+                    break;
+                }
+
                 managerActivity.retryTransfer(transfer);
                 break;
         }
