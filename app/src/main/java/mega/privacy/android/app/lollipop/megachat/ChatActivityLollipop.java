@@ -3882,12 +3882,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void sendMessagesToUI(ArrayList<AndroidMegaChatMessage> messages) {
-        for (AndroidMegaChatMessage message : messages) {
-            sendMessageToUI(message);
-        }
-    }
-
     /**
      * Method for copying a message.
      *

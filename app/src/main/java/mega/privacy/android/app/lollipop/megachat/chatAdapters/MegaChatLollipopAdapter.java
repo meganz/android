@@ -228,58 +228,51 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         @Override
         protected Integer doInBackground(MegaNode... params) {
-            logDebug("ChatPreviewAsyncTask-doInBackground");
             node = params[0];
             preview = getPreviewFromFolder(node, context);
 
             if (preview != null) {
                 previewCache.put(node.getHandle(), preview);
                 return 0;
+            } else if (pendingPreviews.containsKey(node.getHandle())) {
+                logDebug("The preview is already downloaded or added to the list");
+                return 1;
             } else {
-                if (pendingPreviews.containsKey(node.getHandle())) {
-                    logDebug("The preview is already downloaded or added to the list");
-                    return 1;
-                } else {
-                    return 2;
-                }
+                return 2;
             }
         }
 
         @Override
         protected void onPostExecute(Integer param) {
-            logDebug("ChatPreviewAsyncTask-onPostExecute");
             if (param == 0) {
-                logDebug("Preview recovered from folder");
-                int position = holder.getCurrentPosition();
-                if(position<=messages.size()){
-                    AndroidMegaChatMessage message = messages.get(position - 1);
-                    if (message.getMessage() != null) {
-                        if (message.getMessage().getMegaNodeList() != null) {
-                            if (message.getMessage().getMegaNodeList().get(0) != null) {
-                                long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
-
-                                if (nodeMessageHandle == node.getHandle()) {
-                                    if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
-                                        setOwnPreview(holder, preview, node);
-                                        int status = message.getMessage().getStatus();
-                                        if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
-                                            setErrorStateOnPreview(holder, preview);
-                                        }
-                                    } else {
-                                        setContactPreview(holder, preview, node);
-                                    }
-
-                                } else {
-                                    logWarning("The nodeHandles are not equal!");
-                                }
-                            }
-                        }
-                    }
-                }else{
+                int position = holder.getAdapterPosition();
+                if (position > messages.size()) {
                     logWarning("Messages removed");
+                    return;
+                }
+
+                AndroidMegaChatMessage message = messages.get(position - 1);
+                if (message.getMessage() != null && message.getMessage().getMegaNodeList() != null
+                        && message.getMessage().getMegaNodeList().get(0) != null) {
+                    long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
+                    if (nodeMessageHandle != node.getHandle()) {
+                        logWarning("The nodeHandles are not equal!");
+                        return;
+                    }
+
+                    if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
+                        setOwnPreview(holder, preview, node);
+
+                        int status = message.getMessage().getStatus();
+                        if (status == MegaChatMessage.STATUS_SERVER_REJECTED || status == MegaChatMessage.STATUS_SENDING_MANUAL) {
+                            setErrorStateOnPreview(holder, preview);
+                        }
+                    } else {
+                        setContactPreview(holder, preview, node);
+                    }
                 }
             } else if (param == 2) {
-                File previewFile = new File(getPreviewFolder(context), node.getBase64Handle() + ".jpg");
+                File previewFile = new File(getPreviewFolder(context), node.getBase64Handle() + JPG_EXTENSION);
                 logDebug("GET PREVIEW OF HANDLE: " + node.getHandle() + " to download here: " + previewFile.getAbsolutePath());
                 pendingPreviews.put(node.getHandle(), msgId);
                 PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, megaChatAdapter, node);
@@ -353,7 +346,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             logDebug("ChatLocalPreviewAsyncTask-onPostExecute");
 
             if (param == 0) {
-                int position = holder.getCurrentPosition();
+                int position = holder.getAdapterPosition();
 
                 AndroidMegaChatMessage message = messages.get(position - 1);
 
@@ -579,7 +572,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         boolean contentVisible;
-        int currentPosition;
         long userHandle;
         String fullNameTitle;
         //        boolean nameRequested = false;
@@ -788,10 +780,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         public long getUserHandle() {
             return userHandle;
-        }
-
-        public int getCurrentPosition() {
-            return currentPosition;
         }
 
         public void setMyImageView(Bitmap bitmap) {
@@ -1325,8 +1313,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(params);
-        ((ViewHolderMessageChat) holder).currentPosition = position;
-
         ((ViewHolderMessageChat) holder).ownMessageSelectLayout.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.GONE);
@@ -1546,7 +1532,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams paramsDefault = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(paramsDefault);
-        ((ViewHolderMessageChat) holder).currentPosition = position;
 
         ((ViewHolderMessageChat) holder).ownMessageSelectLayout.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).contactMessageSelectLayout.setVisibility(View.GONE);
@@ -4174,15 +4159,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
             holder.contactMessageLayout.setVisibility(View.GONE);
-
-            String messageContent = "";
-
-            if (message.getContent() != null) {
-                messageContent = message.getContent();
-            }
-
-            AndroidMegaChatMessage androidMsg = messages.get(position - 1);
-
             holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
             holder.ownManagementMessageLayout.setVisibility(View.GONE);
             holder.contentOwnMessageText.setVisibility(View.GONE);
@@ -4212,10 +4188,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             int status = message.getStatus();
             logDebug("Status: " + message.getStatus());
             if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
-
                 holder.contentOwnMessageFileLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
             }else if (status == MegaChatMessage.STATUS_SENDING) {
-
                 holder.contentOwnMessageFileLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
             }else {
                 holder.contentOwnMessageFileLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
@@ -6261,31 +6235,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyItemChanged(position);
     }
 
-    public void appendMessage(ArrayList<AndroidMegaChatMessage> messages) {
-        this.messages = messages;
-        notifyItemInserted(messages.size() - 1);
-    }
-
     public void addMessage(ArrayList<AndroidMegaChatMessage> messages, int position) {
-        logDebug("position: " + position);
         this.messages = messages;
+
         notifyItemInserted(position);
-        if (position == messages.size()) {
-            logDebug("No need to update more");
-        } else {
-            int itemCount = messages.size() - position;
-            logDebug("Update until end - itemCount: " + itemCount);
-            notifyItemRangeChanged(position, itemCount + 1);
-        }
+        notifyRangeChanged(position);
     }
 
     public void removeMessage(int position, ArrayList<AndroidMegaChatMessage> messages) {
         this.messages = messages;
 
         notifyItemRemoved(position);
+        notifyRangeChanged(position);
+    }
+
+    /**
+     * Notifies the adapter if the range changed due to and addition or deletion in adapter.
+     *
+     * @param position where the item was added or removed.
+     */
+    private void notifyRangeChanged(int position) {
         if (position != messages.size()) {
-            int itemCount = messages.size() - position;
-            notifyItemRangeChanged(position, itemCount);
+            int itemCount = messages.size() - position + 1;
+            notifyItemRangeChanged(position, itemCount + 1);
         }
     }
 
@@ -7144,6 +7116,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         msgId = pendingPreviews.get(handle);
                         pendingPreviews.remove(handle);
                     }
+
                     setPreview(handle, holder, node, msgId);
 
                 } else {
@@ -7172,7 +7145,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ImageView imageView = null;
 
-        int position = holder.getCurrentPosition();
+        int position = holder.getAdapterPosition();
         if(position<=messages.size()){
             AndroidMegaChatMessage message = messages.get(position - 1);
             if (message.getMessage() != null) {
