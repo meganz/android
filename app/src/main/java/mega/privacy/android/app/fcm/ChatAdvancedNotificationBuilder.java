@@ -87,6 +87,7 @@ public final class ChatAdvancedNotificationBuilder {
     private long[] patternIncomingCall = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
     private static Set<Integer> notificationIds = new HashSet<>();
+    private static Set<Integer> callsNotificationIds = new HashSet<>();
 
     private String notificationChannelIdChatSimple = NOTIFICATION_CHANNEL_CHAT_ID;
     private String notificationChannelNameChatSimple = NOTIFICATION_CHANNEL_CHAT_NAME;
@@ -162,6 +163,11 @@ public final class ChatAdvancedNotificationBuilder {
 
     private void notify(int id, Notification notification) {
         notificationIds.add(id);
+        notificationManager.notify(id, notification);
+    }
+
+    private void notifyCall(int id, Notification notification) {
+        callsNotificationIds.add(id);
         notificationManager.notify(id, notification);
     }
 
@@ -713,7 +719,6 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void removeAllChatNotifications(){
-        logDebug("removeAllChatNotifications");
         notificationManager.cancel(NOTIFICATION_SUMMARY_CHAT);
         notificationManager.cancel(NOTIFICATION_GENERAL_PUSH_CHAT);
         for(int id : notificationIds) {
@@ -990,6 +995,8 @@ public final class ChatAdvancedNotificationBuilder {
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
                     .setAutoCancel(true)
+                    .setOngoing(true)
+                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(patternIncomingCall)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
@@ -998,7 +1005,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomContentView(collapsedViews)
                     .setCustomBigContentView(expandedView);
 
-            notify(notificationId, notificationBuilderO.build());
+            notifyCall(notificationId, notificationBuilderO.build());
         } else {
             long[] pattern = {0, 1000};
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -1010,6 +1017,8 @@ public final class ChatAdvancedNotificationBuilder {
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
                     .setAutoCancel(true)
+                    .setOngoing(true)
+                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
@@ -1028,7 +1037,7 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
 
-            notify(notificationId, notificationBuilder.build());
+            notifyCall(notificationId, notificationBuilder.build());
         }
     }
 
@@ -1127,13 +1136,16 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
                     .setFullScreenIntent(callScreen, true)
+                    .setShowWhen(true)
                     .setAutoCancel(true)
+                    .setOngoing(true)
+                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(patternIncomingCall)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
-            notify(notificationId, notificationBuilderO.build());
+            notifyCall(notificationId, notificationBuilderO.build());
         } else {
             long[] pattern = {0, 1000};
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -1146,7 +1158,10 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
                     .setFullScreenIntent(callScreen, true)
+                    .setShowWhen(true)
                     .setAutoCancel(true)
+                    .setOngoing(true)
+                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
@@ -1161,7 +1176,7 @@ public final class ChatAdvancedNotificationBuilder {
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
-            notify(notificationId, notificationBuilder.build());
+            notifyCall(notificationId, notificationBuilder.build());
         }
     }
 

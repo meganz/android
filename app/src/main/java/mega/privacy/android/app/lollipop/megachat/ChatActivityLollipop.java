@@ -105,6 +105,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
@@ -8112,6 +8113,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             setChatSubtitle();
             if(emojiKeyboard!=null){
                 emojiKeyboard.hideBothKeyboard(this);
+            }
+
+            try {
+                ChatAdvancedNotificationBuilder notificationBuilder;
+                notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                notificationBuilder.removeAllChatNotifications();
+            } catch (Exception e) {
+                logError("Exception NotificationManager - remove all notifications", e);
             }
             //Update last seen position if different and there is unread messages
             //If the chat is being opened do not update, onLoad will do that
