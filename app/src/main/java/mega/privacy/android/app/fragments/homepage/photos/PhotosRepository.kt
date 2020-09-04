@@ -2,27 +2,25 @@ package mega.privacy.android.app.fragments.homepage.photos
 
 import android.content.Context
 import android.os.Handler
-import android.text.TextUtils
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
 
 class PhotosRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
@@ -151,41 +149,8 @@ class PhotosRepository @Inject constructor(
     }
 
     private fun getMegaNodesOfPhotos(): List<MegaNode> {
-//        return megaApi.searchByType(null, null, null,
-//            true, order, 1, 3)
-        var cuHandle: Long = -1
-        val pref = dbHandler.preferences
-
-        if (pref != null && pref.camSyncHandle != null) {
-            try {
-                cuHandle = pref.camSyncHandle.toLong()
-            } catch (ignored: java.lang.NumberFormatException) {
-            }
-
-            if (megaApi.getNodeByHandle(cuHandle) == null) {
-                cuHandle = -1
-            }
-        }
-
-        if (cuHandle == -1L) {
-            for (node in megaApi.getChildren(megaApi.rootNode)) {
-                if (node.isFolder && TextUtils.equals(
-                        context.getString(R.string.section_photo_sync),
-                        node.name
-                    )
-                ) {
-                    cuHandle = node.handle
-                    dbHandler.setCamSyncHandle(cuHandle)
-                    break
-                }
-            }
-        }
-
-        if (cuHandle == -1L) {
-            return Collections.emptyList()
-        }
-
-        return megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), order)
+        // TODO: use constants
+        return megaApi.searchByType(null, null, null, true, order, 1, 3)
     }
 
     companion object {
