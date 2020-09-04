@@ -8991,4 +8991,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void setLastIdMsgSeen(long lastIdMsgSeen) {
         this.lastIdMsgSeen = lastIdMsgSeen;
     }
+
+    /**
+     * Gets the visible positions on adapter and updates the uploading messages between them, if any.
+     */
+    public void updatePausedUploadingMessages() {
+        if (mLayoutManager == null || adapter == null) {
+            return;
+        }
+
+        adapter.updatePausedUploadingMessages(mLayoutManager.findFirstVisibleItemPosition(),
+                mLayoutManager.findLastVisibleItemPosition());
+    }
 }

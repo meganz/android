@@ -1026,7 +1026,6 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:textSize="14sp"
-                            android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
                             android:ellipsize="middle"
@@ -1038,7 +1037,6 @@
                             android:textColor="@color/white"
                             android:layout_below="@+id/content_own_message_file_name"
                             android:textSize="12sp"
-                            android:layout_marginBottom="11dp"
                             android:inputType="textMultiLine|textNoSuggestions"
                             android:gravity="left"/>
                     </RelativeLayout>
@@ -1049,7 +1047,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/content_own_message_file_layout"
+                    android:layout_toStartOf="@+id/content_own_message_file_layout"
                     android:gravity="right"
                     android:paddingRight="4dp"
                     android:background="@android:color/transparent">

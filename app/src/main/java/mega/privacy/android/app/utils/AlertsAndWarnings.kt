@@ -9,6 +9,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 
 class AlertsAndWarnings {
 
@@ -53,6 +54,12 @@ class AlertsAndWarnings {
             app.startActivity(intent)
         }
 
+        /**
+         * Shows a resume transfers warning.
+         * It will be displayed if the queue of transfers is paused and a new chat upload starts.
+         *
+         * @param context current Context.
+         */
         @JvmStatic
         fun showResumeTransfersWarning(context: Context) {
             if (context is BaseActivity
@@ -61,12 +68,18 @@ class AlertsAndWarnings {
                 return
             }
 
-            val resumeTransfersDialogBuilder = AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle)
+            val resumeTransfersDialogBuilder = AlertDialog.Builder(context, R.style.ResumeTransfersWarning)
 
             resumeTransfersDialogBuilder.setTitle(R.string.warning_resume_transfers)
-                    .setMessage(R.string.warning_message_resume_transfers)
+                        .setMessage(R.string.warning_message_resume_transfers)
+                    .setCancelable(false)
                     .setPositiveButton(R.string.button_resume_individual_transfer) { dialog, which ->
                         MegaApplication.getInstance().megaApi.pauseTransfers(false)
+
+                        if (context is ChatActivityLollipop) {
+                            context.updatePausedUploadingMessages()
+                        }
+
                         dialog.dismiss()
                     }
                     .setNegativeButton(R.string.general_cancel) { dialog, which ->
@@ -79,7 +92,7 @@ class AlertsAndWarnings {
 
             if (context is BaseActivity) {
                 context.setIsResumeTransfersWarningShown(true)
-                context.setResumeTransfersWarning(resumeTransfersDialogBuilder.create())
+                context.resumeTransfersWarning = resumeTransfersDialogBuilder.create()
             }
 
             resumeTransfersDialogBuilder.show()
