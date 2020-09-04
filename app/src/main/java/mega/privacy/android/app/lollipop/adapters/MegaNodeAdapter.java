@@ -1241,10 +1241,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             ((FolderLinkActivityLollipop)context).activateActionMode();
             ((FolderLinkActivityLollipop)context).itemClick(currentPosition,null,null);
         } else if (type == SEARCH_ADAPTER) {
-            if (((SearchFragmentLollipop)fragment).isAllowedMultiselect()) {
-                ((SearchFragmentLollipop)fragment).activateActionMode();
-                ((SearchFragmentLollipop)fragment).itemClick(currentPosition,null,null);
-            }
+            ((SearchFragmentLollipop) fragment).activateActionMode();
+            ((SearchFragmentLollipop) fragment).itemClick(currentPosition, null, null);
         } else if (type == LINKS_ADAPTER) {
             logDebug("FOLDER_LINK_ADAPTER");
             ((LinksFragment)fragment).activateActionMode();

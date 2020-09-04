@@ -44,6 +44,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.PHOTOS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.PHOTOS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.DraggingThumbnailCallback
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -130,10 +131,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupDraggingThumbnailCallback() =
-        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(
-            DraggingThumbnailCallback(
-                WeakReference(this)
-            )
+        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
+            PhotosFragment::class.java,
+            PhotosDraggingThumbnailCallback(WeakReference(this))
         )
 
     /**
@@ -373,6 +373,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
             intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it))
 
+            setupDraggingThumbnailCallback()
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
 
@@ -384,7 +385,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     override fun onDestroy() {
         super.onDestroy()
-        FullScreenImageViewerLollipop.setDraggingThumbnailCallback(null)
+        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(PhotosFragment::class.java)
     }
 
     /** All below methods are for supporting functions of FullScreenImageViewer */
@@ -432,8 +433,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     companion object {
-        private class DraggingThumbnailCallback(private val fragmentRef: WeakReference<PhotosFragment>) :
-            FullScreenImageViewerLollipop.DraggingThumbnailCallback {
+        private class PhotosDraggingThumbnailCallback(private val fragmentRef: WeakReference<PhotosFragment>) :
+            DraggingThumbnailCallback {
 
             override fun setVisibility(visibility: Int) {
                 val fragment = fragmentRef.get() ?: return
