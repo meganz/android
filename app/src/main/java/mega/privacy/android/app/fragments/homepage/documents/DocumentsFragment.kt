@@ -3,7 +3,6 @@ package mega.privacy.android.app.fragments.homepage.documents
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -15,31 +14,19 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentDocumentsBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.photos.ActionModeCallback
-import mega.privacy.android.app.fragments.homepage.photos.ActionModeViewModel
-import mega.privacy.android.app.fragments.homepage.photos.DividerDecoration
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
-import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
 class DocumentsFragment : BaseFragment(), HomepageSearchable {
@@ -58,9 +45,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var activity: ManagerActivityLollipop
 
-    private var draggingPhotoHandle = INVALID_HANDLE
-
-    private lateinit var itemDecoration: DividerDecoration
+    private lateinit var itemDecoration: SimpleDividerItemDecoration
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -88,7 +73,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
-                activity.invalidateOptionsMenu()  // Hide the search icon if no photo
+                activity.invalidateOptionsMenu()  // Hide the search icon if no file
             }
 
             actionModeViewModel.setNodesData(it)
@@ -109,8 +94,8 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupNavigation() {
-        viewModel.openPhotoEvent.observe(viewLifecycleOwner, EventObserver {
-//            openPhoto(it)
+        viewModel.openDocEvent.observe(viewLifecycleOwner, EventObserver {
+//            openDoc(it)
         })
 
         viewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -144,25 +129,25 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         listView.switchToLinear()
         preventListItemBlink()
         elevateToolbarWhenScrolling()
-        itemDecoration = DividerDecoration(context)
+        itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
     }
 
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(context, actionModeViewModel, megaApi)
 
-        observePhotoLongClick()
-        observeSelectedPhotos()
-        observeAnimatedPhotos()
+        observeDocLongClick()
+        observeSelectedDocs()
+        observeAnimatedDocs()
         observeActionModeDestroy()
     }
 
-    private fun observePhotoLongClick() =
+    private fun observeDocLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { actionModeViewModel.enterActionMode(it) }
         })
 
-    private fun observeSelectedPhotos() =
+    private fun observeSelectedDocs() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()) {
                 actionMode?.apply {
@@ -186,7 +171,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
             }
         })
 
-    private fun observeAnimatedPhotos() {
+    private fun observeAnimatedDocs() {
         var animatorSet: AnimatorSet? = null
 
         actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {
@@ -242,7 +227,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                         visibility = View.VISIBLE
 
                         val animator =
-                            AnimatorInflater.loadAnimator(context, R.animator.photo_select)
+                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
                         animator.setTarget(this)
                         animatorList.add(animator)
                     }
@@ -301,7 +286,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 //        (listView.layoutManager as CustomizedGridLayoutManager).apply {
 //            spanSizeLookup = adapter.getSpanSizeLookup(spanCount)
 //            val itemDimen =
-//                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
+//                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.Doc_grid_margin)
 //                    .toInt() * 2
 //            adapter.setItemDimen(itemDimen)
 //        }
@@ -310,6 +295,6 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
         viewModel.searchQuery = query
-        viewModel.loadPhotos()
+        viewModel.loadDocuments()
     }
 }

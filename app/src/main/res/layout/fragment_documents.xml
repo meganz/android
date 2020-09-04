@@ -15,7 +15,7 @@
 
         <variable
             name="actionModeViewModel"
-            type="mega.privacy.android.app.fragments.homepage.photos.ActionModeViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.ActionModeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

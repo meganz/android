@@ -25,8 +25,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -66,7 +69,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private var draggingPhotoHandle = INVALID_HANDLE
 
-    private lateinit var itemDecoration: DividerDecoration
+    private lateinit var itemDecoration: SimpleDividerItemDecoration
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -162,7 +165,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         listView = binding.photoList
         preventListItemBlink()
         elevateToolbarWhenScrolling()
-        itemDecoration = DividerDecoration(context)
+        itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
     }
 
@@ -187,7 +190,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                     finish()
                 }
             } else {
-                actionModeCallback.nodeCount = viewModel.getRealNodeCount()
+                actionModeCallback.nodeCount = viewModel.getRealPhotoCount()
 
                 if (actionMode == null) {
                     activity.hideKeyboardSearch()
@@ -258,7 +261,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                         visibility = View.VISIBLE
 
                         val animator =
-                            AnimatorInflater.loadAnimator(context, R.animator.photo_select)
+                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
                         animator.setTarget(this)
                         animatorList.add(animator)
                     }
@@ -387,7 +390,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     /** All below methods are for supporting functions of FullScreenImageViewer */
 
     fun scrollToPhoto(handle: Long) {
-        val position = viewModel.getNodePositionByHandle(handle)
+        val position = viewModel.getItemPositionByHandle(handle)
         if (position == INVALID_POSITION) return
 
         listView.scrollToPosition(position)
@@ -416,7 +419,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {
-        val position = viewModel.getNodePositionByHandle(handle)
+        val position = viewModel.getItemPositionByHandle(handle)
         val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
         return viewHolder.itemView.findViewById(R.id.thumbnail)
     }

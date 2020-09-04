@@ -19,7 +19,7 @@
 
         <variable
             name="actionModeViewModel"
-            type="mega.privacy.android.app.fragments.homepage.photos.ActionModeViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.ActionModeViewModel" />
 
         <variable
             name="item"
@@ -32,6 +32,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:layout_marginTop="1dp"
         android:layout_height="72dp"
         android:background="@{item.selected ? @color/new_multiselect_color : @color/transparent}"
         android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperation.onItemClick(item) : actionModeViewModel.onPhotoClick(item)}"
@@ -59,7 +60,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
-            app:placeholderImage="@drawable/ic_image_thumbnail"
             app:roundedCornerRadius="2dp"
             app:thumbnail="@{item.thumbnail}"
             tools:src="@drawable/ic_image_thumbnail" />
@@ -145,7 +145,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@null"
-            android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperation.showNodeOptionsInfo(item) : actionModeViewModel.onPhotoClick(item)}"
+            android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperation.showNodeItemOptions(item) : actionModeViewModel.onPhotoClick(item)}"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_dots_vertical_grey"

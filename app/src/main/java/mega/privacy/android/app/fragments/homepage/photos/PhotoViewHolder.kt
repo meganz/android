@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 

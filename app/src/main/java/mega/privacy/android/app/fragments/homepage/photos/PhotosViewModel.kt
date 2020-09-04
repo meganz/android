@@ -4,16 +4,14 @@ import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.fragments.homepage.ItemOperation
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.nodesChange
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.NODE_PHOTO
 
 class PhotosViewModel @ViewModelInject constructor(
-    private val photosRepository: PhotosRepository
+    private val repository: TypedFilesRepository
 ) : ViewModel(), ItemOperation {
 
     private var _query = MutableLiveData<String>("")
@@ -21,8 +19,8 @@ class PhotosViewModel @ViewModelInject constructor(
     private val _openPhotoEvent = MutableLiveData<Event<PhotoNodeItem>>()
     val openPhotoEventItem: LiveData<Event<PhotoNodeItem>> = _openPhotoEvent
 
-    private val _showNodeOptionsEvent = MutableLiveData<Event<NodeItem>>()
-    val showNodeItemOptionsEvent: LiveData<Event<NodeItem>> = _showNodeOptionsEvent
+    private val _showNodeItemOptionsEvent = MutableLiveData<Event<NodeItem>>()
+    val showNodeItemOptionsEvent: LiveData<Event<NodeItem>> = _showNodeItemOptionsEvent
 
     var searchMode = false
     var searchQuery = ""
@@ -31,18 +29,24 @@ class PhotosViewModel @ViewModelInject constructor(
     private var ignoredFirst = false
 
     val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
-        viewModelScope.launch {
-            photosRepository.getPhotos(forceUpdate)
+        if (forceUpdate) {
+            viewModelScope.launch {
+                repository.getFiles(NODE_PHOTO)
+            }
+        } else {
+            repository.emitFiles()
         }
 
-        photosRepository.photoNodesItem
-    }.map { nodes ->
+        repository.fileNodeItems
+    }.map { it ->
+        @Suppress("UNCHECKED_CAST")
+        val items = it as List<PhotoNodeItem>
         var index = 0
         var photoIndex = 0
-        var filteredNodes = nodes
+        var filteredNodes = items
 
         if (!TextUtil.isTextEmpty(_query.value)) {
-            filteredNodes = nodes.filter {
+            filteredNodes = items.filter {
                 it.node?.name?.contains(
                     _query.value!!,
                     true
@@ -97,8 +101,8 @@ class PhotosViewModel @ViewModelInject constructor(
      * the underlying data may have been changed.
      */
     fun refreshUi() {
-        items.value?.forEach {photoNode ->
-            photoNode.uiDirty = true
+        items.value?.forEach {item ->
+            item.uiDirty = true
         }
         loadPhotos()
     }
@@ -107,7 +111,7 @@ class PhotosViewModel @ViewModelInject constructor(
         _openPhotoEvent.value = Event(item as PhotoNodeItem)
     }
 
-    fun getRealNodeCount(): Int {
+    fun getRealPhotoCount(): Int {
         items.value?.filter { it.type == PhotoNodeItem.TYPE_PHOTO }?.let {
             return it.size
         }
@@ -117,7 +121,7 @@ class PhotosViewModel @ViewModelInject constructor(
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getNodePositionByHandle(handle: Long): Int {
+    fun getItemPositionByHandle(handle: Long): Int {
         return items.value?.find {
             it.node?.handle == handle
         }?.index ?: INVALID_POSITION
@@ -131,8 +135,8 @@ class PhotosViewModel @ViewModelInject constructor(
         return list?.toLongArray()
     }
 
-    override fun showNodeOptionsInfo(item: NodeItem) {
-        _showNodeOptionsEvent.value = Event(item)
+    override fun showNodeItemOptions(item: NodeItem) {
+        _showNodeItemOptionsEvent.value = Event(item)
     }
 
     override fun onCleared() {

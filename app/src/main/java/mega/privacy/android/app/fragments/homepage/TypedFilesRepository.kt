@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage.photos
+package mega.privacy.android.app.fragments.homepage
 
 import android.content.Context
 import android.os.Handler
@@ -7,53 +7,54 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.NODE_PHOTO
+import nz.mega.sdk.MegaApiJava.TARGET_ROOTNODES
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class PhotosRepository @Inject constructor(
+class TypedFilesRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
-    private val dbHandler: DatabaseHandler,
     @ApplicationContext private val context: Context
 ) {
     private var order = MegaApiJava.ORDER_MODIFICATION_DESC
+    private var type: Int = MegaApiJava.NODE_UNKNOWN
 
     // LinkedHashMap guarantees that the index order of elements is consistent with
     // the order of putting. Moreover, it has a quick element search[O(1)] (for
     // the callback of megaApi.getThumbnail())
-    private val photoNodesMapItem: MutableMap<Long, PhotoNodeItem> = LinkedHashMap()
-    private val savedPhotoNodesMapItem: MutableMap<Long, PhotoNodeItem> = LinkedHashMap()
+    private val fileNodesMap: MutableMap<Long, NodeItem> = LinkedHashMap()
+    private val savedFileNodesMap: MutableMap<Long, NodeItem> = LinkedHashMap()
 
     private var waitingForRefresh = false
 
-    private val _photoNodes = MutableLiveData<List<PhotoNodeItem>>()
-    val photoNodesItem: LiveData<List<PhotoNodeItem>> = _photoNodes
+    private val _fileNodeItems = MutableLiveData<List<NodeItem>>()
+    val fileNodeItems: LiveData<List<NodeItem>> = _fileNodeItems
 
-    suspend fun getPhotos(forceUpdate: Boolean) {
-        if (forceUpdate) {
-            withContext(Dispatchers.IO) {
-                saveAndClearData()
-                getPhotoNodes()
+    suspend fun getFiles(type: Int, order: Int = MegaApiJava.ORDER_MODIFICATION_DESC) {
+        this.type = type
+        this.order = order
 
-                // Update LiveData must in main thread
-                withContext(Dispatchers.Main) {
-                    _photoNodes.value = ArrayList<PhotoNodeItem>(photoNodesMapItem.values)
-                }
+        withContext(Dispatchers.IO) {
+            saveAndClearData()
+            getNodeItems()
+
+            // Update LiveData must in main thread
+            withContext(Dispatchers.Main) {
+                _fileNodeItems.value = ArrayList<NodeItem>(fileNodesMap.values)
             }
-        } else {
-            _photoNodes.value = ArrayList<PhotoNodeItem>(photoNodesMapItem.values)
         }
+    }
+
+    fun emitFiles() {
+        _fileNodeItems.value = ArrayList<NodeItem>(fileNodesMap.values)
     }
 
     /**
@@ -61,9 +62,9 @@ class PhotosRepository @Inject constructor(
      * Restore these values in event of querying the raw data again
      */
     private fun saveAndClearData() {
-        savedPhotoNodesMapItem.clear()
-        photoNodesMapItem.toMap(savedPhotoNodesMapItem)
-        photoNodesMapItem.clear()
+        savedFileNodesMap.clear()
+        fileNodesMap.toMap(savedFileNodesMap)
+        fileNodesMap.clear()
     }
 
     private fun getThumbnail(node: MegaNode): File? {
@@ -82,11 +83,7 @@ class PhotosRepository @Inject constructor(
                     e: MegaError?
                 ) {
                     request?.let {
-                        // Must generate a new PhotoNode object, or the oldItem and newItem in
-                        // PhotosGridAdapter's areContentsTheSame will be an identical object,
-                        // then the item wouldn't be refreshed
-                        photoNodesMapItem[it.nodeHandle]?.apply {
-//                            photoNodesMap[it.nodeHandle] = copy(thumbnail = thumbFile.absoluteFile)
+                        fileNodesMap[it.nodeHandle]?.apply {
                             thumbnail = thumbFile.absoluteFile
                             uiDirty = true
                         }
@@ -110,47 +107,62 @@ class PhotosRepository @Inject constructor(
         Handler().postDelayed(
             {
                 waitingForRefresh = false
-                _photoNodes.value = ArrayList<PhotoNodeItem>(photoNodesMapItem.values)
+                _fileNodeItems.value = ArrayList<NodeItem>(fileNodesMap.values)
             }, UPDATE_DATA_THROTTLE_TIME
         )
     }
 
-    private fun getPhotoNodes() {
+    private fun getNodeItems() {
         var lastModifyDate: LocalDate? = null
         var mapKeyTitle = Long.MIN_VALUE
 
-        for (node in getMegaNodesOfPhotos()) {
+        for (node in getMegaNodes()) {
             val thumbnail = getThumbnail(node)
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
 
-            if (lastModifyDate == null
-                || YearMonth.from(lastModifyDate) != YearMonth.from(
+            if (type == NODE_PHOTO && (lastModifyDate == null
+                        || YearMonth.from(lastModifyDate) != YearMonth.from(
                     modifyDate
-                )
+                ))
             ) {
                 lastModifyDate = modifyDate
-                photoNodesMapItem[mapKeyTitle++] =
+                fileNodesMap[mapKeyTitle++] =
                     PhotoNodeItem(PhotoNodeItem.TYPE_TITLE, -1, null, -1, dateString, null, false)
             }
 
-            val selected = savedPhotoNodesMapItem[node.handle]?.selected ?: false
+            val selected = savedFileNodesMap[node.handle]?.selected ?: false
+            var nodeItem: NodeItem? = null
 
-            photoNodesMapItem[node.handle] = PhotoNodeItem(
-                PhotoNodeItem.TYPE_PHOTO,
-                -1,
-                node,
-                -1,
-                dateString,
-                thumbnail,
-                selected
-            )
+            if (type == NODE_PHOTO) {
+                nodeItem = PhotoNodeItem(
+                    PhotoNodeItem.TYPE_PHOTO,
+                    -1,
+                    node,
+                    -1,
+                    dateString,
+                    thumbnail,
+                    selected
+                )
+            } else {
+                nodeItem = NodeItem(
+                    node,
+                    -1,
+                    dateString,
+                    thumbnail,
+                    selected
+                )
+            }
+
+            fileNodesMap[node.handle] = nodeItem
         }
     }
 
-    private fun getMegaNodesOfPhotos(): List<MegaNode> {
-        // TODO: use constants
-        return megaApi.searchByType(null, null, null, true, order, 1, 3)
+    private fun getMegaNodes(): List<MegaNode> {
+        return megaApi.searchByType(
+            null, null, null,
+            true, order, type, TARGET_ROOTNODES
+        )
     }
 
     companion object {

@@ -13,7 +13,7 @@
 
         <variable
             name="actionModeViewModel"
-            type="mega.privacy.android.app.fragments.homepage.photos.ActionModeViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.ActionModeViewModel" />
 
         <variable
             name="item"

@@ -10,6 +10,7 @@ import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 
 class PhotosBrowseAdapter constructor(
     private val viewModel: PhotosViewModel,

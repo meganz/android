@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage.photos
+package mega.privacy.android.app.fragments.homepage
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData

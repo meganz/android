@@ -11067,6 +11067,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (fullscreenOfflineFragment != null) {
 			fullscreenOfflineFragment.setOrder(orderCloud);
 		}
+
+		NodesChangeNotifierKt.notifyOrderChange(orderCloud);
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){

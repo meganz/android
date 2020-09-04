@@ -10,10 +10,9 @@ import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
-import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.photos.ActionModeViewModel
 
 class DocumentsAdapter constructor(
     private val viewModel: DocumentsViewModel,
