@@ -7286,7 +7286,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         } else if (request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug(" The call has been started success");
-                //getFlag - Returns true if it is a video-audio call or false for audio call
+                MegaApplication.setShowPinScreen(false);
+                Intent i = new Intent(this, ChatCallActivity.class);
+                i.putExtra(CHAT_ID, idChat);
+                i.setAction(SECOND_CALL);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                this.startActivity(i);
             } else {
                 logError("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);

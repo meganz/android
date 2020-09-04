@@ -2689,6 +2689,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if(call != null && statusCallInProgress(call.getStatus()) && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING){
             return;
         }
+
         checkTerminatingCall();
     }
 
@@ -2696,11 +2697,24 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Perform the necessary actions when the call is over.
      */
     private void checkTerminatingCall() {
-        clearHandlers();
-        app.removeChatAudioManager();
-        app.removeRTCAudioManager();
-        MegaApplication.setSpeakerStatus(chatId, false);
-        finishActivity();
+        ArrayList<Long> calls = getCallsParticipating();
+        if(calls == null || calls.isEmpty()){
+            clearHandlers();
+            app.removeChatAudioManager();
+            app.removeRTCAudioManager();
+            MegaApplication.setSpeakerStatus(chatId, false);
+            finishActivity();
+        }else{
+            for(Long chatId:calls) {
+                MegaApplication.setSpeakerStatus(chatId, false);
+                MegaApplication.setShowPinScreen(false);
+                Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
+                intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intentOpenCall.putExtra(CHAT_ID, chatId);
+                startActivity(intentOpenCall);
+                break;
+            }
+        }
     }
 
     /**

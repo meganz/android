@@ -986,16 +986,17 @@ public final class ChatAdvancedNotificationBuilder {
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
                     .setFullScreenIntent(callScreen, true)
+                    .setShowWhen(true)
                     .setAutoCancel(true)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(patternIncomingCall)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
-                    .setPriority(NotificationManager.IMPORTANCE_HIGH);
+                    .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
+                    .setCustomContentView(collapsedViews)
+                    .setCustomBigContentView(expandedView);
 
             notify(notificationId, notificationBuilderO.build());
         } else {
@@ -1005,16 +1006,17 @@ public final class ChatAdvancedNotificationBuilder {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
                     .setFullScreenIntent(callScreen, true)
+                    .setShowWhen(true)
                     .setAutoCancel(true)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.mega))
+                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
+                    .setCustomContentView(collapsedViews)
+                    .setCustomBigContentView(expandedView);
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
                 notificationBuilder.setPriority(Notification.PRIORITY_HIGH);

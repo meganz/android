@@ -516,9 +516,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 
 			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				logDebug("Call status is "+callStatusToString(callStatus));
-
 				switch (callStatus) {
 					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 					case MegaChatCall.CALL_STATUS_RING_IN:

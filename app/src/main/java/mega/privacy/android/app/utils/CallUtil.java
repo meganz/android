@@ -145,13 +145,14 @@ public class CallUtil {
 
         for(Long chatIdCall:currentCalls){
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
-            if(call != null && !call.isOnHold()){
+            if(call != null){
                 MegaApplication.setShowPinScreen(false);
                 Intent intent = new Intent(context, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, call.getChatid());
                 intent.putExtra(CALL_ID, call.getId());
                 context.startActivity(intent);
+                break;
             }
         }
     }
@@ -173,20 +174,6 @@ public class CallUtil {
                 intent.putExtra(CHAT_ID, call.getChatid());
                 intent.putExtra(CALL_ID, call.getId());
                 context.startActivity(intent);
-            }
-        }
-    }
-
-    /**
-     * Open the call that is in progress
-     *
-     * @param context from which the action is done
-     */
-    public static void returnCall(Context context) {
-        if (participatingInACall() && getChatCallInProgress() != MEGACHAT_INVALID_HANDLE && !isSessionOnHold(getChatCallInProgress())) {
-            long chatCallId = getChatCallInProgress();
-            if (chatCallId != MEGACHAT_INVALID_HANDLE && !isSessionOnHold(chatCallId)) {
-                returnCall(context, chatCallId);
             }
         }
     }
@@ -220,60 +207,19 @@ public class CallUtil {
         return session.isOnHold();
     }
 
-    /**
-     * Show or hide the "Tap to return to call" banner
-     *
-     * @param context              from which the action is done
-     * @param callInProgressLayout RelativeLayout to be shown or hidden
-     * @param callInProgressChrono Chronometer of the banner to be updated.
-     * @param callInProgressText   Text of the banner to be updated
-     */
-    public static void showCallLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
+    private static void createCallBanner(Context context, long chatId, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (callInProgressLayout == null){
-            return;
-        }
-
-        ArrayList<Long> currentChatCallsList = getCallsParticipating();
-
-        if (!participatingInACall() || currentChatCallsList == null) {
-            hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
-            return;
-        }
-
-        ArrayList<MegaChatCall> callsActive = new ArrayList<>();
-
-        for (Long chatIdCall : currentChatCallsList) {
-            MegaChatCall current = megaChatApi.getChatCall(chatIdCall);
-            if (current != null) {
-                if (!current.isOnHold() && !isSessionOnHold(chatIdCall)) {
-                    callsActive.add(current);
-                }
-            }
-        }
-        if (callsActive.isEmpty()) {
-            hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
-            return;
-        }
-
-        long chatId = getChatCallInProgress();
-        if (chatId == -1){
-            return;
-        }
 
         MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if(call == null || !MegaApplication.getCallLayoutStatus(chatId))
+        if (call == null || !MegaApplication.getCallLayoutStatus(call.getChatid()))
             return;
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
-            logDebug("Displayed the Reconnecting call layout");
             activateChrono(false, callInProgressChrono, null);
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
-
         } else {
-            logDebug("Displayed the layout to return to the call");
-            callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
+            callInProgressText.setText(context.getString(call.isOnHold() || isSessionOnHold(chatId) ? R.string.call_on_hold : R.string.call_in_progress_layout));
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
 
             if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -284,12 +230,53 @@ public class CallUtil {
         }
 
         callInProgressLayout.setVisibility(View.VISIBLE);
-        if(context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop)context).changeToolbarLayoutElevation();
+
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
         }
-        if(context instanceof ContactInfoActivityLollipop) {
-            ((ContactInfoActivityLollipop)context).changeToolbarLayoutElevation();
+        if (context instanceof ContactInfoActivityLollipop) {
+            ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
         }
+    }
+
+    /**
+     * Show or hide the "Tap to return to call" banner
+     *
+     * @param context              from which the action is done
+     * @param callInProgressLayout RelativeLayout to be shown or hidden
+     * @param callInProgressChrono Chronometer of the banner to be updated.
+     * @param callInProgressText   Text of the banner to be updated
+     */
+    public static void showCallLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
+        if (callInProgressLayout == null) {
+            return;
+        }
+
+        ArrayList<Long> currentChatCallsList = getCallsParticipating();
+        if (!participatingInACall() || currentChatCallsList == null || !isScreenInPortrait(context)) {
+            hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
+            return;
+        }
+
+        long chatIdInProgress = getChatCallInProgress();
+        if (chatIdInProgress != MEGACHAT_INVALID_HANDLE) {
+            createCallBanner(context, chatIdInProgress, callInProgressLayout, callInProgressChrono, callInProgressText);
+            return;
+        }
+
+        ArrayList<Long> calls = getCallsParticipating();
+        if (calls != null && !calls.isEmpty()) {
+            for (long chatId : calls) {
+                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+                if (call != null && call.isOnHold()) {
+                    createCallBanner(context, chatId, callInProgressLayout, callInProgressChrono, callInProgressText);
+                    break;
+                }
+            }
+            return;
+        }
+
+        hideCallInProgressLayout(context, callInProgressLayout, callInProgressChrono);
     }
 
     /**
@@ -310,42 +297,58 @@ public class CallUtil {
         }
     }
 
+    private static void createCallMenuItem(MegaChatCall call, final MenuItem returnCallMenuItem, final LinearLayout layoutCallMenuItem, final Chronometer chronometerMenuItem){
+        Context context = MegaApplication.getInstance().getBaseContext();
+        int callStatus = call.getStatus();
+        layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context, callStatus == MegaChatCall.CALL_STATUS_RECONNECTING ? R.drawable.reconnection_rounded : R.drawable.dark_rounded_chat_own_message));
+
+        if(chronometerMenuItem != null && (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)){
+            if(chronometerMenuItem.getVisibility() == View.VISIBLE) return;
+            chronometerMenuItem.setVisibility(View.VISIBLE);
+            chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
+            chronometerMenuItem.start();
+            chronometerMenuItem.setFormat(" %s");
+        }else{
+            if(chronometerMenuItem.getVisibility() == View.GONE) return;
+            chronometerMenuItem.stop();
+            chronometerMenuItem.setVisibility(View.GONE);
+        }
+        returnCallMenuItem.setVisible(true);
+    }
+
     /**
      * This method shows or hides the toolbar icon to return a call when a call is in progress
      * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
+     *
+     * @param returnCallMenuItem  The MenuItem.
+     * @param layoutCallMenuItem  The layout of MenuItem.
+     * @param chronometerMenuItem The chronometer.
      */
-    public static void setCallMenuItem(final MenuItem returnCallMenuItem, final LinearLayout layoutCallMenuItem, final Chronometer chronometerMenuItem){
+    public static void setCallMenuItem(final MenuItem returnCallMenuItem, final LinearLayout layoutCallMenuItem, final Chronometer chronometerMenuItem) {
         Context context = MegaApplication.getInstance().getBaseContext();
-        if (!isScreenInPortrait(context) &&
-                participatingInACall() && getChatCallInProgress() != MEGACHAT_INVALID_HANDLE &&
-                !isSessionOnHold(getChatCallInProgress())) {
-            returnCallMenuItem.setVisible(true);
-
-            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(getChatCallInProgress());
-            int callStatus = call.getStatus();
-
-            if(callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
-                layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context,R.drawable.reconnection_rounded));
-            }else{
-                layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context,R.drawable.dark_rounded_chat_own_message));
+        if (!isScreenInPortrait(context) && participatingInACall()) {
+            long chatIdInProgress = getChatCallInProgress();
+            if (chatIdInProgress != MEGACHAT_INVALID_HANDLE) {
+                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdInProgress);
+                createCallMenuItem(call, returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
+                return;
             }
 
-            if(chronometerMenuItem != null && (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)){
-                if(chronometerMenuItem.getVisibility() == View.VISIBLE) return;
-                chronometerMenuItem.setVisibility(View.VISIBLE);
-                chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
-                chronometerMenuItem.start();
-                chronometerMenuItem.setFormat(" %s");
-            }else{
-                if(chronometerMenuItem.getVisibility() == View.GONE) return;
-                chronometerMenuItem.stop();
-                chronometerMenuItem.setVisibility(View.GONE);
+            ArrayList<Long> calls = getCallsParticipating();
+            if (calls != null && !calls.isEmpty()) {
+                for (long chatId : calls) {
+                    MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+                    if (call != null && call.isOnHold()) {
+                        createCallMenuItem(call, returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
+                        break;
+                    }
+                }
+                return;
             }
-        }else {
-            hideCallMenuItem(chronometerMenuItem, returnCallMenuItem);
+
         }
+        hideCallMenuItem(chronometerMenuItem, returnCallMenuItem);
     }
-
 
     /**
      * This method is used to hide the current call menu item.
@@ -358,6 +361,7 @@ public class CallUtil {
             chronometerMenuItem.stop();
         }
         if (returnCallMenuItem != null) {
+            logDebug("***************** returnCallMenuItem GONE");
             returnCallMenuItem.setVisible(false);
         }
     }
