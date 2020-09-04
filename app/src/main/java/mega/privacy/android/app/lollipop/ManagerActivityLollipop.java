@@ -11316,8 +11316,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				isFirstTimeCam();
 				checkIfShouldCloseSearchView(oldDrawerItem);
 				drawerLayout.closeDrawer(Gravity.LEFT);
-				setTabsVisibility();
 				openFullscreenOfflineFragment(getPathNavigationOffline());
+				setTabsVisibility();
 				break;
 			}
 			case R.id.settings_section: {
