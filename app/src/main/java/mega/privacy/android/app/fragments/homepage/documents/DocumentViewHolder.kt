@@ -23,7 +23,6 @@ class DocumentViewHolder(private val binding: ViewDataBinding) :
         binding.apply {
             when (this) {
                 is ItemNodeListBinding -> {
-                    this.itemOperation = viewModel
                     this.actionModeViewModel = actionModeViewModel
                     this.item = item
                     this.megaApi = megaApi

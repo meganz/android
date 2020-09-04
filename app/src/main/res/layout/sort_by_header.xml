@@ -33,7 +33,7 @@
             android:id="@+id/list_mode_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
+            android:layout_marginEnd="12dp"
             android:src="@drawable/ic_thumbnail_view"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

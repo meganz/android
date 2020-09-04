@@ -11,15 +11,9 @@ import nz.mega.sdk.MegaApiJava.NODE_PHOTO
 
 class PhotosViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
-) : ViewModel(), ItemOperation {
+) : ViewModel() {
 
     private var _query = MutableLiveData<String>("")
-
-    private val _openPhotoEvent = MutableLiveData<Event<PhotoNodeItem>>()
-    val openPhotoEventItem: LiveData<Event<PhotoNodeItem>> = _openPhotoEvent
-
-    private val _showNodeItemOptionsEvent = MutableLiveData<Event<NodeItem>>()
-    val showNodeItemOptionsEvent: LiveData<Event<NodeItem>> = _showNodeItemOptionsEvent
 
     var searchMode = false
     var searchQuery = ""
@@ -118,17 +112,13 @@ class PhotosViewModel @ViewModelInject constructor(
 
     /**
      * Make the list adapter to rebind all item views with data since
-     * the underlying data may have been changed.
+     * the underlying meta data of items may have been changed.
      */
     fun refreshUi() {
         items.value?.forEach {item ->
             item.uiDirty = true
         }
         loadPhotos()
-    }
-
-    override fun onItemClick(item: NodeItem) {
-        _openPhotoEvent.value = Event(item as PhotoNodeItem)
     }
 
     fun getRealPhotoCount(): Int {
@@ -153,10 +143,6 @@ class PhotosViewModel @ViewModelInject constructor(
         }?.map { node -> node.node?.handle ?: INVALID_HANDLE }
 
         return list?.toLongArray()
-    }
-
-    override fun showNodeItemOptions(item: NodeItem) {
-        _showNodeItemOptionsEvent.value = Event(item)
     }
 
     override fun onCleared() {

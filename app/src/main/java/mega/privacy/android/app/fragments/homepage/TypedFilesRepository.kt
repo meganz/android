@@ -40,7 +40,6 @@ class TypedFilesRepository @Inject constructor(
 
     private val _fileNodeItems = MutableLiveData<List<NodeItem>>()
     val fileNodeItems: LiveData<List<NodeItem>> = _fileNodeItems
-//    private val counterContext = newSingleThreadContext("CounterContext")
 
     suspend fun getFiles(type: Int, order: Int = MegaApiJava.ORDER_MODIFICATION_DESC) {
         this.type = type
@@ -166,7 +165,7 @@ class TypedFilesRepository @Inject constructor(
         return megaApi.searchByType(
             null, null, null,
             true, order, type, TARGET_ROOTNODES
-        ).filter { node -> !megaApi.isInRubbish(node)}
+        )
     }
 
     companion object {

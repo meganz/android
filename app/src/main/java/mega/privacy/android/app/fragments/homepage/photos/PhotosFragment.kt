@@ -28,10 +28,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.fragments.homepage.ActionModeCallback
-import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
-import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
@@ -55,6 +52,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private val viewModel by viewModels<PhotosViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
+    private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
     private lateinit var binding: FragmentPhotosBinding
 
@@ -79,7 +77,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     ): View? {
         binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
             viewModel = this@PhotosFragment.viewModel
-            actionModeViewModel = this@PhotosFragment.actionModeViewModel
         }
 
         return binding.root
@@ -121,11 +118,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupNavigation() {
-        viewModel.openPhotoEventItem.observe(viewLifecycleOwner, EventObserver {
-            openPhoto(it)
+        itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
+            openPhoto(it as PhotoNodeItem)
         })
 
-        viewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
+        itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { activity.showNodeOptionsPanel(it.node) }
         })
     }
@@ -282,8 +279,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
-        browseAdapter = PhotosBrowseAdapter(viewModel, actionModeViewModel)
-        searchAdapter = PhotosSearchAdapter(viewModel, actionModeViewModel)
+        browseAdapter = PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel)
+        searchAdapter = PhotosSearchAdapter(actionModeViewModel, itemOperationViewModel)
 
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {

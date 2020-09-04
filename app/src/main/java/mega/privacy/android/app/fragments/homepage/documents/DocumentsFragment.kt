@@ -33,6 +33,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
     private val viewModel by viewModels<DocumentsViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
+    private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
     private lateinit var binding: FragmentDocumentsBinding
 
@@ -54,7 +55,6 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     ): View? {
         binding = FragmentDocumentsBinding.inflate(inflater, container, false).apply {
             viewModel = this@DocumentsFragment.viewModel
-            actionModeViewModel = this@DocumentsFragment.actionModeViewModel
         }
 
         return binding.root
@@ -94,11 +94,11 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupNavigation() {
-        viewModel.openDocEvent.observe(viewLifecycleOwner, EventObserver {
+        itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
 //            openDoc(it)
         })
 
-        viewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
+        itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { activity.showNodeOptionsPanel(it.node) }
         })
     }

@@ -11,10 +11,11 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 
 class PhotosBrowseAdapter constructor(
-    private val viewModel: PhotosViewModel,
-    private val actionModeViewModel: ActionModeViewModel
+    private val actionModeViewModel: ActionModeViewModel,
+    private val itemOperationViewModel: ItemOperationViewModel
 ) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
@@ -60,7 +61,7 @@ class PhotosBrowseAdapter constructor(
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        holder.bind(viewModel, actionModeViewModel, getItem(position))
+        holder.bind(actionModeViewModel, itemOperationViewModel, getItem(position))
     }
 
     private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNodeItem>() {
