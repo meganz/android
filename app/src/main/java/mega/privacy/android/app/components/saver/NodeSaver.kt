@@ -157,7 +157,6 @@ abstract class NodeSaver(
         intent.putExtra(EXTRA_FROM_SETTINGS, false)
         intent.setClass(context, FileStorageActivityLollipop::class.java)
         if (sdRoot != null) {
-            saving.externalSDCard = true
             intent.putExtra(EXTRA_SD_ROOT, sdRoot)
         }
         if (prompt != null) {
@@ -289,8 +288,7 @@ abstract class NodeSaver(
 
     abstract class Saving(
         val totalSize: Long,
-        val highPriority: Boolean,
-        var externalSDCard: Boolean = false
+        val highPriority: Boolean
     ) {
         var unsupportedFileName = ""
             protected set

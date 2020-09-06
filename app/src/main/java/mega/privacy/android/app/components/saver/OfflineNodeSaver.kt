@@ -40,7 +40,7 @@ class OfflineNodeSaver @Inject constructor(
             .fromCallable {
                 download(
                     getOfflineFile(context, (saving as OfflineSaving).node),
-                    parentPath, saving.externalSDCard
+                    parentPath, SDCardOperator.isSDCardPath(parentPath)
                 )
             }
             .subscribeOn(Schedulers.io())
