@@ -649,6 +649,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			notification = mBuilder.getNotification();
 
 		}else{
+			notification = new Notification();
 			notification.flags |= Notification.FLAG_ONGOING_EVENT;
 			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 			notification.contentIntent = pendingIntent;
@@ -857,6 +858,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
         }
         else
         {
+        	notification = new Notification();
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
             notification.contentIntent = pendingIntent;
