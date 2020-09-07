@@ -24,7 +24,8 @@ class AudioViewModel @ViewModelInject constructor(
 
     private var _query = MutableLiveData<String>("")
 
-    private var order: Int = ORDER_DEFAULT_ASC
+    var order: Int = ORDER_DEFAULT_ASC
+        private set
     var searchMode = false
     var listMode = true   // false for grid mode
     var searchQuery = ""

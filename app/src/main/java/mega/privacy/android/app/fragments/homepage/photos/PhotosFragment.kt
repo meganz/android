@@ -43,6 +43,7 @@ import mega.privacy.android.app.utils.Constants.PHOTOS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.getThumbnailLocationOnScreen
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.lang.ref.WeakReference
@@ -93,6 +94,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -392,12 +394,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         listView.scrollToPosition(position)
         notifyThumbnailLocationOnScreen()
-    }
-
-    private fun getThumbnailLocationOnScreen(imageView: ImageView): IntArray {
-        val topLeft = IntArray(2)
-        imageView.getLocationOnScreen(topLeft)
-        return intArrayOf(topLeft[0], topLeft[1], imageView.width, imageView.height)
     }
 
     private fun getDraggingThumbnailLocationOnScreen(): IntArray? {

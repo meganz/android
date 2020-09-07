@@ -311,4 +311,20 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
 
         return nodes;
     }
+
+    public static ArrayList<MegaNode> getSearchedNodes(long[] handles) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+
+        if (handles != null) {
+            for (long handle : handles) {
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                if (node != null) {
+                    nodes.add(node);
+                }
+            }
+        }
+
+        return nodes;
+    }
 }
