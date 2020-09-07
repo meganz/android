@@ -17,12 +17,14 @@ import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
 import androidx.appcompat.app.AlertDialog.Builder
 import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
+import mega.privacy.android.app.R.string
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_FROM_SETTINGS
@@ -32,6 +34,8 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_SD_RO
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
+import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
 import mega.privacy.android.app.utils.FileUtils.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtils.isBasedOnFileStorage
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -41,7 +45,7 @@ import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.SDCardOperator.SDCardException
-import mega.privacy.android.app.utils.SDCardOperator.requestSDCardPermission
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.askMe
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.scaleHeightPx
@@ -74,8 +78,40 @@ abstract class NodeSaver(
             add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            if (intent == null) {
+                logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
+                if (resultCode != Activity.RESULT_OK) {
+                    Util.showSnackbar(
+                        context, context.getString(string.download_requires_permission)
+                    )
+                } else {
+                    Util.showSnackbar(
+                        context, context.getString(string.no_external_SD_card_detected)
+                    )
+                }
+                return false
+            }
+            val uri = intent.data
+            if (uri == null) {
+                logWarning("handleActivityResult REQUEST_CODE_TREE: tree uri is null!")
+                return false
+            }
+            val pickedDir = DocumentFile.fromTreeUri(context, uri)
+            if (pickedDir == null || !pickedDir.canWrite()) {
+                logWarning("handleActivityResult REQUEST_CODE_TREE: pickedDir not writable")
+                return false
+            }
+            dbHandler.sdCardUri = uri.toString()
+            val parentPath = getFullPathFromTreeUri(uri, context)
+            if (parentPath == null) {
+                logWarning("handleActivityResult REQUEST_CODE_TREE: parentPath is null")
+                return false
+            }
+            add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
         }
-
 
         return false
     }
@@ -136,10 +172,10 @@ abstract class NodeSaver(
                         logError(
                             "SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e
                         )
-                        requestSDCardPermission(sdCardRoot, context, context as Activity)
+                        requestSDCardPermission(sdCardRoot, activityStarter)
                     }
                 } else {
-                    requestSDCardPermission(sdCardRoot, context, context as Activity)
+                    requestSDCardPermission(sdCardRoot, activityStarter)
                 }
             }
         } catch (e: SDCardException) {
@@ -147,6 +183,14 @@ abstract class NodeSaver(
             // sd card is available, choose internal storage location
             requestLocalFolder(null, null, activityStarter)
         }
+    }
+
+    private fun requestSDCardPermission(
+        sdCardRoot: String,
+        activityStarter: (Intent, Int) -> Unit
+    ) {
+        val intent = SDCardOperator.getRequestPermissionIntent(context, sdCardRoot)
+        activityStarter(intent, REQUEST_CODE_TREE)
     }
 
     private fun requestLocalFolder(
