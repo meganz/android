@@ -2,7 +2,7 @@ package mega.privacy.android.app.components.textFormatter;
 
 import java.util.ArrayList;
 
-public class textFormatterUtils {
+public class TextFormatterUtils {
     public static final char NEW_LINE = '\n';
     public static final char SPACE = ' ';
     public static final char BOLD_FLAG = '*';
@@ -10,9 +10,6 @@ public class textFormatterUtils {
     public static final char ITALIC_FLAG = '_';
     public static final char MONOSPACE_FLAG = '`';
     public static final int INVALID_INDEX = -1;
-
-    public textFormatterUtils() {
-    }
 
     public static String getText(ArrayList<Character> characters) {
         char[] chars = new char[characters.size()];

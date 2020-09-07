@@ -10,16 +10,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.components.CustomTypefaceSpan;
-import static mega.privacy.android.app.components.textFormatter.textFormatterUtils.*;
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 public class TextFormatterViewCompat {
     private static final int GENERAL_FLAG = 18;
     private static final int NUM_CHAR_MONOSPACE = 2;
-    private static final Typeface monospaceFont = Typeface.createFromAsset(MegaApplication.getInstance().getBaseContext().getAssets(), "font/RobotoMono-Regular.ttf");
-
-    public TextFormatterViewCompat() {
-    }
+    private static final Typeface MONOSPACE_FONT = Typeface.createFromAsset(MegaApplication.getInstance().getBaseContext().getAssets(), "font/RobotoMono-Regular.ttf");
 
     public static CharSequence getFormattedText(String text) {
         if (isTextEmpty(text))
@@ -28,22 +25,18 @@ public class TextFormatterViewCompat {
         return extractFlagsForTextView(text);
     }
 
-    public static void applyFormatting(final TextView textView, final TextWatcher... watchers) {
+    public static void applyFormatting(final TextView textView) {
         TextWatcher mEditTextWatcher = new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                TextFormatterViewCompat.sendBeforeTextChanged(watchers, s, start, count, after);
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                TextFormatterViewCompat.sendOnTextChanged(watchers, s, start, before, count);
             }
 
             public void afterTextChanged(Editable s) {
                 CharSequence formatted = TextFormatterViewCompat.extractFlagsForTextView(s);
                 TextFormatterViewCompat.removeTextChangedListener(textView, this);
                 textView.setText(formatted, TextView.BufferType.EDITABLE);
-                Editable formattedEditableText = (Editable) textView.getText();
-                TextFormatterViewCompat.sendAfterTextChanged(watchers, formattedEditableText);
                 TextFormatterViewCompat.addTextChangedListener(textView, this);
             }
         };
@@ -53,32 +46,7 @@ public class TextFormatterViewCompat {
         if (formattedText != null) {
             textView.setText(formattedText);
         }
-
         textView.addTextChangedListener(mEditTextWatcher);
-    }
-
-    private static void sendAfterTextChanged(TextWatcher[] mListeners, Editable s) {
-        if (mListeners != null) {
-            for (int i = 0; i < mListeners.length; ++i) {
-                mListeners[i].afterTextChanged(s);
-            }
-        }
-    }
-
-    private static void sendOnTextChanged(TextWatcher[] mListeners, CharSequence s, int start, int before, int count) {
-        if (mListeners != null) {
-            for (int i = 0; i < mListeners.length; ++i) {
-                mListeners[i].onTextChanged(s, start, before, count);
-            }
-        }
-    }
-
-    private static void sendBeforeTextChanged(TextWatcher[] mListeners, CharSequence s, int start, int count, int after) {
-        if (mListeners != null) {
-            for (int i = 0; i < mListeners.length; ++i) {
-                mListeners[i].beforeTextChanged(s, start, count, after);
-            }
-        }
     }
 
     static void removeTextChangedListener(TextView textView, TextWatcher watcher) {
@@ -180,32 +148,33 @@ public class TextFormatterViewCompat {
             StyleSpan iss;
             switch (flag.flag) {
                 case BOLD_FLAG:
-                    if (flag.end < builder.length())
+                    if (flag.end > builder.length())
                         break;
 
-                    iss = new StyleSpan(1);
+                    iss = new StyleSpan(Typeface.BOLD);
                     builder.setSpan(iss, flag.start, flag.end, GENERAL_FLAG);
                     break;
 
                 case STRIKE_FLAG:
-                    if (flag.end < builder.length())
+                    if (flag.end > builder.length())
                         break;
 
                     builder.setSpan(new StrikethroughSpan(), flag.start, flag.end, GENERAL_FLAG);
                     break;
 
                 case ITALIC_FLAG:
-                    if (flag.end < builder.length())
+                    if (flag.end > builder.length())
                         break;
 
-                    iss = new StyleSpan(2);
+                    iss = new StyleSpan(Typeface.ITALIC);
                     builder.setSpan(iss, flag.start, flag.end, GENERAL_FLAG);
                     break;
 
                 case MONOSPACE_FLAG:
-                    if (flag.end < builder.length())
+                    if (flag.end > builder.length())
                         break;
-                    builder.setSpan(new CustomTypefaceSpan("", monospaceFont), flag.start, flag.end, GENERAL_FLAG);
+
+                    builder.setSpan(new CustomTypefaceSpan("", MONOSPACE_FONT), flag.start, flag.end, GENERAL_FLAG);
                     break;
             }
         }
