@@ -36,11 +36,9 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
@@ -315,24 +313,23 @@ class HomepageFragment : Fragment() {
 
     private fun openChatActivity() {
         val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
-            putExtra(KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
+            putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
         }
-        activity?.startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT)
+
+        activity.startActivityForResult(intent, REQUEST_CREATE_CHAT)
     }
 
     private fun showUploadPanel() {
-        if (activity is ManagerActivityLollipop) {
-            val managerActivity = activity as ManagerActivityLollipop
-            if (!Util.isOnline(context)) {
-                managerActivity.showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getString(R.string.error_server_connection_problem),
-                    INVALID_HANDLE
-                )
-                return
-            }
-            managerActivity.showUploadPanel()
+        if (!isOnline(context)) {
+            activity.showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.error_server_connection_problem),
+                INVALID_HANDLE
+            )
+            return
         }
+
+        activity.showUploadPanel()
     }
 
     private fun fabMainClickCallback(
@@ -415,7 +412,8 @@ class HomepageFragment : Fragment() {
         view.animate()
             .setDuration(FAB_ANIM_DURATION)
             .translationY(0f)
-            .setListener(object : AnimatorListenerAdapter() {/* No need to override any methods here. */})
+            .setListener(object :
+                AnimatorListenerAdapter() {/* No need to override any methods here. */ })
             .alpha(ALPHA_OPAQUE)
             .start()
     }

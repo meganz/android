@@ -55,7 +55,7 @@ class SortByHeaderViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         orderChange.removeObserver(orderChangeObserver)
-        listGridChange.observeForever(listGridChangeObserver)
+        listGridChange.removeObserver(listGridChangeObserver)
     }
 
     companion object {
