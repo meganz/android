@@ -6,7 +6,7 @@
     app:startDestination="@id/homepageFragment">
     <fragment
         android:id="@+id/homepageFragment"
-        android:name="mega.privacy.android.app.lollipop.managerSections.HomepageFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.HomepageFragment"
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
         <action
@@ -17,15 +17,17 @@
             app:destination="@id/fullscreen_offline" />
         <action
             android:id="@+id/action_homepage_to_offline_file_info"
-            app:destination="@id/offline_file_info"
-            />
+            app:destination="@id/offline_file_info" />
+        <action
+            android:id="@+id/action_homepageFragment_to_documentsFragment"
+            app:destination="@id/documentsFragment" />
         <action
             android:id="@+id/action_homepage_to_recentBucket"
             app:destination="@id/recentBucketFragment"/>
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
-        android:name="mega.privacy.android.app.fragments.photos.PhotosFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.photos.PhotosFragment"
         android:label="@string/category_photos" />
     <fragment
         android:id="@+id/recentBucketFragment"
@@ -54,17 +56,18 @@
             app:destination="@id/fullscreen_offline" />
         <action
             android:id="@+id/action_homepage_to_offline_file_info"
-            app:destination="@id/offline_file_info"
-            />
+            app:destination="@id/offline_file_info" />
     </fragment>
     <fragment
         android:id="@+id/offline_file_info"
         android:name="mega.privacy.android.app.fragments.offline.OfflineFileInfoFragment"
-        tools:layout="@layout/fragment_offline_file_info"
-        >
+        tools:layout="@layout/fragment_offline_file_info">
         <argument
             android:name="handle"
-            app:argType="string"
-            />
+            app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/documentsFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment"
+        android:label="DocumentsFragment" />
 </navigation>

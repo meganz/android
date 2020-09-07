@@ -2,13 +2,13 @@ package mega.privacy.android.app.repo
 
 import android.content.Context
 import android.text.TextUtils
+import android.util.Pair
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.FileUtils
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.SortUtil.sortOfflineByModificationDateAscending
@@ -49,12 +49,14 @@ class MegaNodeRepo @Inject constructor(
      * 1 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
      * 2 means search for nodes between two days, filter[3] and filter[4] are start and end day in
      * millis.
+     * @return list of pairs, whose first value is index used for
+     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
      */
     fun getCuChildren(
         type: Int,
         orderBy: Int,
         filter: LongArray?
-    ): List<MegaNode>? {
+    ): List<Pair<Int, MegaNode>> {
         var cuHandle: Long = -1
         val pref = dbHandler.preferences
         if (type == CU_TYPE_CAMERA) {
@@ -98,17 +100,22 @@ class MegaNodeRepo @Inject constructor(
         }
         val children: List<MegaNode> =
             megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy)
-        val nodes: MutableList<MegaNode> = java.util.ArrayList()
-        for (node in children) {
+        val nodes = ArrayList<Pair<Int, MegaNode>>()
+        for ((index, node) in children.withIndex()) {
+            if (node.isFolder) {
+                continue
+            }
             val mime = MimeTypeThumbnail.typeForName(node.name)
             if (mime.isImage || mime.isVideoReproducible) {
-                nodes.add(node)
+                // when not in search mode, index used by viewer is index in all siblings,
+                // including non image/video nodes
+                nodes.add(Pair.create(index, node))
             }
         }
         if (filter == null) {
             return nodes
         }
-        val result: MutableList<MegaNode> = java.util.ArrayList()
+        val result = ArrayList<Pair<Int, MegaNode>>()
         var filterFunction: Function<MegaNode, Boolean>? = null
         if (filter[0] == 1L) {
             val date =
@@ -153,9 +160,14 @@ class MegaNodeRepo @Inject constructor(
         if (filterFunction == null) {
             return result
         }
+
+        // when in search mode, index used by viewer is also index in all siblings,
+        // but all siblings are image/video, non image/video nodes are filtered by previous step
+        var indexInSiblings = 0
         for (node in nodes) {
-            if (filterFunction.apply(node)) {
-                result.add(node)
+            if (filterFunction.apply(node.second)) {
+                result.add(Pair.create(indexInSiblings, node.second))
+                indexInSiblings++
             }
         }
         return result

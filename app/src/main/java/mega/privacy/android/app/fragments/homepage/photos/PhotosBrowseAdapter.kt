@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.photos
+package mega.privacy.android.app.fragments.homepage.photos
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +10,12 @@ import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
-import javax.inject.Inject
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 
 class PhotosBrowseAdapter constructor(
     private val viewModel: PhotosViewModel,
     private val actionModeViewModel: ActionModeViewModel
-) : ListAdapter<PhotoNode, PhotoViewHolder>(PhotoDiffCallback()),
+) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
     private var itemDimen = 0
@@ -28,7 +28,7 @@ class PhotosBrowseAdapter constructor(
         val inflater = LayoutInflater.from(parent.context)
 
         val binding = when (viewType) {
-            PhotoNode.TYPE_TITLE ->
+            PhotoNodeItem.TYPE_TITLE ->
                 ItemPhotosTitleBinding.inflate(
                     inflater,
                     parent,
@@ -42,7 +42,7 @@ class PhotosBrowseAdapter constructor(
                 )
         }
 
-        if (viewType == PhotoNode.TYPE_PHOTO && itemDimen > 0) {
+        if (viewType == PhotoNodeItem.TYPE_PHOTO && itemDimen > 0) {
             setItemLayoutParams(binding)
             // FastScroller would affect the normal process of RecyclerView that makes the "selected"
             // icon appear before binding the item. Therefore, hide the icon up front
@@ -63,12 +63,12 @@ class PhotosBrowseAdapter constructor(
         holder.bind(viewModel, actionModeViewModel, getItem(position))
     }
 
-    private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNode>() {
-        override fun areItemsTheSame(oldItem: PhotoNode, newItem: PhotoNode): Boolean {
+    private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNodeItem>() {
+        override fun areItemsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
             return oldItem.node?.handle == newItem.node?.handle
         }
 
-        override fun areContentsTheSame(oldItem: PhotoNode, newItem: PhotoNode): Boolean {
+        override fun areContentsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
             if (newItem.uiDirty) {
                 return false
             }
@@ -84,7 +84,7 @@ class PhotosBrowseAdapter constructor(
     fun getSpanSizeLookup(spanCount: Int) = object : GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
             return when (getItem(position).type) {
-                PhotoNode.TYPE_TITLE -> spanCount
+                PhotoNodeItem.TYPE_TITLE -> spanCount
                 else -> 1
             }
         }

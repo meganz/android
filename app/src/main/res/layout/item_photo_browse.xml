@@ -9,15 +9,15 @@
 
         <variable
             name="viewModel"
-            type="mega.privacy.android.app.fragments.photos.PhotosViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.photos.PhotosViewModel" />
 
         <variable
             name="actionModeViewModel"
-            type="mega.privacy.android.app.fragments.photos.ActionModeViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.ActionModeViewModel" />
 
         <variable
             name="item"
-            type="mega.privacy.android.app.fragments.photos.PhotoNode" />
+            type="mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem" />
     </data>
 
     <!-- Caution: don't set to wrap_content, or the grid item size will be messy and
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/photo_grid_margin"
-        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick(item) : actionModeViewModel.onPhotoClick(item))}"
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? viewModel.onItemClick(item) : actionModeViewModel.onPhotoClick(item))}"
         android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
 
         <com.facebook.drawee.view.SimpleDraweeView

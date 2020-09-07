@@ -147,12 +147,13 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fragments.homepage.HomepageFragmentDirections;
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.photos.HomepageSearchable;
-import mega.privacy.android.app.fragments.photos.NodesChangeNotifierKt;
-import mega.privacy.android.app.fragments.photos.PhotosFragment;
+import mega.privacy.android.app.fragments.homepage.NodesChangeNotifierKt;
+import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -176,7 +177,6 @@ import mega.privacy.android.app.lollipop.managerSections.CreditCardFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
@@ -4952,11 +4952,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case SEARCH:{
 				aB.setSubtitle(null);
-				if(textsearchQuery){
-					if (getSearchFragment() != null) {
-						sFLol.setAllowedMultiselect(true);
-					}
-				}
 				if(parentHandleSearch==-1){
 					firstNavigationLevel = true;
 					if(searchQuery!=null){
@@ -6539,17 +6534,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						mHomepageSearchable.searchQuery(searchQuery);
 					}
 				} else {
-					getSearchFragment();
 					if (textSubmitted) {
-						if (sFLol != null) {
-							sFLol.setAllowedMultiselect(true);
-						}
 						textSubmitted = false;
 					} else {
 						if (!textsearchQuery) {
 							searchQuery = newText;
 						}
-						if (sFLol != null) {
+						if (getSearchFragment() != null) {
 							sFLol.newSearchNodesTask();
 						}
 					}
@@ -11094,6 +11085,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (fullscreenOfflineFragment != null) {
 			fullscreenOfflineFragment.setOrder(orderCloud);
 		}
+
+		NodesChangeNotifierKt.notifyOrderChange(orderCloud);
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){

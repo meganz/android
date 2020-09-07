@@ -57,6 +57,9 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
 
     static void updateThumbnailDisplay(SimpleDraweeView thumbnail, CuNode node,
             CuItemSizeConfig itemSizeConfig) {
+        // force set the thumbnail visible, in case FullscreenImageViewer/AudioVideoPlayer
+        // doesn't call setVisibility when dismissed
+        thumbnail.setVisibility(View.VISIBLE);
         if (node.getThumbnail() != null) {
             thumbnail.setImageURI(Uri.fromFile(node.getThumbnail()));
         } else {

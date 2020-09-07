@@ -14,16 +14,16 @@
         <import type="mega.privacy.android.app.utils.OfflineUtils" />
 
         <variable
-            name="viewModel"
-            type="mega.privacy.android.app.fragments.photos.PhotosViewModel" />
+            name="itemOperation"
+            type="mega.privacy.android.app.fragments.homepage.ItemOperation" />
 
         <variable
             name="actionModeViewModel"
-            type="mega.privacy.android.app.fragments.photos.ActionModeViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.ActionModeViewModel" />
 
         <variable
             name="item"
-            type="mega.privacy.android.app.fragments.photos.PhotoNode" />
+            type="mega.privacy.android.app.fragments.homepage.NodeItem" />
 
         <variable
             name="megaApi"
@@ -32,9 +32,10 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:layout_marginTop="1dp"
         android:layout_height="72dp"
         android:background="@{item.selected ? @color/new_multiselect_color : @color/transparent}"
-        android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? viewModel.onPhotoClick(item) : actionModeViewModel.onPhotoClick(item)}"
+        android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperation.onItemClick(item) : actionModeViewModel.onPhotoClick(item)}"
         android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
 
         <ImageView
@@ -51,32 +52,34 @@
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"
             android:layout_width="36dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="18dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
             android:scaleType="fitCenter"
-            app:roundedCornerRadius="2dp"
-            app:placeholderImage="@drawable/ic_image_thumbnail"
+            app:item_selected="@{item.selected}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
-            app:item_selected="@{item.selected}"
+            app:roundedCornerRadius="2dp"
             app:thumbnail="@{item.thumbnail}"
             tools:src="@drawable/ic_image_thumbnail" />
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="16dp"
             android:ellipsize="middle"
             android:singleLine="true"
             android:text="@{item.node.name}"
             android:textColor="@color/file_list_first_row"
             android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@id/thumbnail"
+            app:layout_constraintEnd_toStartOf="@id/guideline"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@+id/thumbnail"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_default="wrap"
             tools:text="2020-05-25 22.30.21.jpg" />
 
         <ImageView
@@ -85,7 +88,6 @@
             android:layout_height="16dp"
             android:layout_marginStart="3dp"
             android:layout_marginTop="6dp"
-            android:layout_marginEnd="6dp"
             android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
@@ -99,9 +101,9 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="6dp"
             android:src="@drawable/ic_input_warning"
-            app:visibleGone="@{item.node.takenDown}"
             app:layout_constraintStart_toEndOf="@id/name"
             app:layout_constraintTop_toTopOf="@id/name"
+            app:visibleGone="@{item.node.takenDown}"
             tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -119,10 +121,10 @@
                 android:alpha="0.76"
                 android:background="@null"
                 android:src="@drawable/ic_versions_small"
-                app:visibleGone="@{megaApi.hasVersions(item.node)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:visibleGone="@{megaApi.hasVersions(item.node)}" />
 
             <TextView
                 android:id="@+id/node_info"
@@ -143,12 +145,19 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@null"
-            android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? viewModel.showFileInfo(item) : actionModeViewModel.onPhotoClick(item)}"
+            android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperation.showNodeItemOptions(item) : actionModeViewModel.onPhotoClick(item)}"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_dots_vertical_grey"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="100dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -37,12 +37,12 @@ import mega.privacy.android.app.R.string
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
-import mega.privacy.android.app.fragments.photos.EventObserver
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageFragmentDirections
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
-import mega.privacy.android.app.lollipop.managerSections.HomepageFragmentDirections
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -50,6 +50,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -419,10 +424,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             }
             mime.isImage -> {
                 val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-                intent.putExtra("position", position)
+                intent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
-                intent.putExtra("parentNodeHandle", INVALID_HANDLE)
-                intent.putExtra("offlinePathDirectory", file.parent)
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
+                intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
                 val screenPosition = getThumbnailScreenPosition(position)
                 if (screenPosition != null) {
                     intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
@@ -458,11 +463,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.node.name)
-                mediaIntent.putExtra("path", file.absolutePath)
+                mediaIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
-                mediaIntent.putExtra("position", position)
-                mediaIntent.putExtra("parentNodeHandle", INVALID_HANDLE)
-                mediaIntent.putExtra("offlinePathDirectory", file.parent)
+                mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
+                mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
+                mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
                 val screenPosition = getThumbnailScreenPosition(position)
                 if (screenPosition != null) {
                     mediaIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
@@ -530,8 +535,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
-                pdfIntent.putExtra("path", file.absolutePath)
-                pdfIntent.putExtra("pathNavigation", viewModel.path)
+                pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
+                pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
                 val screenPosition = getThumbnailScreenPosition(position)
                 if (screenPosition != null) {
                     pdfIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)

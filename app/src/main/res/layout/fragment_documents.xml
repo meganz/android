@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="mega.privacy.android.app.fragments.homepage.photos.PhotosViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.documents.DocumentsViewModel" />
 
         <variable
             name="actionModeViewModel"
@@ -34,7 +34,7 @@
             tools:visibility="visible" />
 
         <mega.privacy.android.app.components.NewGridRecyclerView
-            android:id="@+id/photo_list"
+            android:id="@+id/document_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:columnWidth="@dimen/photo_item_width"

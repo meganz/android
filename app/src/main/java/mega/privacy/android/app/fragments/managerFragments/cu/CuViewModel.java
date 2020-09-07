@@ -65,6 +65,7 @@ class CuViewModel extends BaseRxViewModel {
     private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
 
     private long[] mSearchDate;
+    private int mRealNodeCount;
 
     @Inject
     public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, MegaNodeRepo repo,
@@ -204,11 +205,7 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     public int getRealNodesCount() {
-        List<CuNode> nodes = mCuNodes.getValue();
-        if (nodes == null || nodes.isEmpty()) {
-            return 0;
-        }
-        return nodes.get(nodes.size() - 1).getIndex();
+        return mRealNodeCount;
     }
 
     public void selectAll() {
@@ -362,8 +359,9 @@ class CuViewModel extends BaseRxViewModel {
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
 
         LocalDate lastModifyDate = null;
-        int index = 0;
-        for (MegaNode node : mRepo.getCuChildren(mType, orderBy, mSearchDate)) {
+        List<Pair<Integer, MegaNode>> realNodes = mRepo.getCuChildren(mType, orderBy, mSearchDate);
+        for (Pair<Integer, MegaNode> pair : realNodes) {
+            MegaNode node = pair.second;
             File thumbnail =
                     new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
@@ -375,15 +373,15 @@ class CuViewModel extends BaseRxViewModel {
                 nodes.add(new CuNode(null, -1, null, CuNode.TYPE_TITLE, dateString, false));
             }
 
-            nodes.add(new CuNode(node, index, thumbnail.exists() ? thumbnail : null,
+            nodes.add(new CuNode(node, pair.first, thumbnail.exists() ? thumbnail : null,
                     isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE, dateString,
                     mSelectedNodes.containsKey(node.getHandle())));
-            index++;
 
             if (!thumbnail.exists()) {
                 nodesWithoutThumbnail.add(node);
             }
         }
+        mRealNodeCount = realNodes.size();
 
         for (MegaNode node : nodesWithoutThumbnail) {
             File thumbnail =
