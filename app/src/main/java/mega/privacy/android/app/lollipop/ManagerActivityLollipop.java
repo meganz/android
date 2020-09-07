@@ -4380,23 +4380,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						emailError = comparedToCurrentEmail(value, managerActivity);
 					}
 					if (emailError != null) {
-//						inputMail.setError(emailError);
 						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					} else if (valueFirstName.equals("") || valueFirstName.isEmpty()) {
 						logWarning("First name input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
 						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
+						textError_firtName.setText(R.string.error_enter_username);
 						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					} else if (valueLastName.equals("") || valueLastName.isEmpty()) {
 						logWarning("Last name input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
 						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
+                        textError_lastName.setText(R.string.error_enter_userlastname);
 						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					} else {
@@ -4538,7 +4535,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					emailError = comparedToCurrentEmail(value, managerActivity);
 				}
 				if (emailError != null) {
-//					inputMail.setError(emailError);
 					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
@@ -4546,17 +4542,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					logWarning("Input is empty");
-//					inputFirstName.setError(getString(R.string.invalid_string));
 					inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError_firtName.setText(getString(R.string.invalid_string));
+                    textError_firtName.setText(R.string.error_enter_username);
 					error_layout_firtName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
 				}
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
 					logWarning("Input is empty");
-//					inputLastName.setError(getString(R.string.invalid_string));
 					inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError_lastName.setText(getString(R.string.invalid_string));
+                    textError_lastName.setText(R.string.error_enter_userlastname);
 					error_layout_lastName.setVisibility(View.VISIBLE);
 					inputLastName.requestFocus();
 				}
