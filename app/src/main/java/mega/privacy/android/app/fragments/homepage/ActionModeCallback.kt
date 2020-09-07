@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage.photos
+package mega.privacy.android.app.fragments.homepage
 
 import android.content.Context
 import android.view.Menu

@@ -5,6 +5,8 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -15,19 +17,19 @@ class PhotoViewHolder(private val binding: ViewDataBinding) :
     lateinit var megaApi: MegaApiAndroid
 
     fun bind(
-        viewModel: PhotosViewModel,
         actionModeViewModel: ActionModeViewModel,
+        itemOperationViewModel: ItemOperationViewModel?,
         item: PhotoNodeItem
     ) {
         binding.apply {
             when (this) {
                 is ItemPhotoBrowseBinding -> {
-                    this.viewModel = viewModel
                     this.actionModeViewModel = actionModeViewModel
+                    this.itemOperationViewModel = itemOperationViewModel
                     this.item = item
                 }
                 is ItemNodeListBinding -> {
-                    this.itemOperation = viewModel
+                    this.itemOperationViewModel = itemOperationViewModel
                     this.actionModeViewModel = actionModeViewModel
                     this.item = item
                     this.megaApi = megaApi

@@ -260,20 +260,21 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
 
     private void showConfirmLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        megaApi.logout();
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        break;
-                }
-
-                dialog.dismiss();
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    /*
+                       If the account is trying to login,
+                       at this stage should set isLoggingRunning as `false` to indicate the login process is ended.
+                     */
+                    MegaApplication.getInstance().setIsLoggingRunning(false);
+                    megaApi.logout();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    break;
             }
+
+            dialog.dismiss();
         };
         String message = getString(R.string.confirm_logout_from_sms_verification);
         builder.setCancelable(true)

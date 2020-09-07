@@ -1,28 +1,19 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.fragments.homepage.ItemOperation
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.nodesChange
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.*
 
 class PhotosViewModel @ViewModelInject constructor(
-    private val photosRepository: PhotosRepository
-) : ViewModel(), ItemOperation {
+    private val repository: TypedFilesRepository
+) : ViewModel() {
 
     private var _query = MutableLiveData<String>("")
-
-    private val _openPhotoEvent = MutableLiveData<Event<PhotoNodeItem>>()
-    val openPhotoEventItem: LiveData<Event<PhotoNodeItem>> = _openPhotoEvent
-
-    private val _showNodeOptionsEvent = MutableLiveData<Event<NodeItem>>()
-    val showNodeItemOptionsEvent: LiveData<Event<NodeItem>> = _showNodeOptionsEvent
 
     var searchMode = false
     var searchQuery = ""
@@ -30,29 +21,40 @@ class PhotosViewModel @ViewModelInject constructor(
     private var forceUpdate = false
     private var ignoredFirst = false
 
+    // Whether a photo loading is in progress
+    private var loadInProgress = false
+    // Whether another photo loading should be executed after current loading
+    private var pendingLoad = false
+
     val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
-        viewModelScope.launch {
-            photosRepository.getPhotos(forceUpdate)
+        if (forceUpdate) {
+            viewModelScope.launch {
+                repository.getFiles(NODE_PHOTO, ORDER_MODIFICATION_DESC)
+            }
+        } else {
+            repository.emitFiles()
         }
 
-        photosRepository.photoNodesItem
-    }.map { nodes ->
+        repository.fileNodeItems
+    }.map { it ->
+        @Suppress("UNCHECKED_CAST")
+        val items = it as List<PhotoNodeItem>
         var index = 0
         var photoIndex = 0
-        var filteredNodes = nodes
-
-        if (!TextUtil.isTextEmpty(_query.value)) {
-            filteredNodes = nodes.filter {
-                it.node?.name?.contains(
-                    _query.value!!,
-                    true
-                ) ?: false
-            }
-        }
+        var filteredNodes = items
 
         if (searchMode) {
             filteredNodes = filteredNodes.filter {
                 it.type == PhotoNodeItem.TYPE_PHOTO
+            }
+        }
+
+        if (!TextUtil.isTextEmpty(_query.value)) {
+            filteredNodes = items.filter {
+                it.node?.name?.contains(
+                    _query.value!!,
+                    true
+                ) ?: false
             }
         }
 
@@ -77,9 +79,18 @@ class PhotosViewModel @ViewModelInject constructor(
         }
     }
 
+    private val loadFinishedObserver = Observer<List<PhotoNodeItem>> {
+        loadInProgress = false
+
+        if (pendingLoad) {
+            loadPhotos(true)
+        }
+    }
+
     init {
-        loadPhotos(true)
+        items.observeForever(loadFinishedObserver)
         nodesChange.observeForever(nodesChangeObserver)
+        loadPhotos(true)
     }
 
     /**
@@ -89,25 +100,28 @@ class PhotosViewModel @ViewModelInject constructor(
      */
     fun loadPhotos(forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
-        _query.value = searchQuery
+
+        if (loadInProgress) {
+            pendingLoad = true
+        } else {
+            pendingLoad = false
+            loadInProgress = true
+            _query.value = searchQuery
+        }
     }
 
     /**
      * Make the list adapter to rebind all item views with data since
-     * the underlying data may have been changed.
+     * the underlying meta data of items may have been changed.
      */
     fun refreshUi() {
-        items.value?.forEach {photoNode ->
-            photoNode.uiDirty = true
+        items.value?.forEach {item ->
+            item.uiDirty = true
         }
         loadPhotos()
     }
 
-    override fun onItemClick(item: NodeItem) {
-        _openPhotoEvent.value = Event(item as PhotoNodeItem)
-    }
-
-    fun getRealNodeCount(): Int {
+    fun getRealPhotoCount(): Int {
         items.value?.filter { it.type == PhotoNodeItem.TYPE_PHOTO }?.let {
             return it.size
         }
@@ -117,7 +131,7 @@ class PhotosViewModel @ViewModelInject constructor(
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getNodePositionByHandle(handle: Long): Int {
+    fun getItemPositionByHandle(handle: Long): Int {
         return items.value?.find {
             it.node?.handle == handle
         }?.index ?: INVALID_POSITION
@@ -131,11 +145,8 @@ class PhotosViewModel @ViewModelInject constructor(
         return list?.toLongArray()
     }
 
-    override fun showNodeOptionsInfo(item: NodeItem) {
-        _showNodeOptionsEvent.value = Event(item)
-    }
-
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)
+        items.removeObserver(loadFinishedObserver)
     }
 }

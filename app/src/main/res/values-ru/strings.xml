@@ -104,7 +104,7 @@
 
     <string name="action_settings" context="Menu item">Настройки</string>
     <string name="action_search" context="Search button">Поиск</string>
-    <string name="action_search_country" context="Select country page title">Выберите страну</string>
+    <string name="action_search_country" context="Select country page title">Выберите регион</string>
     <string name="action_play" context="Search button">Проиграть</string>
     <string name="action_pause" context="Search button">Пауза</string>
     <string name="action_refresh" context="Menu item">Обновить</string>
@@ -724,8 +724,8 @@
     <string name="general_back_button" context="Button label - go to previous page">Назад</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Не сейчас</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Подтвердить</string>
-	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Пожалуйста, выберите код страны</string>
-    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Коды стран не могут быть получены.</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Пожалуйста, выберите код региона</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Коды регионов не могут быть получены.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Пожалуйста, укажите действительный номер телефона.</string>
 	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Пожалуйста, введите отправленный проверочный код</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Подтвердить аккаунт</string>
@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">Просмотр файлов</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Импортировать</string>
-    <string name="save_for_offline" context="Menu option">Сохранить локально</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">Сохранить локально</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Добавить на облачный диск</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">Сохранить локально</string>
 
@@ -2788,6 +2788,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Лучше всего это сделать в реальной жизни, встречаясь лицом к лицу. Если у вас есть другой проверенный канал, например, проверенный OTR или PGP, вы также можете его использовать.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Ваши Учетные Данные</string>
     <string name="action_reset" context="Button to reset credentials">Сбросить</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Удалить ваш номер телефона?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Номер телефона успешно удалён.</string>
