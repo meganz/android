@@ -12,19 +12,23 @@ import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import nz.mega.sdk.MegaPricing
 
 class DocumentsAdapter constructor(
-    private val viewModel: DocumentsViewModel,
-    private val actionModeViewModel: ActionModeViewModel
+    private val actionModeViewModel: ActionModeViewModel,
+    private val itemOperationViewModel: ItemOperationViewModel,
+    private val sortByHeaderViewModel: SortByHeaderViewModel
 ) : ListAdapter<NodeItem, DocumentViewHolder>(PhotoDiffCallback()),
     SectionTitleProvider {
 
     private var itemDimen = 0
 
     override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            0 -> TYPE_HEADER
+        return when (getItem(position).node) {
+            null -> TYPE_HEADER
             else -> TYPE_ITEM
         }
     }
@@ -65,7 +69,12 @@ class DocumentsAdapter constructor(
     }
 
     override fun onBindViewHolder(holder: DocumentViewHolder, position: Int) {
-        holder.bind(viewModel, actionModeViewModel, getItem(position))
+        holder.bind(
+            actionModeViewModel,
+            itemOperationViewModel,
+            sortByHeaderViewModel,
+            getItem(position)
+        )
     }
 
     private class PhotoDiffCallback : DiffUtil.ItemCallback<NodeItem>() {

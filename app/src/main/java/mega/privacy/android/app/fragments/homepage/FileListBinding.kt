@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage.photos
+package mega.privacy.android.app.fragments.homepage
 
 import android.content.Context
 import android.net.Uri
@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.homepage.photos.PhotoViewHolder
+import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter
 import mega.privacy.android.app.utils.Util
 import java.io.File
 
@@ -17,7 +18,7 @@ import java.io.File
 @BindingAdapter("items")
 fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
     items?.let {
-        (listView.adapter as ListAdapter<NodeItem, PhotoViewHolder>).submitList(it)
+        (listView.adapter as ListAdapter<NodeItem, RecyclerView.ViewHolder>).submitList(it)
     }
 }
 

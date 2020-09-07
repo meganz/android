@@ -3,7 +3,6 @@ package mega.privacy.android.app.fragments.homepage.documents
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
@@ -11,6 +10,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 
 class DocumentsViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
@@ -18,6 +18,7 @@ class DocumentsViewModel @ViewModelInject constructor(
 
     private var _query = MutableLiveData<String>("")
 
+    private var order: Int = ORDER_DEFAULT_ASC
     var searchMode = false
     var listMode = true   // false for grid mode
     var searchQuery = ""
@@ -28,7 +29,7 @@ class DocumentsViewModel @ViewModelInject constructor(
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_DOCUMENT)
+                repository.getFiles(MegaApiJava.NODE_DOCUMENT, order)
             }
         } else {
             repository.emitFiles()
@@ -69,7 +70,7 @@ class DocumentsViewModel @ViewModelInject constructor(
     }
 
     init {
-        loadDocuments(true)
+//        loadDocuments(true, order)
         nodesChange.observeForever(nodesChangeObserver)
     }
 
@@ -78,8 +79,9 @@ class DocumentsViewModel @ViewModelInject constructor(
      * @param forceUpdate True if retrieve all nodes by calling API
      * , false if filter current nodes by searchQuery
      */
-    fun loadDocuments(forceUpdate: Boolean = false) {
+    fun loadDocuments(forceUpdate: Boolean = false, order: Int = this.order) {
         this.forceUpdate = forceUpdate
+        this.order = order
         _query.value = searchQuery
     }
 

@@ -6,8 +6,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.NODE_PHOTO
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.*
 
 class PhotosViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
@@ -29,7 +29,7 @@ class PhotosViewModel @ViewModelInject constructor(
     val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(NODE_PHOTO)
+                repository.getFiles(NODE_PHOTO, ORDER_MODIFICATION_DESC)
             }
         } else {
             repository.emitFiles()
@@ -43,18 +43,18 @@ class PhotosViewModel @ViewModelInject constructor(
         var photoIndex = 0
         var filteredNodes = items
 
+        if (searchMode) {
+            filteredNodes = filteredNodes.filter {
+                it.type == PhotoNodeItem.TYPE_PHOTO
+            }
+        }
+
         if (!TextUtil.isTextEmpty(_query.value)) {
             filteredNodes = items.filter {
                 it.node?.name?.contains(
                     _query.value!!,
                     true
                 ) ?: false
-            }
-        }
-
-        if (searchMode) {
-            filteredNodes = filteredNodes.filter {
-                it.type == PhotoNodeItem.TYPE_PHOTO
             }
         }
 

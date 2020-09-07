@@ -93,7 +93,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
-        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -169,18 +168,18 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(context, actionModeViewModel, megaApi)
 
-        observePhotoLongClick()
-        observeSelectedPhotos()
-        observeAnimatedPhotos()
+        observeItemLongClick()
+        observeSelectedItems()
+        observeAnimatedItems()
         observeActionModeDestroy()
     }
 
-    private fun observePhotoLongClick() =
+    private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { actionModeViewModel.enterActionMode(it) }
         })
 
-    private fun observeSelectedPhotos() =
+    private fun observeSelectedItems() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()) {
                 actionMode?.apply {
@@ -202,7 +201,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             }
         })
 
-    private fun observeAnimatedPhotos() {
+    private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
         actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {

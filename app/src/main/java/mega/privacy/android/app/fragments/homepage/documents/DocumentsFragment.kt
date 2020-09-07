@@ -34,6 +34,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     private val viewModel by viewModels<DocumentsViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
+    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
     private lateinit var binding: FragmentDocumentsBinding
 
@@ -101,6 +102,19 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { activity.showNodeOptionsPanel(it.node) }
         })
+
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            activity.showNewSortByPanel()
+        })
+
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            adapter.notifyItemChanged(POSITION_HEADER)
+            viewModel.loadDocuments(true, it)
+        })
+
+        sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            adapter.notifyItemChanged(POSITION_HEADER)
+        })
     }
 
     /**
@@ -136,18 +150,18 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(context, actionModeViewModel, megaApi)
 
-        observeDocLongClick()
-        observeSelectedDocs()
-        observeAnimatedDocs()
+        observeItemLongClick()
+        observeSelectedItems()
+        observeAnimatedItems()
         observeActionModeDestroy()
     }
 
-    private fun observeDocLongClick() =
+    private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { actionModeViewModel.enterActionMode(it) }
         })
 
-    private fun observeSelectedDocs() =
+    private fun observeSelectedItems() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()) {
                 actionMode?.apply {
@@ -171,7 +185,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
             }
         })
 
-    private fun observeAnimatedDocs() {
+    private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
         actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {
@@ -209,8 +223,8 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
 //                    val imageView = if (viewModel.listMode) {
-                        itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
-                        val imageView = itemView.findViewById<ImageView>(R.id.thumbnail)
+                    itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                    val imageView = itemView.findViewById<ImageView>(R.id.thumbnail)
 //                    } else {
 //                        // Draw the green outline for the thumbnail view at once
 //                        val thumbnailView =
@@ -248,7 +262,8 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
-        adapter = DocumentsAdapter(viewModel, actionModeViewModel)
+        adapter =
+            DocumentsAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 listView.linearLayoutManager?.scrollToPosition(0)
@@ -296,5 +311,9 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         if (viewModel.searchQuery == query) return
         viewModel.searchQuery = query
         viewModel.loadDocuments()
+    }
+
+    companion object {
+        private const val POSITION_HEADER = 0
     }
 }

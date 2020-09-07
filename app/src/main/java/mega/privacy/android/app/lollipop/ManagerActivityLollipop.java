@@ -152,7 +152,7 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.homepage.NodesChangeNotifierKt;
+import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
@@ -2099,6 +2099,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		logDebug("Preferred View List: " + isList);
 
+		EventNotifierKt.notifyListGridChange(isList);
+
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
 				orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
@@ -2137,6 +2139,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			orderContacts = ORDER_DEFAULT_ASC;
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
+
+		EventNotifierKt.notifyOrderChange(orderCloud);
 
 		handler = new Handler();
 
@@ -7471,6 +7475,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             dbH.setPreferredViewList(isList);
         }
 
+        EventNotifierKt.notifyListGridChange(this.isList);
+
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
 
@@ -7565,7 +7571,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
 		} else if (drawerItem == DrawerItem.HOMEPAGE) {
-			NodesChangeNotifierKt.notifyNodesChange(false);
+			EventNotifierKt.notifyNodesChange(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -11038,6 +11044,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void refreshCloudOrder(int newOrderCloud){
 		logDebug("New order: " + newOrderCloud);
 		this.setOrderCloud(newOrderCloud);
+
+		EventNotifierKt.notifyOrderChange(orderCloud);
+
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
 
@@ -11058,8 +11067,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (fullscreenOfflineFragment != null) {
 			fullscreenOfflineFragment.setOrder(orderCloud);
 		}
-
-		NodesChangeNotifierKt.notifyOrderChange(orderCloud);
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){
@@ -11436,7 +11443,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         	sttFLol.taskGetSizeOffline();
                         }
 
-						NodesChangeNotifierKt.notifyNodesChange(false);
+						EventNotifierKt.notifyNodesChange(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -14791,7 +14798,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		NodesChangeNotifierKt.notifyNodesChange(true);
+		EventNotifierKt.notifyNodesChange(true);
 
 		// Invalidate the menu will collapse/expand the search view and set the query text to ""
 		// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -15112,7 +15119,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
-				NodesChangeNotifierKt.notifyNodesChange(false);
+				EventNotifierKt.notifyNodesChange(false);
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
