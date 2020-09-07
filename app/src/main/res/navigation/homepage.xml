@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_homepageFragment_to_documentsFragment"
             app:destination="@id/documentsFragment" />
+        <action
+            android:id="@+id/action_homepageFragment_to_audioFragment"
+            app:destination="@id/audioFragment" />
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
@@ -57,4 +60,8 @@
         android:id="@+id/documentsFragment"
         android:name="mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment"
         android:label="DocumentsFragment" />
+    <fragment
+        android:id="@+id/audioFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.audio.AudioFragment"
+        android:label="AudioFragment" />
 </navigation>

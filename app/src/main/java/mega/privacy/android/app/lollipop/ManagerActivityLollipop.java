@@ -597,7 +597,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 	private enum HomepageScreen {
-       	HOMEPAGE, PHOTOS,
+       	HOMEPAGE, PHOTOS, DOCUMENTS, AUDIO,
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO,
 	}
 
@@ -5012,8 +5012,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case HOMEPAGE: {
 				setFirstNavigationLevel(false);
-				if (mHomepageScreen == HomepageScreen.PHOTOS) {
-					aB.setTitle((getString(R.string.category_photos)));
+				switch (mHomepageScreen) {
+					case PHOTOS:
+						aB.setTitle((getString(R.string.category_photos)));
+						break;
+					case DOCUMENTS:
+						aB.setTitle((getString(R.string.category_documents)));
+						break;
+					case AUDIO:
+						aB.setTitle((getString(R.string.category_audio)));
+						break;
+					default:
+						break;
 				}
 			}
 			default:{
@@ -5742,6 +5752,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					return;
 				case R.id.photosFragment:
 					mHomepageScreen = HomepageScreen.PHOTOS;
+					break;
+				case R.id.documentsFragment:
+					mHomepageScreen = HomepageScreen.DOCUMENTS;
+					break;
+				case R.id.audioFragment:
+					mHomepageScreen = HomepageScreen.AUDIO;
 					break;
 				case R.id.fullscreen_offline:
 					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;

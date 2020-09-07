@@ -82,7 +82,9 @@ class HomepageFragment : Fragment() {
         with(viewDataBinding.category) {
             val direction = when (it) {
                 categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
-                else -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
+                categoryDocument -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
+                categoryAudio -> HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
+                else -> return@with
             }
 
             findNavController().navigate(direction)
@@ -135,6 +137,10 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showOnlineMode() {
+        if (!this::viewPager.isInitialized) {
+            return
+        }
+
         viewPager.isUserInputEnabled = true
         rootView.findViewById<View>(R.id.category).isVisible = true
         //rootView.findViewById<View>(R.id.banner).isVisible = true
@@ -145,6 +151,10 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showOfflineMode() {
+        if (!this::viewPager.isInitialized) {
+            return
+        }
+
         viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
         viewPager.isUserInputEnabled = false
         rootView.findViewById<View>(R.id.category).isVisible = false
@@ -213,6 +223,7 @@ class HomepageFragment : Fragment() {
     private fun setupCategories() {
         viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryAudio.setOnClickListener(categoryClickListener)
     }
 
     private fun getTabTitle(position: Int): String? {
