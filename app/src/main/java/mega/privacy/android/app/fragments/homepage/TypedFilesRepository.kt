@@ -84,14 +84,16 @@ class TypedFilesRepository @Inject constructor(
                     request: MegaRequest?,
                     e: MegaError?
                 ) {
-                    request?.let {
-                        fileNodesMap[it.nodeHandle]?.apply {
-                            thumbnail = thumbFile.absoluteFile
-                            uiDirty = true
+                    if (e?.errorCode == MegaError.API_OK) {
+                        request?.let {
+                            fileNodesMap[it.nodeHandle]?.apply {
+                                thumbnail = thumbFile.absoluteFile
+                                uiDirty = true
+                            }
                         }
-                    }
 
-                    refreshLiveData()
+                        refreshLiveData()
+                    }
                 }
             })
 

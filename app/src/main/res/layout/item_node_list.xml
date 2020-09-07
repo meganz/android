@@ -13,6 +13,8 @@
 
         <import type="mega.privacy.android.app.utils.OfflineUtils" />
 
+        <import type="mega.privacy.android.app.MimeTypeList" />
+
         <variable
             name="itemOperationViewModel"
             type="mega.privacy.android.app.fragments.homepage.ItemOperationViewModel" />
@@ -62,6 +64,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:roundedCornerRadius="2dp"
             app:thumbnail="@{item.thumbnail}"
+            app:placeholder_icon="@{MimeTypeList.typeForName(item.node.name).iconResourceId}"
             tools:src="@drawable/ic_image_thumbnail" />
 
         <TextView

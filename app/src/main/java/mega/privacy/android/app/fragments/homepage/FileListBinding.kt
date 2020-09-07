@@ -39,17 +39,17 @@ fun setThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
     }
 }
 
-@BindingAdapter("thumbnail", "item_selected")
-fun setSearchThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
+@BindingAdapter("thumbnail", "placeholder_icon", "item_selected")
+fun setSearchThumbnail(imageView: SimpleDraweeView, file: File?, placeholderIcon: Int, selected: Boolean) {
     with(imageView) {
         if (selected) {
             setActualImageResource(R.drawable.ic_select_folder)
         } else {
-            if (file == null) setImageResource(R.drawable.ic_image_thumbnail) else setImageURI(
-                Uri.fromFile(
-                    file
-                )
-            )
+            if (file == null) {
+                setImageResource(placeholderIcon)
+            } else {
+                setImageURI(Uri.fromFile(file))
+            }
         }
     }
 }
