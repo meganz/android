@@ -13,8 +13,7 @@ import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.NODE_PHOTO
-import nz.mega.sdk.MegaApiJava.TARGET_ROOTNODES
+import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode.TYPE_RUBBISH
 import okhttp3.Dispatcher
 import java.io.File
@@ -27,8 +26,8 @@ class TypedFilesRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context
 ) {
-    private var order = MegaApiJava.ORDER_MODIFICATION_DESC
-    private var type: Int = MegaApiJava.NODE_UNKNOWN
+    private var order = ORDER_DEFAULT_ASC
+    private var type = NODE_UNKNOWN
 
     // LinkedHashMap guarantees that the index order of elements is consistent with
     // the order of putting. Moreover, it has a quick element search[O(1)] (for
@@ -40,9 +39,8 @@ class TypedFilesRepository @Inject constructor(
 
     private val _fileNodeItems = MutableLiveData<List<NodeItem>>()
     val fileNodeItems: LiveData<List<NodeItem>> = _fileNodeItems
-//    private val counterContext = newSingleThreadContext("CounterContext")
 
-    suspend fun getFiles(type: Int, order: Int = MegaApiJava.ORDER_MODIFICATION_DESC) {
+    suspend fun getFiles(type: Int, order: Int) {
         this.type = type
         this.order = order
 
@@ -120,11 +118,16 @@ class TypedFilesRepository @Inject constructor(
         var lastModifyDate: LocalDate? = null
         var mapKeyTitle = Long.MIN_VALUE
 
+        if (type != NODE_PHOTO) {
+            fileNodesMap[INVALID_HANDLE] = NodeItem()   // "Sort by" header
+        }
+
         for (node in getMegaNodes()) {
             val thumbnail = getThumbnail(node)
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
 
+            // Photo "Month-Year" section headers
             if (type == NODE_PHOTO && (lastModifyDate == null
                         || YearMonth.from(lastModifyDate) != YearMonth.from(
                     modifyDate
@@ -166,7 +169,7 @@ class TypedFilesRepository @Inject constructor(
         return megaApi.searchByType(
             null, null, null,
             true, order, type, TARGET_ROOTNODES
-        ).filter { node -> !megaApi.isInRubbish(node)}
+        )
     }
 
     companion object {
