@@ -206,6 +206,10 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         binding.avatarContainer.setOnClickListener(listener)
     }
 
+    fun setOnSearchInputClickListener(listener: OnClickListener) {
+        binding.searchInput.setOnClickListener(listener)
+    }
+
     private fun initDrawables() {
         menuBtnDrawable = BadgeDrawerArrowDrawable(context)
         menuBtnDrawable?.backgroundColor =
