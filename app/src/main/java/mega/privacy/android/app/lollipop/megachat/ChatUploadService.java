@@ -720,8 +720,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							else{
 								individualProgressPercent = 100;
 							}
-						}
-						else{
+						} else if (individualTotalBytes > 0) {
 							if(MimeTypeList.typeForName(currentTransfer.getFileName()).isMp4Video()){
 								individualProgressPercent = individualInProgress*50 / individualTotalBytes;
 							}
