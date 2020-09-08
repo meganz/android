@@ -78,22 +78,26 @@ class TypedFilesRepository @Inject constructor(
         return if (thumbFile.exists()) {
             thumbFile
         } else {
-            megaApi.getThumbnail(node, thumbFile.absolutePath, object : BaseListener(context) {
-                override fun onRequestFinish(
-                    api: MegaApiJava?,
-                    request: MegaRequest?,
-                    e: MegaError?
-                ) {
-                    request?.let {
-                        fileNodesMap[it.nodeHandle]?.apply {
-                            thumbnail = thumbFile.absoluteFile
-                            uiDirty = true
-                        }
-                    }
+            if (node.hasThumbnail()) {
+                megaApi.getThumbnail(node, thumbFile.absolutePath, object : BaseListener(context) {
+                    override fun onRequestFinish(
+                        api: MegaApiJava?,
+                        request: MegaRequest?,
+                        e: MegaError?
+                    ) {
+                        if (e?.errorCode != MegaError.API_OK) return
 
-                    refreshLiveData()
-                }
-            })
+                        request?.let {
+                            fileNodesMap[it.nodeHandle]?.apply {
+                                thumbnail = thumbFile.absoluteFile
+                                uiDirty = true
+                            }
+                        }
+
+                        refreshLiveData()
+                    }
+                })
+            }
 
             null
         }
