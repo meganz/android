@@ -367,7 +367,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
             }
 
-            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it))
+            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
 
             setupDraggingThumbnailCallback()
             startActivity(intent)
@@ -394,15 +394,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         notifyThumbnailLocationOnScreen()
     }
 
-    private fun getThumbnailLocationOnScreen(imageView: ImageView): IntArray {
-        val topLeft = IntArray(2)
-        imageView.getLocationOnScreen(topLeft)
-        return intArrayOf(topLeft[0], topLeft[1], imageView.width, imageView.height)
-    }
-
     private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
         val thumbnailView = getThumbnailViewByHandle(draggingPhotoHandle) ?: return null
-        return getThumbnailLocationOnScreen(thumbnailView)
+        return thumbnailView.getLocationAndDimen()
     }
 
     private fun notifyThumbnailLocationOnScreen() {

@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.homepage.documents
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -17,6 +18,7 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
@@ -25,7 +27,11 @@ import mega.privacy.android.app.databinding.FragmentDocumentsBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.FileUtils
 import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
@@ -96,7 +102,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-//            openDoc(it)
+            openDoc(it)
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -311,6 +317,46 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         if (viewModel.searchQuery == query) return
         viewModel.searchQuery = query
         viewModel.loadDocuments()
+    }
+
+    private fun openDoc(nodeItem: NodeItem) {
+        var screenPosition: IntArray? = null
+        val node = nodeItem.node
+
+        val localPath = FileUtils.getLocalFile(context, node?.name, node?.size!!)
+
+        listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
+            R.id.thumbnail
+        )?.let {
+            screenPosition = it.getLocationAndDimen()
+        }
+
+        if (MimeTypeList.typeForName(node.name).isPdf) {
+            val intent = Intent(context, PdfViewerActivityLollipop::class.java)
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.RECENTS_ADAPTER)
+            if (screenPosition != null) intent.putExtra(
+                Constants.INTENT_EXTRA_KEY_SCREEN_POSITION,
+                screenPosition
+            )
+
+            val paramsSetSuccessfully =
+                if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
+                    FileUtils.setLocalIntentParams(context, node, intent, localPath, false)
+                } else {
+                    FileUtils.setStreamingIntentParams(context, node, megaApi, intent)
+                }
+
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
+
+            if (paramsSetSuccessfully) {
+                context.startActivity(intent)
+                (context as ManagerActivityLollipop).overridePendingTransition(0, 0)
+                return
+            }
+        }
+
+        NodeController(context).prepareForDownload(arrayListOf(node.handle), true)
     }
 
     companion object {
