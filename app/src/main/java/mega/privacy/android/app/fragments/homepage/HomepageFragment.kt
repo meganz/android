@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -27,24 +26,21 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_homepage.view.fab_home_main
-import kotlinx.android.synthetic.main.homepage_fabs.view.fab_chat
-import kotlinx.android.synthetic.main.homepage_fabs.view.fab_main
-import kotlinx.android.synthetic.main.homepage_fabs.view.fab_upload
-import kotlinx.android.synthetic.main.homepage_fabs.view.text_chat
-import kotlinx.android.synthetic.main.homepage_fabs.view.text_upload
+import kotlinx.android.synthetic.main.fragment_homepage.view.*
+import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
-import mega.privacy.android.app.utils.Constants.GO_OFFLINE
-import mega.privacy.android.app.utils.Constants.GO_ONLINE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ACTION_TYPE
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -191,6 +187,9 @@ class HomepageFragment : Fragment() {
 
         searchInputView.setAvatarClickListener(
             OnClickListener { activity.showMyAccount() })
+
+        searchInputView.setOnSearchInputClickListener(
+            OnClickListener { activity.homepageToSearch() })
     }
 
     private fun setupBottomSheetUI() {
@@ -309,10 +308,39 @@ class HomepageFragment : Fragment() {
         }
 
         fabChat.setOnClickListener {
+            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            runDelay(FAB_MASK_OUT_DELAY) {
+                openChatActivity()
+            }
         }
 
         fabUpload.setOnClickListener {
+            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            runDelay(FAB_MASK_OUT_DELAY) {
+                showUploadPanel()
+            }
         }
+    }
+
+    private fun openChatActivity() {
+        val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
+            putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+        }
+
+        activity.startActivityForResult(intent, REQUEST_CREATE_CHAT)
+    }
+
+    private fun showUploadPanel() {
+        if (!isOnline(context)) {
+            activity.showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.error_server_connection_problem),
+                INVALID_HANDLE
+            )
+            return
+        }
+
+        activity.showUploadPanel()
     }
 
     private fun fabMainClickCallback(
@@ -325,7 +353,7 @@ class HomepageFragment : Fragment() {
             rotateFab()
             showOut(fabChat, fabUpload, textChat, textUpload)
             // After animation completed, then remove mask.
-            runDelay {
+            runDelay(FAB_MASK_OUT_DELAY) {
                 removeMask()
                 fabMain.visibility = View.VISIBLE
                 isFabExpanded = !isFabExpanded
@@ -334,16 +362,12 @@ class HomepageFragment : Fragment() {
             fabMain.visibility = View.GONE
             addMask()
             // Need to do so, otherwise, fabMaskMain.background is null.
-            Handler().post {
+            post {
                 rotateFab()
                 showIn(fabChat, fabUpload, textChat, textUpload)
                 isFabExpanded = !isFabExpanded
             }
         }
-    }
-
-    private fun runDelay(task: () -> Unit) {
-        Handler().postDelayed(task, FAB_MASK_OUT_DELAY)
     }
 
     private fun showIn(vararg fabs: View) {
@@ -399,6 +423,8 @@ class HomepageFragment : Fragment() {
         view.animate()
             .setDuration(FAB_ANIM_DURATION)
             .translationY(0f)
+            .setListener(object :
+                AnimatorListenerAdapter() {/* No need to override any methods here. */ })
             .alpha(ALPHA_OPAQUE)
             .start()
     }
@@ -424,5 +450,6 @@ class HomepageFragment : Fragment() {
         private const val FAB_DEFAULT_ANGEL = 0f
         private const val FAB_ROTATE_ANGEL = 135f
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
+        private const val KEY_CONTACT_TYPE = "contactType"
     }
 }

@@ -169,7 +169,7 @@ public class SDCardOperator {
         activity.startActivityForResult(intent, Constants.REQUEST_CODE_TREE);
     }
 
-    private static Intent getRequestPermissionIntent(Context context, String sdCardRoot) {
+    public static Intent getRequestPermissionIntent(Context context, String sdCardRoot) {
         Intent intent = null;
         if (isBasedOnFileStorage()) {
             StorageManager sm = context.getSystemService(StorageManager.class);

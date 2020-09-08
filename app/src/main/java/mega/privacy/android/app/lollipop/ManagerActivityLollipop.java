@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -34,6 +35,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.navigation.NavOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
@@ -108,10 +110,13 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -598,6 +603,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	String feedback;
 
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
+
 	private enum HomepageScreen {
        	HOMEPAGE, PHOTOS, DOCUMENTS, AUDIO,
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO,
@@ -5028,18 +5034,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case HOMEPAGE: {
 				setFirstNavigationLevel(false);
+				int titleId = -1;
+
 				switch (mHomepageScreen) {
 					case PHOTOS:
-						aB.setTitle((getString(R.string.category_photos)));
+						titleId = R.string.category_photos;
 						break;
 					case DOCUMENTS:
-						aB.setTitle((getString(R.string.category_documents)));
+						titleId = R.string.category_documents;
 						break;
 					case AUDIO:
-						aB.setTitle((getString(R.string.category_audio)));
+						titleId = R.string.category_audio;
 						break;
-					default:
-						break;
+				}
+
+				if (titleId != -1) {
+					aB.setTitle(getString(titleId));
 				}
 			}
 			default:{
@@ -5745,13 +5755,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void setupNavDestListener() {
 		mNavController = Navigation.findNavController(mNavHostView);
 
-		// TODO: Following code isn't compatible with legacy code, so commented temporarily
-//		AppBarConfiguration appBarConfiguration =
-//				new AppBarConfiguration.Builder(navController.getGraph())
-//						.setOpenableLayout(drawerLayout).build();
-//		NavigationUI.setupWithNavController(
-//				tB, navController, appBarConfiguration);
-
 		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			int destinationId = destination.getId();
 			mHomepageSearchable = null;
@@ -6434,28 +6437,29 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				logDebug("onMenuItemActionExpand");
-				searchQuery = "";
-				searchExpand = true;
-
-				resetActionBar(aB);
-				if (drawerItem == DrawerItem.HOMEPAGE) {
-					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
-						setFullscreenOfflineFragmentSearchQuery(searchQuery);
-					} else if (mHomepageSearchable != null) {
-						mHomepageSearchable.searchReady();
-					}
-				} else {
-					textsearchQuery = false;
-					firstNavigationLevel = true;
-					parentHandleSearch = -1;
-					levelsSearch = -1;
-					setSearchDrawerItem();
-					selectDrawerItemLollipop(drawerItem);
-				}
-
-				hideCallMenuItem();
-				hideCallWidget();
-				return true;
+                searchQuery = "";
+                searchExpand = true;
+                if (drawerItem == DrawerItem.HOMEPAGE) {
+                    if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+                        setFullscreenOfflineFragmentSearchQuery(searchQuery);
+                    } else if (mHomepageSearchable != null) {
+                        mHomepageSearchable.searchReady();
+                    } else {
+                        openSearchOnHomepage();
+                    }
+                } else if (drawerItem != DrawerItem.CHAT) {
+                    textsearchQuery = false;
+                    firstNavigationLevel = true;
+                    parentHandleSearch = -1;
+                    levelsSearch = -1;
+                    setSearchDrawerItem();
+                    selectDrawerItemLollipop(drawerItem);
+                } else {
+                    resetActionBar(aB);
+                }
+                hideCallMenuItem();
+                hideCallWidget();
+                return true;
 			}
 
 			@Override
@@ -6830,7 +6834,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			} else {
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
-					if (mHomepageSearchable instanceof PhotosFragment && isOnline(this)) {
+					if (isOnline(this)) {
 						rubbishBinMenuItem.setVisible(true);
 					}
 				}
@@ -6845,7 +6849,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
+    private void openSearchOnHomepage() {
+        textsearchQuery = false;
+        firstNavigationLevel = true;
+        parentHandleSearch = -1;
+        levelsSearch = -1;
+        setSearchDrawerItem();
+        selectDrawerItemLollipop(drawerItem);
+        resetActionBar(aB);
+    }
+
+    private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
 		if (fullscreenOfflineFragment != null) {
 			fullscreenOfflineFragment.setSearchQuery(searchQuery);
 		}
@@ -7060,35 +7074,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		    }
 			case R.id.action_search:{
 				logDebug("Action search selected");
-				textSubmitted = false;
-				if (createFolderMenuItem != null){
-					upgradeAccountMenuItem.setVisible(false);
-					cancelAllTransfersMenuItem.setVisible(false);
-					clearCompletedTransfers.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					changePass.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					gridSmallLargeMenuItem.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
-					inviteMenuItem.setVisible(false);
-					selectMenuItem.setVisible(false);
-					thumbViewMenuItem.setVisible(false);
-					searchMenuItem.setVisible(false);
-				}
-				return true;
+                hideItemsWhenSearchSelected();
+                return true;
 			}
 		    case R.id.action_import_link:{
 				showOpenLinkDialog();
@@ -7478,6 +7465,37 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             }
 		}
 	}
+
+    private void hideItemsWhenSearchSelected() {
+        textSubmitted = false;
+        if (createFolderMenuItem != null) {
+            upgradeAccountMenuItem.setVisible(false);
+            cancelAllTransfersMenuItem.setVisible(false);
+            clearCompletedTransfers.setVisible(false);
+            pauseTransfersMenuIcon.setVisible(false);
+            playTransfersMenuIcon.setVisible(false);
+            createFolderMenuItem.setVisible(false);
+            addContactMenuItem.setVisible(false);
+            addMenuItem.setVisible(false);
+            refreshMenuItem.setVisible(false);
+            sortByMenuItem.setVisible(false);
+            unSelectMenuItem.setVisible(false);
+            changePass.setVisible(false);
+            rubbishBinMenuItem.setVisible(false);
+            clearRubbishBinMenuitem.setVisible(false);
+            importLinkMenuItem.setVisible(false);
+            takePicture.setVisible(false);
+            refreshMenuItem.setVisible(false);
+            helpMenuItem.setVisible(false);
+            gridSmallLargeMenuItem.setVisible(false);
+            logoutMenuItem.setVisible(false);
+            forgotPassMenuItem.setVisible(false);
+            inviteMenuItem.setVisible(false);
+            selectMenuItem.setVisible(false);
+            thumbViewMenuItem.setVisible(false);
+            searchMenuItem.setVisible(false);
+        }
+    }
 
 	private void returnCallWithPermissions() {
 		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
@@ -10069,6 +10087,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		long parentHandle = -1;
 
 		switch (drawerItem) {
+            case HOMEPAGE:
+                // For home page, its parent is always the root of cloud drive.
+                parentHandle = megaApi.getRootNode().getHandle();
+                break;
 			case CLOUD_DRIVE:
 				parentHandle = getParentHandleBrowser();
 				break;
@@ -11348,8 +11370,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				isFirstTimeCam();
 				checkIfShouldCloseSearchView(oldDrawerItem);
 				drawerLayout.closeDrawer(Gravity.LEFT);
-				setTabsVisibility();
 				openFullscreenOfflineFragment(getPathNavigationOffline());
+				setTabsVisibility();
 				break;
 			}
 			case R.id.settings_section: {
@@ -11526,6 +11548,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void saveOfflineNodeToDevice(MegaOffline node) {
+		if (fullscreenOfflineFragment != null) {
+			fullscreenOfflineFragment.saveNodeToDevice(node);
+		} else if (pagerOfflineFragment != null) {
+			pagerOfflineFragment.saveNodeToDevice(node);
+		}
 	}
 
 	@Override
@@ -16347,77 +16377,43 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return searchQuery != null && !searchQuery.isEmpty();
 	}
 
-	public void openSearchNode(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
-		if (node.isFolder()) {
-			switch (drawerItem) {
-				case CLOUD_DRIVE: {
-					setParentHandleBrowser(node.getHandle());
-					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-					if (cloudPageAdapter != null) {
-						cloudPageAdapter.notifyDataSetChanged();
-					}
-					break;
-				}
-				case SHARED_ITEMS: {
-					if (viewPagerShares == null || sharesPageAdapter == null) break;
+    public void openSearchFolderNode(MegaNode node) {
+        switch (drawerItem) {
+            case HOMEPAGE:
+                // Redirect to Cloud drive.
+                selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
+            case CLOUD_DRIVE: {
+                setParentHandleBrowser(node.getHandle());
+                refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+                if (cloudPageAdapter != null) {
+                    cloudPageAdapter.notifyDataSetChanged();
+                }
+                break;
+            }
+            case SHARED_ITEMS: {
+                if (viewPagerShares == null || sharesPageAdapter == null) break;
 
-					if (getTabItemShares() == INCOMING_TAB) {
-						setParentHandleIncoming(node.getHandle());
-						increaseDeepBrowserTreeIncoming();
-					} else if (getTabItemShares() == OUTGOING_TAB) {
-						setParentHandleOutgoing(node.getHandle());
-						increaseDeepBrowserTreeOutgoing();
-					} else if (getTabItemShares() == LINKS_TAB) {
-						setParentHandleLinks(node.getHandle());
-						increaseDeepBrowserTreeLinks();
-					}
-					refreshSharesPageAdapter();
+                if (getTabItemShares() == INCOMING_TAB) {
+                    setParentHandleIncoming(node.getHandle());
+                    increaseDeepBrowserTreeIncoming();
+                } else if (getTabItemShares() == OUTGOING_TAB) {
+                    setParentHandleOutgoing(node.getHandle());
+                    increaseDeepBrowserTreeOutgoing();
+                } else if (getTabItemShares() == LINKS_TAB) {
+                    setParentHandleLinks(node.getHandle());
+                    increaseDeepBrowserTreeLinks();
+                }
+                refreshSharesPageAdapter();
 
-					break;
-				}
-				case INBOX: {
-					setParentHandleInbox(node.getHandle());
-					refreshFragment(FragmentTag.INBOX.getTag());
-					break;
-				}
-			}
-		} else {
-			switch (drawerItem) {
-				case CLOUD_DRIVE: {
-					if (isCloudAdded()) {
-						fbFLol.openFile(node, position, screenPosition, imageView);
-					}
-					break;
-				}
-				case SHARED_ITEMS: {
-					if (viewPagerShares == null || sharesPageAdapter == null) break;
-
-					if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
-						inSFLol.openFile(node, INCOMING_SHARES_ADAPTER, position, screenPosition, imageView);
-					} else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
-						outSFLol.openFile(node, OUTGOING_SHARES_ADAPTER, position, screenPosition, imageView);
-					} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
-					    lF.openFile(node, LINKS_ADAPTER, position, screenPosition, imageView);
-                    }
-					break;
-				}
-				case INBOX: {
-					if (getInboxFragment() != null) {
-						iFLol.openFile(node, position, screenPosition, imageView);
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	public boolean isSearchViewExpanded() {
-		if (searchMenuItem != null) {
-			return searchMenuItem.isActionViewExpanded();
-		}
-
-		return false;
-	}
+                break;
+            }
+            case INBOX: {
+                setParentHandleInbox(node.getHandle());
+                refreshFragment(FragmentTag.INBOX.getTag());
+                break;
+            }
+        }
+    }
 
 	public void closeSearchView () {
 	    if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
@@ -16427,10 +16423,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void setTextSubmitted () {
 	    if (searchView != null) {
-	    	if (!isValidSearchQuery()) {
-				searchExpand = false;
-				return;
-			}
+	    	if (!isValidSearchQuery()) return;
 	        searchView.setQuery(searchQuery, true);
         }
     }
@@ -16687,6 +16680,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logDebug("Transfer panel not visible");
 		}
 	}
+
+    public void homepageToSearch() {
+        hideItemsWhenSearchSelected();
+        searchMenuItem.expandActionView();
+    }
 
 	public String getSearchQuery() {
 		return searchQuery;

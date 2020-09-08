@@ -48,6 +48,8 @@
                 android:imeOptions="actionSearch"
                 android:inputType="textNoSuggestions"
                 android:longClickable="false"
+                android:focusable="false"
+                android:cursorVisible="false"
                 android:maxLines="1"
                 android:minHeight="@dimen/square_button_size"
                 android:textSize="@dimen/search_bar_text_size" />

@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
@@ -14,13 +13,14 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
-import nz.mega.sdk.MegaNode.TYPE_RUBBISH
-import okhttp3.Dispatcher
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 class TypedFilesRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
@@ -32,8 +32,8 @@ class TypedFilesRepository @Inject constructor(
     // LinkedHashMap guarantees that the index order of elements is consistent with
     // the order of putting. Moreover, it has a quick element search[O(1)] (for
     // the callback of megaApi.getThumbnail())
-    private val fileNodesMap: MutableMap<Long, NodeItem> = LinkedHashMap()
-    private val savedFileNodesMap: MutableMap<Long, NodeItem> = LinkedHashMap()
+    private val fileNodesMap: MutableMap<Any, NodeItem> = LinkedHashMap()
+    private val savedFileNodesMap: MutableMap<Any, NodeItem> = LinkedHashMap()
 
     private var waitingForRefresh = false
 
@@ -78,13 +78,15 @@ class TypedFilesRepository @Inject constructor(
         return if (thumbFile.exists()) {
             thumbFile
         } else {
-            megaApi.getThumbnail(node, thumbFile.absolutePath, object : BaseListener(context) {
-                override fun onRequestFinish(
-                    api: MegaApiJava?,
-                    request: MegaRequest?,
-                    e: MegaError?
-                ) {
-                    if (e?.errorCode == MegaError.API_OK) {
+            if (node.hasThumbnail()) {
+                megaApi.getThumbnail(node, thumbFile.absolutePath, object : BaseListener(context) {
+                    override fun onRequestFinish(
+                        api: MegaApiJava?,
+                        request: MegaRequest?,
+                        e: MegaError?
+                    ) {
+                        if (e?.errorCode != MegaError.API_OK) return
+
                         request?.let {
                             fileNodesMap[it.nodeHandle]?.apply {
                                 thumbnail = thumbFile.absoluteFile
@@ -94,8 +96,8 @@ class TypedFilesRepository @Inject constructor(
 
                         refreshLiveData()
                     }
-                }
-            })
+                })
+            }
 
             null
         }
@@ -111,14 +113,13 @@ class TypedFilesRepository @Inject constructor(
         Handler().postDelayed(
             {
                 waitingForRefresh = false
-                _fileNodeItems.value = ArrayList<NodeItem>(fileNodesMap.values)
+                emitFiles()
             }, UPDATE_DATA_THROTTLE_TIME
         )
     }
 
     private fun getNodeItems() {
         var lastModifyDate: LocalDate? = null
-        var mapKeyTitle = Long.MIN_VALUE
 
         if (type != NODE_PHOTO) {
             fileNodesMap[INVALID_HANDLE] = NodeItem()   // "Sort by" header
@@ -136,12 +137,13 @@ class TypedFilesRepository @Inject constructor(
                 ))
             ) {
                 lastModifyDate = modifyDate
-                fileNodesMap[mapKeyTitle++] =
+                // RandomUUID() can ensure non-repetitive values in practical purpose
+                fileNodesMap[UUID.randomUUID()] =
                     PhotoNodeItem(PhotoNodeItem.TYPE_TITLE, -1, null, -1, dateString, null, false)
             }
 
             val selected = savedFileNodesMap[node.handle]?.selected ?: false
-            var nodeItem: NodeItem? = null
+            var nodeItem: NodeItem?
 
             if (type == NODE_PHOTO) {
                 nodeItem = PhotoNodeItem(

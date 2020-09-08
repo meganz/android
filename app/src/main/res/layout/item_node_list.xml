@@ -59,12 +59,12 @@
             android:layout_marginEnd="6dp"
             android:scaleType="fitCenter"
             app:item_selected="@{item.selected}"
+            app:nodeName="@{item.node.name}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
             app:roundedCornerRadius="2dp"
             app:thumbnail="@{item.thumbnail}"
-            app:placeholder_icon="@{MimeTypeList.typeForName(item.node.name).iconResourceId}"
             />
 
         <TextView

@@ -101,7 +101,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 activity.invalidateOptionsMenu()  // Hide the search icon if no photo
             }
 
-            actionModeViewModel.setNodesData(it.filter { node -> node.type == PhotoNodeItem.TYPE_PHOTO })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
         }
     }
 
@@ -369,7 +369,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
             }
 
-            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it))
+            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
 
             setupDraggingThumbnailCallback()
             startActivity(intent)
@@ -398,7 +398,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
         val thumbnailView = getThumbnailViewByHandle(draggingPhotoHandle) ?: return null
-        return getThumbnailLocationOnScreen(thumbnailView)
+        return thumbnailView.getLocationAndDimen()
     }
 
     private fun notifyThumbnailLocationOnScreen() {

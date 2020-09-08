@@ -8,7 +8,7 @@ abstract class BaseRxViewModel : ViewModel() {
 
     protected var composite = CompositeDisposable()
 
-    protected fun add(disposable: Disposable?) {
+    protected fun add(disposable: Disposable) {
         composite.add(disposable)
     }
 

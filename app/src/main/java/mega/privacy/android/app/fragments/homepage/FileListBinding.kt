@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fragments.homepage.photos.PhotoViewHolder
+import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter
 import mega.privacy.android.app.utils.Util
 import java.io.File
 
@@ -21,9 +24,9 @@ fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
 }
 
 @BindingAdapter("thumbnail", "selected")
-fun setThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
+fun setGridItemThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
     with(imageView) {
-        if (file == null) setImageResource(R.drawable.ic_image_thumbnail) else setImageURI(
+        if (file == null || !file.exists()) setImageResource(R.drawable.ic_image_thumbnail) else setImageURI(
             Uri.fromFile(
                 file
             )
@@ -37,22 +40,24 @@ fun setThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
     }
 }
 
-@BindingAdapter("thumbnail", "placeholder_icon", "item_selected")
-fun setSearchThumbnail(
+@BindingAdapter("thumbnail", "item_selected", "nodeName")
+fun setListItemThumbnail(
     imageView: SimpleDraweeView,
     file: File?,
-    placeholderIcon: Int,
-    selected: Boolean
+    selected: Boolean,
+    nodeName: String
 ) {
     with(imageView) {
         if (selected) {
             setActualImageResource(R.drawable.ic_select_folder)
         } else {
-            if (file == null) {
-                setImageResource(placeholderIcon)
-            } else {
-                setImageURI(Uri.fromFile(file))
-            }
+            if (file == null || !file.exists()) {
+                setImageResource(MimeTypeList.typeForName(nodeName).iconResourceId)
+            } else setImageURI(
+                Uri.fromFile(
+                    file
+                )
+            )
         }
     }
 }

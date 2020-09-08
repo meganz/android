@@ -6,10 +6,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 
 class DocumentsViewModel @ViewModelInject constructor(
@@ -25,6 +24,11 @@ class DocumentsViewModel @ViewModelInject constructor(
 
     private var forceUpdate = false
     private var ignoredFirst = false
+
+    // Whether a photo loading is in progress
+    private var loadInProgress = false
+    // Whether another photo loading should be executed after current loading
+    private var pendingLoad = false
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
@@ -56,6 +60,14 @@ class DocumentsViewModel @ViewModelInject constructor(
         filteredNodes
     }
 
+    private val loadFinishedObserver = Observer<List<NodeItem>> {
+        loadInProgress = false
+
+        if (pendingLoad) {
+            loadDocuments(true)
+        }
+    }
+
     private val nodesChangeObserver = Observer<Boolean> {
         if (!ignoredFirst) {
             ignoredFirst = true
@@ -70,7 +82,7 @@ class DocumentsViewModel @ViewModelInject constructor(
     }
 
     init {
-//        loadDocuments(true, order)
+        items.observeForever(loadFinishedObserver)
         nodesChange.observeForever(nodesChangeObserver)
     }
 
@@ -82,7 +94,14 @@ class DocumentsViewModel @ViewModelInject constructor(
     fun loadDocuments(forceUpdate: Boolean = false, order: Int = this.order) {
         this.forceUpdate = forceUpdate
         this.order = order
-        _query.value = searchQuery
+
+        if (loadInProgress) {
+            pendingLoad = true
+        } else {
+            pendingLoad = false
+            loadInProgress = true
+            _query.value = searchQuery
+        }
     }
 
     /**
@@ -98,19 +117,8 @@ class DocumentsViewModel @ViewModelInject constructor(
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getNodePositionByHandle(handle: Long): Int {
-        return items.value?.find {
-            it.node?.handle == handle
-        }?.index ?: INVALID_POSITION
-    }
-
-    fun getHandlesOfPhotos(): LongArray? {
-        val list = items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }
-
-        return list?.toLongArray()
-    }
-
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)
+        items.removeObserver(loadFinishedObserver)
     }
 }
