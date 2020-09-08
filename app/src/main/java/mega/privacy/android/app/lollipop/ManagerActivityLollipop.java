@@ -264,7 +264,6 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
@@ -16207,69 +16206,40 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return searchQuery != null && !searchQuery.isEmpty();
 	}
 
-	public void openSearchNode(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
-		if (node.isFolder()) {
-			switch (drawerItem) {
-				case CLOUD_DRIVE: {
-					setParentHandleBrowser(node.getHandle());
-					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-					if (cloudPageAdapter != null) {
-						cloudPageAdapter.notifyDataSetChanged();
-					}
-					break;
-				}
-				case SHARED_ITEMS: {
-					if (viewPagerShares == null || sharesPageAdapter == null) break;
+    public void openSearchFolder(MegaNode node) {
+        switch (drawerItem) {
+            case CLOUD_DRIVE: {
+                setParentHandleBrowser(node.getHandle());
+                refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+                if (cloudPageAdapter != null) {
+                    cloudPageAdapter.notifyDataSetChanged();
+                }
+                break;
+            }
+            case SHARED_ITEMS: {
+                if (viewPagerShares == null || sharesPageAdapter == null) break;
 
-					if (getTabItemShares() == INCOMING_TAB) {
-						setParentHandleIncoming(node.getHandle());
-						increaseDeepBrowserTreeIncoming();
-					} else if (getTabItemShares() == OUTGOING_TAB) {
-						setParentHandleOutgoing(node.getHandle());
-						increaseDeepBrowserTreeOutgoing();
-					} else if (getTabItemShares() == LINKS_TAB) {
-						setParentHandleLinks(node.getHandle());
-						increaseDeepBrowserTreeLinks();
-					}
-					refreshSharesPageAdapter();
+                if (getTabItemShares() == INCOMING_TAB) {
+                    setParentHandleIncoming(node.getHandle());
+                    increaseDeepBrowserTreeIncoming();
+                } else if (getTabItemShares() == OUTGOING_TAB) {
+                    setParentHandleOutgoing(node.getHandle());
+                    increaseDeepBrowserTreeOutgoing();
+                } else if (getTabItemShares() == LINKS_TAB) {
+                    setParentHandleLinks(node.getHandle());
+                    increaseDeepBrowserTreeLinks();
+                }
+                refreshSharesPageAdapter();
 
-					break;
-				}
-				case INBOX: {
-					setParentHandleInbox(node.getHandle());
-					refreshFragment(FragmentTag.INBOX.getTag());
-					break;
-				}
-			}
-		} else {
-			switch (drawerItem) {
-				case CLOUD_DRIVE: {
-					if (isCloudAdded()) {
-						fbFLol.openFile(node, position, screenPosition, imageView);
-					}
-					break;
-				}
-				case SHARED_ITEMS: {
-					if (viewPagerShares == null || sharesPageAdapter == null) break;
-
-					if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
-						inSFLol.openFile(node, INCOMING_SHARES_ADAPTER, position, screenPosition, imageView);
-					} else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
-						outSFLol.openFile(node, OUTGOING_SHARES_ADAPTER, position, screenPosition, imageView);
-					} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
-					    lF.openFile(node, LINKS_ADAPTER, position, screenPosition, imageView);
-                    }
-					break;
-				}
-				case INBOX: {
-					if (getInboxFragment() != null) {
-						iFLol.openFile(node, position, screenPosition, imageView);
-					}
-					break;
-				}
-			}
-		}
-	}
+                break;
+            }
+            case INBOX: {
+                setParentHandleInbox(node.getHandle());
+                refreshFragment(FragmentTag.INBOX.getTag());
+                break;
+            }
+        }
+    }
 
 	public boolean isSearchViewExpanded() {
 		if (searchMenuItem != null) {
@@ -16288,7 +16258,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void setTextSubmitted () {
 	    if (searchView != null) {
 	    	if (!isValidSearchQuery()) {
-				searchExpand = false;
 				return;
 			}
 	        searchView.setQuery(searchQuery, true);
