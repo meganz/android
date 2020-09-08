@@ -83,7 +83,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                 activity.invalidateOptionsMenu()  // Hide the search icon if no file
             }
 
-            actionModeViewModel.setNodesData(it)
+            actionModeViewModel.setNodesData(it.filter{nodeItem -> nodeItem.node != null})
         }
     }
 
@@ -175,7 +175,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                 }
             } else {
                 viewModel.items.value?.let { items ->
-                    actionModeCallback.nodeCount = items.size
+                    actionModeCallback.nodeCount = items.size - 1   // The "sort by" header isn't counted
                 }
 
                 if (actionMode == null) {

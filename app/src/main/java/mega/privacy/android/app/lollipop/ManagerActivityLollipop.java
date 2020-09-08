@@ -601,9 +601,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	String feedback;
 
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
+
 	private enum HomepageScreen {
-       	HOMEPAGE, PHOTOS,
-       	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO,
+		HOMEPAGE, PHOTOS, DOCUMENTS, FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO
 	}
 
 	//	private boolean isListCloudDrive = true;
@@ -5017,8 +5017,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case HOMEPAGE: {
 				setFirstNavigationLevel(false);
-				if (mHomepageScreen == HomepageScreen.PHOTOS) {
-					aB.setTitle((getString(R.string.category_photos)));
+				int titleId = -1;
+
+				switch (mHomepageScreen) {
+					case PHOTOS:
+						titleId = R.string.category_photos;
+						break;
+					case DOCUMENTS:
+						titleId = R.string.category_documents;
+						break;
+				}
+
+				if (titleId != -1) {
+					aB.setTitle(getString(titleId));
 				}
 			}
 			default:{
@@ -5724,13 +5735,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void setupNavDestListener() {
 		mNavController = Navigation.findNavController(mNavHostView);
 
-		// TODO: Following code isn't compatible with legacy code, so commented temporarily
-//		AppBarConfiguration appBarConfiguration =
-//				new AppBarConfiguration.Builder(navController.getGraph())
-//						.setOpenableLayout(drawerLayout).build();
-//		NavigationUI.setupWithNavController(
-//				tB, navController, appBarConfiguration);
-
 		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			int destinationId = destination.getId();
 			mHomepageSearchable = null;
@@ -5747,6 +5751,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					return;
 				case R.id.photosFragment:
 					mHomepageScreen = HomepageScreen.PHOTOS;
+					break;
+				case R.id.documentsFragment:
+					mHomepageScreen = HomepageScreen.DOCUMENTS;
 					break;
 				case R.id.fullscreen_offline:
 					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
@@ -6804,7 +6811,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			} else {
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
-					if (mHomepageSearchable instanceof PhotosFragment && isOnline(this)) {
+					if (isOnline(this)) {
 						rubbishBinMenuItem.setVisible(true);
 					}
 				}
