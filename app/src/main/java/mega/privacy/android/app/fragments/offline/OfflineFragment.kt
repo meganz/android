@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.R.drawable
@@ -677,6 +678,18 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
     fun refreshActionBarTitle() {
         viewModel.refreshActionBarTitle()
+    }
+
+    fun saveNodeToDevice(node: MegaOffline) {
+        viewModel.saveNodeToDevice(node) { intent, code ->
+            startActivityForResult(intent, code)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (!viewModel.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     fun refreshListGridView() {

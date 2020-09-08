@@ -17,10 +17,10 @@ import mega.privacy.android.app.utils.FileUtils.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
+import mega.privacy.android.app.utils.OfflineUtils.getTotalSize
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util.getSizeString
-import java.io.File
 
 class OfflineFileInfoViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context,
@@ -57,7 +57,7 @@ class OfflineFileInfoViewModel @ViewModelInject constructor(
                 if (it != null) {
                     getMetaInfo(it.node)
                 }
-            }, logErr("OfflineFileInfoViewModel loadNode onError")))
+            }, logErr("OfflineFileInfoViewModel loadNode")))
     }
 
     private fun getMetaInfo(node: MegaOffline) {
@@ -85,24 +85,7 @@ class OfflineFileInfoViewModel @ViewModelInject constructor(
                 if (node.isFolder) {
                     _contains.value = it.second
                 }
-            }, logErr("OfflineFileInfoViewModel getMetaInfo onError"))
+            }, logErr("OfflineFileInfoViewModel getMetaInfo"))
         )
-    }
-
-    private fun getTotalSize(file: File): Long {
-        if (file.isFile) {
-            return file.length()
-        }
-        val files = file.listFiles() ?: return 0L
-
-        var totalSize = 0L
-        files.forEach {
-            totalSize += if (it.isFile) {
-                it.length()
-            } else {
-                getTotalSize(it)
-            }
-        }
-        return totalSize
     }
 }

@@ -11340,8 +11340,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				isFirstTimeCam();
 				checkIfShouldCloseSearchView(oldDrawerItem);
 				drawerLayout.closeDrawer(Gravity.LEFT);
-				setTabsVisibility();
 				openFullscreenOfflineFragment(getPathNavigationOffline());
+				setTabsVisibility();
 				break;
 			}
 			case R.id.settings_section: {
@@ -11518,6 +11518,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void saveOfflineNodeToDevice(MegaOffline node) {
+		if (fullscreenOfflineFragment != null) {
+			fullscreenOfflineFragment.saveNodeToDevice(node);
+		} else if (pagerOfflineFragment != null) {
+			pagerOfflineFragment.saveNodeToDevice(node);
+		}
 	}
 
 	@Override

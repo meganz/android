@@ -607,7 +607,7 @@ public class NodeController {
         }
     }
 
-    void askForPermissions () {
+    public void askForPermissions () {
         if(context instanceof ManagerActivityLollipop){
             ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
