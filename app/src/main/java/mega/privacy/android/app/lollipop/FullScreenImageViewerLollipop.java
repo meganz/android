@@ -1275,7 +1275,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				callback.setVisibility(visibility);
 			}
 		} else if(adapterType == RECENTS_BUCKET_ADAPTER ) {
-            RecentsBucketFragment.setDraggingThumbnailVisibility(visibility);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
 	}
 
@@ -1348,7 +1352,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				callback.getLocationOnScreen(location);
 			}
 		} else if(adapterType == RECENTS_BUCKET_ADAPTER) {
-            RecentsBucketFragment.getDraggingThumbnailLocationOnScreen(location);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
 	}
 
@@ -1414,7 +1422,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
             }
 		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
 				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
-				|| adapterType == PHOTOS_SEARCH_ADAPTER) {
+				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			getImageView(0, handle);
 		}
@@ -1487,7 +1495,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
             }
 		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
 				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
-				|| adapterType == PHOTOS_SEARCH_ADAPTER) {
+				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			scrollToPosition(0, handle);
 		}

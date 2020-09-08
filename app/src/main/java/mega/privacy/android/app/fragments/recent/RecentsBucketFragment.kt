@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,12 +23,10 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtils
-import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.*
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
+import java.lang.ref.WeakReference
 import java.util.*
 
 @AndroidEntryPoint
@@ -41,11 +40,13 @@ class RecentsBucketFragment : BaseFragment() {
 
     private lateinit var binding: FragmentRecentBucketBinding
 
+    private lateinit var gridView: RecyclerView
+
     private lateinit var mAdapter: MultipleBucketAdapter
 
     private lateinit var bucket: BucketSaved
 
-    private var draggingPhotoHandle = MegaApiJava.INVALID_HANDLE
+    private var draggingNodeHandle = MegaApiJava.INVALID_HANDLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +59,7 @@ class RecentsBucketFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentRecentBucketBinding.inflate(inflater, container, false)
+        gridView = binding.multipleBucketView
         return binding.root
     }
 
@@ -154,43 +156,17 @@ class RecentsBucketFragment : BaseFragment() {
         }
     }?.map { it.handle }?.toLongArray()
 
-    companion object {
-
-        @JvmStatic
-        var imageDrag: ImageView? = null
-
-        @JvmStatic
-        fun setDraggingThumbnailVisibility(visibility: Int) {
-            imageDrag?.visibility = visibility
-        }
-
-        @JvmStatic
-        fun getDraggingThumbnailLocationOnScreen(location: IntArray) {
-            imageDrag?.getLocationOnScreen(location)
-        }
-    }
-
     fun openFile(
         node: MegaNode,
         isMedia: Boolean,
-        thumbnail: ImageView?,
+        thumbnail: ImageView,
         openFrom: Int
     ) {
-        imageDrag = thumbnail
-
-        var screenPosition: IntArray? = null
-        if (thumbnail != null) {
-            screenPosition = IntArray(4)
-            val loc = IntArray(2)
-            thumbnail.getLocationOnScreen(loc)
-            screenPosition[0] = loc[0]
-            screenPosition[1] = loc[1]
-            screenPosition[2] = thumbnail.width
-            screenPosition[3] = thumbnail.height
-        }
+        setupDraggingThumbnailCallback()
+        val screenPosition = getThumbnailLocationOnScreen(thumbnail)
+        draggingNodeHandle = node.handle
 
         val mime = MimeTypeList.typeForName(node.name)
-
         when {
             mime.isImage -> {
                 val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
@@ -198,12 +174,10 @@ class RecentsBucketFragment : BaseFragment() {
                     Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
                     Constants.RECENTS_BUCKET_ADAPTER
                 )
-                if (screenPosition != null) {
-                    intent.putExtra(
-                        "screenPosition",
-                        screenPosition
-                    )
-                }
+                intent.putExtra(
+                    "screenPosition",
+                    screenPosition
+                )
                 intent.putExtra(
                     Constants.HANDLE,
                     node.handle
@@ -216,7 +190,79 @@ class RecentsBucketFragment : BaseFragment() {
                 managerActivity.overridePendingTransition(0, 0)
             }
         }
-
     }
 
+    /** All below methods are for supporting functions of FullScreenImageViewer */
+
+    override fun onDestroy() {
+        super.onDestroy()
+        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(RecentsBucketFragment::class.java)
+    }
+
+    private fun setupDraggingThumbnailCallback() {
+        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
+            RecentsBucketFragment::class.java,
+            RecentsBucketDraggingThumbnailCallback(WeakReference(this))
+        )
+    }
+
+    fun scrollToPhoto(handle: Long) {
+        val position = viewModel.getItemPositionByHandle(handle)
+        if (position == Constants.INVALID_POSITION) return
+
+        gridView.scrollToPosition(position)
+        notifyThumbnailLocationOnScreen()
+    }
+
+    private fun getThumbnailViewByHandle(handle: Long): ImageView? {
+        val position = viewModel.getItemPositionByHandle(handle)
+        val viewHolder = gridView.findViewHolderForLayoutPosition(position) ?: return null
+        return viewHolder.itemView.findViewById(R.id.thumbnail_media)
+    }
+
+    private fun getThumbnailLocationOnScreen(imageView: ImageView): IntArray {
+        val topLeft = IntArray(2)
+        imageView.getLocationOnScreen(topLeft)
+        return intArrayOf(topLeft[0], topLeft[1], imageView.width, imageView.height)
+    }
+
+    private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
+        val thumbnailView = getThumbnailViewByHandle(draggingNodeHandle) ?: return null
+        return getThumbnailLocationOnScreen(thumbnailView)
+    }
+
+    fun hideDraggingThumbnail(handle: Long) {
+        getThumbnailViewByHandle(draggingNodeHandle)?.apply { visibility = View.VISIBLE }
+        getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
+        draggingNodeHandle = handle
+        notifyThumbnailLocationOnScreen()
+    }
+
+    private fun notifyThumbnailLocationOnScreen() {
+        val location = getDraggingThumbnailLocationOnScreen() ?: return
+        location[0] += location[2] / 2
+        location[1] += location[3] / 2
+
+        val intent = Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
+        intent.putExtra(Constants.INTENT_EXTRA_KEY_SCREEN_POSITION, location)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+    }
+
+    companion object {
+        private class RecentsBucketDraggingThumbnailCallback(private val fragmentRef: WeakReference<RecentsBucketFragment>) :
+            DraggingThumbnailCallback {
+
+            override fun setVisibility(v: Int) {
+                val fragment = fragmentRef.get() ?: return
+                fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
+                    ?.apply { visibility = v }
+            }
+
+            override fun getLocationOnScreen(location: IntArray) {
+                val fragment = fragmentRef.get() ?: return
+                val result = fragment.getDraggingThumbnailLocationOnScreen() ?: return
+                result.copyInto(location, 0, 0, 2)
+            }
+        }
+    }
 }

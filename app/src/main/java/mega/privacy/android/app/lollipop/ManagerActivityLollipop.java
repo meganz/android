@@ -154,6 +154,7 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -1237,17 +1238,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					} else if(adapterType == RECENTS_BUCKET_ADAPTER) {
                         long handle = intent.getLongExtra("handle", INVALID_HANDLE);
-                        if (actionType == UPDATE_IMAGE_DRAG) {
-                            imageDrag = rF.getImageDrag(handle);
-                            if (rF.imageDrag != null) {
-                                rF.imageDrag.setVisibility(View.VISIBLE);
-                            }
-                            if (imageDrag != null) {
-                                rF.imageDrag = imageDrag;
-                                rF.imageDrag.setVisibility(View.INVISIBLE);
-                            }
-                        } else if (actionType == SCROLL_TO_POSITION) {
-                            rF.updateScrollPosition(handle);
+                        RecentsBucketFragment fragment = getFragmentByType(RecentsBucketFragment.class);
+                        switch (actionType) {
+                            case SCROLL_TO_POSITION:
+                                fragment.scrollToPhoto(handle);
+                                break;
+                            case UPDATE_IMAGE_DRAG:
+                                fragment.hideDraggingThumbnail(handle);
+                                break;
+                            default:
+                                break;
                         }
                     }
 
@@ -6881,6 +6881,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		return null;
 	}
+
+    public <F extends Fragment> F getFragmentByType(Class<F> fragmentClass) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
+        for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
+            if (fragment.getClass() == fragmentClass) {
+                return (F) fragment;
+            }
+        }
+        return null;
+    }
 
 	public void updateCuFragmentOptionsMenu() {
 		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
