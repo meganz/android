@@ -281,6 +281,26 @@ public class OfflineUtils {
         }
     }
 
+    public static long getTotalSize(File file) {
+        if (file.isFile()) {
+            return file.length();
+        }
+        File[] files = file.listFiles();
+        if (files == null) {
+            return 0;
+        }
+
+        long totalSize = 0;
+        for (File child : files) {
+            if (child.isFile()) {
+                totalSize += child.length();
+            } else {
+                totalSize += getTotalSize(child);
+            }
+        }
+        return totalSize;
+    }
+
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
