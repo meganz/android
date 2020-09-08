@@ -9,8 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fragments.homepage.photos.PhotoViewHolder
-import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter
 import mega.privacy.android.app.utils.Util
 import java.io.File
 
@@ -40,7 +38,12 @@ fun setThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
 }
 
 @BindingAdapter("thumbnail", "placeholder_icon", "item_selected")
-fun setSearchThumbnail(imageView: SimpleDraweeView, file: File?, placeholderIcon: Int, selected: Boolean) {
+fun setSearchThumbnail(
+    imageView: SimpleDraweeView,
+    file: File?,
+    placeholderIcon: Int,
+    selected: Boolean
+) {
     with(imageView) {
         if (selected) {
             setActualImageResource(R.drawable.ic_select_folder)
@@ -51,6 +54,20 @@ fun setSearchThumbnail(imageView: SimpleDraweeView, file: File?, placeholderIcon
                 setImageURI(Uri.fromFile(file))
             }
         }
+    }
+}
+
+@BindingAdapter("thumbnail", "placeholder_icon")
+fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, placeholderIcon: Int) {
+    with(imageView) {
+        if (file == null) {
+            setImageResource(placeholderIcon)
+        } else {
+            setImageURI(Uri.fromFile(file))
+        }
+
+        val radius = Util.px2dp(5F, imageView.resources.displayMetrics).toFloat()
+        hierarchy.roundingParams = RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
     }
 }
 

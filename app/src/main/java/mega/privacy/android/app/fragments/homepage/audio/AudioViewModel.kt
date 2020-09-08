@@ -27,7 +27,6 @@ class AudioViewModel @ViewModelInject constructor(
     var order: Int = ORDER_DEFAULT_ASC
         private set
     var searchMode = false
-    var listMode = true   // false for grid mode
     var searchQuery = ""
 
     private var forceUpdate = false

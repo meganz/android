@@ -4,8 +4,6 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.fragments.homepage.NodeItem
 
 class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
     // The full set of nodes
@@ -28,9 +26,9 @@ class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
 
     private val selectedNodeList = mutableListOf<NodeItem>()
 
-    fun onPhotoClick(nodeItem: NodeItem) = updateSelectedNodeList(nodeItem)
+    fun onNodeClick(nodeItem: NodeItem) = updateSelectedNodeList(nodeItem)
 
-    fun onPhotoLongClick(nodeItem: NodeItem): Boolean {
+    fun onNodeLongClick(nodeItem: NodeItem): Boolean {
         _longClick.value = Event(nodeItem)
         return true
     }

@@ -49,12 +49,11 @@
 				android:textSize="14sp"
 				tools:text="name"
 				/>
-		<ImageButton
+		<ImageView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="end|center_vertical"
 				android:background="@null"
-				android:clickable="false"
 				android:src="@drawable/ic_dots_vertical_grey"
 				/>
 	</FrameLayout>

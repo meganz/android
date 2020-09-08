@@ -24,15 +24,15 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.R.string
+import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
@@ -40,6 +40,7 @@ import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsAdapter
@@ -81,8 +82,9 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var binding: FragmentAudioBinding
     private lateinit var listView: NewGridRecyclerView
-    private lateinit var adapter: DocumentsAdapter
-    private lateinit var itemDecoration: SimpleDividerItemDecoration
+    private lateinit var listAdapter: DocumentsAdapter
+    private lateinit var gridAdapter: NodeGridAdapter
+    private lateinit var itemDecoration: PositionDividerItemDecoration
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
@@ -154,13 +156,36 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            adapter.notifyItemChanged(POSITION_HEADER)
+            if (sortByHeaderViewModel.isList) {
+                listAdapter.notifyItemChanged(POSITION_HEADER)
+            } else {
+                gridAdapter.notifyItemChanged(POSITION_HEADER)
+            }
             viewModel.loadAudio(true, it)
         })
 
-        sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            adapter.notifyItemChanged(POSITION_HEADER)
-        })
+        sortByHeaderViewModel.listGridChangeEvent.observe(
+            viewLifecycleOwner,
+            EventObserver { isList ->
+                switchListGridView(isList)
+            })
+    }
+
+    private fun switchListGridView(isList: Boolean) {
+        if (isList) {
+            listView.switchToLinear()
+            listView.adapter = listAdapter
+            listView.addItemDecoration(itemDecoration)
+        } else {
+            listView.switchBackToGrid()
+            listView.adapter = gridAdapter
+            listView.removeItemDecoration(itemDecoration)
+
+            (listView.layoutManager as CustomizedGridLayoutManager).apply {
+                spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+            }
+        }
+        viewModel.refreshUi()
     }
 
     private fun openNode(node: MegaNode, index: Int) {
@@ -285,7 +310,11 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<NodeItem>(it)
-        adapter.submitList(newList)
+        if (sortByHeaderViewModel.isList) {
+            listAdapter.submitList(newList)
+        } else {
+            gridAdapter.submitList(newList)
+        }
     }
 
     private fun preventListItemBlink() {
@@ -303,13 +332,12 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupListView() {
         listView = binding.audioList
-        listView.switchToLinear()
         preventListItemBlink()
         elevateToolbarWhenScrolling()
-        itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
-        if (viewModel.searchMode) {
-            listView.addItemDecoration(itemDecoration)
-        }
+        itemDecoration = PositionDividerItemDecoration(context, outMetrics)
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
     }
 
     private fun setupActionMode() {
@@ -387,19 +415,12 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val itemView = viewHolder.itemView
 
-//                    val imageView = if (viewModel.listMode) {
-                    itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
-                    val imageView = itemView.findViewById<ImageView>(R.id.thumbnail)
-//                    } else {
-//                        // Draw the green outline for the thumbnail view at once
-//                        val thumbnailView =
-//                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-//                        thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
-//
-//                        itemView.findViewById<ImageView>(
-//                            R.id.icon_selected
-//                        )
-//                    }
+                    val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
+                        itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        itemView.findViewById(R.id.thumbnail)
+                    } else {
+                        itemView.findViewById(R.id.ic_selected)
+                    }
 
                     imageView?.run {
                         setImageResource(R.drawable.ic_select_folder)
@@ -427,15 +448,12 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
-        adapter =
+        listAdapter =
             DocumentsAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.linearLayoutManager?.scrollToPosition(0)
-            }
-        })
+        gridAdapter =
+            NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
 
-        listView.adapter = adapter
+        switchListGridView(sortByHeaderViewModel.isList)
     }
 
     override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()

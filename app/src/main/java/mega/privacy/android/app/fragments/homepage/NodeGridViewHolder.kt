@@ -1,17 +1,13 @@
-package mega.privacy.android.app.fragments.homepage.documents
+package mega.privacy.android.app.fragments.homepage
 
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.databinding.ItemNodeListBinding
+import mega.privacy.android.app.databinding.ItemNodeGridBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
-import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
-import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
-class DocumentViewHolder(private val binding: ViewDataBinding) :
+class NodeGridViewHolder(private val binding: ViewDataBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     @Inject
@@ -25,11 +21,12 @@ class DocumentViewHolder(private val binding: ViewDataBinding) :
     ) {
         binding.apply {
             when (this) {
-                is ItemNodeListBinding -> {
+                is ItemNodeGridBinding -> {
                     this.itemOperationViewModel = itemOperationViewModel
                     this.actionModeViewModel = actionModeViewModel
                     this.item = item
                     this.megaApi = megaApi
+                    this.context = binding.root.context
                 }
                 is SortByHeaderBinding -> {
                     this.orderNameStringId =
