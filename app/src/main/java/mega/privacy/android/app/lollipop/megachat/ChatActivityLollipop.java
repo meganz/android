@@ -6382,6 +6382,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         boolean selectableMessages = false;
         if ((messages != null && chatRoom != null && !joiningOrLeaving && messages.size() > 0)) {
             for (AndroidMegaChatMessage msg : messages) {
+                if (msg == null || msg.getMessage() == null) {
+                    continue;
+                }
+
                 switch (msg.getMessage().getType()) {
                     case MegaChatMessage.TYPE_CONTAINS_META:
                     case MegaChatMessage.TYPE_NORMAL:
