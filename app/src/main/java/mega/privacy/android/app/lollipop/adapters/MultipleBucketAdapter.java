@@ -237,8 +237,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             case R.id.multiple_bucket_layout: {
                 if(ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
                     ((RecentsBucketFragment) fragment).openFile(node, true,
-                            v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list),
-                            RecentsFragment.OPEN_FROM_SUB);
+                            v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list));
                 } else {
                     ((RecentsFragment) fragment).openFile(node, true,
                             v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list),

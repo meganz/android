@@ -20,10 +20,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
+import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
@@ -79,25 +84,25 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun setupListView(nodes: List<MegaNode>) {
-        mAdapter = MultipleBucketAdapter(context, this, nodes, bucket.isMedia)
+        mAdapter = MultipleBucketAdapter(managerActivity, this, nodes, bucket.isMedia)
         if (bucket.isMedia) {
-            val numCells: Int = if (Util.isScreenInPortrait(context)) 4 else 6
+            val numCells: Int = if (Util.isScreenInPortrait(managerActivity)) 4 else 6
             val gridLayoutManager =
-                GridLayoutManager(context, numCells, GridLayoutManager.VERTICAL, false)
-            binding.multipleBucketView.layoutManager = gridLayoutManager
+                GridLayoutManager(managerActivity, numCells, GridLayoutManager.VERTICAL, false)
+            gridView.layoutManager = gridLayoutManager
 
         } else {
-            val linearLayoutManager = LinearLayoutManager(context)
-            binding.multipleBucketView.layoutManager = linearLayoutManager
-            binding.multipleBucketView.addItemDecoration(
+            val linearLayoutManager = LinearLayoutManager(managerActivity)
+            gridView.layoutManager = linearLayoutManager
+            gridView.addItemDecoration(
                 SimpleDividerItemDecoration(
-                    context,
+                    managerActivity,
                     outMetrics
                 )
             )
         }
-        binding.multipleBucketView.adapter = mAdapter
-        binding.multipleBucketView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        gridView.adapter = mAdapter
+        gridView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -109,7 +114,7 @@ class RecentsBucketFragment : BaseFragment() {
     private fun setupFastScroller(nodes: List<MegaNode>) {
         if (bucket.isMedia && nodes.size >= Constants.MIN_ITEMS_SCROLLBAR) {
             binding.fastscroll.visibility = View.VISIBLE
-            binding.fastscroll.setRecyclerView(binding.multipleBucketView)
+            binding.fastscroll.setRecyclerView(gridView)
         } else {
             binding.fastscroll.visibility = View.GONE
         }
@@ -125,7 +130,7 @@ class RecentsBucketFragment : BaseFragment() {
                 binding.actionImage.setImageResource(R.drawable.ic_recents_up)
             }
             binding.dateText.text = TimeUtils.formatBucketDate(
-                context,
+                managerActivity,
                 bucket.timestamp
             )
             binding.headerInfoLayout.visibility = View.VISIBLE
@@ -141,7 +146,7 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun checkScroll() {
-        if (binding.multipleBucketView.canScrollVertically(-1)) {
+        if (gridView.canScrollVertically(-1)) {
             managerActivity.changeActionBarElevation(true)
         } else {
             managerActivity.changeActionBarElevation(false)
@@ -159,37 +164,138 @@ class RecentsBucketFragment : BaseFragment() {
     fun openFile(
         node: MegaNode,
         isMedia: Boolean,
-        thumbnail: ImageView,
-        openFrom: Int
+        thumbnail: ImageView
     ) {
         setupDraggingThumbnailCallback()
         val screenPosition = getThumbnailLocationOnScreen(thumbnail)
         draggingNodeHandle = node.handle
 
         val mime = MimeTypeList.typeForName(node.name)
+        val localPath = FileUtils.getLocalFile(managerActivity, node.name, node.size)
+        logDebug("Open node: ${node.name} which mime is: ${mime.type}, local path is: $localPath")
+
         when {
             mime.isImage -> {
-                val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-                intent.putExtra(
-                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                    Constants.RECENTS_BUCKET_ADAPTER
-                )
-                intent.putExtra(
-                    "screenPosition",
-                    screenPosition
-                )
-                intent.putExtra(
-                    Constants.HANDLE,
-                    node.handle
-                )
-                intent.putExtra(
-                    Constants.NODE_HANDLES,
-                    getNodesHandles(isMedia)
-                )
-                startActivity(intent)
-                managerActivity.overridePendingTransition(0, 0)
+                openImage(screenPosition, node)
+            }
+            FileUtils.isAudioOrVideo(node) -> {
+                openAudioVideo(screenPosition, node, isMedia, localPath)
+            }
+            mime.isURL -> {
+                openURL(node, localPath)
+            }
+            mime.isPdf -> {
+                openPdf(node, localPath)
+            }
+            else -> {
+                download(node.handle)
             }
         }
+    }
+
+    private fun openPdf(
+        node: MegaNode,
+        localPath: String?
+    ) {
+        val intent = Intent(context, PdfViewerActivityLollipop::class.java)
+        intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
+        intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
+        val paramsSetSuccessfully =
+            if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
+                FileUtils.setLocalIntentParams(managerActivity, node, intent, localPath, false)
+            } else {
+                FileUtils.setStreamingIntentParams(managerActivity, node, megaApi, intent)
+            }
+        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+        openOrDownload(intent, paramsSetSuccessfully, node.handle)
+    }
+
+    private fun openURL(
+        node: MegaNode,
+        localPath: String?
+    ) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        val paramsSetSuccessfully =
+            if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
+                FileUtils.setURLIntentParams(context, node, intent, localPath)
+            } else false
+        openOrDownload(intent, paramsSetSuccessfully, node.handle)
+    }
+
+    private fun openAudioVideo(
+        screenPosition: IntArray,
+        node: MegaNode,
+        isMedia: Boolean,
+        localPath: String?
+    ) {
+        val intent = if (FileUtils.isInternalIntent(node)) {
+            Intent(managerActivity, AudioVideoPlayerLollipop::class.java)
+        } else {
+            Intent(Intent.ACTION_VIEW)
+        }
+        intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
+        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
+        intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
+        if (isMedia) {
+            intent.putExtra(NODE_HANDLES, getNodesHandles(false))
+            intent.putExtra(AudioVideoPlayerLollipop.IS_PLAYLIST, true)
+        } else {
+            intent.putExtra(AudioVideoPlayerLollipop.IS_PLAYLIST, false)
+        }
+
+        val paramsSetSuccessfully =
+            if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
+                FileUtils.setLocalIntentParams(managerActivity, node, intent, localPath, false)
+            } else {
+                FileUtils.setStreamingIntentParams(managerActivity, node, megaApi, intent)
+            }
+
+        if (paramsSetSuccessfully) {
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+
+            if (FileUtils.isOpusFile(node)) {
+                intent.setDataAndType(intent.data, "audio/*")
+            }
+        }
+        openOrDownload(intent, paramsSetSuccessfully, node.handle)
+    }
+
+    private fun openOrDownload(
+        intent: Intent,
+        paramsSetSuccessfully: Boolean,
+        handle: Long
+    ) {
+        if (paramsSetSuccessfully && MegaApiUtils.isIntentAvailable(managerActivity, intent)) {
+            managerActivity.startActivity(intent)
+            managerActivity.overridePendingTransition(0, 0)
+        } else {
+            managerActivity.showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.intent_not_available),
+                -1
+            )
+            download(handle)
+        }
+    }
+
+    private fun openImage(
+        screenPosition: IntArray,
+        node: MegaNode
+    ) {
+        val intent = Intent(managerActivity, FullScreenImageViewerLollipop::class.java)
+        intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
+        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
+        intent.putExtra(HANDLE, node.handle)
+        intent.putExtra(NODE_HANDLES, getNodesHandles(true))
+        startActivity(intent)
+        managerActivity.overridePendingTransition(0, 0)
+    }
+
+    private fun download(handle: Long) {
+        val handleList = ArrayList<Long>()
+        handleList.add(handle)
+        val nC = NodeController(managerActivity)
+        nC.prepareForDownload(handleList, true)
     }
 
     /** All below methods are for supporting functions of FullScreenImageViewer */
@@ -197,6 +303,7 @@ class RecentsBucketFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(RecentsBucketFragment::class.java)
+        AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(RecentsBucketFragment::class.java)
     }
 
     private fun setupDraggingThumbnailCallback() {
@@ -204,11 +311,15 @@ class RecentsBucketFragment : BaseFragment() {
             RecentsBucketFragment::class.java,
             RecentsBucketDraggingThumbnailCallback(WeakReference(this))
         )
+        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
+            RecentsBucketFragment::class.java,
+            RecentsBucketDraggingThumbnailCallback(WeakReference(this))
+        )
     }
 
     fun scrollToPhoto(handle: Long) {
         val position = viewModel.getItemPositionByHandle(handle)
-        if (position == Constants.INVALID_POSITION) return
+        if (position == INVALID_POSITION) return
 
         gridView.scrollToPosition(position)
         notifyThumbnailLocationOnScreen()
@@ -217,7 +328,12 @@ class RecentsBucketFragment : BaseFragment() {
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {
         val position = viewModel.getItemPositionByHandle(handle)
         val viewHolder = gridView.findViewHolderForLayoutPosition(position) ?: return null
-        return viewHolder.itemView.findViewById(R.id.thumbnail_media)
+        // List and grid have different thumnail ImageView
+        return if (bucket.isMedia) {
+            viewHolder.itemView.findViewById(R.id.thumbnail_media)
+        } else {
+            viewHolder.itemView.findViewById(R.id.thumbnail_list)
+        }
     }
 
     private fun getThumbnailLocationOnScreen(imageView: ImageView): IntArray {
@@ -243,9 +359,9 @@ class RecentsBucketFragment : BaseFragment() {
         location[0] += location[2] / 2
         location[1] += location[3] / 2
 
-        val intent = Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
-        intent.putExtra(Constants.INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+        val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
+        intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
+        LocalBroadcastManager.getInstance(managerActivity).sendBroadcast(intent)
     }
 
     companion object {

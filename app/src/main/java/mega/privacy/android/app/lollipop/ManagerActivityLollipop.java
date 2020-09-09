@@ -309,7 +309,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public static final int RECENTS_TAB = 1;
 	public static final int INCOMING_TAB = 0;
 	public static final int OUTGOING_TAB = 1;
-	public static final int LINKS_TAB = 2;
+  	public static final int LINKS_TAB = 2;
 	public static final int CONTACTS_TAB = 0;
 	public static final int SENT_REQUESTS_TAB = 1;
 	public static final int RECEIVED_REQUESTS_TAB = 2;

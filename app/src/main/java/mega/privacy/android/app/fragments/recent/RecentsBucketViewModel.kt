@@ -10,9 +10,6 @@ class RecentsBucketViewModel @ViewModelInject constructor(
     private val recentsBucketRepository: RecentsBucketRepository
 ) : ViewModel() {
 
-    private val _openNodeEvent = MutableLiveData<MegaNode>()
-    val openNodeEvent: LiveData<MegaNode> = _openNodeEvent
-
     var serializedNodes: MutableLiveData<Array<String>> = MutableLiveData()
 
     val items: LiveData<List<MegaNode>> = serializedNodes.switchMap {
@@ -26,7 +23,7 @@ class RecentsBucketViewModel @ViewModelInject constructor(
     fun getItemPositionByHandle(handle: Long): Int {
         var index = INVALID_POSITION
         items.value?.forEachIndexed { i, megaNode ->
-            if(megaNode.handle == handle) {
+            if (megaNode.handle == handle) {
                 index = i
                 return@forEachIndexed
             }

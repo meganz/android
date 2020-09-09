@@ -97,6 +97,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.File;
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -118,6 +119,7 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -507,7 +509,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             msgId = intent.getLongExtra("msgId", -1);
             chatId = intent.getLongExtra("chatId", -1);
         }
-        else if (adapterType == RECENTS_ADAPTER) {
+        else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
             nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
             if (nodeHandles == null || nodeHandles.length <= 0) isPlayList = false;
         }
@@ -931,7 +933,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
             }
-            else if (adapterType == RECENTS_ADAPTER) {
+            else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
                 ArrayList<MegaNode> nodes = new ArrayList<>();
                 MegaNode node;
 
@@ -1588,6 +1590,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
             RecentsFragment.imageDrag.setVisibility(visibility);
+        } else if (adapterType == RECENTS_BUCKET_ADAPTER) {
+            DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
     }
 
@@ -1652,6 +1659,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         } else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null){
             RecentsFragment.imageDrag.getLocationOnScreen(location);
+        } else if(adapterType == RECENTS_BUCKET_ADAPTER) {
+            DraggingThumbnailCallback callback = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
     }
 
@@ -2149,7 +2161,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
             }
-            else if (adapterType == RECENTS_ADAPTER) {
+            else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
