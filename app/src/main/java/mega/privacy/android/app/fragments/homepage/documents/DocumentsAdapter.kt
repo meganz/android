@@ -80,9 +80,14 @@ class DocumentsAdapter constructor(
         if (dimen > 0) itemDimen = dimen
     }
 
-    override fun getSectionTitle(position: Int) = if (position < 0 || position >= itemCount) {
-        ""
-    } else getItem(position).modifiedDate
+    override fun getSectionTitle(position: Int): String {
+        if (position < 0 || position >= itemCount) {
+            return ""
+        }
+
+        val nodeName = getItem(position).node?.name ?: ""
+        return if (nodeName == "") "" else nodeName.substring(0, 1)
+    }
 
     companion object {
         private const val TYPE_ITEM = 0
