@@ -275,7 +275,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 File previewFile = new File(getPreviewFolder(context), node.getBase64Handle() + JPG_EXTENSION);
                 logDebug("GET PREVIEW OF HANDLE: " + node.getHandle() + " to download here: " + previewFile.getAbsolutePath());
                 pendingPreviews.put(node.getHandle(), msgId);
-                PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, megaChatAdapter, node);
+                PreviewDownloadListener listener = new PreviewDownloadListener(context, holder, megaChatAdapter, node);
                 megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
             }
         }
@@ -4256,8 +4256,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.forwardOwnPortrait.setVisibility(View.GONE);
                                 holder.forwardOwnLandscape.setVisibility(View.GONE);
                             }
+
+                            long msgId = message.getMsgId() != MEGACHAT_INVALID_HANDLE ? message.getMsgId() : message.getTempId();
                             try {
-                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder, message.getMsgId()).execute(node);
+                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder, msgId).execute(node);
                             } catch (Exception ex) {
                                 //Too many AsyncTasks
                                 logError("Too many AsyncTasks", ex);
@@ -4666,8 +4668,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }
 
                         } else {
+                            long msgId = message.getMsgId() != MEGACHAT_INVALID_HANDLE ? message.getMsgId() : message.getTempId();
                             try {
-                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder, message.getMsgId()).execute(node);
+                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder, msgId).execute(node);
 
                             } catch (Exception ex) {
                                 //Too many AsyncTasks
@@ -6190,16 +6193,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return temp;
     }
 
-    /**
-     * Method get message in the array of messages.
-     *
-     * @param position The message position.
-     * @return The message.
-     */
-    public AndroidMegaChatMessage getMessageAtPosition(int position) {
-        return messages == null || messages.isEmpty() || messages.get(position) == null ? null : messages.get(position);
-    }
-
     @Override
     public int getFolderCount() {
         return 0;
@@ -6262,14 +6255,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     /**
-     * Get request at specified position in Adapter.
+     * Gets the message at specified position in the Adapter.
      *
      * @param positionInAdapter The position in adapter.
      * @return The message.
      */
-    public AndroidMegaChatMessage getMessageAt(int positionInAdapter) {
-        int position = positionInAdapter - 1;
-        return messages != null && position >= 0 && position < messages.size() ? messages.get(position) : null;
+    public AndroidMegaChatMessage getMessageAtAdapterPosition(int positionInAdapter) {
+        int positionInMessages = positionInAdapter - 1;
+        return getMessageAtMessagesPosition(positionInMessages);
+    }
+
+    /**
+     * Gets the message at specified position in messages array.
+     *
+     * @param positionInMessages The position in messages array.
+     * @return The message.
+     */
+    public AndroidMegaChatMessage getMessageAtMessagesPosition(int positionInMessages) {
+        return messages != null && positionInMessages >= 0 && positionInMessages < messages.size() ? messages.get(positionInMessages) : null;
     }
 
     public void loadPreviousMessages(ArrayList<AndroidMegaChatMessage> messages, int counter) {
@@ -6588,323 +6591,275 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private void setPreview(long handle, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaNode node, long msgId) {
-        logDebug("handle: " + handle);
+        if (holder == null) {
+            logWarning("Holder is null. Handle: " + handle);
+            return;
+        }
 
-        if (holder != null) {
-            AndroidMegaChatMessage megaMessage = getMessageAt(holder.getAdapterPosition());
+        int adapterPosition = holder.getAdapterPosition();
+        AndroidMegaChatMessage megaMessage = getMessageAtAdapterPosition(adapterPosition);
+        if (megaMessage == null || megaMessage.getMessage() == null) {
+            logWarning("Message is null. Handle: " + handle);
+            return;
+        }
 
-            if(megaMessage == null || megaMessage.getMessage() == null || megaMessage.getMessage().getMsgId() != msgId)
+        if (megaMessage.getMessage().getMsgId() != msgId) {
+            adapterPosition = ((ChatActivityLollipop) context).getPositionOfAttachmentMessageIfVisible(handle);
+            if (adapterPosition == INVALID_POSITION) {
+                logWarning("The message is not visible or does not exist. Handle: " + handle);
                 return;
-
-            File previewDir = getPreviewFolder(context);
-            String base64 = MegaApiJava.handleToBase64(handle);
-            File preview = new File(previewDir, base64 + ".jpg");
-            if (preview.exists()) {
-
-                if (preview.length() > 0) {
-                    Bitmap bitmap = getBitmapForCache(preview, context);
-
-                    if (bitmap != null) {
-
-                        previewCache.put(handle, bitmap);
-
-                        if (holder.userHandle == megaChatApi.getMyUserHandle()) {
-
-                            String name = holder.contentOwnMessageFileName.getText().toString();
-
-                            if (bitmap.getWidth() < bitmap.getHeight()) {
-                                logDebug("Portrait");
-
-                                holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
-                                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-
-                                if (MimeTypeList.typeForName(name).isPdf()) {
-                                    logDebug("Is pfd preview");
-                                    holder.iconOwnTypeDocPortraitPreview.setVisibility(View.VISIBLE);
-
-                                    holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
-
-                                } else if (MimeTypeList.typeForName(name).isVideo()) {
-                                    logDebug("Is video preview");
-
-                                    holder.gradientOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                                    holder.videoIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
-
-                                    if (node != null) {
-                                        holder.videoTimecontentOwnMessageThumbPort.setText(timeVideo(node));
-                                        holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                                    } else {
-                                        holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
-                                    }
-
-                                    holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
-
-                                } else {
-                                    holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
-                                    holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
-                                }
-
-                                holder.previewFramePort.setVisibility(View.VISIBLE);
-                                holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
-
-                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                    holder.forwardOwnPortrait.setVisibility(View.GONE);
-                                }
-                                else {
-                                    holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
-                                }
-                                if(isMultipleSelect()){
-                                    holder.forwardOwnPortrait.setOnClickListener(null);
-                                }else{
-                                    holder.forwardOwnPortrait.setOnClickListener(this);
-                                }
-                                holder.forwardOwnLandscape.setVisibility(View.GONE);
-                                holder.forwardOwnFile.setVisibility(View.GONE);
-
-                                holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
-                                holder.previewFrameLand.setVisibility(View.GONE);
-                                holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
-
-                                holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
-                                holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
-                                holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
-                            } else {
-                                logDebug("Landscape");
-                                holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
-                                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-
-                                if (MimeTypeList.typeForName(name).isPdf()) {
-                                    logDebug("Is pfd preview");
-                                    holder.iconOwnTypeDocLandPreview.setVisibility(View.VISIBLE);
-
-                                    holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
-                                    holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
-                                    holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
-
-                                } else if (MimeTypeList.typeForName(name).isVideo()) {
-                                    logDebug("Is video preview");
-                                    holder.gradientOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                                    holder.videoIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
-
-                                    if (node != null) {
-                                        holder.videoTimecontentOwnMessageThumbLand.setText(timeVideo(node));
-                                        holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                                    } else {
-                                        holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
-                                    }
-
-                                    holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
-
-                                } else {
-                                    holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
-                                    holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
-                                    holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
-                                    holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
-                                }
-
-                                holder.previewFrameLand.setVisibility(View.VISIBLE);
-                                holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                                holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
-                                holder.previewFramePort.setVisibility(View.GONE);
-                                holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
-
-                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                    holder.forwardOwnLandscape.setVisibility(View.GONE);
-                                }
-                                else {
-                                    holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
-                                }
-                                if(isMultipleSelect()){
-                                    holder.forwardOwnLandscape.setOnClickListener(null);
-                                }else{
-                                    holder.forwardOwnLandscape.setOnClickListener(this);
-                                }
-                                holder.forwardOwnPortrait.setVisibility(View.GONE);
-                                holder.forwardOwnFile.setVisibility(View.GONE);
-
-                                holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
-                                holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
-                                holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
-                            }
-                        } else {
-                            logDebug("Update my contacts preview");
-                            String name = holder.contentContactMessageFileName.getText().toString();
-
-                            if (bitmap.getWidth() < bitmap.getHeight()) {
-
-                                logDebug("Portrait");
-                                holder.contentContactMessageThumbPort.setImageBitmap(bitmap);
-                                holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-
-                                if (MimeTypeList.typeForName(name).isPdf()) {
-                                    logDebug("Contact message - Is pfd preview");
-                                    holder.iconContactTypeDocPortraitPreview.setVisibility(View.VISIBLE);
-
-                                    holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
-
-                                } else if (MimeTypeList.typeForName(name).isVideo()) {
-                                    logDebug("Contact message - Is video preview");
-
-                                    holder.gradientContactMessageThumbPort.setVisibility(View.VISIBLE);
-                                    holder.videoIconContactMessageThumbPort.setVisibility(View.VISIBLE);
-
-                                    if (node != null) {
-                                        holder.videoTimecontentContactMessageThumbPort.setText(timeVideo(node));
-                                        holder.videoTimecontentContactMessageThumbPort.setVisibility(View.VISIBLE);
-                                    } else {
-                                        holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
-                                    }
-
-                                    holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
-
-                                } else {
-                                    holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
-                                    holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
-                                    holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
-                                }
-
-                                holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
-                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                    holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-                                }
-                                else {
-                                    holder.forwardContactPreviewPortrait.setVisibility(View.VISIBLE);
-                                }
-                                if(isMultipleSelect()){
-                                    holder.forwardContactPreviewPortrait.setOnClickListener(null);
-                                }else{
-                                    holder.forwardContactPreviewPortrait.setOnClickListener(this);
-                                }
-                                holder.contentContactMessageThumbLand.setVisibility(View.GONE);
-                                holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-
-                                holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
-                                holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
-                                holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
-
-//                                holder.contentContactMessageThumbLandFramework.setVisibility(View.GONE);
-                                holder.contentContactMessageFile.setVisibility(View.GONE);
-                                holder.forwardContactFile.setVisibility(View.GONE);
-
-                                holder.contentContactMessageFileThumb.setVisibility(View.GONE);
-                                holder.contentContactMessageFileName.setVisibility(View.GONE);
-                                holder.contentContactMessageFileSize.setVisibility(View.GONE);
-
-                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams) holder.contentContactMessageThumbPort.getLayoutParams();
-                                contactThumbParams.setMargins(0, 0, 0, 0);
-                                holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-
-//                                if(chatRoom.isGroup()){
-//                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbPort.getLayoutParams();
-//                                    contactThumbParams.setMargins(0, scaleHeightPx(10, outMetrics) ,0, 0);
-//                                    holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-////                                    holder.contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
-//                                }
-//                                else{
-//                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbPort.getLayoutParams();
-//                                    contactThumbParams.setMargins(0, 0 ,0, 0);
-//                                    holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-////                                    holder.contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
-//                                }
-
-                            } else {
-
-                                logDebug("Landscape");
-                                holder.contentContactMessageThumbLand.setImageBitmap(bitmap);
-                                holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-
-                                if (MimeTypeList.typeForName(name).isPdf()) {
-                                    logDebug("Contact message - Is pfd preview");
-                                    holder.iconContactTypeDocLandPreview.setVisibility(View.VISIBLE);
-
-                                    holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
-                                    holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
-                                    holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
-
-                                } else if (MimeTypeList.typeForName(name).isVideo()) {
-                                    logDebug("Contact message - Is video preview");
-                                    holder.gradientContactMessageThumbLand.setVisibility(View.VISIBLE);
-                                    holder.videoIconContactMessageThumbLand.setVisibility(View.VISIBLE);
-
-                                    if (node != null) {
-                                        holder.videoTimecontentContactMessageThumbLand.setText(timeVideo(node));
-                                        holder.videoTimecontentContactMessageThumbLand.setVisibility(View.VISIBLE);
-                                    } else {
-                                        logWarning("Landscape: Node is NULL");
-                                        holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
-                                    }
-
-                                    holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
-
-                                } else {
-                                    holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
-                                    holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
-                                    holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
-                                    holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
-                                }
-
-                                holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
-
-                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
-                                    holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
-                                }
-                                else {
-                                    holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
-                                }
-                                if(isMultipleSelect()){
-                                    holder.forwardContactPreviewLandscape.setOnClickListener(null);
-                                }else{
-                                    holder.forwardContactPreviewLandscape.setOnClickListener(this);
-                                }
-//                                holder.contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
-
-                                holder.contentContactMessageThumbPort.setVisibility(View.GONE);
-                                holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
-
-                                holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
-                                holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
-                                holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
-//                                holder.contentContactMessageThumbPortFramework.setVisibility(View.GONE);
-                                holder.contentContactMessageFile.setVisibility(View.GONE);
-                                holder.forwardContactFile.setVisibility(View.GONE);
-
-                                holder.contentContactMessageFileThumb.setVisibility(View.GONE);
-                                holder.contentContactMessageFileName.setVisibility(View.GONE);
-                                holder.contentContactMessageFileSize.setVisibility(View.GONE);
-
-                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams) holder.contentContactMessageThumbLand.getLayoutParams();
-                                contactThumbParams.setMargins(0, 0, 0, 0);
-                                holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-
-//                                if(chatRoom.isGroup()){
-//                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbLand.getLayoutParams();
-//                                    contactThumbParams.setMargins(0, scaleHeightPx(10, outMetrics),0, 0);
-//                                    holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-////                                    holder.contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
-//                                }
-//                                else{
-//                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbLand.getLayoutParams();
-//                                    contactThumbParams.setMargins(0, 0 ,0, 0);
-//                                    holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-////                                    holder.contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
-//
-//                                }
-
-                            }
-                        }
-                    }
-                }
-            } else {
-                logWarning("Preview not exists");
             }
         }
+
+        File previewDir = getPreviewFolder(context);
+        String base64 = MegaApiJava.handleToBase64(handle);
+        File preview = new File(previewDir, base64 + JPG_EXTENSION);
+        if (!preview.exists() || preview.length() <= 0) {
+            logWarning("Preview not exists. Handle: " + handle);
+            return;
+        }
+
+        Bitmap bitmap = getBitmapForCache(preview, context);
+        if (bitmap == null) {
+            logWarning("Bitmap is null. Handle: " + handle);
+            return;
+        }
+
+        previewCache.put(handle, bitmap);
+
+        if (holder.userHandle == megaChatApi.getMyUserHandle()) {
+            String name = holder.contentOwnMessageFileName.getText().toString();
+
+            if (bitmap.getWidth() < bitmap.getHeight()) {
+                holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
+                holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
+                if (MimeTypeList.typeForName(name).isPdf()) {
+                    holder.iconOwnTypeDocPortraitPreview.setVisibility(View.VISIBLE);
+                    holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+                } else if (MimeTypeList.typeForName(name).isVideo()) {
+                    holder.gradientOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                    holder.videoIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
+
+                    if (node != null) {
+                        holder.videoTimecontentOwnMessageThumbPort.setText(timeVideo(node));
+                        holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+                    }
+
+                    holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
+
+                } else {
+                    holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
+                    holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+                }
+
+                holder.previewFramePort.setVisibility(View.VISIBLE);
+                holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+
+                if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                    holder.forwardOwnPortrait.setVisibility(View.GONE);
+                } else {
+                    holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
+                }
+
+                if (isMultipleSelect()) {
+                    holder.forwardOwnPortrait.setOnClickListener(null);
+                } else {
+                    holder.forwardOwnPortrait.setOnClickListener(this);
+                }
+
+                holder.forwardOwnLandscape.setVisibility(View.GONE);
+                holder.forwardOwnFile.setVisibility(View.GONE);
+
+                holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                holder.previewFrameLand.setVisibility(View.GONE);
+                holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
+
+                holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
+                holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
+                holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+            } else {
+                holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
+                holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
+                if (MimeTypeList.typeForName(name).isPdf()) {
+                    holder.iconOwnTypeDocLandPreview.setVisibility(View.VISIBLE);
+                    holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
+                } else if (MimeTypeList.typeForName(name).isVideo()) {
+                    holder.gradientOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                    holder.videoIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
+
+                    if (node != null) {
+                        holder.videoTimecontentOwnMessageThumbLand.setText(timeVideo(node));
+                        holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+                    }
+
+                    holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
+                } else {
+                    holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
+                    holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
+                }
+
+                holder.previewFrameLand.setVisibility(View.VISIBLE);
+                holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                holder.previewFramePort.setVisibility(View.GONE);
+                holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
+
+                if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                    holder.forwardOwnLandscape.setVisibility(View.GONE);
+                } else {
+                    holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
+                }
+                if (isMultipleSelect()) {
+                    holder.forwardOwnLandscape.setOnClickListener(null);
+                } else {
+                    holder.forwardOwnLandscape.setOnClickListener(this);
+                }
+                holder.forwardOwnPortrait.setVisibility(View.GONE);
+                holder.forwardOwnFile.setVisibility(View.GONE);
+
+                holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
+                holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
+                holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+            }
+        } else {
+            String name = holder.contentContactMessageFileName.getText().toString();
+
+            if (bitmap.getWidth() < bitmap.getHeight()) {
+                holder.contentContactMessageThumbPort.setImageBitmap(bitmap);
+                holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
+                if (MimeTypeList.typeForName(name).isPdf()) {
+                    holder.iconContactTypeDocPortraitPreview.setVisibility(View.VISIBLE);
+                    holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
+                } else if (MimeTypeList.typeForName(name).isVideo()) {
+                    holder.gradientContactMessageThumbPort.setVisibility(View.VISIBLE);
+                    holder.videoIconContactMessageThumbPort.setVisibility(View.VISIBLE);
+
+                    if (node != null) {
+                        holder.videoTimecontentContactMessageThumbPort.setText(timeVideo(node));
+                        holder.videoTimecontentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
+                    }
+
+                    holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
+                } else {
+                    holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
+                    holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
+                }
+
+                holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+
+                if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                    holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
+                } else {
+                    holder.forwardContactPreviewPortrait.setVisibility(View.VISIBLE);
+                }
+
+                if (isMultipleSelect()) {
+                    holder.forwardContactPreviewPortrait.setOnClickListener(null);
+                } else {
+                    holder.forwardContactPreviewPortrait.setOnClickListener(this);
+                }
+
+                holder.contentContactMessageThumbLand.setVisibility(View.GONE);
+                holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+
+                holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
+                holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
+                holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
+
+                holder.contentContactMessageFile.setVisibility(View.GONE);
+                holder.forwardContactFile.setVisibility(View.GONE);
+
+                holder.contentContactMessageFileThumb.setVisibility(View.GONE);
+                holder.contentContactMessageFileName.setVisibility(View.GONE);
+                holder.contentContactMessageFileSize.setVisibility(View.GONE);
+
+                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams) holder.contentContactMessageThumbPort.getLayoutParams();
+                contactThumbParams.setMargins(0, 0, 0, 0);
+                holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+            } else {
+                holder.contentContactMessageThumbLand.setImageBitmap(bitmap);
+                holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
+                if (MimeTypeList.typeForName(name).isPdf()) {
+                    holder.iconContactTypeDocLandPreview.setVisibility(View.VISIBLE);
+
+                    holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
+                } else if (MimeTypeList.typeForName(name).isVideo()) {
+                    holder.gradientContactMessageThumbLand.setVisibility(View.VISIBLE);
+                    holder.videoIconContactMessageThumbLand.setVisibility(View.VISIBLE);
+
+                    if (node != null) {
+                        holder.videoTimecontentContactMessageThumbLand.setText(timeVideo(node));
+                        holder.videoTimecontentContactMessageThumbLand.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
+                    }
+
+                    holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
+                } else {
+                    holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
+                    holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
+                }
+
+                holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
+
+                if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                    holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+                } else {
+                    holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
+                }
+
+                if (isMultipleSelect()) {
+                    holder.forwardContactPreviewLandscape.setOnClickListener(null);
+                } else {
+                    holder.forwardContactPreviewLandscape.setOnClickListener(this);
+                }
+
+                holder.contentContactMessageThumbPort.setVisibility(View.GONE);
+                holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
+
+                holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
+                holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
+                holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
+                holder.contentContactMessageFile.setVisibility(View.GONE);
+                holder.forwardContactFile.setVisibility(View.GONE);
+
+                holder.contentContactMessageFileThumb.setVisibility(View.GONE);
+                holder.contentContactMessageFileName.setVisibility(View.GONE);
+                holder.contentContactMessageFileSize.setVisibility(View.GONE);
+
+                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams) holder.contentContactMessageThumbLand.getLayoutParams();
+                contactThumbParams.setMargins(0, 0, 0, 0);
+                holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+            }
+        }
+
+        notifyItemChanged(adapterPosition);
     }
 
     private void setUploadingPreview(MegaChatLollipopAdapter.ViewHolderMessageChat holder, Bitmap bitmap) {
@@ -7430,7 +7385,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Play or pause a voice clip
      */
     private void playOrPauseVoiceClip(int positionInAdapter, ViewHolderMessageChat holder){
-        AndroidMegaChatMessage currentMessage = getMessageAtPosition(positionInAdapter-1);
+        AndroidMegaChatMessage currentMessage = getMessageAtAdapterPosition(positionInAdapter-1);
         if (currentMessage == null || currentMessage.getMessage() == null ||
                 currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP ||
                 messagesPlaying == null || messagesPlaying.isEmpty())
