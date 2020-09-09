@@ -90,7 +90,7 @@ class DocumentsAdapter constructor(
     }
 
     companion object {
-        private const val TYPE_ITEM = 0
-        private const val TYPE_HEADER = 1
+        const val TYPE_ITEM = 0
+        const val TYPE_HEADER = 1
     }
 }

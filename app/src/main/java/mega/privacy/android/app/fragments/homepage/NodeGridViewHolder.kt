@@ -26,7 +26,6 @@ class NodeGridViewHolder(private val binding: ViewDataBinding) :
                     this.actionModeViewModel = actionModeViewModel
                     this.item = item
                     this.megaApi = megaApi
-                    this.context = binding.root.context
                 }
                 is SortByHeaderBinding -> {
                     this.orderNameStringId =

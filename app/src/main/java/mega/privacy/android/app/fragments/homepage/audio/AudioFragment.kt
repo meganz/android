@@ -122,7 +122,7 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
                 activity.invalidateOptionsMenu()  // Hide the search icon if no file
             }
 
-            actionModeViewModel.setNodesData(it)
+            actionModeViewModel.setNodesData(it.filter{nodeItem -> nodeItem.node != null})
         }
     }
 
@@ -362,7 +362,7 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
                 }
             } else {
                 viewModel.items.value?.let { items ->
-                    actionModeCallback.nodeCount = items.size
+                    actionModeCallback.nodeCount = items.size - 1   // The "sort by" header isn't counted
                 }
 
                 if (actionMode == null) {
@@ -416,7 +416,9 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        if (listAdapter.getItemViewType(pos) != DocumentsAdapter.TYPE_HEADER) {
+                            itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         itemView.findViewById(R.id.ic_selected)
@@ -477,18 +479,6 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
         viewModel.searchQuery = ""
         viewModel.refreshUi()
     }
-
-//    private fun configureGridLayoutManager() {
-//        if (listView.layoutManager !is CustomizedGridLayoutManager) return
-//
-//        (listView.layoutManager as CustomizedGridLayoutManager).apply {
-//            spanSizeLookup = adapter.getSpanSizeLookup(spanCount)
-//            val itemDimen =
-//                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.Doc_grid_margin)
-//                    .toInt() * 2
-//            adapter.setItemDimen(itemDimen)
-//        }
-//    }
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return

@@ -6,8 +6,6 @@
     <data>
 
         <import type="android.view.View" />
-        <import type="mega.privacy.android.app.R" />
-        <import type="androidx.core.content.ContextCompat" />
 
         <import type="mega.privacy.android.app.utils.Util" />
 
@@ -32,17 +30,13 @@
         <variable
             name="megaApi"
             type="nz.mega.sdk.MegaApiJava" />
-
-        <variable
-            name="context"
-            type="android.content.Context" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="219dp"
         android:layout_margin="2dp"
-        android:background="@{ContextCompat.getDrawable(context, item.selected ? R.drawable.background_item_grid_selected : R.drawable.background_item_grid_new)}"
+        android:background="@{item.selected ? @drawable/background_item_grid_selected : @drawable/background_item_grid_new}"
         android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item)}"
         android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}"
         >
