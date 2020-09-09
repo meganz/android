@@ -3236,6 +3236,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	        		if (intentRec.getAction() != null){
 	        			if (intentRec.getAction().equals(ACTION_SHOW_TRANSFERS)){
+							if (getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+								sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
+							}
+
 	        				drawerItem = DrawerItem.TRANSFERS;
 	        				indexTransfers = intentRec.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
 							setIntent(null);
@@ -3958,7 +3962,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     }
 				}
     			else if (intent.getAction().equals(ACTION_SHOW_TRANSFERS)){
-					logDebug("Intent show transfers");
+					if (getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+						sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
+					}
 
     				drawerItem = DrawerItem.TRANSFERS;
 					indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
@@ -11196,7 +11202,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				navigateToUpgradeAccount();
 				return;
 			} else if (ACTION_SHOW_TRANSFERS.equals(intent.getAction())){
-				logDebug("Intent show transfers");
+				if (getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+					sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
+				}
 
 				drawerItem = DrawerItem.TRANSFERS;
 				indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);

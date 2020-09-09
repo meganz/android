@@ -786,10 +786,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
         Intent intent;
         intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		switch (isOverquota) {
 			case 0:
 			default:
 				intent.setAction(ACTION_SHOW_TRANSFERS);
+				intent.putExtra(OPENED_FROM_CHAT, true);
 				break;
 			case 1:
 				intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -802,7 +804,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String actionString = isOverquota == 0 ? getString(R.string.chat_upload_title_notification) :
 				getString(R.string.general_show_info);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = null;
         int currentapiVersion = Build.VERSION.SDK_INT;
 

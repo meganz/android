@@ -36,6 +36,7 @@ public class BroadcastConstants {
     public static final String ACTION_UPDATE_CREDENTIALS = "ACTION_UPDATE_CREDENTIALS";
     public static final String ACTION_LEFT_CHAT = "ACTION_LEFT_CHAT";
     public static final String ACTION_CLOSE_CHAT_AFTER_IMPORT = "ACTION_CLOSE_CHAT_AFTER_IMPORT";
+    public static final String ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS = "ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";

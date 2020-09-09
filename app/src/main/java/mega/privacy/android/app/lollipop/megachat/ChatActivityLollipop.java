@@ -642,7 +642,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null) return;
 
-            if (intent.getAction().equals(ACTION_CLOSE_CHAT_AFTER_IMPORT)) {
+            if (intent.getAction().equals(ACTION_CLOSE_CHAT_AFTER_IMPORT)
+                    || intent.getAction().equals(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS)) {
                 finish();
             }
         }
@@ -765,7 +766,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         leftChatFilter.addAction(ACTION_LEFT_CHAT);
         registerReceiver(leftChatReceiver, leftChatFilter);
 
-        registerReceiver(closeChatReceiver, new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT));
+        IntentFilter closeChatFilter = new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT);
+        closeChatFilter.addAction(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS);
+        registerReceiver(closeChatReceiver, closeChatFilter);
 
         changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
 
