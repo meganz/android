@@ -12,7 +12,7 @@ class NodeGridAdapter(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel,
     private val sortByHeaderViewModel: SortByHeaderViewModel
-) : ListAdapter<NodeItem, NodeGridViewHolder>(NodeDiffCallback()),
+) : ListAdapter<NodeItem, NodeViewHolder>(NodeDiffCallback()),
     SectionTitleProvider {
 
     override fun getItemViewType(position: Int): Int {
@@ -22,7 +22,7 @@ class NodeGridAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeGridViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
         val binding = when (viewType) {
@@ -40,10 +40,10 @@ class NodeGridAdapter(
                 )
         }
 
-        return NodeGridViewHolder(binding)
+        return NodeViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: NodeGridViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: NodeViewHolder, position: Int) {
         holder.bind(
             actionModeViewModel,
             itemOperationViewModel,

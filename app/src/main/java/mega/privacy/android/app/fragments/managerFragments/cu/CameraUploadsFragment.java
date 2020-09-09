@@ -1,13 +1,10 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,7 +24,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -39,7 +35,6 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
@@ -59,7 +54,6 @@ import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVE
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.utils.CameraUploadUtil.resetCUTimestampsAndCache;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
@@ -69,8 +63,6 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_H
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
 import static mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER;
@@ -79,6 +71,8 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIR
 import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtils.findVideoLocalPath;
+import static mega.privacy.android.app.utils.FileUtils.setLocalIntentParams;
+import static mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -689,6 +683,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
             mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
 
+            boolean paramsSetSuccessfully = false;
             String localPath = null;
             try {
                 localPath = findVideoLocalPath(context, node);
@@ -696,46 +691,22 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 logWarning(e.getMessage());
             }
             if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
-                File mediaFile = new File(localPath);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(
-                        Environment.getExternalStorageDirectory().getPath())) {
-                    mediaIntent.setDataAndType(FileProvider.getUriForFile(context,
-                            "mega.privacy.android.app.providers.fileprovider", mediaFile),
-                            MimeTypeList
-                                    .typeForName(node.getName()).getType());
-                } else {
-                    mediaIntent.setDataAndType(Uri.fromFile(mediaFile), mime.getType());
-                }
-                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                paramsSetSuccessfully = setLocalIntentParams(context, node, mediaIntent, localPath,
+                        false);
             } else {
-                if (megaApi.httpServerIsRunning() == 0) {
-                    megaApi.httpServerStart();
-                }
-
-                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager
-                        = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                if (activityManager != null) {
-                    activityManager.getMemoryInfo(mi);
-                }
-
-                megaApi.httpServerSetMaxBufferSize(
-                        mi.totalMem > BUFFER_COMP ? MAX_BUFFER_32MB : MAX_BUFFER_16MB);
-
-                String url = megaApi.httpServerGetLocalLink(node);
-                mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi,
+                        mediaIntent);
             }
-            if (internalIntent) {
-                setDraggingThumbnailCallback();
-                launchNodeViewer(mediaIntent, node.getHandle());
-            } else {
-                if (isIntentAvailable(context, mediaIntent)) {
-                    launchNodeViewer(mediaIntent, node.getHandle());
-                } else {
-                    mManagerActivity.showSnackbar(SNACKBAR_TYPE,
-                            getString(R.string.intent_not_available), -1);
+            if (!isIntentAvailable(context, mediaIntent)) {
+                mManagerActivity.showSnackbar(SNACKBAR_TYPE,
+                        getString(R.string.intent_not_available), -1);
+                paramsSetSuccessfully = false;
+            }
+            if (paramsSetSuccessfully) {
+                if (internalIntent) {
+                    setDraggingThumbnailCallback();
                 }
+                launchNodeViewer(mediaIntent, node.getHandle());
             }
         }
     }

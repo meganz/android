@@ -43,7 +43,6 @@ import mega.privacy.android.app.utils.Constants.PHOTOS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.getThumbnailLocationOnScreen
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.lang.ref.WeakReference

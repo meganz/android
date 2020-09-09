@@ -3,15 +3,8 @@ package mega.privacy.android.app.fragments.homepage.audio
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
-import android.app.ActivityManager
-import android.app.ActivityManager.MemoryInfo
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
@@ -19,14 +12,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.R.string
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -42,8 +33,9 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.homepage.NodeListAdapter
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.fragments.homepage.documents.DocumentsAdapter
+import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -60,16 +52,18 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
 import mega.privacy.android.app.utils.FileUtils.getLocalFile
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.FileUtils.isInternalIntent
+import mega.privacy.android.app.utils.FileUtils.isLocalFile
+import mega.privacy.android.app.utils.FileUtils.isOpusFile
+import mega.privacy.android.app.utils.FileUtils.setLocalIntentParams
+import mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.app.utils.getThumbnailLocationOnScreen
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.io.File
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
@@ -82,7 +76,7 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var binding: FragmentAudioBinding
     private lateinit var listView: NewGridRecyclerView
-    private lateinit var listAdapter: DocumentsAdapter
+    private lateinit var listAdapter: NodeListAdapter
     private lateinit var gridAdapter: NodeGridAdapter
     private lateinit var itemDecoration: PositionDividerItemDecoration
 
@@ -122,7 +116,7 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
                 activity.invalidateOptionsMenu()  // Hide the search icon if no file
             }
 
-            actionModeViewModel.setNodesData(it.filter{nodeItem -> nodeItem.node != null})
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
     }
 
@@ -191,117 +185,60 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
     private fun openNode(node: MegaNode, index: Int) {
         val file: MegaNode = node
 
-        val mimeType = MimeTypeList.typeForName(file.name)
+        val internalIntent = isInternalIntent(node)
+        val intent = if (internalIntent) {
+            Intent(context, AudioVideoPlayerLollipop::class.java)
+        } else {
+            Intent(Intent.ACTION_VIEW)
+        }
 
-        val mediaIntent: Intent
-        val internalIntent: Boolean
-        var opusFile = false
-        if (mimeType.isAudioNotSupported) {
-            mediaIntent = Intent(Intent.ACTION_VIEW)
-            internalIntent = false
-            val parts = file.name.split("\\.")
-            if (parts.size > 1 && parts.last() == "opus") {
-                opusFile = true
-            }
-        } else {
-            mediaIntent = Intent(context, AudioVideoPlayerLollipop::class.java)
-            internalIntent = true
-        }
-        mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        mediaIntent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, viewModel.order)
+        intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, viewModel.order)
+        intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
+        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
+
         if (viewModel.searchMode) {
-            mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_SEARCH_ADAPTER)
-            mediaIntent.putExtra(
-                INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, viewModel.getHandlesOfAudio()
-            )
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_SEARCH_ADAPTER)
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, viewModel.getHandlesOfAudio())
         } else {
-            mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
         }
+
         listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(R.id.thumbnail)
             ?.let {
-                mediaIntent.putExtra(
-                    INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocationOnScreen(it)
-                )
+                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
             }
-
-        mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, file.name)
 
         val localPath = getLocalFile(context, file.name, file.size)
+        var paramsSetSuccessfully = if (isLocalFile(context, node, megaApi, localPath)) {
+            setLocalIntentParams(context, node, intent, localPath, false)
+        } else {
+            setStreamingIntentParams(context, node, megaApi, intent)
+        }
 
-        if (localPath != null) {
-            val mediaFile = File(localPath)
-            if (VERSION.SDK_INT >= VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                logDebug("itemClick:FileProviderOption")
-                val mediaFileUri = FileProvider.getUriForFile(
-                    context, "mega.privacy.android.app.providers.fileprovider", mediaFile
-                )
-                if (mediaFileUri == null) {
-                    logDebug("itemClick:ERROR:NULLmediaFileUri")
-                    showSnackbar(context, SNACKBAR_TYPE, getString(string.general_text_error), -1)
-                } else {
-                    mediaIntent.setDataAndType(mediaFileUri, mimeType.type)
-                }
-            } else {
-                val mediaFileUri = Uri.fromFile(mediaFile)
-                if (mediaFileUri == null) {
-                    logError("itemClick:ERROR:NULLmediaFileUri")
-                    showSnackbar(context, SNACKBAR_TYPE, getString(string.general_text_error), -1)
-                } else {
-                    mediaIntent.setDataAndType(mediaFileUri, mimeType.type)
-                }
-            }
-            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        } else {
-            logDebug("itemClick:localPathNULL")
-            if (megaApi.httpServerIsRunning() == 0) {
-                megaApi.httpServerStart()
-            } else {
-                logWarning("itemClick:ERROR:httpServerAlreadyRunning")
-            }
-            val mi = MemoryInfo()
-            val activityManager =
-                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.getMemoryInfo(mi)
-            if (mi.totalMem > Constants.BUFFER_COMP) {
-                logDebug("itemClick:total mem: " + mi.totalMem + " allocate 32 MB")
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-            } else {
-                logDebug("itemClick:total mem: " + mi.totalMem + " allocate 16 MB")
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-            }
-            val url = megaApi.httpServerGetLocalLink(file)
-            if (url != null) {
-                val parsedUri = Uri.parse(url)
-                if (parsedUri != null) {
-                    mediaIntent.setDataAndType(parsedUri, mimeType.type)
-                } else {
-                    logError("itemClick:ERROR:httpServerGetLocalLink")
-                    showSnackbar(context, SNACKBAR_TYPE, getString(string.general_text_error), -1)
-                }
-            } else {
-                logError("itemClick:ERROR:httpServerGetLocalLink")
-                showSnackbar(context, SNACKBAR_TYPE, getString(string.general_text_error), -1)
-            }
+        if (paramsSetSuccessfully && isOpusFile(node)) {
+            intent.setDataAndType(intent.data, "audio/*")
         }
-        mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
-        if (opusFile) {
-            mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
+
+        if (!isIntentAvailable(context, intent)) {
+            paramsSetSuccessfully = false
+            showSnackbar(context, SNACKBAR_TYPE, getString(string.intent_not_available), -1)
         }
-        if (internalIntent) {
-            setupDraggingThumbnailCallback()
-            startActivity(mediaIntent)
-            activity.overridePendingTransition(0, 0)
-            draggingNodeHandle = node.handle
-        } else {
-            logDebug("itemClick:externalIntent")
-            if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
-                startActivity(mediaIntent)
+
+        if (paramsSetSuccessfully) {
+            if (internalIntent) {
+                draggingNodeHandle = node.handle
+                setupDraggingThumbnailCallback()
+                startActivity(intent)
+                activity.overridePendingTransition(0, 0)
             } else {
-                logWarning("itemClick:noAvailableIntent")
-                showSnackbar(context, SNACKBAR_TYPE, getString(string.intent_not_available), -1)
-                val nC = NodeController(context)
-                nC.prepareForDownload(arrayListOf(node.handle), true)
+                startActivity(intent)
             }
+        } else {
+            logWarning("itemClick:noAvailableIntent")
+            showSnackbar(context, SNACKBAR_TYPE, getString(string.intent_not_available), -1)
+            val nC = NodeController(context)
+            nC.prepareForDownload(arrayListOf(node.handle), true)
         }
     }
 
@@ -362,7 +299,8 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
                 }
             } else {
                 viewModel.items.value?.let { items ->
-                    actionModeCallback.nodeCount = items.size - 1   // The "sort by" header isn't counted
+                    actionModeCallback.nodeCount =
+                        items.size - 1   // The "sort by" header isn't counted
                 }
 
                 if (actionMode == null) {
@@ -416,7 +354,7 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != DocumentsAdapter.TYPE_HEADER) {
+                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
                             itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
                         }
                         itemView.findViewById(R.id.thumbnail)
@@ -451,7 +389,7 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupListAdapter() {
         listAdapter =
-            DocumentsAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+            NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         gridAdapter =
             NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
 
@@ -486,11 +424,11 @@ class AudioFragment : BaseFragment(), HomepageSearchable {
         viewModel.loadAudio()
     }
 
-    /** All below methods are for supporting functions of FullScreenImageViewer */
+    /** All below methods are for supporting functions of AudioVideoPlayerLollipop */
 
     private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
         val thumbnailView = getThumbnailViewByHandle(draggingNodeHandle) ?: return null
-        return getThumbnailLocationOnScreen(thumbnailView)
+        return thumbnailView.getLocationAndDimen()
     }
 
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {

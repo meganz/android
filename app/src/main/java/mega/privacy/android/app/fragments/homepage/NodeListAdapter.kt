@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage.documents
+package mega.privacy.android.app.fragments.homepage
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,17 +10,12 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
-import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
-import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
-import mega.privacy.android.app.fragments.homepage.NodeDiffCallback
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 
-class DocumentsAdapter constructor(
+class NodeListAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel,
     private val sortByHeaderViewModel: SortByHeaderViewModel
-) : ListAdapter<NodeItem, DocumentViewHolder>(NodeDiffCallback()),
+) : ListAdapter<NodeItem, NodeViewHolder>(NodeDiffCallback()),
     SectionTitleProvider {
 
     private var itemDimen = 0
@@ -32,7 +27,7 @@ class DocumentsAdapter constructor(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DocumentViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
         val binding = when (viewType) {
@@ -57,7 +52,7 @@ class DocumentsAdapter constructor(
             (binding as ItemPhotoBrowseBinding).iconSelected.visibility = View.GONE
         }
 
-        return DocumentViewHolder(binding)
+        return NodeViewHolder(binding)
     }
 
     private fun setItemLayoutParams(binding: ViewBinding) {
@@ -67,7 +62,7 @@ class DocumentsAdapter constructor(
         }
     }
 
-    override fun onBindViewHolder(holder: DocumentViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: NodeViewHolder, position: Int) {
         holder.bind(
             actionModeViewModel,
             itemOperationViewModel,
