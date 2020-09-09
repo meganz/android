@@ -60,6 +60,7 @@
             android:name="mega.privacy.android.app.lollipop.LoginActivityLollipop"
             android:label="@string/login_text"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden">
         </activity>
 

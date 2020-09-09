@@ -2267,17 +2267,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     void ifAnonymousModeLogin(boolean pendingJoin) {
-        if(chatC.isInAnonymousMode()){
-            Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+        Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+        if (pendingJoin && getIntent() != null && getIntent().getDataString() != null) {
             loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-            if (pendingJoin && getIntent() != null && getIntent().getDataString() != null) {
-                loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-                loginIntent.setData(Uri.parse(getIntent().getDataString()));
-                loginIntent.putExtra("idChatToJoin", idChat);
-                closeChat(true);
-            }
-            startActivity(loginIntent);
+            loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
+            loginIntent.setData(Uri.parse(getIntent().getDataString()));
+            loginIntent.putExtra("idChatToJoin", idChat);
+            closeChat(true);
+        } else {
+            loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
         }
+        startActivity(loginIntent);
         finish();
     }
 
