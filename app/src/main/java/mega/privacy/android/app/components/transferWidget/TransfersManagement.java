@@ -103,20 +103,6 @@ public class TransfersManagement {
         return MegaApplication.getInstance().getMegaApi().getBandwidthOverquotaDelay() > 0;
     }
 
-    public void setCurrentTransferOverQuota(boolean currentTransferOverQuota) {
-        isCurrentTransferOverQuota = currentTransferOverQuota;
-    }
-
-    /**
-     * Checks if the transfer over quota has occurred at this moment
-     * or it occurred in other past moment.
-     *
-     * @return  True if the transfer over quota has occurred at this moment, false otherwise.
-     */
-    public boolean isCurrentTransferOverQuota() {
-        return isCurrentTransferOverQuota;
-    }
-
     /**
      * Sets if the widget has to be shown depending on if it is on transfer over quota
      * and the Transfers section has been opened from the transfers widget.
@@ -140,6 +126,29 @@ public class TransfersManagement {
      */
     public boolean hasNotToBeShowDueToTransferOverQuota() {
         return hasNotToBeShowDueToTransferOverQuota && MegaApplication.getInstance().getMegaApi().getNumPendingUploads() <= 0;
+    }
+
+    /**
+     * Sends a broadcast to update the transfer widget where needed.
+     *
+     * @param transferType  the transfer type.
+     */
+    public static void launchTransferUpdateIntent(int transferType) {
+        MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
+    }
+
+    /**
+     * Checks if the transfer over quota has occurred at this moment
+     * or it occurred in other past moment.
+     *
+     * @return  True if the transfer over quota has occurred at this moment, false otherwise.
+     */
+    public boolean isCurrentTransferOverQuota() {
+        return isCurrentTransferOverQuota;
+    }
+
+    public void setCurrentTransferOverQuota(boolean currentTransferOverQuota) {
+        isCurrentTransferOverQuota = currentTransferOverQuota;
     }
 
     public void setIsOnTransfersSection(boolean isOnTransfersSection) {
@@ -172,15 +181,6 @@ public class TransfersManagement {
 
     public boolean isTransferOverQuotaBannerShown() {
         return isTransferOverQuotaBannerShown;
-    }
-
-    /**
-     * Sends a broadcast to update the transfer widget where needed.
-     *
-     * @param transferType  the transfer type.
-     */
-    public static void launchTransferUpdateIntent(int transferType) {
-        MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
     }
 
     public void setTargetPaths(Map<String, String> targetPaths) {

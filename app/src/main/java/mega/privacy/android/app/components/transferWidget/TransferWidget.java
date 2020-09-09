@@ -102,7 +102,8 @@ public class TransferWidget {
                 && drawerItem != ManagerActivityLollipop.DrawerItem.ACCOUNT
                 && drawerItem != ManagerActivityLollipop.DrawerItem.SETTINGS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.CHAT;
+                && drawerItem != ManagerActivityLollipop.DrawerItem.CHAT
+                && drawerItem != ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
     }
 
     /**
