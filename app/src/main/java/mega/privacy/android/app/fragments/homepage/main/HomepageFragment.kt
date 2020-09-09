@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage
+package mega.privacy.android.app.fragments.homepage.main
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -34,7 +34,6 @@ import kotlinx.android.synthetic.main.homepage_fabs.view.text_chat
 import kotlinx.android.synthetic.main.homepage_fabs.view.text_upload
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.BottomSheetPagerAdapter
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
@@ -228,7 +227,6 @@ class HomepageFragment : Fragment() {
 
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources?.getString(R.string.tab_recents)
-            BottomSheetPagerAdapter.FAVOURITES_INDEX -> return resources?.getString(R.string.tab_favourites)
             BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources?.getString(R.string.tab_offline)
         }
 

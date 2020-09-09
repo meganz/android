@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage
+package mega.privacy.android.app.fragments.homepage.main
 
 import android.content.Context
 import android.graphics.Bitmap

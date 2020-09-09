@@ -1,16 +1,14 @@
-package mega.privacy.android.app.components
+package mega.privacy.android.app.fragments.homepage.main
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.fragments.offline.OfflineFragment
-import mega.privacy.android.app.lollipop.managerSections.FavouritesFragment
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment
 
 class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     private val tabFragmentMap = hashMapOf(
         RECENT_INDEX to RecentsFragment::class.java,
-        FAVOURITES_INDEX to FavouritesFragment::class.java,
         OFFLINE_INDEX to OfflineFragment::class.java
     )
 
@@ -34,7 +32,6 @@ class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
 
     companion object {
         const val RECENT_INDEX = 0
-        const val FAVOURITES_INDEX = 1
-        const val OFFLINE_INDEX = 2
+        const val OFFLINE_INDEX = 1
     }
 }

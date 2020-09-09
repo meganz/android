@@ -6,7 +6,7 @@
     app:startDestination="@id/homepageFragment">
     <fragment
         android:id="@+id/homepageFragment"
-        android:name="mega.privacy.android.app.fragments.homepage.HomepageFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.main.HomepageFragment"
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
         <action
