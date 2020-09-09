@@ -271,7 +271,10 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	 * @return The progress of the transfer.
 	 */
     private String getProgress(MegaTransfer transfer) {
-        return Math.round(100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes()) + "%";
+    	long percentage = Math.round(100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes());
+    	String size = getSizeString(transfer.getTotalBytes());
+
+        return context.getString(R.string.progress_size_indicator, percentage, size);
     }
 
 	@Override

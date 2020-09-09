@@ -3236,7 +3236,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	        		if (intentRec.getAction() != null){
 	        			if (intentRec.getAction().equals(ACTION_SHOW_TRANSFERS)){
-							if (getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+							if (intentRec.getBooleanExtra(OPENED_FROM_CHAT, false)) {
 								sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
 							}
 
@@ -3962,7 +3962,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     }
 				}
     			else if (intent.getAction().equals(ACTION_SHOW_TRANSFERS)){
-					if (getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+					if (intent.getBooleanExtra(OPENED_FROM_CHAT, false)) {
 						sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
 					}
 
@@ -11202,7 +11202,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				navigateToUpgradeAccount();
 				return;
 			} else if (ACTION_SHOW_TRANSFERS.equals(intent.getAction())){
-				if (getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
+				if (intent.getBooleanExtra(OPENED_FROM_CHAT, false)) {
 					sendBroadcast(new Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS));
 				}
 
