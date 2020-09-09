@@ -626,9 +626,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message)
 					.setAutoCancel(true)
-					.setOnlyAlertOnce(true);
+					.setOnlyAlertOnce(true)
+					.setColor(ContextCompat.getColor(this, R.color.mega));
 
-			mBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
 			notification = mBuilder.build();
 
 		} else {
@@ -675,10 +675,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 			}
 
-			long inProgressTemp;
 			if (total > 0) {
-				inProgressTemp = inProgress * 100;
-				progressPercent = inProgressTemp / total;
+				progressPercent = (inProgress * 100) / total;
 			}
 		} else {
 			if (totalVideos > 0) {
@@ -750,8 +748,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		Intent intent;
-		intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+		Intent intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
 		switch (isOverquota) {
 			case 0:
 			default:
@@ -796,9 +793,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message)
 					.setContentText(actionString)
-					.setOnlyAlertOnce(true);
-
-			mBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
+					.setOnlyAlertOnce(true)
+					.setColor(ContextCompat.getColor(this, R.color.mega));
 
 			notification = mBuilder.build();
 		} else {
