@@ -45,6 +45,17 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+    /* The "modes" are defined to allow the client to specify the dialog style more flexibly.
+    At the same time, compatible with old code.For which mode corresponds to which dialog style,
+     please refer to the code */
+    public static final int MODE0 = 0;  // No definite mode, map the drawerItem to a specific mode
+    public static final int MODE1 = 1;
+    public static final int MODE2 = 2;
+    public static final int MODE3 = 3;
+    public static final int MODE4 = 4;
+    public static final int MODE5 = 5;
+
+    private int mMode;
 
     private MegaNode node = null;
     private NodeController nC;
@@ -52,6 +63,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private TextView nodeInfo;
 
     private ManagerActivityLollipop.DrawerItem drawerItem;
+
+    public NodeOptionsBottomSheetDialogFragment(int mode) {
+        if (mode >= MODE0 && mode <= MODE5) {
+            mMode = mode;
+        }
+    }
+
+    public NodeOptionsBottomSheetDialogFragment() {
+        mMode = MODE0;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -222,8 +243,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionShare.setVisibility(View.GONE);
         }
 
-        switch (drawerItem) {
-            case CLOUD_DRIVE:
+        if (mMode == MODE0) {
+            mapDrawerItemToMode(drawerItem);
+        }
+
+        switch (mMode) {
+            case MODE1:
                 logDebug("show Cloud bottom sheet");
                 if (((ManagerActivityLollipop) context).isOnRecents()) {
                     optionInfoText.setText(R.string.general_file_info);
@@ -343,7 +368,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionRestoreFromRubbish.setVisibility(View.GONE);
                 break;
 
-            case RUBBISH_BIN:
+            case MODE2:
                 logDebug("show Rubbish bottom sheet");
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
@@ -396,7 +421,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionSendChat.setVisibility(View.GONE);
                 break;
 
-            case INBOX:
+            case MODE3:
 
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
@@ -449,7 +474,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 break;
 
-            case SHARED_ITEMS:
+            case MODE4:
 
                 int tabSelected = ((ManagerActivityLollipop) context).getTabItemShares();
                 if (tabSelected == 0) {
@@ -686,8 +711,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 break;
 
-            case SEARCH:
-            case HOMEPAGE:
+            case MODE5:
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
@@ -1098,5 +1122,25 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);
+    }
+
+    private void mapDrawerItemToMode(ManagerActivityLollipop.DrawerItem drawerItem) {
+        switch (drawerItem) {
+            case CLOUD_DRIVE:
+                mMode = MODE1;
+                break;
+            case RUBBISH_BIN:
+                mMode = MODE2;
+                break;
+            case INBOX:
+                mMode = MODE3;
+                break;
+            case SHARED_ITEMS:
+                mMode = MODE4;
+                break;
+            case SEARCH:
+                mMode = MODE5;
+                break;
+        }
     }
 }

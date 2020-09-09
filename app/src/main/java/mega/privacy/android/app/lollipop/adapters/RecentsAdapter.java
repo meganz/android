@@ -30,6 +30,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -326,7 +327,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     break;
                 }
                 if (node != null) {
-                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node);
+                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE1);
                 }
                 break;
             }
