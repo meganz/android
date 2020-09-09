@@ -59,6 +59,9 @@
     <dimen name="icon_selected_size">23dp</dimen>
     <dimen name="icon_selected_margin">7dp</dimen>
 
+    <dimen name="grid_node_item_width">172dp</dimen>
+    <dimen name="grid_node_list_padding_bottom">65dp</dimen>
+
     <dimen name="photo_item_width">86dp</dimen>
     <dimen name="photo_grid_margin">1dp</dimen>
     <dimen name="photo_selected_icon_width">16dp</dimen>

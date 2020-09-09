@@ -13,7 +13,7 @@
 
         <import type="mega.privacy.android.app.utils.OfflineUtils" />
 
-        <import type="mega.privacy.android.app.MimeTypeList"/>
+        <import type="mega.privacy.android.app.MimeTypeList" />
 
         <variable
             name="itemOperationViewModel"
@@ -37,8 +37,8 @@
         android:layout_height="72dp"
         android:layout_marginTop="1dp"
         android:background="@{item.selected ? @color/new_multiselect_color : @color/transparent}"
-        android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onPhotoClick(item)}"
-        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
+        android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item)}"
+        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
 
         <ImageView
             android:id="@+id/saved_offline"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:src="@drawable/ic_cloud_saved_offline"
-            android:visibility="@{OfflineUtils.availableOffline(context, item.node) ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{OfflineUtils.availableOffline(context, item.node) ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -60,12 +60,12 @@
             android:scaleType="fitCenter"
             app:item_selected="@{item.selected}"
             app:nodeName="@{item.node.name}"
-            app:thumbnail="@{item.thumbnail}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
             app:roundedCornerRadius="2dp"
-            tools:src="@drawable/ic_image_thumbnail" />
+            app:thumbnail="@{item.thumbnail}"
+            />
 
         <TextView
             android:id="@+id/name"
@@ -148,7 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@null"
-            android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.showNodeItemOptions(item) : actionModeViewModel.onPhotoClick(item)}"
+            android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.showNodeItemOptions(item) : actionModeViewModel.onNodeClick(item)}"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_dots_vertical_grey"
@@ -164,4 +164,3 @@
             app:layout_constraintGuide_end="100dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
-<!--    app:thumbnail="@{item.thumbnail != null ? item.thumbnail : MimeTypeList.typeForName(item.node.name).iconResourceId}"-->

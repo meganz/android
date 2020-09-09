@@ -26,8 +26,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_homepage.view.*
-import kotlinx.android.synthetic.main.homepage_fabs.view.*
+import kotlinx.android.synthetic.main.fragment_homepage.view.fab_home_main
+import kotlinx.android.synthetic.main.homepage_fabs.view.fab_chat
+import kotlinx.android.synthetic.main.homepage_fabs.view.fab_main
+import kotlinx.android.synthetic.main.homepage_fabs.view.fab_upload
+import kotlinx.android.synthetic.main.homepage_fabs.view.text_chat
+import kotlinx.android.synthetic.main.homepage_fabs.view.text_upload
 import mega.privacy.android.app.HomepageBottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.BottomSheetPagerAdapter
@@ -36,7 +40,13 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
+import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.app.utils.Constants.GO_OFFLINE
+import mega.privacy.android.app.utils.Constants.GO_ONLINE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ACTION_TYPE
+import mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
@@ -78,19 +88,13 @@ class HomepageFragment : Fragment() {
         with(viewDataBinding.category) {
             val direction = when (it) {
                 categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
-                else -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
+                categoryDocument -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
+                categoryAudio -> HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
+                else -> return@with
             }
 
             findNavController().navigate(direction)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
-            networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
-        )
     }
 
     override fun onCreateView(
@@ -114,6 +118,10 @@ class HomepageFragment : Fragment() {
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
+
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+            networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
+        )
     }
 
     override fun onResume() {
@@ -124,8 +132,8 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
 
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(networkReceiver)
     }
@@ -212,6 +220,7 @@ class HomepageFragment : Fragment() {
     private fun setupCategories() {
         viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryAudio.setOnClickListener(categoryClickListener)
     }
 
     private fun getTabTitle(position: Int): String? {

@@ -17,7 +17,9 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     var order = ORDER_DEFAULT_ASC
+        private set
     var isList = true
+        private set
 
     private val _showDialogEvent = MutableLiveData<Event<Unit>>()
     val showDialogEvent: LiveData<Event<Unit>> = _showDialogEvent

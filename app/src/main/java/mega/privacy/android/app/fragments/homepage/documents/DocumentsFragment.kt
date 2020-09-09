@@ -46,7 +46,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var listView: NewGridRecyclerView
 
-    private lateinit var adapter: DocumentsAdapter
+    private lateinit var adapter: NodeListAdapter
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
@@ -269,7 +269,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupListAdapter() {
         adapter =
-            DocumentsAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+            NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 listView.linearLayoutManager?.scrollToPosition(0)

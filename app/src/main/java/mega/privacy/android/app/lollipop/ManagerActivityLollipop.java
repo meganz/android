@@ -154,6 +154,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
+import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -218,6 +219,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
@@ -603,7 +605,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 
 	private enum HomepageScreen {
-		HOMEPAGE, PHOTOS, DOCUMENTS, FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO
+       	HOMEPAGE, PHOTOS, DOCUMENTS, AUDIO,
+       	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO,
 	}
 
 	//	private boolean isListCloudDrive = true;
@@ -1181,7 +1184,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-						long handle = intent.getLongExtra("handle", -1);
+						long handle = intent.getLongExtra(Constants.HANDLE, INVALID_HANDLE);
 						cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 								.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 						if (cuFragment != null) {
@@ -1210,11 +1213,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									break;
 							}
 						}
-					}
-					else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
-						Long handle = intent.getLongExtra("handle", -1);
+					} else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
+						long handle = intent.getLongExtra(Constants.HANDLE, INVALID_HANDLE);
 						if (mHomepageSearchable != null) {
 							PhotosFragment fragment = (PhotosFragment)mHomepageSearchable;
+							switch (actionType) {
+								case SCROLL_TO_POSITION:
+									fragment.scrollToPhoto(handle);
+									break;
+								case UPDATE_IMAGE_DRAG:
+									fragment.hideDraggingThumbnail(handle);
+									break;
+								default:
+									break;
+							}
+						}
+					} else if (adapterType == AUDIO_BROWSE_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER) {
+						long handle = intent.getLongExtra(Constants.HANDLE, INVALID_HANDLE);
+						if (mHomepageSearchable != null) {
+							AudioFragment fragment = (AudioFragment)mHomepageSearchable;
 							switch (actionType) {
 								case SCROLL_TO_POSITION:
 									fragment.scrollToPhoto(handle);
@@ -5026,6 +5043,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					case DOCUMENTS:
 						titleId = R.string.category_documents;
 						break;
+					case AUDIO:
+						titleId = R.string.category_audio;
+						break;
 				}
 
 				if (titleId != -1) {
@@ -5754,6 +5774,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					break;
 				case R.id.documentsFragment:
 					mHomepageScreen = HomepageScreen.DOCUMENTS;
+					break;
+				case R.id.audioFragment:
+					mHomepageScreen = HomepageScreen.AUDIO;
 					break;
 				case R.id.fullscreen_offline:
 					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;

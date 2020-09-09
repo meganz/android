@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage.photos
+package mega.privacy.android.app.fragments.homepage.audio
 
 import android.animation.Animator
 import android.animation.AnimatorInflater
@@ -16,67 +16,84 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.empty_result_files.view.empty_hint_text
 import mega.privacy.android.app.R
+import mega.privacy.android.app.R.string
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
-import mega.privacy.android.app.databinding.FragmentPhotosBinding
+import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.databinding.FragmentAudioBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
+import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.homepage.NodeListAdapter
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
+import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.AUDIO_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.Constants.PHOTOS_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.Constants.PHOTOS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
+import mega.privacy.android.app.utils.FileUtils.getLocalFile
+import mega.privacy.android.app.utils.FileUtils.isInternalIntent
+import mega.privacy.android.app.utils.FileUtils.isLocalFile
+import mega.privacy.android.app.utils.FileUtils.isOpusFile
+import mega.privacy.android.app.utils.FileUtils.setLocalIntentParams
+import mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams
+import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiJava
+import mega.privacy.android.app.utils.Util.showSnackbar
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
-class PhotosFragment : BaseFragment(), HomepageSearchable {
+class AudioFragment : BaseFragment(), HomepageSearchable {
 
-    private val viewModel by viewModels<PhotosViewModel>()
+    private val viewModel by viewModels<AudioViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
+    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
-    private lateinit var binding: FragmentPhotosBinding
-
+    private lateinit var binding: FragmentAudioBinding
     private lateinit var listView: NewGridRecyclerView
-
-    private lateinit var browseAdapter: PhotosBrowseAdapter
-    private lateinit var searchAdapter: PhotosSearchAdapter
+    private lateinit var listAdapter: NodeListAdapter
+    private lateinit var gridAdapter: NodeGridAdapter
+    private lateinit var itemDecoration: PositionDividerItemDecoration
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
     private lateinit var activity: ManagerActivityLollipop
 
-    private var draggingPhotoHandle = INVALID_HANDLE
-
-    private lateinit var itemDecoration: SimpleDividerItemDecoration
+    private var draggingNodeHandle = INVALID_HANDLE
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
-            viewModel = this@PhotosFragment.viewModel
+        binding = FragmentAudioBinding.inflate(inflater, container, false).apply {
+            viewModel = this@AudioFragment.viewModel
         }
 
         return binding.root
@@ -86,7 +103,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         activity = getActivity() as ManagerActivityLollipop
-        binding.root.empty_hint_text.text = getString(R.string.photos_no_photos)
 
         setupListView()
         setupListAdapter()
@@ -97,10 +113,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
-                activity.invalidateOptionsMenu()  // Hide the search icon if no photo
+                activity.invalidateOptionsMenu()  // Hide the search icon if no file
             }
 
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
     }
 
@@ -119,29 +135,122 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            openPhoto(it as PhotoNodeItem)
+            val node = it.node
+            if (node != null) {
+                openNode(node, it.index)
+            }
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { activity.showNodeOptionsPanel(it.node) }
         })
+
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            activity.showNewSortByPanel()
+        })
+
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            if (sortByHeaderViewModel.isList) {
+                listAdapter.notifyItemChanged(POSITION_HEADER)
+            } else {
+                gridAdapter.notifyItemChanged(POSITION_HEADER)
+            }
+            viewModel.loadAudio(true, it)
+        })
+
+        sortByHeaderViewModel.listGridChangeEvent.observe(
+            viewLifecycleOwner,
+            EventObserver { isList ->
+                switchListGridView(isList)
+            })
     }
 
-    private fun setupDraggingThumbnailCallback() =
-        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
-            PhotosFragment::class.java,
-            PhotosDraggingThumbnailCallback(WeakReference(this))
-        )
+    private fun switchListGridView(isList: Boolean) {
+        if (isList) {
+            listView.switchToLinear()
+            listView.adapter = listAdapter
+            listView.addItemDecoration(itemDecoration)
+        } else {
+            listView.switchBackToGrid()
+            listView.adapter = gridAdapter
+            listView.removeItemDecoration(itemDecoration)
+
+            (listView.layoutManager as CustomizedGridLayoutManager).apply {
+                spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+            }
+        }
+        viewModel.refreshUi()
+    }
+
+    private fun openNode(node: MegaNode, index: Int) {
+        val file: MegaNode = node
+
+        val internalIntent = isInternalIntent(node)
+        val intent = if (internalIntent) {
+            Intent(context, AudioVideoPlayerLollipop::class.java)
+        } else {
+            Intent(Intent.ACTION_VIEW)
+        }
+
+        intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, viewModel.order)
+        intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
+        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
+
+        if (viewModel.searchMode) {
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_SEARCH_ADAPTER)
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, viewModel.getHandlesOfAudio())
+        } else {
+            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
+        }
+
+        listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(R.id.thumbnail)
+            ?.let {
+                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
+            }
+
+        val localPath = getLocalFile(context, file.name, file.size)
+        var paramsSetSuccessfully = if (isLocalFile(context, node, megaApi, localPath)) {
+            setLocalIntentParams(context, node, intent, localPath, false)
+        } else {
+            setStreamingIntentParams(context, node, megaApi, intent)
+        }
+
+        if (paramsSetSuccessfully && isOpusFile(node)) {
+            intent.setDataAndType(intent.data, "audio/*")
+        }
+
+        if (!isIntentAvailable(context, intent)) {
+            paramsSetSuccessfully = false
+            showSnackbar(context, SNACKBAR_TYPE, getString(string.intent_not_available), -1)
+        }
+
+        if (paramsSetSuccessfully) {
+            if (internalIntent) {
+                draggingNodeHandle = node.handle
+                setupDraggingThumbnailCallback()
+                startActivity(intent)
+                activity.overridePendingTransition(0, 0)
+            } else {
+                startActivity(intent)
+            }
+        } else {
+            logWarning("itemClick:noAvailableIntent")
+            showSnackbar(context, SNACKBAR_TYPE, getString(string.intent_not_available), -1)
+            val nC = NodeController(context)
+            nC.prepareForDownload(arrayListOf(node.handle), true)
+        }
+    }
 
     /**
      * Only refresh the list items of uiDirty = true
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
-        val newList = ArrayList<PhotoNodeItem>(it)
-        if (viewModel.searchMode) {
-            searchAdapter.submitList(newList)
+        val newList = ArrayList<NodeItem>(it)
+        if (sortByHeaderViewModel.isList) {
+            listAdapter.submitList(newList)
         } else {
-            browseAdapter.submitList(newList)
+            gridAdapter.submitList(newList)
         }
     }
 
@@ -159,11 +268,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupListView() {
-        listView = binding.photoList
+        listView = binding.audioList
         preventListItemBlink()
         elevateToolbarWhenScrolling()
-        itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
-        if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
+        itemDecoration = PositionDividerItemDecoration(context, outMetrics)
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
     }
 
     private fun setupActionMode() {
@@ -187,7 +298,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                     finish()
                 }
             } else {
-                actionModeCallback.nodeCount = viewModel.getRealPhotoCount()
+                viewModel.items.value?.let { items ->
+                    actionModeCallback.nodeCount =
+                        items.size - 1   // The "sort by" header isn't counted
+                }
 
                 if (actionMode == null) {
                     activity.hideKeyboardSearch()
@@ -239,18 +353,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val itemView = viewHolder.itemView
 
-                    val imageView = if (viewModel.searchMode) {
-                        itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                    val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
+                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
+                            itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
-                        // Draw the green outline for the thumbnail view at once
-                        val thumbnailView =
-                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-                        thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
-
-                        itemView.findViewById<ImageView>(
-                            R.id.icon_selected
-                        )
+                        itemView.findViewById(R.id.ic_selected)
                     }
 
                     imageView?.run {
@@ -279,22 +388,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
-        browseAdapter = PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel)
-        searchAdapter = PhotosSearchAdapter(actionModeViewModel, itemOperationViewModel)
+        listAdapter =
+            NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+        gridAdapter =
+            NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
 
-        searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.linearLayoutManager?.scrollToPosition(0)
-            }
-        })
-
-        if (viewModel.searchMode) {
-            listView.switchToLinear()
-            listView.adapter = searchAdapter
-        } else {
-            configureGridLayoutManager()
-            listView.adapter = browseAdapter
-        }
+        switchListGridView(sortByHeaderViewModel.isList)
     }
 
     override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
@@ -306,10 +405,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
         if (viewModel.searchMode) return
 
-        listView.switchToLinear()
-        listView.adapter = searchAdapter
-        listView.addItemDecoration(itemDecoration)
-
         viewModel.searchMode = true
         viewModel.searchQuery = ""
         viewModel.refreshUi()
@@ -318,86 +413,48 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun exitSearch() {
         if (!viewModel.searchMode) return
 
-        listView.switchBackToGrid()
-        configureGridLayoutManager()
-        listView.adapter = browseAdapter
-        listView.removeItemDecoration(itemDecoration)
-
         viewModel.searchMode = false
         viewModel.searchQuery = ""
         viewModel.refreshUi()
     }
 
-    private fun configureGridLayoutManager() {
-        if (listView.layoutManager !is CustomizedGridLayoutManager) return
-
-        (listView.layoutManager as CustomizedGridLayoutManager).apply {
-            spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
-            val itemDimen =
-                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
-                    .toInt() * 2
-            browseAdapter.setItemDimen(itemDimen)
-        }
-    }
-
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
         viewModel.searchQuery = query
-        viewModel.loadPhotos()
+        viewModel.loadAudio()
     }
 
-    private fun openPhoto(nodeItem: PhotoNodeItem) {
-        listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
-            R.id.thumbnail
-        )?.also {
-            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
+    /** All below methods are for supporting functions of AudioVideoPlayerLollipop */
 
-            intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
-            intent.putExtra(
-                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                MegaApiJava.ORDER_MODIFICATION_DESC
-            )
-
-            if (viewModel.searchMode) {
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_SEARCH_ADAPTER);
-                intent.putExtra(
-                    INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
-                    viewModel.getHandlesOfPhotos()
-                )
-            } else {
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
-            }
-
-            intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
-
-            setupDraggingThumbnailCallback()
-            startActivity(intent)
-            requireActivity().overridePendingTransition(0, 0)
-
-            nodeItem.node?.let { node ->
-                draggingPhotoHandle = node.handle
-            }
-        }
+    private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
+        val thumbnailView = getThumbnailViewByHandle(draggingNodeHandle) ?: return null
+        return thumbnailView.getLocationAndDimen()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(PhotosFragment::class.java)
+    private fun getThumbnailViewByHandle(handle: Long): ImageView? {
+        val position = viewModel.getNodePositionByHandle(handle)
+        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
+        return viewHolder.itemView.findViewById(R.id.thumbnail)
     }
 
-    /** All below methods are for supporting functions of FullScreenImageViewer */
+    private fun setupDraggingThumbnailCallback() =
+        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
+            AudioFragment::class.java, AudioDraggingThumbnailCallback(WeakReference(this))
+        )
 
     fun scrollToPhoto(handle: Long) {
-        val position = viewModel.getItemPositionByHandle(handle)
-        if (position == INVALID_POSITION) return
+        val position = viewModel.getNodePositionByHandle(handle)
+        if (position == Constants.INVALID_POSITION) return
 
         listView.scrollToPosition(position)
         notifyThumbnailLocationOnScreen()
     }
 
-    private fun getDraggingThumbnailLocationOnScreen(): IntArray? {
-        val thumbnailView = getThumbnailViewByHandle(draggingPhotoHandle) ?: return null
-        return thumbnailView.getLocationAndDimen()
+    fun hideDraggingThumbnail(handle: Long) {
+        getThumbnailViewByHandle(draggingNodeHandle)?.apply { visibility = View.VISIBLE }
+        getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
+        draggingNodeHandle = handle
+        notifyThumbnailLocationOnScreen()
     }
 
     private fun notifyThumbnailLocationOnScreen() {
@@ -405,31 +462,20 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         location[0] += location[2] / 2
         location[1] += location[3] / 2
 
-        val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
+        val intent = Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
-    private fun getThumbnailViewByHandle(handle: Long): ImageView? {
-        val position = viewModel.getItemPositionByHandle(handle)
-        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
-        return viewHolder.itemView.findViewById(R.id.thumbnail)
-    }
-
-    fun hideDraggingThumbnail(handle: Long) {
-        getThumbnailViewByHandle(draggingPhotoHandle)?.apply { visibility = View.VISIBLE }
-        getThumbnailViewByHandle(handle)?.apply { visibility = View.INVISIBLE }
-        draggingPhotoHandle = handle
-        notifyThumbnailLocationOnScreen()
-    }
-
     companion object {
-        private class PhotosDraggingThumbnailCallback(private val fragmentRef: WeakReference<PhotosFragment>) :
+        private const val POSITION_HEADER = 0
+
+        private class AudioDraggingThumbnailCallback(private val fragmentRef: WeakReference<AudioFragment>) :
             DraggingThumbnailCallback {
 
             override fun setVisibility(visibility: Int) {
                 val fragment = fragmentRef.get() ?: return
-                fragment.getThumbnailViewByHandle(fragment.draggingPhotoHandle)
+                fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
                     ?.apply { this.visibility = visibility }
             }
 
