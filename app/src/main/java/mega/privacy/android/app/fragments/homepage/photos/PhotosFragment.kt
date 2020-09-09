@@ -31,6 +31,8 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
@@ -123,7 +125,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
-            doIfOnline { activity.showNodeOptionsPanel(it.node) }
+            doIfOnline {
+                activity.showNodeOptionsPanel(
+                    it.node,
+                    MODE5
+                )
+            }
         })
     }
 

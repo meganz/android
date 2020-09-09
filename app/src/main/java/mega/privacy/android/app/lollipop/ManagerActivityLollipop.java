@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -110,13 +109,10 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -10876,6 +10872,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		selectedNode = node;
 		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+	}
+
+	public void showNodeOptionsPanel(MegaNode node, int mode){
+		logDebug("showNodeOptionsPanel");
+
+		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = node;
+		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment(mode);
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
