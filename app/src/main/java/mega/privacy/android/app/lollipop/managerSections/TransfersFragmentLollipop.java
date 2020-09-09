@@ -137,6 +137,10 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		}
 
 		setEmptyView(tL.size());
+
+		if (tL.isEmpty()) {
+			managerActivity.supportInvalidateOptionsMenu();
+		}
 	}
 
 	/**
@@ -145,10 +149,15 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 	 * @param transfer	transfer to add
 	 */
 	public void transferStart(MegaTransfer transfer) {
-		if (!transfer.isStreamingTransfer()) {
-			tL.add(transfer);
+		if (transfer.isStreamingTransfer()) {
+			return;
 		}
 
+		if (tL.isEmpty()) {
+			managerActivity.supportInvalidateOptionsMenu();
+		}
+
+		tL.add(transfer);
 		adapter.notifyItemInserted(tL.size() - 1);
 		setEmptyView(tL.size());
 	}
