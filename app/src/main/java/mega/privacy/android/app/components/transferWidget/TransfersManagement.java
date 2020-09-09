@@ -24,6 +24,7 @@ public class TransfersManagement {
     private boolean failedTransfers;
     private boolean transferOverQuotaNotificationShown;
     private boolean isTransferOverQuotaBannerShown;
+    private boolean resumeTransfersWarningHasAlreadyBeenShown;
 
     private ArrayList<String> pausedTransfers = new ArrayList<>();
     private Map<String, String> targetPaths = new HashMap<>();
@@ -189,5 +190,13 @@ public class TransfersManagement {
 
     public Map<String, String> getTargetPaths() {
         return targetPaths;
+    }
+
+    public void setResumeTransfersWarningHasAlreadyBeenShown(boolean resumeTransfersWarningHasAlreadyBeenShown) {
+        this.resumeTransfersWarningHasAlreadyBeenShown = resumeTransfersWarningHasAlreadyBeenShown;
+    }
+
+    public boolean isResumeTransfersWarningHasAlreadyBeenShown() {
+        return resumeTransfersWarningHasAlreadyBeenShown;
     }
 }

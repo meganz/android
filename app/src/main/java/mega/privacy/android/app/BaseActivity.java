@@ -398,6 +398,7 @@ public class BaseActivity extends AppCompatActivity {
                 return;
             }
 
+            MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(true);
             showResumeTransfersWarning(baseActivity);
         }
     };

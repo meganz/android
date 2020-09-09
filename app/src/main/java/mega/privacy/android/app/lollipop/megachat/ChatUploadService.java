@@ -509,6 +509,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		isForeground = false;
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
+		MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(false);
 		stopSelf();
 		logDebug("After stopSelf");
 
@@ -922,7 +923,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 			logDebug("onTransferUpdate: " + transfer.getNodeHandle());
 
-			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+					&& !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown()) {
 				sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
 			}
 
