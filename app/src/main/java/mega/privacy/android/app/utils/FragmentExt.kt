@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import android.util.DisplayMetrics
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
@@ -10,4 +11,8 @@ fun <T> Fragment.callManager(call: (manager: ManagerActivityLollipop) -> T): T? 
     } else {
         null
     }
+}
+
+fun Fragment.displayMetrics(): DisplayMetrics {
+    return requireContext().resources.displayMetrics
 }

@@ -174,7 +174,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupActionMode() {
-        actionModeCallback = ActionModeCallback(context, actionModeViewModel, megaApi)
+        actionModeCallback = ActionModeCallback(activity, actionModeViewModel, megaApi)
 
         observeItemLongClick()
         observeSelectedItems()
