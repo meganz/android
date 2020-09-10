@@ -2273,9 +2273,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
             loginIntent.setData(Uri.parse(getIntent().getDataString()));
             loginIntent.putExtra("idChatToJoin", idChat);
-            closeChat(true);
         } else {
             loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
+        }
+        if (app.isActivityVisible()) {
+            loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        } else {
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
         startActivity(loginIntent);
         finish();
@@ -3648,6 +3652,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
             case R.id.join_button:{
                 if (chatC.isInAnonymousMode()) {
+                    closeChat(true);
                     ifAnonymousModeLogin(true);
                 }
                 else {
@@ -7546,7 +7551,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (megaChatApi == null || chatRoom == null || idChat == MEGACHAT_INVALID_HANDLE) {
             return;
         }
-        if (chatRoom.isPreview() && chatC.isInAnonymousMode() && shouldLogout) {
+        if (chatRoom.isPreview() && !chatC.isInAnonymousMode() && shouldLogout) {
             megaChatApi.logout();
         } else {
             megaChatApi.closeChatRoom(idChat, this);
