@@ -3622,12 +3622,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             case R.id.call_on_hold_layout:
                 callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
-                if(callInThisChat == null)
+                if (callInThisChat == null)
                     break;
-
-                if ((callInThisChat.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT &&
-                        callInThisChat.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) ||
-                        callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
+                if (callInThisChat.getStatus() != MegaChatCall.CALL_STATUS_RING_IN &&
+                        ((callInThisChat.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT &&
+                                callInThisChat.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) ||
+                                callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING)) {
                     if (callInThisChat.isOnHold()) {
                         returnCall(this, chatRoom.getChatId());
                     }
@@ -3643,9 +3643,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
 
             case R.id.call_in_progress_layout:
-                if (chatIdBanner == MEGACHAT_INVALID_HANDLE) {
+                if (chatIdBanner == MEGACHAT_INVALID_HANDLE)
                     break;
-                }
+
                 MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                     startVideo = false;
