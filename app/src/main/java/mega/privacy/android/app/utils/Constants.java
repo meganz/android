@@ -263,6 +263,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
+    public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
