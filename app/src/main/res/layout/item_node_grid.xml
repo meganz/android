@@ -48,7 +48,7 @@
             android:paddingRight="1dp"
             android:paddingTop="1dp"
             app:actualImageScaleType="centerCrop"
-            app:placeholder_icon="@{MimeTypeList.typeForName(item.node.name).iconResourceId}"
+            app:defaultThumbnail="@{MimeTypeList.typeForName(item.node.name).iconResourceId}"
             app:thumbnail="@{item.thumbnail}"
             />
         <ImageView
