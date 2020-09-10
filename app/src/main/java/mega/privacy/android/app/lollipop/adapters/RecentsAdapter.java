@@ -344,8 +344,6 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 if (bucket == null) break;
                 if(ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
                     ((ManagerActivityLollipop) context).openRecentBucketFragment(MegaNodeUtil.getSerializedNodesFromBucket(bucket), new BucketSaved(bucket));
-                } else {
-                    ((RecentsFragment) fragment).openMultipleBucket(bucket);
                 }
                 break;
             }

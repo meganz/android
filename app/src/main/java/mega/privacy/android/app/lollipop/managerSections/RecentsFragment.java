@@ -259,7 +259,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                     fastScroller.setVisibility(View.VISIBLE);
                 }
             }
-            ((ManagerActivityLollipop) context).showTabCloud(true);
         } else {
             emptyLayout.setVisibility(View.GONE);
             listLayout.setVisibility(View.VISIBLE);
@@ -277,7 +276,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             } else {
                 fastScroller.setVisibility(View.GONE);
             }
-            ((ManagerActivityLollipop) context).showTabCloud(false);
         }
         ((ManagerActivityLollipop) context).setToolbarTitle();
         checkScroll();

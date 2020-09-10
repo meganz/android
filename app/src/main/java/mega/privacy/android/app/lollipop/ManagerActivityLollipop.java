@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -35,7 +34,6 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
-import androidx.core.content.FileProvider;
 import androidx.navigation.NavOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
@@ -163,7 +161,6 @@ import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
-import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -190,7 +187,6 @@ import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollip
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
@@ -301,12 +297,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private static final String DEEP_BROWSER_TREE_LINKS = "DEEP_BROWSER_TREE_LINKS";
     private static final String PARENT_HANDLE_LINKS = "PARENT_HANDLE_LINKS";
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
-	private static final String INDEX_CLOUD = "INDEX_CLOUD";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
 
 	public static final int ERROR_TAB = -1;
-	public static final int CLOUD_TAB = 0;
-	public static final int RECENTS_TAB = 1;
 	public static final int INCOMING_TAB = 0;
 	public static final int OUTGOING_TAB = 1;
   	public static final int LINKS_TAB = 2;
@@ -444,13 +437,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private List<SkuDetails> mSkuDetailsList;
 
     public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, RECENTS, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
 				case CLOUD_DRIVE: return "fbFLol";
 				case HOMEPAGE: return "fragmentHomepage";
-				case RECENTS: return "rF";
 				case RUBBISH_BIN: return "rubbishBinFLol";
 				case CAMERA_UPLOADS: return "cuFLol";
 				case MEDIA_UPLOADS: return "muFLol";
@@ -530,11 +522,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	RoundedImageView nVPictureProfile;
 	TextView spaceTV;
 	ProgressBar usedSpacePB;
-
-	//Tabs in Shares
-	private TabLayout tabLayoutCloud;
-	private CloudPageAdapter cloudPageAdapter;
-	private CustomViewPager viewPagerCloud;
 
     //Tabs in Shares
 	private TabLayout tabLayoutShares;
@@ -634,7 +621,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public int deepBrowserTreeIncoming = 0;
 	public int deepBrowserTreeOutgoing = 0;
 	private int deepBrowserTreeLinks;
-	int indexCloud = -1;
+
 	int indexShares = -1;
 	int indexContacts = -1;
 	int indexAccount = -1;
@@ -642,7 +629,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;
-    private RecentsFragment rF;
     private RubbishBinFragmentLollipop rubbishBinFLol;
     private InboxFragmentLollipop iFLol;
     private IncomingSharesFragmentLollipop inSFLol;
@@ -1165,7 +1151,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if (adapterType == FILE_BROWSER_ADAPTER){
-						if (getTabItemCloud() == CLOUD_TAB && isCloudAdded()){
+						if (isCloudAdded()){
 							if (actionType == UPDATE_IMAGE_DRAG) {
 								imageDrag = fbFLol.getImageDrag(position + placeholderCount);
 								if (fbFLol.imageDrag != null){
@@ -1227,21 +1213,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									break;
 							}
 						}
-					} else if (adapterType == RECENTS_ADAPTER && rF != null) {
-						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
-						if (actionType == UPDATE_IMAGE_DRAG) {
-							imageDrag = rF.getImageDrag(handle);
-							if (rF.imageDrag != null) {
-								rF.imageDrag.setVisibility(View.VISIBLE);
-							}
-							if (imageDrag != null) {
-								rF.imageDrag = imageDrag;
-								rF.imageDrag.setVisibility(View.INVISIBLE);
-							}
-						} else if (actionType == SCROLL_TO_POSITION) {
-							rF.updateScrollPosition(handle);
-						}
-					} else if(adapterType == RECENTS_BUCKET_ADAPTER) {
+					}  else if(adapterType == RECENTS_BUCKET_ADAPTER) {
                         long handle = intent.getLongExtra("handle", INVALID_HANDLE);
                         RecentsBucketFragment fragment = getFragmentByType(RecentsBucketFragment.class);
                         switch (actionType) {
@@ -1761,18 +1733,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			outState.putInt(DEEP_BROWSER_TREE_LINKS, deepBrowserTreeLinks);
 		}
 
-		if (deepBrowserTreeRecents > 0 && isRecentsAdded() && getBucketSaved() != null) {
-			outState.putSerializable("bucketSaved", getBucketSaved());
-		}
 		else {
 			setDeepBrowserTreeRecents(0);
 		}
 		outState.putInt(DEEP_BROWSER_TREE_RECENTS, deepBrowserTreeRecents);
-
-		if (viewPagerCloud != null) {
-			indexCloud = viewPagerCloud.getCurrentItem();
-		}
-		outState.putInt(INDEX_CLOUD, indexCloud);
 
 		if (viewPagerShares != null) {
 			indexShares = viewPagerShares.getCurrentItem();
@@ -1899,7 +1863,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
-			indexCloud = savedInstanceState.getInt(INDEX_CLOUD, indexCloud);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			logDebug("savedInstanceState -> indexShares: " + indexShares);
 			indexContacts = savedInstanceState.getInt("indexContacts", 0);
@@ -2380,32 +2343,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else {
 			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
 		}
-
-		//TABS section Cloud Drive
-		tabLayoutCloud = (TabLayout) findViewById(R.id.sliding_tabs_cloud);
-		viewPagerCloud = (CustomViewPager) findViewById(R.id.cloud_tabs_pager);
-		viewPagerCloud.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-			}
-
-			@Override
-			public void onPageSelected(int position) {
-				supportInvalidateOptionsMenu();
-				checkScrollElevation();
-				if(position == 1 && isCloudAdded() && fbFLol.isMultipleselect()){
-					fbFLol.actionMode.finish();
-				}
-				setToolbarTitle();
-				showFabButton();
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state) {
-
-			}
-		});
 
 		//TABS section Shared Items
 		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
@@ -4725,31 +4662,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
 		abL.setVisibility(View.VISIBLE);
 
-		if (cloudPageAdapter == null){
-			logDebug("selectDrawerItemCloudDrive: cloudPageAdapter is NULL");
-			cloudPageAdapter = new CloudPageAdapter(getSupportFragmentManager(), this);
-			viewPagerCloud.setAdapter(cloudPageAdapter);
-			tabLayoutCloud.setupWithViewPager(viewPagerCloud);
+        tabLayoutContacts.setVisibility(View.GONE);
+        viewPagerContacts.setVisibility(View.GONE);
+        tabLayoutShares.setVisibility(View.GONE);
+        viewPagerShares.setVisibility(View.GONE);
+        tabLayoutMyAccount.setVisibility(View.GONE);
+        viewPagerMyAccount.setVisibility(View.GONE);
+        tabLayoutTransfers.setVisibility(View.GONE);
+        viewPagerTransfers.setVisibility(View.GONE);
 
-			//Force on CreateView, addTab do not execute onCreateView
-			if(indexCloud!=-1){
-				logDebug("selectDrawerItemCloudDrive: The index of the TAB Cloud is: "+indexCloud);
-				if (viewPagerCloud != null){
-					if(indexCloud==0){
-						logDebug("selectDrawerItemCloudDrive: after creating tab in CLOUD TAB: "+parentHandleBrowser);
-						viewPagerCloud.setCurrentItem(0);
-					}
-					else{
-						viewPagerCloud.setCurrentItem(1);
-					}
-				}
-				indexCloud=-1;
-			}
-			else {
-				//No bundle, no change of orientation
-				logDebug("selectDrawerItemCloudDrive: indexCloud is NOT -1");
-			}
-		}
+        fragmentContainer.setVisibility(View.VISIBLE);
+
+        fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+        if (fbFLol == null) {
+            fbFLol = FileBrowserFragmentLollipop.newInstance();
+        }
+        replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
 
 		if (!firstTimeAfterInstallation){
 			logDebug("Its NOT first time");
@@ -4802,46 +4730,34 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case CLOUD_DRIVE:{
 
                 aB.setSubtitle(null);
-				if (getTabItemCloud() == CLOUD_TAB) {
-					logDebug("Cloud Drive SECTION");
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-					if (parentNode != null) {
-						if (megaApi.getRootNode() != null) {
-							if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1) {
-								aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
-								firstNavigationLevel = true;
-							}
-							else {
-								aB.setTitle(parentNode.getName());
-								firstNavigationLevel = false;
-							}
-						}
-						else {
-							parentHandleBrowser = -1;
-						}
-					}
-					else {
-						if (megaApi.getRootNode() != null) {
-							parentHandleBrowser = megaApi.getRootNode().getHandle();
-							aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
-							firstNavigationLevel = true;
-						}
-						else {
-							parentHandleBrowser = -1;
-							firstNavigationLevel = true;
-						}
-					}
-				}
-				else if (getTabItemCloud() == RECENTS_TAB) {
-					if (isRecentsAdded() && getDeepBrowserTreeRecents() > 0
-							&& rF.getBucketSelected() != null) {
-						aB.setTitle((rF.getBucketSelected().getNodes().size() + " " + getString(R.string.general_files)).toUpperCase());
-						firstNavigationLevel = false;
-						break;
-					}
-					firstNavigationLevel = true;
-					aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
-				}
+                logDebug("Cloud Drive SECTION");
+                MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+                if (parentNode != null) {
+                    if (megaApi.getRootNode() != null) {
+                        if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1) {
+                            aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
+                            firstNavigationLevel = true;
+                        }
+                        else {
+                            aB.setTitle(parentNode.getName());
+                            firstNavigationLevel = false;
+                        }
+                    }
+                    else {
+                        parentHandleBrowser = -1;
+                    }
+                }
+                else {
+                    if (megaApi.getRootNode() != null) {
+                        parentHandleBrowser = megaApi.getRootNode().getHandle();
+                        aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
+                        firstNavigationLevel = true;
+                    }
+                    else {
+                        parentHandleBrowser = -1;
+                        firstNavigationLevel = true;
+                    }
+                }
 				break;
 			}
 			case RUBBISH_BIN: {
@@ -5668,8 +5584,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void setTabsVisibility() {
-    	tabLayoutCloud.setVisibility(View.GONE);
-    	viewPagerCloud.setVisibility(View.GONE);
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutShares.setVisibility(View.GONE);
@@ -5689,14 +5603,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
     	switch (drawerItem) {
-			case CLOUD_DRIVE: {
-				if (getTabItemCloud() == CLOUD_TAB
-						|| (getTabItemCloud() == RECENTS_TAB && getDeepBrowserTreeRecents() == 0)) {
-					tabLayoutCloud.setVisibility(View.VISIBLE);
-				}
-				viewPagerCloud.setVisibility(View.VISIBLE);
-				break;
-			}
 			case SHARED_ITEMS: {
 				tabLayoutShares.setVisibility(View.VISIBLE);
 				viewPagerShares.setVisibility(View.VISIBLE);
@@ -6132,29 +6038,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		fragmentLayout.setLayoutParams(params);
 	}
 
-	public boolean isOnRecents() {
-		if (getDrawerItem() == DrawerItem.CLOUD_DRIVE && getTabItemCloud() == RECENTS_TAB ) return true;
-
-		return false;
-	}
-
 	private boolean isCloudAdded () {
-    	if (cloudPageAdapter == null) return false;
-
-		fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCloud, 0);
-		if (fbFLol != null && fbFLol.isAdded()) return true;
-
-		return false;
-	}
-
-	public boolean isRecentsAdded () {
-		if (cloudPageAdapter == null) return false;
-
-		rF = (RecentsFragment) cloudPageAdapter.instantiateItem(viewPagerCloud, 1);
-		if (rF != null && rF.isAdded()) return true;
-
-    	return false;
-	}
+        fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+        return fbFLol != null && fbFLol.isAdded();
+    }
 
 	private boolean isIncomingAdded () {
     	if (sharesPageAdapter == null) return false;
@@ -6187,8 +6074,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
         switch (drawerItem) {
             case CLOUD_DRIVE: {
-            	if (getTabItemCloud() == CLOUD_TAB && isCloudAdded()) fbFLol.checkScroll();
-				else if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) rF.checkScroll();
+            	fbFLol.checkScroll();
                 break;
             }
 			case HOMEPAGE: {
@@ -6635,16 +6521,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
-					if (getTabItemCloud() == CLOUD_TAB) {
-						createFolderMenuItem.setVisible(true);
-
-						if (isCloudAdded() && fbFLol.getItemCount() > 0) {
-							thumbViewMenuItem.setVisible(true);
-							setGridListIcon();
-							searchMenuItem.setVisible(true);
-							sortByMenuItem.setVisible(true);
-						}
-					}
+                    if (isCloudAdded() && fbFLol.getItemCount() > 0) {
+                        thumbViewMenuItem.setVisible(true);
+                        setGridListIcon();
+                        searchMenuItem.setVisible(true);
+                        sortByMenuItem.setVisible(true);
+                    }
 					break;
 				case HOMEPAGE:
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
@@ -6997,10 +6879,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						//Cloud Drive
-						if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) {
-							rF.onBackPressed();
-						}
-						else if (getTabItemCloud() == CLOUD_TAB && isCloudAdded()) {
+						if (isCloudAdded()) {
 							fbFLol.onBackPressed();
 						}
 		    		}
@@ -7545,10 +7424,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
 
-        if(cloudPageAdapter != null) {
-            cloudPageAdapter.notifyDataSetChanged();
-        }
-
         //Refresh Rubbish Fragment
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
 
@@ -7821,11 +7696,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-			if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) {
-				if (rF.onBackPressed() == 0) {
-					viewPagerCloud.setCurrentItem(CLOUD_TAB);
-				}
-			} else if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
+		    if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
 				backToDrawerItem(-1);
 			}
 		} else if (drawerItem == DrawerItem.RUBBISH_BIN) {
@@ -8039,21 +7910,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-					if (getTabItemCloud() == CLOUD_TAB) {
-						long rootHandle = megaApi.getRootNode().getHandle();
-						if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
-							parentHandleBrowser = rootHandle;
-							refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-							if (cloudPageAdapter != null) {
-								cloudPageAdapter.notifyDataSetChanged();
-							}
-							if (isCloudAdded()) {
-								fbFLol.scrollToFirstPosition();
-							}
-						}
-					} else if (getDeepBrowserTreeRecents() > 0 && isRecentsAdded()) {
-                        rF.onBackPressed();
-					}
+                    long rootHandle = megaApi.getRootNode().getHandle();
+                    if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
+                        parentHandleBrowser = rootHandle;
+                        refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+                        if (isCloudAdded()) {
+                            fbFLol.scrollToFirstPosition();
+                        }
+                    }
 				}
 				else {
 					drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -14608,10 +14472,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							maFLol.updateContactsCount();
 							maFLol.updateView();
                         }
-
-						if (isRecentsAdded()) {
-							rF.setVisibleContacts();
-						}
 					}
 				}
 				else{
@@ -14847,13 +14707,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
-		refreshFragment(FragmentTag.RECENTS.getTag());
 
 		onNodesCloudDriveUpdate();
-
-		if(cloudPageAdapter!=null){
-			cloudPageAdapter.notifyDataSetChanged();
-		}
 
 		onNodesSearchUpdate();
 
@@ -15421,12 +15276,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public static void setDrawerItem(DrawerItem drawerItem) {
 		ManagerActivityLollipop.drawerItem = drawerItem;
-	}
-
-	public int getTabItemCloud() {
-		if (viewPagerCloud == null) return ERROR_TAB;
-
-		return viewPagerCloud.getCurrentItem();
 	}
 
 	public int getTabItemShares(){
@@ -16400,9 +16249,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             case CLOUD_DRIVE: {
                 setParentHandleBrowser(node.getHandle());
                 refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-                if (cloudPageAdapter != null) {
-                    cloudPageAdapter.notifyDataSetChanged();
-                }
                 break;
             }
             case SHARED_ITEMS: {
@@ -16504,25 +16350,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public DrawerItem getSearchDrawerItem(){
 		return searchDrawerItem;
-	}
-
-	/**
-	 * This method show or hide the tabs of Cloud Drive section and blocks or not
-	 * respectively the swipe of the ViewPager
-	 *
-	 * @param show if true, it shows the tabs and enable the swipe, else hide the tabs
-	 *             and disable the swipe
-	 */
-	public void showTabCloud(boolean show) {
-		if (drawerItem != DrawerItem.CLOUD_DRIVE) return;
-
-		if (show || getTabItemCloud() == CLOUD_TAB) {
-			tabLayoutCloud.setVisibility(View.VISIBLE);
-			viewPagerCloud.disableSwipe(false);
-		} else {
-			tabLayoutCloud.setVisibility(View.GONE);
-			viewPagerCloud.disableSwipe(true);
-		}
 	}
 
 	public void setBucketSaved(BucketSaved bucketSaved) {
