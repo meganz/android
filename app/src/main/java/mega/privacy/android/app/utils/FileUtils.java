@@ -730,12 +730,13 @@ public class FileUtils {
      * @param context activity where the snackbar has to be shown
      * @param numberOfNodesPending pending downloads
      * @param numberOfNodesAlreadyDownloaded files already downloaded
+     * @param emptyFolders number of empty folders
      */
-    public static void showSnackBarWhenDownloading(Context context, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded) {
+    public static void showSnackBarWhenDownloading(Context context, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded, int emptyFolders) {
         logDebug(" Already downloaded: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
 
         if (numberOfNodesPending == 0) {
-            showSnackbar(context, context.getString(R.string.folder_empty));
+            showSnackbar(context, context.getResources().getQuantityString(R.plurals.empty_folders, emptyFolders));
         } else if (numberOfNodesAlreadyDownloaded == 0) {
             showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending));
         } else {
