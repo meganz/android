@@ -296,7 +296,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private static final String DEEP_BROWSER_TREE_LINKS = "DEEP_BROWSER_TREE_LINKS";
     private static final String PARENT_HANDLE_LINKS = "PARENT_HANDLE_LINKS";
-    private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
 
 	public static final int ERROR_TAB = -1;
@@ -616,8 +615,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private long parentHandleSearch;
 	private long parentHandleInbox;
 	private String pathNavigationOffline;
-	private int deepBrowserTreeRecents = 0;
-	private BucketSaved bucketSaved;
 	public int deepBrowserTreeIncoming = 0;
 	public int deepBrowserTreeOutgoing = 0;
 	private int deepBrowserTreeLinks;
@@ -1733,11 +1730,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			outState.putInt(DEEP_BROWSER_TREE_LINKS, deepBrowserTreeLinks);
 		}
 
-		else {
-			setDeepBrowserTreeRecents(0);
-		}
-		outState.putInt(DEEP_BROWSER_TREE_RECENTS, deepBrowserTreeRecents);
-
 		if (viewPagerShares != null) {
 			indexShares = viewPagerShares.getCurrentItem();
 		}
@@ -1847,10 +1839,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			parentHandleLinks = savedInstanceState.getLong(PARENT_HANDLE_LINKS, INVALID_HANDLE);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
-			deepBrowserTreeRecents = savedInstanceState.getInt(DEEP_BROWSER_TREE_RECENTS, 0);
-			if (deepBrowserTreeRecents > 0) {
-				setBucketSaved((BucketSaved) savedInstanceState.getSerializable("bucketSaved"));
-			}
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			deepBrowserTreeLinks = savedInstanceState.getInt(DEEP_BROWSER_TREE_LINKS, 0);
@@ -16350,22 +16338,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public DrawerItem getSearchDrawerItem(){
 		return searchDrawerItem;
-	}
-
-	public void setBucketSaved(BucketSaved bucketSaved) {
-		this.bucketSaved = bucketSaved;
-	}
-
-	public BucketSaved getBucketSaved() {
-		return bucketSaved;
-	}
-
-	public void setDeepBrowserTreeRecents(int deepBrowserTreeRecents) {
-		this.deepBrowserTreeRecents = deepBrowserTreeRecents;
-	}
-
-	public int getDeepBrowserTreeRecents() {
-		return deepBrowserTreeRecents;
 	}
 
 	/**

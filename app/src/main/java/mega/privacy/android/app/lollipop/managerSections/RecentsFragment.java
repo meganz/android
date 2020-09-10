@@ -28,6 +28,7 @@ import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.rxjava3.internal.schedulers.ImmediateThinScheduler;
 import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -68,13 +69,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     public static final int OPEN_FROM_ROOT_SINGLE = 1;
     public static final int OPEN_FROM_ROOT_MULTI = 2;
-    public static final int OPEN_FROM_SUB = 3;
 
-    private RecentsFragment recentsFragment;
     private Context context;
     private DisplayMetrics outMetrics;
 
-    private DatabaseHandler dbH;
     private MegaApiAndroid megaApi;
 
     private ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
@@ -90,34 +88,16 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private LinearLayout listLayout;
     private RecyclerView listView;
     private FastScroller fastScroller;
-    private RecyclerView multipleBucketView;
-    private MultipleBucketAdapter multipleBucketAdapter;
-    private LinearLayoutManager linearLayoutManager;
-    private GridLayoutManager gridLayoutManager;
-    private SimpleDividerItemDecoration simpleDividerItemDecoration;
-    private LinearLayout headerView;
-    private TextView folderNameText;
-    private ImageView actionImage;
-    private TextView dateText;
 
     private int openFrom;
-
-    public static RecentsFragment newInstance() {
-        logDebug("newInstance");
-        RecentsFragment fragment = new RecentsFragment();
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        recentsFragment = this;
     }
 
     @Override public void onResume() {
         super.onResume();
-
         imageDrag = null;
     }
 
@@ -133,7 +113,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
         if (megaApi.getRootNode() == null) return null;
 
-        dbH = DatabaseHandler.getDbHandler(context);
         recentsItems = new ArrayList<>();
 
         buckets = megaApi.getRecentActions();
@@ -173,24 +152,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
         emptyText.setText(result);
 
-        headerView = v.findViewById(R.id.header_info_layout);
-        folderNameText = v.findViewById(R.id.folder_name_text);
-        actionImage = v.findViewById(R.id.action_image);
-        dateText = v.findViewById(R.id.date_text);
-
         listLayout = v.findViewById(R.id.linear_layout_recycler);
         listView = v.findViewById(R.id.list_view_recents);
         fastScroller = v.findViewById(R.id.fastscroll);
-        multipleBucketView = v.findViewById(R.id.multiple_bucket_view);
-        multipleBucketView.setClipToPadding(false);
-        multipleBucketView.setItemAnimator(new DefaultItemAnimator());
-        multipleBucketView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                checkScroll();
-            }
-        });
+
         stickyLayoutManager = new TopSnappedStickyLayoutManager(context, this);
         listView.setLayoutManager(stickyLayoutManager);
         listView.setClipToPadding(false);
@@ -205,11 +170,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         String previousDate = "";
         String currentDate;
-        BucketSaved bucketSaved = ((ManagerActivityLollipop) context).getBucketSaved();
+
         for (int i = 0; i < buckets.size(); i++) {
-            if (bucketSaved != null && bucketSaved.isTheSameBucket(buckets.get(i))) {
-                setBucketSelected(buckets.get(i));
-            }
+
             RecentsItem item = new RecentsItem(context, buckets.get(i));
             if (i == 0) {
                 previousDate = currentDate = item.getDate();
@@ -224,12 +187,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             recentsItems.add(item);
         }
 
-        if (bucketSaved == null || getBucketSelected() == null) {
-            ((ManagerActivityLollipop) context).setDeepBrowserTreeRecents(0);
-        } else if (getBucketSelected() != null) {
-            openMultipleBucket(getBucketSelected());
-        }
-
         adapter = new RecentsAdapter(context, this, recentsItems);
         listView.setAdapter(adapter);
         listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
@@ -240,91 +197,33 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     }
 
     private void setRecentsView() {
-        if (((ManagerActivityLollipop) context).getDeepBrowserTreeRecents() == 0) {
-            if (buckets == null || buckets.isEmpty()) {
-                emptyLayout.setVisibility(View.VISIBLE);
-                headerView.setVisibility(View.GONE);
-                listLayout.setVisibility(View.GONE);
-                fastScroller.setVisibility(View.GONE);
-            } else {
-                emptyLayout.setVisibility(View.GONE);
-                listLayout.setVisibility(View.VISIBLE);
-                headerView.setVisibility(View.GONE);
-                listView.setVisibility(View.VISIBLE);
-                multipleBucketView.setVisibility(View.GONE);
-                fastScroller.setRecyclerView(listView);
-                if (buckets.size() < MIN_ITEMS_SCROLLBAR) {
-                    fastScroller.setVisibility(View.GONE);
-                } else {
-                    fastScroller.setVisibility(View.VISIBLE);
-                }
-            }
+        if (buckets == null || buckets.isEmpty()) {
+            emptyLayout.setVisibility(View.VISIBLE);
+            listLayout.setVisibility(View.GONE);
+            fastScroller.setVisibility(View.GONE);
         } else {
             emptyLayout.setVisibility(View.GONE);
             listLayout.setVisibility(View.VISIBLE);
-            if (!isBucketSelectedMedia()) {
-                headerView.setVisibility(View.VISIBLE);
-                setHeaderContent();
-            } else {
-                headerView.setVisibility(View.GONE);
-            }
-            listView.setVisibility(View.GONE);
-            multipleBucketView.setVisibility(View.VISIBLE);
-            fastScroller.setRecyclerView(multipleBucketView);
-            if (isBucketSelectedMedia() && getBucketSelected().getNodes() != null && getBucketSelected().getNodes().size() >= MIN_ITEMS_SCROLLBAR) {
-                fastScroller.setVisibility(View.VISIBLE);
-            } else {
+            listView.setVisibility(View.VISIBLE);
+            fastScroller.setRecyclerView(listView);
+            if (buckets.size() < MIN_ITEMS_SCROLLBAR) {
                 fastScroller.setVisibility(View.GONE);
+            } else {
+                fastScroller.setVisibility(View.VISIBLE);
             }
         }
         ((ManagerActivityLollipop) context).setToolbarTitle();
         checkScroll();
     }
 
-    private void setHeaderContent() {
-        if (getBucketSelected() == null) return;
-
-        MegaNode folder = megaApi.getNodeByHandle(getBucketSelected().getParentHandle());
-        if (folder == null) return;
-
-        folderNameText.setText(folder.getName());
-        if (getBucketSelected().isUpdate()) {
-            actionImage.setImageResource(R.drawable.ic_versions_small);
-        } else {
-            actionImage.setImageResource(R.drawable.ic_recents_up);
-        }
-        dateText.setText(formatBucketDate(context, getBucketSelected().getTimestamp()));
-    }
-
     public void checkScroll() {
-        if (((ManagerActivityLollipop) context).getDeepBrowserTreeRecents() == 0) {
-            if (listView == null) return;
+        if (listView == null) return;
 
-            if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE)) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-            } else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-            }
+        if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE)) {
+            ((ManagerActivityLollipop) context).changeActionBarElevation(true);
         } else {
-            if (multipleBucketView == null) return;
-
-            if ((multipleBucketView.canScrollVertically(-1) && multipleBucketView.getVisibility() == View.VISIBLE)) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-            } else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-            }
+            ((ManagerActivityLollipop) context).changeActionBarElevation(false);
         }
-    }
-
-    public int onBackPressed() {
-        if (((ManagerActivityLollipop) context).getDeepBrowserTreeRecents() > 0) {
-            ((ManagerActivityLollipop) context).setDeepBrowserTreeRecents(0);
-            setBucketSelected(null);
-            setRecentsView();
-            return 1;
-        }
-
-        return 0;
     }
 
     public String findUserName(String mail) {
@@ -361,11 +260,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     }
 
     private long[] getBucketNodeHandles(boolean areImages) {
-        if (getBucketSelected() == null || getBucketSelected().getNodes() == null || getBucketSelected().getNodes().size() == 0)
+        if (bucketSelected == null || bucketSelected.getNodes() == null || bucketSelected.getNodes().size() == 0)
             return null;
 
         MegaNode node;
-        MegaNodeList list = getBucketSelected().getNodes();
+        MegaNodeList list = bucketSelected.getNodes();
         ArrayList<Long> nodeHandlesList = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
@@ -396,8 +295,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             case OPEN_FROM_ROOT_MULTI:
                 return adapter.getThumbnailView(listView, handle,
                     openFrom == OPEN_FROM_ROOT_SINGLE);
-            case OPEN_FROM_SUB:
-                return multipleBucketAdapter.getThumbnailView(multipleBucketView, handle);
             default:
                 return null;
         }
@@ -408,13 +305,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             case OPEN_FROM_ROOT_MULTI:
                 adapter.scrollToSubListNode(listView, handle);
                 break;
-            case OPEN_FROM_SUB: {
-                int position = multipleBucketAdapter.getNodePosition(handle);
-                if (position != -1) {
-                    multipleBucketView.scrollToPosition(position);
-                }
-                break;
-            }
             case OPEN_FROM_ROOT_SINGLE:
             default:
                 break;
@@ -530,46 +420,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         nC.prepareForDownload(handleList, true);
     }
 
-    public void openMultipleBucket(MegaRecentActionBucket bucket) {
-        setBucketSelected(bucket);
-        MegaNodeList nodeList = bucket.getNodes();
-        if (nodeList == null) return;
-
-        ((ManagerActivityLollipop) context).setDeepBrowserTreeRecents(1);
-        setRecentsView();
-
-        multipleBucketAdapter = new MultipleBucketAdapter(context, this, getNodes(nodeList), isBucketSelectedMedia());
-        if (isBucketSelectedMedia()) {
-            int numCells;
-            if (isScreenInPortrait(context)) {
-                numCells = 4;
-            } else {
-                numCells = 6;
-            }
-            gridLayoutManager = new GridLayoutManager(context, numCells, GridLayoutManager.VERTICAL, false);
-            multipleBucketView.setLayoutManager(gridLayoutManager);
-            if (simpleDividerItemDecoration != null) {
-                multipleBucketView.removeItemDecoration(simpleDividerItemDecoration);
-            }
-        } else {
-            linearLayoutManager = new LinearLayoutManager(context);
-            multipleBucketView.setLayoutManager(linearLayoutManager);
-            if (simpleDividerItemDecoration == null) {
-                simpleDividerItemDecoration = new SimpleDividerItemDecoration(context, outMetrics);
-            }
-            multipleBucketView.addItemDecoration(simpleDividerItemDecoration);
-        }
-        multipleBucketView.setAdapter(multipleBucketAdapter);
-    }
-
-    private ArrayList<MegaNode> getNodes(MegaNodeList list) {
-        ArrayList<MegaNode> nodes = new ArrayList<>();
-
-        for (int i = 0; i < list.size(); i++) {
-            nodes.add(list.get(i));
-        }
-
-        return nodes;
+    public void setBucketSelected(MegaRecentActionBucket bucketSelected) {
+        this.bucketSelected = bucketSelected;
     }
 
     @Override
@@ -582,24 +434,5 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         public RecentsItemHeader(String date) {
             super(date);
         }
-    }
-
-    public void setBucketSelected(MegaRecentActionBucket bucketSelected) {
-        this.bucketSelected = bucketSelected;
-        if (bucketSelected == null) {
-            ((ManagerActivityLollipop) context).setBucketSaved(null);
-        } else {
-            ((ManagerActivityLollipop) context).setBucketSaved(new BucketSaved(bucketSelected));
-        }
-    }
-
-    public MegaRecentActionBucket getBucketSelected() {
-        return bucketSelected;
-    }
-
-    public boolean isBucketSelectedMedia() {
-        if (bucketSelected == null) return false;
-
-        return bucketSelected.isMedia();
     }
 }
