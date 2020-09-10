@@ -54,7 +54,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,6 +73,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -83,7 +86,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -121,6 +124,9 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+
+	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
 
 	int[] screenPosition;
 	int mLeftDelta;
@@ -233,6 +239,14 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
+	public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
+		DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
+	}
+
+	public static void removeDraggingThumbnailCallback(Class<?> clazz) {
+		DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
+	}
+
 	@Override
 	public void onDestroy(){
 
@@ -245,6 +259,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+
+		DRAGGING_THUMBNAIL_CALLBACKS.clear();
 
 		super.onDestroy();
 	}
@@ -1228,7 +1244,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-			CameraUploadsFragment.setDraggingThumbnailVisibility(visibility);
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
+			if (callback != null) {
+				callback.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER) {
 			if (OfflineFragmentLollipop.imageDrag != null){
@@ -1291,7 +1311,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-			CameraUploadsFragment.getDraggingThumbnailLocationOnScreen(location);
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
+			if (callback != null) {
+				callback.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER){
 			if (OfflineFragmentLollipop.imageDrag != null){
