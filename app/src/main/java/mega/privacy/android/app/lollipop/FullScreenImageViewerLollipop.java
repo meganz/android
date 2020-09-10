@@ -72,6 +72,7 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -1255,7 +1256,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER) {
-			OfflineFragment.setDraggingThumbnailVisibility(visibility);
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+			if (callback != null) {
+				callback.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == ZIP_ADAPTER) {
 			if (ZipBrowserActivityLollipop.imageDrag != null) {
@@ -1325,8 +1330,12 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				callback.getLocationOnScreen(location);
 			}
 		}
-		else if (adapterType == OFFLINE_ADAPTER){
-			OfflineFragment.getDraggingThumbnailLocationOnScreen(location);
+		else if (adapterType == OFFLINE_ADAPTER) {
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+			if (callback != null) {
+				callback.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == ZIP_ADAPTER) {
 			if (ZipBrowserActivityLollipop.imageDrag != null) {

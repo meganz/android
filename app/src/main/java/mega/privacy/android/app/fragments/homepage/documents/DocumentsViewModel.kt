@@ -7,6 +7,7 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -113,6 +114,12 @@ class DocumentsViewModel @ViewModelInject constructor(
             item.uiDirty = true
         }
         loadDocuments()
+    }
+
+    fun getNodePositionByHandle(handle: Long): Int {
+        return items.value?.find {
+            it.node?.handle == handle
+        }?.index ?: Constants.INVALID_POSITION
     }
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false

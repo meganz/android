@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
@@ -20,24 +21,43 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentDocumentsBinding
-import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
+import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.homepage.NodeListAdapter
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.DraggingThumbnailCallback
 import mega.privacy.android.app.utils.FileUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.app.utils.displayMetrics
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaNode
+import java.lang.ref.WeakReference
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class DocumentsFragment : BaseFragment(), HomepageSearchable {
+class DocumentsFragment : Fragment(), HomepageSearchable {
 
     private val viewModel by viewModels<DocumentsViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
@@ -45,17 +65,17 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
     private lateinit var binding: FragmentDocumentsBinding
-
     private lateinit var listView: NewGridRecyclerView
-
-    private lateinit var adapter: NodeListAdapter
+    private lateinit var listAdapter: NodeListAdapter
+    private lateinit var gridAdapter: NodeGridAdapter
+    private lateinit var itemDecoration: PositionDividerItemDecoration
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
-    private lateinit var activity: ManagerActivityLollipop
+    @Inject lateinit var megaApi: MegaApiAndroid
 
-    private lateinit var itemDecoration: SimpleDividerItemDecoration
+    private var openingNodeHandle = INVALID_HANDLE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,17 +92,19 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        activity = getActivity() as ManagerActivityLollipop
 
         setupListView()
         setupListAdapter()
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupDraggingThumbnailCallback()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
-                activity.invalidateOptionsMenu()  // Hide the search icon if no file
+                callManager { manager ->
+                    manager.invalidateOptionsMenu()  // Hide the search icon if no file
+                }
             }
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
@@ -93,41 +115,68 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         if (Util.isOnline(context)) {
             operation()
         } else {
-            activity.hideKeyboardSearch()  // Make the snack bar visible to the user
-            activity.showSnackbar(
-                SNACKBAR_TYPE,
-                context.getString(R.string.error_server_connection_problem),
-                -1
-            )
+            callManager {
+                it.hideKeyboardSearch()  // Make the snack bar visible to the user
+                it.showSnackbar(
+                    SNACKBAR_TYPE,
+                    getString(R.string.error_server_connection_problem),
+                    -1
+                )
+            }
         }
     }
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            openDoc(it)
+            val node = it.node
+            if (node != null) {
+                openDoc(node, it.index)
+            }
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline {
-                activity.showNodeOptionsPanel(
-                    it.node,
-                    if (viewModel.searchMode) MODE5 else MODE1
-                )
+                callManager { manager ->
+                    manager.showNodeOptionsPanel(
+                        it.node,
+                        if (viewModel.searchMode) MODE5 else MODE1
+                    )
+                }
             }
         })
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            activity.showNewSortByPanel()
+            callManager { manager ->
+                manager.showNewSortByPanel()
+            }
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            adapter.notifyItemChanged(POSITION_HEADER)
             viewModel.loadDocuments(true, it)
         })
 
-        sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            adapter.notifyItemChanged(POSITION_HEADER)
-        })
+        sortByHeaderViewModel.listGridChangeEvent.observe(
+            viewLifecycleOwner,
+            EventObserver { isList ->
+                switchListGridView(isList)
+            })
+    }
+
+    private fun switchListGridView(isList: Boolean) {
+        if (isList) {
+            listView.switchToLinear()
+            listView.adapter = listAdapter
+            listView.addItemDecoration(itemDecoration)
+        } else {
+            listView.switchBackToGrid()
+            listView.adapter = gridAdapter
+            listView.removeItemDecoration(itemDecoration)
+
+            (listView.layoutManager as CustomizedGridLayoutManager).apply {
+                spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+            }
+        }
+        viewModel.refreshUi()
     }
 
     /**
@@ -135,7 +184,11 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<NodeItem>(it)
-        adapter.submitList(newList)
+        if (sortByHeaderViewModel.isList) {
+            listAdapter.submitList(newList)
+        } else {
+            gridAdapter.submitList(newList)
+        }
     }
 
     private fun preventListItemBlink() {
@@ -148,20 +201,25 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        activity.changeActionBarElevation(v!!.canScrollVertically(-1))
+        callManager { manager ->
+            manager.changeActionBarElevation(v!!.canScrollVertically(-1))
+        }
     }
 
     private fun setupListView() {
         listView = binding.documentList
-        listView.switchToLinear()
         preventListItemBlink()
         elevateToolbarWhenScrolling()
-        itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
-        if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
+        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
     }
 
     private fun setupActionMode() {
-        actionModeCallback = ActionModeCallback(activity, actionModeViewModel, megaApi)
+        actionModeCallback = ActionModeCallback(
+            requireActivity() as ManagerActivityLollipop, actionModeViewModel, megaApi
+        )
 
         observeItemLongClick()
         observeSelectedItems()
@@ -187,7 +245,9 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                 }
 
                 if (actionMode == null) {
-                    activity.hideKeyboardSearch()
+                    callManager { manager ->
+                        manager.hideKeyboardSearch()
+                    }
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
@@ -236,19 +296,14 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val itemView = viewHolder.itemView
 
-//                    val imageView = if (viewModel.listMode) {
-                    itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
-                    val imageView = itemView.findViewById<ImageView>(R.id.thumbnail)
-//                    } else {
-//                        // Draw the green outline for the thumbnail view at once
-//                        val thumbnailView =
-//                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-//                        thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
-//
-//                        itemView.findViewById<ImageView>(
-//                            R.id.icon_selected
-//                        )
-//                    }
+                    val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
+                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
+                            itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        }
+                        itemView.findViewById(R.id.thumbnail)
+                    } else {
+                        itemView.findViewById(R.id.ic_selected)
+                    }
 
                     imageView?.run {
                         setImageResource(R.drawable.ic_select_folder)
@@ -270,21 +325,31 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
-            activity.showKeyboardForSearch()
+            callManager { manager ->
+                manager.showKeyboardForSearch()
+            }
         })
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
-        adapter =
+        listAdapter =
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 listView.linearLayoutManager?.scrollToPosition(0)
             }
         })
 
-        listView.adapter = adapter
+        gridAdapter =
+            NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+        gridAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                listView.layoutManager?.scrollToPosition(0)
+            }
+        })
+
+        switchListGridView(sortByHeaderViewModel.isList)
     }
 
     override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
@@ -292,7 +357,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            Handler().post { activity.hideKeyboardSearch() }
+            Handler().post { callManager { it.hideKeyboardSearch() } }
         }
         if (viewModel.searchMode) return
 
@@ -309,31 +374,32 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         viewModel.refreshUi()
     }
 
-//    private fun configureGridLayoutManager() {
-//        if (listView.layoutManager !is CustomizedGridLayoutManager) return
-//
-//        (listView.layoutManager as CustomizedGridLayoutManager).apply {
-//            spanSizeLookup = adapter.getSpanSizeLookup(spanCount)
-//            val itemDimen =
-//                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.Doc_grid_margin)
-//                    .toInt() * 2
-//            adapter.setItemDimen(itemDimen)
-//        }
-//    }
-
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
         viewModel.searchQuery = query
         viewModel.loadDocuments()
     }
 
-    private fun openDoc(nodeItem: NodeItem) {
+    /** All below methods are for supporting functions of PdfViewerActivityLollipop */
+
+    private fun getOpeningThumbnailLocationOnScreen(): IntArray? {
+        val position = viewModel.getNodePositionByHandle(openingNodeHandle)
+        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
+        val thumbnailView = viewHolder.itemView.findViewById<ImageView>(R.id.thumbnail)
+        return thumbnailView.getLocationAndDimen()
+    }
+
+    private fun setupDraggingThumbnailCallback() =
+        PdfViewerActivityLollipop.addDraggingThumbnailCallback(
+            DocumentsFragment::class.java, DocumentsDraggingThumbnailCallback(WeakReference(this))
+        )
+
+    private fun openDoc(node: MegaNode, index: Int) {
         var screenPosition: IntArray? = null
-        val node = nodeItem.node
 
-        val localPath = FileUtils.getLocalFile(context, node?.name, node?.size!!)
+        val localPath = FileUtils.getLocalFile(context, node.name, node.size)
 
-        listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
+        listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.let {
             screenPosition = it.getLocationAndDimen()
@@ -342,24 +408,29 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         if (MimeTypeList.typeForName(node.name).isPdf) {
             val intent = Intent(context, PdfViewerActivityLollipop::class.java)
             intent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.RECENTS_ADAPTER)
-            if (screenPosition != null) intent.putExtra(
-                Constants.INTENT_EXTRA_KEY_SCREEN_POSITION,
-                screenPosition
-            )
+            if (viewModel.searchMode) {
+                intent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, DOCUMENTS_SEARCH_ADAPTER)
+            } else {
+                intent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, DOCUMENTS_BROWSE_ADAPTER)
+            }
+            if (screenPosition != null) {
+                intent.putExtra(Constants.INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
+            }
 
             val paramsSetSuccessfully =
                 if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-                    FileUtils.setLocalIntentParams(context, node, intent, localPath, false)
+                    FileUtils.setLocalIntentParams(activity, node, intent, localPath, false)
                 } else {
-                    FileUtils.setStreamingIntentParams(context, node, megaApi, intent)
+                    FileUtils.setStreamingIntentParams(activity, node, megaApi, intent)
                 }
 
             intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
 
             if (paramsSetSuccessfully) {
-                context.startActivity(intent)
-                (context as ManagerActivityLollipop).overridePendingTransition(0, 0)
+                openingNodeHandle = node.handle
+                setupDraggingThumbnailCallback()
+                startActivity(intent)
+                requireActivity().overridePendingTransition(0, 0)
                 return
             }
         }
@@ -368,6 +439,18 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
     }
 
     companion object {
-        private const val POSITION_HEADER = 0
+        private class DocumentsDraggingThumbnailCallback(
+            private val fragmentRef: WeakReference<DocumentsFragment>
+        ) : DraggingThumbnailCallback {
+
+            override fun setVisibility(visibility: Int) {
+            }
+
+            override fun getLocationOnScreen(location: IntArray) {
+                val fragment = fragmentRef.get() ?: return
+                val result = fragment.getOpeningThumbnailLocationOnScreen() ?: return
+                result.copyInto(location, 0, 0, 2)
+            }
+        }
     }
 }

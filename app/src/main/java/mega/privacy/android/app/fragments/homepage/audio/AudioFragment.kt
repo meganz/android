@@ -123,6 +123,11 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(AudioFragment::class.java)
+    }
+
     private fun doIfOnline(operation: () -> Unit) {
         if (Util.isOnline(context)) {
             operation()
@@ -217,9 +222,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         val localPath = getLocalFile(context, file.name, file.size)
         var paramsSetSuccessfully = if (isLocalFile(context, node, megaApi, localPath)) {
-            setLocalIntentParams(context, node, intent, localPath, false)
+            setLocalIntentParams(activity, node, intent, localPath, false)
         } else {
-            setStreamingIntentParams(context, node, megaApi, intent)
+            setStreamingIntentParams(activity, node, megaApi, intent)
         }
 
         if (paramsSetSuccessfully && isOpusFile(node)) {
@@ -228,7 +233,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         if (!isIntentAvailable(context, intent)) {
             paramsSetSuccessfully = false
-            showSnackbar(context, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
+            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
         }
 
         if (paramsSetSuccessfully) {
@@ -242,7 +247,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             }
         } else {
             logWarning("itemClick:noAvailableIntent")
-            showSnackbar(context, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
+            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
             val nC = NodeController(context)
             nC.prepareForDownload(arrayListOf(node.handle), true)
         }
