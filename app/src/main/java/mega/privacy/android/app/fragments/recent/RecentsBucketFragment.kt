@@ -94,12 +94,7 @@ class RecentsBucketFragment : BaseFragment() {
         } else {
             val linearLayoutManager = LinearLayoutManager(managerActivity)
             gridView.layoutManager = linearLayoutManager
-            gridView.addItemDecoration(
-                SimpleDividerItemDecoration(
-                    managerActivity,
-                    outMetrics
-                )
-            )
+            gridView.addItemDecoration(SimpleDividerItemDecoration(managerActivity, outMetrics))
         }
         gridView.adapter = mAdapter
         gridView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -129,28 +124,20 @@ class RecentsBucketFragment : BaseFragment() {
             } else {
                 binding.actionImage.setImageResource(R.drawable.ic_recents_up)
             }
-            binding.dateText.text = TimeUtils.formatBucketDate(
-                managerActivity,
-                bucket.timestamp
-            )
+            binding.dateText.text = TimeUtils.formatBucketDate(managerActivity, bucket.timestamp)
             binding.headerInfoLayout.visibility = View.VISIBLE
         }
     }
 
     private fun setupToolbar() {
         managerActivity.setToolbarTitle(
-            "${viewModel.items.value?.size} ${getString(R.string.general_files).toUpperCase(
-                Locale.ROOT
-            )}"
+            "${viewModel.items.value?.size} ${getString(R.string.general_files).toUpperCase(Locale.ROOT)}"
         )
     }
 
     private fun checkScroll() {
-        if (gridView.canScrollVertically(-1)) {
-            managerActivity.changeActionBarElevation(true)
-        } else {
-            managerActivity.changeActionBarElevation(false)
-        }
+        val canScroll = gridView.canScrollVertically(-1)
+        managerActivity.changeActionBarElevation(canScroll)
     }
 
     private fun getNodesHandles(isImage: Boolean): LongArray? = viewModel.items.value?.filter {
@@ -298,13 +285,13 @@ class RecentsBucketFragment : BaseFragment() {
         nC.prepareForDownload(handleList, true)
     }
 
-    /** All below methods are for supporting functions of FullScreenImageViewer */
-
     override fun onDestroy() {
         super.onDestroy()
         FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(RecentsBucketFragment::class.java)
         AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(RecentsBucketFragment::class.java)
     }
+
+    /** All below methods are for supporting functions of FullScreenImageViewer */
 
     private fun setupDraggingThumbnailCallback() {
         FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
@@ -317,7 +304,7 @@ class RecentsBucketFragment : BaseFragment() {
         )
     }
 
-    fun scrollToPhoto(handle: Long) {
+    fun scrollToPosition(handle: Long) {
         val position = viewModel.getItemPositionByHandle(handle)
         if (position == INVALID_POSITION) return
 

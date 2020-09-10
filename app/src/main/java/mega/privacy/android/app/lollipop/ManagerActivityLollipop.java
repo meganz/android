@@ -139,7 +139,6 @@ import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -1229,7 +1228,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         RecentsBucketFragment fragment = getFragmentByType(RecentsBucketFragment.class);
                         switch (actionType) {
                             case SCROLL_TO_POSITION:
-                                fragment.scrollToPhoto(handle);
+                                fragment.scrollToPosition(handle);
                                 break;
                             case UPDATE_IMAGE_DRAG:
                                 fragment.hideDraggingThumbnail(handle);
