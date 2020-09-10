@@ -602,8 +602,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-                if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) && callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+
+                if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) && callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT && callStatus != MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     updateCallBar();
                 }
                 switch (callStatus) {
