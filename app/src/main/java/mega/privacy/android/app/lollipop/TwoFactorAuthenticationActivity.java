@@ -67,6 +67,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -213,7 +214,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scanOrCopyIsShown = false;
             isEnabled2FA = false;
             if (getIntent() != null) {
-                newAccount = getIntent().getBooleanExtra("newAccount", false);
+                newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
             }
             isNoAppsDialogShown = false;
             isHelpDialogShown = false;

@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -71,11 +74,13 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -592,6 +597,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL &&
+					item.getItemId() != R.id.cab_menu_select_all && item.getItemId() != R.id.cab_menu_unselect_all) {
+				showOverDiskQuotaPaywallWarning();
+				return false;
+			}
+
 			ArrayList<MegaUser> users = adapter.getSelectedUsers();
 
 			switch(item.getItemId()){
@@ -644,13 +655,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 				case R.id.cab_menu_select_all:{
 					selectAll();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
 					hideMultipleSelect();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{
@@ -753,8 +762,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 			}
-			
-			updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	
@@ -1292,8 +1301,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		switch (((ManagerActivityLollipop)context).orderContacts) {
 			case ORDER_DEFAULT_DESC:
 				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
-					String name1 = c1.getFullName();
-					String name2 = c2.getFullName();
+					String name1 = getContactOrderName(c1);
+					String name2 = getContactOrderName(c2);
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
 					if (res == 0) {
 						res = name1.compareTo(name2);
@@ -1324,8 +1333,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 			default:
 				Collections.sort(visibleContacts, (c1, c2) -> {
-					String name1 = c1.getFullName();
-					String name2 = c2.getFullName();
+					String name1 = getContactOrderName(c1);
+					String name2 = getContactOrderName(c2);
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
 					if (res == 0) {
 						res = name1.compareTo(name2);
@@ -1338,6 +1347,30 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if (isAdded() && adapter != null) {
 			adapter.notifyDataSetChanged();
 		}
+	}
+
+    /**
+     * Gets the contact's name to order contacts by name.
+     * If the contact is not saved in the DB, the full name will be null,
+     * so the value returned will be the email.
+	 *
+	 * Note: this method should be used only for sorting purposes.
+     *
+     * @param contact   contact from who the name has to be get
+     * @return The contact's name.
+     */
+	private String getContactOrderName(MegaContactAdapter contact) {
+		String orderName = null;
+
+		if (contact != null) {
+			orderName = contact.getFullName();
+
+			if (isTextEmpty(orderName) && contact.getMegaUser() != null) {
+				orderName = contact.getMegaUser().getEmail();
+			}
+		}
+
+		return isTextEmpty(orderName) ? "" : orderName;
 	}
 
 	public boolean showSelectMenuItem(){

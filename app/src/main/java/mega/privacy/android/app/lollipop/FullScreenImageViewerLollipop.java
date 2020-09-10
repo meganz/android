@@ -54,7 +54,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,18 +73,20 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -109,6 +113,7 @@ import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -119,6 +124,9 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+
+	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
 
 	int[] screenPosition;
 	int mLeftDelta;
@@ -231,6 +239,14 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
+	public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
+		DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
+	}
+
+	public static void removeDraggingThumbnailCallback(Class<?> clazz) {
+		DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
+	}
+
 	@Override
 	public void onDestroy(){
 
@@ -243,6 +259,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+
+		DRAGGING_THUMBNAIL_CALLBACKS.clear();
 
 		super.onDestroy();
 	}
@@ -607,6 +625,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 
 			case R.id.full_image_viewer_chat:{
+				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+					showOverDiskQuotaPaywallWarning();
+					break;
+				}
 
 //				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
@@ -1222,8 +1244,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-			if (CameraUploadFragmentLollipop.imageDrag != null){
-				CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
+			if (callback != null) {
+				callback.setVisibility(visibility);
 			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER) {
@@ -1239,6 +1263,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			if (LinksFragment.imageDrag != null) {
 				LinksFragment.imageDrag.setVisibility(visibility);
 			}
+		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
+			RecentsFragment.imageDrag.setVisibility(visibility);
 		}
 	}
 
@@ -1284,9 +1310,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
 			}
 		}
-		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-			if (CameraUploadFragmentLollipop.imageDrag != null) {
-				CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
+		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
+			if (callback != null) {
+				callback.getLocationOnScreen(location);
 			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER){
@@ -1302,6 +1330,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			if (LinksFragment.imageDrag != null) {
 				LinksFragment.imageDrag.getLocationOnScreen(location);
 			}
+		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
+			RecentsFragment.imageDrag.getLocationOnScreen(location);
 		}
 	}
 
@@ -1393,7 +1423,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
-                    getImageView(i, -1);
+                    getImageView(i, handle);
                     break;
                 }
             }
@@ -1470,7 +1500,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
-                    scrollToPosition(i, -1);
+                    scrollToPosition(i, handle);
                     break;
                 }
             }
@@ -2186,6 +2216,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 							REQUEST_WRITE_STORAGE);
 				}
+			}
+
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
 			}
 
 			Uri treeUri = intent.getData();

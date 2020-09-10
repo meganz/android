@@ -76,11 +76,13 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class ChatFullScreenImageViewer extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
 	private static final long ANIMATION_DURATION = 400L;
@@ -846,6 +848,11 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
 
 		if(!isOnline(this)||megaApi==null) {
 			try{

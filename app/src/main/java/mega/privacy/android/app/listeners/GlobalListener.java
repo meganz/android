@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
@@ -133,6 +134,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 int state = (int) event.getNumber();
                 if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
                     api.getAccountDetails(null);
+                } else if (state == MegaApiJava.STORAGE_STATE_PAYWALL) {
+                    megaApplication.setStorageState(state);
+                    showOverDiskQuotaPaywallWarning();
                 } else {
                     megaApplication.setStorageState(state);
 
@@ -146,11 +150,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             case MegaEvent.EVENT_ACCOUNT_BLOCKED:
                 logDebug("EVENT_ACCOUNT_BLOCKED: " + event.getNumber());
 
-                Intent intent = new Intent(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
-                intent.setAction(ACTION_EVENT_ACCOUNT_BLOCKED);
-                intent.putExtra(EVENT_NUMBER, event.getNumber());
-                intent.putExtra(EVENT_TEXT, event.getText());
-                LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                megaApplication.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
+                        .putExtra(EVENT_NUMBER, event.getNumber())
+                        .putExtra(EVENT_TEXT, event.getText()));
                 break;
 
             case MegaEvent.EVENT_BUSINESS_STATUS:
