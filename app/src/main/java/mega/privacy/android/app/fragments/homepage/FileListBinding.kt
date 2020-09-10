@@ -62,6 +62,20 @@ fun setListItemThumbnail(
     }
 }
 
+@BindingAdapter("thumbnail", "placeholder_icon")
+fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, placeholderIcon: Int) {
+    with(imageView) {
+        if (file == null) {
+            setImageResource(placeholderIcon)
+        } else {
+            setImageURI(Uri.fromFile(file))
+        }
+
+        val radius = Util.px2dp(5F, imageView.resources.displayMetrics).toFloat()
+        hierarchy.roundingParams = RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
+    }
+}
+
 @BindingAdapter("visibleGone")
 fun showHide(view: View, show: Boolean) {
     view.visibility = if (show) View.VISIBLE else View.GONE

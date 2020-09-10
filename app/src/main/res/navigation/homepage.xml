@@ -6,7 +6,7 @@
     app:startDestination="@id/homepageFragment">
     <fragment
         android:id="@+id/homepageFragment"
-        android:name="mega.privacy.android.app.fragments.homepage.HomepageFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.main.HomepageFragment"
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
         <action
@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_homepageFragment_to_documentsFragment"
             app:destination="@id/documentsFragment" />
+        <action
+            android:id="@+id/action_homepageFragment_to_audioFragment"
+            app:destination="@id/audioFragment" />
         <action
             android:id="@+id/action_homepage_to_recentBucket"
             app:destination="@id/recentBucketFragment"/>
@@ -70,4 +73,8 @@
         android:id="@+id/documentsFragment"
         android:name="mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment"
         android:label="DocumentsFragment" />
+    <fragment
+        android:id="@+id/audioFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.audio.AudioFragment"
+        android:label="AudioFragment" />
 </navigation>

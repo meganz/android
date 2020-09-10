@@ -26,8 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/photo_grid_margin"
-        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onPhotoClick(item))}"
-        android:onLongClick="@{()->actionModeViewModel.onPhotoLongClick(item)}">
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item))}"
+        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"

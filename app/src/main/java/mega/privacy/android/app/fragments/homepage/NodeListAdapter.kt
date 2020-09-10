@@ -1,9 +1,8 @@
-package mega.privacy.android.app.fragments.homepage.documents
+package mega.privacy.android.app.fragments.homepage
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
@@ -11,17 +10,12 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
-import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
-import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import nz.mega.sdk.MegaPricing
 
-class DocumentsAdapter constructor(
+class NodeListAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel,
     private val sortByHeaderViewModel: SortByHeaderViewModel
-) : ListAdapter<NodeItem, DocumentViewHolder>(PhotoDiffCallback()),
+) : ListAdapter<NodeItem, NodeViewHolder>(NodeDiffCallback()),
     SectionTitleProvider {
 
     private var itemDimen = 0
@@ -33,7 +27,7 @@ class DocumentsAdapter constructor(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DocumentViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
         val binding = when (viewType) {
@@ -58,7 +52,7 @@ class DocumentsAdapter constructor(
             (binding as ItemPhotoBrowseBinding).iconSelected.visibility = View.GONE
         }
 
-        return DocumentViewHolder(binding)
+        return NodeViewHolder(binding)
     }
 
     private fun setItemLayoutParams(binding: ViewBinding) {
@@ -68,7 +62,7 @@ class DocumentsAdapter constructor(
         }
     }
 
-    override fun onBindViewHolder(holder: DocumentViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: NodeViewHolder, position: Int) {
         holder.bind(
             actionModeViewModel,
             itemOperationViewModel,
@@ -77,39 +71,21 @@ class DocumentsAdapter constructor(
         )
     }
 
-    private class PhotoDiffCallback : DiffUtil.ItemCallback<NodeItem>() {
-        override fun areItemsTheSame(oldItem: NodeItem, newItem: NodeItem): Boolean {
-            return oldItem.node?.handle == newItem.node?.handle
-        }
-
-        override fun areContentsTheSame(oldItem: NodeItem, newItem: NodeItem): Boolean {
-            if (newItem.uiDirty) {
-                return false
-            }
-
-            return true
-        }
-    }
-
     fun setItemDimen(dimen: Int) {
         if (dimen > 0) itemDimen = dimen
     }
 
-//    fun getSpanSizeLookup(spanCount: Int) = object : GridLayoutManager.SpanSizeLookup() {
-//        override fun getSpanSize(position: Int): Int {
-//            return when (getItem(position).type) {
-//                NodeItem.TYPE_TITLE -> spanCount
-//                else -> 1
-//            }
-//        }
-//    }
+    override fun getSectionTitle(position: Int): String {
+        if (position < 0 || position >= itemCount) {
+            return ""
+        }
 
-    override fun getSectionTitle(position: Int) = if (position < 0 || position >= itemCount) {
-        ""
-    } else getItem(position).modifiedDate
+        val nodeName = getItem(position).node?.name ?: ""
+        return if (nodeName == "") "" else nodeName.substring(0, 1)
+    }
 
     companion object {
-        private const val TYPE_ITEM = 0
-        private const val TYPE_HEADER = 1
+        const val TYPE_ITEM = 0
+        const val TYPE_HEADER = 1
     }
 }

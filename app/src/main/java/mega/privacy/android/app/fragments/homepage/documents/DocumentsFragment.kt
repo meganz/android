@@ -29,6 +29,8 @@ import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtils
@@ -46,7 +48,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var listView: NewGridRecyclerView
 
-    private lateinit var adapter: DocumentsAdapter
+    private lateinit var adapter: NodeListAdapter
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
@@ -83,7 +85,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                 activity.invalidateOptionsMenu()  // Hide the search icon if no file
             }
 
-            actionModeViewModel.setNodesData(it.filter{nodeItem -> nodeItem.node != null})
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
     }
 
@@ -106,7 +108,12 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
-            doIfOnline { activity.showNodeOptionsPanel(it.node) }
+            doIfOnline {
+                activity.showNodeOptionsPanel(
+                    it.node,
+                    if (viewModel.searchMode) MODE5 else MODE1
+                )
+            }
         })
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
@@ -175,7 +182,8 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
                 }
             } else {
                 viewModel.items.value?.let { items ->
-                    actionModeCallback.nodeCount = items.size - 1   // The "sort by" header isn't counted
+                    actionModeCallback.nodeCount =
+                        items.size - 1   // The "sort by" header isn't counted
                 }
 
                 if (actionMode == null) {
@@ -269,7 +277,7 @@ class DocumentsFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupListAdapter() {
         adapter =
-            DocumentsAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+            NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 listView.linearLayoutManager?.scrollToPosition(0)

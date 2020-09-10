@@ -27,8 +27,9 @@ class ActionModeCallback constructor(
     var nodeCount = 0
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        val selectedNodes = viewModel.selectedNodes.value!!.map { it.node }
-        val nodesHandles = ArrayList(selectedNodes.map { it!!.handle })
+        val selectedNodeItems = viewModel.selectedNodes.value ?: return false
+        val selectedNodes = selectedNodeItems.mapNotNull { it.node }
+        val nodesHandles = ArrayList(selectedNodes.map { it.handle })
 
         if (item!!.itemId != R.id.cab_menu_select_all) {
             viewModel.clearSelection()   // include cab_menu_clear_selection

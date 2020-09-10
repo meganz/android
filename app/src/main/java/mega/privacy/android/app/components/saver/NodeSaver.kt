@@ -15,16 +15,17 @@ import android.text.TextUtils
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog.Builder
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.app.R.string
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_FROM_SETTINGS
@@ -55,11 +56,12 @@ import java.io.File
 
 abstract class NodeSaver(
     protected val context: Context,
-    protected val dbHandler: DatabaseHandler
+    private val dbHandler: DatabaseHandler
 ) {
     private val compositeDisposable = CompositeDisposable()
     private val uiHandler = Handler(Looper.getMainLooper())
     protected var saving = Saving.NOTHING
+    private var activityStarter: (Intent, Int) -> Unit = { _, _ -> }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == Activity.RESULT_OK) {
@@ -83,11 +85,11 @@ abstract class NodeSaver(
                 logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
                 if (resultCode != Activity.RESULT_OK) {
                     Util.showSnackbar(
-                        context, context.getString(string.download_requires_permission)
+                        context, context.getString(R.string.download_requires_permission)
                     )
                 } else {
                     Util.showSnackbar(
-                        context, context.getString(string.no_external_SD_card_detected)
+                        context, context.getString(R.string.no_external_SD_card_detected)
                     )
                 }
                 return false
@@ -124,6 +126,7 @@ abstract class NodeSaver(
         add(Completable
             .fromCallable {
                 saving = savingProducer()
+                this.activityStarter = activityStarter
                 val downloadLocationDefaultPath = getDownloadLocation()
                 if (askMe(context)) {
                     logDebug("askMe")
@@ -268,7 +271,65 @@ abstract class NodeSaver(
         }
     }
 
-    abstract fun download(parentPath: String)
+    fun download(parentPath: String) {
+        add(Completable
+            .fromCallable {
+                checkParentPathAndDownload(parentPath)
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(IGNORE, logErr("NodeSaver download"))
+        )
+    }
+
+    private fun checkParentPathAndDownload(parentPath: String) {
+        val externalSDCard = SDCardOperator.isSDCardPath(parentPath)
+        var sdCardOperator: SDCardOperator? = null
+        if (externalSDCard) {
+            try {
+                sdCardOperator = SDCardOperator(context)
+            } catch (e: SDCardException) {
+                logError("Initialize SDCardOperator failed", e)
+                requestLocalFolder(
+                    null, context.getString(R.string.no_external_SD_card_detected), activityStarter
+                )
+            }
+        }
+        if (externalSDCard && sdCardOperator == null) {
+            return
+        }
+
+        if (sdCardOperator != null && sdCardOperator.isNewSDCardPath(parentPath)) {
+            logDebug("new sd card, check permission.")
+            runOnUiThread {
+                Toast.makeText(
+                    context, R.string.old_sdcard_unavailable, Toast.LENGTH_LONG
+                ).show()
+            }
+            runOnUiThreadDelayed(1500) {
+                showSelectDownloadLocationDialog(activityStarter)
+            }
+            return
+        }
+
+        if (sdCardOperator != null && !sdCardOperator.canWriteWithFile(parentPath)) {
+            try {
+                sdCardOperator.initDocumentFileRoot(dbHandler.sdCardUri);
+            } catch (e: SDCardException) {
+                logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e)
+                requestSDCardPermission(sdCardOperator.sdCardRoot, activityStarter)
+                return
+            }
+        }
+
+        doDownload(parentPath, externalSDCard, sdCardOperator)
+    }
+
+    abstract fun doDownload(
+        parentPath: String,
+        externalSDCard: Boolean,
+        sdCardOperator: SDCardOperator?
+    )
 
     private fun showConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
         runOnUiThread { doShowConfirmationDialog(message, onConfirmed) }
@@ -322,8 +383,12 @@ abstract class NodeSaver(
         compositeDisposable.dispose()
     }
 
-    private fun runOnUiThread(task: () -> Unit) {
+    protected fun runOnUiThread(task: () -> Unit) {
         uiHandler.post(task)
+    }
+
+    private fun runOnUiThreadDelayed(delayMs: Long, task: () -> Unit) {
+        uiHandler.postDelayed(task, delayMs)
     }
 
     companion object {
