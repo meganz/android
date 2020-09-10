@@ -164,6 +164,8 @@ public class CallUtil {
      */
     public static void returnCall(Context context, long chatId) {
         ArrayList<Long> currentCalls = getCallsParticipating();
+        if(currentCalls == null || currentCalls.isEmpty())
+            return;
 
         for(Long chatIdCall:currentCalls){
             if(chatIdCall == chatId){

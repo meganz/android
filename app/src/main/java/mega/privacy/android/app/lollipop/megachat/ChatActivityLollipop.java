@@ -2791,10 +2791,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
 
         MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
-
         if(callInThisChat != null){
             logDebug("There is a call in this chat");
-
             if (participatingInACall()) {
                 long chatIdCallInProgress = getChatCallInProgress();
                 if (callInThisChat.isOnHold() || chatIdCallInProgress == chatRoom.getChatId()) {
@@ -3647,7 +3645,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     break;
 
                 MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
-                if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                        callBanner.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     startVideo = false;
                     if (checkPermissionsCall()) {
                         startCall();
