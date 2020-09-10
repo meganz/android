@@ -66,6 +66,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class FileContactListActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaGlobalListenerInterface {
 
@@ -147,6 +148,20 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 			if (statusDialog != null) {
 				statusDialog.dismiss();
+			}
+		}
+	};
+
+	private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null) return;
+
+			if (intent.getAction().equals(ACTION_UPDATE_NICKNAME)
+					|| intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)
+					|| intent.getAction().equals(ACTION_UPDATE_FIRST_NAME)
+					|| intent.getAction().equals(ACTION_UPDATE_LAST_NAME)) {
+				updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
 			}
 		}
 	};
@@ -434,6 +449,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+
+		IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+		contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
+		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
+		LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 
 	public void checkScroll() {
@@ -478,6 +500,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
     	handler.removeCallbacksAndMessages(null);
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
     }
 	
 	@Override
@@ -910,6 +933,20 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	public void setSelectedShare(MegaShare selectedShare) {
 		this.selectedShare = selectedShare;
+	}
+
+	private void updateAdapter(long handleReceived) {
+		if (listContacts == null || listContacts.isEmpty()) return;
+
+		for (int i = 0; i < listContacts.size(); i++) {
+			String email = listContacts.get(i).getUser();
+			MegaUser contact = megaApi.getContact(email);
+			long handleUser = contact.getHandle();
+			if (handleUser == handleReceived) {
+				adapter.notifyItemChanged(i);
+				break;
+			}
+		}
 	}
 }
 

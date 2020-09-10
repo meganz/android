@@ -108,12 +108,12 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
+	private final static String CURRENT_ACTION = "CURRENT_ACTION";
 
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
@@ -128,21 +128,19 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
-	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
 	public static String ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE";
-	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
 	public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
 
-	public static int UPLOAD = 0;
-	public static int MOVE = 1;
-	public static int COPY = 2;
-	public static int CAMERA = 3;
-	public static int IMPORT = 4;
-	public static int SELECT = 5;
-	public static int SELECT_CAMERA_FOLDER = 7;
-	public static int SHARE_LINK = 8;
+	public static final int UPLOAD = 0;
+	public static final int MOVE = 1;
+	public static final int COPY = 2;
+	public static final int CAMERA = 3;
+	public static final int IMPORT = 4;
+	public static final int SELECT = 5;
+	public static final int SELECT_CAMERA_FOLDER = 7;
+	public static final int SHARE_LINK = 8;
 
 	private static final int NO_TABS = -1;
 	private static final int CLOUD_TAB = 0;
@@ -150,10 +148,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private static final int CHAT_TAB = 2;
 	private static final int SHOW_TABS = 3;
 	private boolean isChatFirst;
+	private static final int DEFAULT_TAB_TO_REMOVE = -1;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
-
 	private AppBarLayout abL;
 	private Toolbar tB;
 	private ActionBar aB;
@@ -261,6 +259,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private boolean shouldRestartSearch;
 	private String queryAfterSearch;
+	private String currentAction;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -425,6 +424,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			totalErrors = savedInstanceState.getInt("totalErrors", 0);
 			shouldRestartSearch = savedInstanceState.getBoolean(SHOULD_RESTART_SEARCH, false);
 			queryAfterSearch = savedInstanceState.getString(QUERY_AFTER_SEARCH, null);
+			currentAction = savedInstanceState.getString(CURRENT_ACTION, null);
 
 			if (isSearchExpanded) {
 				pendingToOpenSearchView = true;
@@ -505,7 +505,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		tabLayoutExplorer =  findViewById(R.id.sliding_tabs_file_explorer);
 		viewPagerExplorer = findViewById(R.id.explorer_tabs_pager);
 		viewPagerExplorer.setOffscreenPageLimit(3);
-		
+
 		//Layout for login if needed
 		loginLoggingIn = findViewById(R.id.file_logging_in_layout);
 		loginProgressBar = findViewById(R.id.file_login_progress_bar);
@@ -574,7 +574,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	
 	private void afterLoginAndFetch(){
 		handler = new Handler();
-
 		logDebug("SHOW action bar");
 		if(aB==null){
 			aB=getSupportActionBar();
@@ -586,8 +585,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		aB.setDisplayShowHomeEnabled(true);
 
 		if ((intent != null) && (intent.getAction() != null)){
-            selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
+			selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			logDebug("intent OK: " + intent.getAction());
+			currentAction = intent.getAction();
 			if (intent.getAction().equals(ACTION_SELECT_FOLDER_TO_SHARE)){
 				logDebug("action = ACTION_SELECT_FOLDER_TO_SHARE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
@@ -597,18 +597,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				setView(CLOUD_TAB, false, -1);
 				tabShown = NO_TABS;
 
-			}
-			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
-				logDebug("action = ACTION_SELECT_FILE");
-				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
-				mode = SELECT;
-				selectFile = true;
-
-				aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 1).toUpperCase());
-				setView(CLOUD_TAB, false, -1);
-				tabShown=NO_TABS;
-			}
-			else if (intent.getAction().equals(ACTION_MULTISELECT_FILE)){
+			} else if (intent.getAction().equals(ACTION_MULTISELECT_FILE)) {
 				logDebug("action = ACTION_MULTISELECT_FILE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
@@ -676,13 +665,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
 			}
-			else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
-				logDebug("action = ACTION_SELECT_FOLDER");
-				mode = SELECT;
-
-				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
-				setView(SHOW_TABS, false, CHAT_TAB);
-			}
 			else if ((intent.getAction().equals(ACTION_UPLOAD_TO_CLOUD))){
 				logDebug("action = UPLOAD to Cloud Drive");
 				mode = UPLOAD;
@@ -734,7 +716,29 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
+	private void updateAdapterExplorer(boolean isChatFirst, int tabToRemove) {
+		tabLayoutExplorer.setVisibility(View.VISIBLE);
+		viewPagerExplorer.setVisibility(View.VISIBLE);
+
+		int position = mTabsAdapterExplorer != null ? viewPagerExplorer.getCurrentItem() : 0;
+		if (isChatFirst) {
+			mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this, true);
+		} else {
+			mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this);
+		}
+		viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
+		viewPagerExplorer.setCurrentItem(position);
+		tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
+
+		if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
+			mTabsAdapterExplorer.setTabRemoved(true);
+			tabLayoutExplorer.removeTabAt(2);
+			mTabsAdapterExplorer.notifyDataSetChanged();
+		}
+	}
+
 	private void setView(int tab, boolean isChatFirst, int tabToRemove) {
+		logDebug("setView "+tab);
 		switch (tab) {
 			case CLOUD_TAB:{
 				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
@@ -752,22 +756,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				break;
 			}
 			case SHOW_TABS:{
-				if (mTabsAdapterExplorer == null){
-					tabLayoutExplorer.setVisibility(View.VISIBLE);
-					viewPagerExplorer.setVisibility(View.VISIBLE);
-					if (isChatFirst) {
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this, true);
-					} else {
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this);
-					}
-					viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
-					tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
-					if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
-						mTabsAdapterExplorer.setTabRemoved(true);
-						tabLayoutExplorer.removeTabAt(2);
-						mTabsAdapterExplorer.notifyDataSetChanged();
-					}
+				if (mTabsAdapterExplorer == null) {
+					updateAdapterExplorer(isChatFirst, tabToRemove);
 				}
 
 				viewPagerExplorer.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -779,6 +769,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						supportInvalidateOptionsMenu();
 						changeTitle();
 
+						checkFragmentScroll(position);
+
 						if (!multiselect) {
 							return;
 						}
@@ -787,28 +779,26 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 							clearQuerySearch();
 							collapseSearchView();
 						}
-						cDriveExplorer = getCloudExplorerFragment();
-						iSharesExplorer = getIncomingExplorerFragment();
+
 						if (position == 0) {
 							if (iSharesExplorer != null ) {
 								iSharesExplorer.hideMultipleSelect();
-							}
-							if (cDriveExplorer != null) {
-								cDriveExplorer.checkScroll();
 							}
 						}
 						else if (position == 1) {
 							if (cDriveExplorer != null) {
 								cDriveExplorer.hideMultipleSelect();
 							}
-							if (iSharesExplorer != null) {
-								iSharesExplorer.checkScroll();
-							}
 						}
 					}
 				});
 			}
 		}
+	}
+
+	private void checkFragmentScroll(int position) {
+		CheckScrollInterface fragment = (CheckScrollInterface)mTabsAdapterExplorer.getItem(position);
+		fragment.checkScroll();
 	}
 
 	public void chooseFragment (int fragment) {
@@ -852,17 +842,25 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	public void changeActionBarElevation(boolean whitElevation) {
-		chatExplorer = getChatExplorerFragment();
-		if (chatExplorer == null || chatExplorer.isHidden()) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				if (whitElevation) {
-					abL.setElevation(px2dp(4, outMetrics));
-				}
-				else {
-					abL.setElevation(0);
-				}
-			}
+	public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
+		if (!isCurrentFragment(fragmentIndex)) return;
+
+		abL.setElevation(elevate ? px2dp(4, outMetrics) : 0);
+	}
+
+	private boolean isCurrentFragment(int index) {
+		if (tabShown == NO_TABS) return true;  // only one fragment
+
+		// No need to care ImportFilesFragment as it would never be shown in SHOW_TABS mode
+		switch(index) {
+			case CLOUD_FRAGMENT:
+				return tabShown == CLOUD_TAB;
+			case CHAT_FRAGMENT:
+				return tabShown == CHAT_TAB;
+			case INCOMING_FRAGMENT:
+				return tabShown == INCOMING_TAB;
+			default:
+				return false;
 		}
 	}
 
@@ -1023,7 +1021,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			return;
 		}
 
-		if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
+		if(intent.getAction().equals(ACTION_MULTISELECT_FILE)){
 			createFolderMenuItem.setVisible(false);
 		}
 		else{
@@ -1438,6 +1436,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		bundle.putInt("totalErrors", totalErrors);
 		bundle.putBoolean(SHOULD_RESTART_SEARCH, shouldRestartSearch);
 		bundle.putString(QUERY_AFTER_SEARCH, queryAfterSearch);
+		bundle.putString(CURRENT_ACTION, currentAction);
 	}
 	
 	@Override
@@ -1482,6 +1481,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				case CHAT_FRAGMENT:{
 					chatExplorer = getChatExplorerFragment();
 					if(chatExplorer!=null){
+						chatExplorer.clearSelections();
 						showFabButton(false);
 						chooseFragment(IMPORT_FRAGMENT);
 					}
@@ -3280,7 +3280,18 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		if (viewPagerExplorer != null && tabShown != NO_TABS) {
-			mTabsAdapterExplorer.notifyDataSetChanged();
+			if (currentAction.equals(ACTION_SELECT_FOLDER_TO_SHARE) ||
+					currentAction.equals(ACTION_UPLOAD_TO_CLOUD)) {
+				updateAdapterExplorer(false, DEFAULT_TAB_TO_REMOVE);
+			} else if (currentAction.equals(ACTION_MULTISELECT_FILE) ||
+					currentAction.equals(ACTION_PICK_MOVE_FOLDER) ||
+					currentAction.equals(ACTION_PICK_COPY_FOLDER) ||
+					currentAction.equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC) ||
+					currentAction.equals(ACTION_PICK_IMPORT_FOLDER)) {
+				updateAdapterExplorer(false, CHAT_TAB);
+			} else if (isChatFirst) {
+				updateAdapterExplorer(true, DEFAULT_TAB_TO_REMOVE);
+			}
 		}
 	}
 

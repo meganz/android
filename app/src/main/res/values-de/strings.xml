@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
-
-    <!--
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    -->
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA - der Speicherplatz in der Cloud, der Ihre Privatsphäre schützt.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
 
@@ -107,7 +104,7 @@
 
     <string name="action_settings" context="Menu item">Einstellungen</string>
     <string name="action_search" context="Search button">Suchen</string>
-    <string name="action_search_country" context="Select country page title">Select country</string>
+    <string name="action_search_country" context="Select country page title">Choose your region</string>
     <string name="action_play" context="Search button">Abspielen</string>
     <string name="action_pause" context="Search button">Anhalten</string>
     <string name="action_refresh" context="Menu item">Aktualisieren</string>
@@ -176,7 +173,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s wird heruntergeladen.</string>
     <string name="alert_no_app" context="Alert text before download">Keine installierte App kennt den Dateityp von %s. Download trotzdem fortsetzen?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">Nicht nochmal anzeigen</string>
+    <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Nicht nochmal anzeigen</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Wollen Sie den Loginvorgang abbrechen?</string>
 
@@ -558,6 +555,7 @@
 
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Entschlüsselungs-Code</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Bitte geben Sie den Schlüssel für den Link ein</string>
+    <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">Ungültiger Schlüssel</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Bild</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -692,8 +690,8 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Hochladen von Dateien aus Medienordnern</string>
 	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Dateien werden für den Upload geprüft</string>
 	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Kamera-Uploads werden initialisiert</string>
-	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads has been disabled. Your local folder is unavailable.</string>
-	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads has been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_primary_local_unavailable" context="title of the notification when camera upload’s primary local folder is unavailable.">Camera Uploads have been disabled. Your local folder is unavailable.</string>
+	<string name="camera_notif_secondary_local_unavailable" context="title of the notification when camera upload’s secondary local folder is unavailable.">Media Uploads have been disabled. Your local folder is unavailable.</string>
 
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
@@ -726,8 +724,8 @@
     <string name="general_back_button" context="Button label - go to previous page">Zurück</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Bestätigung</string>
-	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Please select a country code</string>
-    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Country codes could not be fetched.</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Please select a region code</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Region codes could not be fetched.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Bitte geben Sie eine gültige Telefonnummer an.</string>
 	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Please enter the verification code sent to</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Account verifizieren</string>
@@ -1543,9 +1541,9 @@
 
     <string name="general_view" context="Menu option">Dateien anzeigen</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Import</string>
-    <string name="save_for_offline" context="Menu option">Für Offline-Nutzung speichern</string>
-    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Add to Cloud</string>
-    <string name="save_to_offline" context="Menu option to choose save to offline section">Save to Offline</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">Für Offline-Nutzung speichern</string>
+    <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">In Cloud Drive kopieren</string>
+    <string name="save_to_offline" context="Menu option to choose save to Offline section">Für Offline-Nutzung speichern</string>
 
     <string name="general_view_contacts" context="Menu option">Kontakte anzeigen</string>
 
@@ -1571,6 +1569,10 @@
     <plurals name="context_link_removal_error">
         <item context="Error message when removing public links of nodes. Singular." quantity="one">Link-Entfernung fehlgeschlagen. Bitte versuchen Sie es später noch einmal.</item>
         <item context="Error message when removing public links of nodes. Plural." quantity="other">Failed to remove some links. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_export_error">
+        <item context="Error message when create public links of nodes. Singular." quantity="one">Link creation failed. Please try again later.</item>
+        <item context="Error message when creating public links of nodes. Plural." quantity="other">Failed to create some links. Please try again later.</item>
     </plurals>
     <plurals name="context_link_removal_success">
         <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
@@ -1662,7 +1664,7 @@
 
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">In den Papierkorb verschieben?</string>
     <string name="confirmation_move_cu_folder_to_rubbish" context="confirmation message before removing CU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Camera Uploads.</string>
-    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Media Uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Are you sure you want to move this folder to the Rubbish Bin? This will disable Secondary Media Uploads.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">In den Papierkorb verschieben?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Von MEGA löschen?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Wenn Sie diese Ordnerfreigabe verlassen, können Sie auf sie nicht mehr zugreifen.</string>
@@ -1856,6 +1858,9 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">Speicherlimit überschritten</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Link ungültig, bitte lassen Sie sich einen neuen zusenden</string>
+    <string name="invalid_link_password" context="error message shown on the link password dialog if the password typed in was wrong">Invalid link password</string>
+
+    <string name="open_link_not_valid_link" context="Error message shown when user tries to open a not valid MEGA link">The link you are trying to open is not a valid MEGA link.</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Link wird verarbeitet&#8230;</string>
 
@@ -1879,6 +1884,7 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Ihr Account wurde wegen mehrfacher Verletzung der MEGA-Nutzungsbedingungen gesperrt. Wir haben Ihnen diesbezüglich eine E-Mail geschickt.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Ihr Account wurde wegen Verletzung der MEGA-Nutzungsbedingungen (Verletzung der Persönlichkeitsrechte Dritter, Import oder Verteilung illegaler Dateien oder Missbrauch unserer Systemressourcen) gesperrt.</string>
 
+    <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Loading files</string>
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Keine Dateien</string>
     <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s B</string>
     <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s KB</string>
@@ -1961,7 +1967,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Können Sie sich noch an Ihr Passwort erinnern?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Sie loggen sich aus. Bitte prüfen Sie, ob Sie sich noch an Ihr Passwort erinnern können.\nPasswortverlust bedeutet Datenverlust!</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Bitte testen Sie Ihr Passwort. Passwortverlust bedeutet Datenverlust!</string>
-    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Nicht wieder anzeigen</string>
+    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Nicht nochmal anzeigen</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Passswort testen</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Passwort-Test</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Passwort akzeptiert</string>
@@ -2548,7 +2554,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Invite contact now?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Discover your contacts on MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
@@ -2578,7 +2584,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Sie haben noch keine Kontakte. Bitte laden Sie Freunde, Bekannte oder Kollegen über über den Bereich Kontakte ein.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Invite more&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Invite more</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Sie sind der alleinige Inhaber Ihrer Schlüsel</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Die Sicherheit Ihrer Daten ist unsere Existenzgrundlage. Dank Ende-zu-Ende-Verschlüsselung kontrollieren Sie alleine, wer Zugang zu ihnen erhält.</string>
@@ -2766,13 +2772,29 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to stop sharing these %1$d folders?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
 
     <string name="download_location" context="Download location label">Downloadziel</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat created on %s</string>
-    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select message</string>
+    <string name="select_message_title" context="Title of the chat when multi-selection is activated">Select messages</string>
+
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Identität prüfen</string>
+    <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Not verified</string>
+    <string name="label_verified" context="Action indicating something was verified.">Bestätigt</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Authentizitätsinformationen</string>
+    <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Der beste Weg ist ein persönliches Treffen. Sollten Sie über einen bereits verifizierten sicheren Kommunikationskanal verfügen, z.B. verifiziertes OTR oder PGP, so können Sie stattdessen diesen verwenden.</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Ihre Identität</string>
+    <string name="action_reset" context="Button to reset credentials">Zurücksetzen</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+
+    <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Remove your phone number?</string>
+    <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Ihre Mobilnummer wurde erfolgreich entfernt.</string>
+    <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number removal failed.</string>
+
+    <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
 </resources>

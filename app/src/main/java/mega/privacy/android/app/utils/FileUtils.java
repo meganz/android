@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.webkit.MimeTypeMap;
+
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
@@ -27,6 +30,8 @@ import java.io.Writer;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
+import java.util.ArrayList;
+import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -640,6 +645,53 @@ public class FileUtils {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    /**
+     * Share multiple files to other apps.
+     *
+     * credit: https://stackoverflow.com/a/15577579/3077508
+     *
+     * @param context current Context
+     * @param files files to share
+     */
+    public static void shareFiles(Context context, List<File> files) {
+        String intentType = null;
+        for (File file : files) {
+            String type = MimeTypeList.typeForName(file.getName()).getType();
+            if (intentType == null) {
+                intentType = type;
+            } else if (!TextUtils.equals(intentType, type)) {
+                intentType = "*";
+                break;
+            }
+        }
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (File file : files) {
+            uris.add(getUriForFile(context, file));
+        }
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        shareIntent.setType(intentType + "/*");
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(
+            Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    /**
+     * Share a file via its Uri.
+     *
+     * @param context Current context.
+     * @param extention The file's extention, for example, pdf, jpg. Use to infer the mimetype.
+     * @param uri The file's Uri.
+     */
+    public static void shareWithUri(Context context, String extention, Uri uri) {
+        Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+        shareIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extention) + "/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }

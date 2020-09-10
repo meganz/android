@@ -178,8 +178,20 @@ public class ContactUtil {
     }
 
     public static void notifyNicknameUpdate(Context context, long userHandle) {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_NICKNAME);
-        intent.putExtra(EXTRA_USER_HANDLE, userHandle);
+        notifyUserNameUpdate(context, ACTION_UPDATE_NICKNAME, userHandle);
+    }
+
+    public static void notifyFirstNameUpdate(Context context, long userHandle) {
+        notifyUserNameUpdate(context, ACTION_UPDATE_FIRST_NAME, userHandle);
+    }
+
+    public static void notifyLastNameUpdate(Context context, long userHandle) {
+        notifyUserNameUpdate(context, ACTION_UPDATE_LAST_NAME, userHandle);
+    }
+
+    public static void notifyUserNameUpdate(Context context, String action, long userHandle) {
+        Intent intent = new Intent(action)
+            .putExtra(EXTRA_USER_HANDLE, userHandle);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 

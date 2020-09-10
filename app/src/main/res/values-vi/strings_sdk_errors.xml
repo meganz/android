@@ -11,14 +11,14 @@
     <string name="api_erange" context="Label to show that an error of Out of range occurs during a SDK operation.">Quá kích thước</string>
     <string name="api_eexpired" context="State to indicate something has expired (achivements of business status account for instance)">Hết</string>
     <string name="api_enoent" context="Label to show that an error related with a resource Not found occurs during a SDK operation.">Không tìm thấy</string>
-    <string name="api_ecircular_ec_upload" context="Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation.">Transfer failed due to a recursive directory structure</string>
+    <string name="api_ecircular_ec_upload" context="Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation.">Truyền tải bị thất bại do cấu trúc đệ quy của thư mục</string>
     <string name="api_ecircular" context="Label to show that an error related with a circular linkage occurs during a SDK operation.">Phát hiện lỗi liên kết vòng lặp</string>
     <string name="api_eaccess" context="Label to show that an error related with an denied access occurs during a SDK operation.">Truy cập bị từ chối</string>
     <string name="api_eexist" context="Label to show that an error related with an existent resource occurs during a SDK operation.">Đã tồn tại sẵn</string>
     <string name="api_eincomplete" context="Label to show that an error related with an Incomplete SDK operation.">Chưa hoàn thoành</string>
     <string name="api_ekey" context="Label to show that an error related with the decryption process of a node occurs during a SDK operation.">Khóa không hợp lệ/Lỗi giải mã</string>
     <string name="api_esid" context="Label to show that an error related with a bad session ID occurs during a SDK operation.">Bad session ID</string>
-    <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">Không truy cập được do vi phạm Điều Khoản Sử Dụng và Dịch Vụ</string>
+    <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">Không truy cập được do vi phạm ĐKDV/CSSD</string>
     <string name="api_eblocked" context="Label to show that an error related with a blocked account occurs during a SDK operation.">Bị chặn</string>
     <string name="api_eoverquota" context="Label to show that an error related with an over quota occurs during a SDK operation.">Quá giới hạn</string>
     <string name="api_etempunavail" context="Label to show that an error related with a temporary problem occurs during a SDK operation.">Tạm thời không khả dụng</string>
@@ -28,14 +28,14 @@
     <string name="api_eappkey" context="Label to show that an error related with an invalid or missing application key occurs during a SDK operation.">Application key không hợp lệ</string>
     <string name="api_essl" context="Error shown when SSL check has failed">Xác thực SSL bị thất bại</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Không đủ băng thông</string>
-    <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Two-Factor Authentication required.</string>
-    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Access denied for users</string>
+    <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Cần sử dụng Xác Minh 2-Bước.</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Truy cập bị từ chối cho tất cả thành viên dưới hạng admin</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Tài khoản doanh nghiệp của quý khách đã hết hạn</string>
-    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Credit card rejected</string>
-    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Billing failed</string>
-    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Rejected by fraud protection</string>
-    <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Too many requests</string>
-    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Balance error</string>
+    <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Thẻ bị từ chối</string>
+    <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Thanh toán thất bại</string>
+    <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Bị từ chối bởi phòng chống gian lận</string>
+    <string name="payment_etoomay" context="Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible).">Quá nhiều yêu cầu</string>
+    <string name="payment_ebalance" context="Label to show that an error of Balance occurs during a SDK operation.">Số dư tài khoản bị lỗi</string>
     <string name="payment_egeneric_api_error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">Lỗi không xác định được</string>
-    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">HTTP Error</string>
+    <string name="api_error_http" context="Label to show that an error related with an HTTP error occurs during a SDK operation.">Lỗi HTTP</string>
 </resources>
