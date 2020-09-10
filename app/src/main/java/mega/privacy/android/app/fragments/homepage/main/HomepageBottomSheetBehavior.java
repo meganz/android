@@ -1,4 +1,4 @@
-package mega.privacy.android.app;
+package mega.privacy.android.app.fragments.homepage.main;
 
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
