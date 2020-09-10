@@ -34,7 +34,7 @@ class DocumentsViewModel @ViewModelInject constructor(
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_DOCUMENT, order)
+                repository.getFiles(MegaApiJava.NODE_DOCUMENT, order, !searchMode)
             }
         } else {
             repository.emitFiles()
@@ -123,6 +123,12 @@ class DocumentsViewModel @ViewModelInject constructor(
     }
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
+
+    fun getRealNodeCount(): Int {
+        val nodes = items.value ?: return 0
+
+        return nodes.size - if (searchMode) 0 else 1
+    }
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)

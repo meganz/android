@@ -40,13 +40,13 @@ class TypedFilesRepository @Inject constructor(
     private val _fileNodeItems = MutableLiveData<List<NodeItem>>()
     val fileNodeItems: LiveData<List<NodeItem>> = _fileNodeItems
 
-    suspend fun getFiles(type: Int, order: Int) {
+    suspend fun getFiles(type: Int, order: Int, showHeader: Boolean) {
         this.type = type
         this.order = order
 
         withContext(Dispatchers.IO) {
             saveAndClearData()
-            getNodeItems()
+            getNodeItems(showHeader)
 
             // Update LiveData must in main thread
             withContext(Dispatchers.Main) {
@@ -118,10 +118,10 @@ class TypedFilesRepository @Inject constructor(
         )
     }
 
-    private fun getNodeItems() {
+    private fun getNodeItems(showHeader: Boolean) {
         var lastModifyDate: LocalDate? = null
 
-        if (type != NODE_PHOTO) {
+        if (showHeader) {
             fileNodesMap[INVALID_HANDLE] = NodeItem()   // "Sort by" header
         }
 

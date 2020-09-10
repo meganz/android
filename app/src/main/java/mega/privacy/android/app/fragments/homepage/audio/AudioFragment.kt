@@ -313,10 +313,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
                     finish()
                 }
             } else {
-                viewModel.items.value?.let { items ->
-                    actionModeCallback.nodeCount =
-                        items.size - 1   // The "sort by" header isn't counted
-                }
+                actionModeCallback.nodeCount = viewModel.getRealNodeCount()
 
                 if (actionMode == null) {
                     callManager { manager ->
