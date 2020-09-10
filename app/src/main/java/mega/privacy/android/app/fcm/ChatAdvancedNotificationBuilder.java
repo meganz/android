@@ -991,39 +991,38 @@ public final class ChatAdvancedNotificationBuilder {
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
+                    .setCustomContentView(collapsedViews)
+                    .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
-                    .setAutoCancel(true)
-                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
+                    .setAutoCancel(false)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(patternIncomingCall)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
-                    .setPriority(NotificationManager.IMPORTANCE_HIGH)
-                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView);
-
+                    .setPriority(NotificationManager.IMPORTANCE_HIGH);
             notifyCall(notificationId, notificationBuilderO.build());
         } else {
             long[] pattern = {0, 1000};
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
+                    .setCustomContentView(collapsedViews)
+                    .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
-                    .setAutoCancel(true)
+                    .setAutoCancel(false)
                     .setDefaults(Notification.FLAG_ONGOING_EVENT)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(context, R.color.mega))
-                    .setCustomHeadsUpContentView(numberButtons.equals(HORIZONTAL_TWO_BUTTONS) ? expandedView : collapsedViews)
-                    .setCustomContentView(collapsedViews)
-                    .setCustomBigContentView(expandedView);
+                    .setColor(ContextCompat.getColor(context, R.color.mega));
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
                 notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
@@ -1133,10 +1132,10 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomContentView(collapsedViews)
                     .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
-                    .setAutoCancel(true)
-                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
+                    .setAutoCancel(false)
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(patternIncomingCall)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
@@ -1154,10 +1153,10 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomContentView(collapsedViews)
                     .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
-                    .setAutoCancel(true)
-                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
+                    .setAutoCancel(false)
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
