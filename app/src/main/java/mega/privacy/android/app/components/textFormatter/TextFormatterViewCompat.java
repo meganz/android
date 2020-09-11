@@ -81,6 +81,7 @@ public class TextFormatterViewCompat {
         ArrayList<Flag> flags = new ArrayList<>();
         Flag boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
         Flag monospaceFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
+        Flag simpleMonospaceFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
         Flag strikeFlag = new Flag(INVALID_INDEX, INVALID_INDEX, STRIKE_FLAG);
         Flag italicFlag = new Flag(INVALID_INDEX, INVALID_INDEX, ITALIC_FLAG);
         int i = 0;
@@ -130,28 +131,50 @@ public class TextFormatterViewCompat {
                     break;
 
                 case MONOSPACE_FLAG:
-                    if (textChars.length > 6) {
-                        if (textChars.length > i + NUM_CHAR_MONOSPACE) {
+                    if (simpleMonospaceFlag.start != INVALID_INDEX || monospaceFlag.start != INVALID_INDEX) {
+                        boolean monospaceIsFinished = false;
+                        if (monospaceFlag.start != INVALID_INDEX && textChars.length > 6 && textChars.length > i + NUM_CHAR_MONOSPACE &&
+                                monospaceFlag.end == INVALID_INDEX && textChars[i + 1] == MONOSPACE_FLAG &&
+                                textChars[i + NUM_CHAR_MONOSPACE] == MONOSPACE_FLAG) {
+                            j = j - NUM_CHAR_MONOSPACE;
+                            monospaceFlag.end = j;
+                            flags.add(monospaceFlag);
+                            monospaceIsFinished = true;
+                            monospaceFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
+                            i = i + NUM_CHAR_MONOSPACE;
 
-                            if (monospaceFlag.start != INVALID_INDEX) {
-                                if (monospaceFlag.end == INVALID_INDEX && textChars[i + 1] == MONOSPACE_FLAG && textChars[i + NUM_CHAR_MONOSPACE] == MONOSPACE_FLAG) {
-                                    j = j - NUM_CHAR_MONOSPACE;
-                                    monospaceFlag.end = j;
-                                    flags.add(monospaceFlag);
+                        }
+                        if (simpleMonospaceFlag.start != INVALID_INDEX) {
+                            if (!monospaceIsFinished) {
+                                simpleMonospaceFlag.end = j;
+                                flags.add(simpleMonospaceFlag);
+                                if (monospaceFlag.start == simpleMonospaceFlag.start + NUM_CHAR_MONOSPACE) {
                                     monospaceFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
-                                    i = i + NUM_CHAR_MONOSPACE;
-                                    continue;
-                                }
-                            } else {
-                                if (textChars[i + 1] == MONOSPACE_FLAG && textChars[i + NUM_CHAR_MONOSPACE] == MONOSPACE_FLAG) {
-                                    monospaceFlag.start = j;
-                                    i = i + NUM_CHAR_MONOSPACE;
-                                    j = j + NUM_CHAR_MONOSPACE;
-                                    continue;
                                 }
                             }
+                            simpleMonospaceFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
+                            continue;
                         }
                     }
+
+                    boolean needContinue = false;
+                    if (textChars.length > 6 && textChars.length > i + NUM_CHAR_MONOSPACE &&
+                            textChars[i + 1] == MONOSPACE_FLAG && textChars[i + NUM_CHAR_MONOSPACE] == MONOSPACE_FLAG &&
+                            hasMultiMonospaceSameLine(text, MONOSPACE_FLAG, i + 3)) {
+                        monospaceFlag.start = j;
+                        i = i + NUM_CHAR_MONOSPACE;
+                        j = j + NUM_CHAR_MONOSPACE;
+                        needContinue = true;
+                    }
+
+                    if (hasFlagSameLine(text, MONOSPACE_FLAG, i + 1)) {
+                        simpleMonospaceFlag.start = j;
+                        continue;
+                    }
+
+                    if (needContinue)
+                        continue;
+
                     break;
             }
 

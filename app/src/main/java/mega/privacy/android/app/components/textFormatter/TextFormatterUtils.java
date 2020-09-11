@@ -28,11 +28,11 @@ public class TextFormatterUtils {
     }
 
     /**
-     * Method to check if there is a line break in the sentence to be formatted.
+     * Method to see if that special character is found again on that same line.
      *
      * @param sequence  The CharSequence to be controlled.
      * @param flag      The element that indicates what type of formatting will be carried out.
-     * @param fromIndex The position from which the formatting starts.
+     * @param fromIndex The position from which you start checking.
      * @return True, if you find the same formatting element on the same line. False, otherwise.
      */
     public static boolean hasFlagSameLine(CharSequence sequence, char flag, int fromIndex) {
@@ -42,9 +42,45 @@ public class TextFormatterUtils {
                 return false;
             }
             if (c == flag) {
-                return i != fromIndex && sequence.charAt(i - 1) != SPACE;
-            } else if (c == SPACE && sequence.charAt(i - 1) == flag) {
+                return i != fromIndex;
+            }
+            if (c == SPACE) {
+                continue;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Method to see if the combination "```" is found again in that text.
+     *
+     * @param sequence  The CharSequence to be controlled.
+     * @param flag      The special character that is repeated three times.
+     * @param fromIndex The position from which you start checking.
+     * @return True, if you find the same formatting element. False, otherwise.
+     */
+    public static boolean hasMultiMonospaceSameLine(CharSequence sequence, char flag, int fromIndex) {
+        for (int i = fromIndex; i < sequence.length(); ++i) {
+            char c = sequence.charAt(i);
+            if (c == NEW_LINE) {
                 return false;
+            }
+            if (c == flag) {
+                if (i != fromIndex && sequence.length() > 6 && sequence.length() > i + 2 &&
+                        sequence.charAt(i + 1) == MONOSPACE_FLAG && sequence.charAt(i + 2) == MONOSPACE_FLAG) {
+                    if (sequence.length() > i + 3 && sequence.charAt(i + 3) == MONOSPACE_FLAG) {
+                        continue;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (c == SPACE) {
+                continue;
             }
         }
 
