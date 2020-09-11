@@ -604,8 +604,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
 
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
-
-                if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) && callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT && callStatus != MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
+                if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) && callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT) {
                     updateCallBar();
                 }
                 switch (callStatus) {
@@ -8662,6 +8661,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         logDebug("Call Status in this chatRoom: "+callStatusToString(callStatus));
         switch (callStatus){
+            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_RING_IN:
                 if(chatRoom == null)
