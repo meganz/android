@@ -228,6 +228,7 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -14593,6 +14594,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshCloudDrive();
 	}
 
+    public void onNodesRecentsUpdate() {
+        if (isRecentsAdded()) {
+            ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
+            rF.fillRecentItems(getBucketSaved(), buckets);
+            rF.refreshRecentsActions();
+        }
+    }
+
 	public void onNodesInboxUpdate() {
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
@@ -14687,9 +14696,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		onNodesCloudDriveUpdate();
 
-		if(cloudPageAdapter!=null){
-			cloudPageAdapter.notifyDataSetChanged();
-		}
+		onNodesRecentsUpdate();
 
 		onNodesSearchUpdate();
 
