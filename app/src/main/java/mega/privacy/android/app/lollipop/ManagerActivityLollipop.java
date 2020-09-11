@@ -601,7 +601,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 
 	private enum HomepageScreen {
-       	HOMEPAGE, PHOTOS, DOCUMENTS, AUDIO,
+       	HOMEPAGE, PHOTOS, DOCUMENTS, AUDIO, VIDEO,
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO,
 	}
 
@@ -5774,6 +5774,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case R.id.audioFragment:
 					mHomepageScreen = HomepageScreen.AUDIO;
 					break;
+                case R.id.videoFragment:
+                    mHomepageScreen = HomepageScreen.VIDEO;
+                    break;
 				case R.id.fullscreen_offline:
 					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
 					break;
