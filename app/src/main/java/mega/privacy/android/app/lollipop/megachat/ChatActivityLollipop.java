@@ -2267,17 +2267,26 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     void ifAnonymousModeLogin(boolean pendingJoin) {
-        if(chatC.isInAnonymousMode()){
+        if (chatC.isInAnonymousMode()) {
             Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-            loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             if (pendingJoin && getIntent() != null && getIntent().getDataString() != null) {
+                loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(getIntent().getDataString()));
                 loginIntent.putExtra("idChatToJoin", idChat);
-                closeChat(true);
+            } else {
+                loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
             }
+            if (app.isActivityVisible()) {
+                loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            } else {
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            }
+            app.setIsLoggingRunning(true);
             startActivity(loginIntent);
         }
+
+        closeChat(true);
         finish();
     }
 
@@ -2310,7 +2319,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (handlerKeyboard != null) {
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
-                closeChat(true);
                 ifAnonymousModeLogin(false);
                 break;
             }
@@ -3522,7 +3530,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (handlerKeyboard != null) {
                 handlerKeyboard.removeCallbacksAndMessages(null);
             }
-            closeChat(true);
             ifAnonymousModeLogin(false);
         }
     }
@@ -7547,13 +7554,22 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (megaChatApi == null || chatRoom == null || idChat == MEGACHAT_INVALID_HANDLE) {
             return;
         }
-        if (chatRoom.isPreview() && chatC.isInAnonymousMode() && shouldLogout) {
-            megaChatApi.logout();
-        } else {
-            megaChatApi.closeChatRoom(idChat, this);
+
+        shouldLogout = chatC.isInAnonymousMode() && shouldLogout;
+
+        megaChatApi.closeChatRoom(idChat, this);
+
+        if (chatRoom.isPreview()) {
+            megaChatApi.closeChatPreview(idChat);
         }
+
         MegaApplication.setClosedChat(true);
         megaChatApi.removeChatListener(this);
+
+        if (shouldLogout) {
+            megaChatApi.logout();
+        }
+
         chatRoom = null;
         idChat = MEGACHAT_INVALID_HANDLE;
     }
