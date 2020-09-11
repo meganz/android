@@ -7382,6 +7382,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 chatTitle = "\""+chatTitle+"\"";
             }
 
+            supportInvalidateOptionsMenu();
+            setChatSubtitle();
+
+            if (!chatRoom.isArchived()) {
+                requestLastGreen(INITIAL_PRESENCE_STATUS);
+            }
+
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
 
                 if(request.getFlag()){
@@ -7401,12 +7408,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     logError("ERROR WHEN UNARCHIVING CHAT " + e.getErrorString());
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_unarchive_chat, chatTitle), -1);
                 }
-            }
-            supportInvalidateOptionsMenu();
-            setChatSubtitle();
-
-            if(!chatRoom.isArchived()){
-                requestLastGreen(INITIAL_PRESENCE_STATUS);
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
