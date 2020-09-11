@@ -7555,6 +7555,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
+        shouldLogout = chatC.isInAnonymousMode() && shouldLogout;
+
         megaChatApi.closeChatRoom(idChat, this);
 
         if (chatRoom.isPreview()) {
