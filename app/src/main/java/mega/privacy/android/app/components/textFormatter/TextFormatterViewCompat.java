@@ -18,6 +18,12 @@ public class TextFormatterViewCompat {
     private static final int NUM_CHAR_MONOSPACE = 2;
     private static final Typeface MONOSPACE_FONT = Typeface.createFromAsset(MegaApplication.getInstance().getBaseContext().getAssets(), "font/RobotoMono-Regular.ttf");
 
+    /**
+     * Method that receives a text and returns it properly formatted.
+     *
+     * @param text The text without format.
+     * @return The formatted text.
+     */
     public static CharSequence getFormattedText(String text) {
         if (isTextEmpty(text))
             return null;
@@ -25,6 +31,11 @@ public class TextFormatterViewCompat {
         return extractFlagsForTextView(text);
     }
 
+    /**
+     * Method that controls a TextView, to format the text it contains.
+     *
+     * @param textView The TextView.
+     */
     public static void applyFormatting(final TextView textView) {
         TextWatcher mEditTextWatcher = new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -49,18 +60,25 @@ public class TextFormatterViewCompat {
         textView.addTextChangedListener(mEditTextWatcher);
     }
 
-    static void removeTextChangedListener(TextView textView, TextWatcher watcher) {
+    private static void removeTextChangedListener(TextView textView, TextWatcher watcher) {
         textView.removeTextChangedListener(watcher);
     }
 
-    static void addTextChangedListener(TextView textView, TextWatcher watcher) {
+    private static void addTextChangedListener(TextView textView, TextWatcher watcher) {
         textView.addTextChangedListener(watcher);
     }
 
+    /**
+     * Method that actually formats the text. The first part gets a count of the special characters in the text,
+     * and where they are located. The second part is to convert the text according to the special characters found in the first part.
+     *
+     * @param text The plain text.
+     * @return The formatted text.
+     */
     public static CharSequence extractFlagsForTextView(CharSequence text) {
         char[] textChars = text.toString().toCharArray();
-        ArrayList<Character> characters = new ArrayList();
-        ArrayList<Flag> flags = new ArrayList();
+        ArrayList<Character> characters = new ArrayList<>();
+        ArrayList<Flag> flags = new ArrayList<>();
         Flag boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
         Flag monospaceFlag = new Flag(INVALID_INDEX, INVALID_INDEX, MONOSPACE_FLAG);
         Flag strikeFlag = new Flag(INVALID_INDEX, INVALID_INDEX, STRIKE_FLAG);
