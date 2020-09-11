@@ -735,7 +735,7 @@ public class FileUtils {
     public static void showSnackBarWhenDownloading(Context context, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded, int emptyFolders) {
         logDebug(" Already downloaded: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
 
-        if (numberOfNodesPending == 0) {
+        if (numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0) {
             showSnackbar(context, context.getResources().getQuantityString(R.plurals.empty_folders, emptyFolders));
         } else if (numberOfNodesAlreadyDownloaded == 0) {
             showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending));
