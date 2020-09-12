@@ -3290,16 +3290,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.retryAlert.setVisibility(View.GONE);
                 }
 
-                    holder.urlOwnMessageText.setText(content + " ");
+                holder.urlOwnMessageText.setText(content + " ");
+                Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
+                edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.urlOwnMessageText.setText(getFormattedText(holder.urlOwnMessageText.getText().toString()));
+                holder.urlOwnMessageText.append(edited);
 
-                    Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
-                    edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    ((ViewHolderMessageChat) holder).urlOwnMessageText.append(edited);
-
-                checkEmojiSize(messageContent, holder.contentOwnMessageText);
-                holder.contentOwnMessageText.setText(getFormattedText(holder.contentOwnMessageText.getText().toString()));
+                checkEmojiSize(messageContent, holder.urlOwnMessageText);
             } else {
                 int status = message.getStatus();
 
@@ -3463,9 +3462,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.urlContactMessageText.setText(getFormattedText(holder.urlContactMessageText.getText().toString()));
+                holder.urlContactMessageText.append(edited);
+                checkEmojiSize(messageContent, holder.urlContactMessageText);
 
-                    CharSequence indexedText = TextUtils.concat(messageContent, edited);
-                    ((ViewHolderMessageChat) holder).urlContactMessageText.setText(indexedText);
             } else {
                 ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                 holder.urlContactMessageText.setText(getFormattedText(messageContent));

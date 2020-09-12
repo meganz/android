@@ -38,7 +38,7 @@ public class TextFormatterUtils {
     public static boolean hasFlagSameLine(CharSequence sequence, char flag, int fromIndex) {
         for (int i = fromIndex; i < sequence.length(); ++i) {
             char c = sequence.charAt(i);
-            if (c == NEW_LINE) {
+            if (c == NEW_LINE && flag != MONOSPACE_FLAG) {
                 return false;
             }
             if (c == flag) {
@@ -63,9 +63,6 @@ public class TextFormatterUtils {
     public static boolean hasMultiMonospaceSameLine(CharSequence sequence, char flag, int fromIndex) {
         for (int i = fromIndex; i < sequence.length(); ++i) {
             char c = sequence.charAt(i);
-            if (c == NEW_LINE) {
-                return false;
-            }
             if (c == flag) {
                 if (i != fromIndex && sequence.length() > 6 && sequence.length() > i + 2 &&
                         sequence.charAt(i + 1) == MONOSPACE_FLAG && sequence.charAt(i + 2) == MONOSPACE_FLAG) {
