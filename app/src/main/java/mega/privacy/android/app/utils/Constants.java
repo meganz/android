@@ -304,6 +304,8 @@ public class Constants {
     public static final int PHOTOS_SEARCH_ADAPTER = 2027;
     public static final int AUDIO_BROWSE_ADAPTER = 2028;
     public static final int AUDIO_SEARCH_ADAPTER = 2029;
+    public static final int VIDEO_BROWSE_ADAPTER = 2031;
+    public static final int VIDEO_SEARCH_ADAPTER = 2032;
 
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;

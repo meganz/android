@@ -63,6 +63,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
+
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -117,6 +118,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,6 +153,7 @@ import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
+import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -1239,7 +1242,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									break;
 							}
 						}
-					} else if (adapterType == RECENTS_ADAPTER && rF != null) {
+					} else if (adapterType == VIDEO_BROWSE_ADAPTER || adapterType == VIDEO_SEARCH_ADAPTER) {
+                        long handle = intent.getLongExtra(Constants.HANDLE, INVALID_HANDLE);
+                        if (mHomepageSearchable != null) {
+                            VideoFragment fragment = (VideoFragment)mHomepageSearchable;
+                            switch (actionType) {
+                                case SCROLL_TO_POSITION:
+                                    fragment.scrollToPhoto(handle);
+                                    break;
+                                case UPDATE_IMAGE_DRAG:
+                                    fragment.hideDraggingThumbnail(handle);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }else if (adapterType == RECENTS_ADAPTER && rF != null) {
 						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
 						if (actionType == UPDATE_IMAGE_DRAG) {
 							imageDrag = rF.getImageDrag(handle);
@@ -5042,10 +5060,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					case AUDIO:
 						titleId = R.string.category_audio;
 						break;
+                    case VIDEO:
+                        titleId = R.string.category_video;
+                        break;
 				}
 
 				if (titleId != -1) {
-					aB.setTitle(getString(titleId));
+					aB.setTitle(getString(titleId).toUpperCase(Locale.getDefault()));
 				}
 			}
 			default:{
