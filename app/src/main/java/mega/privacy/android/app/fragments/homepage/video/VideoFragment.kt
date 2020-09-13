@@ -14,9 +14,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentVideoBinding
@@ -49,25 +51,9 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
-    private lateinit var managerActivity: ManagerActivityLollipop
+    private lateinit var activity: ManagerActivityLollipop
 
     private var draggingNodeHandle = MegaApiJava.INVALID_HANDLE
-
-    private val animatorListener = object : Animator.AnimatorListener {
-
-        override fun onAnimationRepeat(animation: Animator?) {
-        }
-
-        override fun onAnimationEnd(animation: Animator?) {
-            updateUi()
-        }
-
-        override fun onAnimationCancel(animation: Animator?) {
-        }
-
-        override fun onAnimationStart(animation: Animator?) {
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,7 +70,7 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        managerActivity = requireActivity() as ManagerActivityLollipop
+        activity = getActivity() as ManagerActivityLollipop
 
         setupListView()
         setupListAdapter()
@@ -96,7 +82,7 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
                 // Hide the search icon if no file
-                managerActivity.invalidateOptionsMenu()
+                activity.invalidateOptionsMenu()
             }
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
@@ -105,12 +91,38 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupListView() {
         listView = binding.videoList
-        preventListItemBlink(listView)
-        elevateToolbarWhenScrolling(managerActivity, listView)
+        preventListItemBlink()
+        elevateToolbarWhenScrolling()
         itemDecoration = PositionDividerItemDecoration(context, outMetrics)
 
         listView.clipToPadding = false
         listView.setHasFixedSize(true)
+    }
+
+    private fun preventListItemBlink() {
+        val animator = listView.itemAnimator
+        if (animator is SimpleItemAnimator) {
+            animator.supportsChangeAnimations = false
+        }
+    }
+
+    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
+        listView
+    ) { v: View?, _, _, _, _ ->
+        activity.changeActionBarElevation(v!!.canScrollVertically(-1))
+    }
+
+    private fun doIfOnline(operation: () -> Unit) {
+        if (Util.isOnline(context)) {
+            operation()
+        } else {
+            activity.hideKeyboardSearch()  // Make the snack bar visible to the user
+            activity.showSnackbar(
+                SNACKBAR_TYPE,
+                context.getString(R.string.error_server_connection_problem),
+                -1
+            )
+        }
     }
 
     private fun setupListAdapter() {
@@ -142,7 +154,7 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupActionMode() {
-        actionModeCallback = ActionModeCallback(managerActivity, actionModeViewModel, megaApi)
+        actionModeCallback = ActionModeCallback(activity, actionModeViewModel, megaApi)
 
         observeItemLongClick()
         observeSelectedItems()
@@ -152,25 +164,28 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
 
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            doIfOnline(managerActivity) { actionModeViewModel.enterActionMode(it) }
+            doIfOnline { actionModeViewModel.enterActionMode(it) }
         })
 
     private fun observeSelectedItems() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()) {
-                actionMode?.finish()
+                actionMode?.apply {
+                    finish()
+                }
             } else {
                 viewModel.items.value?.let { items ->
-                    // The "sort by" header isn't counted
-                    actionModeCallback.nodeCount = items.size - 1
+                    actionModeCallback.nodeCount =
+                        items.size - 1   // The "sort by" header isn't counted
                 }
 
                 if (actionMode == null) {
-                    managerActivity.hideKeyboardSearch()
-                    actionMode = managerActivity.startSupportActionMode(actionModeCallback)
+                    activity.hideKeyboardSearch()
+                    actionMode = activity.startSupportActionMode(
+                        actionModeCallback
+                    )
                 } else {
-                    // Update the action items based on the selected nodes
-                    actionMode!!.invalidate()
+                    actionMode?.invalidate()  // Update the action items based on the selected nodes
                 }
 
                 actionMode?.title = it.size.toString()
@@ -195,7 +210,20 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
             animatorSet = AnimatorSet()
             val animatorList = mutableListOf<Animator>()
 
-            animatorSet?.addListener(animatorListener)
+            animatorSet?.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    updateUi()
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                }
+
+                override fun onAnimationStart(animation: Animator?) {
+                }
+            })
 
             it.forEach { pos ->
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
@@ -230,11 +258,17 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
-            managerActivity.showKeyboardForSearch()
+            activity.showKeyboardForSearch()
         })
 
     private fun updateUi() = viewModel.items.value?.let {
-        if (sortByHeaderViewModel.isList) listAdapter.submitList(it) else gridAdapter.submitList(it)
+        // Musti create a new list, otherwise, onBindViewHolder in adapter cannot trigger.
+        val newList = ArrayList<NodeItem>(it)
+        if (sortByHeaderViewModel.isList) {
+            listAdapter.submitList(newList)
+        } else {
+            gridAdapter.submitList(newList)
+        }
     }
 
     private fun setupNavigation() {
@@ -246,8 +280,8 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
-            doIfOnline(managerActivity) {
-                managerActivity.showNodeOptionsPanel(
+            doIfOnline {
+                activity.showNodeOptionsPanel(
                     it.node,
                     if (viewModel.searchMode) MODE5 else MODE1
                 )
@@ -255,7 +289,7 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            (managerActivity).showNewSortByPanel()
+            (activity).showNewSortByPanel()
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
@@ -327,7 +361,7 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
                 draggingNodeHandle = node.handle
                 setupDraggingThumbnailCallback()
                 startActivity(intent)
-                managerActivity.overridePendingTransition(0, 0)
+                activity.overridePendingTransition(0, 0)
             } else {
                 startActivity(intent)
             }
@@ -349,7 +383,7 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            RunOnUIThreadUtils.post { managerActivity.hideKeyboardSearch() }
+            RunOnUIThreadUtils.post { activity.hideKeyboardSearch() }
         }
         if (viewModel.searchMode) return
 
@@ -432,6 +466,6 @@ class VideoFragment : BaseFragment(), HomepageSearchable {
 
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(managerActivity).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
     }
 }
