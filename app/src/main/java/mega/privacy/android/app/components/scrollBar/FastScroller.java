@@ -110,6 +110,15 @@ public class FastScroller extends LinearLayout{
         invalidate();
     }
 
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+
+        if (!isInEditMode() && recyclerView != null) {
+            scrollListener.updateHandlePosition(recyclerView);
+        }
+    }
+
     public void addScrollerListener(RecyclerViewScrollListener.ScrollerListener listener) {
         scrollListener.addScrollerListener(listener);
     }
