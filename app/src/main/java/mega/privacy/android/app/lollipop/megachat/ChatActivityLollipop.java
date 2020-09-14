@@ -7449,33 +7449,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     @Override
     protected void onStop() {
-        logDebug("onStop()");
-        try{
-            if(textChat!=null){
-                String written = textChat.getText().toString();
-                if(written!=null){
-                    if (dbH == null) {
-                        dbH = MegaApplication.getInstance().getDbH();
-                    }
-
-                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
-                    String editedMessageId = editingMessage && messageToEdit != null ? Long.toString(messageToEdit.getMsgId()) : "";
-                    if (prefs != null) {
-                        prefs.setEditedMsgId(editedMessageId);
-                        prefs.setWrittenText(written);
-                        dbH.setWrittenTextItem(Long.toString(idChat), written, editedMessageId);
-                    } else {
-                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), written, editedMessageId);
-                        dbH.setChatItemPreferences(prefs);
-                    }
-                }
-            }
-            else{
-                logWarning("textChat is NULL");
-            }
-        }catch (Exception e){
-            logError("Written message not stored on DB", e);
-        }
         super.onStop();
     }
 
@@ -7549,12 +7522,40 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         super.onDestroy();
     }
 
+    /**
+     * Method for saving in the database if there was something written in the input text or if a message was being edited
+     */
+    private void saveInputText() {
+        try {
+            if (textChat != null) {
+                String written = textChat.getText().toString();
+                if (written != null) {
+                    if (dbH == null) {
+                        dbH = MegaApplication.getInstance().getDbH();
+                    }
+                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+                    String editedMessageId = editingMessage && messageToEdit != null ? Long.toString(messageToEdit.getMsgId()) : "";
+                    if (prefs != null) {
+                        prefs.setEditedMsgId(editedMessageId);
+                        prefs.setWrittenText(written);
+                        dbH.setWrittenTextItem(Long.toString(idChat), written, editedMessageId);
+                    } else {
+                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), written, editedMessageId);
+                        dbH.setChatItemPreferences(prefs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logError("Written message not stored on DB", e);
+        }
+    }
+
     public void closeChat(boolean shouldLogout) {
         logDebug("closeChat");
         if (megaChatApi == null || chatRoom == null || idChat == MEGACHAT_INVALID_HANDLE) {
             return;
         }
-
+        saveInputText();
         shouldLogout = chatC.isInAnonymousMode() && shouldLogout;
 
         megaChatApi.closeChatRoom(idChat, this);
