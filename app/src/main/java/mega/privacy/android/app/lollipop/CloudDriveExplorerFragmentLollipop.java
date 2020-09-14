@@ -372,6 +372,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				break;
 
 			case FileExplorerActivityLollipop.SELECT:
+				separator.setVisibility(View.GONE);
+				optionsBar.setVisibility(View.GONE);
 				activateButton(shouldShowOptionsBar(megaApi.getNodeByHandle(parentHandle)));
 				//No break; needed: the text should be set with SELECT mode
 
