@@ -2837,6 +2837,8 @@
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support&#64;mega.nz</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Your account has been disabled by your administrator. Please contact your business account administrator for further details.</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">Your account has been removed by your administrator. Please contact your business account administrator for further details.</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify</string>
     <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>

@@ -617,8 +617,12 @@ public class BaseActivity extends AppCompatActivity {
                 megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS)));
                 break;
 
-            case DISABLED_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_account_blocked)));
+            case DISABLED_BUSINESS_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_disabled)));
+                break;
+
+            case REMOVED_BUSINESS_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_removed)));
                 break;
 
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
