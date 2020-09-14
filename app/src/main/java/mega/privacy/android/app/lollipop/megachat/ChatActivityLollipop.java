@@ -205,6 +205,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private static final String SELECTED_ITEMS = "selectedItems";
     private static final String JOINING_OR_LEAVING = "JOINING_OR_LEAVING";
     private static final String JOINING_OR_LEAVING_ACTION = "JOINING_OR_LEAVING_ACTION";
+    private static final String OPENING_AND_JOINING_ACTION = "OPENING_AND_JOINING_ACTION";
 
     private final static int NUMBER_MESSAGES_TO_LOAD = 32;
     private final static int MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN = 256;
@@ -470,6 +471,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private boolean joiningOrLeaving;
     private String joiningOrLeavingAction;
+    private boolean openingAndJoining;
 
     private AudioFocusRequest request;
     private AudioManager mAudioManager;
@@ -1253,9 +1255,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (intentAction.equals(ACTION_OPEN_CHAT_LINK) || intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
                     megaChatApi.openChatPreview(link, this);
-                }
-                else{
 
+                    if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
+                        openingAndJoining = true;
+                        setJoiningOrLeaving(getString(R.string.joining_label));
+                    }
+                } else {
                     long newIdChat = newIntent.getLongExtra("CHAT_ID", -1);
 
                     if(idChat != newIdChat){
@@ -1318,6 +1323,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                         joiningOrLeaving = savedInstanceState.getBoolean(JOINING_OR_LEAVING, false);
                         joiningOrLeavingAction = savedInstanceState.getString(JOINING_OR_LEAVING_ACTION);
+                        openingAndJoining = savedInstanceState.getBoolean(OPENING_AND_JOINING_ACTION, false);
                     }
 
                     String text = null;
@@ -1478,6 +1484,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void initAndShowChat(String textSnackbar) {
         if (!initChat()) {
             return;
+        }
+
+        if (!chatRoom.isPreview()) {
+            joiningOrLeaving = false;
+
         }
 
         initializeInputText();
@@ -1691,11 +1702,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if(chatRoom.isPreview()){
                     logDebug("Is preview");
                     setPreviewGroupalSubtitle();
-                    if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-                        setBottomLayout(SHOW_NOTHING_LAYOUT);
-                    }else {
-                        setBottomLayout(SHOW_JOIN_LAYOUT);
-                    }
+                   setBottomLayout(openingAndJoining ? SHOW_JOINING_OR_LEFTING_LAYOUT : SHOW_JOIN_LAYOUT);
                 }
                 else {
                     logDebug("Check permissions group chat");
@@ -2273,7 +2280,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(getIntent().getDataString()));
-                loginIntent.putExtra("idChatToJoin", idChat);
             } else {
                 loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
             }
@@ -3656,8 +3662,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case R.id.join_button:{
                 if (chatC.isInAnonymousMode()) {
                     ifAnonymousModeLogin(true);
-                }
-                else {
+                } else {
                     setJoiningOrLeaving(getString(R.string.joining_label));
                     megaChatApi.autojoinPublicChat(idChat, this);
                 }
@@ -7316,7 +7321,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 MegaApplication.setOpenChatId(idChat);
 
-                if (e.getErrorCode() == MegaChatError.ERROR_EXIST && !megaChatApi.getChatRoom(idChat).isActive()) {
+                if (e.getErrorCode() == MegaChatError.ERROR_OK && openingAndJoining) {
+                    megaChatApi.autojoinPublicChat(idChat, this);
+                    openingAndJoining = false;
+                } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST && !megaChatApi.getChatRoom(idChat).isActive()) {
                     if (initChat()) {
                         //Chat successfully initialized, now can rejoin
                         setJoiningOrLeaving(getString(R.string.joining_label));
@@ -7818,6 +7826,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         outState.putBoolean("isLocationDialogShown", isLocationDialogShown);
         outState.putBoolean(JOINING_OR_LEAVING, joiningOrLeaving);
         outState.putString(JOINING_OR_LEAVING_ACTION, joiningOrLeavingAction);
+        outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -9008,6 +9017,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @param action    String which indicates if the UI to set is the joining or leaving state.
      */
     private void setJoiningOrLeaving(String action) {
+        if (chatRoom != null && !chatRoom.isPreview()) {
+            return;
+        }
+
         joiningOrLeaving = true;
         joiningOrLeavingAction = action;
         joiningLeavingText.setText(action);

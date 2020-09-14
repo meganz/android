@@ -752,7 +752,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	View callBadge;
 
 	private boolean joiningToChatLink = false;
-	private long idJoinToChatLink = -1;
+	private long idJoinToChatLink = MEGACHAT_INVALID_HANDLE;
 
 	private boolean onAskingPermissionsFragment = false;
 	public boolean onAskingSMSVerificationFragment = false;
@@ -2906,11 +2906,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						selectDrawerItemPending = false;
 
 						megaChatApi.checkChatLink(getIntent().getDataString(), this);
-						idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
 						joiningToChatLink = true;
-						if (idJoinToChatLink == -1) {
-							showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
-						}
 
 						getIntent().setAction(null);
 						setIntent(null);
@@ -9268,15 +9264,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}catch (Exception e){}
 	}
 
-	public void showChatLink(String link){
+	public void showChatLink(String link) {
 		logDebug("Link: " + link);
 		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+
 		if (joiningToChatLink) {
 			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-		}
-		else {
+			joiningToChatLink = false;
+		} else {
 			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
 		}
+
 		openChatLinkIntent.setData(Uri.parse(link));
 		startActivity(openChatLinkIntent);
 		drawerItem = DrawerItem.CHAT;
@@ -13096,9 +13094,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("CONNECT CHAT finished ");
-				if (joiningToChatLink && idJoinToChatLink != -1) {
-					megaChatApi.autojoinPublicChat(idJoinToChatLink, this);
-				}
+
 				if(drawerItem == DrawerItem.CHAT){
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if(rChatFL!=null){
@@ -13184,6 +13180,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
+				if (joiningToChatLink) {
+					idJoinToChatLink = request.getChatHandle();
+
+					if (idJoinToChatLink == MEGACHAT_INVALID_HANDLE) {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
+						return;
+					}
+				}
+
 				showChatLink(request.getLink());
 				dismissOpenLinkDialog();
 			}
