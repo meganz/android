@@ -16,7 +16,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,6 +39,7 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -159,9 +163,21 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 checkScroll();
             }
         });
-
+        setRecentsView();
         fillRecentItems(buckets);
         return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EventNotifierKt.getNodesChange().observeForever(o -> {
+            if (o) {
+                ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
+                fillRecentItems(buckets);
+                refreshRecentsActions();
+            }
+        });
     }
 
     public void fillRecentItems(ArrayList<MegaRecentActionBucket> buckets) {

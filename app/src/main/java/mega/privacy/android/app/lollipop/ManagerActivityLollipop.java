@@ -14637,15 +14637,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshCloudDrive();
 	}
 
-    public void onNodesRecentsUpdate() {
-        RecentsFragment fragment = getFragmentByType(RecentsFragment.class);
-        if (fragment != null) {
-            ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
-            fragment.fillRecentItems(buckets);
-            fragment.refreshRecentsActions();
-        }
-    }
-
 	public void onNodesInboxUpdate() {
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
@@ -14737,8 +14728,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 
 		onNodesCloudDriveUpdate();
-
-		onNodesRecentsUpdate();
 
 		onNodesSearchUpdate();
 
