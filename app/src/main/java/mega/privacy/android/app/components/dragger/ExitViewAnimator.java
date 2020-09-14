@@ -50,7 +50,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                     surfaceView = (SurfaceView) currentView;
                     scaleX = ((float) screenPosition[2]) / ((float) surfaceView.getWidth());
                     scaleY = ((float) screenPosition[3]) / ((float) surfaceView.getHeight());
-                    logDebug("Scale: " + scaleX + " " + scaleY + " dimensions: " + surfaceView.getWidth() + " " + surfaceView.getHeight() + " position: " + screenPosition[2] + " " + screenPosition[3]);
+                    logDebug("Scale: " + scaleX + " " + scaleY + " dimensions: " + surfaceView.getWidth() + " " + surfaceView.getHeight() + " position: " + screenPosition[0] + " " + screenPosition[1]);
                 }
 
                 ViewCompat.animate(draggableView)
