@@ -5790,14 +5790,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				replaceFragment(oFLol, FragmentTag.OFFLINE.getTag());
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-						ActivityCompat.requestPermissions(this,
-								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								REQUEST_WRITE_STORAGE);
-					}
-				}
-
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
 				showFabButton();
