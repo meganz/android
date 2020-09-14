@@ -29,13 +29,14 @@ public class TextFormatterUtils {
 
     /**
      * Method to see if that special character is found again on that same line.
+     * NOTE: not applicable for MONOSPACE_FLAG, because it could be used in multiline format.
      *
      * @param sequence  The CharSequence to be controlled.
      * @param flag      The element that indicates what type of formatting will be carried out.
      * @param fromIndex The position from which you start checking.
      * @return True, if you find the same formatting element on the same line. False, otherwise.
      */
-    public static boolean hasFlagSameLine(CharSequence sequence, char flag, int fromIndex) {
+    public static boolean hasSimpleFormatter(CharSequence sequence, char flag, int fromIndex) {
         for (int i = fromIndex; i < sequence.length(); ++i) {
             char c = sequence.charAt(i);
             if (c == NEW_LINE && flag != MONOSPACE_FLAG) {
@@ -43,9 +44,6 @@ public class TextFormatterUtils {
             }
             if (c == flag) {
                 return i != fromIndex;
-            }
-            if (c == SPACE) {
-                continue;
             }
         }
 
@@ -60,7 +58,7 @@ public class TextFormatterUtils {
      * @param fromIndex The position from which you start checking.
      * @return True, if you find the same formatting element. False, otherwise.
      */
-    public static boolean hasMultiMonospaceSameLine(CharSequence sequence, char flag, int fromIndex) {
+    public static boolean hasMultiFormatter(CharSequence sequence, char flag, int fromIndex) {
         for (int i = fromIndex; i < sequence.length(); ++i) {
             char c = sequence.charAt(i);
             if (c == flag) {
@@ -75,17 +73,16 @@ public class TextFormatterUtils {
 
                 return false;
             }
-
-            if (c == SPACE) {
-                continue;
-            }
         }
 
         return false;
     }
 
     /**
-     * Class with the necessary elements to make a sentence formatted. Start, where it begins. End, where it ends. Flag, the formatting element
+     * Class with the necessary elements to make a sentence formatted.
+     * Start, where it begins.
+     * End, where it ends.
+     * Flag, the formatting element
      */
     public static class Flag {
         int start;

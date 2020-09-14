@@ -96,7 +96,7 @@ public class TextFormatterViewCompat {
                         boldFlag = new Flag(INVALID_INDEX, INVALID_INDEX, BOLD_FLAG);
                         continue;
                     }
-                    if (hasFlagSameLine(text, BOLD_FLAG, i + 1)) {
+                    if (hasSimpleFormatter(text, BOLD_FLAG, i + 1)) {
                         boldFlag.start = j;
                         continue;
                     }
@@ -110,7 +110,7 @@ public class TextFormatterViewCompat {
                         continue;
                     }
 
-                    if (hasFlagSameLine(text, STRIKE_FLAG, i + 1)) {
+                    if (hasSimpleFormatter(text, STRIKE_FLAG, i + 1)) {
                         strikeFlag.start = j;
                         continue;
                     }
@@ -124,7 +124,7 @@ public class TextFormatterViewCompat {
                         continue;
                     }
 
-                    if (hasFlagSameLine(text, ITALIC_FLAG, i + 1)) {
+                    if (hasSimpleFormatter(text, ITALIC_FLAG, i + 1)) {
                         italicFlag.start = j;
                         continue;
                     }
@@ -160,14 +160,14 @@ public class TextFormatterViewCompat {
                     boolean needContinue = false;
                     if (textChars.length > 6 && textChars.length > i + NUM_CHAR_MONOSPACE &&
                             textChars[i + 1] == MONOSPACE_FLAG && textChars[i + NUM_CHAR_MONOSPACE] == MONOSPACE_FLAG &&
-                            hasMultiMonospaceSameLine(text, MONOSPACE_FLAG, i + 3)) {
+                            hasMultiFormatter(text, MONOSPACE_FLAG, i + 3)) {
                         monospaceFlag.start = j;
                         i = i + NUM_CHAR_MONOSPACE;
                         j = j + NUM_CHAR_MONOSPACE;
                         needContinue = true;
                     }
 
-                    if (hasFlagSameLine(text, MONOSPACE_FLAG, i + 1)) {
+                    if (hasSimpleFormatter(text, MONOSPACE_FLAG, i + 1)) {
                         simpleMonospaceFlag.start = j;
                         continue;
                     }
