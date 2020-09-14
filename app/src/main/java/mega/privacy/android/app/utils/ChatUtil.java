@@ -548,12 +548,22 @@ public class ChatUtil {
      * @return True, if it has been successful. False, if not.
      */
     public static boolean getAudioFocus(AudioManager mAudioManager, AudioFocusListener listener, AudioFocusRequest request, int focusType, int streamType) {
+        if (mAudioManager == null) {
+            logWarning("Audio Manager is NULL");
+            return false;
+        }
+
         int focusRequest;
         if (SHOULD_BUILD_FOCUS_REQUEST) {
+            if (request == null) {
+                logWarning("Audio Focus Request is NULL");
+                return false;
+            }
             focusRequest = mAudioManager.requestAudioFocus(request);
         } else {
             focusRequest = mAudioManager.requestAudioFocus(listener, streamType, focusType);
         }
+
         return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
