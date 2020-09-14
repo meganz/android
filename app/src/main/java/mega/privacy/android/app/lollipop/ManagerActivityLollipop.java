@@ -5790,14 +5790,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				replaceFragment(oFLol, FragmentTag.OFFLINE.getTag());
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-						ActivityCompat.requestPermissions(this,
-								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								REQUEST_WRITE_STORAGE);
-					}
-				}
-
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
 				showFabButton();
@@ -11305,14 +11297,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showConfirmationRemoveFromOffline(){
 		logDebug("showConfirmationRemoveFromOffline");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
-		}
-
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -11353,12 +11337,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showConfirmationRemoveSomeFromOffline(final List<MegaOffline> documents){
 		logDebug("showConfirmationRemoveSomeFromOffline");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-			}
-		}
-
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
