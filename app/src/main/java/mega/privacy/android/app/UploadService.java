@@ -696,6 +696,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 		    if (!transfer.isFolderTransfer()) {
                 dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
+
+                if (transfer.getState() == MegaTransfer.STATE_FAILED) {
+                    MegaApplication.getTransfersManagement().setFailedTransfers(true);
+                }
             }
 
             if (isTransferBelongsToFolderTransfer(transfer)) {
