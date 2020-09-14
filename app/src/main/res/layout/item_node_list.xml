@@ -46,25 +46,23 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:src="@drawable/ic_cloud_saved_offline"
-            android:visibility="@{OfflineUtils.availableOffline(context, item.node) ? View.VISIBLE : View.GONE}"
+            android:visibility="@{OfflineUtils.availableOffline(context, item.node) ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:scaleType="fitCenter"
             app:item_selected="@{item.selected}"
-            app:nodeName="@{item.node.name}"
+            app:defaultThumbnail="@{MimeTypeList.typeForName(item.node.name).iconResourceId}"
+            app:thumbnail="@{item.thumbnail}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
             app:roundedCornerRadius="2dp"
-            app:thumbnail="@{item.thumbnail}"
             />
 
         <TextView

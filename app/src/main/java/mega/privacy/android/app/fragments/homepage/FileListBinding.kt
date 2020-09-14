@@ -8,10 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fragments.homepage.photos.PhotoViewHolder
-import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter
 import mega.privacy.android.app.utils.Util
 import java.io.File
 
@@ -40,19 +37,19 @@ fun setGridItemThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boo
     }
 }
 
-@BindingAdapter("thumbnail", "item_selected", "nodeName")
+@BindingAdapter("thumbnail", "item_selected", "defaultThumbnail")
 fun setListItemThumbnail(
     imageView: SimpleDraweeView,
     file: File?,
     selected: Boolean,
-    nodeName: String
+    defaultThumbnail: Int
 ) {
     with(imageView) {
         if (selected) {
             setActualImageResource(R.drawable.ic_select_folder)
         } else {
             if (file == null || !file.exists()) {
-                setImageResource(MimeTypeList.typeForName(nodeName).iconResourceId)
+                setImageResource(defaultThumbnail)
             } else setImageURI(
                 Uri.fromFile(
                     file
@@ -62,11 +59,11 @@ fun setListItemThumbnail(
     }
 }
 
-@BindingAdapter("thumbnail", "placeholder_icon")
-fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, placeholderIcon: Int) {
+@BindingAdapter("thumbnail", "defaultThumbnail")
+fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbnail: Int) {
     with(imageView) {
         if (file == null) {
-            setImageResource(placeholderIcon)
+            setImageResource(defaultThumbnail)
         } else {
             setImageURI(Uri.fromFile(file))
         }

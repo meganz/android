@@ -184,6 +184,7 @@ import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollip
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
@@ -239,6 +240,7 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -14635,6 +14637,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshCloudDrive();
 	}
 
+    public void onNodesRecentsUpdate() {
+        RecentsFragment fragment = getFragmentByType(RecentsFragment.class);
+        if (fragment != null) {
+            ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
+            fragment.fillRecentItems(buckets);
+            fragment.refreshRecentsActions();
+        }
+    }
+
 	public void onNodesInboxUpdate() {
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
@@ -14726,6 +14737,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 
 		onNodesCloudDriveUpdate();
+
+		onNodesRecentsUpdate();
 
 		onNodesSearchUpdate();
 

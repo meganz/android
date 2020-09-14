@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.homepage
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -38,6 +39,12 @@ class NodeGridAdapter(
                     parent,
                     false
                 )
+        }
+
+        if (viewType == NodeListAdapter.TYPE_ITEM) {
+            // FastScroller would affect the normal process of RecyclerView that makes the "selected"
+            // icon appear before binding the item. Therefore, hide the icon up front
+            (binding as ItemNodeGridBinding).icSelected.visibility = View.GONE
         }
 
         return NodeViewHolder(binding)

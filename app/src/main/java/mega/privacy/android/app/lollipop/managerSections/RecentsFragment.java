@@ -160,6 +160,13 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             }
         });
 
+        fillRecentItems(buckets);
+        return v;
+    }
+
+    public void fillRecentItems(ArrayList<MegaRecentActionBucket> buckets) {
+        recentsItems.clear();
+        this.buckets = buckets;
         String previousDate = "";
         String currentDate;
 
@@ -182,9 +189,13 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         listView.setAdapter(adapter);
         listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
         setVisibleContacts();
-        setRecentsView();
+    }
 
-        return v;
+    public void refreshRecentsActions() {
+        if(adapter != null) {
+            adapter.setItems(recentsItems);
+        }
+        setRecentsView();
     }
 
     private void setRecentsView() {

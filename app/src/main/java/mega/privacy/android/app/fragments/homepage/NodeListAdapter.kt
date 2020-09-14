@@ -3,12 +3,9 @@ package mega.privacy.android.app.fragments.homepage
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeListBinding
-import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 
 class NodeListAdapter constructor(
@@ -17,8 +14,6 @@ class NodeListAdapter constructor(
     private val sortByHeaderViewModel: SortByHeaderViewModel
 ) : ListAdapter<NodeItem, NodeViewHolder>(NodeDiffCallback()),
     SectionTitleProvider {
-
-    private var itemDimen = 0
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position).node) {
@@ -45,21 +40,14 @@ class NodeListAdapter constructor(
                 )
         }
 
-        if (viewType == TYPE_ITEM && itemDimen > 0) {
-            setItemLayoutParams(binding)
-            // FastScroller would affect the normal process of RecyclerView that makes the "selected"
-            // icon appear before binding the item. Therefore, hide the icon up front
-            (binding as ItemPhotoBrowseBinding).iconSelected.visibility = View.GONE
+        if (binding is ItemNodeListBinding) {
+            binding.publicLink.visibility = View.GONE
+            binding.savedOffline.visibility = View.GONE
+            binding.takenDown.visibility = View.GONE
+            binding.versionsIcon.visibility = View.GONE
         }
 
         return NodeViewHolder(binding)
-    }
-
-    private fun setItemLayoutParams(binding: ViewBinding) {
-        (binding.root.layoutParams as GridLayoutManager.LayoutParams).apply {
-            width = itemDimen
-            height = itemDimen
-        }
     }
 
     override fun onBindViewHolder(holder: NodeViewHolder, position: Int) {
@@ -69,10 +57,6 @@ class NodeListAdapter constructor(
             sortByHeaderViewModel,
             getItem(position)
         )
-    }
-
-    fun setItemDimen(dimen: Int) {
-        if (dimen > 0) itemDimen = dimen
     }
 
     override fun getSectionTitle(position: Int): String {

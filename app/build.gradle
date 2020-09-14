@@ -135,7 +135,6 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
-    implementation "com.squareup.picasso:picasso:2.71828"
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'com.brandongogetap:stickyheaders:0.6.1'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
@@ -161,6 +160,17 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
+
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
+    implementation "com.facebook.fresco:fresco:$frescoVersion"
+    implementation "com.facebook.fresco:animated-gif:$frescoVersion"
+    implementation "com.facebook.fresco:animated-webp:$frescoVersion"
+    implementation "com.facebook.fresco:webpsupport:$frescoVersion"
+
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'
