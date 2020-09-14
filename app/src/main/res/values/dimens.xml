@@ -70,6 +70,8 @@
     <dimen name="photo_item_padding">2dp</dimen>
     <dimen name="photo_selected_border_width">0.5dp</dimen>
 
+    <dimen name="homepage_node_grid_round_corner_radius">5dp</dimen>
+
     <dimen name="empty_data_font_size">18sp</dimen>
 
     <dimen name="cu_fragment_ic_selected_size_large">23dp</dimen>

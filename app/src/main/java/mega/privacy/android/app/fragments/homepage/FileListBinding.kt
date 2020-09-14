@@ -63,12 +63,13 @@ fun setListItemThumbnail(
 fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbnail: Int) {
     with(imageView) {
         if (file == null) {
-            setImageResource(defaultThumbnail)
+            setActualImageResource(defaultThumbnail)
         } else {
             setImageURI(Uri.fromFile(file))
         }
 
-        val radius = Util.px2dp(5F, imageView.resources.displayMetrics).toFloat()
+        val radius = resources.getDimensionPixelSize(R.dimen.homepage_node_grid_round_corner_radius)
+            .toFloat()
         hierarchy.roundingParams = RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
     }
 }
