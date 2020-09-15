@@ -244,6 +244,7 @@ import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -287,6 +288,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
 	private static final String INDEX_CLOUD = "INDEX_CLOUD";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
+    public static final String JOINING_CHAT_LINK = "JOINING_CHAT_LINK";
+    public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
+    public static final String CONNECTED = "CONNECTED";
 
 	public static final int ERROR_TAB = -1;
 	public static final int CLOUD_TAB = 0;
@@ -751,8 +755,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	View chatBadge;
 	View callBadge;
 
-	private boolean joiningToChatLink = false;
-	private long idJoinToChatLink = MEGACHAT_INVALID_HANDLE;
+	private boolean connected;
+
+	private boolean joiningToChatLink;
+	private String linkJoinToChatLink;
 
 	private boolean onAskingPermissionsFragment = false;
 	public boolean onAskingSMSVerificationFragment = false;
@@ -1821,6 +1827,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		outState.putInt(TYPE_CALL_PERMISSION, typesCameraPermission);
+		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
+		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
+		outState.putBoolean(CONNECTED, connected);
 	}
 
 	@Override
@@ -1920,6 +1929,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			typesCameraPermission = savedInstanceState.getInt(TYPE_CALL_PERMISSION, INVALID_TYPE_PERMISSIONS);
+			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
+			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
+			connected = savedInstanceState.getBoolean(CONNECTED, false);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -2901,12 +2913,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						setIntent(null);
 					}
 					else if (getIntent().getAction().equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-						drawerItem=DrawerItem.CHAT;
-						selectDrawerItemLollipop(drawerItem);
-						selectDrawerItemPending = false;
-
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						linkJoinToChatLink = getIntent().getDataString();
 						joiningToChatLink = true;
+
+						if (connected) {
+							megaChatApi.checkChatLink(linkJoinToChatLink, this);
+						}
 
 						getIntent().setAction(null);
 						setIntent(null);
@@ -9270,7 +9282,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		if (joiningToChatLink) {
 			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-			joiningToChatLink = false;
+			resetJoiningChatLink();
 		} else {
 			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
 		}
@@ -9279,6 +9291,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		startActivity(openChatLinkIntent);
 		drawerItem = DrawerItem.CHAT;
 		selectDrawerItemLollipop(drawerItem);
+	}
+
+	/**
+	 * Initializes the variables to join chat by default.
+	 */
+	private void resetJoiningChatLink() {
+		joiningToChatLink = false;
+		linkJoinToChatLink = null;
 	}
 
 	public void checkPermissions(){
@@ -13094,6 +13114,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("CONNECT CHAT finished ");
+				connected = true;
+
+				if (joiningToChatLink && !isTextEmpty(linkJoinToChatLink)) {
+					megaChatApi.checkChatLink(linkJoinToChatLink, this);
+				}
 
 				if(drawerItem == DrawerItem.CHAT){
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
@@ -13180,13 +13205,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
-				if (joiningToChatLink) {
-					idJoinToChatLink = request.getChatHandle();
-
-					if (idJoinToChatLink == MEGACHAT_INVALID_HANDLE) {
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
-						return;
-					}
+				if (joiningToChatLink && isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE) {
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
+					resetJoiningChatLink();
+					return;
 				}
 
 				showChatLink(request.getLink());

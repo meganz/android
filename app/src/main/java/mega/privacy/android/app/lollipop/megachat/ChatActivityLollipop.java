@@ -1487,11 +1487,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-        if (!chatRoom.isPreview()) {
-            joiningOrLeaving = false;
-
-        }
-
         initializeInputText();
 
         int chatConnection = megaChatApi.getChatConnectionState(idChat);
@@ -7325,24 +7320,30 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (e.getErrorCode() == MegaChatError.ERROR_OK && openingAndJoining) {
                     megaChatApi.autojoinPublicChat(idChat, this);
                     openingAndJoining = false;
-                } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST && !megaChatApi.getChatRoom(idChat).isActive()) {
-                    if (initChat()) {
-                        //Chat successfully initialized, now can rejoin
-                        setJoiningOrLeaving(getString(R.string.joining_label));
-                        titleToolbar.setText(chatRoom.getTitle());
-                        groupalSubtitleToolbar.setText(null);
-                        setGroupalSubtitleToolbarVisibility(false);
-                        if (adapter == null) {
-                            createAdapter();
-                        } else {
-                            adapter.updateChatRoom(chatRoom);
-                            adapter.notifyDataSetChanged();
-                        }
-                        megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+                } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
+                    if (megaChatApi.getChatRoom(idChat).isActive()) {
+                        //I'm already participant
+                        joiningOrLeaving = false;
+                        openingAndJoining = false;
                     } else {
-                        logWarning("Error opening chat before rejoin");
+                        if (initChat()) {
+                            //Chat successfully initialized, now can rejoin
+                            setJoiningOrLeaving(getString(R.string.joining_label));
+                            titleToolbar.setText(chatRoom.getTitle());
+                            groupalSubtitleToolbar.setText(null);
+                            setGroupalSubtitleToolbarVisibility(false);
+                            if (adapter == null) {
+                                createAdapter();
+                            } else {
+                                adapter.updateChatRoom(chatRoom);
+                                adapter.notifyDataSetChanged();
+                            }
+                            megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+                        } else {
+                            logWarning("Error opening chat before rejoin");
+                        }
+                        return;
                     }
-                    return;
                 }
 
                 initAndShowChat(null);
