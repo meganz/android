@@ -91,8 +91,6 @@ dependencies {
     implementation "androidx.legacy:legacy-support-$legacySupportVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "androidx.viewpager2:viewpager2:$viewPagerVersion"
-    implementation "com.github.bumptech.glide:glide:$glideVersion"
-    kapt "com.github.bumptech.glide:compiler:$glideVersion"
     implementation "com.google.code.gson:gson:$gsonVersion"
 
     // Architecture Components
@@ -156,8 +154,6 @@ dependencies {
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
     implementation "com.facebook.fresco:fresco:$frescoVersion"
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
-
-    annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
 
