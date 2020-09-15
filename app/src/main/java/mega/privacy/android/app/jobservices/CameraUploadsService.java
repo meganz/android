@@ -52,6 +52,7 @@ import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
+import mega.privacy.android.app.utils.ImageProcessor;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -127,7 +128,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean running, ignoreAttr;
     private Handler handler;
     
-    private ExecutorService threadPool = Executors.newCachedThreadPool();
+    private ExecutorService threadPool = Executors.newFixedThreadPool(8);
     
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
@@ -1565,7 +1566,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 megaApi.setOriginalFingerprint(node,originalFingerprint,this);
                 megaApi.setNodeCoordinates(node,record.getLatitude(),record.getLongitude(),null);
                 
-                File src = new File(record.getLocalPath());
+                final File src = new File(record.getLocalPath());
                 if (src.exists()) {
                     logDebug("Creating preview");
                     File previewDir = getPreviewFolder(this);
@@ -1573,35 +1574,20 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     File thumbDir = getThumbFolder(this);
                     final File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     final SyncRecord finalRecord = record;
-                    if(isVideoFile(transfer.getPath())) {
-                        threadPool.execute(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                File img = new File(finalRecord.getLocalPath());
-                                if(!preview.exists()) {
-                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create previews.
-                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        createVideoPreview(CameraUploadsService.this, img, preview);
-                                    }
-                                }
-                                createVideoThumbnail(api,finalRecord.getLocalPath(),thumb);
+                    if (isVideoFile(transfer.getPath())) {
+                        threadPool.execute(() -> {
+                            File img = new File(finalRecord.getLocalPath());
+                            if (!preview.exists()) {
+                                createVideoPreview(CameraUploadsService.this, img, preview);
                             }
+                            createThumbnail(img, thumb);
                         });
                     } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
-                        threadPool.execute(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                File img = new File(finalRecord.getLocalPath());
-                                if(!preview.exists()) {
-                                    //for Android 5, 5.1 devices may have insufficient memory, so don't create previews.
-                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        createImagePreview(img, preview);
-                                    }
-                                }
-                                createImageThumbnail(api,finalRecord.getLocalPath(),thumb);
+                        threadPool.execute(() -> {
+                            if (!preview.exists()) {
+                                createImagePreview(src, preview);
                             }
+                            createThumbnail(src, thumb);
                         });
                     }
                 }

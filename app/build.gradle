@@ -10,8 +10,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 322
-        versionName "3.7.8 (322)"
+        versionCode 325
+        versionName "3.7.8 (325)"
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
     }
@@ -87,10 +87,8 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
-    implementation "com.squareup.picasso:picasso:2.71828"
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'com.brandongogetap:stickyheaders:0.5.1'
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.emoji:emoji:1.1.0'
@@ -110,12 +108,14 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
 
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
-    implementation 'com.facebook.fresco:fresco:2.2.0'
+    implementation 'com.facebook.fresco:fresco:2.3.0'
+    implementation 'com.facebook.fresco:animated-gif:2.3.0'
+    implementation 'com.facebook.fresco:animated-webp:2.3.0'
+    implementation 'com.facebook.fresco:webpsupport:2.3.0'
 
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
 
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.anko:anko-commons:$anko_version"
 }

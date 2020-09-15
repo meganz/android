@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.squareup.picasso.Picasso;
+import com.facebook.common.util.UriUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,12 +172,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder, int position) {
         holder.thumbLayout.setVisibility(View.VISIBLE);
         holder.photo.setVisibility(View.VISIBLE);
-
-        Picasso.get()
-                .load(uriImages.get(position))
-                .fit()
-                .centerCrop()
-                .into(holder.photo);
+        holder.photo.setImageURI(UriUtil.parseUriOrNull(uriImages.get(position)));
 
         if (!multipleSelect || !this.isItemChecked(position)) {
             holder.photoSelectedIcon.setVisibility(View.GONE);
