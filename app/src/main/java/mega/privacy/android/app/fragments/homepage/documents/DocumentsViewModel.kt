@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -61,7 +61,7 @@ class DocumentsViewModel @ViewModelInject constructor(
             }
         )
 
-        if (!searchMode) {
+        if (!searchMode && filteredNodes.isNotEmpty()) {
             filteredNodes.add(0, NodeItem.SORT_BY_HEADER)
         }
 
@@ -127,11 +127,8 @@ class DocumentsViewModel @ViewModelInject constructor(
         loadDocuments()
     }
 
-    fun getNodePositionByHandle(handle: Long): Int {
-        return items.value?.find {
-            it.node?.handle == handle
-        }?.index ?: Constants.INVALID_POSITION
-    }
+    fun getNodePositionByHandle(handle: Long): Int =
+        items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 

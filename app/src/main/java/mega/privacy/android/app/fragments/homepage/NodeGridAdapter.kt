@@ -42,10 +42,11 @@ class NodeGridAdapter(
                 )
         }
 
-        if (viewType == TYPE_ITEM) {
+        if (binding is ItemNodeGridBinding) {
             // FastScroller would affect the normal process of RecyclerView that makes the "selected"
             // icon appear before binding the item. Therefore, hide the icon up front
-            (binding as ItemNodeGridBinding).icSelected.isVisible = false
+            binding.icSelected.isVisible = false
+            binding.takenDown.isVisible = false
         }
 
         return NodeViewHolder(binding)
