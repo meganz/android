@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/search_query_section"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-    card_view:cardCornerRadius="@dimen/search_view_corner_radius"
-    card_view:cardUseCompatPadding="true">
+    app:cardCornerRadius="@dimen/search_view_corner_radius"
+    app:cardUseCompatPadding="true">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -20,79 +20,85 @@
             android:id="@+id/left_action"
             android:layout_width="@dimen/square_button_size"
             android:layout_height="@dimen/square_button_size"
-            android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/search_bar_left_icon_left_margin"
             android:alpha="1"
             android:background="@drawable/oval_btn_selector"
             android:clickable="true"
             android:focusable="true"
             android:padding="@dimen/square_button_padding"
-            tools:src="@drawable/ic_arrow_back_black" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_arrow_back_black"
+            />
 
-        <FrameLayout
-            android:layout_width="match_parent"
+        <mega.privacy.android.app.components.search.SearchInputView
+            android:id="@+id/search_input"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:layout_marginStart="@dimen/search_bar_search_input_left_margin"
-            android:layout_toEndOf="@+id/left_action">
+            android:alpha="1"
+            android:background="@color/transparent"
+            android:cursorVisible="false"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="textNoSuggestions"
+            android:longClickable="false"
+            android:maxLines="1"
+            android:minHeight="@dimen/square_button_size"
+            android:textSize="@dimen/search_bar_text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/clear_btn"
+            app:layout_constraintStart_toEndOf="@id/left_action"
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
-            <mega.privacy.android.app.components.search.SearchInputView
-                android:id="@+id/search_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|start"
-                android:alpha="1"
-                android:background="@color/transparent"
-                android:ellipsize="end"
-                android:hint="@string/search_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="textNoSuggestions"
-                android:longClickable="false"
-                android:focusable="false"
-                android:cursorVisible="false"
-                android:maxLines="1"
-                android:minHeight="@dimen/square_button_size"
-                android:textSize="@dimen/search_bar_text_size" />
-        </FrameLayout>
+        <mega.privacy.android.app.components.RoundedImageView
+            android:id="@+id/avatar_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="17dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:border_width="0dp"
+            app:corner_radius="14dp"
+            />
 
-        <FrameLayout
+        <ImageView
+            android:id="@+id/chat_status_icon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@null"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintStart_toStartOf="@id/avatar_image"
+            app:layout_constraintBottom_toBottomOf="@id/avatar_image"
+            tools:src="@drawable/ic_offline"
+            />
+
+        <androidx.constraintlayout.widget.Group
             android:id="@+id/avatar_container"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="14dp"
-            >
-
-            <mega.privacy.android.app.components.RoundedImageView
-                android:id="@+id/avatar_image"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
-                android:scaleType="fitCenter"
-                card_view:border_width="0dp"
-                card_view:corner_radius="14dp"
-                />
-
-            <ImageView
-                android:id="@+id/chat_status_icon"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_gravity="end"
-                android:background="@null"
-                tools:src="@drawable/ic_offline"
-                />
-        </FrameLayout>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:constraint_referenced_ids="avatar_image,chat_status_icon"
+            />
 
         <ImageView
             android:id="@+id/clear_btn"
             android:layout_width="@dimen/square_button_size"
             android:layout_height="@dimen/square_button_size"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:alpha="1"
             android:background="@drawable/oval_btn_selector"
             android:clickable="true"
             android:focusable="true"
-            android:padding="@dimen/square_button_padding" />
-    </RelativeLayout>
+            android:padding="@dimen/square_button_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
