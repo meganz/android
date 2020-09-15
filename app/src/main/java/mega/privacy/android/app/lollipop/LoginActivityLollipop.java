@@ -139,6 +139,16 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     };
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        intentReceived = intent;
+        setIntent(intentReceived);
+        visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        showFragment(visibleFragment);
+    }
+
+    @Override
     protected void onDestroy() {
         logDebug("onDestroy");
 
