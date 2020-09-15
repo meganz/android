@@ -274,6 +274,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY = "offlinePathDirectory";
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
+    public static final String INTENT_EXTRA_KEY_IS_LIST = "isList";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -304,9 +305,11 @@ public class Constants {
     public static final int PHOTOS_SEARCH_ADAPTER = 2027;
     public static final int AUDIO_BROWSE_ADAPTER = 2028;
     public static final int AUDIO_SEARCH_ADAPTER = 2029;
-    public static final int RECENTS_BUCKET_ADAPTER = 2030;
-    public static final int VIDEO_BROWSE_ADAPTER = 2031;
-    public static final int VIDEO_SEARCH_ADAPTER = 2032;
+    public static final int DOCUMENTS_BROWSE_ADAPTER = 2030;
+    public static final int DOCUMENTS_SEARCH_ADAPTER = 2031;
+    public static final int VIDEO_BROWSE_ADAPTER = 2032;
+    public static final int VIDEO_SEARCH_ADAPTER = 2033;
+    public static final int RECENTS_BUCKET_ADAPTER = 2034;
 
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;

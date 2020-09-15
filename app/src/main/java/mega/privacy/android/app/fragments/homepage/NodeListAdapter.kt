@@ -59,13 +59,13 @@ class NodeListAdapter constructor(
         )
     }
 
-    override fun getSectionTitle(position: Int): String {
+    override fun getSectionTitle(position: Int): String? {
         if (position < 0 || position >= itemCount) {
-            return ""
+            return null
         }
 
         val nodeName = getItem(position).node?.name ?: ""
-        return if (nodeName == "") "" else nodeName.substring(0, 1)
+        return if (nodeName == "") null else nodeName.substring(0, 1)
     }
 
     companion object {

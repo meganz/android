@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.homepage
 import android.content.Context
 import android.net.Uri
 import android.view.View
+import android.widget.FrameLayout
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -63,12 +64,25 @@ fun setListItemThumbnail(
 fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbnail: Int) {
     with(imageView) {
         if (file == null) {
-            setImageResource(defaultThumbnail)
+            setActualImageResource(defaultThumbnail)
         } else {
             setImageURI(Uri.fromFile(file))
         }
 
-        val radius = Util.px2dp(5F, imageView.resources.displayMetrics).toFloat()
+        val params = layoutParams
+        if (params is FrameLayout.LayoutParams) {
+            val realThumbnailSize = resources.getDimensionPixelSize(R.dimen.grid_node_item_width)
+            val defaultThumbnailSize =
+                resources.getDimensionPixelSize(R.dimen.grid_node_default_thumbnail_size)
+            val defaultThumbnailMarginTop = (realThumbnailSize - defaultThumbnailSize) / 2
+            params.width = if (file == null) defaultThumbnailSize else realThumbnailSize
+            params.height = layoutParams.width
+            params.topMargin = if (file == null) defaultThumbnailMarginTop else 0
+            layoutParams = params
+        }
+
+        val radius = resources.getDimensionPixelSize(R.dimen.homepage_node_grid_round_corner_radius)
+            .toFloat()
         hierarchy.roundingParams = RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
     }
 }

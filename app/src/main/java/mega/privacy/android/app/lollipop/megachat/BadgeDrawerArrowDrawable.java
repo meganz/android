@@ -74,13 +74,13 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
             bigBackgroundPaint.setAlpha((int) ((1 - getProgress()) * 255));
             backgroundPaint.setAlpha((int) ((1 - getProgress()) * 255));
 
-            final float x = (1 - 0.2f) * bounds.width();
+            final float x = 0.8f * bounds.width();
             final float y = 0.25f * bounds.height();
-            canvas.drawCircle(x, y, (0.25f / 1.4f) * bounds.width(), bigBackgroundPaint);
+            canvas.drawCircle(x, y, 0.16f * bounds.width(), bigBackgroundPaint);
 
-            final float x1 = (1 - 0.2f) * bounds.width() + 2;
+            final float x1 = 0.8f * bounds.width() + 2;
             final float y1 = 0.25f * bounds.height() - 2;
-            canvas.drawCircle(x1, y1, (0.25f / 1.3f) * bounds.width() - 2, backgroundPaint);
+            canvas.drawCircle(x1, y1, 0.16f * bounds.width() - 2, backgroundPaint);
 
             return;
         }

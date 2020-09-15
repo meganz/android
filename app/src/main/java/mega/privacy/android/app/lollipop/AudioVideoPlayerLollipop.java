@@ -1600,7 +1600,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == OFFLINE_ADAPTER) {
-            OfflineFragment.setDraggingThumbnailVisibility(visibility);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
         else if (adapterType == ZIP_ADAPTER) {
             if (ZipBrowserActivityLollipop.imageDrag != null){
@@ -1681,7 +1685,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == OFFLINE_ADAPTER){
-            OfflineFragment.getDraggingThumbnailLocationOnScreen(location);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
         else if (adapterType == ZIP_ADAPTER){
             if (ZipBrowserActivityLollipop.imageDrag != null){

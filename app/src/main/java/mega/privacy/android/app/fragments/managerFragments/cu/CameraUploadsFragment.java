@@ -736,9 +736,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void launchNodeViewer(Intent intent, long handle) {
-        context.startActivity(intent);
-        requireActivity().overridePendingTransition(0, 0);
         mDraggingNodeHandle = handle;
+        startActivity(intent);
+        requireActivity().overridePendingTransition(0, 0);
     }
 
     @Override

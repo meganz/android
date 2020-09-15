@@ -11,16 +11,21 @@ import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.NODE_PHOTO
+import nz.mega.sdk.MegaApiJava.NODE_UNKNOWN
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.TARGET_ROOTNODES
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
 
 class TypedFilesRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
@@ -120,10 +125,6 @@ class TypedFilesRepository @Inject constructor(
 
     private fun getNodeItems() {
         var lastModifyDate: LocalDate? = null
-
-        if (type != NODE_PHOTO) {
-            fileNodesMap[INVALID_HANDLE] = NodeItem()   // "Sort by" header
-        }
 
         for (node in getMegaNodes()) {
             val thumbnail = getThumbnail(node)

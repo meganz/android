@@ -58,6 +58,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.DraggingThumbnailCallback
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -69,6 +70,7 @@ import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import java.io.File
+import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback {
@@ -133,8 +135,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     override fun onResume() {
         super.onResume()
 
-        instanceForDragging = null
-
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
 
@@ -188,6 +188,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         } else {
             setViewModelDisplayParam(viewModel.path)
         }
+        setupDraggingThumbnailCallback()
     }
 
     private fun setViewModelDisplayParam(path: String) {
@@ -437,12 +438,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
                 )
 
-                callManager {
-                    it.startActivity(intent)
-                    it.overridePendingTransition(0, 0)
-                }
-                instanceForDragging = this
                 draggingNodeHandle = node.node.handle.toLong()
+                setupDraggingThumbnailCallback()
+                startActivity(intent)
+                requireActivity().overridePendingTransition(0, 0)
             }
             mime.isVideoReproducible || mime.isAudio -> {
                 logDebug("Video/Audio file")
@@ -493,7 +492,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                     mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
                 }
                 if (internalIntent) {
+                    draggingNodeHandle = node.node.handle.toLong()
+                    setupDraggingThumbnailCallback()
                     startActivity(mediaIntent)
+                    requireActivity().overridePendingTransition(0, 0)
                 } else {
                     if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
                         startActivity(mediaIntent)
@@ -524,9 +526,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                         }
                     }
                 }
-                callManager { it.overridePendingTransition(0, 0) }
-                instanceForDragging = this
-                draggingNodeHandle = node.node.handle.toLong()
             }
             mime.isPdf -> {
                 logDebug("PDF file")
@@ -554,10 +553,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                     pdfIntent.setDataAndType(Uri.fromFile(file), mime.type)
                 }
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                startActivity(pdfIntent)
-                callManager { it.overridePendingTransition(0, 0) }
-                instanceForDragging = this
                 draggingNodeHandle = node.node.handle.toLong()
+                setupDraggingThumbnailCallback()
+                startActivity(pdfIntent)
+                requireActivity().overridePendingTransition(0, 0)
             }
             mime.isURL -> {
                 logDebug("Is URL file")
@@ -713,6 +712,25 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         setViewModelDisplayParam(viewModel.path)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(OfflineFragment::class.java)
+        AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(OfflineFragment::class.java)
+        PdfViewerActivityLollipop.removeDraggingThumbnailCallback(OfflineFragment::class.java)
+    }
+
+    private fun setupDraggingThumbnailCallback() {
+        FullScreenImageViewerLollipop.addDraggingThumbnailCallback(
+            OfflineFragment::class.java, OfflineDraggingThumbnailCallback(this)
+        )
+        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
+            OfflineFragment::class.java, OfflineDraggingThumbnailCallback(this)
+        )
+        PdfViewerActivityLollipop.addDraggingThumbnailCallback(
+            OfflineFragment::class.java, OfflineDraggingThumbnailCallback(this)
+        )
+    }
+
     private fun setDraggingThumbnailVisibility(
         handle: Long,
         visibility: Int
@@ -733,37 +751,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, res)
         LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
-    }
-
-    companion object {
-        const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
-
-        var instanceForDragging: OfflineFragment? = null
-
-        /**
-         * Get the location on screen of the dragging node thumbnail.
-         *
-         * TODO: we need figure out a better way to implement the drag feature, this kind of static hack
-         * should be avoided.
-         *
-         * @param location out param for location
-         */
-        @JvmStatic
-        fun getDraggingThumbnailLocationOnScreen(location: IntArray) {
-            val fragment = instanceForDragging ?: return
-            val position = fragment.adapter?.getNodePosition(fragment.draggingNodeHandle) ?: return
-            val viewHolder: ViewHolder =
-                fragment.recyclerView?.findViewHolderForLayoutPosition(position) ?: return
-            val res = fragment.adapter?.getThumbnailLocationOnScreen(viewHolder) ?: return
-            System.arraycopy(res, 0, location, 0, 2)
-        }
-
-        @JvmStatic
-        fun setDraggingThumbnailVisibility(visibility: Int) {
-            val fragment = instanceForDragging ?: return
-            fragment.setDraggingThumbnailVisibility(fragment.draggingNodeHandle, visibility)
-        }
-
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -816,5 +803,30 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         viewModel.clearSelection()
         callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY) }
         checkScroll()
+    }
+
+    private class OfflineDraggingThumbnailCallback constructor(fragment: OfflineFragment) :
+        DraggingThumbnailCallback {
+        private val fragmentRef = WeakReference(fragment)
+        override fun setVisibility(visibility: Int) {
+            val fragment = fragmentRef.get()
+            fragment?.setDraggingThumbnailVisibility(fragment.draggingNodeHandle, visibility)
+        }
+
+        override fun getLocationOnScreen(location: IntArray) {
+            val fragment = fragmentRef.get()
+            if (fragment != null) {
+                val position =
+                    fragment.adapter?.getNodePosition(fragment.draggingNodeHandle) ?: return
+                val viewHolder =
+                    fragment.recyclerView?.findViewHolderForLayoutPosition(position) ?: return
+                val res = fragment.adapter?.getThumbnailLocationOnScreen(viewHolder) ?: return
+                System.arraycopy(res, 0, location, 0, 2)
+            }
+        }
+    }
+
+    companion object {
+        const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
     }
 }

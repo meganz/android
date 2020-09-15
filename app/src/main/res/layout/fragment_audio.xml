@@ -12,6 +12,9 @@
         <variable
             name="viewModel"
             type="mega.privacy.android.app.fragments.homepage.audio.AudioViewModel" />
+        <variable
+            name="sortByHeaderViewModel"
+            type="mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR_GRID}"
+            app:visibleGone="@{viewModel.items.size() > (sortByHeaderViewModel.list ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
