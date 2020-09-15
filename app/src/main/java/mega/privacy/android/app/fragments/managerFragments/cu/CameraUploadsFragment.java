@@ -168,7 +168,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     public void onStoragePermissionRefused() {
         showSnackbar(context, getString(R.string.on_refuse_storage_permission));
-        navigateToCloudDrive();
+        skipInitialCUSetup();
     }
 
     public void scrollToNode(long handle) {
@@ -219,7 +219,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private void navigateToCloudDrive() {
+    private void skipInitialCUSetup() {
         mViewModel.setCamSyncEnabled(false);
         mManagerActivity.setFirstLogin(false);
         mManagerActivity.skipInitialCUSetup();
@@ -408,7 +408,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         });
         mFirstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-            navigateToCloudDrive();
+            skipInitialCUSetup();
         });
 
         return mFirstLoginBinding.getRoot();

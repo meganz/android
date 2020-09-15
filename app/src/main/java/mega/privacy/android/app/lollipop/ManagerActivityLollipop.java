@@ -4658,11 +4658,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void selectDrawerItemCloudDrive(){
 		logDebug("selectDrawerItemCloudDrive");
-        if (showStorageAlertWithDelay) {
-            showStorageAlertWithDelay = false;
-            checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
-					storageStateFromBroadcast : app.getStorageState(), false);
-        }
 		abL.setVisibility(View.VISIBLE);
 
         tabLayoutContacts.setVisibility(View.GONE);
@@ -4681,6 +4676,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             fbFLol = FileBrowserFragmentLollipop.newInstance();
         }
         replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
+    }
+
+    private void showGlobalAlertDialogsIfNeeded() {
+		if (showStorageAlertWithDelay) {
+			showStorageAlertWithDelay = false;
+			checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
+					storageStateFromBroadcast : app.getStorageState(), false);
+		}
 
 		if (!firstTimeAfterInstallation){
 			logDebug("Its NOT first time");
@@ -4700,12 +4703,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
 			fillDBContactsTask.execute();
 			firstTimeAfterInstallation = false;
-            dbH.setFirstTime(false);
+			dbH.setFirstTime(false);
 		}
-        checkBeforeShow();
-    }
+		checkBeforeShowSMSVerificationDialog();
+	}
 
-    public void checkBeforeShow() {
+    public void checkBeforeShowSMSVerificationDialog() {
         //This account hasn't verified a phone number and first login.
 
 		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
@@ -5785,6 +5788,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
+				showGlobalAlertDialogsIfNeeded();
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -13340,7 +13344,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
             }
             showAddPhoneNumberInMenu();
-            checkBeforeShow();
+            checkBeforeShowSMSVerificationDialog();
         }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			logDebug("TYPE_SET_ATTR_USER");
