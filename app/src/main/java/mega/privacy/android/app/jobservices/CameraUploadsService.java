@@ -1405,12 +1405,16 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             logDebug("Cancel transfer received");
             if (e.getErrorCode() == MegaError.API_OK) {
                 new Handler().postDelayed(() -> {
-                    if(megaApi.getNumPendingUploads() <= 0) {
+                    if (megaApi.getNumPendingUploads() <= 0) {
                         megaApi.resetTotalUploads();
                     }
                 }, 200);
             } else {
                 finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
+            if (e.getErrorCode() == MegaError.API_OK && megaApi.getNumPendingUploads() <= 0) {
+                megaApi.resetTotalUploads();
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             logDebug("Pausetransfer false received");
