@@ -76,6 +76,7 @@ import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -453,7 +454,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				}
 			}
 		}
-		else if (adapterType == RECENTS_ADAPTER) {
+		else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 			getlinkIcon.setVisible(false);
 			removelinkIcon.setVisible(false);
@@ -752,7 +753,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					}
 					boolean fromIncoming = false;
 
-					if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) {
+					if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 						fromIncoming = nC.nodeComesFromIncoming(node);
 					}
 					if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
@@ -1080,7 +1081,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 			getImageHandles(nodes,savedInstanceState);
 		}
-		else if (adapterType == RECENTS_ADAPTER) {
+		else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			long handle = intent.getLongExtra(HANDLE, -1);
 			if (handle == -1) finish();
 
@@ -1273,7 +1274,13 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			if (callback != null) {
 				callback.setVisibility(visibility);
 			}
-		}
+		} else if(adapterType == RECENTS_BUCKET_ADAPTER ) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
+        }
 	}
 
 	void getLocationOnScreen(int[] location){
@@ -1344,7 +1351,13 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			if (callback != null) {
 				callback.getLocationOnScreen(location);
 			}
-		}
+		} else if(adapterType == RECENTS_BUCKET_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
+        }
 	}
 
 	public void runEnterAnimation() {
@@ -1409,7 +1422,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
             }
 		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
 				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
-				|| adapterType == PHOTOS_SEARCH_ADAPTER) {
+				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			getImageView(0, handle);
 		}
@@ -1482,7 +1495,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
             }
 		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
 				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
-				|| adapterType == PHOTOS_SEARCH_ADAPTER) {
+				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			scrollToPosition(0, handle);
 		}
@@ -1597,7 +1610,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		super.onSaveInstanceState(savedInstanceState);
 		if (getIntent() != null) {
 			getIntent().putExtra("position", positionG);
-			if (adapterType == RECENTS_ADAPTER) {
+			if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 				getIntent().putExtra(HANDLE, imageHandles.get(positionG));
 			}
 		}

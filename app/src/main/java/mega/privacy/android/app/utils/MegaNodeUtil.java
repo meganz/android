@@ -33,6 +33,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
+import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
@@ -633,5 +635,19 @@ public class MegaNodeUtil {
                     MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_DESTROY_ACTION_MODE));
                 })
                 .setNegativeButton(R.string.general_cancel, null).show();
+    }
+
+    public static String[] getSerializedNodesFromBucket(MegaRecentActionBucket bucket) {
+        if (bucket != null) {
+            MegaNodeList nodeList = bucket.getNodes();
+            if (nodeList != null) {
+                String[] serializedNodes = new String[nodeList.size()];
+                for (int i = 0; i < nodeList.size(); i++) {
+                    serializedNodes[i] = nodeList.get(i).serialize();
+                }
+                return serializedNodes;
+            }
+        }
+        return null;
     }
 }

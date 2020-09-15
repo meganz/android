@@ -41,13 +41,6 @@
                     tools:context=".ManagerActivityLollipop" />
 
                 <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_cloud"
-                    style="@style/MyCustomTabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal" />
-
-                <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_contacts"
                     style="@style/MyCustomTabLayout"
                     android:layout_width="wrap_content"
@@ -82,12 +75,6 @@
                     android:visibility="gone" />
 
             </com.google.android.material.appbar.AppBarLayout>
-
-            <mega.privacy.android.app.components.CustomViewPager
-                android:id="@+id/cloud_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/contact_tabs_pager"
