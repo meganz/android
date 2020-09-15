@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -41,6 +42,7 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.lang.ref.WeakReference
+import java.util.Locale
 
 @AndroidEntryPoint
 class PhotosFragment : BaseFragment(), HomepageSearchable {
@@ -81,7 +83,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         activity = getActivity() as ManagerActivityLollipop
-        binding.root.empty_hint_text.text = getString(R.string.photos_no_photos)
+
+        binding.emptyHint.emptyHintImage.isVisible = false
+        binding.emptyHint.emptyHintText.isVisible = false
+        binding.emptyHint.emptyHintText.text =
+            getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
 
         setupListView()
         setupListAdapter()

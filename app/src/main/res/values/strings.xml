@@ -2864,6 +2864,8 @@
     <string name="tab_favourites">Favourites</string>
     <string name="tab_offline">Offline</string>
 
-    <string name="photos_no_photos">NO PHOTOS TO SHOW</string>
-    <string name="documents_no_documents">NO DOCUMENTS TO SHOW</string>
+    <string name="homepage_empty_hint_photos">No photos to show</string>
+    <string name="homepage_empty_hint_documents">No documents to show</string>
+    <string name="homepage_empty_hint_audio">No audio to show</string>
+    <string name="homepage_empty_hint_video">No video to show</string>
 </resources>
