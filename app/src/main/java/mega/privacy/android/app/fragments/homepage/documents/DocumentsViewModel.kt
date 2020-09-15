@@ -1,12 +1,17 @@
 package mega.privacy.android.app.fragments.homepage.documents
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
-import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
@@ -20,7 +25,6 @@ class DocumentsViewModel @ViewModelInject constructor(
 
     private var order: Int = ORDER_DEFAULT_ASC
     var searchMode = false
-    var listMode = true   // false for grid mode
     var searchQuery = ""
 
     private var forceUpdate = false
@@ -28,13 +32,14 @@ class DocumentsViewModel @ViewModelInject constructor(
 
     // Whether a photo loading is in progress
     private var loadInProgress = false
+
     // Whether another photo loading should be executed after current loading
     private var pendingLoad = false
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_DOCUMENT, order, !searchMode)
+                repository.getFiles(MegaApiJava.NODE_DOCUMENT, order)
             }
         } else {
             repository.emitFiles()
@@ -43,15 +48,21 @@ class DocumentsViewModel @ViewModelInject constructor(
         repository.fileNodeItems
     }.map { nodes ->
         var index = 0
-        var filteredNodes = nodes
-
-        if (!TextUtil.isTextEmpty(_query.value)) {
-            filteredNodes = nodes.filter {
-                it.node?.name?.contains(
-                    _query.value!!,
-                    true
-                ) ?: false
+        val filteredNodes = ArrayList(
+            if (!TextUtil.isTextEmpty(_query.value)) {
+                nodes.filter {
+                    it.node?.name?.contains(
+                        _query.value!!,
+                        true
+                    ) ?: false
+                }
+            } else {
+                nodes
             }
+        )
+
+        if (!searchMode) {
+            filteredNodes.add(0, NodeItem.SORT_BY_HEADER)
         }
 
         filteredNodes.forEach {
@@ -110,7 +121,7 @@ class DocumentsViewModel @ViewModelInject constructor(
      * the underlying data may have been changed.
      */
     fun refreshUi() {
-        items.value?.forEach {item ->
+        items.value?.forEach { item ->
             item.uiDirty = true
         }
         loadDocuments()
@@ -124,11 +135,7 @@ class DocumentsViewModel @ViewModelInject constructor(
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getRealNodeCount(): Int {
-        val nodes = items.value ?: return 0
-
-        return nodes.size - if (searchMode) 0 else 1
-    }
+    fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)

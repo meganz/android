@@ -9,7 +9,7 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.FitCenter
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.utils.Util.px2dp
@@ -22,7 +22,7 @@ class OfflineGridFileViewHolder(
 
         binding.filenameContainer.setOnClickListener { listener.onOptionsClicked(position, node) }
 
-        val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
+        val placeHolderRes = MimeTypeThumbnail.typeForName(node.node.name).iconResourceId
 
         val requestBuilder: RequestBuilder<Drawable> = if (node.thumbnail != null) {
             Glide.with(binding.thumbnail)

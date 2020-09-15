@@ -35,7 +35,7 @@ class AudioViewModel @ViewModelInject constructor(
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_AUDIO, order, !searchMode)
+                repository.getFiles(MegaApiJava.NODE_AUDIO, order)
             }
         } else {
             repository.emitFiles()
@@ -44,15 +44,21 @@ class AudioViewModel @ViewModelInject constructor(
         repository.fileNodeItems
     }.map { nodes ->
         var index = 0
-        var filteredNodes = nodes
-
-        if (!TextUtil.isTextEmpty(_query.value)) {
-            filteredNodes = nodes.filter {
-                it.node?.name?.contains(
-                    _query.value!!,
-                    true
-                ) ?: false
+        val filteredNodes = ArrayList(
+            if (!TextUtil.isTextEmpty(_query.value)) {
+                nodes.filter {
+                    it.node?.name?.contains(
+                        _query.value!!,
+                        true
+                    ) ?: false
+                }
+            } else {
+                nodes
             }
+        )
+
+        if (!searchMode) {
+            filteredNodes.add(0, NodeItem.SORT_BY_HEADER)
         }
 
         filteredNodes.forEach {
@@ -116,11 +122,7 @@ class AudioViewModel @ViewModelInject constructor(
         return list?.toLongArray()
     }
 
-    fun getRealNodeCount(): Int {
-        val nodes = items.value ?: return 0
-
-        return nodes.size - if (searchMode) 0 else 1
-    }
+    fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)

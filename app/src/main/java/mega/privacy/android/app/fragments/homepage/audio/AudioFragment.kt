@@ -96,6 +96,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     ): View? {
         binding = FragmentAudioBinding.inflate(inflater, container, false).apply {
             viewModel = this@AudioFragment.viewModel
+            sortByHeaderViewModel = this@AudioFragment.sortByHeaderViewModel
         }
 
         return binding.root
@@ -145,10 +146,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            val node = it.node
-            if (node != null) {
-                openNode(node, it.index)
-            }
+            openNode(it.node, it.index)
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -180,7 +178,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
-            listView.addItemDecoration(itemDecoration)
+            if (listView.itemDecorationCount == 0) {
+                listView.addItemDecoration(itemDecoration)
+            }
         } else {
             listView.switchBackToGrid()
             listView.adapter = gridAdapter
@@ -193,7 +193,10 @@ class AudioFragment : Fragment(), HomepageSearchable {
         viewModel.refreshUi()
     }
 
-    private fun openNode(node: MegaNode, index: Int) {
+    private fun openNode(node: MegaNode?, index: Int) {
+        if (node == null) {
+            return
+        }
         val file: MegaNode = node
 
         val internalIntent = isInternalIntent(node)
@@ -373,6 +376,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
+                        if (gridAdapter.getItemViewType(pos) != NodeGridAdapter.TYPE_HEADER) {
+                            itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
+                        }
                         itemView.findViewById(R.id.ic_selected)
                     }
 

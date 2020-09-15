@@ -21,7 +21,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -67,7 +67,7 @@ class OfflineFileInfoFragment : Fragment() {
                         if (it.node.isFolder) {
                             R.drawable.ic_folder_list
                         } else {
-                            MimeTypeList.typeForName(it.node.name).iconResourceId
+                            MimeTypeThumbnail.typeForName(it.node.name).iconResourceId
                         }
                     )
 

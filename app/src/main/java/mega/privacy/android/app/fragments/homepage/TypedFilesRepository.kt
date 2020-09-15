@@ -11,16 +11,21 @@ import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.NODE_PHOTO
+import nz.mega.sdk.MegaApiJava.NODE_UNKNOWN
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.TARGET_ROOTNODES
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
 
 class TypedFilesRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
@@ -40,13 +45,13 @@ class TypedFilesRepository @Inject constructor(
     private val _fileNodeItems = MutableLiveData<List<NodeItem>>()
     val fileNodeItems: LiveData<List<NodeItem>> = _fileNodeItems
 
-    suspend fun getFiles(type: Int, order: Int, showHeader: Boolean) {
+    suspend fun getFiles(type: Int, order: Int) {
         this.type = type
         this.order = order
 
         withContext(Dispatchers.IO) {
             saveAndClearData()
-            getNodeItems(showHeader)
+            getNodeItems()
 
             // Update LiveData must in main thread
             withContext(Dispatchers.Main) {
@@ -118,12 +123,8 @@ class TypedFilesRepository @Inject constructor(
         )
     }
 
-    private fun getNodeItems(showHeader: Boolean) {
+    private fun getNodeItems() {
         var lastModifyDate: LocalDate? = null
-
-        if (showHeader) {
-            fileNodesMap[INVALID_HANDLE] = NodeItem()   // "Sort by" header
-        }
 
         for (node in getMegaNodes()) {
             val thumbnail = getThumbnail(node)

@@ -84,6 +84,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     ): View? {
         binding = FragmentDocumentsBinding.inflate(inflater, container, false).apply {
             viewModel = this@DocumentsFragment.viewModel
+            sortByHeaderViewModel = this@DocumentsFragment.sortByHeaderViewModel
         }
 
         return binding.root
@@ -128,10 +129,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            val node = it.node
-            if (node != null) {
-                openDoc(node, it.index)
-            }
+            openDoc(it.node, it.index)
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -166,7 +164,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
-            listView.addItemDecoration(itemDecoration)
+            if (listView.itemDecorationCount == 0) {
+                listView.addItemDecoration(itemDecoration)
+            }
         } else {
             listView.switchBackToGrid()
             listView.adapter = gridAdapter
@@ -299,6 +299,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
+                        if (gridAdapter.getItemViewType(pos) != NodeGridAdapter.TYPE_HEADER) {
+                            itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
+                        }
                         itemView.findViewById(R.id.ic_selected)
                     }
 
@@ -391,7 +394,10 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             DocumentsFragment::class.java, DocumentsDraggingThumbnailCallback(WeakReference(this))
         )
 
-    private fun openDoc(node: MegaNode, index: Int) {
+    private fun openDoc(node: MegaNode?, index: Int) {
+        if (node == null) {
+            return
+        }
         var screenPosition: IntArray? = null
 
         val localPath = FileUtils.getLocalFile(context, node.name, node.size)

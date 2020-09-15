@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.homepage
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
@@ -41,10 +42,10 @@ class NodeGridAdapter(
                 )
         }
 
-        if (viewType == NodeListAdapter.TYPE_ITEM) {
+        if (viewType == TYPE_ITEM) {
             // FastScroller would affect the normal process of RecyclerView that makes the "selected"
             // icon appear before binding the item. Therefore, hide the icon up front
-            (binding as ItemNodeGridBinding).icSelected.visibility = View.GONE
+            (binding as ItemNodeGridBinding).icSelected.isVisible = false
         }
 
         return NodeViewHolder(binding)
@@ -69,17 +70,17 @@ class NodeGridAdapter(
         }
     }
 
-    override fun getSectionTitle(position: Int): String {
+    override fun getSectionTitle(position: Int): String? {
         if (position < 0 || position >= itemCount) {
-            return ""
+            return null
         }
 
         val nodeName = getItem(position).node?.name ?: ""
-        return if (nodeName == "") "" else nodeName.substring(0, 1)
+        return if (nodeName == "") null else nodeName.substring(0, 1)
     }
 
     companion object {
-        private const val TYPE_ITEM = 0
-        private const val TYPE_HEADER = 1
+        const val TYPE_ITEM = 0
+        const val TYPE_HEADER = 1
     }
 }
