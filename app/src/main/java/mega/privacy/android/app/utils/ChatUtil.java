@@ -287,20 +287,6 @@ public class ChatUtil {
         return EmojiUtilsShortcodes.emojify(text);
     }
 
-    public static SimpleSpanBuilder formatText(Context context, String text) {
-
-        SimpleSpanBuilder result;
-
-        try {
-            RTFFormatter formatter = new RTFFormatter(text, context);
-            result = formatter.setRTFFormat();
-        } catch (Exception e) {
-            logError("FORMATTER EXCEPTION!!!", e);
-            result = null;
-        }
-        return result;
-    }
-
     public static boolean areDrawablesIdentical(Drawable drawableA, Drawable drawableB) {
         Drawable.ConstantState stateA = drawableA.getConstantState();
         Drawable.ConstantState stateB = drawableB.getConstantState();
@@ -558,12 +544,22 @@ public class ChatUtil {
      * @return True, if it has been successful. False, if not.
      */
     public static boolean getAudioFocus(AudioManager mAudioManager, AudioFocusListener listener, AudioFocusRequest request, int focusType, int streamType) {
+        if (mAudioManager == null) {
+            logWarning("Audio Manager is NULL");
+            return false;
+        }
+
         int focusRequest;
         if (SHOULD_BUILD_FOCUS_REQUEST) {
+            if (request == null) {
+                logWarning("Audio Focus Request is NULL");
+                return false;
+            }
             focusRequest = mAudioManager.requestAudioFocus(request);
         } else {
             focusRequest = mAudioManager.requestAudioFocus(listener, streamType, focusType);
         }
+
         return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <mega.privacy.android.app.components.TouchImageView
         android:id="@+id/full_screen_image_viewer_image"
@@ -9,12 +11,13 @@
         android:layout_height="match_parent"
         android:scaleType="fitCenter" />
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/full_screen_image_viewer_gif"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"/>
-    
+        app:actualImageScaleType="fitCenter"
+        />
+
     <ProgressBar
         android:id="@+id/full_screen_image_viewer_progress_bar"
         style="?android:attr/progressBarStyleLargeInverse"
@@ -24,7 +27,7 @@
         android:layout_centerVertical="true"
         android:layout_centerInParent="true"
         android:layout_marginTop="30dp" />
-    
+
     <ProgressBar
         android:id="@+id/full_screen_image_viewer_download_progress_bar"
         style="@style/UsedSpaceProgressBar"
