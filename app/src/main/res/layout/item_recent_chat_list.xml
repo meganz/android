@@ -43,6 +43,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toRightOf="@+id/recent_chat_list_relative_layout_avatar"
@@ -51,7 +52,7 @@
         <LinearLayout
             android:id="@+id/first_line_layout"
             android:layout_width="wrap_content"
-            android:layout_height="24dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -78,7 +79,7 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/recent_chat_list_contact_state"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
@@ -129,7 +130,6 @@
                 rounded:emojiSize="12sp"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:text="OOOOOOOOOOOOO"
                 android:textColor="@color/accentColor"
                 android:layout_alignParentLeft="true"/>
 
