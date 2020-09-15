@@ -1,18 +1,13 @@
 package mega.privacy.android.app.fragments.offline
 
-import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.load.resource.bitmap.FitCenter
-import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
-import mega.privacy.android.app.utils.Util.px2dp
 
 class OfflineGridFileViewHolder(
     private val binding: OfflineItemGridFileBinding
@@ -24,20 +19,17 @@ class OfflineGridFileViewHolder(
 
         val placeHolderRes = MimeTypeThumbnail.typeForName(node.node.name).iconResourceId
 
-        val requestBuilder: RequestBuilder<Drawable> = if (node.thumbnail != null) {
-            Glide.with(binding.thumbnail)
-                .load(node.thumbnail)
-                .placeholder(placeHolderRes)
+        if (node.thumbnail != null) {
+            binding.thumbnail.setImageURI(Uri.fromFile(node.thumbnail))
         } else {
-            Glide.with(binding.thumbnail)
-                .load(placeHolderRes)
+            binding.thumbnail.setActualImageResource(placeHolderRes)
         }
 
-        val radius = px2dp(5F, binding.root.resources.displayMetrics).toFloat()
-        requestBuilder
-            .transform(FitCenter(), GranularRoundedCorners(radius, radius, 0F, 0F))
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(binding.thumbnail)
+        val radius =
+            binding.root.resources.getDimensionPixelSize(R.dimen.homepage_node_grid_round_corner_radius)
+                .toFloat()
+        binding.thumbnail.hierarchy.roundingParams =
+            RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
 
         binding.filename.text = node.node.name
 

@@ -3,35 +3,29 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.FileProvider;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.io.File;
 
-import java.util.ArrayList;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -66,7 +60,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         contentView.findViewById(R.id.option_properties_layout).setOnClickListener(this);
         TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
 
-        ImageView nodeThumb = contentView.findViewById(R.id.offline_thumbnail);
+        SimpleDraweeView nodeThumb = contentView.findViewById(R.id.offline_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.offline_name_text);
         TextView nodeInfo = contentView.findViewById(R.id.offline_info_text);
         LinearLayout optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
@@ -136,11 +130,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             if (file.isFile()) {
                 if (MimeTypeList.typeForName(nodeOffline.getName()).isImage()) {
                     if (file.exists()) {
-                        Glide.with(this)
-                                .load(file)
-                                .into(nodeThumb);
+                        nodeThumb.setImageURI(Uri.fromFile(file));
                     } else {
-                        nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
+                        nodeThumb.setActualImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
                     }
                 } else {
                     nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());

@@ -2,6 +2,9 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
@@ -18,19 +21,22 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 
-import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1;
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -327,7 +333,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     break;
                 }
                 if (node != null) {
-                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE1);
+                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE6);
                 }
                 break;
             }
@@ -339,8 +345,12 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                         v.findViewById(R.id.thumbnail_view), RecentsFragment.OPEN_FROM_ROOT_SINGLE);
                     break;
                 }
-                if (item.getBucket() == null) break;
-                ((RecentsFragment) fragment).openMultipleBucket(item.getBucket());
+                MegaRecentActionBucket bucket = item.getBucket();
+                if (bucket == null) break;
+
+                Navigation.findNavController(v).navigate(
+                        HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(MegaNodeUtil.getSerializedNodesFromBucket(bucket), new BucketSaved(bucket)),
+                        new NavOptions.Builder().build());
                 break;
             }
         }

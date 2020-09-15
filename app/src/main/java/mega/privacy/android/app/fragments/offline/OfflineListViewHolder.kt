@@ -1,15 +1,11 @@
 package mega.privacy.android.app.fragments.offline
 
 import android.graphics.Color
-import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.load.resource.bitmap.FitCenter
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemListBinding
@@ -33,29 +29,18 @@ class OfflineListViewHolder(
                 ContextCompat.getColor(binding.root.context, R.color.new_multiselect_color)
             )
 
-            Glide.with(binding.thumbnail)
-                .load(R.drawable.ic_select_folder)
-                .fitCenter()
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.thumbnail)
+            binding.thumbnail.setActualImageResource(R.drawable.ic_select_folder)
         } else {
             binding.root.setBackgroundColor(Color.WHITE)
 
             val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
 
-            val requestBuilder: RequestBuilder<Drawable> = if (node.thumbnail != null) {
-                Glide.with(binding.thumbnail)
-                    .load(node.thumbnail)
-                    .placeholder(placeHolderRes)
+            if (node.thumbnail != null) {
+                binding.thumbnail.setImageURI(Uri.fromFile(node.thumbnail))
             } else {
-                Glide.with(binding.thumbnail)
-                    .load(if (node.node.isFolder) R.drawable.ic_folder_list else placeHolderRes)
+                binding.thumbnail.setActualImageResource(if (node.node.isFolder) R.drawable.ic_folder_list else placeHolderRes)
             }
-
-            requestBuilder
-                .transform(FitCenter(), RoundedCorners(5))
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.thumbnail)
+            binding.thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(5F)
         }
 
         val res = binding.root.resources.displayMetrics
