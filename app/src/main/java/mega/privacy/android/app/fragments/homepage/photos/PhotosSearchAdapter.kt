@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.R
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -34,8 +33,6 @@ class PhotosSearchAdapter constructor(
         binding.savedOffline.visibility = View.GONE
         binding.takenDown.visibility = View.GONE
         binding.versionsIcon.visibility = View.GONE
-
-        binding.thumbnail.hierarchy.setPlaceholderImage(R.drawable.ic_image_list)
 
         return PhotoViewHolder(binding)
     }

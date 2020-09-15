@@ -253,6 +253,6 @@ public class MimeTypeList {
 	}
 
 	public boolean isGIF () {
-		return extension.equals("gif");
+		return extension.equals("gif") || extension.equals("webp");
 	}
 }
