@@ -470,7 +470,7 @@ public class BaseActivity extends AppCompatActivity {
         try {
             switch (type) {
                 case MESSAGE_SNACKBAR_TYPE:
-                    snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
+                    snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_LONG);
                     break;
                 case NOT_SPACE_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);

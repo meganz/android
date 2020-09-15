@@ -7351,7 +7351,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
                     text = getString(R.string.invalid_chat_link);
                 } else {
-                    showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
                     text = getString(R.string.error_chat_link);
                 }
 
@@ -7374,8 +7374,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 supportInvalidateOptionsMenu();
             } else {
+                MegaChatRoom chatRoom = megaChatApi.getChatRoom(idChat);
+                if (chatRoom != null && chatRoom.getOwnPrivilege() >= MegaChatRoom.PRIV_RO) {
+                    logWarning("I'm already a participant");
+                    return;
+                }
+
                 logError("ERROR WHEN JOINING CHAT " + e.getErrorCode() + " " + e.getErrorString());
-                showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
             }
         } else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
             logDebug("TYPE_LAST_GREEN requested");

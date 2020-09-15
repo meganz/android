@@ -13210,22 +13210,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logError("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: " + e.getErrorType());
 			}
 		}
-		else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
-			joiningToChatLink = false;
-			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
-				showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
-			}
-			else{
-				logError("Error joining to chat: " + e.getErrorString());
-				MegaChatRoom chatRoom = megaChatApi.getChatRoom(request.getChatHandle());
-				if (chatRoom != null && (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR
-						|| chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO)) {
-					logWarning("Error joining to chat: I'm already a participant");
-					return;
-				}
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
-			}
-		}
 	}
 
 	@Override
