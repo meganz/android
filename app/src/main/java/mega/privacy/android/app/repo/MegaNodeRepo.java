@@ -2,6 +2,7 @@ package mega.privacy.android.app.repo;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Pair;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -44,8 +45,10 @@ public class MegaNodeRepo {
      * 1 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
      * 2 means search for nodes between two days, filter[3] and filter[4] are start and end day in
      * millis.
+     * @return list of pairs, whose first value is index used for
+     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
      */
-    public List<MegaNode> getCuChildren(int type, int orderBy, long[] filter) {
+    public List<Pair<Integer, MegaNode>> getCuChildren(int type, int orderBy, long[] filter) {
         long cuHandle = -1;
         MegaPreferences pref = dbHandler.getPreferences();
         if (type == CU_TYPE_CAMERA) {
@@ -89,11 +92,17 @@ public class MegaNodeRepo {
         }
 
         List<MegaNode> children = megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy);
-        List<MegaNode> nodes = new ArrayList<>();
-        for (MegaNode node : children) {
+        List<Pair<Integer, MegaNode>> nodes = new ArrayList<>();
+        for (int i = 0; i < children.size(); i++) {
+            MegaNode node = children.get(i);
+            if (node.isFolder()) {
+                continue;
+            }
             MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
             if (mime.isImage() || mime.isVideoReproducible()) {
-                nodes.add(node);
+                // when not in search mode, index used by viewer is index in all siblings,
+                // including non image/video nodes
+                nodes.add(Pair.create(i, node));
             }
         }
 
@@ -101,7 +110,7 @@ public class MegaNodeRepo {
             return nodes;
         }
 
-        List<MegaNode> result = new ArrayList<>();
+        List<Pair<Integer, MegaNode>> result = new ArrayList<>();
 
         Function<MegaNode, Boolean> filterFunction = null;
         if (filter[0] == 1) {
@@ -131,9 +140,13 @@ public class MegaNodeRepo {
             return result;
         }
 
-        for (MegaNode node : nodes) {
-            if (filterFunction.apply(node)) {
-                result.add(node);
+        // when in search mode, index used by viewer is also index in all siblings,
+        // but all siblings are image/video, non image/video nodes are filtered by previous step
+        int indexInSiblings = 0;
+        for (Pair<Integer, MegaNode> pair : nodes) {
+            if (filterFunction.apply(pair.second)) {
+                result.add(Pair.create(indexInSiblings, pair.second));
+                indexInSiblings++;
             }
         }
 
