@@ -127,7 +127,7 @@ class DocumentsViewModel @ViewModelInject constructor(
         loadDocuments()
     }
 
-    fun getNodePositionByHandle(handle: Long): Int =
+    fun getNodePositionByHandle(handle: Long) =
         items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false

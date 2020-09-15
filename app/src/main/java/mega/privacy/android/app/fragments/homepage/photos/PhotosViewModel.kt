@@ -131,7 +131,7 @@ class PhotosViewModel @ViewModelInject constructor(
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getItemPositionByHandle(handle: Long): Int =
+    fun getItemPositionByHandle(handle: Long) =
         items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
 
     fun getHandlesOfPhotos(): LongArray? {

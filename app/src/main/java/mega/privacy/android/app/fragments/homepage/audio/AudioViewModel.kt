@@ -110,14 +110,11 @@ class AudioViewModel @ViewModelInject constructor(
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getNodePositionByHandle(handle: Long): Int =
+    fun getNodePositionByHandle(handle: Long) =
         items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
 
-    fun getHandlesOfAudio(): LongArray? {
-        val list = items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }
-
-        return list?.toLongArray()
-    }
+    fun getHandlesOfAudio() =
+        items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }?.toLongArray()
 
     fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
