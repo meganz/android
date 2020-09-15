@@ -203,7 +203,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     fun setAvatarClickListener(listener: OnClickListener) {
-        binding.avatarContainer.setOnClickListener(listener)
+        binding.avatarImage.setOnClickListener(listener)
     }
 
     fun setOnSearchInputClickListener(listener: OnClickListener) {
