@@ -277,20 +277,6 @@ public class ChatUtil {
         return EmojiUtilsShortcodes.emojify(text);
     }
 
-    public static SimpleSpanBuilder formatText(Context context, String text) {
-
-        SimpleSpanBuilder result;
-
-        try {
-            RTFFormatter formatter = new RTFFormatter(text, context);
-            result = formatter.setRTFFormat();
-        } catch (Exception e) {
-            logError("FORMATTER EXCEPTION!!!", e);
-            result = null;
-        }
-        return result;
-    }
-
     public static boolean areDrawablesIdentical(Drawable drawableA, Drawable drawableB) {
         Drawable.ConstantState stateA = drawableA.getConstantState();
         Drawable.ConstantState stateB = drawableB.getConstantState();
