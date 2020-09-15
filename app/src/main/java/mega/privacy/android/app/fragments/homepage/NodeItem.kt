@@ -10,4 +10,8 @@ open class NodeItem(
     open var thumbnail: File? = null,
     open var selected: Boolean = false,
     open var uiDirty: Boolean = true   // Force refresh the newly created Node list item
-)
+) {
+    companion object {
+        val SORT_BY_HEADER = NodeItem()
+    }
+}

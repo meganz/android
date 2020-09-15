@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.homepage
 
-import android.content.Context
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
@@ -18,12 +17,11 @@ import nz.mega.sdk.MegaShare
 import java.util.*
 
 class ActionModeCallback constructor(
-    private val context: Context,
+    private val mainActivity: ManagerActivityLollipop,
     private val viewModel: ActionModeViewModel,
     private val megaApi: MegaApiAndroid
 ) : ActionMode.Callback {
 
-    private var mainActivity = context as ManagerActivityLollipop
     var nodeCount = 0
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -37,16 +35,16 @@ class ActionModeCallback constructor(
 
         when (item.itemId) {
             R.id.cab_menu_download -> {
-                NodeController(context).prepareForDownload(nodesHandles, false)
+                NodeController(mainActivity).prepareForDownload(nodesHandles, false)
             }
             R.id.cab_menu_copy -> {
-                NodeController(context).chooseLocationToCopyNodes(nodesHandles)
+                NodeController(mainActivity).chooseLocationToCopyNodes(nodesHandles)
             }
             R.id.cab_menu_move -> {
-                NodeController(context).chooseLocationToMoveNodes(nodesHandles)
+                NodeController(mainActivity).chooseLocationToMoveNodes(nodesHandles)
             }
             R.id.cab_menu_share_out -> {
-                MegaNodeUtil.shareNodes(context, selectedNodes)
+                MegaNodeUtil.shareNodes(mainActivity, selectedNodes)
             }
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 LogUtil.logDebug("Public link option")
@@ -66,7 +64,7 @@ class ActionModeCallback constructor(
             }
             R.id.cab_menu_send_to_chat -> {
                 LogUtil.logDebug("Send files to chat")
-                NodeController(context).checkIfNodesAreMineAndSelectChatsToSendNodes(
+                NodeController(mainActivity).checkIfNodesAreMineAndSelectChatsToSendNodes(
                     ArrayList(selectedNodes)
                 )
             }
@@ -88,7 +86,7 @@ class ActionModeCallback constructor(
         }
 
         Util.changeStatusBarColor(
-            context, mainActivity.window,
+            mainActivity, mainActivity.window,
             R.color.accentColorDark
         )
 
@@ -132,7 +130,7 @@ class ActionModeCallback constructor(
         control.copy().isVisible = true
 
         menu?.findItem(R.id.cab_menu_send_to_chat)?.icon = Util.mutateIconSecondary(
-            context, R.drawable.ic_send_to_contact,
+            mainActivity, R.drawable.ic_send_to_contact,
             R.color.white
         )
 
@@ -145,7 +143,7 @@ class ActionModeCallback constructor(
         viewModel.clearSelection()
 
         Util.changeStatusBarColor(
-            context, mainActivity.window,
+            mainActivity, mainActivity.window,
             R.color.black
         )
 

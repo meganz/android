@@ -126,7 +126,9 @@ public class FileUtils {
             return true;
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        }
         return false;
     }
 
@@ -154,7 +156,9 @@ public class FileUtils {
             }
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        }
         return false;
     }
 

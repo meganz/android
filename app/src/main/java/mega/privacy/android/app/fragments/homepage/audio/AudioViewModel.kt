@@ -44,15 +44,21 @@ class AudioViewModel @ViewModelInject constructor(
         repository.fileNodeItems
     }.map { nodes ->
         var index = 0
-        var filteredNodes = nodes
-
-        if (!TextUtil.isTextEmpty(_query.value)) {
-            filteredNodes = nodes.filter {
-                it.node?.name?.contains(
-                    _query.value!!,
-                    true
-                ) ?: false
+        val filteredNodes = ArrayList(
+            if (!TextUtil.isTextEmpty(_query.value)) {
+                nodes.filter {
+                    it.node?.name?.contains(
+                        _query.value!!,
+                        true
+                    ) ?: false
+                }
+            } else {
+                nodes
             }
+        )
+
+        if (!searchMode && filteredNodes.isNotEmpty()) {
+            filteredNodes.add(0, NodeItem.SORT_BY_HEADER)
         }
 
         filteredNodes.forEach {
@@ -104,17 +110,13 @@ class AudioViewModel @ViewModelInject constructor(
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getNodePositionByHandle(handle: Long): Int {
-        return items.value?.find {
-            it.node?.handle == handle
-        }?.index ?: INVALID_POSITION
-    }
+    fun getNodePositionByHandle(handle: Long) =
+        items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
 
-    fun getHandlesOfAudio(): LongArray? {
-        val list = items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }
+    fun getHandlesOfAudio() =
+        items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }?.toLongArray()
 
-        return list?.toLongArray()
-    }
+    fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)

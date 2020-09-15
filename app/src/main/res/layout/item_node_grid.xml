@@ -13,7 +13,7 @@
 
         <import type="mega.privacy.android.app.utils.OfflineUtils" />
 
-        <import type="mega.privacy.android.app.MimeTypeList" />
+        <import type="mega.privacy.android.app.MimeTypeThumbnail" />
 
         <variable
             name="itemOperationViewModel"
@@ -42,13 +42,15 @@
         >
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="172dp"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:layout_marginTop="42dp"
+            android:layout_gravity="center_horizontal"
             android:paddingLeft="1dp"
             android:paddingRight="1dp"
             android:paddingTop="1dp"
-            app:actualImageScaleType="centerCrop"
-            app:defaultThumbnail="@{MimeTypeList.typeForName(item.node.name).iconResourceId}"
+            app:actualImageScaleType="fitCenter"
+            app:defaultThumbnail="@{MimeTypeThumbnail.typeForName(item.node.name).iconResourceId}"
             app:thumbnail="@{item.thumbnail}"
             />
         <ImageView
@@ -66,27 +68,41 @@
             android:layout_marginTop="172dp"
             android:background="@color/divider_upgrade_account"
             />
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/filename_container"
             android:layout_width="match_parent"
             android:layout_height="47dp"
             android:layout_marginTop="172dp"
+            android:orientation="horizontal"
             android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.showNodeItemOptions(item) : actionModeViewModel.onNodeClick(item)}"
             >
             <TextView
                 android:id="@+id/filename"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="32dp"
+                android:layout_marginEnd="8dp"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textColor="@color/black_87_opacity"
+                android:textColor="@{item.node.isTakenDown() ? @color/dark_primary_color : @color/black_87_opacity }"
                 android:textSize="14sp"
                 android:text="@{item.node.name}"
                 tools:text="2048.jpg"
                 />
+
+            <ImageView
+                android:id="@+id/taken_down"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="end|center_vertical"
+                android:background="@null"
+                android:src="@drawable/ic_input_warning"
+                android:tint="@color/login_warning"
+                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}"
+                />
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,6 +110,6 @@
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
                 />
-        </FrameLayout>
+        </LinearLayout>
     </FrameLayout>
 </layout>

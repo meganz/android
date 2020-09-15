@@ -5,7 +5,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.facebook.drawee.generic.RoundingParams
-import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 
@@ -17,7 +17,7 @@ class OfflineGridFileViewHolder(
 
         binding.filenameContainer.setOnClickListener { listener.onOptionsClicked(position, node) }
 
-        val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
+        val placeHolderRes = MimeTypeThumbnail.typeForName(node.node.name).iconResourceId
 
         if (node.thumbnail != null) {
             binding.thumbnail.setImageURI(Uri.fromFile(node.thumbnail))

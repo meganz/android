@@ -4,10 +4,10 @@ import androidx.recyclerview.widget.DiffUtil
 
 class OfflineNodeDiffCallback : DiffUtil.ItemCallback<OfflineNode>() {
     override fun areItemsTheSame(oldItem: OfflineNode, newItem: OfflineNode): Boolean {
-        return oldItem == newItem
+        return oldItem.node.handle == newItem.node.handle
     }
 
     override fun areContentsTheSame(oldItem: OfflineNode, newItem: OfflineNode): Boolean {
-        return oldItem.node.handle == newItem.node.handle
+        return true
     }
 }
