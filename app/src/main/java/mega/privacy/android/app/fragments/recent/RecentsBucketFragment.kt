@@ -107,7 +107,7 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun setupFastScroller(nodes: List<MegaNode>) {
-        if (bucket.isMedia && nodes.size >= Constants.MIN_ITEMS_SCROLLBAR) {
+        if (bucket.isMedia && nodes.size >= MIN_ITEMS_SCROLLBAR) {
             binding.fastscroll.visibility = View.VISIBLE
             binding.fastscroll.setRecyclerView(gridView)
         } else {

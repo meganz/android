@@ -54,6 +54,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public static final int MODE3 = 3;
     public static final int MODE4 = 4;
     public static final int MODE5 = 5;
+    // For recent
+    public static final int MODE6 = 6;
 
     private int mMode;
 
@@ -65,7 +67,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private ManagerActivityLollipop.DrawerItem drawerItem;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
-        if (mode >= MODE0 && mode <= MODE5) {
+        if (mode >= MODE0 && mode <= MODE6) {
             mMode = mode;
         }
     }
@@ -818,6 +820,66 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionLeaveShares.setVisibility(View.GONE);
                     counterModify--;
                     optionRestoreFromRubbish.setVisibility(View.GONE);
+                }
+                break;
+            case MODE6:
+                optionInfoText.setText(R.string.general_file_info);
+                counterShares--;
+                optionShareFolder.setVisibility(View.GONE);
+                nodeIconLayout.setVisibility(View.GONE);
+                counterShares--;
+                optionLink.setVisibility(View.GONE);
+                counterShares--;
+                optionRemoveLink.setVisibility(View.GONE);
+                counterShares--;
+                optionClearShares.setVisibility(View.GONE);
+                offlineSwitch.setChecked(availableOffline(context, node));
+
+                optionSendChat.setVisibility(View.VISIBLE);
+
+                counterRemove--;
+                optionRemove.setVisibility(View.GONE);
+                counterRemove--;
+                optionLeaveShares.setVisibility(View.GONE);
+                counterOpen--;
+                optionOpenFolder.setVisibility(View.GONE);
+                counterModify--;
+                optionRestoreFromRubbish.setVisibility(View.GONE);
+
+                int accessLevel = megaApi.getAccess(node);
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_READWRITE:
+                    case MegaShare.ACCESS_READ:
+                    case MegaShare.ACCESS_UNKNOWN:
+                        counterModify--;
+                        optionRename.setVisibility(View.GONE);
+                        counterModify--;
+                        optionMove.setVisibility(View.GONE);
+                        counterRemove--;
+                        optionRubbishBin.setVisibility(View.GONE);
+                        counterShares--;
+                        optionLink.setVisibility(View.GONE);
+                        nodeIconLayout.setVisibility(View.GONE);
+                        optionLinkText.setText(R.string.context_get_link_menu);
+                        counterShares--;
+                        optionRemoveLink.setVisibility(View.GONE);
+                        break;
+
+                    case MegaShare.ACCESS_FULL:
+                    case MegaShare.ACCESS_OWNER:
+                        optionLink.setVisibility(View.VISIBLE);
+                        if (node.isExported()) {
+                            nodeIconLayout.setVisibility(View.VISIBLE);
+                            nodeIcon.setImageResource(R.drawable.link_ic);
+                            optionLinkText.setText(R.string.edit_link_option);
+                            optionRemoveLink.setVisibility(View.VISIBLE);
+                        } else {
+                            nodeIconLayout.setVisibility(View.GONE);
+                            optionLinkText.setText(R.string.context_get_link_menu);
+                            counterShares--;
+                            optionRemoveLink.setVisibility(View.GONE);
+                        }
+                        break;
                 }
                 break;
         }

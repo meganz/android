@@ -5999,12 +5999,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-    public void openRecentBucketFragment(String[] serializedNodes, BucketSaved bucket) {
-        mNavController.navigate(
-                HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(serializedNodes, bucket),
-                new NavOptions.Builder().build());
-    }
-
 	public void fullscreenOfflineFragmentOpened(OfflineFragment fragment) {
     	fullscreenOfflineFragment = fragment;
 

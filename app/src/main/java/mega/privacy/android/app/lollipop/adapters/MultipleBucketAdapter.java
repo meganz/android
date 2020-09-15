@@ -21,10 +21,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -231,11 +231,11 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                     ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
-                ((ManagerActivityLollipop) context).showNodeOptionsPanel(node);
+                ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE6);
                 break;
             }
             case R.id.multiple_bucket_layout: {
-                if(ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
+                if (fragment instanceof RecentsBucketFragment) {
                     ((RecentsBucketFragment) fragment).openFile(node, true,
                             v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list));
                 }
@@ -253,33 +253,5 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (!isTextEmpty(name)) return name.substring(0, 1);
 
         return "";
-    }
-
-    public int getNodePosition(long handle) {
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getHandle() == handle) {
-                return i;
-            }
-        }
-        return INVALID_POSITION;
-    }
-
-    public ImageView getThumbnailView(RecyclerView recyclerView, long handle) {
-        if (nodes == null || nodes.isEmpty()) {
-            return null;
-        }
-
-        int position = getNodePosition(handle);
-        if (position == INVALID_POSITION) {
-            return null;
-        }
-
-        RecyclerView.ViewHolder holder = recyclerView.findViewHolderForLayoutPosition(position);
-        if (holder instanceof ViewHolderMultipleBucket) {
-            return isMedia ? ((ViewHolderMultipleBucket) holder).thumbnailMedia
-                : ((ViewHolderMultipleBucket) holder).thumbnailList;
-        }
-
-        return null;
     }
 }

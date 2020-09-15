@@ -81,7 +81,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private ImageView emptyImage;
     private TextView emptyText;
     private StickyLayoutManager stickyLayoutManager;
-    private LinearLayout listLayout;
     private RecyclerView listView;
     private FastScroller fastScroller;
 
@@ -148,7 +147,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
         emptyText.setText(result);
 
-        listLayout = v.findViewById(R.id.linear_layout_recycler);
         listView = v.findViewById(R.id.list_view_recents);
         fastScroller = v.findViewById(R.id.fastscroll);
 
@@ -217,11 +215,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private void setRecentsView() {
         if (buckets == null || buckets.isEmpty()) {
             emptyLayout.setVisibility(View.VISIBLE);
-            listLayout.setVisibility(View.GONE);
+            listView.setVisibility(View.GONE);
             fastScroller.setVisibility(View.GONE);
         } else {
             emptyLayout.setVisibility(View.GONE);
-            listLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.VISIBLE);
             fastScroller.setRecyclerView(listView);
             if (buckets.size() < MIN_ITEMS_SCROLLBAR) {

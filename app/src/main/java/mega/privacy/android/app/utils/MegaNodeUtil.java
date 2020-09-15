@@ -641,11 +641,11 @@ public class MegaNodeUtil {
         if (bucket != null) {
             MegaNodeList nodeList = bucket.getNodes();
             if (nodeList != null) {
-                String[] serailizedNodes = new String[nodeList.size()];
+                String[] serializedNodes = new String[nodeList.size()];
                 for (int i = 0; i < nodeList.size(); i++) {
-                    serailizedNodes[i] = nodeList.get(i).serialize();
+                    serializedNodes[i] = nodeList.get(i).serialize();
                 }
-                return serailizedNodes;
+                return serializedNodes;
             }
         }
         return null;
