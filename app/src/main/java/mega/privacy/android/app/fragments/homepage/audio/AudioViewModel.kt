@@ -82,7 +82,6 @@ class AudioViewModel @ViewModelInject constructor(
     }
 
     init {
-//        loadAudio(true, order)
         nodesChange.observeForever(nodesChangeObserver)
     }
 

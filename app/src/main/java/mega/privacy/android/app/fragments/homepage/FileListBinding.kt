@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.homepage
 import android.content.Context
 import android.net.Uri
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
@@ -75,8 +76,9 @@ fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbn
             val defaultThumbnailSize =
                 resources.getDimensionPixelSize(R.dimen.grid_node_default_thumbnail_size)
             val defaultThumbnailMarginTop = (realThumbnailSize - defaultThumbnailSize) / 2
-            params.width = if (file == null) defaultThumbnailSize else realThumbnailSize
-            params.height = layoutParams.width
+            params.width =
+                if (file == null) defaultThumbnailSize else ViewGroup.LayoutParams.MATCH_PARENT
+            params.height = if (file == null) defaultThumbnailSize else realThumbnailSize
             params.topMargin = if (file == null) defaultThumbnailMarginTop else 0
             layoutParams = params
         }
