@@ -8,7 +8,7 @@ import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.*
 
 class VideoViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
@@ -16,18 +16,25 @@ class VideoViewModel @ViewModelInject constructor(
 
     private var _query = MutableLiveData<String>("")
 
-    var order: Int = MegaApiJava.ORDER_DEFAULT_ASC
+    var order: Int = ORDER_DEFAULT_ASC
         private set
+
     var searchMode = false
     var searchQuery = ""
 
     private var forceUpdate = false
     private var ignoredFirst = false
 
+    // Whether a photo loading is in progress
+    private var loadInProgress = false
+
+    // Whether another photo loading should be executed after current loading
+    private var pendingLoad = false
+
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_VIDEO, order)
+                repository.getFiles(NODE_VIDEO, order)
             }
         } else {
             repository.emitFiles()
@@ -36,12 +43,18 @@ class VideoViewModel @ViewModelInject constructor(
         repository.fileNodeItems
     }.map { nodes ->
         var index = 0
-        var filteredNodes = nodes
-
-        if (!TextUtil.isTextEmpty(_query.value)) {
-            filteredNodes = nodes.filter {
-                it.node?.name?.contains(_query.value!!, true) ?: false
+        val filteredNodes = ArrayList(
+            if (!TextUtil.isTextEmpty(_query.value)) {
+                nodes.filter {
+                    it.node?.name?.contains(_query.value!!, true) ?: false
+                }
+            } else {
+                nodes
             }
+        )
+
+        if (!searchMode && filteredNodes.isNotEmpty()) {
+            filteredNodes.add(0, NodeItem.SORT_BY_HEADER)
         }
 
         filteredNodes.forEach {
@@ -64,7 +77,16 @@ class VideoViewModel @ViewModelInject constructor(
         }
     }
 
+    private val loadFinishedObserver = Observer<List<NodeItem>> {
+        loadInProgress = false
+
+        if (pendingLoad) {
+            loadVideo(true)
+        }
+    }
+
     init {
+        items.observeForever(loadFinishedObserver)
         nodesChange.observeForever(nodesChangeObserver)
     }
 
@@ -76,7 +98,14 @@ class VideoViewModel @ViewModelInject constructor(
     fun loadVideo(forceUpdate: Boolean = false, order: Int = this.order) {
         this.forceUpdate = forceUpdate
         this.order = order
-        _query.value = searchQuery
+
+        if (loadInProgress) {
+            pendingLoad = true
+        } else {
+            pendingLoad = false
+            loadInProgress = true
+            _query.value = searchQuery
+        }
     }
 
     /**
@@ -99,10 +128,12 @@ class VideoViewModel @ViewModelInject constructor(
     }
 
     fun getHandlesOfVideo(): LongArray? {
-        val list = items.value?.map { node -> node.node?.handle ?: MegaApiJava.INVALID_HANDLE }
+        val list = items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }
 
         return list?.toLongArray()
     }
+
+    fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)

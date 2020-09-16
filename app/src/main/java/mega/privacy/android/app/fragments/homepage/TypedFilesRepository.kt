@@ -13,10 +13,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.NODE_PHOTO
-import nz.mega.sdk.MegaApiJava.NODE_UNKNOWN
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.TARGET_ROOTNODES
+import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -156,10 +153,20 @@ class TypedFilesRepository @Inject constructor(
                     thumbnail,
                     selected
                 )
+            } else if(type == NODE_VIDEO){
+                nodeItem = NodeItem(
+                    node,
+                    -1,
+                    true,
+                    dateString,
+                    thumbnail,
+                    selected
+                )
             } else {
                 nodeItem = NodeItem(
                     node,
                     -1,
+                    false,
                     dateString,
                     thumbnail,
                     selected

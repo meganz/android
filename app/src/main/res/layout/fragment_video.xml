@@ -13,6 +13,10 @@
         <variable
             name="viewModel"
             type="mega.privacy.android.app.fragments.homepage.video.VideoViewModel" />
+
+        <variable
+            name="sortByHeaderViewModel"
+            type="mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -51,7 +55,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR_GRID}" />
+            app:visibleGone="@{viewModel.items.size() > (sortByHeaderViewModel.list ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
