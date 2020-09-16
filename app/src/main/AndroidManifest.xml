@@ -574,6 +574,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="mega.privacy.android.app.lollipop.megachat.calls.VolumeEventsReceiver" >
+            <intent-filter>
+                <action android:name="android.media.VOLUME_CHANGED_ACTION" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="mega.privacy.android.app.providers.fileprovider"

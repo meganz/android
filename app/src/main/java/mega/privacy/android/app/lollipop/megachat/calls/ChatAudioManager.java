@@ -9,8 +9,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Vibrator;
-
 import java.io.IOException;
 
 import mega.privacy.android.app.R;
@@ -18,6 +18,7 @@ import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
+import static android.media.AudioManager.STREAM_RING;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -30,6 +31,9 @@ public class ChatAudioManager {
     private Vibrator vibrator = null;
     private AudioFocusRequest request;
     private AudioFocusListener audioFocusListener;
+    private boolean isIncomingSound = false;
+    private int previousVolume;
+
     private ChatAudioManager(Context context) {
         myContext = context;
         initializeAudioManager();
@@ -107,6 +111,7 @@ public class ChatAudioManager {
 
             logDebug("Start outgoing call sound");
             mediaPlayer.start();
+            isIncomingSound = false;
         }
     }
 
@@ -118,6 +123,7 @@ public class ChatAudioManager {
         if (audioManager == null)
             return;
 
+
         Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         if (ringtoneUri == null)
             return;
@@ -126,6 +132,7 @@ public class ChatAudioManager {
         request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
 
         if (getAudioFocus(audioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT)) {
+            unmuteIncomingCall();
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
             mediaPlayer.setLooping(true);
@@ -142,11 +149,14 @@ public class ChatAudioManager {
 
             logDebug("Start incoming call sound");
             mediaPlayer.start();
+            previousVolume = audioManager.getStreamVolume(STREAM_RING);
+            isIncomingSound = true;
+
         }
     }
 
     private void checkVibration() {
-        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING));
+        logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(STREAM_RING));
 
         if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
             if (vibrator == null || !vibrator.hasVibrator()) return;
@@ -159,7 +169,7 @@ public class ChatAudioManager {
             return;
         }
 
-        if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0) {
+        if (audioManager.getStreamVolume(STREAM_RING) == 0) {
             return;
         }
         startVibration();
@@ -174,11 +184,61 @@ public class ChatAudioManager {
         vibrator.vibrate(pattern, 0);
     }
 
+    /**
+     * Method of checking whether the volume has been raised or lowered using the keys on the device.
+     *
+     * @param newVolume The new volume detected.
+     */
+    public void checkVolume(int newVolume) {
+        if (newVolume < previousVolume) {
+            muteIncomingCall();
+        } else if (newVolume > previousVolume && isPlayingIncomingCall()) {
+            unmuteIncomingCall();
+        }
+        previousVolume = newVolume;
+    }
+
+    /**
+     * Method to know if an incoming call is ringing
+     *
+     * @return True, if it's ringing. False, if not.
+     */
+    private boolean isPlayingIncomingCall() {
+        return mediaPlayer != null && mediaPlayer.isPlaying() && isIncomingSound && audioManager != null;
+    }
+
+    /**
+     * Method to mute an incoming call.
+     */
+    public void muteIncomingCall() {
+        if (isPlayingIncomingCall()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!audioManager.isStreamMute(STREAM_RING)) {
+                    audioManager.adjustStreamVolume(STREAM_RING, AudioManager.ADJUST_MUTE, 0);
+                }
+            } else {
+                audioManager.setStreamMute(STREAM_RING, true);
+            }
+        }
+    }
+
+    /**
+     * Method to unmute an incoming call.
+     */
+    private void unmuteIncomingCall() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (audioManager.isStreamMute(STREAM_RING)) {
+                audioManager.adjustStreamVolume(STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
+            }
+        } else {
+            audioManager.setStreamMute(STREAM_RING, false);
+        }
+    }
+
     public void stopAudioSignals() {
         logDebug("Stop sound and vibration");
         stopSound();
         stopVibration();
-
         if (audioManager != null) {
             abandonAudioFocus(audioFocusListener, audioManager, request);
         }
@@ -192,6 +252,8 @@ public class ChatAudioManager {
                 mediaPlayer.reset();
                 mediaPlayer.release();
                 mediaPlayer = null;
+                isIncomingSound = false;
+                unmuteIncomingCall();
             }
         } catch (Exception e) {
             logWarning("Exception stopping player", e);
@@ -209,5 +271,4 @@ public class ChatAudioManager {
             logWarning("Exception canceling vibrator", e);
         }
     }
-
 }
