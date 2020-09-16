@@ -39,6 +39,8 @@ import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.AUDIO_SEARCH_ADAPTER
@@ -162,7 +164,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline {
                 callManager { manager ->
-                    manager.showNodeOptionsPanel(it.node)
+                    manager.showNodeOptionsPanel(
+                        it.node, if (viewModel.searchMode) MODE5 else MODE1
+                    )
                 }
             }
         })
