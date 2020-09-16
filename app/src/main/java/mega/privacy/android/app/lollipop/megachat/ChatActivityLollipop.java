@@ -933,22 +933,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         observersNumberText = findViewById(R.id.observers_text);
 
         textChat.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) { }
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-
                 if (s != null && !s.toString().trim().isEmpty()) {
-                    sendIcon.setEnabled(true);
-                    sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
-                    textChat.setHint(" ");
-                    setSizeInputText(false);
-                    sendIcon.setVisibility(View.VISIBLE);
-                    currentRecordButtonState = 0;
-                    recordLayout.setVisibility(View.GONE);
-                    recordButtonLayout.setVisibility(View.GONE);
+                    showSendIcon();
                 } else {
                     refreshTextInput();
                 }
@@ -1365,14 +1357,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 editingMessage = !isTextEmpty(editedMsgId);
                 messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(editedMsgId)) : null;
                 textChat.setText(written);
-                sendIcon.setVisibility(View.VISIBLE);
-                sendIcon.setEnabled(true);
-                sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
-                textChat.setHint(" ");
-                setSizeInputText(false);
-                currentRecordButtonState = 0;
-                recordLayout.setVisibility(View.GONE);
-                recordButtonLayout.setVisibility(View.GONE);
+                showSendIcon();
                 return;
             }
         } else {
@@ -2395,7 +2380,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      *Prepare recording
      */
     private void prepareRecording() {
-        logDebug("prepareRecording");
         recordView.playSound(TYPE_START_RECORD);
         stopReproductions();
     }
@@ -2405,8 +2389,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * Start recording
      */
     public void startRecording(){
-        logDebug("startRecording() with Permissions");
-
         long timeStamp = System.currentTimeMillis() / 1000;
         outputFileName = "/note_voice" + getVoiceClipName(timeStamp);
         File vcFile = buildVoiceClipFile(this, outputFileName);
@@ -2581,34 +2563,54 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         button.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Method that displays the send icon.
+     */
+    private void showSendIcon() {
+        if(recordView.isRecordingNow())
+            return;
+
+        sendIcon.setEnabled(true);
+        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
+        textChat.setHint(" ");
+        setSizeInputText(false);
+        sendIcon.setVisibility(View.VISIBLE);
+        currentRecordButtonState = 0;
+        recordLayout.setVisibility(View.GONE);
+        recordButtonLayout.setVisibility(View.GONE);
+    }
+
     /*
      *Record button deactivated or ready to send
      */
     private void recordButtonDeactivated(boolean isDeactivated) {
-        logDebug("isDeactivated: " + isDeactivated);
-        recordButtonLayout.setBackground(null);
-        sendIcon.setVisibility(View.GONE);
-        recordButton.setVisibility(View.VISIBLE);
+        if (textChat != null && textChat.getText() != null && !isTextEmpty(textChat.getText().toString()) && isDeactivated) {
+            showSendIcon();
+        } else {
+            recordButtonLayout.setBackground(null);
+            sendIcon.setVisibility(View.GONE);
+            recordButton.setVisibility(View.VISIBLE);
 
-        if(isDeactivated){
-            recordButton.activateOnClickListener(false);
-            recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
-            recordButton.setColorFilter(null);
-            return;
+            if(isDeactivated){
+                recordButton.activateOnClickListener(false);
+                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
+                recordButton.setColorFilter(null);
+                return;
+            }
+
+            recordButton.activateOnTouchListener(false);
+            recordButton.activateOnClickListener(true);
+            recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
+            recordButton.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor));
         }
-        recordButton.activateOnTouchListener(false);
-        recordButton.activateOnClickListener(true);
-        recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-        recordButton.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor));
     }
 
     /*
      *Update the record button view depending on the state the recording is in
      */
     private void recordButtonStates(int recordButtonState){
-        logDebug("recordButtonState: " + recordButtonState);
-
-        if(currentRecordButtonState == recordButtonState) return;
+        if (currentRecordButtonState == recordButtonState)
+            return;
 
         currentRecordButtonState = recordButtonState;
         recordLayout.setVisibility(View.VISIBLE);
@@ -2703,7 +2705,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * Know if you're recording right now
      */
     public void setRecordingNow(boolean recordingNow) {
-        logDebug("recordingNow: " + recordingNow);
         if (recordView == null) return;
 
         recordView.setRecordingNow(recordingNow);
@@ -3555,7 +3556,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
             }
             case R.id.send_message_icon_chat:{
-                logDebug("send_message_icon_chat");
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
                 if(text.trim().isEmpty()) break;
