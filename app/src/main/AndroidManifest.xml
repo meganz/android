@@ -613,6 +613,13 @@
             android:launchMode="singleTop">
         </activity>
 
+        <activity
+            android:name="nz.mega.documentscanner.DocumentScannerActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/DocumentScannerTheme"
+            />
+
     </application>
 
 </manifest>

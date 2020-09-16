@@ -63,6 +63,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
+import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -235,6 +236,11 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		}
 		checkTakePicture(this, TAKE_PHOTO_CODE);
 	}
+
+    @Override
+    public void scanDocument() {
+        startActivityForResult(new Intent(this, DocumentScannerActivity.class), REQUEST_CODE_SCAN_DOCUMENT);
+    }
 
 	@Override
 	public void showNewFolderDialog() {

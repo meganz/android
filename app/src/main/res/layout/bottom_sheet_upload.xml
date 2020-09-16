@@ -112,8 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/scan_document"
@@ -131,11 +130,13 @@
                     android:id="@+id/scan_document_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/menu_scan_document"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    />
             </LinearLayout>
 
             <LinearLayout

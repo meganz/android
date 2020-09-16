@@ -206,6 +206,7 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -9472,6 +9473,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		checkTakePicture(this, TAKE_PHOTO_CODE);
 	}
+
+    @Override
+    public void scanDocument() {
+        startActivityForResult(new Intent(this, DocumentScannerActivity.class), REQUEST_CODE_SCAN_DOCUMENT);
+    }
 
 	@Override
 	public void showNewFolderDialog() {
