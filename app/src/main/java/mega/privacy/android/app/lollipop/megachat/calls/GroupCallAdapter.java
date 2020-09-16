@@ -520,6 +520,25 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             height = maxScreenWidth / 2;
         }
 
+        RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
+        int size;
+        int margin;
+        if (peers.size() <= MAX_PARTICIPANTS_GRID) {
+            size = px2dp(24, outMetrics);
+            margin = px2dp(15, outMetrics);
+        } else {
+            size = px2dp(20, outMetrics);
+            margin = px2dp(7, outMetrics);
+        }
+
+        paramsQuality.height = size;
+        paramsQuality.width = size;
+        paramsQuality.setMargins(margin, 0, 0, margin);
+        paramsQuality.addRule(RelativeLayout.ALIGN_BOTTOM, holder.parentSurfaceView.getId());
+        paramsQuality.addRule(RelativeLayout.ALIGN_LEFT, holder.parentSurfaceView.getId());
+        holder.qualityIcon.setLayoutParams(paramsQuality);
+        holder.qualityIcon.setVisibility(View.VISIBLE);
+
         Bitmap bitmap = peer.getListener().getLastFrame(width, height);
         if (bitmap != null) {
             RelativeLayout.LayoutParams paramsQualityLayout = new RelativeLayout.LayoutParams(holder.qualityBackground.getLayoutParams());
@@ -534,24 +553,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.qualityBackground.setImageBitmap(null);
             holder.qualityBackground.setVisibility(View.GONE);
         }
-
-        RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
-        int size;
-        int margin;
-        if (peers.size() <= MAX_PARTICIPANTS_GRID) {
-            size = px2dp(24, outMetrics);
-            margin = px2dp(15, outMetrics);
-        } else {
-            size = px2dp(20, outMetrics);
-            margin = px2dp(7, outMetrics);
-        }
-        paramsQuality.height = size;
-        paramsQuality.width = size;
-        paramsQuality.setMargins(margin, 0, 0, margin);
-        paramsQuality.addRule(RelativeLayout.ALIGN_BOTTOM, holder.parentSurfaceView.getId());
-        paramsQuality.addRule(RelativeLayout.ALIGN_LEFT, holder.parentSurfaceView.getId());
-        holder.qualityIcon.setLayoutParams(paramsQuality);
-        holder.qualityIcon.setVisibility(View.VISIBLE);
     }
 
     /**
