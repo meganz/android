@@ -108,6 +108,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static final String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER";
     public static final String EXTRA_IGNORE_ATTR_CHECK = "EXTRA_IGNORE_ATTR_CHECK";
     public static final String CU_CACHE_FOLDER = "cu";
+    private static final String EXTENSION_JPG = ".jpg";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
     public static boolean isServiceRunning = false;
@@ -408,7 +409,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 long addedTime = cursor.getLong(addedColumn) * 1000;
                 long modifiedTime = cursor.getLong(modifiedColumn) * 1000;
                 media.timestamp = Math.max(addedTime, modifiedTime);
-                logDebug("Extract from cursor, file parentPath: " + media.filePath + ", add time: " + addedTime + ", modify time: " + modifiedTime + ", chosen time: " + media.timestamp);
+                logDebug("Extract from cursor, add time: " + addedTime + ", modify time: " + modifiedTime + ", chosen time: " + media.timestamp);
 
                 //Check files of the Camera Uploads
                 if (checkFile(media, parentPath)) {
@@ -463,7 +464,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             logDebug("Primary photo timestamp is: " + currentTimeStamp);
 
             selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-            logDebug("SQL where clause for primary photo:\n" + selectionCamera);
 
             if (prefs.getCamVideoSyncTimeStamp() != null) {
                 currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
@@ -473,7 +473,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             logDebug("Primary video timestamp is: " + currentVideoTimeStamp);
 
             selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-            logDebug("SQL where clause for primary video:\n" + selectionCameraVideo);
 
             if (secondaryEnabled) {
                 logDebug("Secondary upload is enabled.");
@@ -483,13 +482,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
                     logDebug("Secondary photo timestamp is: " + secondaryTimeStamp);
                     selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
-                    logDebug("SQL where clause for secondary photo:\n" + selectionSecondary);
                 }
                 if (prefs.getSecVideoSyncTimeStamp() != null) {
                     secondaryVideoTimeStamp = Long.parseLong(prefs.getSecVideoSyncTimeStamp());
                     logDebug("Secondary video timestamp is: " + secondaryVideoTimeStamp);
                     selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
-                    logDebug("SQL where clause for secondary video:\n" + selectionSecondaryVideo);
                 }
             }
         }
@@ -551,7 +548,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
             //Secondary Media Folder
             if (secondaryEnabled) {
-                logDebug("if(secondaryEnabled)");
+                logDebug("Secondary is enabled.");
                 Cursor cursorSecondary;
                 String orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
                 String orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
@@ -682,7 +679,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
 
             if (file.isCopyOnly()) {
-                logDebug("Copy from node: " + file.getFileName());
+                logDebug("Copy from node, file timestamp is: " + file.getTimestamp());
                 totalToUpload++;
                 megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()), parent, file.getFileName(), this);
             } else {
@@ -691,16 +688,16 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     //compare size
                     MegaNode node = checkExsitBySize(parent, toUpload.length());
                     if (node != null && node.getOriginalFingerprint() == null) {
-                        logDebug(node.getName() + " already exists, delete record from database.");
+                        logDebug("Node with handle: " + node.getHandle() + " already exists, delete record from database.");
                         dbH.deleteSyncRecordByPath(path, isSec);
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        logDebug("Upload file from: " + path + ", name is:" + file.getFileName() + ", last modify timestamp is: " + lastModified);
+                        logDebug("Upload file which last modify timestamp is: " + lastModified);
                         megaApi.startUpload(path, parent, file.getFileName(), lastModified / 1000, this);
                     }
                 } else {
-                    logDebug(path + " is unavailable, delete record from database.");
+                    logDebug("Local file is unavailable, delete record from database.");
                     dbH.deleteSyncRecordByPath(path, isSec);
                 }
             }
@@ -733,7 +730,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private void saveDataToDB(List<SyncRecord> list) {
         for (SyncRecord file : list) {
-            logDebug("Handle with: " + file);
+            logDebug("Handle with local file which timestamp is: " + file.getTimestamp());
             if (stopped) return;
 
             SyncRecord exist = dbH.recordExists(file.getOriginFingerprint(), file.isSecondary(), file.isCopyOnly());
@@ -772,7 +769,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     if (stopped) return;
 
                     fileName = getNoneDuplicatedDeviceFileName(tempFileName, photoIndex);
-                    logDebug("Keep file name as in device, name is: " + fileName);
+                    logDebug("Keep file name as in device, name index is: " + photoIndex);
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
@@ -783,7 +780,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     if (stopped) return;
 
                     fileName = getPhotoSyncNameWithIndex(getLastModifiedTime(file), file.getLocalPath(), photoIndex);
-                    logDebug("Use MEGA name, name is: " + fileName);
+                    logDebug("Use MEGA name, name index is: " + photoIndex);
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
@@ -798,8 +795,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
 
             file.setFileName(fileName);
-            file.setNewPath(tempRoot + System.nanoTime() + "." + extension);
-            logDebug("Save file to database, name is " + fileName + ", local path is " + file.getLocalPath());
+            String newPath = tempRoot + System.nanoTime() + "." + extension;
+            file.setNewPath(newPath);
+            logDebug("Save file to database, new path is: " + newPath);
             dbH.saveSyncRecord(file);
         }
     }
@@ -823,7 +821,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         long parentNodeHandle = (isSecondary) ? secondaryUploadHandle : cameraUploadHandle;
         MegaNode parentNode = megaApi.getNodeByHandle(parentNodeHandle);
 
-        logDebug("Upload to: " + parentNode.getName() + ", handle is: " + parentNodeHandle);
+        logDebug("Upload to parent node which handle is: " + parentNodeHandle);
         int type = isVideo ? SyncRecord.TYPE_VIDEO : SyncRecord.TYPE_PHOTO;
 
         while (mediaList.size() > 0) {
@@ -833,7 +831,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (media == null) continue;
 
             if (dbH.localPathExists(media.filePath, isSecondary, SyncRecord.TYPE_ANY)) {
-                logDebug("Skip media: [" + media.filePath + ", " + media.timestamp + "].");
+                logDebug("Skip media with timestamp: "  + media.timestamp);
                 continue;
             }
 
@@ -858,15 +856,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 record.setLatitude(gpsData[0]);
                 record.setLongitude(gpsData[1]);
                 record.setOriginFingerprint(localFingerPrint);
-                logDebug("Add " + record.getFileName() + " to pending list, for upload.");
+                logDebug("Add local file with timestamp: " + record.getTimestamp() + " to pending list, for upload.");
                 pendingList.add(record);
             } else {
-                logDebug("Possible node with same fingerprint is: " + nodeExists.getName());
+                logDebug("Possible node with same fingerprint which handle is: " + nodeExists.getHandle());
                 if (megaApi.getParentNode(nodeExists).getHandle() != parentNodeHandle) {
                     SyncRecord record = new SyncRecord(nodeExists.getHandle(), sourceFile.getName(), true, media.filePath, media.timestamp, isSecondary, type);
                     record.setOriginFingerprint(nodeExists.getOriginalFingerprint());
                     record.setNewFingerprint(nodeExists.getFingerprint());
-                    logDebug("Add " + record.getFileName() + " to pending list, for copy.");
+                    logDebug("Add local file with handle: " + record.getNodeHandle() + " to pending list, for copy.");
                     pendingList.add(record);
                 } else {
                     if (!isSecondary) {
@@ -1462,12 +1460,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-        transferUpdated(api, transfer);
+        transferUpdated(transfer);
     }
 
-    private synchronized void transferUpdated(MegaApiJava api, MegaTransfer transfer) {
+    private synchronized void transferUpdated(MegaTransfer transfer) {
         if (canceled) {
-            logDebug("Transfer cancel: " + transfer.getFileName());
+            logDebug("Transfer cancel: " + transfer.getNodeHandle());
             megaApi.cancelTransfer(transfer);
             cancel();
             return;
@@ -1482,7 +1480,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-        logWarning("onTransferTemporaryError: " + transfer.getFileName());
+        logWarning("onTransferTemporaryError: " + transfer.getNodeHandle());
         if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
             if (e.getValue() != 0)
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
@@ -1496,19 +1494,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-        logDebug("Image sync finished: " + transfer.getFileName() + ", size: " + transfer.getTransferredBytes());
-        logDebug("Path: " + transfer.getPath());
-        logDebug("Node handle: " + transfer.getNodeHandle());
+        logDebug("Image sync finished, error code: " + e.getErrorCode() + ", handle: " + transfer.getNodeHandle() + ", size: " + transfer.getTransferredBytes());
 
         try {
-            transferFinished(api, transfer, e);
+            transferFinished(transfer, e);
         } catch (Throwable th) {
             logError("onTransferFinish error", th);
             th.printStackTrace();
         }
     }
 
-    private synchronized void transferFinished(final MegaApiJava api, final MegaTransfer transfer, MegaError e) {
+    private synchronized void transferFinished(MegaTransfer transfer, MegaError e) {
         String path = transfer.getPath();
         if (isOverQuota) {
             return;
@@ -1521,7 +1517,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {
-            logDebug("Image Sync OK: " + transfer.getFileName() + ", path is : " + path);
+            logDebug("Image Sync API_OK");
             MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
             boolean isSecondary = (node.getParentHandle() == secondaryUploadHandle);
             SyncRecord record = dbH.findSyncRecordByNewPath(path);
@@ -1537,9 +1533,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 if (src.exists()) {
                     logDebug("Creating preview");
                     File previewDir = getPreviewFolder(this);
-                    final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                    final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + EXTENSION_JPG);
                     File thumbDir = getThumbFolder(this);
-                    final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                    final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + EXTENSION_JPG);
                     final SyncRecord finalRecord = record;
                     if (isVideoFile(transfer.getPath())) {
                         threadPool.execute(() -> {
@@ -1573,10 +1569,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             isOverQuota = true;
             cancel();
         } else {
-            logWarning("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
+            logWarning("Image Sync FAIL: " + transfer.getNodeHandle() + "___" + e.getErrorString());
         }
         if (canceled) {
-            logWarning("Image sync cancelled: " + transfer.getFileName());
+            logWarning("Image sync cancelled: " + transfer.getNodeHandle());
             cancel();
         }
         updateUpload();
@@ -1751,18 +1747,18 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     public synchronized void onCompressSuccessful(SyncRecord record) {
-        logDebug("Compression successfully: " + record.getLocalPath());
+        logDebug("Compression successfully for file with timestamp: " + record.getTimestamp());
         dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING, record.getLocalPath(), record.isSecondary());
     }
 
     public synchronized void onCompressNotSupported(SyncRecord record) {
-        logDebug("Compression failed, not support for file: " + record.getLocalPath());
+        logDebug("Compression failed, not support for file with timestampe: " + record.getTimestamp());
     }
 
     public synchronized void onCompressFailed(SyncRecord record) {
         String localPath = record.getLocalPath();
         boolean isSecondary = record.isSecondary();
-        logWarning("Compression failed: " + localPath);
+        logWarning("Compression failed for file with timestampe:  " + record.getTimestamp());
 
         File srcFile = new File(localPath);
         if (srcFile.exists()) {
@@ -1932,6 +1928,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void removeGPSCoordinates(String filePath) {
+        // The file path is new file path.
         logDebug("Remove GPS coordinates from path: " + filePath);
         try {
             ExifInterface exif = new ExifInterface(filePath);
@@ -2005,8 +2002,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
                 String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
                 if (location != null) {
-                    logDebug("Location: " + location);
-
                     boolean secondTry = false;
                     try {
                         final int mid = location.length() / 2; //get the middle of the String
@@ -2065,14 +2060,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, parentNode);
         preferNode = getFirstNodeFromList(possibleNodeListFPO);
         if (preferNode != null) {
-            logDebug("Found node by original fingerprint with the same local fingerprint in " + parentNode.getName() + ", node name: " + preferNode.getName());
+            logDebug("Found node by original fingerprint with the same local fingerprint in node with handle: " + parentNode.getHandle() + ", node handle: " + preferNode.getHandle());
             return preferNode;
         }
 
         // Try to find the node by fingerprint from the selected parent folder.
         preferNode = megaApi.getNodeByFingerprint(localFingerPrint, parentNode);
         if (preferNode != null) {
-            logDebug("Found node by fingerprint with the same local fingerprint in " + parentNode.getName() + ", node name: " + preferNode.getName());
+            logDebug("Found node by fingerprint with the same local fingerprint in node with handle: " + parentNode.getHandle() + ", node handle: " + preferNode.getHandle());
             return preferNode;
         }
 
@@ -2080,14 +2075,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
         preferNode = getFirstNodeFromList(possibleNodeListFPO);
         if (preferNode != null) {
-            logDebug("Found node by original fingerprint with the same local fingerprint in the account, node name: " + preferNode.getName());
+            logDebug("Found node by original fingerprint with the same local fingerprint in the account, node handle: " + preferNode.getHandle());
             return preferNode;
         }
 
         // Try to find the node by fingerprint in the account.
         preferNode = megaApi.getNodeByFingerprint(localFingerPrint);
         if (preferNode != null) {
-            logDebug("Found node by fingerprint with the same local fingerprint in the account, node name: " + preferNode.getName());
+            logDebug("Found node by fingerprint with the same local fingerprint in the account, node handle: " + preferNode.getHandle());
             return preferNode;
         }
 
