@@ -16208,15 +16208,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public void openSearchFolder(MegaNode node) {
         switch (drawerItem) {
-            case CLOUD_DRIVE: {
+            case CLOUD_DRIVE:
                 setParentHandleBrowser(node.getHandle());
                 refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
                 if (cloudPageAdapter != null) {
                     cloudPageAdapter.notifyDataSetChanged();
                 }
                 break;
-            }
-            case SHARED_ITEMS: {
+
+            case SHARED_ITEMS:
                 if (viewPagerShares == null || sharesPageAdapter == null) break;
 
                 if (getTabItemShares() == INCOMING_TAB) {
@@ -16232,12 +16232,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 refreshSharesPageAdapter();
 
                 break;
-            }
-            case INBOX: {
+
+            case INBOX:
                 setParentHandleInbox(node.getHandle());
                 refreshFragment(FragmentTag.INBOX.getTag());
                 break;
-            }
         }
     }
 
