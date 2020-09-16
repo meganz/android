@@ -41,6 +41,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -482,6 +483,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList) holder).imageView = v.findViewById(R.id.recent_chat_list_thumbnail);
 			((ViewHolderNormalChatList) holder).textViewContactName = v.findViewById(R.id.recent_chat_list_name);
 			((ViewHolderNormalChatList) holder).textViewContent = v.findViewById(R.id.recent_chat_list_content);
+			TextFormatterViewCompat.applyFormatting(((ViewHolderNormalChatList) holder).textViewContent);
 
 			if(isScreenInPortrait(context)){
 				((ViewHolderNormalChatList) holder).textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));
@@ -2190,13 +2192,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					if(lastMessageString!=null) {
-						SimpleSpanBuilder ssb = formatText(context, lastMessageString);
-						Spannable myMessage;
-						if(ssb == null){
-							myMessage = new SpannableString(lastMessageString);
-						}else{
-							myMessage = ssb.build();
-						}
+						Spannable myMessage = new SpannableString(lastMessageString);
 						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
 						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
@@ -2236,13 +2232,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						Spannable name = new SpannableString(fullNameAction + ": ");
 						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						SimpleSpanBuilder ssb = formatText(context, lastMessageString);
-						Spannable contactMessage;
-						if (ssb == null) {
-							contactMessage = new SpannableString(lastMessageString);
-						} else {
-							contactMessage = ssb.build();
-						}
+						Spannable contactMessage = new SpannableString(lastMessageString);
+
 						boolean isRead;
 						if(chat.getUnreadCount()==0){
 							logDebug("Message READ");
@@ -2273,13 +2264,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
 
-						SimpleSpanBuilder ssb = formatText(context, lastMessageString);
-						if (ssb == null) {
-							((ViewHolderNormalChatList) holder).textViewContent.setText(lastMessageString);
-						} else {
-							((ViewHolderNormalChatList) holder).textViewContent.setText(ssb.build(), TextView.BufferType.SPANNABLE);
-						}
-
+						((ViewHolderNormalChatList) holder).textViewContent.setText(lastMessageString);
 					}
 				}
 			}

@@ -1541,7 +1541,7 @@
 
     <string name="general_view" context="Menu option">Ver archivos</string>
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importar</string>
-    <string name="save_for_offline" context="Menu option">Guardar en Sin conexión</string>
+    <string name="save_for_offline" context="Menu option to choose save to Offline section">Guardar en Sin conexión</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Añadir a Mi nube</string>
     <string name="save_to_offline" context="Menu option to choose save to Offline section">Guardar en Sin conexión</string>
 
@@ -2788,6 +2788,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Esto es mejor hacerlo en persona, cara a cara. Si tienes algún otro canal ya verificado, como OTR o PGP, podrías utilizarlo.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Tus credenciales</string>
     <string name="action_reset" context="Button to reset credentials">Restablecer</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">¿Quieres eliminar tu número de teléfono?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Tu número de teléfono se ha eliminado.</string>
