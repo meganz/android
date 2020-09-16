@@ -5702,6 +5702,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
 						abL.setVisibility(View.GONE);
 					}
+					setDrawerLockMode(false);
 					return;
 				case R.id.photosFragment:
 					mHomepageScreen = HomepageScreen.PHOTOS;
@@ -5732,6 +5733,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showHideBottomNavigationView(true);
 			supportInvalidateOptionsMenu();
 			setToolbarTitle();
+			setDrawerLockMode(true);
 		});
 	}
 

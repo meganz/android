@@ -91,7 +91,6 @@ class ActionModeCallback constructor(
         )
 
         mainActivity.apply {
-            setDrawerLockMode(true)
             changeActionBarElevation(true)
         }
 
@@ -148,7 +147,6 @@ class ActionModeCallback constructor(
         )
 
         mainActivity.apply {
-            setDrawerLockMode(false)
             changeActionBarElevation(false)
         }
 
