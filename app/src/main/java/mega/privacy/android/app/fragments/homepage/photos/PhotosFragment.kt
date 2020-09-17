@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
-import android.drm.DrmStore
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -16,15 +15,12 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.empty_result_files.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
@@ -84,11 +80,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         binding.lifecycleOwner = viewLifecycleOwner
         activity = getActivity() as ManagerActivityLollipop
 
-        binding.emptyHint.emptyHintImage.isVisible = false
-        binding.emptyHint.emptyHintText.isVisible = false
-        binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
-
+        setupEmptyHint()
         setupListView()
         setupListAdapter()
         setupFastScroller()
@@ -103,6 +95,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
         }
+    }
+
+    private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.isVisible = false
+        binding.emptyHint.emptyHintText.isVisible = false
+        binding.emptyHint.emptyHintText.text =
+            getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
     }
 
     private fun doIfOnline(operation: () -> Unit) {

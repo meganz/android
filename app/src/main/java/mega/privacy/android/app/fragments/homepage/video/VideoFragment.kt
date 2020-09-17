@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -37,6 +38,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -78,6 +80,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
+        setupEmptyHint()
         setupListView()
         setupListAdapter()
         setupFastScroller()
@@ -94,6 +97,13 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+    }
+
+    private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.isVisible = false
+        binding.emptyHint.emptyHintText.isVisible = false
+        binding.emptyHint.emptyHintText.text =
+            getString(R.string.homepage_empty_hint_video).toUpperCase(Locale.ROOT)
     }
 
     override fun onDestroy() {

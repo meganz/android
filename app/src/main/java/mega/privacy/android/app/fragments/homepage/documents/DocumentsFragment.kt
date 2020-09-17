@@ -96,11 +96,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        binding.emptyHint.emptyHintImage.isVisible = false
-        binding.emptyHint.emptyHintText.isVisible = false
-        binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_documents).toUpperCase(Locale.ROOT)
-
+        setupEmptyHint()
         setupListView()
         setupListAdapter()
         setupFastScroller()
@@ -117,6 +113,13 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+    }
+
+    private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.isVisible = false
+        binding.emptyHint.emptyHintText.isVisible = false
+        binding.emptyHint.emptyHintText.text =
+            getString(R.string.homepage_empty_hint_documents).toUpperCase(Locale.ROOT)
     }
 
     private fun doIfOnline(operation: () -> Unit) {
