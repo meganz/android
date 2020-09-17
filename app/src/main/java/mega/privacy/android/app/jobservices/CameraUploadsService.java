@@ -51,7 +51,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
-import mega.privacy.android.app.utils.ImageProcessor;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -108,7 +107,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static final String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER";
     public static final String EXTRA_IGNORE_ATTR_CHECK = "EXTRA_IGNORE_ATTR_CHECK";
     public static final String CU_CACHE_FOLDER = "cu";
-    private static final String EXTENSION_JPG = ".jpg";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
     public static boolean isServiceRunning = false;
@@ -1533,9 +1531,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 if (src.exists()) {
                     logDebug("Creating preview");
                     File previewDir = getPreviewFolder(this);
-                    final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + EXTENSION_JPG);
+                    final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + JPG_EXTENSION);
                     File thumbDir = getThumbFolder(this);
-                    final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + EXTENSION_JPG);
+                    final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + JPG_EXTENSION);
                     final SyncRecord finalRecord = record;
                     if (isVideoFile(transfer.getPath())) {
                         threadPool.execute(() -> {
@@ -1928,8 +1926,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void removeGPSCoordinates(String filePath) {
-        // The file path is new file path.
-        logDebug("Remove GPS coordinates from path: " + filePath);
         try {
             ExifInterface exif = new ExifInterface(filePath);
             exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, "0/1,0/1,0/1000");
