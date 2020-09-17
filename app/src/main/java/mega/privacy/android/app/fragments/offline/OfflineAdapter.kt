@@ -3,14 +3,9 @@ package mega.privacy.android.app.fragments.offline
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
-import android.view.animation.AnimationUtils
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 import mega.privacy.android.app.databinding.OfflineItemListBinding
@@ -49,58 +44,6 @@ class OfflineAdapter(
         val topLeft = IntArray(2)
         thumbnail.getLocationOnScreen(topLeft)
         return intArrayOf(topLeft[0], topLeft[1], thumbnail.width, thumbnail.height)
-    }
-
-    fun showSelectionAnimation(
-        position: Int,
-        node: OfflineNode,
-        holder: ViewHolder?
-    ) {
-        if (holder == null || position < 0 || position >= itemCount ||
-            getItem(position) == OfflineNode.PLACE_HOLDER ||
-            getItem(position).node.handle !== node.node.handle
-        ) {
-            return
-        }
-
-        if (node.selected) {
-            notifyItemChanged(position)
-        }
-
-        when (holder) {
-            is OfflineListViewHolder -> {
-                showSelectionAnimation(holder.getThumbnailView(), position)
-            }
-            is OfflineGridFolderViewHolder -> {
-                showSelectionAnimation(holder.getThumbnailView(), position)
-            }
-            is OfflineGridFileViewHolder -> {
-                if (node.selected) {
-                    holder.getIcSelected().isVisible = true
-                }
-                showSelectionAnimation(holder.getIcSelected(), position)
-            }
-        }
-    }
-
-    private fun showSelectionAnimation(
-        view: View,
-        position: Int
-    ) {
-        val flipAnimation: Animation = AnimationUtils.loadAnimation(
-            view.context,
-            R.anim.multiselect_flip
-        )
-        flipAnimation.duration = 200
-        flipAnimation.setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {}
-            override fun onAnimationEnd(animation: Animation?) {
-                notifyItemChanged(position)
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {}
-        })
-        view.startAnimation(flipAnimation)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OfflineViewHolder {
@@ -144,9 +87,9 @@ class OfflineAdapter(
     }
 
     companion object {
-        private const val TYPE_LIST = 1
-        private const val TYPE_GRID_FOLDER = 2
-        private const val TYPE_GRID_FILE = 3
+        const val TYPE_LIST = 1
+        const val TYPE_GRID_FOLDER = 2
+        const val TYPE_GRID_FILE = 3
         const val TYPE_HEADER = 4
     }
 }

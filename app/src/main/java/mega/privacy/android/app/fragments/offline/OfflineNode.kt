@@ -7,7 +7,8 @@ class OfflineNode(
     val node: MegaOffline,
     val thumbnail: File?,
     val nodeInfo: String,
-    var selected: Boolean
+    var selected: Boolean,
+    var uiDirty: Boolean = false
 ) {
     companion object {
         val PLACE_HOLDER =

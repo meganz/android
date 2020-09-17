@@ -1,5 +1,9 @@
 package mega.privacy.android.app.fragments.offline
 
+import android.animation.Animator
+import android.animation.Animator.AnimatorListener
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -15,7 +19,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -33,8 +40,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.R.drawable
-import mega.privacy.android.app.R.string
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
@@ -65,6 +70,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
 import mega.privacy.android.app.utils.callManager
@@ -273,11 +279,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         }
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.emptyHintImage.setImageResource(drawable.offline_empty_landscape)
+            binding.emptyHintImage.setImageResource(R.drawable.offline_empty_landscape)
         } else {
-            binding.emptyHintImage.setImageResource(drawable.ic_empty_offline)
+            binding.emptyHintImage.setImageResource(R.drawable.ic_empty_offline)
         }
-        var textToShow = getString(string.context_empty_offline)
+        var textToShow = getString(R.string.context_empty_offline)
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>")
             textToShow = textToShow.replace("[/A]", "</font>")
@@ -386,19 +392,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 manager.showNewSortByPanel()
             }
         })
-        viewModel.nodeToAnimate.observe(viewLifecycleOwner) {
-            val rv = recyclerView
-            val rvAdapter = adapter
-            if (rv == null || rvAdapter == null || it.first < 0 ||
-                it.first >= rvAdapter.itemCount
-            ) {
-                return@observe
-            }
-
-            rvAdapter.showSelectionAnimation(
-                it.first, it.second, rv.findViewHolderForLayoutPosition(it.first)
-            )
-        }
+        observeAnimatedItems()
         viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner) {
             val layoutManager = recyclerView?.layoutManager
             if (layoutManager is LinearLayoutManager) {
@@ -420,6 +414,100 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
             switchListGridView()
         })
+    }
+
+    private fun observeAnimatedItems() {
+        var animatorSet: AnimatorSet? = null
+        viewModel.nodesToAnimate.observe(viewLifecycleOwner) {
+            val rvAdapter = adapter ?: return@observe
+
+            animatorSet?.run {
+                // End the started animation if any, or the view may show messy as its property
+                // would be wrongly changed by multiple animations running at the same time
+                // via contiguous quick clicks on the item
+                if (isStarted) {
+                    end()
+                }
+            }
+
+            // Must create a new AnimatorSet, or it would keep all previous
+            // animation and play them together
+            animatorSet = AnimatorSet()
+            val animatorList = mutableListOf<Animator>()
+
+            animatorSet?.addListener(object : AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    viewModel.nodes.value?.let { newList ->
+                        rvAdapter.submitList(ArrayList(newList))
+                    }
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                }
+
+                override fun onAnimationStart(animation: Animator?) {
+                }
+            })
+
+            it.forEach { pos ->
+                recyclerView?.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                    val itemView = viewHolder.itemView
+
+                    val imageView: ImageView? = when (rvAdapter.getItemViewType(pos)) {
+                        OfflineAdapter.TYPE_LIST -> {
+                            itemView.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    binding.root.context,
+                                    R.color.new_multiselect_color
+                                )
+                            )
+                            val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail)
+                            val param = thumbnail.layoutParams as FrameLayout.LayoutParams
+                            param.width = Util.px2dp(
+                                OfflineListViewHolder.LARGE_IMAGE_WIDTH,
+                                resources.displayMetrics
+                            )
+                            param.height = param.width
+                            param.marginStart = Util.px2dp(
+                                OfflineListViewHolder.LARGE_IMAGE_MARGIN_LEFT,
+                                resources.displayMetrics
+                            )
+                            thumbnail.layoutParams = param
+                            thumbnail
+                        }
+                        OfflineAdapter.TYPE_GRID_FOLDER -> {
+                            itemView.background = ContextCompat.getDrawable(
+                                requireContext(), R.drawable.background_item_grid_selected
+                            )
+                            itemView.findViewById(R.id.icon)
+                        }
+                        OfflineAdapter.TYPE_GRID_FILE -> {
+                            itemView.background = ContextCompat.getDrawable(
+                                requireContext(), R.drawable.background_item_grid_selected
+                            )
+                            itemView.findViewById(R.id.ic_selected)
+                        }
+                        else -> null
+                    }
+
+                    imageView?.run {
+                        setImageResource(R.drawable.ic_select_folder)
+                        visibility = View.VISIBLE
+
+                        val animator =
+                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                        animator.setTarget(this)
+                        animatorList.add(animator)
+                    }
+                }
+            }
+
+            animatorSet?.playTogether(animatorList)
+            animatorSet?.start()
+        }
     }
 
     private fun openNode(position: Int, node: OfflineNode) {
