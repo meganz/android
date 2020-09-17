@@ -1,24 +1,16 @@
-package mega.privacy.android.app.fragments.homepage.audio
+package mega.privacy.android.app.fragments.homepage.video
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.*
 
-class AudioViewModel @ViewModelInject constructor(
+class VideoViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
 ) : ViewModel() {
 
@@ -26,16 +18,23 @@ class AudioViewModel @ViewModelInject constructor(
 
     var order: Int = ORDER_DEFAULT_ASC
         private set
+
     var searchMode = false
     var searchQuery = ""
 
     private var forceUpdate = false
     private var ignoredFirst = false
 
+    // Whether a photo loading is in progress
+    private var loadInProgress = false
+
+    // Whether another photo loading should be executed after current loading
+    private var pendingLoad = false
+
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_AUDIO, order)
+                repository.getFiles(NODE_VIDEO, order)
             }
         } else {
             repository.emitFiles()
@@ -47,10 +46,7 @@ class AudioViewModel @ViewModelInject constructor(
         val filteredNodes = ArrayList(
             if (!TextUtil.isTextEmpty(_query.value)) {
                 nodes.filter {
-                    it.node?.name?.contains(
-                        _query.value!!,
-                        true
-                    ) ?: false
+                    it.node?.name?.contains(_query.value!!, true) ?: false
                 }
             } else {
                 nodes
@@ -75,25 +71,41 @@ class AudioViewModel @ViewModelInject constructor(
         }
 
         if (it) {
-            loadAudio(true)
+            loadVideo(true)
         } else {
             refreshUi()
         }
     }
 
+    private val loadFinishedObserver = Observer<List<NodeItem>> {
+        loadInProgress = false
+
+        if (pendingLoad) {
+            loadVideo(true)
+        }
+    }
+
     init {
+        items.observeForever(loadFinishedObserver)
         nodesChange.observeForever(nodesChangeObserver)
     }
 
     /**
-     * Load audio by calling Mega Api or just filter loaded nodes
-     * @param forceUpdate True if retrieve all nodes by calling API
-     * , false if filter current nodes by searchQuery
+     * Load video by calling Mega Api or just filter loaded nodes
+     * @param forceUpdate True if retrieve all nodes by calling API,
+     *                    false if filter current nodes by searchQuery
      */
-    fun loadAudio(forceUpdate: Boolean = false, order: Int = this.order) {
+    fun loadVideo(forceUpdate: Boolean = false, order: Int = this.order) {
         this.forceUpdate = forceUpdate
         this.order = order
-        _query.value = searchQuery
+
+        if (loadInProgress) {
+            pendingLoad = true
+        } else {
+            pendingLoad = false
+            loadInProgress = true
+            _query.value = searchQuery
+        }
     }
 
     /**
@@ -104,16 +116,22 @@ class AudioViewModel @ViewModelInject constructor(
         items.value?.forEach { item ->
             item.uiDirty = true
         }
-        loadAudio()
+        loadVideo()
     }
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
-    fun getNodePositionByHandle(handle: Long) =
-        items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
+    fun getNodePositionByHandle(handle: Long): Int {
+        return items.value?.find {
+            it.node?.handle == handle
+        }?.index ?: Constants.INVALID_POSITION
+    }
 
-    fun getHandlesOfAudio() =
-        items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }?.toLongArray()
+    fun getHandlesOfVideo(): LongArray? {
+        val list = items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }
+
+        return list?.toLongArray()
+    }
 
     fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
@@ -121,3 +139,4 @@ class AudioViewModel @ViewModelInject constructor(
         nodesChange.removeObserver(nodesChangeObserver)
     }
 }
+

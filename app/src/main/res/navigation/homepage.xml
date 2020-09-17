@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_homepage_to_recentBucket"
             app:destination="@id/recentBucketFragment"/>
+        <action
+            android:id="@+id/action_homepageFragment_to_videoFragment"
+            app:destination="@id/videoFragment" />
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
@@ -77,4 +80,8 @@
         android:id="@+id/audioFragment"
         android:name="mega.privacy.android.app.fragments.homepage.audio.AudioFragment"
         android:label="AudioFragment" />
+    <fragment
+        android:id="@+id/videoFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.video.VideoFragment"
+        android:label="VideoFragment" />
 </navigation>
