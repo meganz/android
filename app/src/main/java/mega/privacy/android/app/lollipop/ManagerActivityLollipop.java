@@ -2255,7 +2255,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
-		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(2);
+		// Navi button Chat
+		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
 		chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
 		itemView.addView(chatBadge);
 		setChatBadge();
