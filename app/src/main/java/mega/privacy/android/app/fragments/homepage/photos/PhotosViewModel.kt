@@ -19,7 +19,6 @@ class PhotosViewModel @ViewModelInject constructor(
 
     private var forceUpdate = false
     private var ignoredFirstNodesChange = false
-    private var neverLoadedNodes = true
 
     // Whether a photo loading is in progress
     private var loadInProgress = false
@@ -27,8 +26,7 @@ class PhotosViewModel @ViewModelInject constructor(
     private var pendingLoad = false
 
     val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
-        if (forceUpdate || neverLoadedNodes) {
-            forceUpdate = false
+        if (forceUpdate) {
             viewModelScope.launch {
                 repository.getFiles(NODE_PHOTO, ORDER_MODIFICATION_DESC)
             }
@@ -38,7 +36,6 @@ class PhotosViewModel @ViewModelInject constructor(
 
         repository.fileNodeItems
     }.map { it ->
-        neverLoadedNodes = false
         @Suppress("UNCHECKED_CAST")
         val items = it as List<PhotoNodeItem>
         var index = 0

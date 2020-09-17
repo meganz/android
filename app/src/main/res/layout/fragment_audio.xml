@@ -21,11 +21,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-      <include
-          android:id="@+id/empty_hint"
-          layout="@layout/empty_result_files"
-          app:showHint="@{viewModel.items.empty}"
-          />
+        <include
+            android:id="@+id/empty_hint"
+            layout="@layout/empty_result_files"
+            app:showHint="@{viewModel.items.empty}"
+            />
 
         <mega.privacy.android.app.components.NewGridRecyclerView
             android:id="@+id/audio_list"

@@ -24,7 +24,6 @@ class VideoViewModel @ViewModelInject constructor(
 
     private var forceUpdate = false
     private var ignoredFirstNodesChange = false
-    private var neverLoadedNodes = true
 
     // Whether a video loading is in progress
     private var loadInProgress = false
@@ -33,8 +32,7 @@ class VideoViewModel @ViewModelInject constructor(
     private var pendingLoad = false
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
-        if (forceUpdate || neverLoadedNodes) {
-            forceUpdate = false
+        if (forceUpdate) {
             viewModelScope.launch {
                 repository.getFiles(NODE_VIDEO, order)
             }
@@ -44,7 +42,6 @@ class VideoViewModel @ViewModelInject constructor(
 
         repository.fileNodeItems
     }.map { nodes ->
-        neverLoadedNodes = false
         var index = 0
         val filteredNodes = ArrayList(
             if (!TextUtil.isTextEmpty(_query.value)) {
