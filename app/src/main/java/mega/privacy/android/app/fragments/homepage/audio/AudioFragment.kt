@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -66,6 +67,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -106,6 +108,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
+        setupEmptyHint()
         setupListView()
         setupListAdapter()
         setupFastScroller()
@@ -122,6 +125,13 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+    }
+
+    private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.isVisible = false
+        binding.emptyHint.emptyHintText.isVisible = false
+        binding.emptyHint.emptyHintText.text =
+            getString(R.string.homepage_empty_hint_audio).toUpperCase(Locale.ROOT)
     }
 
     override fun onDestroy() {
@@ -171,6 +181,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             viewLifecycleOwner,
             EventObserver { isList ->
                 switchListGridView(isList)
+                viewModel.refreshUi()
             })
     }
 
@@ -190,7 +201,6 @@ class AudioFragment : Fragment(), HomepageSearchable {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
             }
         }
-        viewModel.refreshUi()
     }
 
     private fun openNode(node: MegaNode?, index: Int) {

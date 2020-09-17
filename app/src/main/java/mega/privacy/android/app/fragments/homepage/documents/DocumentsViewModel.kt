@@ -21,19 +21,19 @@ class DocumentsViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
 ) : ViewModel() {
 
-    private var _query = MutableLiveData<String>("")
+    private var _query = MutableLiveData<String>()
 
     private var order: Int = ORDER_DEFAULT_ASC
     var searchMode = false
     var searchQuery = ""
 
     private var forceUpdate = false
-    private var ignoredFirst = false
+    private var ignoredFirstNodesChange = false
 
-    // Whether a photo loading is in progress
+    // Whether a documents loading is in progress
     private var loadInProgress = false
 
-    // Whether another photo loading should be executed after current loading
+    // Whether another documents loading should be executed after current loading
     private var pendingLoad = false
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
@@ -81,8 +81,8 @@ class DocumentsViewModel @ViewModelInject constructor(
     }
 
     private val nodesChangeObserver = Observer<Boolean> {
-        if (!ignoredFirst) {
-            ignoredFirst = true
+        if (!ignoredFirstNodesChange) {
+            ignoredFirstNodesChange = true
             return@Observer
         }
 
