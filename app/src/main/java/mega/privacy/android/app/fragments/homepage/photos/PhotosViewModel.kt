@@ -6,20 +6,20 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.*
 
 class PhotosViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
 ) : ViewModel() {
 
-    private var _query = MutableLiveData<String>("")
+    private var _query = MutableLiveData<String>()
 
     var searchMode = false
     var searchQuery = ""
 
     private var forceUpdate = false
-    private var ignoredFirst = false
+    private var ignoredFirstNodesChange = false
+    private var neverLoadedNodes = true
 
     // Whether a photo loading is in progress
     private var loadInProgress = false
@@ -27,7 +27,8 @@ class PhotosViewModel @ViewModelInject constructor(
     private var pendingLoad = false
 
     val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
-        if (forceUpdate) {
+        if (forceUpdate || neverLoadedNodes) {
+            forceUpdate = false
             viewModelScope.launch {
                 repository.getFiles(NODE_PHOTO, ORDER_MODIFICATION_DESC)
             }
@@ -37,6 +38,7 @@ class PhotosViewModel @ViewModelInject constructor(
 
         repository.fileNodeItems
     }.map { it ->
+        neverLoadedNodes = false
         @Suppress("UNCHECKED_CAST")
         val items = it as List<PhotoNodeItem>
         var index = 0
@@ -67,8 +69,8 @@ class PhotosViewModel @ViewModelInject constructor(
     }
 
     private val nodesChangeObserver = Observer<Boolean> {
-        if (!ignoredFirst) {
-            ignoredFirst = true
+        if (!ignoredFirstNodesChange) {
+            ignoredFirstNodesChange = true
             return@Observer
         }
 

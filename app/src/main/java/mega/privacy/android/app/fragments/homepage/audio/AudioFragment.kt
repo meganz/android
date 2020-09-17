@@ -181,6 +181,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             viewLifecycleOwner,
             EventObserver { isList ->
                 switchListGridView(isList)
+                viewModel.refreshUi()
             })
     }
 
@@ -200,7 +201,6 @@ class AudioFragment : Fragment(), HomepageSearchable {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
             }
         }
-        viewModel.refreshUi()
     }
 
     private fun openNode(node: MegaNode?, index: Int) {

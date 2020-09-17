@@ -186,7 +186,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
             }
         }
-        viewModel.refreshUi()
     }
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
@@ -341,6 +340,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
             viewLifecycleOwner,
             EventObserver { isList ->
                 switchListGridView(isList)
+                viewModel.refreshUi()
             })
     }
 

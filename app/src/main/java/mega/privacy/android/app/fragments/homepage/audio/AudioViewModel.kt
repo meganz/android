@@ -22,7 +22,7 @@ class AudioViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository
 ) : ViewModel() {
 
-    private var _query = MutableLiveData<String>("")
+    private var _query = MutableLiveData<String>()
 
     var order: Int = ORDER_DEFAULT_ASC
         private set
@@ -30,10 +30,18 @@ class AudioViewModel @ViewModelInject constructor(
     var searchQuery = ""
 
     private var forceUpdate = false
-    private var ignoredFirst = false
+    private var ignoredFirstNodesChange = false
+    private var neverLoadedNodes = true
+
+    // Whether a audio loading is in progress
+    private var loadInProgress = false
+
+    // Whether another audio loading should be executed after current loading
+    private var pendingLoad = false
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
-        if (forceUpdate) {
+        if (forceUpdate || neverLoadedNodes) {
+            forceUpdate = false
             viewModelScope.launch {
                 repository.getFiles(MegaApiJava.NODE_AUDIO, order)
             }
@@ -43,6 +51,7 @@ class AudioViewModel @ViewModelInject constructor(
 
         repository.fileNodeItems
     }.map { nodes ->
+        neverLoadedNodes = false
         var index = 0
         val filteredNodes = ArrayList(
             if (!TextUtil.isTextEmpty(_query.value)) {
@@ -68,9 +77,17 @@ class AudioViewModel @ViewModelInject constructor(
         filteredNodes
     }
 
+    private val loadFinishedObserver = Observer<List<NodeItem>> {
+        loadInProgress = false
+
+        if (pendingLoad) {
+            loadAudio(true)
+        }
+    }
+
     private val nodesChangeObserver = Observer<Boolean> {
-        if (!ignoredFirst) {
-            ignoredFirst = true
+        if (!ignoredFirstNodesChange) {
+            ignoredFirstNodesChange = true
             return@Observer
         }
 
@@ -82,6 +99,7 @@ class AudioViewModel @ViewModelInject constructor(
     }
 
     init {
+        items.observeForever(loadFinishedObserver)
         nodesChange.observeForever(nodesChangeObserver)
     }
 
@@ -93,7 +111,14 @@ class AudioViewModel @ViewModelInject constructor(
     fun loadAudio(forceUpdate: Boolean = false, order: Int = this.order) {
         this.forceUpdate = forceUpdate
         this.order = order
-        _query.value = searchQuery
+
+        if (loadInProgress) {
+            pendingLoad = true
+        } else {
+            pendingLoad = false
+            loadInProgress = true
+            _query.value = searchQuery
+        }
     }
 
     /**
@@ -119,5 +144,6 @@ class AudioViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)
+        items.removeObserver(loadFinishedObserver)
     }
 }

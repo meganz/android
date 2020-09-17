@@ -167,6 +167,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             viewLifecycleOwner,
             EventObserver { isList ->
                 switchListGridView(isList)
+                viewModel.refreshUi()
             })
     }
 
@@ -186,7 +187,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
             }
         }
-        viewModel.refreshUi()
     }
 
     /**
