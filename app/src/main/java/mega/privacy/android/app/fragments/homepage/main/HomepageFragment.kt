@@ -78,6 +78,7 @@ class HomepageFragment : Fragment() {
                 categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
                 categoryDocument -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
                 categoryAudio -> HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
+                categoryVideo -> HomepageFragmentDirections.actionHomepageFragmentToVideoFragment();
                 else -> return@with
             }
 
@@ -209,6 +210,7 @@ class HomepageFragment : Fragment() {
         viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryAudio.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryVideo.setOnClickListener(categoryClickListener)
     }
 
     private fun getTabTitle(position: Int): String? {

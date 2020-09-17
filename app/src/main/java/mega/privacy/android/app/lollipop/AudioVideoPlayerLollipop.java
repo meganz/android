@@ -117,6 +117,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
+import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
@@ -890,13 +891,16 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 mediaHandles = new ArrayList<>();
                 ArrayList<String> handles = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
                 getMediaHandles(getSearchedNodes(handles));
-            } else if (adapterType == SEARCH_BY_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER) {
+            } else if (adapterType == SEARCH_BY_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER || adapterType  == VIDEO_SEARCH_ADAPTER) {
                 long[] handles = getIntent().getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH);
                 getMediaHandles(getSearchedNodes(handles));
             } else if (adapterType == AUDIO_BROWSE_ADAPTER) {
                 getMediaHandles(megaApi.searchByType(null, null, null, true, orderGetChildren,
                         MegaApiJava.NODE_AUDIO, MegaApiJava.TARGET_ROOTNODES));
-            } else if (adapterType == FILE_LINK_ADAPTER) {
+            } else if (adapterType == VIDEO_BROWSE_ADAPTER) {
+                getMediaHandles(megaApi.searchByType(null, null, null, true, orderGetChildren,
+                        MegaApiJava.NODE_VIDEO, MegaApiJava.TARGET_ROOTNODES));
+            }else if (adapterType == FILE_LINK_ADAPTER) {
                 if (currentDocument != null) {
                     logDebug("File link node NOT null");
                     size = 1;
@@ -1588,6 +1592,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (callback != null) {
                 callback.setVisibility(visibility);
             }
+        } else if (adapterType == VIDEO_BROWSE_ADAPTER ||adapterType == VIDEO_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(VideoFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
         else if (adapterType == OFFLINE_ADAPTER) {
             DraggingThumbnailCallback callback
@@ -1664,6 +1674,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         } else if (adapterType == AUDIO_BROWSE_ADAPTER || adapterType == AUDIO_SEARCH_ADAPTER) {
             DraggingThumbnailCallback callback
                     = DRAGGING_THUMBNAIL_CALLBACKS.get(AudioFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
+        } else if (adapterType == VIDEO_BROWSE_ADAPTER || adapterType == VIDEO_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(VideoFragment.class);
             if (callback != null) {
                 callback.getLocationOnScreen(location);
             }
