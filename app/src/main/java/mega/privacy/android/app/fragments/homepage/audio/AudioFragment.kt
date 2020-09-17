@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -426,8 +427,19 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private fun setupListAdapter() {
         listAdapter =
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+        listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                listView.linearLayoutManager?.scrollToPosition(0)
+            }
+        })
+
         gridAdapter =
             NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+        gridAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                listView.layoutManager?.scrollToPosition(0)
+            }
+        })
 
         switchListGridView(sortByHeaderViewModel.isList)
     }
