@@ -414,6 +414,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             viewModel.setOrder(it)
+            adapter?.notifyItemChanged(0)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
