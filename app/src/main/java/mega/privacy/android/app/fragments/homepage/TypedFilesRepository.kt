@@ -153,20 +153,11 @@ class TypedFilesRepository @Inject constructor(
                     thumbnail,
                     selected
                 )
-            } else if(type == NODE_VIDEO){
-                nodeItem = NodeItem(
-                    node,
-                    -1,
-                    true,
-                    dateString,
-                    thumbnail,
-                    selected
-                )
             } else {
                 nodeItem = NodeItem(
                     node,
                     -1,
-                    false,
+                    type == NODE_VIDEO,
                     dateString,
                     thumbnail,
                     selected

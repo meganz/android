@@ -61,7 +61,7 @@
             android:layout_marginTop="147dp"
             android:background="@null"
             android:src="@drawable/ic_play_arrow_white_24dp"
-            android:visibility="@{item.video ? View.VISIBLE : View.GONE}"
+            app:visibleGone="@{item.video}"
             tools:ignore="ContentDescription" />
 
         <!-- Video duration -->
@@ -73,7 +73,7 @@
             android:text="@{TimeUtils.getVideoDuration(item.node.duration)}"
             android:textColor="@color/white"
             android:textSize="14sp"
-            android:visibility="@{item.video ? View.VISIBLE : View.GONE}" />
+            app:visibleGone="@{item.video}" />
 
         <ImageView
             android:id="@+id/ic_selected"
