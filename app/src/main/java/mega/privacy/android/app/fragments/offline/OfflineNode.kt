@@ -12,7 +12,6 @@ class OfflineNode(
     companion object {
         val PLACE_HOLDER =
             OfflineNode(MegaOffline(-1, "-1", "", "", -1, "", -1, ""), null, "", false)
-        val HEADER_SORTED_BY =
-            OfflineNode(MegaOffline(-1, "-2", "", "", -1, "", -1, ""), null, "", false)
+        val HEADER = OfflineNode(MegaOffline(-1, "-2", "", "", -1, "", -1, ""), null, "", false)
     }
 }

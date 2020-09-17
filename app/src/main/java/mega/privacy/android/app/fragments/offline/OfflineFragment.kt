@@ -39,6 +39,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -77,6 +78,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
+    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
     private var recyclerView: RecyclerView? = null
     private var adapter: OfflineAdapter? = null
@@ -208,7 +210,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
     private fun setupView() {
         adapter =
-            OfflineAdapter(isList(), viewModel.getOrderDisplay(), object : OfflineAdapterListener {
+            OfflineAdapter(isList(), sortByHeaderViewModel, object : OfflineAdapterListener {
                 override fun onNodeClicked(position: Int, node: OfflineNode) {
                     var firstVisiblePosition = INVALID_POSITION
                     if (isList()) {
@@ -233,10 +235,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 override fun onOptionsClicked(position: Int, node: OfflineNode) {
                     viewModel.onNodeOptionsClicked(position, node)
                 }
-
-                override fun onSortedByClicked() {
-                    viewModel.onSortedByClicked()
-                }
             })
         adapter?.setHasStableIds(true)
 
@@ -244,7 +242,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
         binding.offlineBrowserGrid.layoutManager?.spanSizeLookup = object : SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (position == 0) {
+                return if (adapter?.getItemViewType(position) == OfflineAdapter.TYPE_HEADER) {
                     binding.offlineBrowserGrid.spanCount
                 } else {
                     1
@@ -407,6 +405,20 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 layoutManager.scrollToPositionWithOffset(it, 0)
             }
         }
+
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            callManager { manager ->
+                manager.showNewSortByPanel()
+            }
+        })
+
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            viewModel.setOrder(it)
+        })
+
+        sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            switchListGridView()
+        })
     }
 
     private fun openNode(position: Int, node: OfflineNode) {
@@ -626,12 +638,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         }
     }
 
-    fun setOrder(order: Int) {
-        viewModel.setOrder(order)
-        adapter?.sortedBy = viewModel.getOrderDisplay()
-        adapter?.notifyItemChanged(0)
-    }
-
     fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
     }
@@ -691,7 +697,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         }
     }
 
-    fun refreshListGridView() {
+    private fun switchListGridView() {
         recyclerView = if (isList()) {
             binding.offlineBrowserList.isVisible = true
             binding.offlineBrowserList.adapter = adapter

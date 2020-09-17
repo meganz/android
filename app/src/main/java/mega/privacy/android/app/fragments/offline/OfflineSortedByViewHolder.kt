@@ -1,15 +1,17 @@
 package mega.privacy.android.app.fragments.offline
 
-import mega.privacy.android.app.databinding.OfflineItemSortedByBinding
+import mega.privacy.android.app.databinding.SortByHeaderBinding
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 
 class OfflineSortedByViewHolder(
-    private val binding: OfflineItemSortedByBinding,
-    private val adapter: OfflineAdapter
+    private val binding: SortByHeaderBinding,
+    private val sortByViewModel: SortByHeaderViewModel
 ) : OfflineViewHolder(binding.root) {
     override fun bind(position: Int, node: OfflineNode, listener: OfflineAdapterListener) {
-        super.bind(position, node, listener)
-        binding.sortedBy.text = adapter.sortedBy
-
-        binding.root.setOnClickListener { listener.onSortedByClicked() }
+        binding.apply {
+            this.orderNameStringId =
+                SortByHeaderViewModel.orderNameMap[sortByViewModel.order]!!
+            this.sortByHeaderViewModel = sortByViewModel
+        }
     }
 }

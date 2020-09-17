@@ -14,11 +14,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 import mega.privacy.android.app.databinding.OfflineItemListBinding
-import mega.privacy.android.app.databinding.OfflineItemSortedByBinding
+import mega.privacy.android.app.databinding.SortByHeaderBinding
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 
 class OfflineAdapter(
     var isList: Boolean,
-    var sortedBy: String,
+    private val sortByHeaderViewModel: SortByHeaderViewModel,
     private val listener: OfflineAdapterListener
 ) : ListAdapter<OfflineNode, OfflineViewHolder>(OfflineNodeDiffCallback()) {
 
@@ -111,8 +112,8 @@ class OfflineAdapter(
             TYPE_GRID_FILE -> OfflineGridFileViewHolder(
                 OfflineItemGridFileBinding.inflate(inflater, parent, false)
             )
-            TYPE_SORTED_BY_HEADER -> OfflineSortedByViewHolder(
-                OfflineItemSortedByBinding.inflate(inflater, parent, false), this
+            TYPE_HEADER -> OfflineSortedByViewHolder(
+                SortByHeaderBinding.inflate(inflater, parent, false), sortByHeaderViewModel
             )
             else -> OfflineListViewHolder(OfflineItemListBinding.inflate(inflater, parent, false))
         }
@@ -121,7 +122,7 @@ class OfflineAdapter(
     override fun getItemViewType(position: Int): Int {
         val node = getItem(position)
         return when {
-            node == OfflineNode.HEADER_SORTED_BY -> TYPE_SORTED_BY_HEADER
+            node == OfflineNode.HEADER -> TYPE_HEADER
             isList -> TYPE_LIST
             node == OfflineNode.PLACE_HOLDER || node.node.isFolder -> TYPE_GRID_FOLDER
             else -> TYPE_GRID_FILE
@@ -130,7 +131,7 @@ class OfflineAdapter(
 
     override fun getItemId(position: Int): Long {
         val node = getItem(position)
-        return if (node == OfflineNode.HEADER_SORTED_BY || node == OfflineNode.PLACE_HOLDER) {
+        return if (node == OfflineNode.HEADER || node == OfflineNode.PLACE_HOLDER) {
             // id for real node should be positive integer, let's use negative for placeholders
             -position.toLong()
         } else {
@@ -146,7 +147,7 @@ class OfflineAdapter(
         private const val TYPE_LIST = 1
         private const val TYPE_GRID_FOLDER = 2
         private const val TYPE_GRID_FILE = 3
-        private const val TYPE_SORTED_BY_HEADER = 4
+        const val TYPE_HEADER = 4
     }
 }
 
@@ -156,6 +157,4 @@ interface OfflineAdapterListener {
     fun onNodeLongClicked(position: Int, node: OfflineNode)
 
     fun onOptionsClicked(position: Int, node: OfflineNode)
-
-    fun onSortedByClicked()
 }
