@@ -9,7 +9,8 @@
 	<com.facebook.drawee.view.SimpleDraweeView
 			android:id="@+id/thumbnail"
 			android:layout_width="match_parent"
-			android:layout_height="172dp"
+			android:layout_height="@dimen/grid_node_item_width"
+			android:layout_gravity="center_horizontal"
 			android:paddingLeft="1dp"
 			android:paddingRight="1dp"
 			android:paddingTop="1dp"
@@ -28,14 +29,14 @@
 	<View
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
-			android:layout_marginTop="172dp"
+			android:layout_marginTop="@dimen/grid_node_item_width"
 			android:background="@color/divider_upgrade_account"
 			/>
 	<FrameLayout
 			android:id="@+id/filename_container"
 			android:layout_width="match_parent"
 			android:layout_height="47dp"
-			android:layout_marginTop="172dp"
+			android:layout_marginTop="@dimen/grid_node_item_width"
 			>
 		<TextView
 				android:id="@+id/filename"
