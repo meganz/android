@@ -37,14 +37,7 @@
         android:label="@string/category_photos" />
     <fragment
         android:id="@+id/recentBucketFragment"
-        android:name="mega.privacy.android.app.fragments.recent.RecentsBucketFragment">
-        <argument
-            android:name="serializedNodes"
-            app:argType="string[]" />
-        <argument
-            android:name="bucket"
-            app:argType="mega.privacy.android.app.BucketSaved" />
-    </fragment>
+        android:name="mega.privacy.android.app.fragments.recent.RecentsBucketFragment"/>
     <fragment
         android:id="@+id/fullscreen_offline"
         android:name="mega.privacy.android.app.fragments.offline.OfflineFragment"

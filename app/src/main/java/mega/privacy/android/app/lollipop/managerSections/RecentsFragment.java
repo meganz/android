@@ -12,14 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,6 +39,7 @@ import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
+import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -85,6 +85,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private FastScroller fastScroller;
 
     private int openFrom;
+
+    private SelectedBucketViewModel selectedBucketModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -176,6 +178,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 refreshRecentsActions();
             }
         });
+        selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
+    }
+
+    public SelectedBucketViewModel getSelectedBucketModel() {
+        return selectedBucketModel;
     }
 
     public void fillRecentItems(ArrayList<MegaRecentActionBucket> buckets) {

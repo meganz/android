@@ -6,13 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.fragment.navArgs
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ash.TL
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
@@ -39,9 +41,9 @@ class RecentsBucketFragment : BaseFragment() {
 
     private lateinit var managerActivity: ManagerActivityLollipop
 
-    private val args: RecentsBucketFragmentArgs by navArgs()
-
     private val viewModel by viewModels<RecentsBucketViewModel>()
+
+    private val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
 
     private lateinit var binding: FragmentRecentBucketBinding
 
@@ -52,11 +54,6 @@ class RecentsBucketFragment : BaseFragment() {
     private lateinit var bucket: BucketSaved
 
     private var draggingNodeHandle = MegaApiJava.INVALID_HANDLE
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        bucket = args.bucket
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,7 +70,14 @@ class RecentsBucketFragment : BaseFragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         managerActivity = requireActivity() as ManagerActivityLollipop
 
-        viewModel.serializedNodes.value = args.serializedNodes
+        val selectedBucket = selectedBucketModel.selected.value
+        bucket = BucketSaved(selectedBucket)
+        viewModel.bucket.value = selectedBucket
+
+        viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
+            if(it) Navigation.findNavController(view).popBackStack()
+        }
+
         viewModel.items.observe(viewLifecycleOwner) {
             setupListView(it)
             setupHeaderView()
