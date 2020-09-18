@@ -2,14 +2,14 @@ package mega.privacy.android.app.fragments.recent
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import dagger.hilt.EntryPoint
+import androidx.lifecycle.Observer
+
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
-import javax.inject.Inject
 
 class RecentsBucketViewModel @ViewModelInject constructor(
     private val megaApi: MegaApiAndroid,
@@ -39,11 +39,11 @@ class RecentsBucketViewModel @ViewModelInject constructor(
         return index
     }
 
-    private fun isSameBucket(other: MegaRecentActionBucket): Boolean {
+    private fun isSameBucket(other: MegaRecentActionBucket, ignoreTimestamp: Boolean): Boolean {
         val selected = bucket.value
         return selected?.isMedia == other.isMedia &&
                 selected.isUpdate == other.isUpdate &&
-                selected.timestamp == other.timestamp &&
+                (selected.timestamp == other.timestamp || ignoreTimestamp) &&
                 selected.parentHandle == other.parentHandle &&
                 selected.userEmail == other.userEmail
     }
@@ -54,8 +54,17 @@ class RecentsBucketViewModel @ViewModelInject constructor(
                 return@Observer
             }
 
-            megaApi.recentActions.forEach { b ->
-                if (isSameBucket(b)) {
+            val recentActions = megaApi.recentActions
+            recentActions.forEach { b ->
+                if (isSameBucket(b, false)) {
+                    bucket.value = b
+                    return@Observer
+                }
+            }
+
+            // If enter this loop, that means current open bucket is in today.
+            recentActions.forEach { b ->
+                if (isSameBucket(b, true)) {
                     bucket.value = b
                     return@Observer
                 }
