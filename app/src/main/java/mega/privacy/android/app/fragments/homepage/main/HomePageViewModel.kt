@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.fragments.homepage.avatarChange
 import mega.privacy.android.app.listeners.DefaultMegaChatListener
 import mega.privacy.android.app.listeners.DefaultMegaGlobalListener
 import mega.privacy.android.app.listeners.DefaultMegaRequestListener
@@ -38,6 +39,10 @@ class HomePageViewModel @ViewModelInject constructor(
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
 
+    private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
+        loadAvatar()
+    }
+
     init {
         updateNotification()
         updateChatStatus(megaChatApi.onlineStatus)
@@ -49,6 +54,7 @@ class HomePageViewModel @ViewModelInject constructor(
             getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
         )
         loadAvatar()
+        avatarChange.observeForever(avatarChangeObserver)
     }
 
     override fun onCleared() {
@@ -56,6 +62,7 @@ class HomePageViewModel @ViewModelInject constructor(
 
         megaApi.removeGlobalListener(this)
         megaChatApi.removeChatListener(this)
+        avatarChange.removeObserver(avatarChangeObserver)
     }
 
     private fun loadAvatar() {

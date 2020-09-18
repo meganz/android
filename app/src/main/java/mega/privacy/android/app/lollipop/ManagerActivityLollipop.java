@@ -13461,6 +13461,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if(maFLol!=null){
 						maFLol.updateAvatar(false);
 					}
+					EventNotifierKt.notifyAvatarChange(true);
 				}
 				else{
 					if(request.getFile()!=null) {
@@ -13577,6 +13578,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						maFLol.updateAvatar(false);
 					}
 				}
+				EventNotifierKt.notifyAvatarChange(false);
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				if (e.getErrorCode() == MegaError.API_OK){
