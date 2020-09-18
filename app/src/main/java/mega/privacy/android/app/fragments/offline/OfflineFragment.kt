@@ -146,7 +146,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
 
-        refreshNodes()
+        viewModel.loadOfflineNodes(false)
     }
 
     override fun onPause() {

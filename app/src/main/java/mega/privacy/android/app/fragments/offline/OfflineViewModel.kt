@@ -419,7 +419,7 @@ class OfflineViewModel @ViewModelInject constructor(
         )
     }
 
-    fun loadOfflineNodes() {
+    fun loadOfflineNodes(refreshUi: Boolean = true) {
         if (path == "") {
             return
         }
@@ -436,7 +436,7 @@ class OfflineViewModel @ViewModelInject constructor(
                     nodes.add(
                         OfflineNode(
                             node, if (isFileAvailable(thumbnail)) thumbnail else null,
-                            getNodeInfo(node), selectedNodes.containsKey(node.id), true
+                            getNodeInfo(node), selectedNodes.containsKey(node.id), refreshUi
                         )
                     )
 
