@@ -193,11 +193,13 @@ class HomepageFragment : Fragment() {
             searchInputView.setChatStatus(it != 0, it)
         }
 
-        searchInputView.setAvatarClickListener(
-            OnClickListener { activity.showMyAccount() })
+        searchInputView.setAvatarClickListener(OnClickListener {
+            doIfOnline(false) { activity.showMyAccount() }
+        })
 
-        searchInputView.setOnSearchInputClickListener(
-            OnClickListener { activity.homepageToSearch() })
+        searchInputView.setOnSearchInputClickListener(OnClickListener {
+            doIfOnline(false) { activity.homepageToSearch() }
+        })
     }
 
     private fun setupBottomSheetUI() {
@@ -330,25 +332,32 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun openChatActivity() {
-        val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
-            putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-        }
-
-        activity.startActivityForResult(intent, REQUEST_CREATE_CHAT)
-    }
-
-    private fun showUploadPanel() {
-        if (!isOnline(context)) {
+    private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
+        if (isOnline(context)) {
+            operation()
+        } else if (showSnackBar) {
             activity.showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.error_server_connection_problem),
                 INVALID_HANDLE
             )
-            return
         }
+    }
 
-        activity.showUploadPanel()
+    private fun openChatActivity() {
+        doIfOnline(true) {
+            val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
+                putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+            }
+
+            activity.startActivityForResult(intent, REQUEST_CREATE_CHAT)
+        }
+    }
+
+    private fun showUploadPanel() {
+        doIfOnline(true) {
+            activity.showUploadPanel()
+        }
     }
 
     private fun fabMainClickCallback(
