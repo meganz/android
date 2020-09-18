@@ -2280,11 +2280,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
             }
 
-            if (app.isLoggingRunning()) {
-                loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            }
-
+            loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(loginIntent);
+            app.setIsLoggingRunning(true);
         }
 
         closeChat(true);

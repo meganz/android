@@ -144,7 +144,12 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         intentReceived = intent;
         setIntent(intentReceived);
+
         visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        if (visibleFragment == LOGIN_FRAGMENT) {
+            loginFragment = new LoginFragmentLollipop();
+        }
+
         showFragment(visibleFragment);
     }
 
