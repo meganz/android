@@ -68,6 +68,36 @@ public class FrescoUtils {
     }
 
     /**
+     * Load GIF/WEBP to display the animation.
+     * SimpleDraweeView handles with cache and resource release.
+     *
+     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
+     * @param uri           The uri of GIF/WEBP. May be from url or local path.
+     */
+    public static void loadGif(SimpleDraweeView gifImgDisplay, Uri uri) {
+        // Set placeholder and its scale type here rather than in xml.
+        gifImgDisplay.getHierarchy().setPlaceholderImage(R.drawable.ic_image_thumbnail, ScalingUtils.ScaleType.CENTER_INSIDE);
+
+        ImageRequest imageRequest = ImageRequest.fromUri(uri);
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(imageRequest)
+                .setAutoPlayAnimations(true)
+                .setControllerListener(new BaseControllerListener<ImageInfo>() {
+
+                    @Override
+                    public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+                    }
+
+                    @Override
+                    public void onFailure(String id, Throwable throwable) {
+                        logWarning("Load gif failed, error: " + throwable.getMessage());
+                    }
+                })
+                .build();
+        gifImgDisplay.setController(controller);
+    }
+
+    /**
      * Load a local file into a ordinary ImageView.
      *
      * @param imageView An ordinary ImageView used to display the image.

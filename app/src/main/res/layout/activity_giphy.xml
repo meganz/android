@@ -27,6 +27,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/gif_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:actualImageScaleType="fitCenter" />
+
     </RelativeLayout>
 
 </LinearLayout>
