@@ -124,6 +124,7 @@ class HomepageFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
+        tabsChildren.clear()
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(networkReceiver)
     }
 
@@ -131,6 +132,7 @@ class HomepageFragment : Fragment() {
         viewPager.isUserInputEnabled = true
         rootView.findViewById<View>(R.id.category).isVisible = true
         //rootView.findViewById<View>(R.id.banner).isVisible = true
+        fullyCollapseBottomSheet()
 
         tabsChildren.forEach { tab ->
             tab.isEnabled = true
@@ -142,7 +144,7 @@ class HomepageFragment : Fragment() {
         viewPager.isUserInputEnabled = false
         rootView.findViewById<View>(R.id.category).isVisible = false
         //rootView.findViewById<View>(R.id.banner).isVisible = false
-        bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_COLLAPSED
+        fullyExpandBottomSheet()
 
         if (tabsChildren.isEmpty()) {
             tabs.touchables.forEach { tab ->
@@ -154,6 +156,25 @@ class HomepageFragment : Fragment() {
                 tab.isEnabled = false
             }
         }
+    }
+
+    private fun fullyExpandBottomSheet() {
+        bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_EXPANDED
+        bottomSheetBehavior.isDraggable = false
+        viewDataBinding.backgroundMask.alpha = 1F
+        viewDataBinding.homepageBottomSheet.root.elevation = 0F
+
+        val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
+        bottomSheetRoot.post {
+            val layoutParams = bottomSheetRoot.layoutParams
+            layoutParams.height = rootView.height - searchInputView.bottom
+            bottomSheetRoot.layoutParams = layoutParams
+        }
+    }
+
+    private fun fullyCollapseBottomSheet() {
+        bottomSheetBehavior.setState(HomepageBottomSheetBehavior.STATE_COLLAPSED)
+        bottomSheetBehavior.isDraggable = true
     }
 
     private fun setupSearchView() {
@@ -242,7 +263,7 @@ class HomepageFragment : Fragment() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             HomepageBottomSheetBehavior.BottomSheetCallback() {
 
-            val backgroundMask = rootView.findViewById<View>(R.id.background_mask)
+            val backgroundMask = viewDataBinding.backgroundMask
             val dividend = 1.0f - SLIDE_OFFSET_CHANGE_BACKGROUND
             val bottomSheet = viewDataBinding.homepageBottomSheet
             val maxElevation = bottomSheet.root.elevation
