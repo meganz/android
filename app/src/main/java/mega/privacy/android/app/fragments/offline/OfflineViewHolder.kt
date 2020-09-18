@@ -12,5 +12,6 @@ abstract class OfflineViewHolder(
             listener.onNodeLongClicked(position, node)
             true
         }
+        node.uiDirty = false
     }
 }

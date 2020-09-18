@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -39,6 +40,8 @@ import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.AUDIO_SEARCH_ADAPTER
@@ -162,7 +165,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline {
                 callManager { manager ->
-                    manager.showNodeOptionsPanel(it.node)
+                    manager.showNodeOptionsPanel(
+                        it.node, if (viewModel.searchMode) MODE5 else MODE1
+                    )
                 }
             }
         })
@@ -422,8 +427,19 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private fun setupListAdapter() {
         listAdapter =
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+        listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                listView.linearLayoutManager?.scrollToPosition(0)
+            }
+        })
+
         gridAdapter =
             NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+        gridAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                listView.layoutManager?.scrollToPosition(0)
+            }
+        })
 
         switchListGridView(sortByHeaderViewModel.isList)
     }

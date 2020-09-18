@@ -16,6 +16,9 @@ val orderChange: LiveData<Int> = orderChange_
 private val listGridChange_ = MutableLiveData<Boolean>(true)
 val listGridChange: LiveData<Boolean> = listGridChange_
 
+private val avatarChange_ = MutableLiveData<Boolean>()
+val avatarChange: LiveData<Boolean> = avatarChange_
+
 fun notifyNodesChange(forceUpdate: Boolean) {
     nodesChange_.value = forceUpdate
 }
@@ -26,4 +29,8 @@ fun notifyOrderChange(order: Int) {
 
 fun notifyListGridChange(isList: Boolean) {
     listGridChange_.value = isList
+}
+
+fun notifyAvatarChange(isSet: Boolean) {
+    avatarChange_.value = isSet
 }

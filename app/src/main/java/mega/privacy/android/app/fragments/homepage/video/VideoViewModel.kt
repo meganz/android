@@ -54,7 +54,7 @@ class VideoViewModel @ViewModelInject constructor(
         )
 
         if (!searchMode && filteredNodes.isNotEmpty()) {
-            filteredNodes.add(0, NodeItem.SORT_BY_HEADER)
+            filteredNodes.add(0, NodeItem())
         }
 
         filteredNodes.forEach {

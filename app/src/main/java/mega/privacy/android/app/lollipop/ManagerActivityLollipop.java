@@ -5703,6 +5703,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
 						abL.setVisibility(View.GONE);
 					}
+					setDrawerLockMode(false);
 					return;
 				case R.id.photosFragment:
 					mHomepageScreen = HomepageScreen.PHOTOS;
@@ -5733,6 +5734,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showHideBottomNavigationView(true);
 			supportInvalidateOptionsMenu();
 			setToolbarTitle();
+			setDrawerLockMode(true);
 		});
 	}
 
@@ -6795,8 +6797,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				rubbishBinMenuItem.setVisible(true);
 
 				if (fullscreenOfflineFragment.getItemCount() > 0) {
-					thumbViewMenuItem.setVisible(true);
-					setGridListIcon();
 					searchMenuItem.setVisible(true);
 				}
 			} else {
@@ -7458,12 +7458,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
         //Refresh Rubbish Fragment
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
-
-
-        //Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-        if (fullscreenOfflineFragment != null) {
-        	fullscreenOfflineFragment.refreshListGridView();
-		}
 
         //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
         refreshFragment(FragmentTag.CONTACTS.getTag());
@@ -11038,10 +11032,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				iFLol.getRecyclerView().invalidate();
 			}
 		}
-
-		if (fullscreenOfflineFragment != null) {
-			fullscreenOfflineFragment.setOrder(orderCloud);
-		}
 	}
 
 	public void refreshOthersOrder(int newOrderOthers){
@@ -13472,6 +13462,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if(maFLol!=null){
 						maFLol.updateAvatar(false);
 					}
+					EventNotifierKt.notifyAvatarChange(true);
 				}
 				else{
 					if(request.getFile()!=null) {
@@ -13588,6 +13579,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						maFLol.updateAvatar(false);
 					}
 				}
+				EventNotifierKt.notifyAvatarChange(false);
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				if (e.getErrorCode() == MegaError.API_OK){

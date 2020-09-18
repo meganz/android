@@ -23,6 +23,7 @@ import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
@@ -30,10 +31,6 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
 import java.io.BufferedReader
 import java.io.File
@@ -58,13 +55,12 @@ class OfflineViewModel @ViewModelInject constructor(
     private val openNodeAction = PublishSubject.create<Pair<Int, OfflineNode>>()
     private val openFolderFullscreenAction = PublishSubject.create<String>()
     private val showOptionsPanelAction = PublishSubject.create<MegaOffline>()
-    private val showSortedByAction = PublishSubject.create<Boolean>()
 
     private val _nodes = MutableLiveData<List<OfflineNode>>()
     private val _nodeToOpen = MutableLiveData<Event<Pair<Int, OfflineNode>>>()
     private val _actionBarTitle = MutableLiveData<String>()
     private val _actionMode = MutableLiveData<Boolean>()
-    private val _nodeToAnimate = MutableLiveData<Pair<Int, OfflineNode>>()
+    private val _nodesToAnimate = MutableLiveData<Set<Int>>()
     private val _pathLiveData = MutableLiveData<String>()
     private val _submitSearchQuery = MutableLiveData<Boolean>()
     private val _scrollToPositionWhenNavigateOut = MutableLiveData<Int>()
@@ -84,7 +80,7 @@ class OfflineViewModel @ViewModelInject constructor(
     val nodeToOpen: LiveData<Event<Pair<Int, OfflineNode>>> = _nodeToOpen
     val actionBarTitle: LiveData<String> = _actionBarTitle
     val actionMode: LiveData<Boolean> = _actionMode
-    val nodeToAnimate: LiveData<Pair<Int, OfflineNode>> = _nodeToAnimate
+    val nodesToAnimate: LiveData<Set<Int>> = _nodesToAnimate
     val pathLiveData: LiveData<String> = _pathLiveData
     val submitSearchQuery: LiveData<Boolean> = _submitSearchQuery
     val scrollToPositionWhenNavigateOut: LiveData<Int> = _scrollToPositionWhenNavigateOut
@@ -126,14 +122,6 @@ class OfflineViewModel @ViewModelInject constructor(
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
-        add(
-            showSortedByAction.throttleFirst(1, SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    Consumer { _showSortedBy.value = Event(it) },
-                    logErr("OfflineViewModel showSortedByAction")
-                )
-        )
     }
 
     override fun onCleared() {
@@ -168,16 +156,19 @@ class OfflineViewModel @ViewModelInject constructor(
     fun selectAll() {
         val nodeList = nodes.value ?: return
 
+        val animNodeIndices = mutableSetOf<Int>()
         for ((position, node) in nodeList.withIndex()) {
-            if (node == OfflineNode.HEADER_SORTED_BY || node == OfflineNode.PLACE_HOLDER) {
+            if (node == OfflineNode.HEADER || node == OfflineNode.PLACE_HOLDER) {
                 continue
             }
             if (!node.selected) {
-                _nodeToAnimate.value = Pair(position, node)
+                animNodeIndices.add(position)
             }
             node.selected = true
+            node.uiDirty = true
             selectedNodes.put(node.node.id, node.node)
         }
+        _nodesToAnimate.value = animNodeIndices
         selecting = true
         _nodes.value = nodeList
         _actionMode.value = true
@@ -192,13 +183,16 @@ class OfflineViewModel @ViewModelInject constructor(
         _actionMode.value = false
         selectedNodes.clear()
 
+        val animNodeIndices = mutableSetOf<Int>()
         val nodeList = nodes.value ?: return
         for ((position, node) in nodeList.withIndex()) {
             if (node.selected) {
-                _nodeToAnimate.value = Pair(position, node)
+                animNodeIndices.add(position)
             }
             node.selected = false
+            node.uiDirty = true
         }
+        _nodesToAnimate.value = animNodeIndices
         _nodes.value = nodeList
     }
 
@@ -232,10 +226,6 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
-    fun onSortedByClicked() {
-        showSortedByAction.onNext(true)
-    }
-
     private fun handleSelection(position: Int, node: OfflineNode) {
         val nodes = _nodes.value
         if (nodes == null || position < 0 || position >= nodes.size
@@ -250,10 +240,11 @@ class OfflineViewModel @ViewModelInject constructor(
         } else {
             selectedNodes.remove(node.node.id)
         }
+        nodes[position].uiDirty = true
         selecting = !selectedNodes.isEmpty
         _actionMode.value = selecting
 
-        _nodeToAnimate.value = Pair(position, node)
+        _nodesToAnimate.value = hashSetOf(position)
     }
 
     private fun navigateIn(folder: MegaOffline) {
@@ -287,6 +278,7 @@ class OfflineViewModel @ViewModelInject constructor(
         searchQuery = null
         // has active search, should exit search mode
         if (query != null) {
+            logDebug("navigateOut exit search mode, path $path")
             navigateTo(path, titleFromPath(path))
             return 2
         }
@@ -298,6 +290,7 @@ class OfflineViewModel @ViewModelInject constructor(
             // and if back stack is empty, then should re-enter search mode
             if (navigationDepthInSearch == 0) {
                 searchQuery = historySearchQuery
+                logDebug("navigateOut from searchPath $searchPath")
                 path = searchPath
                 historySearchQuery = null
                 historySearchPath = null
@@ -306,6 +299,7 @@ class OfflineViewModel @ViewModelInject constructor(
             }
         }
 
+        logDebug("navigateOut from $path")
         // if back stack isn't empty, or no search action in back stack, just navigate out
         path = path.substring(0, path.length - 1)
         path = path.substring(0, path.lastIndexOf("/") + 1)
@@ -337,6 +331,8 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun navigateTo(path: String, title: String) {
+        logDebug("navigateTo path $path, title $title")
+
         this.path = path
         _pathLiveData.value = path
         _actionBarTitle.value = title
@@ -348,17 +344,6 @@ class OfflineViewModel @ViewModelInject constructor(
             this.order = order
             loadOfflineNodes()
         }
-    }
-
-    fun getOrderDisplay(): String {
-        val resId = when (order) {
-            ORDER_MODIFICATION_ASC -> R.string.sortby_date
-            ORDER_MODIFICATION_DESC -> R.string.sortby_date
-            ORDER_SIZE_ASC -> R.string.sortby_size
-            ORDER_SIZE_DESC -> R.string.sortby_size
-            else -> R.string.sortby_name
-        }
-        return context.resources.getString(resId)
     }
 
     fun setSearchQuery(query: String?) {
@@ -377,6 +362,8 @@ class OfflineViewModel @ViewModelInject constructor(
         path: String,
         order: Int
     ) {
+        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList, path $path")
+
         this.rootFolderOnly = rootFolderOnly
         this.isList = isList
         gridSpanCount = spanCount
@@ -432,7 +419,7 @@ class OfflineViewModel @ViewModelInject constructor(
         )
     }
 
-    fun loadOfflineNodes() {
+    fun loadOfflineNodes(refreshUi: Boolean = true) {
         if (path == "") {
             return
         }
@@ -449,7 +436,7 @@ class OfflineViewModel @ViewModelInject constructor(
                     nodes.add(
                         OfflineNode(
                             node, if (isFileAvailable(thumbnail)) thumbnail else null,
-                            getNodeInfo(node), selectedNodes.containsKey(node.id)
+                            getNodeInfo(node), selectedNodes.containsKey(node.id), refreshUi
                         )
                     )
 
@@ -476,9 +463,9 @@ class OfflineViewModel @ViewModelInject constructor(
                     }
                 }
 
-                if (nodes.isNotEmpty() && !rootFolderOnly) {
+                if (nodes.isNotEmpty() && !rootFolderOnly && searchQuery == null) {
                     placeholders++
-                    nodes.add(0, OfflineNode.HEADER_SORTED_BY)
+                    nodes.add(0, OfflineNode.HEADER)
                 }
                 placeholderCount = placeholders
 

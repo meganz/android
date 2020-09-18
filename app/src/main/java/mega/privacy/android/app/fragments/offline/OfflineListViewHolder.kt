@@ -11,11 +11,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemListBinding
 import mega.privacy.android.app.utils.Util.px2dp
 
-private const val LARGE_IMAGE_WIDTH = 48F
-private const val LARGE_IMAGE_MARGIN_LEFT = 12F
-private const val SMALL_IMAGE_WIDTH = 36F
-private const val SMALL_IMAGE_MARGIN_LEFT = 18F
-
 class OfflineListViewHolder(
     private val binding: OfflineItemListBinding
 ) : OfflineViewHolder(binding.root) {
@@ -62,5 +57,12 @@ class OfflineListViewHolder(
 
     fun getThumbnailView(): View {
         return binding.thumbnail
+    }
+
+    companion object {
+        const val LARGE_IMAGE_WIDTH = 48F
+        const val LARGE_IMAGE_MARGIN_LEFT = 12F
+        private const val SMALL_IMAGE_WIDTH = 36F
+        private const val SMALL_IMAGE_MARGIN_LEFT = 18F
     }
 }
