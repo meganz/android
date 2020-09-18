@@ -9024,10 +9024,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @param action    String which indicates if the UI to set is the joining or leaving state.
      */
     private void setJoiningOrLeaving(String action) {
-        if (chatRoom != null && !chatRoom.isPreview()) {
-            return;
-        }
-
         joiningOrLeaving = true;
         joiningOrLeavingAction = action;
         joiningLeavingText.setText(action);
