@@ -181,6 +181,7 @@ import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTran
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -205,6 +206,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private static final String SELECTED_ITEMS = "selectedItems";
     private static final String JOINING_OR_LEAVING = "JOINING_OR_LEAVING";
     private static final String JOINING_OR_LEAVING_ACTION = "JOINING_OR_LEAVING_ACTION";
+    private static final String OPENING_AND_JOINING_ACTION = "OPENING_AND_JOINING_ACTION";
 
     private final static int NUMBER_MESSAGES_TO_LOAD = 32;
     private final static int MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN = 256;
@@ -470,6 +472,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private boolean joiningOrLeaving;
     private String joiningOrLeavingAction;
+    private boolean openingAndJoining;
 
     private AudioFocusRequest request;
     private AudioManager mAudioManager;
@@ -1245,9 +1248,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (intentAction.equals(ACTION_OPEN_CHAT_LINK) || intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
                     megaChatApi.openChatPreview(link, this);
-                }
-                else{
 
+                    if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
+                        openingAndJoining = true;
+                        setJoiningOrLeaving(getString(R.string.joining_label));
+                    }
+                } else {
                     long newIdChat = newIntent.getLongExtra("CHAT_ID", -1);
 
                     if(idChat != newIdChat){
@@ -1310,6 +1316,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                         joiningOrLeaving = savedInstanceState.getBoolean(JOINING_OR_LEAVING, false);
                         joiningOrLeavingAction = savedInstanceState.getString(JOINING_OR_LEAVING_ACTION);
+                        openingAndJoining = savedInstanceState.getBoolean(OPENING_AND_JOINING_ACTION, false);
                     }
 
                     String text = null;
@@ -1676,11 +1683,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if(chatRoom.isPreview()){
                     logDebug("Is preview");
                     setPreviewGroupalSubtitle();
-                    if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-                        setBottomLayout(SHOW_NOTHING_LAYOUT);
-                    }else {
-                        setBottomLayout(SHOW_JOIN_LAYOUT);
-                    }
+                   setBottomLayout(openingAndJoining ? SHOW_JOINING_OR_LEFTING_LAYOUT : SHOW_JOIN_LAYOUT);
                 }
                 else {
                     logDebug("Check permissions group chat");
@@ -2258,17 +2261,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(getIntent().getDataString()));
-                loginIntent.putExtra("idChatToJoin", idChat);
             } else {
                 loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
             }
-            if (app.isActivityVisible()) {
-                loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            } else {
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            }
-            app.setIsLoggingRunning(true);
+
+            loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(loginIntent);
+            app.setIsLoggingRunning(true);
         }
 
         closeChat(true);
@@ -3656,8 +3655,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case R.id.join_button:{
                 if (chatC.isInAnonymousMode()) {
                     ifAnonymousModeLogin(true);
-                }
-                else {
+                } else {
                     setJoiningOrLeaving(getString(R.string.joining_label));
                     megaChatApi.autojoinPublicChat(idChat, this);
                 }
@@ -7236,7 +7234,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
             else{
                 logError("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.remove_participant_error), -1);
+                showSnackbar(SNACKBAR_TYPE, getTranslatedErrorString(e), MEGACHAT_INVALID_HANDLE);
             }
 
         }else if(request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM){
@@ -7316,24 +7314,33 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 MegaApplication.setOpenChatId(idChat);
 
-                if (e.getErrorCode() == MegaChatError.ERROR_EXIST && !megaChatApi.getChatRoom(idChat).isActive()) {
-                    if (initChat()) {
-                        //Chat successfully initialized, now can rejoin
-                        setJoiningOrLeaving(getString(R.string.joining_label));
-                        titleToolbar.setText(chatRoom.getTitle());
-                        groupalSubtitleToolbar.setText(null);
-                        setGroupalSubtitleToolbarVisibility(false);
-                        if (adapter == null) {
-                            createAdapter();
-                        } else {
-                            adapter.updateChatRoom(chatRoom);
-                            adapter.notifyDataSetChanged();
-                        }
-                        megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+                if (e.getErrorCode() == MegaChatError.ERROR_OK && openingAndJoining) {
+                    megaChatApi.autojoinPublicChat(idChat, this);
+                    openingAndJoining = false;
+                } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
+                    if (megaChatApi.getChatRoom(idChat).isActive()) {
+                        //I'm already participant
+                        joiningOrLeaving = false;
+                        openingAndJoining = false;
                     } else {
-                        logWarning("Error opening chat before rejoin");
+                        if (initChat()) {
+                            //Chat successfully initialized, now can rejoin
+                            setJoiningOrLeaving(getString(R.string.joining_label));
+                            titleToolbar.setText(chatRoom.getTitle());
+                            groupalSubtitleToolbar.setText(null);
+                            setGroupalSubtitleToolbarVisibility(false);
+                            if (adapter == null) {
+                                createAdapter();
+                            } else {
+                                adapter.updateChatRoom(chatRoom);
+                                adapter.notifyDataSetChanged();
+                            }
+                            megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+                        } else {
+                            logWarning("Error opening chat before rejoin");
+                        }
+                        return;
                     }
-                    return;
                 }
 
                 initAndShowChat(null);
@@ -7343,7 +7350,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
                     text = getString(R.string.invalid_chat_link);
                 } else {
-                    showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
                     text = getString(R.string.error_chat_link);
                 }
 
@@ -7366,8 +7373,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 supportInvalidateOptionsMenu();
             } else {
+                MegaChatRoom chatRoom = megaChatApi.getChatRoom(idChat);
+                if (chatRoom != null && chatRoom.getOwnPrivilege() >= MegaChatRoom.PRIV_RO) {
+                    logWarning("I'm already a participant");
+                    return;
+                }
+
                 logError("ERROR WHEN JOINING CHAT " + e.getErrorCode() + " " + e.getErrorString());
-                showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
             }
         } else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
             logDebug("TYPE_LAST_GREEN requested");
@@ -7818,6 +7831,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         outState.putBoolean("isLocationDialogShown", isLocationDialogShown);
         outState.putBoolean(JOINING_OR_LEAVING, joiningOrLeaving);
         outState.putString(JOINING_OR_LEAVING_ACTION, joiningOrLeavingAction);
+        outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
