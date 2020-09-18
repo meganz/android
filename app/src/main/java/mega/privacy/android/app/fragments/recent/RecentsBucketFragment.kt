@@ -14,7 +14,6 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ash.TL
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
