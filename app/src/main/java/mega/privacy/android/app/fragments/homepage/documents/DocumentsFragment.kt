@@ -448,7 +448,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
         }
 
-        NodeController(context).prepareForDownload(arrayListOf(node.handle), true)
+        NodeController(activity).prepareForDownload(arrayListOf(node.handle), true)
     }
 
     companion object {
