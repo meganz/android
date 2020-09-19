@@ -170,7 +170,7 @@ class OfflineViewModel @ViewModelInject constructor(
         }
         _nodesToAnimate.value = animNodeIndices
         selecting = true
-        _nodes.value = nodeList
+        _nodes.value = ArrayList(nodeList)
         _actionMode.value = true
     }
 
@@ -193,7 +193,7 @@ class OfflineViewModel @ViewModelInject constructor(
             node.uiDirty = true
         }
         _nodesToAnimate.value = animNodeIndices
-        _nodes.value = nodeList
+        _nodes.value = ArrayList(nodeList)
     }
 
     fun onNodeClicked(position: Int, node: OfflineNode, firstVisiblePosition: Int) {
