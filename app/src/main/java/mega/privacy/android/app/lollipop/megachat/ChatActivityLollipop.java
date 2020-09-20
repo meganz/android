@@ -8774,7 +8774,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void createSpeakerAudioManger(){
         if(rtcAudioManager != null) return;
         speakerWasActivated = true;
-        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated);
+        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_STATE_CALL);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
@@ -8797,7 +8797,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             speakerWasActivated = true;
         }
         if(rtcAudioManager != null){
-            rtcAudioManager.updateSpeakerStatus(true);
+            rtcAudioManager.updateSpeakerStatus(true, INVALID_STATE_CALL);
         }
     }
 
