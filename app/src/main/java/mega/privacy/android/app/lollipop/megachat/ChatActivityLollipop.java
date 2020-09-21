@@ -334,7 +334,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private MarqueeTextView individualSubtitleToobar;
     private EmojiTextView groupalSubtitleToolbar;
     private LinearLayout subtitleCall;
-    private Chronometer subtitleChronoCall;
+    private TextView subtitleChronoCall;
     private LinearLayout participantsLayout;
     private TextView participantsText;
     private ImageView iconStateToolbar;
