@@ -283,6 +283,34 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/theme_section"
+            android:layout_width="match_parent"
+            android:layout_height="56dp">
+
+            <TextView
+                android:id="@+id/theme_section_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-light"
+                android:gravity="start|center_vertical"
+                android:text="Switch theme"
+                android:textColor="@color/name_my_account"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+
+            <View
+                android:id="@+id/theme_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="16dp"
+                android:background="@color/divider_upgrade_account" />
+
+        </RelativeLayout>
+
         <Button
             android:id="@+id/upgrade_navigation_view"
             android:layout_width="wrap_content"

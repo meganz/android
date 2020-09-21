@@ -34,6 +34,8 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.app.AppCompatDialog;
 import androidx.navigation.NavOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
@@ -438,6 +440,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
 
+	private int nightMode = AppCompatDelegate.MODE_NIGHT_NO;
+
     public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
@@ -755,6 +759,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	RelativeLayout contactsSection;
 	RelativeLayout notificationsSection;
 	RelativeLayout settingsSection;
+	RelativeLayout themeSection;
 	Button upgradeAccount;
 	TextView contactsSectionText;
 	TextView notificationsSectionText;
@@ -2231,6 +2236,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		findViewById(R.id.offline_section).setOnClickListener(this);
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
+		themeSection = (RelativeLayout) findViewById(R.id.theme_section);
+		themeSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
         upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
         upgradeAccount.setOnClickListener(this);
@@ -11290,6 +11297,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				drawerItem = DrawerItem.SETTINGS;
 				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
+				break;
+			}
+			case R.id.theme_section: {
+				if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+					nightMode = AppCompatDelegate.MODE_NIGHT_YES;
+				} else {
+					nightMode = AppCompatDelegate.MODE_NIGHT_NO;
+				}
+				getDelegate().setLocalNightMode(nightMode);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
