@@ -329,13 +329,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private EmojiTextView titleToolbar;
     private MarqueeTextView individualSubtitleToobar;
     private EmojiTextView groupalSubtitleToolbar;
-    LinearLayout subtitleCall;
-    Chronometer subtitleChronoCall;
-    LinearLayout participantsLayout;
-    TextView participantsText;
     private ImageView iconStateToolbar;
-    private ImageView privateIconToolbar;
     private ImageView muteIconToolbar;
+    private LinearLayout subtitleCall;
+    private TextView subtitleChronoCall;
+    private LinearLayout participantsLayout;
+    private TextView participantsText;
+    private ImageView privateIconToolbar;
 
     boolean editingMessage = false;
     MegaChatMessage messageToEdit = null;
@@ -8378,11 +8378,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call) {
+    private void showCallInProgressLayout(String text, boolean shouldChronoShown, MegaChatCall call) {
         if (callInProgressText != null) {
             callInProgressText.setText(text);
         }
-        activateChrono(chrono, callInProgressChrono, call);
+
+        if (shouldChronoShown) {
+            startChronometers(call);
+        } else {
+            stopChronometers(call);
+        }
 
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setAlpha(1);
@@ -8391,10 +8396,33 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    /**
+     * Method to start the chronometer related to the current call
+     *
+     * @param call The current call in progress.
+     */
+    private void startChronometers(MegaChatCall call) {
+        activateChrono(true, callInProgressChrono, call);
+        callInProgressChrono.setOnChronometerTickListener(chronometer -> {
+            subtitleChronoCall.setVisibility(View.VISIBLE);
+            subtitleChronoCall.setText(chronometer.getText());
+        });
+    }
+
+    /**
+     * Method to stop the chronometer related to the current call
+     *
+     * @param call The current call in progress.
+     */
+    private void stopChronometers(MegaChatCall call) {
+        activateChrono(false, callInProgressChrono, call);
+        callInProgressChrono.setOnChronometerTickListener(null);
+        subtitleChronoCall.setVisibility(View.GONE);
+    }
+
     private void hideCallInProgressLayout(MegaChatCall call) {
         invalidateOptionsMenu();
-        activateChrono(false, callInProgressChrono, call);
-        activateChrono(false, subtitleChronoCall, call);
+        stopChronometers(call);
 
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
             callInProgressLayout.setVisibility(View.GONE);
@@ -8470,7 +8498,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
 
             case MegaChatCall.CALL_STATUS_RECONNECTING:
-                activateChrono(false, subtitleChronoCall, call);
+                subtitleChronoCall.setVisibility(View.GONE);
                 callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
                 showCallInProgressLayout(getString(R.string.reconnecting_message), false, call);
                 callInProgressLayout.setOnClickListener(this);
@@ -8503,7 +8531,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void tapToReturnLayout(MegaChatCall call, String text){
-        activateChrono(false, subtitleChronoCall, call);
         callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
         showCallInProgressLayout(text, false, call);
         callInProgressLayout.setOnClickListener(this);
@@ -8521,7 +8548,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
         usersWithVideo();
-        activateChrono(true, subtitleChronoCall, call);
         invalidateOptionsMenu();
     }
 
@@ -8789,7 +8815,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void createSpeakerAudioManger(){
         if(rtcAudioManager != null) return;
         speakerWasActivated = true;
-        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated);
+        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated, INVALID_STATE_CALL);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
@@ -8812,7 +8838,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             speakerWasActivated = true;
         }
         if(rtcAudioManager != null){
-            rtcAudioManager.updateSpeakerStatus(true);
+            rtcAudioManager.updateSpeakerStatus(true, INVALID_STATE_CALL);
         }
     }
 
