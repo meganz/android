@@ -8,8 +8,8 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.GiphyAdapter
@@ -20,6 +20,7 @@ import mega.privacy.android.app.objects.GiphySingleResponse
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -50,14 +51,14 @@ class GiphyActivity : PinActivityLollipop() {
         gifList?.apply {
             setHasFixedSize(true)
             clipToPadding = false
-            layoutManager = LinearLayoutManager(this@GiphyActivity)
+            layoutManager = StaggeredGridLayoutManager(if (isScreenInPortrait(this@GiphyActivity)) 2 else 3, RecyclerView.VERTICAL)
             itemAnimator = DefaultItemAnimator()
         }
 
         gifImgDisplay = findViewById(R.id.gif_view)
 
         giphyService = GiphyService.buildService()
-        requestRandomData()
+        requestTrendingData()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -71,6 +72,10 @@ class GiphyActivity : PinActivityLollipop() {
         getAndSetSingleData(giphyService?.getGiphyRandom())
     }
 
+    private fun requestTrendingData() {
+        getAndSetData(giphyService?.getGiphyTrending())
+    }
+
     private fun requestSearchData(query: String? = null) {
         getAndSetData(giphyService?.getGiphySearch(query))
     }
@@ -79,10 +84,10 @@ class GiphyActivity : PinActivityLollipop() {
         call?.enqueue(object : Callback<GiphySingleResponse> {
             override fun onResponse(call: Call<GiphySingleResponse>, response: Response<GiphySingleResponse>) {
                 if (response.isSuccessful) {
-                    gifImgDisplay!!.visibility = View.VISIBLE
-                    gifList!!.visibility = View.GONE
+                    gifImgDisplay?.visibility = View.VISIBLE
+                    gifList?.visibility = View.GONE
 
-                    val url = response.body()!!.data!!.images!!.fixed_height?.webp
+                    val url = response.body()?.data?.images?.fixed_height?.webp
                     loadGif(gifImgDisplay, Uri.parse(url))
                 }
             }
@@ -97,11 +102,11 @@ class GiphyActivity : PinActivityLollipop() {
         call?.enqueue(object : Callback<GiphyResponse> {
             override fun onResponse(call: Call<GiphyResponse>, response: Response<GiphyResponse>) {
                 if (response.isSuccessful) {
-                    gifImgDisplay!!.visibility = View.GONE
-                    gifList!!.visibility = View.VISIBLE
+                    gifImgDisplay?.visibility = View.GONE
+                    gifList?.visibility = View.VISIBLE
 
-                    giphyAdapter = GiphyAdapter(response.body()!!.data)
-                    gifList!!.adapter = giphyAdapter
+                    giphyAdapter = GiphyAdapter(response.body()?.data)
+                    gifList?.adapter = giphyAdapter
                 }
             }
 

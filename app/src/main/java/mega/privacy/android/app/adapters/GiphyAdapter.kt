@@ -10,13 +10,23 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
 
-class GiphyAdapter(val gifs: ArrayList<Data>): RecyclerView.Adapter<GiphyAdapter.GifViewHolder>() {
+class GiphyAdapter(private val gifs: ArrayList<Data>?): RecyclerView.Adapter<GiphyAdapter.GifViewHolder>() {
 
     class GifViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         private val gifView: SimpleDraweeView = view.findViewById(R.id.gif_view)
 
-        fun bind(gif: Data) {
-            loadGif(gifView, Uri.parse(gif.images!!.fixed_height?.webp))
+        fun bind(gif: Data?) {
+            val imageAttributes = gif?.images?.fixed_height
+            val gifWidth = imageAttributes?.width ?: 0
+            val gifHeight = imageAttributes?.height ?: 0
+
+            updateLayoutParams(gifWidth, gifHeight)
+            loadGif(gifView, Uri.parse(imageAttributes?.webp))
+        }
+
+        private fun updateLayoutParams(gifWidth: Int, gifHeight: Int) {
+            if (gifWidth > 0 && gifHeight > 0) {
+            }
         }
     }
 
@@ -26,11 +36,10 @@ class GiphyAdapter(val gifs: ArrayList<Data>): RecyclerView.Adapter<GiphyAdapter
     }
 
     override fun getItemCount(): Int {
-        return gifs.size
+        return gifs?.size ?: 0
     }
 
     override fun onBindViewHolder(holder: GifViewHolder, position: Int) {
-        return holder.bind(gifs[position])
+        holder.bind(gifs?.get(position))
     }
-
 }

@@ -66,7 +66,7 @@ class Data {
     var source_post_url: String? = null
 
     @SerializedName("is_sticker")
-    var is_sticker: Int? = null
+    var is_sticker: Int = 0
 
     @SerializedName("import_datetime")
     var import_datetime: String? = null
@@ -160,31 +160,31 @@ class Images {
 
 class ImageAtributes {
     @SerializedName("height")
-    var height: Int? = null
+    var height: Int = 0
 
     @SerializedName("width")
-    var width: Int? = null
+    var width: Int = 0
 
     @SerializedName("size")
-    var size: Double? = null
+    var size: Double = 0.0
 
     @SerializedName("url")
     var url: String? = null
 
     @SerializedName("mp4_size")
-    var mp4_size: Double? = null
+    var mp4_size: Double = 0.0
 
     @SerializedName("mp4")
     var mp4: String? = null
 
     @SerializedName("webp_size")
-    var webp_size: Double? = null
+    var webp_size: Double = 0.0
 
     @SerializedName("webp")
     var webp: String? = null
 
     @SerializedName("frames")
-    var frames: Int? = null
+    var frames: Int = 0
 
     @SerializedName("hash")
     var hash: String? = null
@@ -210,7 +210,7 @@ class User {
     var display_name: String? = null
 
     @SerializedName("is_verified")
-    var is_verified: Boolean? = null
+    var is_verified: Boolean = false
 }
 
 class Analytic {
@@ -231,22 +231,22 @@ class Url {
 
 class Pagination {
     @SerializedName("total_count")
-    var total_count: Double? = null
+    var total_count: Double = 0.0
 
     @SerializedName("count")
-    var count: Double? = null
+    var count: Double = 0.0
 
     @SerializedName("offset")
-    var offset: Int? = null
+    var offset: Int = 0
 }
 
 class Meta {
     @SerializedName("status")
-    var status: Int? = null
+    var status: Int = 0
 
     @SerializedName("msg")
     var msg: String? = null
 
     @SerializedName("response_id")
-    var response_id: Boolean? = null
+    var response_id: Boolean = false
 }

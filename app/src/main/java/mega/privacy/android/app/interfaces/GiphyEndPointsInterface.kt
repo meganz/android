@@ -15,6 +15,12 @@ interface GiphyEndPointsInterface {
                        @Query("lang") lang: String? = null,
                        @Query("random_id") random_id: String? = null): Call<GiphyResponse>
 
+    @GET("v1/gifs/trending")
+    fun getGiphyTrending(@Query("limit") limit: Int? = null,
+                       @Query("offset") offset: Int? = null,
+                       @Query("rating") rating: String? = null,
+                       @Query("random_id") random_id: String? = null): Call<GiphyResponse>
+
     @GET("v1/gifs/random")
     fun getGiphyRandom(@Query("tag") tag: String? = null,
                        @Query("rating") rating: String? = null,
