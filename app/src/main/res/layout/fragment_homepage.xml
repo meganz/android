@@ -41,7 +41,7 @@
             <include
                 android:id="@+id/category"
                 layout="@layout/homepage_category"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
