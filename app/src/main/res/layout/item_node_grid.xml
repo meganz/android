@@ -47,33 +47,38 @@
             android:layout_height="@dimen/grid_node_item_width"
             android:layout_gravity="center_horizontal"
             android:paddingLeft="1dp"
-            android:paddingRight="1dp"
             android:paddingTop="1dp"
+            android:paddingRight="1dp"
             app:actualImageScaleType="fitCenter"
             app:defaultThumbnail="@{MimeTypeThumbnail.typeForName(item.node.name).iconResourceId}"
             app:thumbnail="@{item.thumbnail}"
             />
 
-        <ImageView
-            android:layout_width="wrap_content"
+        <!-- For Video only, vido icon and duration -->
+        <FrameLayout
+            android:id="@+id/video_info"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:layout_marginTop="147dp"
-            android:background="@null"
-            android:src="@drawable/ic_play_arrow_white_24dp"
-            app:visibleGone="@{item.video}"
-            tools:ignore="ContentDescription" />
+            android:background="@drawable/gradient_cam_uploads"
+            app:visibleGone="@{item.video}">
 
-        <!-- Video duration -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="38dp"
-            android:layout_marginTop="149dp"
-            android:text="@{TimeUtils.getVideoDuration(item.node.duration)}"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:visibleGone="@{item.video}" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@drawable/ic_play_arrow_white_24dp"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="33dp"
+                android:layout_marginTop="2dp"
+                android:text="@{TimeUtils.getVideoDuration(item.node.duration)}"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/ic_selected"
@@ -97,8 +102,8 @@
             android:layout_width="match_parent"
             android:layout_height="47dp"
             android:layout_marginTop="@dimen/grid_node_item_width"
-            android:orientation="horizontal"
             android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.showNodeItemOptions(item) : actionModeViewModel.onNodeClick(item)}"
+            android:orientation="horizontal"
             >
 
             <TextView
