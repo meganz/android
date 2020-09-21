@@ -73,6 +73,8 @@ class RecentsBucketFragment : BaseFragment() {
         bucket = BucketSaved(selectedBucket)
         viewModel.bucket.value = selectedBucket
 
+        viewModel.cachedActionList.value = selectedBucketModel.currentActionList.value
+
         viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
             if(it) Navigation.findNavController(view).popBackStack()
         }
