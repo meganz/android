@@ -552,17 +552,24 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	BroadcastReceiver screenOnOffReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
 			String strAction = intent.getAction();
 			KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+
 			if ((strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF) ||
 					strAction.equals(Intent.ACTION_SCREEN_ON)) && myKM.inKeyguardRestrictedInputMode() && chatAudioManager != null)
-				chatAudioManager.muteIncomingCall();
+				chatAudioManager.muteOrUnmuteIncomingCall(true);
 		}
 	};
 
 	BroadcastReceiver volumeReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
 			if (intent.getAction().equals(BROADCAST_ACTION_INCOMING_CALL_VOLUME) &&
 					chatAudioManager != null) {
 				int newVolume = intent.getIntExtra(VOLUME_CALL, INVALID_VOLUME);
@@ -576,8 +583,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
 			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction()) && chatAudioManager != null) {
-				chatAudioManager.muteIncomingCall();
+				chatAudioManager.muteOrUnmuteIncomingCall(true);
 			}
 		}
 	};
@@ -1342,6 +1352,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
+	/**
+	 * Method to start the sound related to an incoming call or outgoing call.
+	 *
+	 * @param callStatus The current status of the call.
+	 */
 	private void startIncomingOutgoingCallSounds(int callStatus){
 		if (callStatus == MegaChatCall.CALL_STATUS_RING_IN ||
 				callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {

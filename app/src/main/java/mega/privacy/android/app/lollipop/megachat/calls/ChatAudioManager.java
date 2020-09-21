@@ -123,7 +123,6 @@ public class ChatAudioManager {
         if (audioManager == null)
             return;
 
-
         Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         if (ringtoneUri == null)
             return;
@@ -132,7 +131,7 @@ public class ChatAudioManager {
         request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
 
         if (getAudioFocus(audioManager, audioFocusListener, request, AUDIOFOCUS_DEFAULT, STREAM_MUSIC_DEFAULT)) {
-            unmuteIncomingCall();
+            muteOrUnmuteIncomingCall(false);
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
             mediaPlayer.setLooping(true);
@@ -151,7 +150,6 @@ public class ChatAudioManager {
             mediaPlayer.start();
             previousVolume = audioManager.getStreamVolume(STREAM_RING);
             isIncomingSound = true;
-
         }
     }
 
@@ -191,9 +189,9 @@ public class ChatAudioManager {
      */
     public void checkVolume(int newVolume) {
         if (newVolume < previousVolume) {
-            muteIncomingCall();
+            muteOrUnmuteIncomingCall(true);
         } else if (newVolume > previousVolume && isPlayingIncomingCall()) {
-            unmuteIncomingCall();
+            muteOrUnmuteIncomingCall(false);
         }
         previousVolume = newVolume;
     }
@@ -208,30 +206,20 @@ public class ChatAudioManager {
     }
 
     /**
-     * Method to mute an incoming call.
+     * Method to mute or unmute an incoming call.
      */
-    public void muteIncomingCall() {
-        if (isPlayingIncomingCall()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (!audioManager.isStreamMute(STREAM_RING)) {
-                    audioManager.adjustStreamVolume(STREAM_RING, AudioManager.ADJUST_MUTE, 0);
-                }
-            } else {
-                audioManager.setStreamMute(STREAM_RING, true);
-            }
-        }
-    }
+    public void muteOrUnmuteIncomingCall(boolean isNeccesaryMute) {
+        if (isNeccesaryMute && isPlayingIncomingCall())
+            return;
 
-    /**
-     * Method to unmute an incoming call.
-     */
-    private void unmuteIncomingCall() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (audioManager.isStreamMute(STREAM_RING)) {
+            if (isNeccesaryMute && !audioManager.isStreamMute(STREAM_RING)) {
+                audioManager.adjustStreamVolume(STREAM_RING, AudioManager.ADJUST_MUTE, 0);
+            } else if (!isNeccesaryMute && audioManager.isStreamMute(STREAM_RING)) {
                 audioManager.adjustStreamVolume(STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
             }
         } else {
-            audioManager.setStreamMute(STREAM_RING, false);
+            audioManager.setStreamMute(STREAM_RING, isNeccesaryMute);
         }
     }
 
@@ -253,7 +241,7 @@ public class ChatAudioManager {
                 mediaPlayer.release();
                 mediaPlayer = null;
                 isIncomingSound = false;
-                unmuteIncomingCall();
+                muteOrUnmuteIncomingCall(false);
             }
         } catch (Exception e) {
             logWarning("Exception stopping player", e);
