@@ -16,7 +16,7 @@ class CategoryButton(context: Context, attrs: AttributeSet?) : ConstraintLayout(
         inflater.inflate(R.layout.category_btn_view, this, true)
 
         (getViewById(R.id.imageView_category) as ImageView).setImageDrawable(
-            typedArray.getDrawable(R.styleable.CategoryButton_photo)
+            typedArray.getDrawable(R.styleable.CategoryButton_icon)
         )
         (getViewById(R.id.textView_category) as TextView).text = typedArray.getText(
             R.styleable.CategoryButton_name

@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/imageView_category"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -20,6 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/text_photo_span"
+        android:textSize="12sp"
+        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="@+id/imageView_category"
         app:layout_constraintStart_toStartOf="@+id/imageView_category"
         app:layout_constraintTop_toBottomOf="@+id/imageView_category"

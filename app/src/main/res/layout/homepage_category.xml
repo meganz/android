@@ -7,7 +7,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/transparent"
-        android:padding="@dimen/category_padding"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="14dp"
         tools:viewBindingIgnore="true">
 
         <mega.privacy.android.app.components.CategoryButton
@@ -20,7 +22,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/category_document"
             app:name="@string/category_photos"
-            app:photo="@drawable/ic_photos" />
+            app:icon="@drawable/ic_photos" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_document"
@@ -31,7 +33,7 @@
             app:layout_constraintStart_toEndOf="@+id/category_photo"
             app:layout_constraintTop_toTopOf="@+id/category_audio"
             app:name="@string/category_documents"
-            app:photo="@drawable/ic_documents" />
+            app:icon="@drawable/ic_documents" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_audio"
@@ -42,7 +44,7 @@
             app:layout_constraintStart_toEndOf="@+id/category_document"
             app:layout_constraintTop_toTopOf="@+id/category_video"
             app:name="@string/category_audio"
-            app:photo="@drawable/ic_audios" />
+            app:icon="@drawable/ic_audios" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_video"
@@ -53,7 +55,7 @@
             app:layout_constraintStart_toEndOf="@+id/category_audio"
             app:layout_constraintTop_toTopOf="parent"
             app:name="@string/category_video"
-            app:photo="@drawable/ic_videos"
+            app:icon="@drawable/ic_videos"
             tools:layout_editor_absoluteY="16dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
