@@ -659,6 +659,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private OfflineFragment fullscreenOfflineFragment;
 	private OfflineFragment pagerOfflineFragment;
+	private RecentsFragment pagerRecentsFragment;
 
 	ProgressDialog statusDialog;
 
@@ -1256,7 +1257,23 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                             default:
                                 break;
                         }
-                    }
+					} else if (adapterType == RECENTS_ADAPTER){
+						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
+						if (pagerRecentsFragment != null && handle != INVALID_HANDLE) {
+							if (actionType == UPDATE_IMAGE_DRAG) {
+								imageDrag = pagerRecentsFragment.getImageDrag(handle);
+								if (RecentsFragment.imageDrag != null) {
+									RecentsFragment.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null) {
+									RecentsFragment.imageDrag = imageDrag;
+									RecentsFragment.imageDrag.setVisibility(View.INVISIBLE);
+								}
+							} else if (actionType == SCROLL_TO_POSITION) {
+								pagerRecentsFragment.updateScrollPosition(handle);
+							}
+						}
+					}
 
 					if (imageDrag != null){
 						int[] positionDrag = new int[2];
@@ -6060,6 +6077,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void pagerOfflineFragmentClosed(OfflineFragment fragment) {
     	if (fragment == pagerOfflineFragment) {
 			pagerOfflineFragment = null;
+		}
+	}
+
+	public void pagerRecentsFragmentOpened(RecentsFragment fragment) {
+    	pagerRecentsFragment = fragment;
+	}
+
+	public void pagerRecentsFragmentClosed(RecentsFragment fragment) {
+    	if (fragment == pagerRecentsFragment) {
+			pagerRecentsFragment = null;
 		}
 	}
 

@@ -89,8 +89,17 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private SelectedBucketViewModel selectedBucketModel;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onStart() {
+        super.onStart();
+
+        ((ManagerActivityLollipop) requireActivity()).pagerRecentsFragmentOpened(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        ((ManagerActivityLollipop) requireActivity()).pagerRecentsFragmentClosed(this);
     }
 
     @Override public void onResume() {
