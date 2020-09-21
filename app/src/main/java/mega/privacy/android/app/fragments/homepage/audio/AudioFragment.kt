@@ -5,7 +5,6 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +35,7 @@ import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.NodeListAdapter
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -62,6 +62,7 @@ import mega.privacy.android.app.utils.FileUtils.setLocalIntentParams
 import mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.callManager
@@ -449,8 +450,12 @@ class AudioFragment : Fragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            Handler().post { callManager { it.hideKeyboardSearch() } }
+            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
         }
+
+        itemDecoration.setDrawAllDividers(true)
+        disableRecyclerViewAnimator(listView)
+
         if (viewModel.searchMode) return
 
         viewModel.searchMode = true
@@ -459,6 +464,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     override fun exitSearch() {
+        itemDecoration.setDrawAllDividers(false)
+        disableRecyclerViewAnimator(listView)
+
         if (!viewModel.searchMode) return
 
         viewModel.searchMode = false

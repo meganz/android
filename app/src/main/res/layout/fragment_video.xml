@@ -50,7 +50,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleGone="@{viewModel.items.size() > (sortByHeaderViewModel.list ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
+            app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR}"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

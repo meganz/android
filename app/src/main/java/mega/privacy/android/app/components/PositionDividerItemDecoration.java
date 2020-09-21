@@ -11,20 +11,21 @@ import android.view.View;
 import mega.privacy.android.app.R;
 
 public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
-    private Drawable mDivider;
+    private Drawable divider;
     private DisplayMetrics outMetrics;
     private Context context;
     private int position = -1;
+    private boolean drawAllDividers = false;
 
     public PositionDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
-        mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
+        divider = ContextCompat.getDrawable(context, R.drawable.line_divider);
 
         this.outMetrics = outMetrics;
         this.context = context;
     }
 
     public PositionDividerItemDecoration (Context context, DisplayMetrics outMetrics, int position) {
-        mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
+        divider = ContextCompat.getDrawable(context, R.drawable.line_divider);
 
         this.outMetrics = outMetrics;
         this.context = context;
@@ -46,16 +47,25 @@ public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
                 RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 
                 int top = child.getBottom() + params.bottomMargin;
-                int bottom = top + mDivider.getIntrinsicHeight();
+                int bottom = top + divider.getIntrinsicHeight();
 
-                mDivider.setBounds(left, top, right, bottom);
-                mDivider.draw(c);
+                divider.setBounds(left, top, right, bottom);
+                divider.draw(c);
             }
         }
     }
 
+    public void setDrawAllDividers(boolean drawAllDividers) {
+        this.drawAllDividers = drawAllDividers;
+    }
+
     private boolean draw(int pos) {
-        if (pos == 0 || (position != -1 && position-1 == pos) || (position != -1 && position == pos)) {
+        if (drawAllDividers) {
+            return true;
+        }
+
+        if (pos == 0 || (position != -1 && position-1 == pos)
+                || (position != -1 && position == pos)) {
             return false;
         }
         return true;

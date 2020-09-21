@@ -421,6 +421,11 @@ class VideoFragment : Fragment(), HomepageSearchable {
         if (actionMode != null) {
             RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
         }
+
+        itemDecoration.setDrawAllDividers(true)
+        disableRecyclerViewAnimator(listView)
+
+
         if (viewModel.searchMode) return
 
         viewModel.searchMode = true
@@ -429,6 +434,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
     }
 
     override fun exitSearch() {
+        itemDecoration.setDrawAllDividers(false)
+        disableRecyclerViewAnimator(listView)
+
         if (!viewModel.searchMode) return
 
         viewModel.searchMode = false
