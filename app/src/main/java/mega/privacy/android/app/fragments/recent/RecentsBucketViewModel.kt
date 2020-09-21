@@ -40,10 +40,11 @@ class RecentsBucketViewModel @ViewModelInject constructor(
     }
 
     private fun isSameBucket(other: MegaRecentActionBucket, ignoreTimestamp: Boolean): Boolean {
-        val selected = bucket.value
-        return selected?.isMedia == other.isMedia &&
+        val selected = bucket.value ?: return false
+        val isToday = if(ignoreTimestamp) {other.timestamp > selected.timestamp} else false
+        return selected.isMedia == other.isMedia &&
                 selected.isUpdate == other.isUpdate &&
-                (selected.timestamp == other.timestamp || ignoreTimestamp) &&
+                (selected.timestamp == other.timestamp || isToday) &&
                 selected.parentHandle == other.parentHandle &&
                 selected.userEmail == other.userEmail
     }
@@ -69,6 +70,7 @@ class RecentsBucketViewModel @ViewModelInject constructor(
                     return@Observer
                 }
             }
+
             shouldCloseFragment.value = true
         }
     }

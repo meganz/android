@@ -1247,15 +1247,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                     } else if(adapterType == RECENTS_BUCKET_ADAPTER) {
                         long handle = intent.getLongExtra("handle", INVALID_HANDLE);
                         RecentsBucketFragment fragment = getFragmentByType(RecentsBucketFragment.class);
-                        switch (actionType) {
-                            case SCROLL_TO_POSITION:
-                                fragment.scrollToPosition(handle);
-                                break;
-                            case UPDATE_IMAGE_DRAG:
-                                fragment.hideDraggingThumbnail(handle);
-                                break;
-                            default:
-                                break;
+                        if(fragment != null) {
+                            switch (actionType) {
+                                case SCROLL_TO_POSITION:
+                                    fragment.scrollToPosition(handle);
+                                    break;
+                                case UPDATE_IMAGE_DRAG:
+                                    fragment.hideDraggingThumbnail(handle);
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
 					} else if (adapterType == RECENTS_ADAPTER){
 						long handle = intent.getLongExtra("handle", INVALID_HANDLE);
