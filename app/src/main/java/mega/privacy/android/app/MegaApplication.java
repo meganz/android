@@ -558,9 +558,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			String strAction = intent.getAction();
 			KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
 
-			if ((strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF) ||
-					strAction.equals(Intent.ACTION_SCREEN_ON)) && myKM.inKeyguardRestrictedInputMode() && chatAudioManager != null)
+			if ((strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF)) && myKM.inKeyguardRestrictedInputMode() && chatAudioManager != null) {
 				chatAudioManager.muteOrUnmuteIncomingCall(true);
+			}
 		}
 	};
 

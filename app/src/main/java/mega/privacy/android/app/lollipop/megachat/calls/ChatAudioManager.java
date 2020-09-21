@@ -209,8 +209,9 @@ public class ChatAudioManager {
      * Method to mute or unmute an incoming call.
      */
     public void muteOrUnmuteIncomingCall(boolean isNeccesaryMute) {
-        if (isNeccesaryMute && isPlayingIncomingCall())
+        if (isNeccesaryMute && !isPlayingIncomingCall()){
             return;
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (isNeccesaryMute && !audioManager.isStreamMute(STREAM_RING)) {
