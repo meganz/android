@@ -92,7 +92,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             case CallNotificationIntentService.IGNORE:
                 logDebug("Ignore incoming call... ");
                 megaChatApi.setIgnoredCall(chatIdIncomingCall);
-                MegaApplication.getInstance().removeChatAudioManager();
+                MegaApplication.getInstance().stopSounds();
                 clearIncomingCallNotification(chatIdIncomingCall);
                 stopSelf();
                 break;
@@ -157,9 +157,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 if (request.getChatHandle() == chatIdIncomingCall) {
                     logDebug("Incoming call hung up. ");
-                    MegaApplication.getInstance().removeChatAudioManager();
                     clearIncomingCallNotification(chatIdIncomingCall);
-
                     stopSelf();
                 } else if (request.getChatHandle() == chatIdCurrentCall) {
                     logDebug("Current call hung up. Answering incoming call ...");

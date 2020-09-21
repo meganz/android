@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.app.ActivityCompat;
@@ -97,13 +98,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private final static String SMALL_FRAGMENT = "cameraFragmentSmall";
     private final static String FULLSCREEN_FRAGMENT = "cameraFragmentFullScreen";
     private final static String PEERSELECTED_FRAGMENT = "cameraFragmentPeerSelected";
-
+    private static final int TIMEOUT = 5000;
     private long chatId;
     private MegaChatRoom chat;
     private MegaChatCall callChat;
     private long chatIdToHang = MEGACHAT_INVALID_HANDLE;
     private boolean answerWithVideo = false;
-
     private float widthScreenPX;
 
     private InfoPeerGroupCall peerSelected;
@@ -174,7 +174,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private int statusBarHeight = 0;
     private int totalVideosAllowed;
     private boolean inTemporaryState = false;
-
     private FragmentIndividualCall cameraFragmentSmall;
     private ViewGroup smallCameraLayout;
     private FrameLayout smallFragmentContainer;
@@ -186,6 +185,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private FragmentPeerSelected cameraFragmentPeerSelected;
     private ViewGroup peerSelectedCameraLayout;
     private FrameLayout peerSelectedFragmentContainer;
+    private CountDownTimer countDownTimer;
     private ChatController chatC;
 
     @Override
@@ -271,7 +271,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        app.createChatAudioManager();
         titleToolbar.setText(getTitleChat(chat));
         updateSubTitle();
 
@@ -397,7 +396,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Check the initial state of the call and update UI.
      */
     private void checkInitialCallStatus() {
-        if (chatId == MEGACHAT_INVALID_HANDLE || megaChatApi == null || getCall() == null) return;
+        if (chatId == MEGACHAT_INVALID_HANDLE || megaChatApi == null || getCall() == null)
+            return;
 
         chat = megaChatApi.getChatRoom(chatId);
         int callStatus = callChat.getStatus();
@@ -1033,7 +1033,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         stopService(new Intent(this, IncomingCallService.class));
         restoreHeightAndWidth();
         app.startProximitySensor();
-
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -1269,6 +1268,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                     displayLinearFAB(false);
                     checkAnswerCall(true);
+
                 } else if (callChat.hasLocalVideo()) {
                     megaChatApi.disableVideo(chatId, this);
                 } else {
@@ -1377,7 +1377,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             answerCallFAB.show();
             linearArrowCall.setVisibility(View.GONE);
             relativeVideo.setVisibility(View.VISIBLE);
-
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
             videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_videocam_white));
             if(!videoFAB.isShown()) videoFAB.show();
@@ -1572,9 +1571,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Check local audio and video values.
      */
     private void updateLocalAV() {
-        updateLocalVideoStatus();
-        updateLocalAudioStatus();
-        updateSubtitleNumberOfVideos();
+        if (getCall() != null && callChat.getStatus() != MegaChatCall.CALL_STATUS_RING_IN) {
+            updateLocalVideoStatus();
+            updateLocalAudioStatus();
+            updateSubtitleNumberOfVideos();
+        }
     }
 
     /**
@@ -1584,7 +1585,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (getCall() == null)
             return;
 
-        logDebug("Call Status " + callStatusToString(callChat.getStatus()));
         boolean isVideoOn = callChat.hasLocalVideo();
         if (!inTemporaryState) {
             app.setVideoStatus(callChat.getChatid(), isVideoOn);
@@ -1678,11 +1678,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for updating speaker status, ON or OFF..
      */
     private void updateLocalSpeakerStatus() {
-        if (getCall() == null || !statusCallInProgress(callChat.getStatus()))
+        if (getCall() == null || (!statusCallInProgress(callChat.getStatus()) && callChat.getStatus() != MegaChatCall.CALL_STATUS_RING_IN))
             return;
 
         boolean isSpeakerOn = MegaApplication.getSpeakerStatus(callChat.getChatid());
-        app.createRTCAudioManager(isSpeakerOn);
+        app.updateSpeakerStatus(isSpeakerOn, callChat.getStatus());
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1691,7 +1691,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
         }
-        app.setAudioManagerValues(callChat.getStatus());
     }
 
     /**
@@ -2102,8 +2101,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method to hide or show the buttons when clicked on the screen.
      */
     public void remoteCameraClick() {
-        if(getCall() == null)
+        stopCountDownTimer();
+
+        if (getCall() == null || (callChat.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS && callChat.getStatus() != MegaChatCall.CALL_STATUS_JOINING && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING))
             return;
+
         if (callChat.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS && callChat.getStatus() != MegaChatCall.CALL_STATUS_JOINING && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING) {
             if (!aB.isShowing()) {
                 showActionBar();
@@ -2679,6 +2681,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         showInitialFABConfiguration();
         updateSubtitleNumberOfVideos();
+
+        updateLocalSpeakerStatus();
+        stopCountDownTimer();
+
+        countDownTimer = new CountDownTimer(TIMEOUT, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                remoteCameraClick();
+            }
+        }.start();
     }
 
     /**
@@ -2700,8 +2714,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         ArrayList<Long> calls = getCallsParticipating();
         if(calls == null || calls.isEmpty()){
             clearHandlers();
-            app.removeChatAudioManager();
-            app.removeRTCAudioManager();
             MegaApplication.setSpeakerStatus(chatId, false);
             finishActivity();
         }else{
@@ -3209,6 +3221,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         } else if (megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
             megaChatApi.enableAudioLevelMonitor(false, chatId);
+        }
+    }
+
+    /**
+     * Stop the countdown timer.
+     */
+    private void stopCountDownTimer() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
         }
     }
 }
