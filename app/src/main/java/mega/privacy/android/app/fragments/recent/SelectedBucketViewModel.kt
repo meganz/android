@@ -10,9 +10,9 @@ class SelectedBucketViewModel: ViewModel() {
 
     val currentActionList = MutableLiveData<List<MegaRecentActionBucket>>()
 
-    fun select(bucket: MegaRecentActionBucket, currenActions: List<MegaRecentActionBucket>) {
+    fun select(bucket: MegaRecentActionBucket, currentActions: List<MegaRecentActionBucket>) {
         selected.value = bucket
-        currentActionList.value = currenActions
+        currentActionList.value = currentActions
     }
 
 }

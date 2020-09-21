@@ -61,9 +61,11 @@ class RecentsBucketViewModel @ViewModelInject constructor(
             val recentActions = megaApi.recentActions
 
             recentActions.forEach { b ->
-                if (isSameBucket(bucket.value!!, b)) {
-                    bucket.value = b
-                    return@Observer
+                bucket.value?.let { current ->
+                    if (isSameBucket(current, b)) {
+                        bucket.value = b
+                        return@Observer
+                    }
                 }
             }
 
