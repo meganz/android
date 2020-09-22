@@ -16312,17 +16312,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return searchQuery != null && !searchQuery.isEmpty();
 	}
 
-    public void openSearchFolderNode(MegaNode node) {
+    public void openSearchFolder(MegaNode node) {
         switch (drawerItem) {
             case HOMEPAGE:
                 // Redirect to Cloud drive.
                 selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
-            case CLOUD_DRIVE: {
+            case CLOUD_DRIVE:
                 setParentHandleBrowser(node.getHandle());
                 refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
                 break;
-            }
-            case SHARED_ITEMS: {
+            case SHARED_ITEMS:
                 if (viewPagerShares == null || sharesPageAdapter == null) break;
 
                 if (getTabItemShares() == INCOMING_TAB) {
@@ -16338,12 +16337,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 refreshSharesPageAdapter();
 
                 break;
-            }
-            case INBOX: {
+            case INBOX:
                 setParentHandleInbox(node.getHandle());
                 refreshFragment(FragmentTag.INBOX.getTag());
                 break;
-            }
         }
     }
 
