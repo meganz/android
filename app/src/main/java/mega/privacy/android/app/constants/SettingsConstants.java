@@ -18,22 +18,38 @@ public class SettingsConstants {
 
     public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 
+    public static final String GENERAL_SETTINGS = "general_preference_screen";
     public static final String CATEGORY_PIN_LOCK = "settings_pin_lock";
-    public static final String CATEGORY_CHAT_ENABLED = "settings_chat";
+    public static final String CATEGORY_FEATURES = "settings_features";
     public static final String CATEGORY_STORAGE = "settings_storage";
-    public static final String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
-    public static final String CATEGORY_ADVANCED_FEATURES = "advanced_features";
-    public static final String CATEGORY_QR_CODE = "settings_qrcode";
     public static final String CATEGORY_SECURITY = "settings_security";
-    public static final String CATEGORY_2FA = "settings_2fa";
-    public static final String CATEGORY_FILE_MANAGEMENT = "settings_file_management";
-
-    public static final String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
-    public static final String KEY_2FA = "settings_2fa_activated";
+    public static final String CATEGORY_HELP = "settings_help";
+    public static final String CATEGORY_ABOUT = "settings_about";
 
     public static final String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
     public static final String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
+    public static final String KEY_FEATURES_CAMERA_UPLOAD = "settings_features_camera_upload";
+    public static final String KEY_FEATURES_CHAT = "settings_features_chat";
+    public static final String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
+    public static final String KEY_STORAGE_FILE_MANAGEMENT = "settings_storage_file_management";
+    public static final String KEY_SECURITY_RECOVERY_KEY = "settings_security_recovey_key";
+    public static final String KEY_SECURITY_CHANGE_PASSWORD = "settings_security_change_password";
+    public static final String KEY_SECURITY_2FA = "settings_security_2fa";
+    public static final String KEY_SECURITY_QRCODE= "settings_security_qrcode";
+    public static final String KEY_SECURITY_ADVANCED= "settings_security_advanced";
+    public static final String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedback";
+    public static final String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
+    public static final String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+    public static final String KEY_ABOUT_GDPR = "settings_about_gdpr";
+    public static final String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
+    public static final String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
+    public static final String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
+    public static final String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
+    public static final String KEY_ABOUT_DELETE_ACCOUNT = "settings_about_delete_account";
 
+    public static final String CATEGORY_CHAT_ENABLED = "settings_chat";
+    public static final String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
+    public static final String CATEGORY_FILE_MANAGEMENT = "settings_file_management";
     public static final String KEY_CHAT_ENABLE = "settings_chat_enable";
 
     public static final String KEY_RICH_LINKS_ENABLE = "settings_rich_links_enable";
@@ -45,11 +61,7 @@ public class SettingsConstants {
     public static final String CATEGORY_PERSISTENCE_CHAT = "settings_persistence_chat";
     public static final String KEY_CHAT_PERSISTENCE = "settings_persistence_chat_checkpreference";
 
-    public static final String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
-
     public static final String KEY_STORAGE_DOWNLOAD_CATEGORY = "download_setting";
-    public static final String KEY_STORAGE_DOWNLOAD = "settings_nested_download_location";
-    public static final String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
     public static final String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
     public static final String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
     public static final String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
@@ -68,7 +80,6 @@ public class SettingsConstants {
     public static final String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
 
     public static final String KEY_CACHE = "settings_advanced_features_cache";
-    public static final String KEY_CANCEL_ACCOUNT = "settings_advanced_features_cancel_account";
     public static final String KEY_OFFLINE = "settings_file_management_offline";
     public static final String KEY_RUBBISH = "settings_file_management_rubbish";
     public static final String KEY_FILE_VERSIONS = "settings_file_management_file_version";
@@ -79,19 +90,10 @@ public class SettingsConstants {
 
     public static final String KEY_ENABLE_LAST_GREEN_CHAT = "settings_last_green_chat_switch";
 
-    public static final String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
-    public static final String KEY_ABOUT_TOS = "settings_about_terms_of_service";
-    public static final String KEY_ABOUT_GDPR = "settings_about_gdpr";
-    public static final String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
-    public static final String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
-    public static final String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
-    public static final String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 
-    public static final String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
+
+//    public static final String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
     public static final String KEY_AUTO_PLAY_SWITCH= "auto_play_switch";
-
-    public static final String KEY_RECOVERY_KEY= "settings_recovery_key";
-    public static final String KEY_CHANGE_PASSWORD= "settings_change_password";
 
     public static final String INVALID_PATH = "";
 

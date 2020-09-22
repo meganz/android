@@ -712,6 +712,7 @@
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Open file when downloaded</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
+    <string name="settings_delete_account" context="Settings preference title for delete account">Delete account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculating</string>
@@ -2032,7 +2033,7 @@
     <string name="context_loop_video" context="menu option to loop video or audio file">Loop</string>
 
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security</string>
-    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Backup recovery key</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">Unable to reach MEGA. Please check your connectivity or try again later.</string>
