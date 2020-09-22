@@ -2,7 +2,6 @@ package mega.privacy.android.app.fragments.offline
 
 import android.content.Context
 import android.content.Intent
-import android.text.TextUtils
 import androidx.collection.SparseArrayCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
@@ -492,7 +491,9 @@ class OfflineViewModel @ViewModelInject constructor(
                 createThumbnails(nodesWithoutThumbnail)
                 nodes
             }
-            .subscribeOn(Schedulers.io())
+            // loadOfflineNodes would be called multiple times when load fragment because of
+            // observing different LiveData, use single thread scheduler to avoid concurrency issue
+            .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 Consumer { _nodes.value = Pair(it, autoScrollPos) },

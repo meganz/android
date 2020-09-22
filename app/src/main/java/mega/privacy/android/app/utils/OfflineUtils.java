@@ -272,7 +272,7 @@ public class OfflineUtils {
             return folderNum + " "
                     + res.getQuantityString(R.plurals.general_num_folders, folderNum)
                     + ", " + fileNum + " "
-                    + res.getQuantityString(R.plurals.general_num_files, folderNum);
+                    + res.getQuantityString(R.plurals.general_num_files, fileNum);
         } else if (folderNum > 0) {
             return folderNum + " " + res.getQuantityString(R.plurals.general_num_folders,
                     folderNum);

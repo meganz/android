@@ -6435,6 +6435,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
 						if (!textSubmitted) {
 							setFullscreenOfflineFragmentSearchQuery(null);
+							textSubmitted = true;
 						}
 						supportInvalidateOptionsMenu();
 					} else if (mHomepageSearchable != null) {
