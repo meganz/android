@@ -5027,11 +5027,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void setToolbarTitleFromFullscreenOfflineFragment(String title,
-			boolean firstNavigationLevel) {
+			boolean firstNavigationLevel, boolean showSearch) {
 		aB.setSubtitle(null);
 		aB.setTitle(title);
 		this.firstNavigationLevel = firstNavigationLevel;
 		updateNavigationToolbarIcon();
+		textSubmitted = true;
+		if (searchMenuItem != null) {
+			searchMenuItem.setVisible(showSearch);
+		}
 	}
 
 	public void updateNavigationToolbarIcon(){
@@ -6429,7 +6433,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 				} else if (drawerItem == DrawerItem.HOMEPAGE) {
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
-						setFullscreenOfflineFragmentSearchQuery(null);
+						if (!textSubmitted) {
+							setFullscreenOfflineFragmentSearchQuery(null);
+						}
 						supportInvalidateOptionsMenu();
 					} else if (mHomepageSearchable != null) {
 						mHomepageSearchable.exitSearch();
@@ -6825,7 +6831,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (isOnline(this)) {
 				rubbishBinMenuItem.setVisible(true);
 
-				if (fullscreenOfflineFragment.getItemCount() > 0) {
+				if (fullscreenOfflineFragment.getItemCount() > 0
+						&& !fullscreenOfflineFragment.searchMode()) {
 					searchMenuItem.setVisible(true);
 				}
 			} else {
