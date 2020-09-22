@@ -1,6 +1,8 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 
 import java.util.Locale;
 
@@ -14,6 +16,23 @@ import static nz.mega.sdk.MegaChatError.*;
 import static nz.mega.sdk.MegaError.*;
 
 public class StringResourcesUtils {
+
+    // English locale resources
+    private static Resources enRes;
+
+    /**
+     * Get the English locale resources
+     * @param context The current context.
+     * @return The English locale resources.
+     */
+    private static Resources getENResource(Context context) {
+        if (enRes == null) {
+            Configuration configuration = new Configuration(context.getResources().getConfiguration());
+            configuration.setLocale(new Locale(Locale.ENGLISH.getLanguage()));
+            enRes = context.createConfigurationContext(configuration).getResources();
+        }
+        return enRes;
+    }
 
     /**
      * Return the string value associated with a particular resource ID in the current app language.
@@ -30,11 +49,7 @@ public class StringResourcesUtils {
             return app.getString(resId);
         } catch (Exception e) {
             logWarning("Error getting a translated string.", e);
-
-            Configuration configuration = new Configuration(app.getResources().getConfiguration());
-            configuration.setLocale(new Locale("en"));
-            String originalString = app.createConfigurationContext(configuration).getResources().getString(resId);
-
+            String originalString = getENResource(app).getString(resId);
             logInfo("Using the original English string: " + originalString);
             return originalString;
         }
@@ -57,11 +72,7 @@ public class StringResourcesUtils {
             return app.getString(resId, formatArgs);
         } catch (Exception e) {
             logWarning("Error getting a translated and formatted string.", e);
-
-            Configuration configuration = new Configuration(app.getResources().getConfiguration());
-            configuration.setLocale(new Locale("en"));
-            String originalString = app.createConfigurationContext(configuration).getResources().getString(resId, formatArgs);
-
+            String originalString = getENResource(app).getString(resId, formatArgs);
             logInfo("Using the original English string: " + originalString);
             return originalString;
         }
@@ -84,11 +95,7 @@ public class StringResourcesUtils {
             return app.getResources().getQuantityString(resId, quantity);
         } catch (Exception e) {
             logWarning("Error getting a translated string with quantity modifier.", e);
-
-            Configuration configuration = new Configuration(app.getResources().getConfiguration());
-            configuration.setLocale(new Locale("en"));
-            String originalString = app.createConfigurationContext(configuration).getResources().getQuantityString(resId, quantity);
-
+            String originalString = getENResource(app).getQuantityString(resId, quantity);
             logInfo("Using the original English string: " + originalString);
             return originalString;
         }
@@ -113,11 +120,7 @@ public class StringResourcesUtils {
             return app.getResources().getQuantityString(resId, quantity, formatArgs);
         } catch (Exception e) {
             logWarning("Error getting a translated and formatted string with quantity modifier.", e);
-
-            Configuration configuration = new Configuration(app.getResources().getConfiguration());
-            configuration.setLocale(new Locale("en"));
-            String originalString = app.createConfigurationContext(configuration).getResources().getQuantityString(resId, quantity, formatArgs);
-
+            String originalString = getENResource(app).getQuantityString(resId, quantity, formatArgs);
             logInfo("Using the original English string: " + originalString);
             return originalString;
         }
