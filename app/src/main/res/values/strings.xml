@@ -2866,6 +2866,6 @@
 
     <string name="homepage_empty_hint_photos">No photos to show</string>
     <string name="homepage_empty_hint_documents">No documents to show</string>
-    <string name="homepage_empty_hint_audio">No audio to show</string>
-    <string name="homepage_empty_hint_video">No video to show</string>
+    <string name="homepage_empty_hint_audio">No audios to show</string>
+    <string name="homepage_empty_hint_video">No videos to show</string>
 </resources>
