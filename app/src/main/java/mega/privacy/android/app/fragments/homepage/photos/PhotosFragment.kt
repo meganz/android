@@ -169,6 +169,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         elevateToolbarWhenScrolling()
         itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
     }
 
     private fun setupActionMode() {

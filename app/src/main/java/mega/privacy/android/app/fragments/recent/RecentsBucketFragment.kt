@@ -110,6 +110,9 @@ class RecentsBucketFragment : BaseFragment() {
                 checkScroll()
             }
         })
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
     }
 
     private fun setupFastScroller(nodes: List<MegaNode>) {

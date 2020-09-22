@@ -29,6 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:columnWidth="@dimen/photo_item_width"
+            android:paddingBottom="@dimen/grid_node_list_padding_bottom"
             app:visibleGone="@{!viewModel.items.empty}"
             app:items="@{viewModel.items}"
             app:layout_constraintBottom_toBottomOf="parent"
