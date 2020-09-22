@@ -10,12 +10,10 @@
 		android:title="@string/settings_pin_lock"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
-		<!--        android:textColor="@color/pressed_mega">  -->
-
 		<androidx.preference.SwitchPreferenceCompat
+			android:defaultValue="false"
 			android:key="settings_pin_lock_enable"
 			android:title="@string/settings_pin_lock_switch"
-			android:defaultValue="false"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
@@ -29,202 +27,24 @@
 	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory
-		android:key="settings_camera_upload"
-		android:title="@string/section_photo_sync"
+		android:key="settings_features"
+		android:title="@string/settings_features"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
 
 		<androidx.preference.Preference
-			android:key="settings_camera_upload_on"
-			android:title="@string/settings_camera_upload_on"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.ListPreference
-			android:key="settings_camera_upload_how_to_upload"
-			android:title="@string/settings_camera_upload_how_to_upload"
-			android:entries="@array/settings_camera_upload_how_to_entries"
-			android:entryValues="@array/settings_camera_upload_how_to_values"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.ListPreference
-			android:key="settings_camera_upload_what_to_upload"
-			android:title="@string/settings_camera_upload_what_to_upload"
-			android:entries="@array/settings_camera_upload_file_upload_entries"
-			android:entryValues="@array/settings_camera_upload_file_upload_values"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-        <androidx.preference.SwitchPreferenceCompat
-            android:key="settings_camera_upload_include_gps"
-            android:title="@string/settings_camera_upload_include_gps"
-            android:defaultValue="false"
-            app:allowDividerAbove="true"
-            app:allowDividerBelow="true"
-            app:iconSpaceReserved="false" />
-		<androidx.preference.ListPreference
-			android:key="settings_video_upload_quality"
-			android:title="@string/settings_video_upload_quality"
-			android:entries="@array/settings_chat_upload_quality_entries"
-			android:entryValues="@array/settings_video_upload_quality_values"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_camera_upload_charging"
-			android:title="@string/settings_camera_upload_require_plug_in"
-			android:defaultValue="true"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="video_compression_queue_size"
-			android:title="@string/settings_video_compression_queue_size_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<mega.privacy.android.app.components.TwoLineCheckPreference
-			android:key="settings_keep_file_names"
-			android:title="@string/settings_keep_file_names"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_local_camera_upload_folder"
-			android:title="@string/settings_local_camera_upload_folder"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_local_camera_upload_folder_sdcard"
-			android:title="@string/settings_local_camera_upload_folder"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_mega_camera_folder"
-			android:title="@string/settings_mega_camera_upload_folder"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_secondary_media_folder_on"
-			android:title="@string/settings_secondary_upload_on"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_local_secondary_media_folder"
-			android:title="@string/settings_local_secondary_folder"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_mega_secondary_media_folder"
-			android:title="@string/settings_mega_secondary_folder"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-	</androidx.preference.PreferenceCategory>
-
-	<androidx.preference.PreferenceCategory
-		android:key="settings_chat"
-		android:title="@string/section_chat"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false">
-		<!--        android:textColor="@color/pressed_mega">  -->
-
-		<androidx.preference.Preference
-			android:key="settings_nested_notifications_chat"
+			android:key="settings_features_camera_updloads"
 			android:title="@string/title_properties_contact_notifications_for_chat"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-        <androidx.preference.ListPreference
-			android:key="settings_chat_list_status"
-			android:title="@string/set_status_option_label"
-			android:entries="@array/settings_status_entries"
-			android:entryValues="@array/settings_chat_status_values"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_last_green_chat_switch"
-			android:title="@string/option_enable_last_green_chat"
-			android:summary="@string/subtitle_option_enable_last_green_chat"
-			android:defaultValue="false"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.ListPreference
-			android:key="settings_chat_send_originals"
-			android:title="@string/settings_chat_upload_quality"
-			android:entries="@array/settings_chat_upload_quality_entries"
-			android:entryValues="@array/settings_chat_upload_quality_values"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_rich_links_enable"
-			android:title="@string/option_enable_chat_rich_preview"
-			android:defaultValue="false"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-	</androidx.preference.PreferenceCategory>
-
-	<androidx.preference.PreferenceCategory
-		android:key="settings_autoaway_chat"
-		android:title="@string/settings_autoaway_title"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false">
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_autoaway_chat_switch"
-			android:title="@string/settings_autoaway_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
 		<androidx.preference.Preference
-			android:key="settings_autoaway_chat_preference"
-			android:title="@string/settings_autoaway_subtitle"
+			android:key="settings_features_chat"
+			android:title="@string/title_properties_contact_notifications_for_chat"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-
-	</androidx.preference.PreferenceCategory>
-
-	<androidx.preference.PreferenceCategory
-		android:key="settings_persistence_chat"
-		android:title="@string/settings_persistence_title"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false">
-
-		<mega.privacy.android.app.components.TwoLineCheckPreference
-			android:key="settings_persistence_chat_checkpreference"
-			android:title="@string/settings_persistence_subtitle"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
 	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory
@@ -240,73 +60,12 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-	</androidx.preference.PreferenceCategory>
-
-	<androidx.preference.PreferenceCategory
-		android:key="settings_file_management"
-		android:title="@string/settings_file_management_category"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false">
-
 		<androidx.preference.Preference
-			android:key="settings_file_management_offline"
-			android:title="@string/settings_advanced_features_offline"
+			android:key="settings_nested_file_management"
+			android:title="@string/settings_file_management_category"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_file_management_rubbish"
-			android:title="@string/context_clear_rubbish"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_rb_scheduler_switch"
-			android:title="@string/settings_rb_scheduler_enable_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_days_rb_scheduler"
-			android:title="@string/settings_rb_scheduler_select_days_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_file_versioning_switch"
-			android:title="@string/settings_enable_file_versioning_title"
-			android:summary="@string/settings_enable_file_versioning_subtitle"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_file_management_file_version"
-			android:title="@string/settings_file_management_file_versions_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_file_management_clear_version"
-			android:layout="@layout/delete_versions_preferences"
-			android:title="@string/settings_file_management_delete_versions"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="auto_play_switch"
-			android:title="@string/settings_auto_play_label"
-			android:defaultValue="false"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
 	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory
@@ -331,6 +90,311 @@
 			app:iconSpaceReserved="false" />
 
 	</androidx.preference.PreferenceCategory>
+
+
+	<!--	<androidx.preference.PreferenceCategory-->
+<!--		android:key="settings_camera_upload"-->
+<!--		android:title="@string/section_photo_sync"-->
+<!--		app:allowDividerAbove="false"-->
+<!--		app:allowDividerBelow="false">-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_camera_upload_on"-->
+<!--			android:title="@string/settings_camera_upload_on"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.ListPreference-->
+<!--			android:key="settings_camera_upload_how_to_upload"-->
+<!--			android:title="@string/settings_camera_upload_how_to_upload"-->
+<!--			android:entries="@array/settings_camera_upload_how_to_entries"-->
+<!--			android:entryValues="@array/settings_camera_upload_how_to_values"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.ListPreference-->
+<!--			android:key="settings_camera_upload_what_to_upload"-->
+<!--			android:title="@string/settings_camera_upload_what_to_upload"-->
+<!--			android:entries="@array/settings_camera_upload_file_upload_entries"-->
+<!--			android:entryValues="@array/settings_camera_upload_file_upload_values"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+<!--        <androidx.preference.SwitchPreferenceCompat-->
+<!--            android:key="settings_camera_upload_include_gps"-->
+<!--            android:title="@string/settings_camera_upload_include_gps"-->
+<!--            android:defaultValue="false"-->
+<!--            app:allowDividerAbove="true"-->
+<!--            app:allowDividerBelow="true"-->
+<!--            app:iconSpaceReserved="false" />-->
+<!--		<androidx.preference.ListPreference-->
+<!--			android:key="settings_video_upload_quality"-->
+<!--			android:title="@string/settings_video_upload_quality"-->
+<!--			android:entries="@array/settings_chat_upload_quality_entries"-->
+<!--			android:entryValues="@array/settings_video_upload_quality_values"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.SwitchPreferenceCompat-->
+<!--			android:key="settings_camera_upload_charging"-->
+<!--			android:title="@string/settings_camera_upload_require_plug_in"-->
+<!--			android:defaultValue="true"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="video_compression_queue_size"-->
+<!--			android:title="@string/settings_video_compression_queue_size_title"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<mega.privacy.android.app.components.TwoLineCheckPreference-->
+<!--			android:key="settings_keep_file_names"-->
+<!--			android:title="@string/settings_keep_file_names"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_local_camera_upload_folder"-->
+<!--			android:title="@string/settings_local_camera_upload_folder"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_local_camera_upload_folder_sdcard"-->
+<!--			android:title="@string/settings_local_camera_upload_folder"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_mega_camera_folder"-->
+<!--			android:title="@string/settings_mega_camera_upload_folder"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_secondary_media_folder_on"-->
+<!--			android:title="@string/settings_secondary_upload_on"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_local_secondary_media_folder"-->
+<!--			android:title="@string/settings_local_secondary_folder"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_mega_secondary_media_folder"-->
+<!--			android:title="@string/settings_mega_secondary_folder"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+<!--	</androidx.preference.PreferenceCategory>-->
+
+<!--	<androidx.preference.PreferenceCategory-->
+<!--		android:key="settings_chat"-->
+<!--		android:title="@string/section_chat"-->
+<!--		app:allowDividerAbove="false"-->
+<!--		app:allowDividerBelow="false">-->
+<!--		&lt;!&ndash;        android:textColor="@color/pressed_mega">  &ndash;&gt;-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_nested_notifications_chat"-->
+<!--			android:title="@string/title_properties_contact_notifications_for_chat"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--        <androidx.preference.ListPreference-->
+<!--			android:key="settings_chat_list_status"-->
+<!--			android:title="@string/set_status_option_label"-->
+<!--			android:entries="@array/settings_status_entries"-->
+<!--			android:entryValues="@array/settings_chat_status_values"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.SwitchPreferenceCompat-->
+<!--			android:key="settings_last_green_chat_switch"-->
+<!--			android:title="@string/option_enable_last_green_chat"-->
+<!--			android:summary="@string/subtitle_option_enable_last_green_chat"-->
+<!--			android:defaultValue="false"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.ListPreference-->
+<!--			android:key="settings_chat_send_originals"-->
+<!--			android:title="@string/settings_chat_upload_quality"-->
+<!--			android:entries="@array/settings_chat_upload_quality_entries"-->
+<!--			android:entryValues="@array/settings_chat_upload_quality_values"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.SwitchPreferenceCompat-->
+<!--			android:key="settings_rich_links_enable"-->
+<!--			android:title="@string/option_enable_chat_rich_preview"-->
+<!--			android:defaultValue="false"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--	</androidx.preference.PreferenceCategory>-->
+
+<!--	<androidx.preference.PreferenceCategory-->
+<!--		android:key="settings_autoaway_chat"-->
+<!--		android:title="@string/settings_autoaway_title"-->
+<!--		app:allowDividerAbove="false"-->
+<!--		app:allowDividerBelow="false">-->
+
+<!--		<androidx.preference.SwitchPreferenceCompat-->
+<!--			android:key="settings_autoaway_chat_switch"-->
+<!--			android:title="@string/settings_autoaway_title"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_autoaway_chat_preference"-->
+<!--			android:title="@string/settings_autoaway_subtitle"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--	</androidx.preference.PreferenceCategory>-->
+
+<!--	<androidx.preference.PreferenceCategory-->
+<!--		android:key="settings_persistence_chat"-->
+<!--		android:title="@string/settings_persistence_title"-->
+<!--		app:allowDividerAbove="false"-->
+<!--		app:allowDividerBelow="false">-->
+
+<!--		<mega.privacy.android.app.components.TwoLineCheckPreference-->
+<!--			android:key="settings_persistence_chat_checkpreference"-->
+<!--			android:title="@string/settings_persistence_subtitle"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--	</androidx.preference.PreferenceCategory>-->
+
+<!--	<androidx.preference.PreferenceCategory-->
+<!--		android:key="settings_storage"-->
+<!--		android:title="@string/settings_storage"-->
+<!--		app:allowDividerAbove="false"-->
+<!--		app:allowDividerBelow="false">-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_nested_download_location"-->
+<!--			android:title="@string/download_location"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--	</androidx.preference.PreferenceCategory>-->
+
+<!--	<androidx.preference.PreferenceCategory-->
+<!--		android:key="settings_file_management"-->
+<!--		android:title="@string/settings_file_management_category"-->
+<!--		app:allowDividerAbove="false"-->
+<!--		app:allowDividerBelow="false">-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_file_management_offline"-->
+<!--			android:title="@string/settings_advanced_features_offline"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_file_management_rubbish"-->
+<!--			android:title="@string/context_clear_rubbish"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.SwitchPreferenceCompat-->
+<!--			android:key="settings_rb_scheduler_switch"-->
+<!--			android:title="@string/settings_rb_scheduler_enable_title"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_days_rb_scheduler"-->
+<!--			android:title="@string/settings_rb_scheduler_select_days_title"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.SwitchPreferenceCompat-->
+<!--			android:key="settings_file_versioning_switch"-->
+<!--			android:title="@string/settings_enable_file_versioning_title"-->
+<!--			android:summary="@string/settings_enable_file_versioning_subtitle"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_file_management_file_version"-->
+<!--			android:title="@string/settings_file_management_file_versions_title"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_file_management_clear_version"-->
+<!--			android:layout="@layout/delete_versions_preferences"-->
+<!--			android:title="@string/settings_file_management_delete_versions"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.SwitchPreferenceCompat-->
+<!--			android:key="auto_play_switch"-->
+<!--			android:title="@string/settings_auto_play_label"-->
+<!--			android:defaultValue="false"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--	</androidx.preference.PreferenceCategory>-->
+
+<!--	<androidx.preference.PreferenceCategory-->
+<!--		android:key="settings_security"-->
+<!--		android:title="@string/settings_security_options_title"-->
+<!--		app:allowDividerAbove="false"-->
+<!--		app:allowDividerBelow="false">-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_recovery_key"-->
+<!--			android:title="@string/settings_recovery_key_title"-->
+<!--			android:summary="@string/settings_recovery_key_summary"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--		<androidx.preference.Preference-->
+<!--			android:key="settings_change_password"-->
+<!--			android:title="@string/my_account_change_password"-->
+<!--			app:allowDividerAbove="true"-->
+<!--			app:allowDividerBelow="true"-->
+<!--			app:iconSpaceReserved="false" />-->
+
+<!--	</androidx.preference.PreferenceCategory>-->
 
 	<androidx.preference.PreferenceCategory
 		android:key="settings_2fa"

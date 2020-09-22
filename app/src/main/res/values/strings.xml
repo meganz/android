@@ -699,6 +699,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads complete</string>
+    <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
     <string name="settings_pin_lock" context="settings of the pin lock">PIN Lock</string>
@@ -2030,7 +2031,7 @@
 
     <string name="context_loop_video" context="menu option to loop video or audio file">Loop</string>
 
-    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security options</string>
+    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security</string>
     <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
 
