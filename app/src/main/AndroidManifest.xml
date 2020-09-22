@@ -478,6 +478,7 @@
             android:name="mega.privacy.android.app.activities.GiphyActivity"
             android:label="@string/search_giphy_title"
             android:theme="@style/Theme.Giphy"
+            android:configChanges="orientation|screenSize"
             android:launchMode="singleTop">
         </activity>
 

@@ -438,13 +438,12 @@ public class Util {
 	 * Note: the name of this function is wrong since the beginning, we should rename it in
 	 * the future.
 	 *
-	 * @param dp dp value
+	 * @param px px value
 	 * @param outMetrics display metrics
-	 * @return corresponding px value
+	 * @return corresponding dp value
 	 */
-	public static int px2dp (float dp, DisplayMetrics outMetrics){
-	
-		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
+	public static int px2dp (float px, DisplayMetrics outMetrics){
+		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, px, outMetrics));
 	}
 	
 	/*
