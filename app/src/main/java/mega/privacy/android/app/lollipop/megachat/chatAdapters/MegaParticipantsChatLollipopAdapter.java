@@ -385,7 +385,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderHeader.notificationsSwitch.setChecked(!groupChatInfoActivity.isChatMuted());
                 }
 
-                holderHeader.infoNumParticipantsText.setText(groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
+                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants() ?
+                        groupChatInfoActivity.getString(R.string.inactive_chat) :
+                        groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
 
                 if (getChat().getNumPreviewers() < 1) {
                     holderHeader.observersSeparator.setVisibility(View.GONE);
