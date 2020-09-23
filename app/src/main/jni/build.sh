@@ -7,6 +7,9 @@ set -e
 if [ -z "$NDK_ROOT" ]; then
     NDK_ROOT=${HOME}/android-ndk
 fi
+if [ -z "$ANDROID_HOME" ]; then
+    ANDROID_HOME=${HOME}/android-sdk
+fi
 ##################################################
 ##################################################
 # LIST OF ARCHS TO BE BUILT.
@@ -16,7 +19,11 @@ if [ -z "${BUILD_ARCHS}" ]; then
 fi
 ##################################################
 if [ ! -d "${NDK_ROOT}" ]; then
-    echo "* NDK_ROOT not set. Please download ndk 16 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
+    echo "* NDK_ROOT not set. Please download ndk 21 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
+    exit 1
+fi
+if [ ! -d "${ANDROID_HOME}" ]; then
+    echo "* ANDROID_HOME not set. Please download Android sdk and export ANDROID_HOME variable or create a link at ${HOME}/android-sdk and try again."
     exit 1
 fi
 
@@ -427,7 +434,7 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     cd "${FFMPEG_EXT_PATH}"
     ${NDK_BUILD} APP_ABI="${BUILD_ARCHS}" &>> ${LOG_FILE}
     cd "${EXOPLAYER_ROOT}"
-    ./gradlew extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
+    ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
     cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
     popd &>> ${LOG_FILE}
     touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
