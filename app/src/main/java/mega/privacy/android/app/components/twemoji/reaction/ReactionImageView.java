@@ -3,7 +3,6 @@ package mega.privacy.android.app.components.twemoji.reaction;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 
@@ -54,7 +53,12 @@ public class ReactionImageView extends AppCompatImageView {
             addEmojiReaction(emoji);
         }
     }
+
     public void addEmojiReaction(@NonNull final Emoji emoji){
+        if (currentEmoji == emoji) {
+            return;
+        }
+
         setImageDrawable(null);
         currentEmoji = emoji;
 
