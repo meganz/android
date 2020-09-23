@@ -303,8 +303,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (intent.getAction().equals(ACTION_CANCEL) ||
                     intent.getAction().equals(ACTION_STOP) ||
                     intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER)) {
+                logDebug("Cancel all CU transfers.");
                 for (MegaTransfer transfer : cuTransfers) {
-                    logDebug("Cancel all CU transfers.");
                     megaApi.cancelTransfer(transfer, this);
                 }
             } else if (ACTION_CANCEL_ALL.equals(intent.getAction()) || intent.getAction().equals(ACTION_LOGOUT)) {
