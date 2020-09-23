@@ -12,12 +12,19 @@ import mega.privacy.android.app.databinding.OfflineItemListBinding
 import mega.privacy.android.app.utils.Util.px2dp
 
 class OfflineListViewHolder(
-    private val binding: OfflineItemListBinding
-) : OfflineViewHolder(binding.root) {
-    override fun bind(position: Int, node: OfflineNode, listener: OfflineAdapterListener) {
-        super.bind(position, node, listener)
+    private val binding: OfflineItemListBinding,
+    listener: OfflineAdapterListener,
+    itemGetter: (Int) -> OfflineNode
+) : OfflineViewHolder(binding.root, listener, itemGetter) {
+    init {
+        binding.threeDots.setOnClickListener {
+            val position = adapterPosition
+            listener.onOptionsClicked(position, itemGetter(position))
+        }
+    }
 
-        binding.threeDots.setOnClickListener { listener.onOptionsClicked(position, node) }
+    override fun bind(position: Int, node: OfflineNode) {
+        super.bind(position, node)
 
         if (node.selected) {
             binding.root.setBackgroundColor(
