@@ -152,7 +152,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private final static int TYPE_ITEM = 1;
 
     private final static int LAYOUT_WIDTH = 330;
-    private static int MAX_COLUMNS = 4;
+    private static int MAX_COLUMNS = 5;
     private static int REACTION_SPACE = 8;
 
     Context context;
