@@ -31,13 +31,13 @@ class ImageAtributes {
     var width: Int = 0
 
     @SerializedName("mp4_size")
-    var mp4Size: Double = 0.0
+    var mp4Size: Long = 0
 
     @SerializedName("mp4")
     var mp4: String? = null
 
     @SerializedName("webp_size")
-    var webpSize: Double = 0.0
+    var webpSize: Long = 0
 
     @SerializedName("webp")
     var webp: String? = null

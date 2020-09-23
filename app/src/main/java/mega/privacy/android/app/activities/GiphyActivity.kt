@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
@@ -17,8 +18,10 @@ import mega.privacy.android.app.adapters.GiphyAdapter
 import mega.privacy.android.app.interfaces.GiphyEndPointsInterface
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.Data
+import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_PICK_GIF
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
@@ -32,6 +35,8 @@ class GiphyActivity : PinActivityLollipop() {
         private const val NUM_COLUMNS_PORTRAIT = 2
         private const val NUM_COLUMNS_LANDSCAPE = 4
         private const val GIF_MARGIN = 4F
+
+        const val GIF_DATA = "GIF_DATA"
     }
 
     private var toolbar: Toolbar? = null
@@ -74,6 +79,11 @@ class GiphyActivity : PinActivityLollipop() {
 
         giphyService = GiphyService.buildService()
         requestTrendingData()
+    }
+
+    override fun onBackPressed() {
+        setResult(RESULT_CANCELED)
+        super.onBackPressed()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -225,6 +235,16 @@ class GiphyActivity : PinActivityLollipop() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_PICK_GIF) {
+            val gifData = data?.getParcelableExtra(GIF_DATA) as GifData
+            setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
+            finish()
+        }
+    }
+
     /**
      * Gets the height of a GIF to display on screen from its real width, real height and width available on the screen.
      * The width available on the screen will depend on the dimensions of the current device and the current columns displayed.
@@ -242,5 +262,16 @@ class GiphyActivity : PinActivityLollipop() {
         val screenGifHeight = gifHeight * factor
 
         return screenGifHeight.toInt()
+    }
+
+    /**
+     * Opens the GIF viewer showing the selected GIF.
+     *
+     * @param gifData   Object containing all the necessary GIF data.
+     */
+    fun openGifViewer(gifData: GifData?) {
+        startActivityForResult(Intent(this@GiphyActivity, GifViewerActivity::class.java)
+                .putExtra(GIF_DATA, gifData),
+                REQUEST_CODE_PICK_GIF)
     }
 }

@@ -11,21 +11,32 @@ import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyActivity
 import mega.privacy.android.app.objects.Data
+import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
 
-class GiphyAdapter(private var gifs: ArrayList<Data>?, private val context: Context): RecyclerView.Adapter<GiphyAdapter.GifViewHolder>() {
+class GiphyAdapter(private var gifs: ArrayList<Data>?, private val context: Context): RecyclerView.Adapter<GiphyAdapter.GifViewHolder>(), View.OnClickListener {
 
     class GifViewHolder(val view: View, val context: Context) : RecyclerView.ViewHolder(view) {
         private var gifView: RelativeLayout = view.findViewById(R.id.gif_view)
         private var gifImage: SimpleDraweeView = view.findViewById(R.id.gif_image)
+        var gifData: GifData? = null
 
         fun bind(gif: Data?) {
             val imageAttributes = gif?.images?.fixedHeight
             val gifWidth = imageAttributes?.width ?: 0
             val gifHeight = imageAttributes?.height ?: 0
 
+            gifData = GifData(imageAttributes?.mp4,
+                    imageAttributes?.webp,
+                    imageAttributes?.mp4Size,
+                    imageAttributes?.webpSize,
+                    gifWidth,
+                    gifHeight,
+                    gif?.title)
+
             updateLayoutParams(gifWidth, gifHeight)
             loadGif(gifImage, Uri.parse(imageAttributes?.webp))
+            view.tag = this@GifViewHolder
         }
 
         /**
@@ -55,10 +66,16 @@ class GiphyAdapter(private var gifs: ArrayList<Data>?, private val context: Cont
 
     override fun onBindViewHolder(holder: GifViewHolder, position: Int) {
         holder.bind(gifs?.get(position))
+        holder.itemView.setOnClickListener(this@GiphyAdapter)
     }
 
     fun setGifs(newGifs: ArrayList<Data>?) {
         gifs = newGifs
         notifyDataSetChanged()
+    }
+
+    override fun onClick(v: View?) {
+        val holder = v?.tag as GifViewHolder
+        (context as GiphyActivity).openGifViewer(holder.gifData)
     }
 }

@@ -138,6 +138,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
+import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -168,6 +169,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.activities.GiphyActivity.GIF_DATA;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
@@ -3222,8 +3224,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             chatC.prepareForDownload(intent, parentPath);
-        } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK) {
-
+        } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
+            sendGiphyMessage(intent.getParcelableExtra(GIF_DATA));
         } else{
             logError("Error onActivityResult");
         }
@@ -3805,7 +3807,26 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if(locationMessage == null) return;
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(locationMessage);
         sendMessageToUI(androidMsgSent);
+    }
 
+    public void sendGiphyMessage(GifData gifData){
+        if (gifData == null) {
+            logWarning("GifData is null");
+            return;
+        }
+
+//        MegaChatMessage giphyMessage = megaChatApi.sendGiphy(idChat,
+//                gifData.getMp4Url(),
+//                gifData.getWebpUrl(),
+//                gifData.getMp4Size(),
+//                gifData.getWebpSize(),
+//                gifData.getWidth(),
+//                gifData.getHeight(),
+//                gifData.getTitle());
+//        if(giphyMessage == null) return;
+//
+//        AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(giphyMessage);
+//        sendMessageToUI(androidMsgSent);
     }
 
     public void hideNewMessagesLayout(){
