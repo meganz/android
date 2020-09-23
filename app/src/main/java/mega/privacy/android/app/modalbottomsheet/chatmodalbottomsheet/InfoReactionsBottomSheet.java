@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -19,6 +20,8 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.reaction.*;
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
@@ -37,10 +40,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
 
-    private static final int HEIGHT_HEADER = 60;
+    private static final int HEIGHT_HEADER = 96;
     private static final int HEIGHT_USERS = 56;
-    private static final int MARGIN = 9;
-
     private Context context;
     private long chatId;
     private long messageId;
@@ -53,6 +54,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     private RelativeLayout separator;
     private InfoReactionPagerAdapter reactionsPageAdapter = null;
     private ViewPager infoReactionsPager;
+    private TextView infoShortCode;
     private String reactionSelected;
     private String REACTION_SELECTED = "REACTION_SELECTED";
     private ArrayList<String> list;
@@ -96,10 +98,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_info_reactions, null);
         RelativeLayout generalLayout = contentView.findViewById(R.id.general_layout);
         infoReactionsTab = contentView.findViewById(R.id.info_reactions_tabs);
+        infoShortCode = contentView.findViewById(R.id.short_code_text);
         infoReactionsPager = contentView.findViewById(R.id.info_reactions_pager);
         infoReactionsPager.addOnPageChangeListener(this);
         separator = new RelativeLayout(context);
-
         separator.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
 
         final MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, messageId);
@@ -236,10 +238,29 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     private RelativeLayout inflateButton(final Context context, String reaction, final ViewGroup parent) {
         final RelativeLayout button = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.reaction_view, parent, false);
         final EmojiImageView reactionImage = button.findViewById(R.id.reaction_image);
+        final TextView reactionText = button.findViewById(R.id.reaction_text);
+
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
-        reactionImage.setEmoji(emojis.get(0).emoji, true);
-        parent.addView(button);
-        return button;
+        Emoji emoji = emojis.get(0).emoji;
+        int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
+        if (numUsers > 0 && emoji != null) {
+            reactionImage.setEmoji(emoji, true);
+            boolean ownReaction = false;
+            MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
+            for (int i = 0; i < handleList.size(); i++) {
+                if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
+                    ownReaction = true;
+                    break;
+                }
+            }
+
+            reactionText.setText(numUsers + "");
+            reactionText.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
+            parent.addView(button);
+            return button;
+        }
+
+        return null;
     }
 
     @Override
@@ -258,15 +279,15 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         }
 
         reactionTabs.get(i).setSelected(true);
+        EmojiImageView reactionImage = infoReactionsTab.getChildAt(i).findViewById(R.id.reaction_image);
+        infoShortCode.setText(EmojiUtilsShortcodes.shortCodify(reactionImage.getEmoji().getUnicode()));
 
         if (reactionTabs.get(i).getChildCount() == 1) {
             if (separator.getParent() != null) {
                 ((ViewGroup) separator.getParent()).removeView(separator);
             }
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(px2dp(40, outMetrics), px2dp(2, outMetrics));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(px2dp(52, outMetrics), px2dp(2, outMetrics));
             lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            lp.leftMargin = px2dp(MARGIN, outMetrics);
-            lp.rightMargin = px2dp(MARGIN, outMetrics);
             reactionTabs.get(i).addView(separator, lp);
         }
 

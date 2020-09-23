@@ -3,12 +3,12 @@
     android:id="@+id/general_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white">
+    android:background="@null">
 
         <HorizontalScrollView
             android:id="@+id/horizontalScroll"
             android:layout_width="wrap_content"
-            android:layout_height="59dp"
+            android:layout_height="62dp"
             android:animateLayoutChanges="true"
             android:scrollbars="none">
 
@@ -18,16 +18,33 @@
                 android:layout_height="match_parent"
                 android:background="@null"
                 android:orientation="horizontal"
-                android:paddingStart="7dp"
-                android:paddingEnd="7dp" />
+                android:clipToPadding="true"
+                android:paddingStart="16dp"/>
         </HorizontalScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/horizontalScroll"
+        android:background="@color/divider_upgrade_account" />
 
         <RelativeLayout
             android:id="@+id/info_reactions_divider"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="36dp"
             android:layout_below="@id/horizontalScroll"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/chat_background"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp">
+            <TextView
+                android:id="@+id/short_code_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/mail_my_account"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:textSize="12dp"/>
+        </RelativeLayout>
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/info_reactions_pager"
