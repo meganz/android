@@ -12,12 +12,19 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 
 class OfflineGridFileViewHolder(
-    private val binding: OfflineItemGridFileBinding
-) : OfflineViewHolder(binding.root) {
-    override fun bind(position: Int, node: OfflineNode, listener: OfflineAdapterListener) {
-        super.bind(position, node, listener)
+    private val binding: OfflineItemGridFileBinding,
+    listener: OfflineAdapterListener,
+    itemGetter: (Int) -> OfflineNode
+) : OfflineViewHolder(binding.root, listener, itemGetter) {
+    init {
+        binding.filenameContainer.setOnClickListener {
+            val position = adapterPosition
+            listener.onOptionsClicked(position, itemGetter(position))
+        }
+    }
 
-        binding.filenameContainer.setOnClickListener { listener.onOptionsClicked(position, node) }
+    override fun bind(position: Int, node: OfflineNode) {
+        super.bind(position, node)
 
         val placeHolderRes = MimeTypeThumbnail.typeForName(node.node.name).iconResourceId
 
@@ -60,9 +67,5 @@ class OfflineGridFileViewHolder(
 
     fun getThumbnailView(): View {
         return binding.thumbnail
-    }
-
-    fun getIcSelected(): View {
-        return binding.icSelected
     }
 }

@@ -329,7 +329,7 @@ class OfflineViewModel @ViewModelInject constructor(
             query != null -> {
                 context.getString(R.string.action_search).toUpperCase(Locale.ROOT) + ": " + query
             }
-            path == OFFLINE_ROOT -> {
+            path == OFFLINE_ROOT || path == "" -> {
                 context.getString(R.string.tab_offline).toUpperCase(Locale.ROOT)
             }
             else -> {
