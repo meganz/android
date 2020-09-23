@@ -74,7 +74,7 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private var isFabExpanded = false
+    var isFabExpanded = false
 
     private val categoryClickListener = OnClickListener {
         with(viewDataBinding.category) {
@@ -98,6 +98,8 @@ class HomepageFragment : Fragment() {
         rootView = viewDataBinding.root
 
         activity = (getActivity() as ManagerActivityLollipop)
+
+        isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
         return rootView
     }
@@ -209,6 +211,11 @@ class HomepageFragment : Fragment() {
         })
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
+    }
+
     private fun setupBottomSheetUI() {
         viewPager = rootView.findViewById(R.id.view_pager)
         viewPager.adapter = BottomSheetPagerAdapter(this)
@@ -313,29 +320,35 @@ class HomepageFragment : Fragment() {
         fabMaskMain = fabMaskLayout.fab_main
         val fabChat = fabMaskLayout.fab_chat
         val fabUpload = fabMaskLayout.fab_upload
-        val textChat = fabMaskLayout.text_chat
-        val textUpload = fabMaskLayout.text_upload
 
         fabMain.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback()
         }
 
         fabMaskMain.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback()
+        }
+
+        fabMaskLayout.setOnClickListener{
+            fabMainClickCallback()
         }
 
         fabChat.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 openChatActivity()
             }
         }
 
         fabUpload.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 showUploadPanel()
             }
+        }
+
+        if(isFabExpanded) {
+         expandFab()
         }
     }
 
@@ -367,30 +380,38 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun fabMainClickCallback(
-        fabChat: View,
-        fabUpload: View,
-        textChat: View,
-        textUpload: View
-    ) {
+    private fun fabMainClickCallback() {
         if (isFabExpanded) {
-            rotateFab()
-            showOut(fabChat, fabUpload, textChat, textUpload)
-            // After animation completed, then remove mask.
-            runDelay(FAB_MASK_OUT_DELAY) {
-                removeMask()
-                fabMain.visibility = View.VISIBLE
-                isFabExpanded = !isFabExpanded
-            }
+            collapseFab()
         } else {
-            fabMain.visibility = View.GONE
-            addMask()
-            // Need to do so, otherwise, fabMaskMain.background is null.
-            post {
-                rotateFab()
-                showIn(fabChat, fabUpload, textChat, textUpload)
-                isFabExpanded = !isFabExpanded
-            }
+            expandFab()
+        }
+    }
+
+    fun collapseFab() {
+        rotateFab(false)
+        showOut(
+            fabMaskLayout.fab_chat,
+            fabMaskLayout.fab_upload,
+            fabMaskLayout.text_chat,
+            fabMaskLayout.text_upload
+        )
+        // After animation completed, then remove mask.
+        runDelay(FAB_MASK_OUT_DELAY) {
+            removeMask()
+            fabMain.visibility = View.VISIBLE
+            isFabExpanded = false
+        }
+    }
+
+    private fun expandFab() {
+        fabMain.visibility = View.GONE
+        addMask()
+        // Need to do so, otherwise, fabMaskMain.background is null.
+        post {
+            rotateFab(true)
+            showIn(fabMaskLayout.fab_chat, fabMaskLayout.fab_upload, fabMaskLayout.text_chat, fabMaskLayout.text_upload)
+            isFabExpanded = true
         }
     }
 
@@ -414,22 +435,22 @@ class HomepageFragment : Fragment() {
         windowContent?.removeView(fabMaskLayout)
     }
 
-    private fun rotateFab() {
+    private fun rotateFab(isExpand : Boolean) {
         val rotateAnim = ObjectAnimator.ofFloat(
             fabMaskMain, "rotation",
-            if (isFabExpanded) FAB_DEFAULT_ANGEL else FAB_ROTATE_ANGEL
+            if (isExpand)  FAB_ROTATE_ANGEL else FAB_DEFAULT_ANGEL
         )
 
         // The tint of the icon in the middle of the FAB
         val tintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.drawable.mutate(), "tint",
-            if (isFabExpanded) Color.WHITE else Color.BLACK
+            if (isExpand)  Color.BLACK else Color.WHITE
         )
 
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isFabExpanded) resources.getColor(R.color.accentColor) else Color.WHITE
+            if (isExpand)  Color.WHITE else resources.getColor(R.color.accentColor)
         )
 
         AnimatorSet().apply {
@@ -475,5 +496,6 @@ class HomepageFragment : Fragment() {
         private const val FAB_ROTATE_ANGEL = 135f
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
         private const val KEY_CONTACT_TYPE = "contactType"
+        private const val KEY_IS_FAB_EXPANDED = "isFabExpaned"
     }
 }

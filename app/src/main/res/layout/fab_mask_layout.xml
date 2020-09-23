@@ -8,10 +8,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="@dimen/mask_view_alpha"
-        android:background="@color/fab_mask"
-        android:clickable="true"
-        android:focusable="true" />
+        android:background="@color/fab_mask"/>
 
     <include
         layout="@layout/homepage_fabs"

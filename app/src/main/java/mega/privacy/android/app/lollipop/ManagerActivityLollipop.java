@@ -123,7 +123,6 @@ import java.util.regex.Pattern;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -150,6 +149,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
+import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
@@ -7873,7 +7873,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (getSearchFragment() == null || sFLol.onBackPressed() == 0) {
     			closeSearchSection();
     		}
-    	} else {
+        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+            HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
+            if(fragment != null && fragment.isFabExpanded()) {
+                fragment.collapseFab();
+            } else {
+                super.onBackPressed();
+            }
+        } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
 		}
 	}
