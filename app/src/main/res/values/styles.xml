@@ -528,6 +528,6 @@
 
     <style name="BorderlessButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">?attr/colorSecondary</item>
-        <item name="android:letterSpacing">0.0</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 </resources>

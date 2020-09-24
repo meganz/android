@@ -25,6 +25,7 @@
         <!-- The color applied to icons/controls in their normal state.-->
         <item name="colorControlNormal">@color/black</item>
 
+        <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnSecondary">@color/black</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>

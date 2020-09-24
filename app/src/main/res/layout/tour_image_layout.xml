@@ -19,8 +19,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginTop="20dp"
-        android:textSize="22sp"
-        android:textColor="@color/name_my_account"
+        android:textAppearance="@style/TextAppearance.Mega.Headline"
         android:gravity="center"/>
 
     <TextView
@@ -32,8 +31,7 @@
         android:layout_marginTop="8dp"
         android:layout_alignTop="@+id/invisible_view"
         android:lineSpacingExtra="5sp"
-        android:textSize="15sp"
-        android:textColor="@color/mail_my_account"
+        android:textAppearance="@style/TextAppearance.Mega.body"
         android:gravity="center"/>
 
 </LinearLayout>

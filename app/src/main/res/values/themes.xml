@@ -47,6 +47,9 @@
         <item name="android:navigationBarColor">?android:attr/colorBackground</item>
 
         <item name="borderlessButtonStyle">@style/BorderlessButton</item>
+
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorSecondary">@color/text_color_secondary</item>
     </style>
 </resources>
 
