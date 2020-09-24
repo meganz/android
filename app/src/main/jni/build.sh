@@ -8,7 +8,7 @@ if [ -z "$NDK_ROOT" ]; then
     NDK_ROOT=${HOME}/android-ndk
 fi
 if [ -z "$ANDROID_HOME" ]; then
-    ANDROID_HOME=${HOME}/android-sdk
+    export ANDROID_HOME=${HOME}/android-sdk
 fi
 ##################################################
 ##################################################
@@ -430,10 +430,12 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     fi
     ENABLED_DECODERS=(ac3)
     cd "${FFMPEG_EXT_PATH}"
+    echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
     cd "${FFMPEG_EXT_PATH}"
     ${NDK_BUILD} APP_ABI="${BUILD_ARCHS}" &>> ${LOG_FILE}
     cd "${EXOPLAYER_ROOT}"
+    echo "* Building ExoPlayer FFMPEG extension"
     ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
     cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
     popd &>> ${LOG_FILE}
