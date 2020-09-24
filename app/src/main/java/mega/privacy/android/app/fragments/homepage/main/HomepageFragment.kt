@@ -193,7 +193,7 @@ class HomepageFragment : Fragment() {
         )
 
         viewModel.notification.observe(viewLifecycleOwner) {
-            searchInputView.setShowLeftDot(it)
+            searchInputView.setLeftNotificationCount(it)
         }
         viewModel.avatar.observe(viewLifecycleOwner) {
             searchInputView.setAvatar(it)

@@ -31,11 +31,11 @@ class HomePageViewModel @ViewModelInject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) : BaseRxViewModel(), DefaultMegaGlobalListener, DefaultMegaChatListener {
-    private val _notification = MutableLiveData<Boolean>()
+    private val _notification = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
 
-    val notification: LiveData<Boolean> = _notification
+    val notification: LiveData<Int> = _notification
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
 
@@ -114,8 +114,7 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     private fun updateNotification() {
-        _notification.value =
-            megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0) > 0
+        _notification.value = megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
     }
 
     override fun onChatOnlineStatusUpdate(

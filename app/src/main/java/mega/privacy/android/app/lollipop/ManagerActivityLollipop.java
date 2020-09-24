@@ -2272,7 +2272,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         megaApi.getAccountAchievements(this);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
+		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity,R.color.white);
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
 		// Navi button Chat
 		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);

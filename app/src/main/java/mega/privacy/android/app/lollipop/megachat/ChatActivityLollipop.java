@@ -826,7 +826,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         participantsLayout.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
-        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext(), R.color.dark_primary_color);
         updateNavigationToolbarIcon();
 
 
