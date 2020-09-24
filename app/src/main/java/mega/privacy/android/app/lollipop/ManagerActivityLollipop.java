@@ -33,7 +33,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -197,11 +199,16 @@ import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragme
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.PsaBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.psa.Psa;
+import mega.privacy.android.app.psa.PsaViewModel;
+import mega.privacy.android.app.psa.PsaViewModelFactory;
+import mega.privacy.android.app.utils.EventObserver;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
@@ -781,6 +788,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
+	private PsaViewModel psaViewModel;
 
 	private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
 		@Override
@@ -2130,6 +2138,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			orderContacts = ORDER_DEFAULT_ASC;
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
+
+		observePsa();
 
 		handler = new Handler();
 
@@ -4747,7 +4757,36 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             dbH.setFirstTime(false);
 		}
         checkBeforeShow();
+
+		psaViewModel.checkPsa();
     }
+
+    private void observePsa() {
+		psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
+				.get(PsaViewModel.class);
+
+		psaViewModel.getPsa().observe(this, new EventObserver<>(this::showPsa));
+	}
+
+	private kotlin.Unit showPsa(Psa psa) {
+    	if (!TextUtils.isEmpty(psa.getUrl())) {
+			Intent intent = new Intent(this, WebViewActivityLollipop.class);
+			intent.setData(Uri.parse(psa.getUrl()));
+			startActivity(intent);
+			psaViewModel.dismissPsa(psa.getId());
+    		return null;
+		}
+
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+			return null;
+		}
+
+		bottomSheetDialogFragment = new PsaBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(),
+				bottomSheetDialogFragment.getTag());
+		psaViewModel.setPsaState(PsaViewModel.PSA_STATE_DISPLAYING);
+		return null;
+	}
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
