@@ -3815,18 +3815,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-//        MegaChatMessage giphyMessage = megaChatApi.sendGiphy(idChat,
-//                gifData.getMp4Url(),
-//                gifData.getWebpUrl(),
-//                gifData.getMp4Size(),
-//                gifData.getWebpSize(),
-//                gifData.getWidth(),
-//                gifData.getHeight(),
-//                gifData.getTitle());
-//        if(giphyMessage == null) return;
-//
-//        AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(giphyMessage);
-//        sendMessageToUI(androidMsgSent);
+        MegaChatMessage giphyMessage = megaChatApi.sendGiphy(idChat,
+                gifData.getMp4Url(),
+                gifData.getWebpUrl(),
+                gifData.getMp4Size(),
+                gifData.getWebpSize(),
+                gifData.getWidth(),
+                gifData.getHeight(),
+                gifData.getTitle());
+        if(giphyMessage == null) return;
+
+        AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(giphyMessage);
+        sendMessageToUI(androidMsgSent);
     }
 
     public void hideNewMessagesLayout(){

@@ -5,17 +5,16 @@ import android.os.Parcelable
 
 data class GifData(val mp4Url: String?,
                    val webpUrl: String?,
-                   val mp4Size: Long?,
-                   val webpSize: Long?,
+                   val mp4Size: Long,
+                   val webpSize: Long,
                    val width: Int,
                    val height: Int,
                    val title: String?): Parcelable {
-
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
+            parcel.readLong(),
+            parcel.readLong(),
             parcel.readInt(),
             parcel.readInt(),
             parcel.readString()) {
@@ -24,8 +23,8 @@ data class GifData(val mp4Url: String?,
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(mp4Url)
         parcel.writeString(webpUrl)
-        parcel.writeValue(mp4Size)
-        parcel.writeValue(webpSize)
+        parcel.writeLong(mp4Size)
+        parcel.writeLong(webpSize)
         parcel.writeInt(width)
         parcel.writeInt(height)
         parcel.writeString(title)

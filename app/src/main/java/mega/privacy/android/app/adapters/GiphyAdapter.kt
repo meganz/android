@@ -28,8 +28,8 @@ class GiphyAdapter(private var gifs: ArrayList<Data>?, private val context: Cont
 
             gifData = GifData(imageAttributes?.mp4,
                     imageAttributes?.webp,
-                    imageAttributes?.mp4Size,
-                    imageAttributes?.webpSize,
+                    imageAttributes?.mp4Size ?: 0,
+                    imageAttributes?.webpSize ?: 0,
                     gifWidth,
                     gifHeight,
                     gif?.title)

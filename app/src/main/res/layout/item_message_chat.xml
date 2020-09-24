@@ -731,6 +731,29 @@
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_portrait_gif"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic_gif_message" />
+
+                        <ProgressBar
+                            android:id="@+id/content_own_message_thumb_portrait_gif_progressbar"
+                            style="?android:attr/progressBarStyleLargeInverse"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:layout_centerInParent="true"
+                            android:indeterminateTint="@color/white" />
+
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_own_message_thumb_portrait_gif_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:scaleType="centerInside"
+                            rounded:roundedCornerRadius="10dp" />
+
                         <!-- Video elements -->
                         <RelativeLayout
                             android:id="@+id/gradient_own_message_thumb_portrait"
@@ -875,6 +898,29 @@
                             android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
+
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_landscape_gif"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic_gif_message" />
+
+                        <ProgressBar
+                            android:id="@+id/content_own_message_thumb_landscape_gif_progressbar"
+                            style="?android:attr/progressBarStyleLargeInverse"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:layout_centerInParent="true"
+                            android:indeterminateTint="@color/white" />
+
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_own_message_thumb_landscape_gif_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:scaleType="centerInside"
+                            rounded:roundedCornerRadius="10dp" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1753,6 +1799,29 @@
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_portrait_gif"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic_gif_message" />
+
+                        <ProgressBar
+                            android:id="@+id/content_contact_message_thumb_portrait_gif_progressbar"
+                            style="?android:attr/progressBarStyleLargeInverse"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:layout_centerInParent="true"
+                            android:indeterminateTint="@color/white" />
+
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_contact_message_thumb_portrait_gif_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:scaleType="centerInside"
+                            rounded:roundedCornerRadius="10dp" />
+
                         <!-- Video elements -->
                         <RelativeLayout
                             android:id="@+id/gradient_contact_message_thumb_portrait"
@@ -1838,6 +1907,29 @@
                             android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_landscape_gif"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic_gif_message" />
+
+                        <ProgressBar
+                            android:id="@+id/content_contact_message_thumb_landscape_gif_progressbar"
+                            style="?android:attr/progressBarStyleLargeInverse"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:layout_centerInParent="true"
+                            android:indeterminateTint="@color/white" />
+
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_contact_message_thumb_landscape_gif_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:scaleType="centerInside"
+                            rounded:roundedCornerRadius="10dp" />
 
                         <!-- Video elements -->
                         <RelativeLayout
