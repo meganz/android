@@ -7,7 +7,7 @@
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
         <item name="colorPrimary">@color/black</item>
-        <item name="colorSecondary">@color/accentColor</item>
+        <item name="colorSecondary">@color/accent_color_dark</item>
         <!-- colorPrimaryDark is used for the status bar -->
         <item name="colorPrimaryDark">@color/black</item>
         <!--colorBackground appears behind scrollable content and is used for the default window-->
@@ -15,7 +15,7 @@
         <!--and menus. colorError is used to indicate an error state for components such as-->
         <!--text fields.-->
         <item name="android:colorBackground">@color/black</item>
-        <item name="colorSurface">@color/transparent</item>
+        <item name="colorSurface">@color/white</item>
         <item name="colorError">@color/dark_primary_color</item>
 
         <!-- colorAccent is used as the default value for colorControlActivated
@@ -24,6 +24,8 @@
 
         <!-- The color applied to icons/controls in their normal state.-->
         <item name="colorControlNormal">@color/black</item>
+
+        <item name="colorOnSecondary">@color/black</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorSurface</item>

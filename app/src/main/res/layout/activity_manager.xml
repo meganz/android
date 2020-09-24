@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
+<!--    android:fitsSystemWindows="true"-->
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:background="@color/white">
+      >
+<!--        android:background="@color/white"-->
 
         <LinearLayout
             android:id="@+id/fragment_layout"
@@ -25,20 +26,20 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/Theme.Megaactionbar">
+                android:layout_height="wrap_content">
+<!--                android:theme="@style/Theme.Megaactionbar">-->
 
-                <androidx.appcompat.widget.Toolbar
+                <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/colorPrimary"
                     android:minHeight="?attr/actionBarSize"
-                    app:popupTheme="@style/Theme.Megaactionbar"
                     app:subtitleTextAppearance="@style/ToolbarSubtitle"
-                    app:theme="@style/Theme.Megaactionbar"
                     app:titleTextAppearance="@style/ToolbarTitle"
                     tools:context=".ManagerActivityLollipop" />
+<!--                app:popupTheme="@style/Theme.Megaactionbar"-->
+<!--                app:theme="@style/Theme.Megaactionbar"-->
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_contacts"

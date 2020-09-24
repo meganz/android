@@ -228,4 +228,7 @@
 
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
+
+    <!-- Dark mode refactoring -->
+    <color name="accent_color_dark">#6DD2BF</color>
 </resources>

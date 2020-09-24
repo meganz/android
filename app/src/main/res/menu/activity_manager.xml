@@ -15,6 +15,7 @@
 		android:orderInCategory="85"
 		android:title="@string/action_search"
 		android:icon="@drawable/ic_menu_search"
+		android:tint="?attr/colorOnSurface"
 		MEGA:actionViewClass="androidx.appcompat.widget.SearchView"
 		MEGA:showAsAction="ifRoom|collapseActionView"
 		android:visible="false"/>

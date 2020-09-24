@@ -6349,7 +6349,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
-		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
+//		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 

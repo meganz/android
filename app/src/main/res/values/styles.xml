@@ -294,7 +294,7 @@
         <item name="colorControlNormal">@color/text_secondary</item>
     </style>
 
-    <style name="ButtonStyle" parent="Widget.AppCompat.Button">
+    <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:minHeight">24dp</item>
@@ -341,10 +341,11 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="Button" parent="@style/ButtonStyle">
-        <item name="android:textColor">#FF00BFA5</item>
-        <item name="android:textSize">14sp</item>
-    </style>
+    <!-- Dark mode comment out-->
+<!--    <style name="Button" parent="@style/ButtonStyle">-->
+<!--        <item name="android:textColor">#FF00BFA5</item>-->
+<!--        <item name="android:textSize">14sp</item>-->
+<!--    </style>-->
 
     <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
         <item name="android:textColor">@color/green_unlocked_rewards</item>
@@ -515,5 +516,18 @@
 
     <style name="MyCredentialsText" parent="CredentialsText">
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <!-- Dark mode refactor start -->
+
+    <style name="Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">?attr/colorSecondary</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:letterSpacing">0.0</item>
+    </style>
+
+    <style name="BorderlessButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:letterSpacing">0.0</item>
     </style>
 </resources>

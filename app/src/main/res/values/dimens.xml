@@ -83,4 +83,9 @@
     <dimen name="cu_fragment_selected_round_corner_radius">4dp</dimen>
     <dimen name="cu_fragment_image_margin_small">1dp</dimen>
     <dimen name="cu_fragment_image_margin_large">2dp</dimen>
+
+    <!-- Dark mode refactor start -->
+
+    <dimen name="btn_padding_vertical">10dp</dimen>
+    <dimen name="btn_padding_horizontal">16dp</dimen>
 </resources>
