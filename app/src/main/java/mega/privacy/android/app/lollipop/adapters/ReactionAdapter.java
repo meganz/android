@@ -97,6 +97,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         holder.moreReactionsLayout.setVisibility(View.GONE);
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
+        if(emojis == null || emojis.isEmpty() || emojis.get(0) == null)
+            return;
+
         Emoji emoji = emojis.get(0).emoji;
         holder.reaction = reaction;
 
