@@ -556,11 +556,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null)
 				return;
-
 			String strAction = intent.getAction();
-			KeyguardManager myKM = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
 
-			if ((strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF)) && myKM.inKeyguardRestrictedInputMode() && rtcAudioManagerRingInCall != null) {
+			if ((strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF)) && rtcAudioManagerRingInCall != null) {
 				rtcAudioManagerRingInCall.muteOrUnmuteIncomingCall(true);
 			}
 		}
@@ -572,8 +570,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			if (intent.getAction().equals(BROADCAST_ACTION_INCOMING_CALL_VOLUME) && rtcAudioManagerRingInCall != null) {
-				int newVolume = intent.getIntExtra(VOLUME_CALL, INVALID_VOLUME);
+			if (intent.getAction().equals(VOLUME_CHANGED_ACTION) && rtcAudioManagerRingInCall != null) {
+				int newVolume = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_VALUE);
 				if (newVolume != INVALID_VOLUME) {
 					rtcAudioManagerRingInCall.checkVolume(newVolume);
 				}
@@ -1472,7 +1470,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			filterScreen.addAction(Intent.ACTION_USER_PRESENT);
 			registerReceiver(screenOnOffReceiver, filterScreen);
 
-			registerReceiver(volumeReceiver, new IntentFilter(BROADCAST_ACTION_INCOMING_CALL_VOLUME));
+			registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
 			registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
 			rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
@@ -1494,14 +1492,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         try {
             logDebug("Removing RTC Audio Manager");
-			rtcAudioManagerRingInCall.muteOrUnmuteIncomingCall(false);
+            rtcAudioManagerRingInCall.stop();
+			rtcAudioManagerRingInCall = null;
 
 			unregisterReceiver(screenOnOffReceiver);
 			unregisterReceiver(volumeReceiver);
 			unregisterReceiver(becomingNoisyReceiver);
-            rtcAudioManagerRingInCall.stop();
-            rtcAudioManagerRingInCall = null;
-        } catch (Exception e) {
+		} catch (Exception e) {
             logError("Exception stopping speaker audio manager", e);
         }
     }

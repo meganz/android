@@ -263,7 +263,6 @@ public class AppRTCAudioManager {
         if (mediaPlayer != null) {
             stopSound();
         }
-        muteOrUnmuteIncomingCall(false);
 
         mediaPlayer = new MediaPlayer();
         audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
@@ -292,7 +291,8 @@ public class AppRTCAudioManager {
 
         logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING) + ", Voice call volume: " + audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
 
-        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
+        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT ||
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && audioManager.isStreamMute(AudioManager.STREAM_RING))) {
             if (vibrator == null || !vibrator.hasVibrator()) return;
             stopVibration();
             return;
@@ -349,18 +349,25 @@ public class AppRTCAudioManager {
      * Method to mute or unmute an incoming call.
      */
     public void muteOrUnmuteIncomingCall(boolean isNeccesaryMute) {
-        if (isNeccesaryMute && !isPlayingIncomingCall()){
+        if ((isNeccesaryMute && !isPlayingIncomingCall()) || audioManager == null){
             return;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (isNeccesaryMute && !audioManager.isStreamMute(AudioManager.STREAM_RING)) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
+                checkVibration();
             } else if (!isNeccesaryMute && audioManager.isStreamMute(AudioManager.STREAM_RING)) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
+                checkVibration();
             }
         } else {
             audioManager.setStreamMute(AudioManager.STREAM_RING, isNeccesaryMute);
+            if (isNeccesaryMute) {
+                stopVibration();
+            } else {
+                checkVibration();
+            }
         }
     }
 
@@ -380,6 +387,7 @@ public class AppRTCAudioManager {
                 mediaPlayer.reset();
                 mediaPlayer.release();
                 mediaPlayer = null;
+                muteOrUnmuteIncomingCall(false);
             }
         } catch (Exception e) {
             logWarning("Exception stopping player", e);
