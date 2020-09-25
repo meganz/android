@@ -1215,21 +1215,24 @@
         <!--chat reactions layout-->
         <RelativeLayout
             android:id="@+id/own_message_reactions_layout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/content_own_message_layout"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="6dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="4dp"
             android:layout_alignEnd="@id/content_own_message_layout"
             android:gravity="end"
             android:background="@null"
             android:visibility="gone">
 
-            <androidx.recyclerview.widget.RecyclerView
+            <mega.privacy.android.app.components.twemoji.reaction.AutoFitRtlRecyclerView
                 android:id="@+id/own_message_reactions_recycler"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:numColumns="auto_fit"
+                android:columnWidth="51dp"
                 android:layout_alignParentEnd="true"
                 android:orientation="horizontal"/>
         </RelativeLayout>
@@ -2107,20 +2110,21 @@
             <!--chat reactions layout-->
             <RelativeLayout
                 android:id="@+id/contact_message_reactions_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/content_contact_message_layout"
                 android:layout_alignStart="@id/content_contact_message_layout"
                 android:layout_marginStart="48dp"
                 android:layout_marginBottom="6dp"
-                android:background="@null"
+                android:layout_marginEnd="10dp"
                 android:gravity="start"
                 android:visibility="gone">
-
-                <androidx.recyclerview.widget.RecyclerView
+                <mega.privacy.android.app.components.twemoji.reaction.AutoFitGridRecyclerView
                     android:id="@+id/contact_message_reactions_recycler"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:numColumns="auto_fit"
+                    android:columnWidth="51dp"
                     android:orientation="horizontal"/>
             </RelativeLayout>
 

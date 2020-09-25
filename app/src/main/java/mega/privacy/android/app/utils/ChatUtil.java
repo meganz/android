@@ -62,7 +62,7 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 
 public class ChatUtil {
-
+    private static int MIN_WIDTH = 50;
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
@@ -391,6 +391,32 @@ public class ChatUtil {
         fileBitmap.recycle();
 
         return outFile;
+    }
+
+    /**
+     * Method for obtaining the reaction with the largest width.
+     * @param receivedChatId The chat ID.
+     * @param receivedMessageId The msg ID.
+     * @param listReactions The reactions list.
+     * @return The size.
+     */
+    public static int getMaxWidthItem(long receivedChatId, long receivedMessageId, ArrayList<String> listReactions) {
+        if (listReactions == null || listReactions.isEmpty()) {
+            return 0;
+        }
+
+        int initSize = MIN_WIDTH;
+        for (String reaction : listReactions) {
+            int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
+            if (numUsers > 0) {
+                String text = numUsers + "";
+                int possibleNewSize = MIN_WIDTH + text.length();
+                if (possibleNewSize > initSize) {
+                    initSize = possibleNewSize;
+                }
+            }
+        }
+        return initSize;
     }
 
     /**

@@ -66,10 +66,10 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.RtlGridLayoutManager;
-import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.components.twemoji.reaction.AutoFitGridRecyclerView;
+import mega.privacy.android.app.components.twemoji.reaction.AutoFitRtlRecyclerView;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ReactionAdapter;
@@ -152,7 +152,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private final static int TYPE_ITEM = 1;
 
     private final static int LAYOUT_WIDTH = 330;
-    private static int MAX_COLUMNS = 5;
+    private static int MAX_COLUMNS = 3;
     private static int REACTION_SPACE = 8;
 
     Context context;
@@ -607,7 +607,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
         private RelativeLayout ownMessageReactionsLayout;
-        private RecyclerView ownMessageReactionsRecycler;
+        private AutoFitRtlRecyclerView ownMessageReactionsRecycler;
         private ReactionAdapter ownReactionsAdapter = null;
         private RelativeLayout ownMessageSelectLayout;
         private ImageView ownMessageSelectIcon;
@@ -738,7 +738,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RoundedImageView contactImageView;
         RelativeLayout contentContactMessageLayout;
         private RelativeLayout contactMessageReactionsLayout;
-        private RecyclerView contactMessageReactionsRecycler;
+        private AutoFitGridRecyclerView contactMessageReactionsRecycler;
         private ReactionAdapter contactReactionsAdapter = null;
         private RelativeLayout contactMessageSelectLayout;
         private ImageView contactMessageSelectIcon;
@@ -893,7 +893,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
             holder.ownMessageReactionsRecycler = v.findViewById(R.id.own_message_reactions_recycler);
             ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(true);
-            holder.ownMessageReactionsRecycler.setLayoutManager(new RtlGridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false));
             holder.ownMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
             holder.ownMessageReactionsRecycler.setHasFixedSize(true);
             holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
@@ -1104,7 +1103,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactMessageReactionsLayout = v.findViewById(R.id.contact_message_reactions_layout);
             holder.contactMessageReactionsRecycler = v.findViewById(R.id.contact_message_reactions_recycler);
             ((SimpleItemAnimator) holder.contactMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(true);
-            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false));
             holder.contactMessageReactionsRecycler.setHasFixedSize(true);
             holder.contactMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
             holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
@@ -7908,11 +7906,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if (holder.ownReactionsAdapter.getItemCount() > 0) {
+                    int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), holder.ownReactionsAdapter.getListReactions());
+                    holder.ownMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
                     holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
                 } else {
                     holder.ownMessageReactionsLayout.setVisibility(View.GONE);
                     holder.ownReactionsAdapter = null;
                     holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
+
                 }
             } else {
                 createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
@@ -7927,6 +7928,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if (holder.contactReactionsAdapter.getItemCount() > 0) {
+                    int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), holder.contactReactionsAdapter.getListReactions());
+                    holder.contactMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
                     holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
                 } else {
                     holder.contactMessageReactionsLayout.setVisibility(View.GONE);
@@ -7950,14 +7953,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     private void createReactionsAdapter(MegaStringList listReactions, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage, final ViewHolderMessageChat holder) {
         ArrayList<String> list = getReactionsList(listReactions, true);
-
+        int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list);
         if (ownMessage) {
             holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.ownReactionsAdapter = new ReactionAdapter(context, holder.ownMessageReactionsRecycler, chatId, megaMessage, list);
+            holder.ownMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+            holder.ownReactionsAdapter = new ReactionAdapter(context, holder.ownMessageReactionsRecycler, list, chatId, megaMessage);
             holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
         } else {
             holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.contactReactionsAdapter = new ReactionAdapter(context, holder.contactMessageReactionsRecycler, chatId, megaMessage, list);
+            holder.contactMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+            holder.contactReactionsAdapter = new ReactionAdapter(context, holder.contactMessageReactionsRecycler, list, chatId, megaMessage);
             holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
         }
     }
@@ -8026,6 +8031,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
             if (holder.ownReactionsAdapter != null && holder.ownReactionsAdapter.isSameAdapter(chatId, megaMessage.getMessage().getMsgId())) {
                 ArrayList<String> list = getReactionsList(listReactions, true);
+                int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list);
+                holder.ownMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
                 holder.ownReactionsAdapter.setReactions(list, chatId, megaMessage.getMessage().getMsgId());
             } else {
                 createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
@@ -8034,6 +8041,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
             if (holder.contactReactionsAdapter != null && holder.contactReactionsAdapter.isSameAdapter(chatId, megaMessage.getMessage().getMsgId())) {
                 ArrayList<String> list = getReactionsList(listReactions, true);
+                int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list);
+                holder.contactMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
                 holder.contactReactionsAdapter.setReactions(list, chatId, megaMessage.getMessage().getMsgId());
             } else {
                 createReactionsAdapter(listReactions, false, chatId, megaMessage, holder);
