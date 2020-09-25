@@ -56,7 +56,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             megaChatApi.hangChatCall(chatHandleInProgress, this);
         } else if (IGNORE.equals(action)) {
             megaChatApi.setIgnoredCall(chatHandleToAnswer);
-            MegaApplication.getInstance().removeChatAudioManager();
+            MegaApplication.getInstance().stopSounds();
             stopSelf();
         } else {
             throw new IllegalArgumentException("Unsupported action: " + action);

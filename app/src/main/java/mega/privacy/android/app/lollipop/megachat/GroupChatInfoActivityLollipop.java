@@ -290,14 +290,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         }
 
-        if (!chat.isPreview()) {
+        if (!chat.isPreview() && chat.isActive()) {
             String myFullName = megaChatApi.getMyFullname();
             if (isTextEmpty(myFullName)) {
                 myFullName = megaChatApi.getMyEmail();
             }
 
             MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
-
             participants.add(me);
         }
 
