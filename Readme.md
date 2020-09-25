@@ -44,7 +44,7 @@ ln -s /path/to/sdk ${HOME}/android-sdk
 5. Export `JAVA_HOME` variable or create a symbolic link at `${HOME}/android-java` to point your Java installation path.
 
 ```
-export JAVA_HOME=/path/to/sdk
+export JAVA_HOME=/path/to/java
 ```
 ```
 ln -s /path/to/sdk ${HOME}/android-java
