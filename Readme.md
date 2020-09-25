@@ -44,10 +44,10 @@ ln -s /path/to/sdk ${HOME}/android-sdk
 5. Export `JAVA_HOME` variable or create a symbolic link at `${HOME}/android-java` to point your Java installation path.
 
 ```
-export JAVA_HOME=/path/to/java
+export JAVA_HOME=/path/to/jdk
 ```
 ```
-ln -s /path/to/sdk ${HOME}/android-java
+ln -s /path/to/jdk ${HOME}/android-java
 ```
 
 6. Download the link https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
