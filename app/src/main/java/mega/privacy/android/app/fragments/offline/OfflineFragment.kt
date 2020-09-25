@@ -47,6 +47,7 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
+import mega.privacy.android.app.fragments.homepage.onScrolling
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
@@ -748,6 +749,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             callManager {
                 it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
             }
+            onScrolling(rv.canScrollVertically(-1))
         }
     }
 

@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -60,7 +61,8 @@ class HomepageFragment : Fragment() {
     private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
 
-    @Inject lateinit var megaApi: MegaApiAndroid
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -236,6 +238,10 @@ class HomepageFragment : Fragment() {
                 )
             }
         })
+
+        viewModel.isScrolling.observe(viewLifecycleOwner) {
+            changeTabEleveation(it)
+        }
     }
 
     private fun setupMask() {
@@ -315,6 +321,12 @@ class HomepageFragment : Fragment() {
         })
     }
 
+    private fun changeTabEleveation(withElevation: Boolean) = if (withElevation) {
+        tabs.elevation = Util.px2dp(4f, resources.displayMetrics).toFloat()
+    } else {
+        tabs.elevation = 0f
+    }
+
     private fun setupFabs() {
         fabMain = rootView.fab_home_main
         fabMaskMain = fabMaskLayout.fab_main
@@ -327,7 +339,7 @@ class HomepageFragment : Fragment() {
             fabMainClickCallback()
         }
 
-        fabMaskLayout.setOnClickListener{
+        fabMaskLayout.setOnClickListener {
             fabMainClickCallback()
         }
 
@@ -359,8 +371,8 @@ class HomepageFragment : Fragment() {
             }
         }
 
-        if(isFabExpanded) {
-         expandFab()
+        if (isFabExpanded) {
+            expandFab()
         }
     }
 
@@ -422,7 +434,12 @@ class HomepageFragment : Fragment() {
         // Need to do so, otherwise, fabMaskMain.background is null.
         post {
             rotateFab(true)
-            showIn(fabMaskLayout.fab_chat, fabMaskLayout.fab_upload, fabMaskLayout.text_chat, fabMaskLayout.text_upload)
+            showIn(
+                fabMaskLayout.fab_chat,
+                fabMaskLayout.fab_upload,
+                fabMaskLayout.text_chat,
+                fabMaskLayout.text_upload
+            )
             isFabExpanded = true
         }
     }
@@ -447,22 +464,22 @@ class HomepageFragment : Fragment() {
         windowContent?.removeView(fabMaskLayout)
     }
 
-    private fun rotateFab(isExpand : Boolean) {
+    private fun rotateFab(isExpand: Boolean) {
         val rotateAnim = ObjectAnimator.ofFloat(
             fabMaskMain, "rotation",
-            if (isExpand)  FAB_ROTATE_ANGEL else FAB_DEFAULT_ANGEL
+            if (isExpand) FAB_ROTATE_ANGEL else FAB_DEFAULT_ANGEL
         )
 
         // The tint of the icon in the middle of the FAB
         val tintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.drawable.mutate(), "tint",
-            if (isExpand)  Color.BLACK else Color.WHITE
+            if (isExpand) Color.BLACK else Color.WHITE
         )
 
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand)  Color.WHITE else resources.getColor(R.color.accentColor)
+            if (isExpand) Color.WHITE else resources.getColor(R.color.accentColor)
         )
 
         AnimatorSet().apply {

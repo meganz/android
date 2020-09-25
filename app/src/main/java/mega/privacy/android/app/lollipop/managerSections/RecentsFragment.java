@@ -249,12 +249,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     public void checkScroll() {
         if (listView == null) return;
-
-        if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE)) {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-        } else {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-        }
+        EventNotifierKt.onScrolling((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE));
     }
 
     public String findUserName(String mail) {

@@ -13,6 +13,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.homepage.avatarChange
+import mega.privacy.android.app.fragments.homepage.scrolling
 import mega.privacy.android.app.listeners.DefaultMegaChatListener
 import mega.privacy.android.app.listeners.DefaultMegaGlobalListener
 import mega.privacy.android.app.listeners.DefaultMegaRequestListener
@@ -34,10 +35,12 @@ class HomePageViewModel @ViewModelInject constructor(
     private val _notification = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
+    private val _isScrolling = MutableLiveData<Boolean>()
 
     val notification: LiveData<Int> = _notification
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
+    val isScrolling: LiveData<Boolean> = _isScrolling
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
         loadAvatar()
@@ -55,6 +58,9 @@ class HomePageViewModel @ViewModelInject constructor(
         )
         loadAvatar()
         avatarChange.observeForever(avatarChangeObserver)
+        scrolling.observeForever {
+            _isScrolling.value = it
+        }
     }
 
     override fun onCleared() {
@@ -114,7 +120,8 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     private fun updateNotification() {
-        _notification.value = megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
+        _notification.value =
+            megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
     }
 
     override fun onChatOnlineStatusUpdate(

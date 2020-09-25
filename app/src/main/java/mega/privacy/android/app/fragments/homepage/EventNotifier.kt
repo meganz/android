@@ -19,6 +19,9 @@ val listGridChange: LiveData<Boolean> = listGridChange_
 private val avatarChange_ = MutableLiveData<Boolean>()
 val avatarChange: LiveData<Boolean> = avatarChange_
 
+private val scrolling_ = MutableLiveData<Boolean>()
+val scrolling: LiveData<Boolean> = scrolling_
+
 fun notifyNodesChange(forceUpdate: Boolean) {
     nodesChange_.value = forceUpdate
 }
@@ -33,4 +36,8 @@ fun notifyListGridChange(isList: Boolean) {
 
 fun notifyAvatarChange(isSet: Boolean) {
     avatarChange_.value = isSet
+}
+
+fun onScrolling(isScrolling: Boolean) {
+    scrolling_.value = isScrolling
 }
