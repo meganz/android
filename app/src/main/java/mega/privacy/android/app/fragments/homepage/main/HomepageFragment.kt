@@ -318,8 +318,6 @@ class HomepageFragment : Fragment() {
     private fun setupFabs() {
         fabMain = rootView.fab_home_main
         fabMaskMain = fabMaskLayout.fab_main
-        val fabChat = fabMaskLayout.fab_chat
-        val fabUpload = fabMaskLayout.fab_upload
 
         fabMain.setOnClickListener {
             fabMainClickCallback()
@@ -333,14 +331,28 @@ class HomepageFragment : Fragment() {
             fabMainClickCallback()
         }
 
-        fabChat.setOnClickListener {
+        fabMaskLayout.fab_chat.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 openChatActivity()
             }
         }
 
-        fabUpload.setOnClickListener {
+        fabMaskLayout.text_chat.setOnClickListener {
+            fabMainClickCallback()
+            runDelay(FAB_MASK_OUT_DELAY) {
+                openChatActivity()
+            }
+        }
+
+        fabMaskLayout.fab_upload.setOnClickListener {
+            fabMainClickCallback()
+            runDelay(FAB_MASK_OUT_DELAY) {
+                showUploadPanel()
+            }
+        }
+
+        fabMaskLayout.text_upload.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 showUploadPanel()
@@ -496,6 +508,6 @@ class HomepageFragment : Fragment() {
         private const val FAB_ROTATE_ANGEL = 135f
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
         private const val KEY_CONTACT_TYPE = "contactType"
-        private const val KEY_IS_FAB_EXPANDED = "isFabExpaned"
+        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
     }
 }
