@@ -10,6 +10,9 @@ fi
 if [ -z "$ANDROID_HOME" ]; then
     export ANDROID_HOME=${HOME}/android-sdk
 fi
+if [ -z "$JAVA_HOME" ]; then
+    export JAVA_HOME=${HOME}/android-java
+fi
 ##################################################
 ##################################################
 # LIST OF ARCHS TO BE BUILT.
