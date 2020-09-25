@@ -289,7 +289,7 @@
         <item name="android:windowMinWidthMinor">85%</item>
     </style>
 
-    <style name="ColorControlStyle" parent="Theme.Megaactionbar">
+    <style name="ColorControlStyle" parent="Theme.Mega">
         <item name="android:colorControlNormal">@color/text_secondary</item>
         <item name="colorControlNormal">@color/text_secondary</item>
     </style>
@@ -518,16 +518,34 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <!-- Dark mode refactor start -->
+    <!-- =================== Dark mode refactor start ======================= -->
 
+    <!-- Contained button -->
     <style name="Button" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">?attr/colorSecondary</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
-        <item name="android:letterSpacing">0.0</item>
+        <item name="android:letterSpacing">0.035714286</item>
     </style>
 
+    <!-- Text button -->
     <style name="BorderlessButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">?attr/colorSecondary</item>
-        <item name="android:letterSpacing">0</item>
+        <item name="android:letterSpacing">0.035714286</item>
+    </style>
+
+    <!-- TextInputLayout
+    colorControlActivated is the floating label, underline and cursor colors, when focused. If we
+    don’t define it, it will fall back to use your colorAccent(colorSecondary for Material)
+    colorControlNormal is the underline color, when the view is NOT focused. If we don’t define it,
+    it will use textColorSecondary itself .
+    textColorPrimary is the color of the user-input text.
+    textColorHint is the hint color when the field is empty and NOT focused. -->
+    <style name="Widget.App.TextInputLayout" parent="Widget.Design.TextInputLayout">
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="colorControlNormal">@color/blue</item>
+    </style>
+
+    <style name="PasswordEndIcon">
+        <item name="endIconMode">password_toggle</item>
     </style>
 </resources>

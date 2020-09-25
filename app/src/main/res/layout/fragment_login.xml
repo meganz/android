@@ -4,7 +4,7 @@
     android:id="@+id/scroll_view_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_create_account"
+    android:background="?attr/greyBackgroundColor"
     android:stackFromBottom="true"
     tools:context=".LoginActivityFragment">
 
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="left"
-        android:background="@color/white"
+        android:background="?attr/colorSurface"
         android:orientation="vertical" >
 
         <LinearLayout
@@ -24,7 +24,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
                 android:layout_marginLeft="22dp"
                 android:layout_marginRight="22dp"
                 android:orientation="vertical" >
@@ -36,11 +35,7 @@
                     android:layout_gravity="left"
                     android:text="@string/login_to_mega"
                     android:layout_marginTop="17dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"
-                    android:textAllCaps="true"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"/>
+                    android:textAppearance="@style/Title_16"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -52,18 +47,15 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="44dp"
                         android:hint="@string/email_text"
-                        app:errorEnabled="true"
-                        app:errorTextAppearance="@style/InputTextAppearanceError">
+                        app:errorEnabled="true">
 
-                        <androidx.appcompat.widget.AppCompatEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/login_email_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
                             android:imeOptions="actionNext"
-                            android:inputType="textEmailAddress"
-                            android:theme="@style/ColorControlStyle"/>
-
+                            android:inputType="textEmailAddress"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <ImageView
@@ -89,7 +81,6 @@
                         android:layout_marginTop="24dp"
                         android:hint="@string/password_text"
                         app:errorEnabled="true"
-                        app:errorTextAppearance="@style/InputTextAppearanceError"
                         app:endIconTint="@color/password_color_toggle">
 
                         <androidx.appcompat.widget.AppCompatEditText
@@ -98,8 +89,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
                             android:imeOptions="actionNext"
-                            android:inputType="textPassword"
-                            android:theme="@style/ColorControlStyle"/>
+                            android:inputType="textPassword" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -119,20 +109,12 @@
                     android:id="@+id/button_login_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_accent_button"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
                     android:layout_marginLeft="3dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="10dp"
-                    android:paddingLeft="26dp"
-                    android:paddingRight="26dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    style="@style/ButtonStyle"
-                    android:elevation="8dp"/>
+                    style="@style/Button"
+                    android:elevation="8dp"
+                    tools:text="LOGIN"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -166,13 +148,10 @@
                     android:id="@+id/button_forgot_pass"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:layout_marginLeft="3dp"
                     android:layout_marginBottom="94dp"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp" />
+                    android:paddingLeft="3dp"
+                    style="@style/BorderlessButton"
+                    tools:text="FORGET YOUR PASSWORD?"/>
 
             </LinearLayout>
 
@@ -190,8 +169,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/new_to_mega"
                     android:layout_marginTop="24dp"
-                    android:textColor="@color/text_login"
-                    android:textSize="20sp" />
+                    android:textAppearance="@style/Title_20" />
 
                 <TextView
                     android:id="@+id/button_create_account_login"
@@ -199,10 +177,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="22dp"
                     android:layout_marginBottom="24dp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp" />
+                    style="@style/BorderlessButton" />
 
             </LinearLayout>
         </LinearLayout>

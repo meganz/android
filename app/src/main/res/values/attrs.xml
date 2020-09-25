@@ -135,4 +135,9 @@
         <attr name="photo" format="reference"/>
         <attr name="name" format="string"/>
     </declare-styleable>
+
+    <!-- =================== Dark Mode refactor start ========================== -->
+
+    <!-- "Login" screen background, Light: #F4F4F4, Dark: ?attr/colorBackground -->
+    <attr name="greyBackgroundColor" format="color"/>
 </resources>

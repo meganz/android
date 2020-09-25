@@ -17,16 +17,16 @@
         <!--and menus. colorError is used to indicate an error state for components such as-->
         <!--text fields.-->
         <item name="android:colorBackground">@color/white</item>
-        <item name="colorSurface">@color/black</item>
+        <item name="colorSurface">@color/white</item>
         <item name="colorError">@color/dark_primary_color</item>
 
         <!-- The color applied to icons/controls in their normal state.-->
-        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlNormal">@color/control_normal_light</item>
 
         <!-- button text color -->
         <item name="colorOnPrimary">@color/black</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="colorOnSurface">@color/accentColor</item>
+        <item name="colorOnSurface">@color/black</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="windowActionModeOverlay">true</item>
@@ -39,6 +39,7 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
+
         <item name="preferenceTheme">@style/PreferenceStyle</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
 
@@ -50,6 +51,11 @@
 
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
+
+        <item name="greyBackgroundColor">@color/background_create_account</item>
+
+        <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components -->
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
     </style>
 </resources>
 

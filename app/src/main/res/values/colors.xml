@@ -229,6 +229,13 @@
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
 
-    <!-- Dark mode refactoring -->
-    <color name="accent_color_dark">#6DD2BF</color>
+    <!-- ======================= Dark mode refactoring =====================  -->
+
+    <!-- Entire screen background in Dark Mode -->
+    <color name="background_dark">#121212</color>
+
+    <!-- Accent color (e.g. Button,FAB background) in Dark Mode -->
+    <color name="accent_dark">#6DD2BF</color>
+
+    <color name="error_dark">#FD3E38</color>
 </resources>

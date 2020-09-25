@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="TextAppearance.Borderless.Button" parent="TextAppearance.MaterialComponents.Button">
-        <item name="android:letterSpacing">0.001</item>
-    </style>
-    
-    <style name="TextAppearance.Mega.Headline" parent="TextAppearance.MaterialComponents.Headline5">
+    <!-- On boarding screen, text title in the carousel -->
+    <style name="TextAppearance.Headline" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textSize">22sp</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Mega.body" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="android:textSize">16sp</item>
-        <item name="android:letterSpacing">0</item>
+    <!-- Normal text body, Roboto regular, 15sp, textColorPrimary, AllCaps=false -->
+    <style name="TextAppearance.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">15sp</item>
     </style>
+
+    <style name="Title_16">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.009375</item>
+    </style>
+
+    <style name="Title_20">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
 </resources>
