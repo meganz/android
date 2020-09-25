@@ -2744,7 +2744,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Storage[/A] **</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">SCALABLE [A]Storage[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Transfer quota[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">When you logout, files from your Offline section will be deleted from your device.</string>
