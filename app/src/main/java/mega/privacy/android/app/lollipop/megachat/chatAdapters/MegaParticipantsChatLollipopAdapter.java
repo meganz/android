@@ -374,15 +374,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         groupChatInfoActivity.setChatLink(null);
                     }
 
-                    if (getChat().isArchived()) {
-                        holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
-                        holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_unarchive));
+                    if (getChat().isActive()) {
+                        holderHeader.notificationsSwitch.setChecked(!groupChatInfoActivity.isChatMuted());
+                        holderHeader.notificationsLayout.setVisibility(View.VISIBLE);
+                        holderHeader.dividerNotifications.setVisibility(View.VISIBLE);
                     } else {
-                        holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_archive));
-                        holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_archive));
+                        holderHeader.notificationsLayout.setVisibility(View.GONE);
+                        holderHeader.dividerNotifications.setVisibility(View.GONE);
                     }
-
-                    holderHeader.notificationsSwitch.setChecked(!groupChatInfoActivity.isChatMuted());
                 }
 
                 holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants() ?
