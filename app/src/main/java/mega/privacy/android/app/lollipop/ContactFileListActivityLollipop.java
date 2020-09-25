@@ -1202,8 +1202,15 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			} else {
 				logWarning("TAKE_PHOTO_CODE--->ERROR!");
 			}
-
-		}
+        } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
+            if (resultCode == RESULT_OK) {
+                Intent fileIntent = new Intent(this, FileExplorerActivityLollipop.class);
+                fileIntent.setAction(Intent.ACTION_SEND);
+                fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
+                fileIntent.setType(intent.getType());
+                startActivity(fileIntent);
+            }
+        }
 	}
 
 	public void onIntentProcessed(List<ShareInfo> infos) {

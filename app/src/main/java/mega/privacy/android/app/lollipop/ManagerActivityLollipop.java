@@ -63,6 +63,7 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -11977,6 +11978,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             }
 
 			onNodesSharedUpdate();
+        } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
+            if (resultCode == RESULT_OK) {
+                Intent fileIntent = new Intent(this, FileExplorerActivityLollipop.class);
+                fileIntent.setAction(Intent.ACTION_SEND);
+                fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
+                fileIntent.setType(intent.getType());
+                startActivity(fileIntent);
+            }
         }
 		else{
 			logWarning("No requestcode");
