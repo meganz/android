@@ -513,7 +513,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 			}
 
-			if (intent.getAction().equals(ACTION_UPDATE_CALL)) {
+			boolean isNotifiable = megaApi.isChatNotifiable(chatId);
+			if (intent.getAction().equals(ACTION_UPDATE_CALL) && isNotifiable) {
 				stopService(new Intent(getInstance(), IncomingCallService.class));
 			}
 
@@ -531,7 +532,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							logError("Calls not found");
 							return;
 						}
-						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN && isNotifiable) {
 							createRTCAudioManager(false, callStatus);
 						}
 
@@ -542,10 +543,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							clearIncomingCallNotification(callId);
 						}
 
-						if (listAllCalls.size() == 1) {
-							checkOneCall(listAllCalls.get(0));
-						} else {
-							checkSeveralCall(listAllCalls, callStatus);
+						if(isNotifiable) {
+							if (listAllCalls.size() == 1) {
+								checkOneCall(listAllCalls.get(0));
+							} else {
+								checkSeveralCall(listAllCalls, callStatus);
+							}
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
