@@ -55,10 +55,6 @@ public class ReactionImageView extends AppCompatImageView {
     }
 
     public void addEmojiReaction(@NonNull final Emoji emoji){
-        if (currentEmoji == emoji) {
-            return;
-        }
-
         setImageDrawable(null);
         currentEmoji = emoji;
 

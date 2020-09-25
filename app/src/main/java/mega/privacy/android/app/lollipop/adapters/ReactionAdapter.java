@@ -102,14 +102,15 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         Emoji emoji = emojis.get(0).emoji;
         holder.reaction = reaction;
-
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
         if (numUsers > 0 && emoji != null) {
             String text = numUsers + "";
+
             if (!holder.itemNumUsersReaction.getText().equals(text)) {
                 holder.itemNumUsersReaction.setText(text);
             }
-            holder.itemEmojiReaction.addEmojiReaction(emoji);
+
+            holder.itemEmojiReaction.setEmoji(emoji);
 
             boolean ownReaction = false;
             MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
