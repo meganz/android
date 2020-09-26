@@ -294,7 +294,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
         fromShared = intent.getBooleanExtra("fromShared", false);
         inside = intent.getBooleanExtra("inside", false);
-//        handle = intent.getLongExtra("HANDLE", -1);
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
@@ -963,7 +962,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         protected void onPostExecute(InputStream inputStream) {
             logDebug("onPostExecute");
             try {
-                pdfView.fromStream(inputStream)
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                pdfView.fromStream(inputStream, node == null ? null : node.getBase64Handle())
                         .defaultPage(currentPage-1)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
