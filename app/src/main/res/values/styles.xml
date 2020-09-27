@@ -540,8 +540,20 @@
         <item name="endIconMode">password_toggle</item>
     </style>
 
-<!--    <style name="Widget.App.TextInputLayout" parent="Widget.Design.TextInputLayout">-->
-<!--        <item name="colorControlNormal">@color/blue</item>-->
-<!--        <item name="android:colorControlNormal">@color/blue</item>-->
-<!--    </style>-->
+    <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
+    colorControlActivated is the floating label, underline and cursor colors, when focused. If we
+    don’t define it, it will fall back to use your colorAccent(colorSecondary for Material)
+    colorControlNormal is the underline color, when the view is NOT focused. If we don’t define it,
+    it will use textColorSecondary itself.
+    textColorPrimary is the color of the user-input text. ColorError is the color of error text
+    textColorHint is the hint color when the field is empty and NOT focused. -->
+    <style name="TextInputLayout" parent="Widget.Design.TextInputLayout">
+        <item name="colorControlNormal">@color/textinputlayout_underline_unfocused</item>
+    </style>
+
+    <style name="TextInputLayout.Password">
+        <item name="endIconMode">password_toggle</item>
+        <item name="endIconDrawable">@drawable/ic_b_see</item>
+        <item name="endIconTint">@color/password_color_toggle</item>
+    </style>
 </resources>

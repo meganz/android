@@ -27,9 +27,8 @@
         <!-- Same to colorOnPrimary: rgba(0,0,0,0.87) -->
         <item name="colorOnSurface">@color/color_on_primary</item>
 
-        <!-- The color applied to icons/controls in their normal state. (currently used by Login screen
-         password TextInputLayout underline)-->
-        <item name="colorControlNormal">@color/control_normal</item>
+        <!-- The color applied to icons/controls in their normal state -->
+<!--        <item name="colorControlNormal">@color/control_normal</item>-->
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="windowActionModeOverlay">true</item>
@@ -59,14 +58,8 @@
         <!-- Used by the hint text color of TextInputLayout -->
         <item name="textColorHint">@color/text_hint</item>
 
-        <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
-          colorControlActivated is the floating label, underline and cursor colors, when focused. If we
-          don’t define it, it will fall back to use your colorAccent(colorSecondary for Material)
-          colorControlNormal is the underline color, when the view is NOT focused. If we don’t define it,
-          it will use textColorSecondary itself.
-          textColorPrimary is the color of the user-input text. ColorError is the color of error text
-          textColorHint is the hint color when the field is empty and NOT focused. -->
-        <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
+
+<!--        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>-->
 
 <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->

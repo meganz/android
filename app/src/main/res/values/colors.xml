@@ -240,7 +240,7 @@
     <color name="error">@color/dark_primary_color</color>
 
     <color name="primaryVariant">@color/dark_primary_color</color>
-    <color name="control_normal">#42000000</color>
+    <color name="textinputlayout_underline_unfocused">#42000000</color>
     <color name="text_hint">#60000000</color>
 
     <!-- Pure black in Light or white in Dark-->
