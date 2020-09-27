@@ -140,4 +140,7 @@
 
     <!-- "Login" screen background, Light: #F4F4F4, Dark: ?attr/colorBackground -->
     <attr name="greyBackgroundColor" format="color"/>
+
+    <!-- "Password visibility icon" color -->
+    <attr name="greyIconColor" format="color"/>
 </resources>

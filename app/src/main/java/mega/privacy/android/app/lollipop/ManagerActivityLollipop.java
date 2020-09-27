@@ -11305,7 +11305,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				} else {
 					nightMode = AppCompatDelegate.MODE_NIGHT_NO;
 				}
-				getDelegate().setLocalNightMode(nightMode);
+				getDelegate().setDefaultNightMode(nightMode);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {

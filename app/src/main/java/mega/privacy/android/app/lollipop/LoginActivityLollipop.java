@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -8,14 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -275,7 +271,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                resetStatusBarColor(this, this.getWindow());
                 break;
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {

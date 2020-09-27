@@ -325,7 +325,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
-        et_password.setOnFocusChangeListener((v1, hasFocus) -> setPasswordToggle(et_passwordLayout, hasFocus));
+        et_password.setOnFocusChangeListener((v1, hasFocus) ->
+                et_passwordLayout.setEndIconVisible(hasFocus));
 
         bLogin = (Button) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));

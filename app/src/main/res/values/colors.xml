@@ -231,11 +231,24 @@
 
     <!-- ======================= Dark mode refactoring =====================  -->
 
-    <!-- Entire screen background in Dark Mode -->
-    <color name="background_dark">#121212</color>
+    <!-- Entire screen background -->
+    <color name="background">@color/white</color>
 
-    <!-- Accent color (e.g. Button,FAB background) in Dark Mode -->
-    <color name="accent_dark">#6DD2BF</color>
+    <!-- Accent color (e.g. Button,FAB background) -->
+    <color name="accent">@color/accentColor</color>
 
-    <color name="error_dark">#FD3E38</color>
+    <color name="error">@color/dark_primary_color</color>
+
+    <color name="primaryVariant">@color/dark_primary_color</color>
+    <color name="control_normal">#42000000</color>
+    <color name="text_hint">#60000000</color>
+
+    <!-- Pure black in Light or white in Dark-->
+    <color name="black_white">@color/black</color>
+
+    <!-- The background color of Login screen -->
+    <color name="grey_background">@color/background_create_account</color>
+
+    <!-- The "eye" icon -->
+    <color name="password_visible_icon">#42000000</color>
 </resources>

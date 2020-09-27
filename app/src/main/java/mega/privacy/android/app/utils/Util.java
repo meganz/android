@@ -38,6 +38,8 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
@@ -1471,6 +1473,23 @@ public class Util {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(context, colorId));
     }
+
+	/**
+	 * Reset the color of the status bar to the Theme setting
+	 * @param context
+	 * @param window
+	 */
+	public static void resetStatusBarColor(Context context, Window window) {
+		if (context == null || window == null) return;
+
+		TypedValue typedValue = new TypedValue();
+		Resources.Theme theme = context.getTheme();
+		theme.resolveAttribute(R.attr.statusBarBackground, typedValue, true);
+
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.setStatusBarColor(typedValue.data);
+	}
 
 	public static int getStatusBarHeight() {
 		Context context = MegaApplication.getInstance().getBaseContext();

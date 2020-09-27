@@ -35,7 +35,7 @@
                     android:layout_gravity="left"
                     android:text="@string/login_to_mega"
                     android:layout_marginTop="17dp"
-                    android:textAppearance="@style/Title_16"/>
+                    android:textAppearance="?attr/textAppearanceHeadline6"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -81,9 +81,11 @@
                         android:layout_marginTop="24dp"
                         android:hint="@string/password_text"
                         app:errorEnabled="true"
+                        app:endIconMode="password_toggle"
+                        app:endIconDrawable="@drawable/ic_b_see"
                         app:endIconTint="@color/password_color_toggle">
 
-                        <androidx.appcompat.widget.AppCompatEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/login_password_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -148,7 +150,7 @@
                     android:id="@+id/button_forgot_pass"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="94dp"
+                    android:layout_marginBottom="18dp"
                     android:paddingLeft="3dp"
                     style="@style/BorderlessButton"
                     tools:text="FORGET YOUR PASSWORD?"/>
@@ -159,23 +161,22 @@
                 android:id="@+id/login_create_account_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/background_create_account"
-                android:gravity="center"
-                android:orientation="vertical" >
+                android:background="?attr/greyBackgroundColor"
+                android:gravity="left"
+                android:orientation="horizontal" >
 
                 <TextView
                     android:id="@+id/text_newToMega"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
                     android:text="@string/new_to_mega"
-                    android:layout_marginTop="24dp"
-                    android:textAppearance="@style/Title_20" />
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <TextView
                     android:id="@+id/button_create_account_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
                     android:layout_marginBottom="24dp"
                     style="@style/BorderlessButton" />
 

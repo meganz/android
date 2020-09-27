@@ -24,6 +24,7 @@ import android.os.PowerManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
@@ -89,6 +90,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -568,6 +570,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		singleApplicationInstance = this;
 
 		super.onCreate();
+
+		AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES);
 
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {

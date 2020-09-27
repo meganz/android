@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#121212</color>
+    <color name="accent">#6DD2BF</color>
+    <color name="error">#FD3E38</color>
+    <color name="primaryVariant">#121212</color>
+    <color name="control_normal">#1EFFFFFF</color>
+    <color name="text_hint">#99FFFFFF</color>
+    <color name="black_white">@color/white</color>
+
+    <color name="grey_background">#121212</color>
+
+    <color name="password_visible_icon">#60FFFFFF</color>
+</resources>

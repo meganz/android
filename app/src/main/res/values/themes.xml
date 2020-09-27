@@ -8,25 +8,28 @@
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorSecondary">@color/accentColor</item>
-        <!-- colorPrimaryVariant is used for the status bar -->
-        <item name="colorPrimaryVariant">@color/dark_primary_color</item>
+        <item name="colorPrimary">@color/background</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorPrimaryVariant">@color/primaryVariant</item>
+
         <!--colorBackground appears behind scrollable content and is used for the default window-->
         <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
         <!--and menus. colorError is used to indicate an error state for components such as-->
         <!--text fields.-->
-        <item name="android:colorBackground">@color/white</item>
-        <item name="colorSurface">@color/white</item>
-        <item name="colorError">@color/dark_primary_color</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/background</item>
+        <item name="colorError">@color/error</item>
 
-        <!-- The color applied to icons/controls in their normal state.-->
-        <item name="colorControlNormal">@color/control_normal_light</item>
+        <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+        <!--on which they appear.-->
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorOnSecondary">@color/background</item>
+        <!-- Same to colorOnPrimary: rgba(0,0,0,0.87) -->
+        <item name="colorOnSurface">@color/color_on_primary</item>
 
-        <!-- button text color -->
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="colorOnSurface">@color/black</item>
+        <!-- The color applied to icons/controls in their normal state. (currently used by Login screen
+         password TextInputLayout underline)-->
+        <item name="colorControlNormal">@color/control_normal</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="windowActionModeOverlay">true</item>
@@ -44,18 +47,40 @@
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
 
         <item name="android:fitsSystemWindows">true</item>
-        <item name="android:statusBarColor">@color/dark_primary_color</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:navigationBarColor">?android:attr/colorBackground</item>
 
         <item name="borderlessButtonStyle">@style/BorderlessButton</item>
 
-        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
 
-        <item name="greyBackgroundColor">@color/background_create_account</item>
+        <item name="greyBackgroundColor">@color/grey_background</item>
+        <!-- Used by the hint text color of TextInputLayout -->
+        <item name="textColorHint">@color/text_hint</item>
 
-        <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components -->
-        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
+          colorControlActivated is the floating label, underline and cursor colors, when focused. If we
+          don’t define it, it will fall back to use your colorAccent(colorSecondary for Material)
+          colorControlNormal is the underline color, when the view is NOT focused. If we don’t define it,
+          it will use textColorSecondary itself.
+          textColorPrimary is the color of the user-input text. ColorError is the color of error text
+          textColorHint is the hint color when the field is empty and NOT focused. -->
+        <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
+
+<!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
+        <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->
+        <!--<item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>-->
+        <!--<item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>-->
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
+        <!--<item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>-->
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Mega.Subtitle2</item>
+        <!--<item name="textAppearanceBody1">@style/TextAppearance.MyTheme.Body1</item>-->
+        <!--<item name="textAppearanceBody2">@style/TextAppearance.MyTheme.Body2</item>-->
+        <!--<item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>-->
+        <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
+        <!--<item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>-->
     </style>
 </resources>
 

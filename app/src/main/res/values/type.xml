@@ -1,30 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- On boarding screen, text title in the carousel -->
-    <style name="TextAppearance.Headline" parent="TextAppearance.MaterialComponents.Headline5">
+    <style name="TextAppearance.Mega.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textSize">22sp</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <!-- Normal text body, Roboto regular, 15sp, textColorPrimary, AllCaps=false -->
-    <style name="TextAppearance.Caption" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="TextAppearance.Mega.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">15sp</item>
     </style>
 
-    <style name="Title_16">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    <style name="TextAppearance.Mega.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textSize">16sp</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.009375</item>
+        <item name="textStyle">normal</item>
     </style>
 
-    <style name="Title_20">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textStyle">normal</item>
+    <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:letterSpacing">0</item>
     </style>
 
 </resources>

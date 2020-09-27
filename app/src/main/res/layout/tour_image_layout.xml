@@ -19,7 +19,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginTop="20dp"
-        android:textAppearance="@style/TextAppearance.Headline"
+        android:textAppearance="?attr/textAppearanceHeadline5"
         android:gravity="center"/>
 
     <TextView
@@ -31,7 +31,7 @@
         android:layout_marginTop="8dp"
         android:layout_alignTop="@+id/invisible_view"
         android:lineSpacingExtra="5sp"
-        android:textAppearance="@style/TextAppearance.Caption"
+        android:textAppearance="@style/TextAppearance.Mega.Caption"
         android:gravity="center"/>
 
 </LinearLayout>
