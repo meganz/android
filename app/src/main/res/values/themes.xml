@@ -77,7 +77,7 @@
         <!--<item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>-->
         <item name="textAppearanceSubtitle2">@style/TextAppearance.Mega.Subtitle2</item>
         <!--<item name="textAppearanceBody1">@style/TextAppearance.MyTheme.Body1</item>-->
-        <!--<item name="textAppearanceBody2">@style/TextAppearance.MyTheme.Body2</item>-->
+        <item name="textAppearanceBody2">@style/TextAppearance.Mega.Body2</item>
         <!--<item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>-->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
         <!--<item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>-->

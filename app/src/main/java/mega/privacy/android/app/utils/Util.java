@@ -1476,6 +1476,8 @@ public class Util {
 	 * @param window
 	 */
 	public static void resetStatusBarColor(Context context, Window window) {
+		if (context == null || window == null) return;
+
 		TypedValue typedValue = new TypedValue();
 		context.getTheme().resolveAttribute(
 				android.R.attr.statusBarColor, typedValue, true);

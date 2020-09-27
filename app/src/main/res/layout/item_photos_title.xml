@@ -16,10 +16,8 @@
         android:layout_height="36dp"
         android:layout_margin="2dp"
         android:layout_marginStart="18dp"
-        android:fontFamily="roboto"
         android:gravity="center_vertical"
         android:text="@{item.modifiedDate}"
-        android:textColor="@color/name_my_account"
-        android:textSize="12sp"
+        android:textAppearance="@style/TextAppearance.Mega.Body2"
         tools:text="July 2020" />
 </layout>
