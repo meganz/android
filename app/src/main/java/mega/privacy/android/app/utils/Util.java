@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -26,7 +25,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.ExifInterface;
@@ -39,7 +37,6 @@ import android.os.Handler;
 
 import android.provider.MediaStore;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
@@ -1476,15 +1473,12 @@ public class Util {
 
 	/**
 	 * Reset the color of the status bar to the Theme setting
-	 * @param context
 	 * @param window
 	 */
 	public static void resetStatusBarColor(Context context, Window window) {
-		if (context == null || window == null) return;
-
 		TypedValue typedValue = new TypedValue();
-		Resources.Theme theme = context.getTheme();
-		theme.resolveAttribute(R.attr.statusBarBackground, typedValue, true);
+		context.getTheme().resolveAttribute(
+				android.R.attr.statusBarColor, typedValue, true);
 
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

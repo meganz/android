@@ -48,7 +48,7 @@
 
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:navigationBarColor">?android:attr/colorBackground</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
 
         <item name="borderlessButtonStyle">@style/BorderlessButton</item>
 
