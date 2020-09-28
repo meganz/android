@@ -46,6 +46,10 @@ class HomePageViewModel @ViewModelInject constructor(
         loadAvatar()
     }
 
+    private val scrollingObserver = androidx.lifecycle.Observer<Boolean> {
+        _isScrolling.value = it
+    }
+
     init {
         updateNotification()
         updateChatStatus(megaChatApi.onlineStatus)
@@ -58,9 +62,7 @@ class HomePageViewModel @ViewModelInject constructor(
         )
         loadAvatar()
         avatarChange.observeForever(avatarChangeObserver)
-        scrolling.observeForever {
-            _isScrolling.value = it
-        }
+        scrolling.observeForever(scrollingObserver)
     }
 
     override fun onCleared() {
@@ -69,6 +71,7 @@ class HomePageViewModel @ViewModelInject constructor(
         megaApi.removeGlobalListener(this)
         megaChatApi.removeChatListener(this)
         avatarChange.removeObserver(avatarChangeObserver)
+        scrolling.removeObserver(scrollingObserver)
     }
 
     private fun loadAvatar() {

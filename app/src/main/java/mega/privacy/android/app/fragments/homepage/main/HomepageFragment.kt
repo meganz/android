@@ -32,6 +32,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
+import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
@@ -232,10 +233,13 @@ class HomepageFragment : Fragment() {
         // the nested scrolling child views and deal with the logic of nested scrolling
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                val fragment = childFragmentManager.findFragmentByTag("f$position")
                 bottomSheetBehavior.invalidateScrollingChild(
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
-                    childFragmentManager.findFragmentByTag("f$position")?.view
+                    fragment?.view
                 )
+
+                (fragment as? Scrollable)?.checkScroll()
             }
         })
 
