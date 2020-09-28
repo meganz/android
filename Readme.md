@@ -41,19 +41,28 @@ export ANDROID_HOME=/path/to/sdk
 ln -s /path/to/sdk ${HOME}/android-sdk
 ```
 
-5. Download the link https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+5. Export `JAVA_HOME` variable or create a symbolic link at `${HOME}/android-java` to point your Java installation path.
 
-6. Before running the building script, install the required packages. For example for Ubuntu or other Debian-based distro:
+```
+export JAVA_HOME=/path/to/jdk
+```
+```
+ln -s /path/to/jdk ${HOME}/android-java
+```
+
+6. Download the link https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+
+7. Before running the building script, install the required packages. For example for Ubuntu or other Debian-based distro:
 
 ```
 sudo apt install build-essential swig automake libtool autoconf cmake
 ```
 
-7. Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
+8. Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
 
-8. Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
+9. Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
 
-9. Open the project with Android Studio, let it build the project and hit _*Run*_.
+10. Open the project with Android Studio, let it build the project and hit _*Run*_.
 
 ### Notice
 
