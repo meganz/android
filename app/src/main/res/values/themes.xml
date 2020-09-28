@@ -8,27 +8,41 @@
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
+        <!-- e.g. the color of the action bar -->
         <item name="colorPrimary">@color/background</item>
+        <!-- e.g. the background color of the FAB -->
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorPrimaryVariant">@color/primaryVariant</item>
+        <!-- e.g. The action bar color of the "select folder" screen -->
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <!-- e.g. A variant color of the FAB -->
+<!--        <item name="colorSecondaryVariant"></item>-->
 
         <!--colorBackground appears behind scrollable content and is used for the default window-->
         <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
         <!--and menus. colorError is used to indicate an error state for components such as-->
         <!--text fields.-->
         <item name="android:colorBackground">@color/background</item>
+        <!-- e.g. the color of the bottom sheet -->
         <item name="colorSurface">@color/background</item>
+        <!-- e.g. the color of the invalid email address hint -->
         <item name="colorError">@color/error</item>
 
         <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
         <!--on which they appear.-->
-        <item name="colorOnPrimary">@color/color_on_primary</item>
-        <item name="colorOnSecondary">@color/background</item>
-        <!-- Same to colorOnPrimary: rgba(0,0,0,0.87) -->
-        <item name="colorOnSurface">@color/color_on_primary</item>
+        <!-- e.g. the color of the title text on the action bar -->
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <!-- e.g. the color of the "+" icon on the FAB -->
+        <item name="colorOnSecondary">@color/on_secondary</item>
+<!--        <item name="colorOnSurface"></item>-->
+<!--        <item name="colorOnError"></item>-->
+<!--        <item name="colorOnBackground"></item>-->
 
         <!-- The color applied to icons/controls in their normal state -->
-<!--        <item name="colorControlNormal">@color/control_normal</item>-->
+        <!-- e.g. The overflow menu item (3 dotes) automatically use this color.
+             Other action bar menu icons tint -->
+        <item name="colorControlNormal">@color/control_normal</item>
+        <!-- You can also set colorControlActivated
+        colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="windowActionModeOverlay">true</item>
@@ -39,8 +53,6 @@
         <item name="elevation">0dp</item>
 
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="preferenceTheme">@style/PreferenceStyle</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
@@ -57,7 +69,6 @@
         <item name="greyBackgroundColor">@color/grey_background</item>
         <!-- Used by the hint text color of TextInputLayout -->
         <item name="textColorHint">@color/text_hint</item>
-
 
 <!--        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>-->
 

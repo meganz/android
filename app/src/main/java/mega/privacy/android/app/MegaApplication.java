@@ -195,6 +195,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private CallListener callListener = new CallListener();
 
+	public static int sNightMode = AppCompatDelegate.MODE_NIGHT_NO;
+
     @Override
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
@@ -571,7 +573,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		super.onCreate();
 
-		AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES);
+		AppCompatDelegate.setDefaultNightMode(sNightMode);
 
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {

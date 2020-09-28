@@ -256,6 +256,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.MegaApplication.sNightMode;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
@@ -439,8 +440,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
-
-	private int nightMode = AppCompatDelegate.MODE_NIGHT_NO;
 
     public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -6349,7 +6348,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
-//		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
+//		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black)); // Dark mode comment out
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 
@@ -11300,12 +11299,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				break;
 			}
 			case R.id.theme_section: {
-				if (nightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-					nightMode = AppCompatDelegate.MODE_NIGHT_YES;
+				if (sNightMode == AppCompatDelegate.MODE_NIGHT_NO) {
+					sNightMode = AppCompatDelegate.MODE_NIGHT_YES;
 				} else {
-					nightMode = AppCompatDelegate.MODE_NIGHT_NO;
+					sNightMode = AppCompatDelegate.MODE_NIGHT_NO;
 				}
-				getDelegate().setDefaultNightMode(nightMode);
+				getDelegate().setDefaultNightMode(sNightMode);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
