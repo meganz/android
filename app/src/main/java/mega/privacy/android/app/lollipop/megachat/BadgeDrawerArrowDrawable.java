@@ -31,28 +31,28 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         backgroundPaint = new Paint();
         if (context instanceof ManagerActivityLollipop
             || context instanceof ArchivedChatsActivity) {
-            backgroundPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
+            backgroundPaint.setColor(ContextCompat.getColor(context, R.color.badge_background));
         } else {
-            backgroundPaint.setColor(Color.WHITE);
+            backgroundPaint.setColor(ContextCompat.getColor(context, R.color.badge_background_secondary));
         }
         backgroundPaint.setAntiAlias(true);
 
         bigBackgroundPaint = new Paint();
         if (context instanceof ManagerActivityLollipop
             || context instanceof ArchivedChatsActivity) {
-            bigBackgroundPaint.setColor(Color.WHITE);
+            bigBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.background));
         } else {
             bigBackgroundPaint.setColor(
-                ContextCompat.getColor(context, R.color.dark_primary_color));
+                ContextCompat.getColor(context, R.color.badge_big_background_secondary));
         }
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
         if (context instanceof ManagerActivityLollipop
             || context instanceof ArchivedChatsActivity) {
-            textPaint.setColor(Color.WHITE);
+            textPaint.setColor(ContextCompat.getColor(context, R.color.badge_text_color));
         } else {
-            textPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
+            textPaint.setColor(ContextCompat.getColor(context, R.color.badge_text_color_secondary));
         }
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);

@@ -38,8 +38,9 @@
 <!--        <item name="colorOnBackground"></item>-->
 
         <!-- The color applied to icons/controls in their normal state -->
-        <!-- e.g. The overflow menu item (3 dotes) automatically use this color.
-             Other action bar menu icons tint -->
+        <!-- e.g. The overflow menu item (3 dotes) automatically use this color
+             so is the BadgeDrawerArrowDrawable's arrow color.
+             Other action bar menu icons tint (activity_manager menu xml), etc. -->
         <item name="colorControlNormal">@color/control_normal</item>
         <!-- You can also set colorControlActivated
         colorControlHighlight & colorSwitchThumbNormal. -->

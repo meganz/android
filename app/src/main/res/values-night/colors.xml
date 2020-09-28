@@ -16,4 +16,8 @@
     <color name="control_normal">#E5FFFFFF</color>
 
     <color name="on_secondary">#121212</color>
+
+    <color name="badge_background_secondary">#F0373A</color>
+    <color name="badge_big_background_secondary">#121212</color>
+    <color name="badge_text_color_secondary">#121212</color>
 </resources>

@@ -256,4 +256,10 @@
     <color name="control_normal">#DD000000</color>
 
     <color name="on_secondary">@color/white</color>
+
+    <color name="badge_background">#F0373A</color>
+    <color name="badge_background_secondary">@color/white</color>
+    <color name="badge_big_background_secondary">@color/dark_primary_color</color>
+    <color name="badge_text_color">@color/on_secondary</color>
+    <color name="badge_text_color_secondary">#F0373A</color>
 </resources>
