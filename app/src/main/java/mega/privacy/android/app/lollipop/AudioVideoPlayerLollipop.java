@@ -3777,6 +3777,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (getIntent() != null) {
             screenPosition = getIntent().getIntArrayExtra("screenPosition");
             draggableView.setScreenPosition(screenPosition);
+            int[] screenPositionForSwipeDismiss = getIntent().getIntArrayExtra(INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS);
+            if (screenPositionForSwipeDismiss != null) {
+                screenPosition = screenPositionForSwipeDismiss;
+                draggableView.setScreenPosition(screenPosition);
+            }
         }
         draggableView.setDraggableListener(this);
         ivShadow = new ImageView(this);

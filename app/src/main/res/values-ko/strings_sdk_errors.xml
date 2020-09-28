@@ -31,6 +31,7 @@
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">2단계 인증이 필요합니다.</string>
     <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">관리자가 아닌 이용자의 접근이 금지됨</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">당신의 비즈니스 계정이 만료되었습니다</string>
+    <string name="api_epaywall" context="Label to show that an error of Over Disk Quota Paywall occurs during a SDK operation.">Over Disk Quota Paywall</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">신용 카드 거절됨</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">결제 실패</string>
     <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">사기 방지에 의해 거절됨</string>

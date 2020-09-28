@@ -363,7 +363,10 @@
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
     </plurals>
 
-    <string name="folder_empty" context="Warning shown when it tries to download an empty folder">Folder is empty</string>
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -2281,8 +2284,8 @@
     <string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Remove files older than</string>
-    <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
-    <string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
+    <string name="settings_rb_scheduler_select_days_subtitle" context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics">%d days</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
 
     <string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
 
@@ -2520,9 +2523,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s left the call</string>
 
-    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">Unable to start a call because the participants limit was exceeded.</string>
-    <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Unable to join this call as it has reached the maximum number of participants.</string>
-    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">Unable to join this call as the group has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">You are not allowed to start a call because the participants limit was exceeded.</string>
+    <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">You are not allowed to join this call as it has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">You are not allowed to join this call as the group has reached the maximum number of participants.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
@@ -2841,12 +2844,14 @@
     <string name="homepage_bottom_sheet_behavior">mega.privacy.android.app.fragments.homepage.main.HomepageBottomSheetBehavior</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
-    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support@mega.nz</string>
+    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support&#64;mega.nz</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Your account has been disabled by your administrator. Please contact your business account administrator for further details.</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">Your account has been removed by your administrator. Please contact your business account administrator for further details.</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify</string>
     <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
     <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
-    <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of ">This operation will remove your current phone number and start the process of associating a new phone number with your account.</string>
+    <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">This operation will remove your current phone number and start the process of associating a new phone number with your account.</string>
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">This will remove your associated phone number from your account. If you later choose to add a phone number you will be required to verify it.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>

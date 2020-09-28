@@ -199,7 +199,7 @@ class CuActionModeCallback implements ActionMode.Callback {
             control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
-        control.selectAll().setVisible(selected.size() < mViewModel.getRealNodesCount() + 1);
+        control.selectAll().setVisible(selected.size() < mViewModel.getRealNodesCount());
 
         CloudStorageOptionControlUtil.applyControl(menu, control);
 

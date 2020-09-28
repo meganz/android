@@ -390,6 +390,14 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
             if (screenPosition != null) {
                 intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
+                int[] screenPositionForSwipeDismiss = new int[] {
+                        screenPosition[0] + screenPosition[2] / 2,
+                        screenPosition[1] + screenPosition[3] / 2,
+                        screenPosition[2],
+                        screenPosition[3]
+                };
+                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS, screenPositionForSwipeDismiss);
+
             }
             intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
             if (isMedia) {

@@ -229,7 +229,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.contact_list_option_call_layout:
-                startNewCall(((GroupChatInfoActivityLollipop) context), megaApi.getContact(selectedChat.getPeerEmailByHandle(participantHandle)));
+                startNewCall(((GroupChatInfoActivityLollipop) context), megaApi.getContact(chatC.getParticipantEmail(participantHandle)));
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:

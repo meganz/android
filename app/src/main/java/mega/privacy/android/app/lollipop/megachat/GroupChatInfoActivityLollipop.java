@@ -1436,6 +1436,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void updateParticipants() {
+        MegaChatRoom chatRoomUpdated = megaChatApi.getChatRoom(chatHandle);
+        if (chatRoomUpdated == null) {
+            logWarning("The chatRoom updated is null");
+            return;
+        }
+
+        chat = chatRoomUpdated;
         participants.clear();
         setParticipants();
     }

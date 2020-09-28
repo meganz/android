@@ -1,14 +1,17 @@
 #!/bin/bash -i
 set -e
 
-##################################################
-### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
-##################################################
+##############################################################
+# SET THE PATH TO YOUR ANDROID NDK, SDK and JAVA DIRECTORIES #
+##############################################################
 if [ -z "$NDK_ROOT" ]; then
     NDK_ROOT=${HOME}/android-ndk
 fi
 if [ -z "$ANDROID_HOME" ]; then
     export ANDROID_HOME=${HOME}/android-sdk
+fi
+if [ -z "$JAVA_HOME" ]; then
+    export JAVA_HOME=${HOME}/android-java
 fi
 ##################################################
 ##################################################
