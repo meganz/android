@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.Event
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -20,20 +19,16 @@ class PsaViewModel(
     )
     private var lastGetPsaTime = preference.getLong(LAST_GET_PSA_KEY, 0)
 
-    private val _psa = MutableLiveData<Event<Psa>>()
-    val psa: LiveData<Event<Psa>> = _psa
-    var psaState = PSA_STATE_IDLE
+    private val _psa = MutableLiveData<Psa?>()
+    val psa: LiveData<Psa?> = _psa
 
     fun checkPsa() {
-        if (System.currentTimeMillis() - lastGetPsaTime < GET_PSA_MIN_INTERVAL_MS
-            || psaState == PSA_STATE_DISPLAYING
-        ) {
+        if (System.currentTimeMillis() - lastGetPsaTime < GET_PSA_MIN_INTERVAL_MS) {
             return
         }
 
-        val event = psa.value
-        if (psaState == PSA_STATE_PENDING_DISPLAY && event != null) {
-            _psa.value = Event(event.peekContent())
+        if (psa.value != null) {
+            _psa.value = psa.value
             return
         }
 
@@ -53,12 +48,9 @@ class PsaViewModel(
                 }
 
                 if (e.errorCode == MegaError.API_OK) {
-                    psaState = PSA_STATE_PENDING_DISPLAY
-                    _psa.value = Event(
-                        Psa(
-                            request.number.toInt(), request.name, request.text, request.file,
-                            request.password, request.link, request.email
-                        )
+                    _psa.value = Psa(
+                        request.number.toInt(), request.name, request.text, request.file,
+                        request.password, request.link, request.email
                     )
                 }
             }
@@ -66,8 +58,8 @@ class PsaViewModel(
     }
 
     fun dismissPsa(id: Int) {
-        psaState = PSA_STATE_IDLE
-        megaApi.setPSA(id.toInt())
+        megaApi.setPSA(id)
+        _psa.value = null
     }
 
     companion object {
@@ -75,10 +67,6 @@ class PsaViewModel(
         const val LAST_GET_PSA_KEY = "LAST_GET_PSA_TIME_KEY"
 
         const val GET_PSA_MIN_INTERVAL_MS = 3600_000
-
-        const val PSA_STATE_IDLE = 1
-        const val PSA_STATE_PENDING_DISPLAY = 2
-        const val PSA_STATE_DISPLAYING = 3
     }
 }
 

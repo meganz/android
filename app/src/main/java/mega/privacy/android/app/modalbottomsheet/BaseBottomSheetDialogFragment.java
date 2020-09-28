@@ -43,8 +43,8 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private BottomSheetBehavior mBehavior;
 
     protected View contentView;
-    protected ViewGroup mainLinearLayout;
-    protected ViewGroup items_layout;
+    protected LinearLayout mainLinearLayout;
+    protected LinearLayout items_layout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

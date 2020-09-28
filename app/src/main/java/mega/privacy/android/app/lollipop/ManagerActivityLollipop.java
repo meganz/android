@@ -199,16 +199,15 @@ import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragme
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.PsaBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
+import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
 import mega.privacy.android.app.psa.PsaViewModelFactory;
-import mega.privacy.android.app.utils.EventObserver;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
@@ -789,6 +788,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 	private PsaViewModel psaViewModel;
+	private PsaViewHolder psaViewHolder;
 
 	private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
 		@Override
@@ -2139,14 +2139,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
 
-		observePsa();
-
 		handler = new Handler();
 
 		logDebug("Set view");
 		setContentView(R.layout.activity_manager);
-//		long num = 11179220468180L;
-//		dbH.setSecondaryFolderHandle(num);
+
+		observePsa();
+
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
 
@@ -4764,28 +4763,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private void observePsa() {
 		psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
 				.get(PsaViewModel.class);
+		psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
 
-		psaViewModel.getPsa().observe(this, new EventObserver<>(this::showPsa));
+		psaViewModel.getPsa().observe(this, this::showPsa);
 	}
 
-	private kotlin.Unit showPsa(Psa psa) {
+	private void showPsa(Psa psa) {
+    	if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+    		return;
+		}
+
     	if (!TextUtils.isEmpty(psa.getUrl())) {
 			Intent intent = new Intent(this, WebViewActivityLollipop.class);
 			intent.setData(Uri.parse(psa.getUrl()));
 			startActivity(intent);
 			psaViewModel.dismissPsa(psa.getId());
-    		return null;
+    		return;
 		}
 
-		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
-			return null;
-		}
-
-		bottomSheetDialogFragment = new PsaBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(),
-				bottomSheetDialogFragment.getTag());
-		psaViewModel.setPsaState(PsaViewModel.PSA_STATE_DISPLAYING);
-		return null;
+		psaViewHolder.bind(psa);
 	}
 
     public void checkBeforeShow() {
@@ -5698,6 +5694,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		viewPagerTransfers.setVisibility(View.GONE);
 
     	fragmentContainer.setVisibility(View.GONE);
+
+    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
