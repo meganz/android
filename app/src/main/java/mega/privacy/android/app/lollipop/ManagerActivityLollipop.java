@@ -221,6 +221,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -15877,7 +15878,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}, 300);
 			}
 			else if (option == COLOR_STATUS_BAR_ZERO) {
-				window.setStatusBarColor(0);
+//				window.setStatusBarColor(0); // Dark mode comment out
+				Util.resetStatusBarColor(this, this.getWindow());
 			}
             else if (option == COLOR_STATUS_BAR_SMS_VERIFICATION) {
                 window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_sms_verification));
