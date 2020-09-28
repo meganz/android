@@ -59,6 +59,7 @@ class HomepageFragment : Fragment() {
     private lateinit var fabMaskLayout: View
     private lateinit var viewPager: ViewPager2
     private lateinit var tabs: TabLayout
+    private var currentSelectedTab: Fragment? = null
     private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
 
@@ -232,19 +233,27 @@ class HomepageFragment : Fragment() {
         // Pass selected page view to HomepageBottomSheetBehavior which would seek for
         // the nested scrolling child views and deal with the logic of nested scrolling
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+
             override fun onPageSelected(position: Int) {
-                val fragment = childFragmentManager.findFragmentByTag("f$position")
+                currentSelectedTab = childFragmentManager.findFragmentByTag("f$position")
                 bottomSheetBehavior.invalidateScrollingChild(
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
-                    fragment?.view
+                    currentSelectedTab?.view
                 )
 
-                (fragment as? Scrollable)?.checkScroll()
+                if (currentSelectedTab == null) {
+                    changeTabEleveation(false)
+                } else {
+                    (currentSelectedTab as Scrollable).checkScroll()
+                }
+
             }
         })
 
         viewModel.isScrolling.observe(viewLifecycleOwner) {
-            changeTabEleveation(it)
+            if (it.first == currentSelectedTab) {
+                changeTabEleveation(it.second)
+            }
         }
     }
 
@@ -326,7 +335,7 @@ class HomepageFragment : Fragment() {
     }
 
     private fun changeTabEleveation(withElevation: Boolean) = if (withElevation) {
-        tabs.elevation = Util.px2dp(4f, resources.displayMetrics).toFloat()
+        tabs.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
     } else {
         tabs.elevation = 0f
     }

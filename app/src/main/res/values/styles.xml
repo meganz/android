@@ -528,7 +528,7 @@
         <item name="android:paddingBottom">6dp</item>
         <item name="android:paddingStart">11dp</item>
         <item name="android:paddingEnd">10dp</item>
-        <item name="android:textColor">#ff373737</item>
+        <item name="android:textColor">@color/homepage_fab_label_text_color</item>
         <item name="android:visibility">gone</item>
         <item name="borderWidth">0dp</item>
     </style>

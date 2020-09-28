@@ -29,6 +29,7 @@ import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.Pair;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
@@ -251,7 +252,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     @Override
     public void checkScroll() {
         if (listView == null) return;
-        EventNotifierKt.onScrolling((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE));
+        EventNotifierKt.onScrolling(new Pair<>(this, listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE));
     }
 
     public String findUserName(String mail) {

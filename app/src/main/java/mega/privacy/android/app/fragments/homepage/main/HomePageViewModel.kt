@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.avatarChange
 import mega.privacy.android.app.fragments.homepage.scrolling
 import mega.privacy.android.app.listeners.DefaultMegaChatListener
@@ -35,18 +36,18 @@ class HomePageViewModel @ViewModelInject constructor(
     private val _notification = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
-    private val _isScrolling = MutableLiveData<Boolean>()
+    private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
 
     val notification: LiveData<Int> = _notification
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
-    val isScrolling: LiveData<Boolean> = _isScrolling
+    val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
         loadAvatar()
     }
 
-    private val scrollingObserver = androidx.lifecycle.Observer<Boolean> {
+    private val scrollingObserver = androidx.lifecycle.Observer<Pair<Scrollable, Boolean>> {
         _isScrolling.value = it
     }
 
