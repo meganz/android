@@ -21,7 +21,7 @@ This document will guide you to build the application on a Linux machine with An
 git clone --recursive https://github.com/meganz/android.git
 ```
 
-2. Install in your system the [Android NDK 16](https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip).
+2. Install in your system the [Android NDK 21](https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip).
 
 3. Export `NDK_ROOT` variable or create a symbolic link at `${HOME}/android-ndk` to point to your Android NDK installation path.
 
@@ -32,19 +32,28 @@ export NDK_ROOT=/path/to/ndk
 ln -s /path/to/ndk ${HOME}/android-ndk
 ```
 
-4. Download the link https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+4. Export `ANDROID_HOME` variable or create a symbolic link at `${HOME}/android-sdk` to point your Android SDK installation path.
 
-5. Before running the building script, install the required packages. For example for Ubuntu or other Debian-based distro:
+```
+export ANDROID_HOME=/path/to/sdk
+```
+```
+ln -s /path/to/sdk ${HOME}/android-sdk
+```
+
+5. Download the link https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+
+6. Before running the building script, install the required packages. For example for Ubuntu or other Debian-based distro:
 
 ```
 sudo apt install build-essential swig automake libtool autoconf cmake
 ```
 
-6. Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
+7. Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
 
-7. Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
+8. Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
 
-8. Open the project with Android Studio, let it build the project and hit _*Run*_.
+9. Open the project with Android Studio, let it build the project and hit _*Run*_.
 
 ### Notice
 
