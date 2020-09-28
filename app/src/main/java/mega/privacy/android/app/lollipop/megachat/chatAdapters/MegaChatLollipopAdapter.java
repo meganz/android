@@ -893,8 +893,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
             holder.ownMessageReactionsRecycler = v.findViewById(R.id.own_message_reactions_recycler);
             ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(true);
-            holder.ownMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
             holder.ownMessageReactionsRecycler.setHasFixedSize(true);
+            holder.ownMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
             holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
             holder.ownMessageReactionsLayout.setVisibility(View.GONE);
 
@@ -7906,8 +7906,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if (holder.ownReactionsAdapter.getItemCount() > 0) {
-                    int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), holder.ownReactionsAdapter.getListReactions());
-                    holder.ownMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+                    int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), holder.ownReactionsAdapter.getListReactions(), outMetrics);
+                    holder.ownMessageReactionsRecycler.columnWidth(maxSize);
                     holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
                 } else {
                     holder.ownMessageReactionsLayout.setVisibility(View.GONE);
@@ -7928,8 +7928,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if (holder.contactReactionsAdapter.getItemCount() > 0) {
-                    int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), holder.contactReactionsAdapter.getListReactions());
-                    holder.contactMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+                    int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), holder.contactReactionsAdapter.getListReactions(), outMetrics);
+                    holder.contactMessageReactionsRecycler.columnWidth(maxSize);
                     holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
                 } else {
                     holder.contactMessageReactionsLayout.setVisibility(View.GONE);
@@ -7953,15 +7953,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     private void createReactionsAdapter(MegaStringList listReactions, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage, final ViewHolderMessageChat holder) {
         ArrayList<String> list = getReactionsList(listReactions, true);
-        int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list);
+        int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list, outMetrics);
         if (ownMessage) {
             holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.ownMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+            holder.ownMessageReactionsRecycler.columnWidth(maxSize);
             holder.ownReactionsAdapter = new ReactionAdapter(context, holder.ownMessageReactionsRecycler, list, chatId, megaMessage);
             holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
         } else {
             holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.contactMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+            holder.contactMessageReactionsRecycler.columnWidth(maxSize);
             holder.contactReactionsAdapter = new ReactionAdapter(context, holder.contactMessageReactionsRecycler, list, chatId, megaMessage);
             holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
         }
@@ -8031,8 +8031,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
             if (holder.ownReactionsAdapter != null && holder.ownReactionsAdapter.isSameAdapter(chatId, megaMessage.getMessage().getMsgId())) {
                 ArrayList<String> list = getReactionsList(listReactions, true);
-                int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list);
-                holder.ownMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+                int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list, outMetrics);
+                holder.ownMessageReactionsRecycler.columnWidth(maxSize);
                 holder.ownReactionsAdapter.setReactions(list, chatId, megaMessage.getMessage().getMsgId());
             } else {
                 createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
@@ -8041,8 +8041,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
             if (holder.contactReactionsAdapter != null && holder.contactReactionsAdapter.isSameAdapter(chatId, megaMessage.getMessage().getMsgId())) {
                 ArrayList<String> list = getReactionsList(listReactions, true);
-                int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list);
-                holder.contactMessageReactionsRecycler.columnWidth(px2dp(maxSize, outMetrics));
+                int maxSize = getMaxWidthItem(chatId, megaMessage.getMessage().getMsgId(), list, outMetrics);
+                holder.contactMessageReactionsRecycler.columnWidth(maxSize);
                 holder.contactReactionsAdapter.setReactions(list, chatId, megaMessage.getMessage().getMsgId());
             } else {
                 createReactionsAdapter(listReactions, false, chatId, megaMessage, holder);

@@ -19,6 +19,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
-import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
@@ -60,9 +60,10 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatUtil {
-    private static int MIN_WIDTH = 50;
+    private static int MIN_WIDTH = 44;
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
@@ -400,17 +401,19 @@ public class ChatUtil {
      * @param listReactions The reactions list.
      * @return The size.
      */
-    public static int getMaxWidthItem(long receivedChatId, long receivedMessageId, ArrayList<String> listReactions) {
+    public static int getMaxWidthItem(long receivedChatId, long receivedMessageId, ArrayList<String> listReactions, DisplayMetrics outMetrics) {
         if (listReactions == null || listReactions.isEmpty()) {
             return 0;
         }
 
-        int initSize = MIN_WIDTH;
+        int initSize = px2dp(MIN_WIDTH, outMetrics);
+        int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? 10 : 11;
         for (String reaction : listReactions) {
             int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
             if (numUsers > 0) {
                 String text = numUsers + "";
-                int possibleNewSize = MIN_WIDTH + text.length();
+                int length = text.length();
+                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2sp(sizeText * length, outMetrics);
                 if (possibleNewSize > initSize) {
                     initSize = possibleNewSize;
                 }

@@ -109,7 +109,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             if (!holder.itemNumUsersReaction.getText().equals(text)) {
                 holder.itemNumUsersReaction.setText(text);
             }
-
             holder.itemEmojiReaction.setEmoji(emoji);
 
             boolean ownReaction = false;

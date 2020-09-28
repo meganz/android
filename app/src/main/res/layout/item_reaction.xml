@@ -11,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="28dp"
         android:paddingStart="10dp"
-        android:paddingEnd="8dp"
         android:layout_centerVertical="true"
         android:gravity="center_vertical"
         android:background="@drawable/contact_reaction_added"
@@ -36,10 +35,9 @@
             android:maxLines="1"
             android:lines="1"
             android:layout_toEndOf="@id/item_emoji_reaction"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/mail_my_account"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMaxTextSize="14sp"
-            app:autoSizeStepGranularity="2sp"/>
+            android:textSize="14sp"/>
     </RelativeLayout>
 
     <RelativeLayout

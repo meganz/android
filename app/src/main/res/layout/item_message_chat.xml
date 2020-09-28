@@ -1220,7 +1220,7 @@
             android:layout_below="@id/content_own_message_layout"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="6dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="48dp"
             android:layout_marginTop="4dp"
             android:layout_alignEnd="@id/content_own_message_layout"
             android:gravity="end"
@@ -2116,9 +2116,10 @@
                 android:layout_alignStart="@id/content_contact_message_layout"
                 android:layout_marginStart="48dp"
                 android:layout_marginBottom="6dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="start"
                 android:visibility="gone">
+
                 <mega.privacy.android.app.components.twemoji.reaction.AutoFitGridRecyclerView
                     android:id="@+id/contact_message_reactions_recycler"
                     android:layout_width="match_parent"

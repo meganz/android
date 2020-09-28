@@ -446,6 +446,17 @@ public class Util {
 	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
+
+	/**
+	 * Convert sp to px.
+	 *
+	 * @param sp         sp value
+	 * @param outMetrics display metrics
+	 * @return corresponding px value
+	 */
+	public static int px2sp(float sp, DisplayMetrics outMetrics) {
+		return (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, outMetrics));
+	}
 	
 	/*
 	 * AES encryption
