@@ -752,7 +752,8 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:scaleType="centerInside"
-                            rounded:roundedCornerRadius="10dp" />
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundWithOverlayColor="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -920,7 +921,8 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:scaleType="centerInside"
-                            rounded:roundedCornerRadius="10dp" />
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundWithOverlayColor="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1820,7 +1822,8 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:scaleType="centerInside"
-                            rounded:roundedCornerRadius="10dp" />
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundWithOverlayColor="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1929,7 +1932,8 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:scaleType="centerInside"
-                            rounded:roundedCornerRadius="10dp" />
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundWithOverlayColor="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
