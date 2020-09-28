@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+
+import androidx.annotation.ColorRes;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.core.content.ContextCompat;
 import java.util.Objects;
@@ -25,35 +27,20 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     private boolean showDot;
     private boolean badgeEnabled = true;
 
-    public BadgeDrawerArrowDrawable(Context context) {
+    public BadgeDrawerArrowDrawable(Context context, @ColorRes int backgroundColor
+            , @ColorRes int bigBackgroundColor, @ColorRes int textColor) {
         super(context);
 
         backgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop
-            || context instanceof ArchivedChatsActivity) {
-            backgroundPaint.setColor(ContextCompat.getColor(context, R.color.badge_background));
-        } else {
-            backgroundPaint.setColor(ContextCompat.getColor(context, R.color.badge_background_secondary));
-        }
+            backgroundPaint.setColor(ContextCompat.getColor(context, backgroundColor));
         backgroundPaint.setAntiAlias(true);
 
         bigBackgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop
-            || context instanceof ArchivedChatsActivity) {
-            bigBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.background));
-        } else {
-            bigBackgroundPaint.setColor(
-                ContextCompat.getColor(context, R.color.badge_big_background_secondary));
-        }
+        bigBackgroundPaint.setColor(ContextCompat.getColor(context, bigBackgroundColor));
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop
-            || context instanceof ArchivedChatsActivity) {
-            textPaint.setColor(ContextCompat.getColor(context, R.color.badge_text_color));
-        } else {
-            textPaint.setColor(ContextCompat.getColor(context, R.color.badge_text_color_secondary));
-        }
+        textPaint.setColor(ContextCompat.getColor(context, textColor));
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);

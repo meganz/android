@@ -2259,8 +2259,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
         megaApi.getAccountAchievements(this);
 
-//		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
+		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.badge_background,
+				R.color.background, R.color.badge_text_color);
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
 		// Navi button Chat
 		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
