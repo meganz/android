@@ -25,6 +25,18 @@
             android:adjustViewBounds="true"
             android:background="@null" />
 
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
+            android:id="@+id/item_emoji_reaction_text"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:layout_marginEnd="6dp"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            app:emojiSize="20dp"
+            android:visibility="gone"/>
+
         <TextView
             android:id="@+id/item_number_users_reaction"
             android:layout_width="wrap_content"

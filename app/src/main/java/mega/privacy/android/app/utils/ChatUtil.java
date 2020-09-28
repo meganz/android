@@ -423,22 +423,38 @@ public class ChatUtil {
     }
 
     /**
-     * Method for adding a reaction in a message.
+     * Method that transforms an emoji into the right format to add a reaction.
      *
      * @param context        Context of Activity.
      * @param chatId         The chat ID.
      * @param messageId      The msg ID.
-     * @param emoji          The chosen reaction.
+     * @param emoji          The chosen emoji.
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
         if (!(context instanceof ChatActivityLollipop))
             return;
 
-        MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
         String reaction = editText.getText().toString();
+        addReactionInMsg(context, chatId, messageId, reaction, isFromKeyboard);
+    }
+
+    /**
+     * Method for adding a reaction in a msg.
+     *
+     * @param context        Context of Activity.
+     * @param chatId         The chat ID.
+     * @param messageId      The msg ID.
+     * @param reaction       The String with the reaction.
+     * @param isFromKeyboard If it's from the keyboard.
+     */
+    public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
+        if (!(context instanceof ChatActivityLollipop))
+            return;
+
+        MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
         MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
     }
 

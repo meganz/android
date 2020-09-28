@@ -1,6 +1,10 @@
 package mega.privacy.android.app.lollipop.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +32,7 @@ import nz.mega.sdk.MegaHandleList;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.px2dp;
 
 public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHolderReaction> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -65,7 +70,8 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         holderGrid.itemReactionLayout.setTag(holderGrid);
         holderGrid.itemNumUsersReaction = v.findViewById(R.id.item_number_users_reaction);
         holderGrid.itemEmojiReaction = v.findViewById(R.id.item_emoji_reaction);
-
+        holderGrid.itemEmojiReactionText = v.findViewById(R.id.item_emoji_reaction_text);
+        holderGrid.itemEmojiReactionText.setVisibility(View.GONE);
         holderGrid.moreReactionsLayout.setOnClickListener(this);
         holderGrid.itemReactionLayout.setOnClickListener(this);
         holderGrid.itemReactionLayout.setOnLongClickListener(chatRoom.isGroup() ? this : null);
@@ -97,19 +103,39 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         holder.moreReactionsLayout.setVisibility(View.GONE);
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
-        if(emojis == null || emojis.isEmpty() || emojis.get(0) == null)
-            return;
+        Emoji emoji = null;
+        if(emojis != null && !emojis.isEmpty() && emojis.get(0) != null){
+            emoji = emojis.get(0).emoji;
+        }
 
-        Emoji emoji = emojis.get(0).emoji;
         holder.reaction = reaction;
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
-        if (numUsers > 0 && emoji != null) {
+        if(numUsers > 0){
             String text = numUsers + "";
-
             if (!holder.itemNumUsersReaction.getText().equals(text)) {
                 holder.itemNumUsersReaction.setText(text);
             }
-            holder.itemEmojiReaction.setEmoji(emoji);
+            Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+            DisplayMetrics outMetrics = new DisplayMetrics ();
+            display.getMetrics(outMetrics);
+
+            if(emoji == null){
+                holder.itemEmojiReaction.setVisibility(View.GONE);
+                holder.itemEmojiReactionText.setVisibility(View.VISIBLE);
+                holder.itemEmojiReactionText.setText(reaction);
+            }else{
+                holder.itemEmojiReaction.setVisibility(View.VISIBLE);
+                holder.itemEmojiReactionText.setVisibility(View.GONE);
+                holder.itemEmojiReaction.setEmoji(emoji);
+            }
+
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(holder.itemNumUsersReaction.getLayoutParams());
+            params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+            params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            params.setMarginEnd(px2dp(8, outMetrics));
+            params.addRule(RelativeLayout.END_OF, emoji == null ? R.id.item_emoji_reaction_text : R.id.item_emoji_reaction);
+            holder.itemNumUsersReaction.setLayoutParams(params);
+            holder.itemNumUsersReaction.setGravity(Gravity.CENTER_VERTICAL);
 
             boolean ownReaction = false;
             MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
@@ -122,7 +148,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
             holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
             holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
-        } else {
+        }else{
             holder.moreReactionsLayout.setVisibility(View.GONE);
             holder.itemReactionLayout.setVisibility(View.GONE);
         }
@@ -133,6 +159,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         RelativeLayout moreReactionsLayout;
         RelativeLayout itemReactionLayout;
         ReactionImageView itemEmojiReaction;
+        TextView itemEmojiReactionText;
         TextView itemNumUsersReaction;
         String reaction;
 
@@ -253,7 +280,11 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 ((ChatActivityLollipop) context).openReactionBottomSheet(chatId, megaMessage);
                 break;
             case R.id.item_reaction_layout:
-                addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReaction.getEmoji(), false);
+                if (holder.itemEmojiReaction.getEmoji() == null) {
+                    addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReactionText.getText().toString(), false);
+                } else {
+                    addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReaction.getEmoji(), false);
+                }
                 break;
         }
     }
