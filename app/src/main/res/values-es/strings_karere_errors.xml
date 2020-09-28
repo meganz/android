@@ -6,5 +6,5 @@
     <string name="error_noent" context="Label to show that an error related to a non-existent resource occurs during a Mega Chat operation.">El recurso no existe.</string>
     <string name="error_exist" context="Label to show that an error related to an already existing resource occurs during a Mega Chat operation.">El recurso ya existe.</string>
     <string name="error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">Error desconocido</string>
-    <string name="error_toomany" context="Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation.">Too many uses for this resource.</string>
+    <string name="error_toomany" context="Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation.">Demasiados usos para este recurso.</string>
 </resources>

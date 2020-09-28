@@ -106,7 +106,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.8_325";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.9_327";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -1108,7 +1108,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					AccountController aC = new AccountController(this);
 					aC.logoutConfirmed(this);
 
-					if (isIsLoggingRunning()) {
+					if (isLoggingRunning()) {
 						logDebug("Already in Login Activity, not necessary to launch it again");
 						return;
 					}
@@ -1710,7 +1710,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		MegaApplication.isLoggingRunning = isLoggingRunning;
 	}
 
-	public boolean isIsLoggingRunning() {
+	public boolean isLoggingRunning() {
 		return isLoggingRunning;
 	}
 
