@@ -44,7 +44,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     private AndroidMegaChatMessage megaMessage;
     private MegaChatRoom chatRoom;
     private RecyclerView recyclerViewFragment;
-    private ViewHolderReactionGrid holderGrid = null;
 
     public ReactionAdapter(Context context, RecyclerView recyclerView, ArrayList<String> listReactions, long chatid, AndroidMegaChatMessage megaMessage) {
         this.context = context;
@@ -61,31 +60,26 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     public ReactionAdapter.ViewHolderReaction onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reaction, parent, false);
 
-        holderGrid = new ViewHolderReactionGrid(v);
+        ViewHolderReaction holder = new ViewHolderReaction(v);
 
-        holderGrid.generalLayout = v.findViewById(R.id.general_rl);
-        holderGrid.moreReactionsLayout = v.findViewById(R.id.more_reactions_layout);
-        holderGrid.moreReactionsLayout.setTag(holderGrid);
-        holderGrid.itemReactionLayout = v.findViewById(R.id.item_reaction_layout);
-        holderGrid.itemReactionLayout.setTag(holderGrid);
-        holderGrid.itemNumUsersReaction = v.findViewById(R.id.item_number_users_reaction);
-        holderGrid.itemEmojiReaction = v.findViewById(R.id.item_emoji_reaction);
-        holderGrid.itemEmojiReactionText = v.findViewById(R.id.item_emoji_reaction_text);
-        holderGrid.itemEmojiReactionText.setVisibility(View.GONE);
-        holderGrid.moreReactionsLayout.setOnClickListener(this);
-        holderGrid.itemReactionLayout.setOnClickListener(this);
-        holderGrid.itemReactionLayout.setOnLongClickListener(chatRoom.isGroup() ? this : null);
-        v.setTag(holderGrid);
-        return holderGrid;
+        holder.generalLayout = v.findViewById(R.id.general_rl);
+        holder.moreReactionsLayout = v.findViewById(R.id.more_reactions_layout);
+        holder.moreReactionsLayout.setTag(holder);
+        holder.itemReactionLayout = v.findViewById(R.id.item_reaction_layout);
+        holder.itemReactionLayout.setTag(holder);
+        holder.itemNumUsersReaction = v.findViewById(R.id.item_number_users_reaction);
+        holder.itemEmojiReaction = v.findViewById(R.id.item_emoji_reaction);
+        holder.itemEmojiReactionText = v.findViewById(R.id.item_emoji_reaction_text);
+        holder.itemEmojiReactionText.setVisibility(View.GONE);
+        holder.moreReactionsLayout.setOnClickListener(this);
+        holder.itemReactionLayout.setOnClickListener(this);
+        holder.itemReactionLayout.setOnLongClickListener(chatRoom.isGroup() ? this : null);
+        v.setTag(holder);
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderReaction holder, int position) {
-        ViewHolderReactionGrid holderGrid2 = (ViewHolderReactionGrid) holder;
-        onBindViewHolderGrid(holderGrid2, position);
-    }
-
-    private void onBindViewHolderGrid(final ViewHolderReactionGrid holder, final int position) {
+    public void onBindViewHolder(ReactionAdapter.ViewHolderReaction holder, int position) {
         String reaction = getItemAtPosition(position);
         if (reaction == null) {
             holder.moreReactionsLayout.setVisibility(View.GONE);
@@ -165,12 +159,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         public ViewHolderReaction(View itemView) {
             super(itemView);
-        }
-    }
-
-    public class ViewHolderReactionGrid extends ViewHolderReaction {
-        public ViewHolderReactionGrid(View v) {
-            super(v);
         }
     }
 
