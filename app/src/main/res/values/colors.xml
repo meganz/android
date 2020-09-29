@@ -103,7 +103,7 @@
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
 
-    <color name="fab_mask">#6B6B6B</color>
+    <color name="fab_mask">#D96B6B6B</color>
 
     <color name="login_warning">#FFFF333A</color>
     <color name="login_title">#FFD90007</color>
@@ -228,4 +228,5 @@
 
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
+    <color name="homepage_fab_label_text_color">#ff373737</color>
 </resources>

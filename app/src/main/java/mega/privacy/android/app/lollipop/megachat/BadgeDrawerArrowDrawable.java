@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+
+import androidx.annotation.ColorRes;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.core.content.ContextCompat;
 import java.util.Objects;
@@ -22,10 +24,9 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     private Paint bigBackgroundPaint;
     private Paint textPaint;
     private String text;
-    private boolean showDot;
     private boolean badgeEnabled = true;
 
-    public BadgeDrawerArrowDrawable(Context context) {
+    public BadgeDrawerArrowDrawable(Context context, @ColorRes int textColor) {
         super(context);
 
         backgroundPaint = new Paint();
@@ -48,12 +49,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop
-            || context instanceof ArchivedChatsActivity) {
-            textPaint.setColor(Color.WHITE);
-        } else {
-            textPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
-        }
+        textPaint.setColor(ContextCompat.getColor(context, textColor));
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);
@@ -69,21 +65,6 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         }
 
         final Rect bounds = getBounds();
-
-        if (showDot) {
-            bigBackgroundPaint.setAlpha((int) ((1 - getProgress()) * 255));
-            backgroundPaint.setAlpha((int) ((1 - getProgress()) * 255));
-
-            final float x = 0.8f * bounds.width();
-            final float y = 0.25f * bounds.height();
-            canvas.drawCircle(x, y, 0.16f * bounds.width(), bigBackgroundPaint);
-
-            final float x1 = 0.8f * bounds.width() + 2;
-            final float y1 = 0.25f * bounds.height() - 2;
-            canvas.drawCircle(x1, y1, 0.16f * bounds.width() - 2, backgroundPaint);
-
-            return;
-        }
 
         if (text == null || text.length() == 0) {
             return;
@@ -118,10 +99,6 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
     public String getText() {
         return text;
-    }
-
-    public void setShowDot(boolean showDot) {
-        this.showDot = showDot;
     }
 
     public void setBackgroundColor(int color) {

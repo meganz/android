@@ -88,22 +88,22 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginStart="3dp"
-            android:layout_marginTop="6dp"
             android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
             android:visibility="@{item.node.exported ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintStart_toEndOf="@id/name"
-            app:layout_constraintTop_toTopOf="@id/name" />
+            app:layout_constraintTop_toTopOf="@id/name"
+            app:layout_constraintBottom_toBottomOf="@id/name"/>
 
         <ImageView
             android:id="@+id/taken_down"
             style="@style/taken_down_icon"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="6dp"
             android:src="@drawable/ic_input_warning"
             app:layout_constraintStart_toEndOf="@id/name"
             app:layout_constraintTop_toTopOf="@id/name"
+            app:layout_constraintBottom_toBottomOf="@id/name"
             app:visibleGone="@{item.node.takenDown}"
             tools:visibility="visible" />
 

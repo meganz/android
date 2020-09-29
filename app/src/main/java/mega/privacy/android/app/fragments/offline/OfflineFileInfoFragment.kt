@@ -72,8 +72,10 @@ class OfflineFileInfoFragment : Fragment() {
                     )
 
                     binding.toolbarNodeIcon.isVisible = true
-                    binding.containsTitle.isVisible = true
-                    binding.containsValue.isVisible = true
+                    if (it.node.isFolder) {
+                        binding.containsTitle.isVisible = true
+                        binding.containsValue.isVisible = true
+                    }
 
                     requireActivity().window.statusBarColor =
                         ContextCompat.getColor(requireContext(), R.color.status_bar_search)

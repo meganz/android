@@ -43,9 +43,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
-import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -81,7 +79,7 @@ import java.io.File
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
-class OfflineFragment : Fragment(), ActionMode.Callback {
+class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
@@ -742,12 +740,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         return callManager { it.isList } ?: true || args.rootFolderOnly
     }
 
-    fun checkScroll() {
+    override fun checkScroll() {
         val rv = recyclerView
         if (rv != null) {
             callManager {
                 it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
             }
+            onScrolling(Pair(this, rv.canScrollVertically(-1)))
         }
     }
 

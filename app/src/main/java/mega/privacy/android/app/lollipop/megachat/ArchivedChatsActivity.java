@@ -146,7 +146,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         }
 
 //        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-        badgeDrawable = new BadgeDrawerArrowDrawable(this);
+        badgeDrawable = new BadgeDrawerArrowDrawable(this, R.color.white);
 
         updateNavigationToolbarIcon();
 

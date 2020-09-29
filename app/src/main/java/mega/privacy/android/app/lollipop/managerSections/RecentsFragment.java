@@ -29,6 +29,7 @@ import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.Pair;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
@@ -39,6 +40,7 @@ import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
+import mega.privacy.android.app.fragments.homepage.Scrollable;
 import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -59,7 +61,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class RecentsFragment extends Fragment implements StickyHeaderHandler {
+public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
 
     public static ImageView imageDrag;
 
@@ -247,14 +249,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         checkScroll();
     }
 
+    @Override
     public void checkScroll() {
         if (listView == null) return;
-
-        if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE)) {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-        } else {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-        }
+        EventNotifierKt.onScrolling(new Pair<>(this, listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE));
     }
 
     public String findUserName(String mail) {

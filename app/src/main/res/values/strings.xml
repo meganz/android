@@ -2841,7 +2841,6 @@
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number removal failed.</string>
 
     <string name="search_hint">Search in MEGA</string>
-    <string name="homepage_bottom_sheet_behavior">mega.privacy.android.app.fragments.homepage.main.HomepageBottomSheetBehavior</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support&#64;mega.nz</string>
@@ -2863,7 +2862,6 @@
     <string name="category_video">Video</string>
 
     <string name="fab_label_new_chat">New Chat</string>
-    <string name="fab_label_upload">Upload</string>
 
     <string name="tab_recents">Recents</string>
     <string name="tab_favourites">Favourites</string>
