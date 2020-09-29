@@ -962,8 +962,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         protected void onPostExecute(InputStream inputStream) {
             logDebug("onPostExecute");
             try {
-                MegaNode node = megaApi.getNodeByHandle(handle);
-                pdfView.fromStream(inputStream, node == null ? null : node.getBase64Handle())
+                pdfView.fromStream(inputStream, String.valueOf(handle))
                         .defaultPage(currentPage-1)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
