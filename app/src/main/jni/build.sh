@@ -1,11 +1,17 @@
 #!/bin/bash -i
 set -e
 
-##################################################
-### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
-##################################################
+##############################################################
+# SET THE PATH TO YOUR ANDROID NDK, SDK and JAVA DIRECTORIES #
+##############################################################
 if [ -z "$NDK_ROOT" ]; then
     NDK_ROOT=${HOME}/android-ndk
+fi
+if [ -z "$ANDROID_HOME" ]; then
+    export ANDROID_HOME=${HOME}/android-sdk
+fi
+if [ -z "$JAVA_HOME" ]; then
+    export JAVA_HOME=${HOME}/android-java
 fi
 ##################################################
 ##################################################
@@ -16,13 +22,20 @@ if [ -z "${BUILD_ARCHS}" ]; then
 fi
 ##################################################
 if [ ! -d "${NDK_ROOT}" ]; then
-    echo "* NDK_ROOT not set. Please download ndk 16 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
+    echo "* NDK_ROOT not set. Please download NDK 21 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk to point to your Android NDK installation path and try again."
+    exit 1
+fi
+if [ ! -d "${ANDROID_HOME}" ]; then
+    echo "* ANDROID_HOME not set. Please download Android SDK and export ANDROID_HOME variable or create a link at ${HOME}/android-sdk to point to your Android SDK installation path and try again."
+    exit 1
+fi
+if [ ! -d "${ANDROID_HOME}" ]; then
+    echo "* JAVA_HOME not set. Please download JDK and export JAVA_HOME variable or create a link at ${HOME}/android-jdk to point to your JDK installation path and try again."
     exit 1
 fi
 
 NDK_BUILD=${NDK_ROOT}/ndk-build
 JNI_PATH=`pwd`
-CC=`${NDK_ROOT}/ndk-which gcc`
 LIBDIR=${JNI_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${JNI_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
@@ -100,6 +113,13 @@ PDFVIEWER_SOURCE_FILE=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
 PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
+
+EXOPLAYER=ExoPlayer
+EXOPLAYER_VERSION=2.11.8
+EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
+EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
+EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
+EXOPLAYER_SHA1="56ad241f26e1e48b387cd9606572b45799c24ad9"
 
 function downloadCheckAndUnpack()
 {
@@ -209,6 +229,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FOLDER}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
     rm -rf ${PDFVIEWER}/${PDFVIEWER}
+    rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
@@ -228,6 +249,10 @@ if [ "$1" == "clean" ]; then
     rm -rf ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
+    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
+    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
+    rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}
+    rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
     rm -rf ../obj/local/armeabi-v7a
@@ -241,8 +266,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ../libs/x86
     rm -rf ../libs/x86_64
 
-    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
-    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
     echo "* Task finished OK"
     exit 0
 fi
@@ -400,6 +423,32 @@ if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
     touch ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
 fi
 echo "* PdfViewer is ready"
+
+echo "* Setting up ExoPlayer"
+if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
+    downloadCheckAndUnpack ${EXOPLAYER_DOWNLOAD_URL} ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE} ${EXOPLAYER_SHA1} ${EXOPLAYER}
+    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
+    EXOPLAYER_ROOT="$(pwd)"
+    FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main/jni"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        HOST_PLATFORM="darwin-x86_64"
+    else
+        HOST_PLATFORM="linux-x86_64"
+    fi
+    ENABLED_DECODERS=(ac3)
+    cd "${FFMPEG_EXT_PATH}"
+    echo "* Building FFMPEG"
+    ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
+    cd "${FFMPEG_EXT_PATH}"
+    ${NDK_BUILD} APP_ABI="${BUILD_ARCHS}" &>> ${LOG_FILE}
+    cd "${EXOPLAYER_ROOT}"
+    echo "* Building ExoPlayer FFMPEG extension"
+    ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
+    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
+    popd &>> ${LOG_FILE}
+    touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
+fi
+echo "* ExoPlayer is ready"
 
 echo "* All dependencies are prepared!"
 

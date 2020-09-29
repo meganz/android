@@ -24,7 +24,9 @@ allprojects {
         maven {
             url "https://jitpack.io"
         }
-        maven { url  "https://dl.bintray.com/blazei/maven" }
+        flatDir {
+            dirs "$rootProject.projectDir/app/src/main/jni/ExoPlayer/"
+        }
     }
 }
 

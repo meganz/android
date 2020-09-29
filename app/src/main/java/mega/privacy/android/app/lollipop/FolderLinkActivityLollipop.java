@@ -820,9 +820,10 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		}
 		catch(Exception ex){}
 
-		int numberOfNodesToDownload = 0;
 		int numberOfNodesAlreadyDownloaded = 0;
 		int numberOfNodesPending = 0;
+		int emptyFolders = 0;
+
 		for (long hash : hashes) {
 			MegaNode node = megaApiFolder.getNodeByHandle(hash);
 			if(node != null){
@@ -844,6 +845,10 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
                     }
 				}
 
+				if (dlFiles.isEmpty()) {
+					emptyFolders++;
+				}
+
 				for (MegaNode document : dlFiles.keySet()) {
 					String path = dlFiles.get(document);
                     String targetPath = targets.get(document.getHandle());
@@ -851,8 +856,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 					if (isTextEmpty(path)) {
 						continue;
 					}
-
-					numberOfNodesToDownload++;
 
 					if(availableFreeSpace < document.getSize()){
 						showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
@@ -908,7 +911,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				logWarning("node not found");
 			}
 
-			showSnackBarWhenDownloading(this, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+			showSnackBarWhenDownloading(this, numberOfNodesPending, numberOfNodesAlreadyDownloaded, emptyFolders);
 		}
 	}
 	

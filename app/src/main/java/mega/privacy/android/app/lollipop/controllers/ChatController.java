@@ -1623,7 +1623,7 @@ public class ChatController {
             return;
         }
 
-        showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+        showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, 0);
     }
 
     public void importNode(long idMessage, long idChat) {
