@@ -59,7 +59,7 @@ class HomepageFragment : Fragment() {
     private lateinit var fabMaskLayout: View
     private lateinit var viewPager: ViewPager2
     private lateinit var tabs: TabLayout
-    private var currentSelectedTab: Fragment? = null
+    private var currentSelectedTabFragment: Fragment? = null
     private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
 
@@ -222,7 +222,10 @@ class HomepageFragment : Fragment() {
 
     private fun setupBottomSheetUI() {
         viewPager = rootView.findViewById(R.id.view_pager)
-        viewPager.adapter = BottomSheetPagerAdapter(this)
+        val adapter = BottomSheetPagerAdapter(this)
+        // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
+        viewPager.offscreenPageLimit = adapter.itemCount
+        viewPager.adapter = adapter
         // Attach the view pager to the tab layout
         tabs = rootView.findViewById(R.id.tabs)
         val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->
@@ -235,23 +238,18 @@ class HomepageFragment : Fragment() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 
             override fun onPageSelected(position: Int) {
-                currentSelectedTab = childFragmentManager.findFragmentByTag("f$position")
+                currentSelectedTabFragment = childFragmentManager.findFragmentByTag("f$position")
                 bottomSheetBehavior.invalidateScrollingChild(
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
-                    currentSelectedTab?.view
+                    currentSelectedTabFragment?.view
                 )
 
-                if (currentSelectedTab == null) {
-                    changeTabEleveation(false)
-                } else {
-                    (currentSelectedTab as Scrollable).checkScroll()
-                }
-
+                (currentSelectedTabFragment as? Scrollable)?.checkScroll()
             }
         })
 
         viewModel.isScrolling.observe(viewLifecycleOwner) {
-            if (it.first == currentSelectedTab) {
+            if (it.first == currentSelectedTabFragment) {
                 changeTabEleveation(it.second)
             }
         }
