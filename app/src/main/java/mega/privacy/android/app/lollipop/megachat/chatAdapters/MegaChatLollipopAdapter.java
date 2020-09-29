@@ -590,6 +590,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         String fullNameTitle;
         //        boolean nameRequested = false;
         boolean nameRequestedAction = false;
+        boolean isPlayingAnimation;
 
         RelativeLayout itemLayout;
 
@@ -4787,8 +4788,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        boolean shouldAutoPlay = gifSize <= MAX_SIZE_GIF_AUTO_PLAY;
-
         if (messages.get(position - 1).getInfoToShow() != -1) {
             setInfoToShow(position, holder, isOwnMessage, messages.get(position - 1).getInfoToShow(),
                     formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
@@ -4855,7 +4854,53 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageFileSize.setText(getSizeString(gifSize));
 
             if (isGiphy) {
+                if (orientationPortrait) {
+                    holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
+                    holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.previewFramePort.setVisibility(View.VISIBLE);
+                    holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                    holder.forwardOwnFile.setVisibility(View.GONE);
 
+                    if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                        holder.forwardOwnPortrait.setVisibility(View.GONE);
+                    } else {
+                        holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
+                    }
+
+                    holder.forwardOwnLandscape.setVisibility(View.GONE);
+                    holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                    holder.previewFrameLand.setVisibility(View.GONE);
+                    holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+                } else {
+                    holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
+                    holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+                    holder.previewFrameLand.setVisibility(View.VISIBLE);
+                    holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                    holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                    holder.previewFramePort.setVisibility(View.GONE);
+                    holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.forwardOwnFile.setVisibility(View.GONE);
+                    holder.forwardOwnPortrait.setVisibility(View.GONE);
+
+                    if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                        holder.forwardOwnLandscape.setVisibility(View.GONE);
+                    } else {
+                        holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
+                    }
+
+                    holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+                }
+
+                setGiphyProperties(giphy, holder, orientationPortrait, true);
             } else {
                 holder.contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(gifName).getIconResourceId());
 
@@ -4874,15 +4919,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         setErrorStateOnPreview(holder, preview);
                     }
                 } else {
+                    setGIFProperties(node, holder, orientationPortrait, true);
+
                     if (orientationPortrait) {
-                        if (shouldAutoPlay) {
-                            Uri uri = getUri(node);
-                            if (uri != null) {
-                                loadGifMessage(holder.gifViewOwnMessageThumbPort, holder.gifProgressOwnMessageThumbPort, holder.contentOwnMessageThumbPort, uri);
-                            }
-                        } else {
-                            holder.gifIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                        }
                         holder.contentOwnMessageThumbPort.setImageBitmap(preview);
                         holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                         holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -4923,15 +4962,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
                         holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
                     } else {
-                        if (shouldAutoPlay) {
-                            Uri uri = getUri(node);
-                            if (uri != null) {
-                                loadGifMessage(holder.gifViewOwnMessageThumbLand, holder.gifProgressOwnMessageThumbLand, holder.contentOwnMessageThumbLand, uri);
-                            }
-                        } else {
-                            holder.gifIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                        }
-
                         holder.contentOwnMessageThumbLand.setImageBitmap(preview);
                         holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                         holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
@@ -5037,22 +5067,76 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageFileSize.setText(getSizeString(gifSize));
 
             if (isGiphy) {
+                if (orientationPortrait) {
+                    holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
+                    holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
 
+                    if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                        holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
+                    }
+                    else {
+                        holder.forwardContactPreviewPortrait.setVisibility(View.VISIBLE);
+                    }
+
+                    if(isMultipleSelect()){
+                        holder.forwardContactPreviewPortrait.setOnClickListener(null);
+                    }else{
+                        holder.forwardContactPreviewPortrait.setOnClickListener(this);
+                    }
+
+                    holder.forwardContactFile.setVisibility(View.GONE);
+                    holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+                    holder.contentContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.contentContactMessageFile.setVisibility(View.GONE);
+                    holder.contentContactMessageFileThumb.setVisibility(View.GONE);
+                    holder.contentContactMessageFileName.setVisibility(View.GONE);
+                    holder.contentContactMessageFileSize.setVisibility(View.GONE);
+                } else {
+                    holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
+                    holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
+                    holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
+
+                    if (cC.isInAnonymousMode() || isMultipleSelect()) {
+                        holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+                    }
+                    else {
+                        holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
+                    }
+                    if(isMultipleSelect()){
+                        holder.forwardContactPreviewLandscape.setOnClickListener(null);
+                    }else{
+                        holder.forwardContactPreviewLandscape.setOnClickListener(this);
+                    }
+                    holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
+                    holder.forwardContactFile.setVisibility(View.GONE);
+
+                    holder.contentContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
+                    holder.contentContactMessageFile.setVisibility(View.GONE);
+                    holder.contentContactMessageFileThumb.setVisibility(View.GONE);
+                    holder.contentContactMessageFileName.setVisibility(View.GONE);
+                    holder.contentContactMessageFileSize.setVisibility(View.GONE);
+                }
+
+                setGiphyProperties(giphy, holder, orientationPortrait, false);
             } else {
                 holder.contentContactMessageFileThumb.setImageResource(MimeTypeList.typeForName(gifName).getIconResourceId());
 
                 if (preview != null) {
                     if (node.hasPreview()) {
-                        if (orientationPortrait) {
-                            if (shouldAutoPlay) {
-                                Uri uri = getUri(node);
-                                if (uri != null) {
-                                    loadGifMessage(holder.gifViewContactMessageThumbPort, holder.gifProgressContactMessageThumbPort, holder.contentContactMessageThumbPort, uri);
-                                }
-                            } else {
-                                holder.gifIconContactMessageThumbPort.setVisibility(View.VISIBLE);
-                            }
+                        setGIFProperties(node, holder, orientationPortrait, false);
 
+                        if (orientationPortrait) {
                             holder.contentContactMessageThumbPort.setImageBitmap(preview);
                             holder.contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                             holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -5083,15 +5167,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             contactThumbParams.setMargins(0, 0, 0, 0);
                             holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
                         } else {
-                            if (shouldAutoPlay) {
-                                Uri uri = getUri(node);
-                                if (uri != null) {
-                                    loadGifMessage(holder.gifViewContactMessageThumbLand, holder.gifProgressContactMessageThumbLand, holder.contentContactMessageThumbLand, uri);
-                                }
-                            } else {
-                                holder.gifIconContactMessageThumbLand.setVisibility(View.VISIBLE);
-                            }
-
                             holder.contentContactMessageThumbLand.setImageBitmap(preview);
                             holder.contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                             holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
@@ -5157,6 +5232,88 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     /**
+     * Updates GIF layouts and attributes depending on the orientation, if the messages is own or of a contact
+     * and if the Giphy should auto-play itself or not.
+     *
+     * @param giphy         MegaChatGiphy of the messages containing the Giphy.
+     * @param holder        ViewHolderMessageChat where the layouts and attributes have to be updated.
+     * @param isPortrait    True if the GIF has portrait orientation, false if has landscape orientation.
+     * @param isOwnMessage  True if the message is own, false if it is of a contact.
+     */
+    private void setGiphyProperties(MegaChatGiphy giphy, ViewHolderMessageChat holder, boolean isPortrait, boolean isOwnMessage) {
+        if (giphy == null || holder == null) {
+            return;
+        }
+
+        boolean shouldAutoPlay = giphy.getWebpSize() <= MAX_SIZE_GIF_AUTO_PLAY;
+
+        setGIFAndGiphyProperties(shouldAutoPlay, shouldAutoPlay ? Uri.parse(giphy.getWebpSrc()) : null, holder, isPortrait, isOwnMessage);
+    }
+
+    /**
+     * Updates GIF layouts and attributes depending on the orientation, if the messages is own or of a contact
+     * and if the GIF should auto-play itself or not.
+     *
+     * @param node          MegaNode of the messages containing the GIF.
+     * @param holder        ViewHolderMessageChat where the layouts and attributes have to be updated.
+     * @param isPortrait    True if the GIF has portrait orientation, false if has landscape orientation.
+     * @param isOwnMessage  True if the message is own, false if it is of a contact.
+     */
+    private void setGIFProperties(MegaNode node, ViewHolderMessageChat holder, boolean isPortrait, boolean isOwnMessage) {
+        if (node == null || holder == null) {
+            return;
+        }
+
+        boolean shouldAutoPlay = node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY;
+
+        setGIFAndGiphyProperties(shouldAutoPlay, shouldAutoPlay ? getUri(node) : null, holder, isPortrait, isOwnMessage);
+    }
+
+    /**
+     *Updates GIF layouts and attributes depending on the orientation, if the messages is own or of a contact
+     * and if the GIF/Giphy should auto-play itself or not.
+     *
+     * @param shouldAutoPlay    True if should auto-play, false otherwise.
+     * @param uri               The Uri to animate if should auto-play, null otherwise.
+     * @param holder            ViewHolderMessageChat where the layouts and attributes have to be updated.
+     * @param isPortrait        True if the GIF has portrait orientation, false if has landscape orientation.
+     * @param isOwnMessage      True if the message is own, false if it is of a contact.
+     */
+    private void setGIFAndGiphyProperties(boolean shouldAutoPlay, Uri uri, ViewHolderMessageChat holder, boolean isPortrait, boolean isOwnMessage) {
+        if (shouldAutoPlay) {
+            if (uri != null) {
+                holder.isPlayingAnimation = true;
+
+                if (isPortrait) {
+                    if (isOwnMessage) {
+                        loadGifMessage(holder.gifViewOwnMessageThumbPort, holder.gifProgressOwnMessageThumbPort, holder.contentOwnMessageThumbPort, uri);
+                    } else {
+                        loadGifMessage(holder.gifViewContactMessageThumbPort, holder.gifProgressContactMessageThumbPort, holder.contentContactMessageThumbPort, uri);
+                    }
+                } else if (isOwnMessage) {
+                    loadGifMessage(holder.gifViewOwnMessageThumbLand, holder.gifProgressOwnMessageThumbLand, holder.contentOwnMessageThumbLand, uri);
+                } else {
+                    loadGifMessage(holder.gifViewContactMessageThumbLand, holder.gifProgressContactMessageThumbLand, holder.contentContactMessageThumbLand, uri);
+                }
+            }
+        } else {
+            holder.isPlayingAnimation = false;
+
+            if (isPortrait) {
+                if (isOwnMessage) {
+                    holder.gifIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                } else {
+                    holder.gifIconContactMessageThumbPort.setVisibility(View.VISIBLE);
+                }
+            } else if (isOwnMessage) {
+                holder.gifIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
+            } else {
+                holder.gifIconContactMessageThumbLand.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    /**
      * If the node is already downloaded, get the local Uri.
      * If not, get the streaming one.
      *
@@ -5191,6 +5348,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return null;
     }
 
+    /**
+     * Hides all the layouts related to GIF or Giphy messages.
+     *
+     * @param position  Position of holder in adapter.
+     * @param holder    ViewHolderMessageChat from which the layouts have to be hidden.
+     */
     private void hideLayoutsGiphyMessages(int position, ViewHolderMessageChat holder){
         if (isHolderNull(position, holder)) {
             return;
@@ -6841,14 +7004,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 } else {
                     if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                        if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                            Uri uri = getUri(node);
-                            if (uri != null) {
-                                loadGifMessage(holder.gifViewOwnMessageThumbPort, holder.gifProgressOwnMessageThumbPort, holder.contentOwnMessageThumbPort, uri);
-                            }
-                        } else {
-                            holder.gifIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                        }
+                        setGIFProperties(node, holder, true, true);
                     }
 
                     holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -6902,14 +7058,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 } else {
                     if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                        if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                            Uri uri = getUri(node);
-                            if (uri != null) {
-                                loadGifMessage(holder.gifViewOwnMessageThumbLand, holder.gifProgressOwnMessageThumbLand, holder.contentOwnMessageThumbLand, uri);
-                            }
-                        } else {
-                            holder.gifIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                        }
+                        setGIFProperties(node, holder, false, true);
                     }
 
                     holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
@@ -6966,14 +7115,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             } else {
                 if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                    if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                        Uri uri = getUri(node);
-                        if (uri != null) {
-                            loadGifMessage(holder.gifViewContactMessageThumbPort, holder.gifProgressContactMessageThumbPort, holder.contentContactMessageThumbPort, uri);
-                        }
-                    } else {
-                        holder.gifIconContactMessageThumbPort.setVisibility(View.VISIBLE);
-                    }
+                    setGIFProperties(node, holder, true, false);
                 }
 
                 holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -7049,14 +7191,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             } else {
                 if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                    if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                        Uri uri = getUri(node);
-                        if (uri != null) {
-                            loadGifMessage(holder.gifViewContactMessageThumbLand, holder.gifProgressContactMessageThumbLand, holder.contentContactMessageThumbLand, uri);
-                        }
-                    } else {
-                        holder.gifIconContactMessageThumbLand.setVisibility(View.VISIBLE);
-                    }
+                    setGIFProperties(node, holder, false, false);
                 }
 
                 holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
@@ -7165,14 +7300,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 } else {
                                     if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                                        if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                                            Uri uri = getUri(node);
-                                            if (uri != null) {
-                                                loadGifMessage(holder.gifViewOwnMessageThumbPort, holder.gifProgressOwnMessageThumbPort, holder.contentOwnMessageThumbPort, uri);
-                                            }
-                                        } else {
-                                            holder.gifIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                                        }
+                                        setGIFProperties(node, holder, true, true);
                                     }
 
                                     holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -7234,14 +7362,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 } else {
                                     if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                                        if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                                            Uri uri = getUri(node);
-                                            if (uri != null) {
-                                                loadGifMessage(holder.gifViewOwnMessageThumbLand, holder.gifProgressOwnMessageThumbLand, holder.contentOwnMessageThumbLand, uri);
-                                            }
-                                        } else {
-                                            holder.gifIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                                        }
+                                        setGIFProperties(node, holder, false, true);
                                     }
 
                                     holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
@@ -7309,14 +7430,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 } else {
                                     if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                                        if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                                            Uri uri = getUri(node);
-                                            if (uri != null) {
-                                                loadGifMessage(holder.gifViewContactMessageThumbPort, holder.gifProgressContactMessageThumbPort, holder.contentContactMessageThumbPort, uri);
-                                            }
-                                        } else {
-                                            holder.gifIconContactMessageThumbPort.setVisibility(View.VISIBLE);
-                                        }
+                                        setGIFProperties(node, holder, true, false);
                                     }
 
                                     holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -7400,14 +7514,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 } else {
                                     if (MimeTypeList.typeForName(node.getName()).isGIF()) {
-                                        if (node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY) {
-                                            Uri uri = getUri(node);
-                                            if (uri != null) {
-                                                loadGifMessage(holder.gifViewContactMessageThumbLand, holder.gifProgressContactMessageThumbLand, holder.contentContactMessageThumbLand, uri);
-                                            }
-                                        } else {
-                                            holder.gifIconContactMessageThumbLand.setVisibility(View.VISIBLE);
-                                        }
+                                        setGIFProperties(node, holder, false, false);
                                     }
 
                                     holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
