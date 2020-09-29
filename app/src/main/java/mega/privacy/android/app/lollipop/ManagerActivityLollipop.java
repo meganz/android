@@ -9481,11 +9481,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     @Override
     public void scanDocument() {
-        String[] saveDestinations = {
-                getString(R.string.section_cloud_drive),
-                getString(R.string.section_chat)
-        };
-        Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
+        Intent intent = DocumentScannerActivity.getIntent(this);
         startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
     }
 
