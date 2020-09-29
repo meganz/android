@@ -45,6 +45,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -87,6 +88,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
     private var recyclerView: RecyclerView? = null
+    private var listDivider: PositionDividerItemDecoration? = null
     private var adapter: OfflineAdapter? = null
     private var actionMode: ActionMode? = null
 
@@ -146,7 +148,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         LocalBroadcastManager.getInstance(requireContext())
             .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
 
-        viewModel.loadOfflineNodes(false)
+        viewModel.loadOfflineNodes()
     }
 
     override fun onPause() {
@@ -210,6 +212,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     override fun onDestroyView() {
         super.onDestroyView()
 
+        viewModel.clearEmptySearchQuery()
         LocalBroadcastManager.getInstance(requireContext())
             .unregisterReceiver(receiverUpdatePosition)
     }
@@ -243,6 +246,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 }
             })
         adapter?.setHasStableIds(true)
+        adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                scrollToPosition(0)
+            }
+        })
 
         binding.offlineBrowserList.layoutManager = LinearLayoutManager(context)
 
@@ -273,9 +281,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 SimpleDividerItemDecoration(requireContext(), resources.displayMetrics)
             )
         } else {
-            binding.offlineBrowserList.addItemDecoration(
-                PositionDividerItemDecoration(requireContext(), resources.displayMetrics)
-            )
+            listDivider = PositionDividerItemDecoration(requireContext(), resources.displayMetrics)
+            binding.offlineBrowserList.addItemDecoration(listDivider!!)
         }
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -315,11 +322,16 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
     private fun observeLiveData() {
         viewModel.nodes.observe(viewLifecycleOwner) {
-            recyclerView?.isVisible = it.isNotEmpty()
-            binding.emptyHint.isVisible = it.isEmpty()
+            val nodes = it.first
+            val autoScrollPos = it.second
+            recyclerView?.isVisible = nodes.isNotEmpty()
+            binding.emptyHint.isVisible = nodes.isEmpty()
 
-            adapter?.submitList(it)
+            adapter?.submitList(nodes) {
+                scrollToPosition(autoScrollPos)
+            }
 
+            listDivider?.setDrawAllDividers(viewModel.searchMode())
             if (!args.rootFolderOnly) {
                 callManager { manager ->
                     manager.updateFullscreenOfflineFragmentOptionMenu(false)
@@ -357,7 +369,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
             val actionModeVal = actionMode
             if (visible) {
                 if (actionModeVal == null) {
-                    actionMode = callManager { it.startSupportActionMode(this) }
+                    callManager {
+                        actionMode = it.startSupportActionMode(this)
+                        it.setTextSubmitted()
+                    }
                 }
                 actionMode?.title = viewModel.getSelectedNodesCount().toString()
                 actionMode?.invalidate()
@@ -373,7 +388,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 if (viewModel.selecting) {
                     manager.supportActionBar?.setTitle(it)
                 } else {
-                    manager.setToolbarTitleFromFullscreenOfflineFragment(it, false)
+                    manager.setToolbarTitleFromFullscreenOfflineFragment(
+                        it, false, !viewModel.searchMode()
+                    )
                 }
             }
         }
@@ -387,18 +404,18 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
                 manager.setTextSubmitted()
             }
         }
+        viewModel.closeSearchView.observe(viewLifecycleOwner) {
+            callManager { manager ->
+                manager.textSubmitted = true
+                manager.closeSearchView()
+            }
+        }
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
                 manager.showNewSortByPanel()
             }
         })
         observeAnimatedItems()
-        viewModel.scrollToPositionWhenNavigateOut.observe(viewLifecycleOwner) {
-            val layoutManager = recyclerView?.layoutManager
-            if (layoutManager is LinearLayoutManager) {
-                layoutManager.scrollToPositionWithOffset(it, 0)
-            }
-        }
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
@@ -414,6 +431,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
         sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
             switchListGridView()
         })
+    }
+
+    private fun scrollToPosition(position: Int) {
+        val layoutManager = recyclerView?.layoutManager
+        if (layoutManager is LinearLayoutManager && position >= 0) {
+            layoutManager.scrollToPositionWithOffset(position, 0)
+        }
     }
 
     private fun observeAnimatedItems() {
@@ -441,7 +465,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
                 override fun onAnimationEnd(animation: Animator?) {
                     viewModel.nodes.value?.let { newList ->
-                        rvAdapter.submitList(ArrayList(newList))
+                        rvAdapter.submitList(ArrayList(newList.first))
                     }
                 }
 
@@ -729,6 +753,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
 
     fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
+        recyclerView?.let { disableRecyclerViewAnimator(it) }
     }
 
     fun onSearchQuerySubmitted() {
@@ -746,6 +771,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback {
     fun getItemCount(): Int {
         return viewModel.getDisplayedNodesCount()
     }
+
+    fun searchMode() = viewModel.searchMode()
 
     fun scrollToNode(handle: Long) {
         logDebug("scrollToNode, handle $handle")

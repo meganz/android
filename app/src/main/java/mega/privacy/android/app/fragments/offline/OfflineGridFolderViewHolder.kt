@@ -6,12 +6,19 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 
 class OfflineGridFolderViewHolder(
-    private val binding: OfflineItemGridFolderBinding
-) : OfflineViewHolder(binding.root) {
-    override fun bind(position: Int, node: OfflineNode, listener: OfflineAdapterListener) {
-        super.bind(position, node, listener)
+    private val binding: OfflineItemGridFolderBinding,
+    listener: OfflineAdapterListener,
+    itemGetter: (Int) -> OfflineNode
+) : OfflineViewHolder(binding.root, listener, itemGetter) {
+    init {
+        binding.threeDots.setOnClickListener {
+            val position = adapterPosition
+            listener.onOptionsClicked(position, itemGetter(position))
+        }
+    }
 
-        binding.threeDots.setOnClickListener { listener.onOptionsClicked(position, node) }
+    override fun bind(position: Int, node: OfflineNode) {
+        super.bind(position, node)
 
         if (node == OfflineNode.PLACE_HOLDER) {
             binding.root.visibility = View.INVISIBLE
@@ -29,9 +36,5 @@ class OfflineGridFolderViewHolder(
             if (node.selected) R.drawable.background_item_grid_selected
             else R.drawable.background_item_grid_new
         )
-    }
-
-    fun getThumbnailView(): View {
-        return binding.icon
     }
 }

@@ -5,7 +5,6 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +33,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -169,6 +169,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         elevateToolbarWhenScrolling()
         itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
     }
 
     private fun setupActionMode() {
@@ -307,7 +310,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            Handler().post { activity.hideKeyboardSearch() }
+            RunOnUIThreadUtils.post { activity.hideKeyboardSearch() }
         }
         if (viewModel.searchMode) return
 

@@ -38,7 +38,9 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -57,6 +59,8 @@ class HomepageFragment : Fragment() {
     private lateinit var tabs: TabLayout
     private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
+
+    @Inject lateinit var megaApi: MegaApiAndroid
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -129,6 +133,9 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showOnlineMode() {
+        if (megaApi.rootNode == null) {
+            return
+        }
         viewPager.isUserInputEnabled = true
         rootView.findViewById<View>(R.id.category).isVisible = true
         //rootView.findViewById<View>(R.id.banner).isVisible = true

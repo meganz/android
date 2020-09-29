@@ -348,7 +348,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 MegaRecentActionBucket bucket = item.getBucket();
                 if (bucket == null) break;
 
-                ((RecentsFragment)fragment).getSelectedBucketModel().select(bucket);
+                ((RecentsFragment)fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
                 Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(),new NavOptions.Builder().build());
                 break;
             }

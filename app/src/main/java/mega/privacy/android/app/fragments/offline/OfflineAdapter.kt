@@ -50,15 +50,21 @@ class OfflineAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             TYPE_GRID_FOLDER -> OfflineGridFolderViewHolder(
-                OfflineItemGridFolderBinding.inflate(inflater, parent, false)
+                OfflineItemGridFolderBinding.inflate(inflater, parent, false),
+                listener, this::getItem
             )
             TYPE_GRID_FILE -> OfflineGridFileViewHolder(
-                OfflineItemGridFileBinding.inflate(inflater, parent, false)
+                OfflineItemGridFileBinding.inflate(inflater, parent, false),
+                listener, this::getItem
             )
             TYPE_HEADER -> OfflineSortedByViewHolder(
-                SortByHeaderBinding.inflate(inflater, parent, false), sortByHeaderViewModel
+                SortByHeaderBinding.inflate(inflater, parent, false), sortByHeaderViewModel,
+                listener, this::getItem
             )
-            else -> OfflineListViewHolder(OfflineItemListBinding.inflate(inflater, parent, false))
+            else -> OfflineListViewHolder(
+                OfflineItemListBinding.inflate(inflater, parent, false),
+                listener, this::getItem
+            )
         }
     }
 
@@ -83,7 +89,7 @@ class OfflineAdapter(
     }
 
     override fun onBindViewHolder(holder: OfflineViewHolder, position: Int) {
-        holder.bind(position, getItem(position), listener)
+        holder.bind(position, getItem(position))
     }
 
     companion object {

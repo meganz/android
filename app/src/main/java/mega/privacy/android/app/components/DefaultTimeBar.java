@@ -374,6 +374,10 @@ public class DefaultTimeBar extends View implements TimeBar {
     update();
   }
 
+  @Override public long getPreferredUpdateDelay() {
+    return 0;
+  }
+
   @Override
   public void setAdGroupTimesMs(@Nullable long[] adGroupTimesMs, @Nullable boolean[] playedAdGroups,
       int adGroupCount) {

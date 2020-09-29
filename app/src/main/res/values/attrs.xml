@@ -132,7 +132,7 @@
     </declare-styleable>
 
     <declare-styleable name="CategoryButton">
-        <attr name="photo" format="reference"/>
+        <attr name="icon" format="reference"/>
         <attr name="name" format="string"/>
     </declare-styleable>
 

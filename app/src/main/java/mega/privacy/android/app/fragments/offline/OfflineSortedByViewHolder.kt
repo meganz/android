@@ -5,9 +5,11 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 
 class OfflineSortedByViewHolder(
     private val binding: SortByHeaderBinding,
-    private val sortByViewModel: SortByHeaderViewModel
-) : OfflineViewHolder(binding.root) {
-    override fun bind(position: Int, node: OfflineNode, listener: OfflineAdapterListener) {
+    private val sortByViewModel: SortByHeaderViewModel,
+    listener: OfflineAdapterListener,
+    itemGetter: (Int) -> OfflineNode
+) : OfflineViewHolder(binding.root, listener, itemGetter) {
+    override fun bind(position: Int, node: OfflineNode) {
         binding.apply {
             this.orderNameStringId =
                 SortByHeaderViewModel.orderNameMap[sortByViewModel.order]!!

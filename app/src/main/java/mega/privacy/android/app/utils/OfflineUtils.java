@@ -92,20 +92,24 @@ public class OfflineUtils {
     /*
      * Get list of all child files
      */
-    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder, MegaApiAndroid megaApi) {
-
-        if (megaApi.getRootNode() == null)
+    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder,
+            MegaApiAndroid megaApi) {
+        if (megaApi.getRootNode() == null) {
             return;
+        }
 
-        folder.mkdir();
         ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
-        for(int i=0; i<nodeList.size(); i++){
+        if (nodeList.size() == 0) {
+            // if this is an empty folder, do nothing
+            return;
+        }
+        folder.mkdir();
+        for (int i = 0; i < nodeList.size(); i++) {
             MegaNode document = nodeList.get(i);
             if (document.getType() == MegaNode.TYPE_FOLDER) {
-                File subfolder = new File(folder, new String(document.getName()));
-                getDlList(dlFiles, document, subfolder, megaApi);
-            }
-            else {
+                File subFolder = new File(folder, document.getName());
+                getDlList(dlFiles, document, subFolder, megaApi);
+            } else {
                 dlFiles.put(document, folder.getAbsolutePath());
             }
         }
@@ -272,7 +276,7 @@ public class OfflineUtils {
             return folderNum + " "
                     + res.getQuantityString(R.plurals.general_num_folders, folderNum)
                     + ", " + fileNum + " "
-                    + res.getQuantityString(R.plurals.general_num_files, folderNum);
+                    + res.getQuantityString(R.plurals.general_num_files, fileNum);
         } else if (folderNum > 0) {
             return folderNum + " " + res.getQuantityString(R.plurals.general_num_folders,
                     folderNum);

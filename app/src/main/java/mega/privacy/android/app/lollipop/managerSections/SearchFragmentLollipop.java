@@ -725,7 +725,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			// If search text is empty and try to open a folder in search fragment.
 			if (!((ManagerActivityLollipop) context).isValidSearchQuery() && nodes.get(position).isFolder()) {
 				((ManagerActivityLollipop) context).closeSearchView();
-				((ManagerActivityLollipop) context).openSearchFolderNode(nodes.get(position));
+				((ManagerActivityLollipop) context).openSearchFolder(nodes.get(position));
 				return;
 			}
 

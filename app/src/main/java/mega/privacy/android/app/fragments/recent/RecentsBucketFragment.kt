@@ -46,7 +46,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private lateinit var binding: FragmentRecentBucketBinding
 
-    private lateinit var gridView: RecyclerView
+    private lateinit var listView: RecyclerView
 
     private lateinit var mAdapter: MultipleBucketAdapter
 
@@ -60,7 +60,7 @@ class RecentsBucketFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentRecentBucketBinding.inflate(inflater, container, false)
-        gridView = binding.multipleBucketView
+        listView = binding.multipleBucketView
         return binding.root
     }
 
@@ -73,6 +73,8 @@ class RecentsBucketFragment : BaseFragment() {
         bucket = BucketSaved(selectedBucket)
         viewModel.bucket.value = selectedBucket
 
+        viewModel.cachedActionList.value = selectedBucketModel.currentActionList.value
+
         viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
             if(it) Navigation.findNavController(view).popBackStack()
         }
@@ -84,6 +86,7 @@ class RecentsBucketFragment : BaseFragment() {
             setupToolbar()
             checkScroll()
         }
+        setupDraggingThumbnailCallback()
     }
 
     private fun setupListView(nodes: List<MegaNode>) {
@@ -92,27 +95,30 @@ class RecentsBucketFragment : BaseFragment() {
             val numCells: Int = if (Util.isScreenInPortrait(managerActivity)) 4 else 6
             val gridLayoutManager =
                 GridLayoutManager(managerActivity, numCells, GridLayoutManager.VERTICAL, false)
-            gridView.layoutManager = gridLayoutManager
+            listView.layoutManager = gridLayoutManager
 
         } else {
             val linearLayoutManager = LinearLayoutManager(managerActivity)
-            gridView.layoutManager = linearLayoutManager
-            gridView.addItemDecoration(SimpleDividerItemDecoration(managerActivity, outMetrics))
+            listView.layoutManager = linearLayoutManager
+            listView.addItemDecoration(SimpleDividerItemDecoration(managerActivity, outMetrics))
         }
-        gridView.adapter = mAdapter
-        gridView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        listView.adapter = mAdapter
+        listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 checkScroll()
             }
         })
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
     }
 
     private fun setupFastScroller(nodes: List<MegaNode>) {
-        if (bucket.isMedia && nodes.size >= MIN_ITEMS_SCROLLBAR) {
+        if (nodes.size >= MIN_ITEMS_SCROLLBAR) {
             binding.fastscroll.visibility = View.VISIBLE
-            binding.fastscroll.setRecyclerView(gridView)
+            binding.fastscroll.setRecyclerView(listView)
         } else {
             binding.fastscroll.visibility = View.GONE
         }
@@ -139,7 +145,7 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun checkScroll() {
-        val canScroll = gridView.canScrollVertically(-1)
+        val canScroll = listView.canScrollVertically(-1)
         managerActivity.changeActionBarElevation(canScroll)
     }
 
@@ -311,13 +317,13 @@ class RecentsBucketFragment : BaseFragment() {
         val position = viewModel.getItemPositionByHandle(handle)
         if (position == INVALID_POSITION) return
 
-        gridView.scrollToPosition(position)
+        listView.scrollToPosition(position)
         notifyThumbnailLocationOnScreen()
     }
 
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {
         val position = viewModel.getItemPositionByHandle(handle)
-        val viewHolder = gridView.findViewHolderForLayoutPosition(position) ?: return null
+        val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
         // List and grid have different thumnail ImageView
         return if (bucket.isMedia) {
             viewHolder.itemView.findViewById(R.id.thumbnail_media)
@@ -358,10 +364,10 @@ class RecentsBucketFragment : BaseFragment() {
         private class RecentsBucketDraggingThumbnailCallback(private val fragmentRef: WeakReference<RecentsBucketFragment>) :
             DraggingThumbnailCallback {
 
-            override fun setVisibility(v: Int) {
+            override fun setVisibility(visibility: Int) {
                 val fragment = fragmentRef.get() ?: return
                 fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
-                    ?.apply { visibility = v }
+                    ?.apply { this.visibility = visibility }
             }
 
             override fun getLocationOnScreen(location: IntArray) {

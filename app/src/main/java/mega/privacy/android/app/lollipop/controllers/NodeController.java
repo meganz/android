@@ -841,6 +841,7 @@ public class NodeController {
 
             int numberOfNodesAlreadyDownloaded = 0;
             int numberOfNodesPending = 0;
+            int emptyFolders = 0;
 
             for (long hash : hashes) {
                 logDebug("hashes.length more than 1");
@@ -865,6 +866,10 @@ public class NodeController {
                         } else {
                             dlFiles.put(node, parentPath);
                         }
+                    }
+
+                    if (dlFiles.isEmpty()) {
+                        emptyFolders++;
                     }
 
                     for (MegaNode document : dlFiles.keySet()) {
@@ -936,7 +941,7 @@ public class NodeController {
                 }
             }
 
-            showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+            showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, emptyFolders);
         }
     }
 

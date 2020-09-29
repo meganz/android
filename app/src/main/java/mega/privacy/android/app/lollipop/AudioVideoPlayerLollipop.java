@@ -68,11 +68,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -84,13 +82,10 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -1056,17 +1051,14 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     void createPlayer () {
         logDebug("createPlayer");
-        //Create a default TrackSelector
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-
-        //Create a default LoadControl
-        LoadControl loadControl = new DefaultLoadControl();
-
         createPlayListErrorCounter = 0;
         //Create the player
-        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
+        MappingTrackSelector trackSelector = new DefaultTrackSelector(this);
+        player = new SimpleExoPlayer.Builder(this,
+                new DefaultRenderersFactory(this)
+                        .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON))
+                .setTrackSelector(trackSelector)
+                .build();
 
         //Set media controller
         playerView.setUseController(true);
@@ -3785,6 +3777,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (getIntent() != null) {
             screenPosition = getIntent().getIntArrayExtra("screenPosition");
             draggableView.setScreenPosition(screenPosition);
+            int[] screenPositionForSwipeDismiss = getIntent().getIntArrayExtra(INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS);
+            if (screenPositionForSwipeDismiss != null) {
+                screenPosition = screenPositionForSwipeDismiss;
+                draggableView.setScreenPosition(screenPosition);
+            }
         }
         draggableView.setDraggableListener(this);
         ivShadow = new ImageView(this);

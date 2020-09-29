@@ -47,6 +47,7 @@ class NodeGridAdapter(
             // icon appear before binding the item. Therefore, hide the icon up front
             binding.icSelected.isVisible = false
             binding.takenDown.isVisible = false
+            binding.videoInfo.isVisible = false
         }
 
         return NodeViewHolder(binding)

@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:visibleGone="@{viewModel.items.size() > (sortByHeaderViewModel.list ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}"
+            app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

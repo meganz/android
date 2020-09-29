@@ -18,6 +18,8 @@ class RecentsBucketViewModel @ViewModelInject constructor(
 
     var bucket: MutableLiveData<MegaRecentActionBucket> = MutableLiveData()
 
+    var cachedActionList = MutableLiveData<List<MegaRecentActionBucket>>()
+
     var shouldCloseFragment: MutableLiveData<Boolean> = MutableLiveData(false)
 
     var items: LiveData<List<MegaNode>> = bucket.switchMap {
@@ -39,11 +41,13 @@ class RecentsBucketViewModel @ViewModelInject constructor(
         return index
     }
 
-    private fun isSameBucket(other: MegaRecentActionBucket, ignoreTimestamp: Boolean): Boolean {
-        val selected = bucket.value
-        return selected?.isMedia == other.isMedia &&
+    private fun isSameBucket(
+        selected: MegaRecentActionBucket,
+        other: MegaRecentActionBucket
+    ): Boolean {
+        return selected.isMedia == other.isMedia &&
                 selected.isUpdate == other.isUpdate &&
-                (selected.timestamp == other.timestamp || ignoreTimestamp) &&
+                selected.timestamp == other.timestamp &&
                 selected.parentHandle == other.parentHandle &&
                 selected.userEmail == other.userEmail
     }
@@ -55,20 +59,32 @@ class RecentsBucketViewModel @ViewModelInject constructor(
             }
 
             val recentActions = megaApi.recentActions
+
             recentActions.forEach { b ->
-                if (isSameBucket(b, false)) {
-                    bucket.value = b
-                    return@Observer
+                bucket.value?.let { current ->
+                    if (isSameBucket(current, b)) {
+                        bucket.value = b
+                        return@Observer
+                    }
                 }
             }
 
-            // If enter this loop, that means current open bucket is in today.
-            recentActions.forEach { b ->
-                if (isSameBucket(b, true)) {
-                    bucket.value = b
-                    return@Observer
+            cachedActionList.value?.forEach { b ->
+                val iterator = recentActions.iterator()
+                while (iterator.hasNext()) {
+                    if (isSameBucket(iterator.next(), b)) {
+                        iterator.remove()
+                    }
                 }
             }
+
+            // The last one is the changed one.
+            if (recentActions.size == 1) {
+                bucket.value = recentActions[0]
+                return@Observer
+            }
+
+            // No nodes contained in the bucket or the action bucket is no loner exists.
             shouldCloseFragment.value = true
         }
     }

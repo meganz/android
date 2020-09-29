@@ -7,7 +7,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := mega
 LOCAL_CFLAGS := -fdata-sections -ffunction-sections -DDEBUG -I$(LOCAL_PATH)/../megachat/webrtc/include/third_party/abseil-cpp
 LOCAL_SRC_FILES := $(LOCAL_PATH)/megasdk.cpp $(LOCAL_PATH)/megachat.cpp
-LOCAL_LDLIBS := -lm -lz -llog -lGLESv2 -lOpenSLES -latomic
+LOCAL_LDLIBS := -lm -lz -llog -lGLESv2 -lOpenSLES
 LOCAL_LDFLAGS :=  -Wl,-gc-sections
 LOCAL_STATIC_LIBRARIES := megasdk megachat
 
