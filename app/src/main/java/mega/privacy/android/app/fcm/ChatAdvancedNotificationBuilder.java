@@ -1154,7 +1154,6 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
                     .setCategory(NotificationCompat.CATEGORY_CALL)
-                    .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
                     .setAutoCancel(false)
                     .setDeleteIntent(pendingIntentIgnore)
