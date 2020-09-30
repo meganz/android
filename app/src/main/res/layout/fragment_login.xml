@@ -4,7 +4,6 @@
     android:id="@+id/scroll_view_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/greyBackgroundColor"
     android:stackFromBottom="true"
     tools:context=".LoginActivityFragment">
 
@@ -162,7 +161,6 @@
                 android:id="@+id/login_create_account_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/greyBackgroundColor"
                 android:gravity="left"
                 android:orientation="horizontal" >
 

@@ -2,5 +2,55 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="Theme.Mega" parent="Base.Theme.Mega" >
+        <!--Material color attributes (light theme) -->
+        <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
+        <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
+        <!--selection controls.-->
+        <!-- e.g. the color of the action bar -->
+        <item name="colorPrimary">@color/dark_grey</item>
+        <!-- e.g. the background color of the FAB -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <!-- e.g. The action bar color of the "select folder" screen -->
+        <item name="colorPrimaryVariant">@color/dark_grey</item>
+        <!-- e.g. A variant color of the FAB -->
+        <!--        <item name="colorSecondaryVariant"></item>-->
+
+        <!--colorBackground appears behind scrollable content and is used for the default window-->
+        <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
+        <!--and menus. colorError is used to indicate an error state for components such as-->
+        <!--text fields.-->
+        <item name="android:colorBackground">@color/dark_grey</item>
+        <!-- e.g. the color of the bottom sheet, overflow menu (Set elevation or use the default elevation
+          would automatically add a white overlay surface with default opacity. see:
+           https://material.io/design/color/dark-theme.html#properties-->
+        <item name="colorSurface">@color/dark_grey</item>
+        <!-- e.g. the color of the invalid email address hint -->
+        <item name="colorError">@color/red_400</item>
+
+        <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+        <!--on which they appear.-->
+        <!-- e.g. the color of the title text on the action bar -->
+        <item name="colorOnPrimary">@color/white_alpha_087</item>
+        <!-- e.g. the color of the "+" icon on the FAB -->
+        <item name="colorOnSecondary">@color/dark_grey</item>
+        <!--        <item name="colorOnSurface"></item>-->
+        <!--        <item name="colorOnError"></item>-->
+        <!--        <item name="colorOnBackground"></item>-->
+
+        <!-- The color applied to icons/controls in their normal state -->
+        <!-- e.g. The overflow menu item (3 dotes) automatically use this color
+             so is the BadgeDrawerArrowDrawable's arrow color.
+             Other action bar menu icons tint (activity_manager menu xml), etc. -->
+        <item name="colorControlNormal">@color/white_alpha_090</item>
+        <!-- You can also set colorControlActivated
+        colorControlHighlight & colorSwitchThumbNormal. -->
+
+        <!-- Headline text color. Title on action bar, menu item text automatically use it -->
+        <item name="android:textColorPrimary">@color/white_alpha_087</item>
+        <!-- Body text color -->
+        <item name="android:textColorSecondary">@color/white_alpha_060</item>
+
+        <!-- Used by the hint text color of TextInputLayout -->
+        <item name="textColorHint">@color/white_alpha_060</item>
     </style>
 </resources>

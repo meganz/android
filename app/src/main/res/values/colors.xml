@@ -52,8 +52,7 @@
     <color name="divider_upgrade_account">#1F000000</color>
 
     <color name="transparent_white">#CCFFFFFF</color>
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
+
     <color name="black_87_opacity">#DE000000</color>
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
@@ -229,37 +228,51 @@
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
 
+
     <!-- ======================= Dark mode refactoring =====================  -->
+
+    <!-- General color names, the suffix numbers are defined
+    in Mega Invision(https://projects.invisionapp.com/d/main#/console/20328430/433152493/preview),
+    not the values from Material design. Some colors cannot be found in the table (e.g. red_390),
+     The "390" is simply deduced from the relative color saturation against red_400 -->
+    <color name="white">#FFFFFF</color>
+    <color name="white_alpha_012">#1EFFFFFF</color>
+    <color name="white_alpha_038">#60FFFFFF</color>
+    <color name="white_alpha_060">#99FFFFFF</color>
+    <color name="white_alpha_087">#DDFFFFFF</color>
+    <color name="white_alpha_090">#E5FFFFFF</color>
+
+    <color name="black">#000000</color>
+    <color name="dark_grey">#121212</color>
+    <color name="grey_alpha_012">#1E000000</color>
+    <color name="grey_alpha_026">#42000000</color>
+    <color name="grey_alpha_038">#60000000</color>
+<!--    <color name="grey_alpha_054">#89000000</color>-->
+    <color name="grey_alpha_060">#99000000</color>
+    <color name="grey_alpha_087">#DD000000</color>
+
+    <color name="teal_200">#6DD2BF</color>
+    <color name="teal_300">#00BFA5</color>
+
+    <color name="red_300">#F46762</color>
+    <color name="red_390">#F0373A</color>
+    <color name="red_400">#FD3E38</color>
+    <color name="red_600">#F30C14</color>
+
+    <!-- ============ Color names by purpose ============== -->
 
     <!-- Entire screen background -->
     <color name="background">@color/white</color>
 
-    <!-- Accent color (e.g. Button,FAB background) -->
-    <color name="accent">@color/accentColor</color>
-
-    <color name="error">@color/dark_primary_color</color>
-
-    <color name="primary_variant">@color/dark_primary_color</color>
-    <color name="textinputlayout_underline_unfocused">#42000000</color>
-    <color name="text_hint">#60000000</color>
-
-    <!-- Pure black in Light or white in Dark-->
-    <color name="black_white">@color/black</color>
-
-    <!-- The background color of Login screen -->
-    <color name="grey_background">@color/background_create_account</color>
+    <color name="textinputlayout_underline_unfocused">@color/grey_alpha_038</color>
 
     <!-- The "eye" icon -->
-    <color name="password_visible_icon">#42000000</color>
+    <color name="password_visible_icon">@color/grey_alpha_012</color>
 
-    <!-- 0.87 black -->
-    <color name="control_normal">#DD000000</color>
-
-    <color name="on_secondary">@color/white</color>
-
-    <color name="badge_background">#F0373A</color>
+    <!-- Notification badge -->
+    <color name="badge_background">@color/red_390</color>
     <color name="badge_background_secondary">@color/white</color>
-    <color name="badge_big_background_secondary">@color/dark_primary_color</color>
-    <color name="badge_text_color">@color/on_secondary</color>
-    <color name="badge_text_color_secondary">#F0373A</color>
+    <color name="badge_big_background_secondary">@color/red_600</color>
+    <color name="badge_text_color">@color/white</color>
+    <color name="badge_text_color_secondary">@color/red_390</color>
 </resources>

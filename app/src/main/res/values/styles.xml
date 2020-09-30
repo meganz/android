@@ -520,7 +520,7 @@
 
     <!-- =================== Dark mode refactor start ======================= -->
 
-    <!-- Contained button -->
+    <!-- Contained button, inherited elevation: 2dp -->
     <style name="Button" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">?attr/colorSecondary</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
@@ -536,9 +536,6 @@
     <!-- Outlined button -->
     <!-- TODO: style -->
 
-    <style name="PasswordEndIcon">
-        <item name="endIconMode">password_toggle</item>
-    </style>
 
     <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
     colorControlActivated is the floating label, underline and cursor colors, when focused. If we

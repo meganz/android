@@ -8,12 +8,13 @@
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
+
         <!-- e.g. the color of the action bar -->
-        <item name="colorPrimary">@color/background</item>
+        <item name="colorPrimary">@color/white</item>
         <!-- e.g. the background color of the FAB -->
-        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondary">@color/teal_300</item>
         <!-- e.g. The action bar color of the "select folder" screen -->
-        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorPrimaryVariant">@color/red_600</item>
         <!-- e.g. A variant color of the FAB -->
 <!--        <item name="colorSecondaryVariant"></item>-->
 
@@ -21,18 +22,18 @@
         <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
         <!--and menus. colorError is used to indicate an error state for components such as-->
         <!--text fields.-->
-        <item name="android:colorBackground">@color/background</item>
-        <!-- e.g. the color of the bottom sheet -->
-        <item name="colorSurface">@color/background</item>
+        <item name="android:colorBackground">@color/white</item>
+        <!-- e.g. the color of the bottom sheet, overflow menu(with some auto-alpha?) -->
+        <item name="colorSurface">@color/white</item>
         <!-- e.g. the color of the invalid email address hint -->
-        <item name="colorError">@color/error</item>
+        <item name="colorError">@color/red_600</item>
 
         <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
         <!--on which they appear.-->
         <!-- e.g. the color of the title text on the action bar -->
-        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorOnPrimary">@color/grey_alpha_087</item>
         <!-- e.g. the color of the "+" icon on the FAB -->
-        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
 <!--        <item name="colorOnSurface"></item>-->
 <!--        <item name="colorOnError"></item>-->
 <!--        <item name="colorOnBackground"></item>-->
@@ -41,7 +42,7 @@
         <!-- e.g. The overflow menu item (3 dotes) automatically use this color
              so is the BadgeDrawerArrowDrawable's arrow color.
              Other action bar menu icons tint (activity_manager menu xml), etc. -->
-        <item name="colorControlNormal">@color/control_normal</item>
+        <item name="colorControlNormal">@color/grey_alpha_087</item>
         <!-- You can also set colorControlActivated
         colorControlHighlight & colorSwitchThumbNormal. -->
 
@@ -51,7 +52,7 @@
         <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="actionModeStyle">@style/Widget.ActionMode</item>
         <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
-        <item name="elevation">0dp</item>
+<!--        <item name="elevation">0dp</item>-->
 
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
 
@@ -64,12 +65,13 @@
 
         <item name="borderlessButtonStyle">@style/BorderlessButton</item>
 
-        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
-        <item name="android:textColorSecondary">@color/text_color_secondary</item>
+        <!-- Headline text color. Title on action bar, menu item text automatically use it -->
+        <item name="android:textColorPrimary">@color/grey_alpha_087</item>
+        <!-- Body text color -->
+        <item name="android:textColorSecondary">@color/grey_alpha_060</item>
 
-        <item name="greyBackgroundColor">@color/grey_background</item>
         <!-- Used by the hint text color of TextInputLayout -->
-        <item name="textColorHint">@color/text_hint</item>
+        <item name="textColorHint">@color/grey_alpha_060</item>
 
 <!--        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>-->
 
