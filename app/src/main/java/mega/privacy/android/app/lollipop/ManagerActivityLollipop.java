@@ -11971,7 +11971,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			onNodesSharedUpdate();
         } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
             if (resultCode == RESULT_OK) {
-                String savedDestination = intent.getStringExtra("EXTRA_PICKED_SAVE_DESTINATION");
+                String savedDestination = intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION);
                 Intent fileIntent = new Intent(this, FileExplorerActivityLollipop.class);
                 if (getString(R.string.section_chat).equals(savedDestination)) {
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
