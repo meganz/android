@@ -437,6 +437,7 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     fi
     ENABLED_DECODERS=(ac3)
     cd "${FFMPEG_EXT_PATH}"
+    sed -i "s/APP_PLATFORM.*/APP_PLATFORM := ${APP_PLATFORM}/" Application.mk
     echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
     cd "${FFMPEG_EXT_PATH}"
