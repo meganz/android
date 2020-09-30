@@ -247,7 +247,7 @@
     <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_026">#42000000</color>
     <color name="grey_alpha_038">#60000000</color>
-<!--    <color name="grey_alpha_054">#89000000</color>-->
+    <color name="grey_alpha_054">#89000000</color>
     <color name="grey_alpha_060">#99000000</color>
     <color name="grey_alpha_087">#DD000000</color>
 
