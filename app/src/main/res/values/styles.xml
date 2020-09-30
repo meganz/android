@@ -536,4 +536,26 @@
         <item name="android:textCursorDrawable">@drawable/giphy_search_cursor</item>
     </style>
 
+    <style name="IconGifMessage">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:src">@drawable/ic_gif_message</item>
+    </style>
+
+    <style name="ProgressBarGifMessage">
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:indeterminateTint">@color/white</item>
+    </style>
+
+    <style name="SimpleDraweeViewMessages">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:maxHeight">212dp</item>
+        <item name="android:maxWidth">212dp</item>
+    </style>
 </resources>

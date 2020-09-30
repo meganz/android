@@ -28,6 +28,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 
+import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter.updateViewDimensions;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class FrescoUtils {
@@ -135,72 +136,16 @@ public class FrescoUtils {
     }
 
     /**
-     * Load GIF/WEBP to display the animation.
-     * SimpleDraweeView handles with cache and resource release.
-     *
-     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
-     * @param pb            Progress bar showing when loading.
-     * @param preview       View where the file preview is shown.
-     * @param uri           The uri of GIF/WEBP. May be from url or local path.
-     */
-    private void loadGif(SimpleDraweeView gifImgDisplay, ProgressBar pb, RoundedImageView preview, Uri uri) {
-        if (gifImgDisplay != null) {
-            gifImgDisplay.setVisibility(View.VISIBLE);
-        }
-
-        if (pb != null) {
-            pb.setVisibility(View.VISIBLE);
-        }
-
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(ImageRequest.fromUri(uri))
-                .setAutoPlayAnimations(true)
-                .setControllerListener(new BaseControllerListener<ImageInfo>() {
-                    @Override
-                    public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                        if (gifImgDisplay != null) {
-                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) gifImgDisplay.getLayoutParams();
-                            params.height = imageInfo.getHeight();
-                            params.width = imageInfo.getWidth();
-                            gifImgDisplay.setLayoutParams(params);
-                        }
-
-                        if (pb != null) {
-                            pb.setVisibility(View.GONE);
-                        }
-
-                        if (preview != null) {
-                            preview.setVisibility(View.GONE);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(String id, Throwable throwable) {
-                        if (gifImgDisplay != null) {
-                            gifImgDisplay.setVisibility(View.GONE);
-                        }
-
-                        if (pb != null) {
-                            pb.setVisibility(View.GONE);
-                        }
-                        logWarning("Load gif failed, error: " + throwable.getMessage());
-                    }
-                })
-                .build();
-
-        gifImgDisplay.setController(controller);
-    }
-
-    /**
      * Load GIF/WEBP in a chat message.
      * SimpleDraweeView handles with cache and resource release.
      *
      * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
      * @param pb            Progress bar showing when loading.
      * @param preview       View where the file preview is shown.
+     * @param fileView      View where the file inso is shown.
      * @param uri           The uri of GIF/WEBP. May be from url or local path.
      */
-    public static void loadGifMessage(SimpleDraweeView gifImgDisplay, ProgressBar pb, RoundedImageView preview, Uri uri) {
+    public static void loadGifMessage(SimpleDraweeView gifImgDisplay, ProgressBar pb, RoundedImageView preview, RelativeLayout fileView, Uri uri) {
         if (gifImgDisplay == null) {
             logWarning("Unable to load GIF, view is null.");
             return;
@@ -218,13 +163,14 @@ public class FrescoUtils {
                 .setControllerListener(new BaseControllerListener<ImageInfo>() {
                     @Override
                     public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) gifImgDisplay.getLayoutParams();
-                        params.height = imageInfo.getHeight();
-                        params.width = imageInfo.getWidth();
-                        gifImgDisplay.setLayoutParams(params);
+                        updateViewDimensions(gifImgDisplay, imageInfo.getWidth(), imageInfo.getHeight());
 
                         if (pb != null) {
                             pb.setVisibility(View.GONE);
+                        }
+
+                        if (fileView != null) {
+                            fileView.setVisibility(View.GONE);
                         }
 
                         if (preview != null) {
