@@ -41,14 +41,14 @@
         <!-- e.g. The overflow menu item (3 dotes) automatically use this color
              so is the BadgeDrawerArrowDrawable's arrow color.
              Other action bar menu icons tint (activity_manager menu xml), etc. -->
-        <item name="colorControlNormal">@color/white_alpha_090</item>
+        <item name="colorControlNormal">@color/white_alpha_087</item>
         <!-- You can also set colorControlActivated
         colorControlHighlight & colorSwitchThumbNormal. -->
 
         <!-- Headline text color. Title on action bar, menu item text automatically use it -->
         <item name="android:textColorPrimary">@color/white_alpha_087</item>
         <!-- Body text color -->
-        <item name="android:textColorSecondary">@color/white_alpha_060</item>
+        <item name="android:textColorSecondary">@color/white_alpha_054</item>
 
         <!-- Used by the hint text color of TextInputLayout -->
         <item name="textColorHint">@color/white_alpha_060</item>

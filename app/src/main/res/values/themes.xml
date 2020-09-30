@@ -68,7 +68,7 @@
         <!-- Headline text color. Title on action bar, menu item text automatically use it -->
         <item name="android:textColorPrimary">@color/grey_alpha_087</item>
         <!-- Body text color -->
-        <item name="android:textColorSecondary">@color/grey_alpha_060</item>
+        <item name="android:textColorSecondary">@color/grey_alpha_054</item>
 
         <!-- Used by the hint text color of TextInputLayout -->
         <item name="textColorHint">@color/grey_alpha_060</item>
@@ -83,7 +83,7 @@
         <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
         <!--<item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>-->
         <item name="textAppearanceSubtitle2">@style/TextAppearance.Mega.Subtitle2</item>
-        <!--<item name="textAppearanceBody1">@style/TextAppearance.MyTheme.Body1</item>-->
+        <item name="textAppearanceBody1">@style/TextAppearance.Mega.Body1</item>
         <item name="textAppearanceBody2">@style/TextAppearance.Mega.Body2</item>
         <!--<item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>-->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>

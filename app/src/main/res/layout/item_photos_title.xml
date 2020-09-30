@@ -18,6 +18,6 @@
         android:layout_marginStart="18dp"
         android:gravity="center_vertical"
         android:text="@{item.modifiedDate}"
-        android:textAppearance="@style/TextAppearance.Mega.Body2"
+        android:textAppearance="@style/ListView.Header.Item"
         tools:text="July 2020" />
 </layout>

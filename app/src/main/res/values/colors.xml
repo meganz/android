@@ -238,9 +238,9 @@
     <color name="white">#FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
+    <color name="white_alpha_054">#89FFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
     <color name="white_alpha_087">#DDFFFFFF</color>
-    <color name="white_alpha_090">#E5FFFFFF</color>
 
     <color name="black">#000000</color>
     <color name="dark_grey">#121212</color>
@@ -276,4 +276,10 @@
     <color name="badge_big_background_secondary">@color/red_600</color>
     <color name="badge_text_color">@color/white</color>
     <color name="badge_text_color_secondary">@color/red_390</color>
+
+    <!-- Three-dots at the end of the list view item -->
+    <color name="list_item_more">@color/grey_alpha_054</color>
+
+    <!-- The divider between List view items -->
+    <color name="list_item_divider">@color/grey_alpha_012</color>
 </resources>

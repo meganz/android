@@ -74,8 +74,7 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:text="@{item.node.name}"
-            android:textColor="@color/file_list_first_row"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@+id/thumbnail"
@@ -134,8 +133,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text='@{String.format("%s . %s", Util.getSizeString(item.node.size), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
-                android:textColor="@color/file_list_second_row"
-                android:textSize="14sp"
+                android:textAppearance="?attr/textAppearanceBody2"
                 app:layout_constraintStart_toEndOf="@id/versions_icon"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="8.27 MB . June 2020 10:39:12" />
@@ -150,6 +148,7 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_dots_vertical_grey"
+            android:tint="@color/list_item_more"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

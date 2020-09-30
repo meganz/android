@@ -5,23 +5,40 @@
         <item name="android:textSize">22sp</item>
     </style>
 
-    <!-- Normal text body, Roboto regular, 15sp, textColorPrimary, AllCaps=false -->
+    <!-- Normal text body, Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
     <style name="TextAppearance.Mega.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 
+    <!-- Title on action bar, Medium, bold, 16sp, 0.2px, textColorPrimary-->
     <style name="TextAppearance.Mega.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textSize">16sp</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:letterSpacing">0.009375</item>
+        <item name="android:letterSpacing">0.0125</item>
         <item name="textStyle">normal</item>
     </style>
 
+    <!-- Medium, bold, 14sp, 0px, textColorPrimary-->
     <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <!--List view item file info, Regular, 14sp, 0.25px, textColorSecondary-->
     <style name="TextAppearance.Mega.Body2" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:letterSpacing">0.017857143</item>
     </style>
+
+    <!-- Regular, 14sp, -0.05px, textColorPrimary-->
+    <style name="ListView.Header.Item" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:letterSpacing">-0.003571429</item>
+    </style>
+
+    <!-- Regular, 16sp, 0.15px, textColorPrimary-->
+    <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:letterSpacing">0.009375</item>
+    </style>
+
+
 </resources>
