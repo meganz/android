@@ -229,7 +229,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
-        userPassword.setOnFocusChangeListener((v1, hasFocus) -> setPasswordToggle(userPasswordLayout, hasFocus));
+        userPassword.setOnFocusChangeListener((v1, hasFocus) -> userPasswordLayout.setEndIconVisible(hasFocus));
 
         userPasswordConfirm.addTextChangedListener(new TextWatcher() {
             @Override
@@ -248,7 +248,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
-        userPasswordConfirm.setOnFocusChangeListener((v12, hasFocus) -> setPasswordToggle(userPasswordConfirmLayout, hasFocus));
+        userPasswordConfirm.setOnFocusChangeListener((v12, hasFocus) -> userPasswordConfirmLayout.setEndIconVisible(hasFocus));
 
         TextView tos = (TextView)v.findViewById(R.id.tos);
 

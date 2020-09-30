@@ -1,10 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".CreateAccountActivityLollipop">
+    android:background="?attr/colorSurface"
+    >
 
     <ScrollView
         android:layout_width="match_parent"
@@ -38,11 +38,8 @@
                         android:layout_gravity="left"
                         android:text="@string/create_account_title"
                         android:layout_marginTop="17dp"
-                        android:textColor="@color/name_my_account"
-                        android:textSize="16sp"
-                        android:textAllCaps="true"
-                        android:fontFamily="sans-serif-light"
-                        android:textStyle="bold" />
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -54,17 +51,19 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
                             android:hint="@string/first_name_text"
+                            style="@style/TextInputLayout"
+                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true"
-                            app:errorTextAppearance="@style/InputTextAppearanceError">
+                            >
 
-                            <androidx.appcompat.widget.AppCompatEditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                android:theme="@style/ColorControlStyle"/>
+                                />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -90,17 +89,19 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/lastname_text"
+                            style="@style/TextInputLayout"
+                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true"
-                            app:errorTextAppearance="@style/InputTextAppearanceError">
+                            >
 
-                            <androidx.appcompat.widget.AppCompatEditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_last_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                android:theme="@style/ColorControlStyle"/>
+                                />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -126,17 +127,19 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/email_text"
+                            style="@style/TextInputLayout"
+                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true"
-                            app:errorTextAppearance="@style/InputTextAppearanceError">
+                            >
 
-                            <androidx.appcompat.widget.AppCompatEditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_email_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textEmailAddress"
-                                android:theme="@style/ColorControlStyle"/>
+                                />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -162,18 +165,19 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/password_text"
+                            style="@style/TextInputLayout.Password"
+                            android:theme="@style/TextInputLayout.Password"
                             app:errorEnabled="true"
-                            app:errorTextAppearance="@style/InputTextAppearanceError"
-                            app:endIconTint="@color/password_color_toggle">
+                            >
 
-                            <androidx.appcompat.widget.AppCompatEditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_password_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textPassword"
-                                android:theme="@style/ColorControlStyle"/>
+                                />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -278,11 +282,12 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/confirm_password_text"
+                            style="@style/TextInputLayout.Password"
+                            android:theme="@style/TextInputLayout.Password"
                             app:errorEnabled="true"
-                            app:errorTextAppearance="@style/InputTextAppearanceError"
-                            app:endIconTint="@color/password_color_toggle">
+                            >
 
-                            <androidx.appcompat.widget.AppCompatEditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_password_text_confirm"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -412,33 +417,27 @@
                     android:id="@+id/button_create_account_create"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/background_accent_button"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16dp"
-                    android:paddingLeft="16dp"
+                    style="@style/Button"
+                    android:stateListAnimator="@null"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
                     android:elevation="6dp"
-                    android:stateListAnimator="@null"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    tools:text="create account"
+                    />
 
                 <Button
                     android:id="@+id/button_login_create"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16dp"
-                    android:paddingLeft="16dp"
+                    style="?attr/borderlessButtonStyle"
+                    android:stateListAnimator="@null"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
-                    android:stateListAnimator="@null" />
+                    tools:text="login"
+                    />
 
             </LinearLayout>
 

@@ -2,6 +2,15 @@
 <resources>
     <color name="background">@color/dark_grey</color>
 
+    <color name="name_my_account">@color/white_alpha_087</color>
+    <color name="background_create_account">@color/dark_grey</color>
+    <color name="text_login">@color/white_alpha_087</color>
+    <color name="login_warning">#F46762</color>
+    <color name="pass_weak">#F5F595</color>
+    <color name="pass_good">#9FF4A1</color>
+    <color name="green_unlocked_rewards">#4EB64E</color>
+    <color name="blue_unlocked_rewards">#5BB5DE</color>
+
     <color name="textinputlayout_underline_unfocused">@color/white_alpha_012</color>
 
     <color name="password_visible_icon">@color/white_alpha_012</color>
