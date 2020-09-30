@@ -239,7 +239,12 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
     @Override
     public void scanDocument() {
-        startActivityForResult(new Intent(this, DocumentScannerActivity.class), REQUEST_CODE_SCAN_DOCUMENT);
+        String[] saveDestinations = {
+                getString(R.string.section_cloud_drive),
+                getString(R.string.section_chat)
+        };
+        Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
+        startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
     }
 
 	@Override
@@ -1204,8 +1209,13 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			}
         } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
             if (resultCode == RESULT_OK) {
+                String savedDestination = intent.getStringExtra("EXTRA_PICKED_SAVE_DESTINATION");
                 Intent fileIntent = new Intent(this, FileExplorerActivityLollipop.class);
-                fileIntent.setAction(Intent.ACTION_SEND);
+                if (getString(R.string.section_chat).equals(savedDestination)) {
+                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
+                } else {
+                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                }
                 fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
                 fileIntent.setType(intent.getType());
                 startActivity(fileIntent);

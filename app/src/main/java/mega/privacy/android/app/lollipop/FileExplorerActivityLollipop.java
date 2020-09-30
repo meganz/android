@@ -134,6 +134,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
 	public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
+	public static String ACTION_UPLOAD_TO_CHAT = "ACTION_UPLOAD_TO_CHAT";
 
 	public static final int UPLOAD = 0;
 	public static final int MOVE = 1;
@@ -372,10 +373,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			if (importFileF) {
 				if (importFragmentSelected != -1) {
 					chooseFragment(importFragmentSelected);
-				}
-				else {
-					chooseFragment(IMPORT_FRAGMENT);
-				}
+                } else if (ACTION_UPLOAD_TO_CHAT.equals(action)) {
+					chooseFragment(CHAT_FRAGMENT);
+                } else {
+                    chooseFragment(IMPORT_FRAGMENT);
+                }
 
 				if (statusDialog != null) {
 					try {
@@ -1481,12 +1483,16 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					break;
 				}
 				case CHAT_FRAGMENT:{
-					chatExplorer = getChatExplorerFragment();
-					if(chatExplorer!=null){
-						chatExplorer.clearSelections();
-						showFabButton(false);
-						chooseFragment(IMPORT_FRAGMENT);
-					}
+                    if (ACTION_UPLOAD_TO_CHAT.equals(action)) {
+                        finishActivity();
+                    } else {
+                        chatExplorer = getChatExplorerFragment();
+                        if (chatExplorer != null) {
+                            chatExplorer.clearSelections();
+                            showFabButton(false);
+                            chooseFragment(IMPORT_FRAGMENT);
+                        }
+                    }
 					break;
 				}
 				case IMPORT_FRAGMENT:{
