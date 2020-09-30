@@ -7,6 +7,7 @@
     <color name="password_visible_icon">@color/white_alpha_012</color>
 
     <color name="badge_background_secondary">@color/red_390</color>
+    <color name="badge_big_background">@color/dark_grey</color>
     <color name="badge_big_background_secondary">@color/dark_grey</color>
-    <color name="badge_text_color_secondary">@color/dark_grey</color>
+    <color name="badge_text_color_secondary">@color/white</color>
 </resources>
