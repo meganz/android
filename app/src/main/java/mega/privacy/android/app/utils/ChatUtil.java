@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.Nullable;
@@ -407,13 +409,16 @@ public class ChatUtil {
         }
 
         int initSize = px2dp(MIN_WIDTH, outMetrics);
-        int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? 10 : 11;
         for (String reaction : listReactions) {
             int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
             if (numUsers > 0) {
                 String text = numUsers + "";
-                int length = text.length();
-                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2sp(sizeText * length, outMetrics);
+                Paint paint = new Paint();
+                paint.setTypeface(Typeface.DEFAULT);
+                paint.setTextSize(14f);
+                int newWidth = (int) paint.measureText(text);
+                int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 2 : newWidth + 4;
+                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2sp(sizeText, outMetrics);
                 if (possibleNewSize > initSize) {
                     initSize = possibleNewSize;
                 }

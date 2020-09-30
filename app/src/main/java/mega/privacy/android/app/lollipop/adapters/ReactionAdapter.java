@@ -79,7 +79,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ReactionAdapter.ViewHolderReaction holder, int position) {
+    public void onBindViewHolder(final ViewHolderReaction holder, int position) {
         String reaction = getItemAtPosition(position);
         if (reaction == null) {
             holder.moreReactionsLayout.setVisibility(View.GONE);
@@ -120,7 +120,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             }else{
                 holder.itemEmojiReaction.setVisibility(View.VISIBLE);
                 holder.itemEmojiReactionText.setVisibility(View.GONE);
-                holder.itemEmojiReaction.setEmoji(emoji);
+                if (holder.itemEmojiReaction.getEmoji() == null || !holder.itemEmojiReaction.getEmoji().equals(emoji)) {
+                    holder.itemEmojiReaction.addEmojiReaction(emoji);
+                }
             }
 
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(holder.itemNumUsersReaction.getLayoutParams());
