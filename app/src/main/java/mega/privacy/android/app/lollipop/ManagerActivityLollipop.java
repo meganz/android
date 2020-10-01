@@ -6388,13 +6388,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
-//		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black)); // Dark mode comment out
-
 		searchView = (SearchView) searchMenuItem.getActionView();
 
 		SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
-		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		searchAutoComplete.setHint(getString(R.string.hint_action_search));
 		View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
@@ -15910,7 +15906,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}, 300);
 			}
 			else if (option == COLOR_STATUS_BAR_ZERO) {
-//				window.setStatusBarColor(0); // Dark mode comment out
 				Util.resetStatusBarColor(this, this.getWindow());
 			}
             else if (option == COLOR_STATUS_BAR_SMS_VERIFICATION) {
