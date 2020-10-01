@@ -735,7 +735,9 @@
                             android:id="@+id/content_own_message_thumb_portrait_gif_view"
                             style="@style/SimpleDraweeViewMessages"
                             rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp"/>
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="0.5dp" />
 
                         <ImageView
                             android:id="@+id/content_own_message_thumb_portrait_gif"
@@ -895,7 +897,9 @@
                             android:id="@+id/content_own_message_thumb_landscape_gif_view"
                             style="@style/SimpleDraweeViewMessages"
                             rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp" />
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="0.5dp" />
 
                         <ImageView
                             android:id="@+id/content_own_message_thumb_landscape_gif"
@@ -1787,7 +1791,9 @@
                             android:id="@+id/content_contact_message_thumb_portrait_gif_view"
                             style="@style/SimpleDraweeViewMessages"
                             rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp" />
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="0.5dp" />
 
                         <ImageView
                             android:id="@+id/content_contact_message_thumb_portrait_gif"
@@ -1888,7 +1894,9 @@
                             android:id="@+id/content_contact_message_thumb_landscape_gif_view"
                             style="@style/SimpleDraweeViewMessages"
                             rounded:roundWithOverlayColor="@color/white"
-                            rounded:roundedCornerRadius="10dp" />
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="0.5dp" />
 
                         <ImageView
                             android:id="@+id/content_contact_message_thumb_landscape_gif"

@@ -3,6 +3,7 @@ package mega.privacy.android.app.activities
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.ProgressBar
 import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -10,16 +11,19 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyActivity.Companion.GIF_DATA
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.GifData
+import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
-class GifViewerActivity: PinActivityLollipop() {
+class GiphyViewerActivity: PinActivityLollipop() {
 
     private var gifView: SimpleDraweeView? = null
     private var pB: ProgressBar? = null
     private var sendFab: FloatingActionButton? = null
 
     private var gifData: GifData? = null
+
+    private var picking = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +33,13 @@ class GifViewerActivity: PinActivityLollipop() {
         gifView = findViewById(R.id.gif_image)
         pB = findViewById(R.id.gif_progress_bar)
         sendFab = findViewById(R.id.send_fab)
-        sendFab?.setOnClickListener { sendGifToChat() }
+
+        if(intent.action.equals(ACTION_PREVIEW_GIPHY)) {
+            picking = false
+            sendFab?.visibility = View.GONE
+        } else {
+            sendFab?.setOnClickListener { sendGifToChat() }
+        }
 
         gifData = intent.getParcelableExtra(GIF_DATA)
         updateGifDimensionsView()
@@ -48,7 +58,7 @@ class GifViewerActivity: PinActivityLollipop() {
         val gifScreenWidth: Int
         val gifScreenHeight: Int
 
-        if (isScreenInPortrait(this@GifViewerActivity)) {
+        if (isScreenInPortrait(this@GiphyViewerActivity)) {
             gifScreenWidth = outMetrics.widthPixels
 
             gifScreenHeight = if (gifWidth == gifHeight) {
@@ -83,12 +93,16 @@ class GifViewerActivity: PinActivityLollipop() {
      * Confirms the selected GIF has to be sent to the chat.
      */
     private fun sendGifToChat() {
-        setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
+        if (picking) {
+            setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
+        }
         finish()
     }
 
     override fun onBackPressed() {
-        setResult(RESULT_CANCELED);
+        if (picking) {
+            setResult(RESULT_CANCELED);
+        }
         super.onBackPressed()
     }
 }

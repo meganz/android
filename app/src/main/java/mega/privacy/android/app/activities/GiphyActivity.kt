@@ -270,7 +270,7 @@ class GiphyActivity : PinActivityLollipop() {
      * @param gifData   Object containing all the necessary GIF data.
      */
     fun openGifViewer(gifData: GifData?) {
-        startActivityForResult(Intent(this@GiphyActivity, GifViewerActivity::class.java)
+        startActivityForResult(Intent(this@GiphyActivity, GiphyViewerActivity::class.java)
                 .putExtra(GIF_DATA, gifData),
                 REQUEST_CODE_PICK_GIF)
     }
