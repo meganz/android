@@ -70,6 +70,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.reaction.AutoFitGridRecyclerView;
 import mega.privacy.android.app.components.twemoji.reaction.AutoFitRtlRecyclerView;
+import mega.privacy.android.app.components.voiceClip.DetectorSeekBar;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ReactionAdapter;
@@ -678,7 +679,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         RelativeLayout contentOwnMessageVoiceClipLayout;
         ImageView contentOwnMessageVoiceClipPlay;
-        SeekBar contentOwnMessageVoiceClipSeekBar;
+        private DetectorSeekBar contentOwnMessageVoiceClipSeekBar;
         TextView contentOwnMessageVoiceClipDuration;
         RelativeLayout errorUploadingVoiceClip;
         long totalDurationOfVoiceClip;
@@ -776,7 +777,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         RelativeLayout contentContactMessageVoiceClipLayout;
         ImageView contentContactMessageVoiceClipPlay;
-        SeekBar contentContactMessageVoiceClipSeekBar;
+        private DetectorSeekBar contentContactMessageVoiceClipSeekBar;
         TextView contentContactMessageVoiceClipDuration;
 
         ImageView iconContactTypeDocLandPreview;
@@ -4904,15 +4905,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         holder.contentOwnMessageVoiceClipSeekBar.setProgress(currentMessagePlaying.getProgress());
                         holder.contentOwnMessageVoiceClipSeekBar.setEnabled(true);
+                        holder.contentOwnMessageVoiceClipSeekBar.setEventListener(new DetectorSeekBar.IListener() {
+                            @Override
+                            public void onClick(DetectorSeekBar detectorSeekBar) { }
+
+                            @Override
+                            public void onLongClick(DetectorSeekBar detectorSeekBar) {
+                                if(!multipleSelect){
+                                    ((ChatActivityLollipop) context).itemLongClick(positionInAdapter);
+                                }
+                            }
+                        });
+
                         holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                             @Override
                             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                if(fromUser) {
+                                if (fromUser) {
                                     updatingSeekBar(messageId, progress);
                                 }
                             }
+
                             @Override
                             public void onStartTrackingTouch(SeekBar seekBar) { }
+
                             @Override
                             public void onStopTrackingTouch(SeekBar seekBar) { }
                         });
@@ -5063,6 +5078,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     holder.contentContactMessageVoiceClipSeekBar.setProgress(currentMessagePlaying.getProgress());
                     holder.contentContactMessageVoiceClipSeekBar.setEnabled(true);
+                    holder.contentContactMessageVoiceClipSeekBar.setEventListener(new DetectorSeekBar.IListener() {
+                        @Override
+                        public void onClick(DetectorSeekBar detectorSeekBar) { }
+
+                        @Override
+                        public void onLongClick(DetectorSeekBar detectorSeekBar) {
+                            if(!multipleSelect){
+                                ((ChatActivityLollipop) context).itemLongClick(positionInAdapter);
+                            }
+                        }
+                    });
 
                     holder.contentContactMessageVoiceClipSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override

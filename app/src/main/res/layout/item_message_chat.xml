@@ -509,7 +509,7 @@
                                     android:layout_height="wrap_content"/>
                             </RelativeLayout>
 
-                            <SeekBar
+                            <mega.privacy.android.app.components.voiceClip.DetectorSeekBar
                                 android:id="@+id/content_own_message_voice_clip_seekBar"
                                 android:layout_width="145dp"
                                 android:layout_height="wrap_content"
@@ -1221,7 +1221,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="6dp"
             android:layout_marginStart="48dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="-4dp"
             android:layout_alignEnd="@id/content_own_message_layout"
             android:gravity="end"
             android:background="@null"
@@ -1627,7 +1627,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
                         </RelativeLayout>
-                        <SeekBar
+                        <mega.privacy.android.app.components.voiceClip.DetectorSeekBar
                             android:id="@+id/content_contact_message_voice_clip_seekBar"
                             android:layout_width="145dp"
                             android:layout_height="wrap_content"
@@ -2116,6 +2116,7 @@
                 android:layout_alignStart="@id/content_contact_message_layout"
                 android:layout_marginStart="48dp"
                 android:layout_marginBottom="6dp"
+                android:layout_marginTop="-4dp"
                 android:layout_marginEnd="16dp"
                 android:gravity="start"
                 android:visibility="gone">
