@@ -130,9 +130,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
-	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
 	public static String ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE";
-	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
 	public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
@@ -601,18 +599,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				setView(CLOUD_TAB, false, -1);
 				tabShown = NO_TABS;
 
-			}
-			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
-				logDebug("action = ACTION_SELECT_FILE");
-				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
-				mode = SELECT;
-				selectFile = true;
-
-				aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 1).toUpperCase());
-				setView(CLOUD_TAB, false, -1);
-				tabShown=NO_TABS;
-			}
-			else if (intent.getAction().equals(ACTION_MULTISELECT_FILE)){
+			} else if (intent.getAction().equals(ACTION_MULTISELECT_FILE)) {
 				logDebug("action = ACTION_MULTISELECT_FILE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
@@ -676,13 +663,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				mode = IMPORT;
 
 				importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
-
-				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
-				setView(SHOW_TABS, false, CHAT_TAB);
-			}
-			else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
-				logDebug("action = ACTION_SELECT_FOLDER");
-				mode = SELECT;
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
@@ -1043,7 +1023,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			return;
 		}
 
-		if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
+		if(intent.getAction().equals(ACTION_MULTISELECT_FILE)){
 			createFolderMenuItem.setVisible(false);
 		}
 		else{
@@ -2702,7 +2682,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					if(body.length()>0){
 						body.append("\n");
 					}
-					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
+//					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
 					body.append(sharedText);
 				}
 				String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
@@ -3313,15 +3293,13 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		if (viewPagerExplorer != null && tabShown != NO_TABS) {
 			if (currentAction.equals(ACTION_SELECT_FOLDER_TO_SHARE) ||
-					currentAction.equals(ACTION_SELECT_FILE) ||
 					currentAction.equals(ACTION_UPLOAD_TO_CLOUD)) {
 				updateAdapterExplorer(false, DEFAULT_TAB_TO_REMOVE);
 			} else if (currentAction.equals(ACTION_MULTISELECT_FILE) ||
 					currentAction.equals(ACTION_PICK_MOVE_FOLDER) ||
 					currentAction.equals(ACTION_PICK_COPY_FOLDER) ||
 					currentAction.equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC) ||
-					currentAction.equals(ACTION_PICK_IMPORT_FOLDER) ||
-					currentAction.equals(ACTION_SELECT_FOLDER)) {
+					currentAction.equals(ACTION_PICK_IMPORT_FOLDER)) {
 				updateAdapterExplorer(false, CHAT_TAB);
 			} else if (isChatFirst) {
 				updateAdapterExplorer(true, DEFAULT_TAB_TO_REMOVE);

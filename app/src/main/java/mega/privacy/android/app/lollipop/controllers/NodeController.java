@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.ExportListener;
+import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -840,6 +841,7 @@ public class NodeController {
 
             int numberOfNodesAlreadyDownloaded = 0;
             int numberOfNodesPending = 0;
+            int emptyFolders = 0;
 
             for (long hash : hashes) {
                 logDebug("hashes.length more than 1");
@@ -864,6 +866,10 @@ public class NodeController {
                         } else {
                             dlFiles.put(node, parentPath);
                         }
+                    }
+
+                    if (dlFiles.isEmpty()) {
+                        emptyFolders++;
                     }
 
                     for (MegaNode document : dlFiles.keySet()) {
@@ -935,7 +941,7 @@ public class NodeController {
                 }
             }
 
-            showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+            showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, emptyFolders);
         }
     }
 
@@ -1334,32 +1340,23 @@ public class NodeController {
         return -1;
     }
 
-    public void leaveIncomingShare (Context context, final MegaNode n){
+    public void leaveIncomingShare (final MegaNode n){
         logDebug("Node handle: " + n.getHandle());
-
-        if (context instanceof ManagerActivityLollipop) {
-            megaApi.remove(n, (ManagerActivityLollipop) context);
-            return;
-        }
-
-        megaApi.remove(n);
+        megaApi.remove(n, new RemoveListener(context, true));
     }
 
     public void leaveMultipleIncomingShares (final ArrayList<Long> handleList){
         logDebug("Leaving " + handleList.size() + " incoming shares");
 
-        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_LEAVE_SHARE, context);
-        if(handleList.size()>1){
-            logDebug("handleList.size()>1");
-            for (int i=0; i<handleList.size(); i++){
-                MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-                megaApi.remove(node, moveMultipleListener);
-            }
+        if (handleList.size() == 1) {
+            leaveIncomingShare(megaApi.getNodeByHandle(handleList.get(0)));
+            return;
         }
-        else{
-            logDebug("handleList.size()<=1");
-            MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
-            megaApi.remove(node, (ManagerActivityLollipop)context);
+
+        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_LEAVE_SHARE, context);
+        for (int i = 0; i < handleList.size(); i++) {
+            MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+            megaApi.remove(node, moveMultipleListener);
         }
     }
 

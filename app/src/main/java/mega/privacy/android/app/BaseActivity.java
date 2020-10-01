@@ -43,6 +43,7 @@ import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -124,6 +125,9 @@ public class BaseActivity extends AppCompatActivity {
         registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
+        registerReceiver(showSnackbarReceiver,
+                new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -167,6 +171,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
         unregisterReceiver(transferFinishedReceiver);
+        unregisterReceiver(showSnackbarReceiver);
 
         super.onDestroy();
     }
@@ -296,6 +301,20 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             Util.showSnackbar(baseActivity, message);
+        }
+    };
+
+    private BroadcastReceiver showSnackbarReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPaused || intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_SHOW_SNACKBAR))
+                return;
+
+            String message = intent.getStringExtra(SNACKBAR_TEXT);
+            if (!isTextEmpty(message)) {
+                Util.showSnackbar(baseActivity, message);
+            }
         }
     };
 
@@ -451,7 +470,7 @@ public class BaseActivity extends AppCompatActivity {
         try {
             switch (type) {
                 case MESSAGE_SNACKBAR_TYPE:
-                    snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
+                    snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_LONG);
                     break;
                 case NOT_SPACE_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
@@ -598,8 +617,12 @@ public class BaseActivity extends AppCompatActivity {
                 megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS)));
                 break;
 
-            case DISABLED_ACCOUNT_BLOCK:
-                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_account_blocked)));
+            case DISABLED_BUSINESS_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_disabled)));
+                break;
+
+            case REMOVED_BUSINESS_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_removed)));
                 break;
 
             case SMS_VERIFICATION_ACCOUNT_BLOCK:

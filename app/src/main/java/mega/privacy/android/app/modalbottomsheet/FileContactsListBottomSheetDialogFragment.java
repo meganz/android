@@ -47,14 +47,9 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
                     nonContactEmail = email;
                 }
             }
-        } else {
-            if (context instanceof FileContactListActivityLollipop) {
-                share = ((FileContactListActivityLollipop) context).getSelectedShare();
-                contact = ((FileContactListActivityLollipop) context).getSelectedContact();
-            } else if (context instanceof FileInfoActivityLollipop) {
-                share = ((FileInfoActivityLollipop) context).getSelectedShare();
-                contact = ((FileInfoActivityLollipop) context).getSelectedContact();
-            }
+        } else if (context instanceof FileContactListActivityLollipop) {
+            share = ((FileContactListActivityLollipop) context).getSelectedShare();
+            contact = ((FileContactListActivityLollipop) context).getSelectedContact();
 
             if (contact == null) {
                 nonContactEmail = share.getUser();
@@ -66,6 +61,15 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
+
+        if (context instanceof FileInfoActivityLollipop) {
+            share = ((FileInfoActivityLollipop) context).getSelectedShare();
+            contact = ((FileInfoActivityLollipop) context).getSelectedContact();
+
+            if (contact == null) {
+                nonContactEmail = share.getUser();
+            }
+        }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
 
@@ -123,7 +127,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
                 titleMailContactPanel.append(" " + getString(R.string.pending_outshare_indicator));
             }
         } else {
-            titleMailContactPanel.setText(contact.getEmail());
+            titleMailContactPanel.setText(contact != null ? contact.getEmail() : nonContactEmail);
         }
 
         dialog.setContentView(contentView);

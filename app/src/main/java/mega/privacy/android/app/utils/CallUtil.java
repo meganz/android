@@ -7,14 +7,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.SystemClock;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -74,6 +72,30 @@ public class CallUtil {
             return true;
         }
         logDebug("I'm in a call in progress");
+        return true;
+    }
+
+    /**
+     * Retrieve if there's a call in progress that you're participating in or a incoming call.
+     *
+     * @return True if you're on a call in progress o exists a incoming call. Otherwise false.
+     */
+    public static boolean existsAnOgoingOrIncomingCall() {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
+        MegaHandleList listCalls = megaChatApi.getChatCalls();
+
+        if ((listCalls.size() - listCallsDestroy.size()) == 0) {
+            logDebug("No calls in progress");
+            return false;
+        }
+
+        if ((listCalls.size() - listCallsDestroy.size()) == listCallsUserNoPresent.size()) {
+            logDebug("I'm not participating in any of the calls there");
+            return false;
+        }
+
         return true;
     }
 
@@ -401,6 +423,9 @@ public class CallUtil {
      * @param user    The mega User.
      */
     public static void startNewCall(Activity activity, MegaUser user) {
+        if(user == null)
+            return;
+
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 

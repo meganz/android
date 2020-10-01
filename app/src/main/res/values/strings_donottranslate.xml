@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" context="Name of the app" translatable="false">MEGA</string>
-    <string name="app_version" context="Version number of the app" translatable="false">3.7.8 (319)</string>
-    <string name="sdk_version" context="SDK version" translatable="false">435bf70</string>
-    <string name="karere_version" context="MEGAchat SDK version" translatable="false">0b21fd8</string>
+    <string name="app_version" context="Version number of the app" translatable="false">3.7.9 (327)</string>
+    <string name="sdk_version" context="SDK version" translatable="false">96e038a</string>
+    <string name="karere_version" context="MEGAchat SDK version" translatable="false">7e3adf4</string>
     <string name="lite_account" context="PRO Lite account" translatable="false">Lite</string>
     <string name="pro_account" context="PRO account" translatable="false">PRO</string>
     <string name="prolite_account" context="PRO Lite account" translatable="false">PRO Lite</string>

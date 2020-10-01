@@ -969,7 +969,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_leave_share_layout:
-                ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
+                showConfirmationLeaveIncomingShare(context, node);
                 break;
 
             case R.id.option_send_chat_layout:
