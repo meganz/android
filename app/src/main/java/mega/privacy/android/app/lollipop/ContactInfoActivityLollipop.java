@@ -928,6 +928,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intentOpenChat);
 				}
+
+				finish();
 			}
 		}
 	}
