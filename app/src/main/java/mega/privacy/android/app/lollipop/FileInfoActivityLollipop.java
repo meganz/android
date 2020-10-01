@@ -885,8 +885,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         setIconResource();
 
         if(savedInstanceState != null){
-            long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, -1);
-            if(handle == -1 || node == null){
+            long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, INVALID_HANDLE);
+            if(handle == INVALID_HANDLE || node == null){
                 return;
             }
             ArrayList<MegaShare> list = megaApi.getOutShares(node);

@@ -137,6 +137,21 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     };
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        intentReceived = intent;
+        setIntent(intentReceived);
+
+        visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        if (visibleFragment == LOGIN_FRAGMENT) {
+            loginFragment = new LoginFragmentLollipop();
+        }
+
+        showFragment(visibleFragment);
+    }
+
+    @Override
     protected void onDestroy() {
         logDebug("onDestroy");
 
@@ -308,9 +323,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             case TOUR_FRAGMENT: {
                 logDebug("Show TOUR_FRAGMENT");
 
-                if (tourFragment == null) {
-                    tourFragment = TourFragmentLollipop.newInstance(intentReceived.getDataString());
+                String recoveryKeyUrl = null;
+                if (intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_RESET_PASS)) {
+                    recoveryKeyUrl = intentReceived.getDataString();
                 }
+                tourFragment = TourFragmentLollipop.newInstance(recoveryKeyUrl);
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment).commit();

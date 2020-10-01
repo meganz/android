@@ -774,6 +774,7 @@ public class NodeController {
 
         int numberOfNodesAlreadyDownloaded = 0;
         int numberOfNodesPending = 0;
+        int emptyFolders = 0;
 
         for (long hash : hashes) {
             MegaNode node = megaApi.getNodeByHandle(hash);
@@ -795,6 +796,10 @@ public class NodeController {
                     } else {
                         dlFiles.put(node, parentPath);
                     }
+                }
+
+                if (dlFiles.isEmpty()) {
+                    emptyFolders++;
                 }
 
                 for (MegaNode document : dlFiles.keySet()) {
@@ -856,9 +861,9 @@ public class NodeController {
             } else {
                 logWarning("Node NOT fOUND!!!!!");
             }
-        }
 
-        showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+            showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, emptyFolders);
+        }
     }
 
     /*
