@@ -32,6 +32,7 @@
         android:layout_alignTop="@+id/invisible_view"
         android:lineSpacingExtra="5sp"
         android:textAppearance="@style/TextAppearance.Mega.Caption"
+        android:textSize="15sp"
         android:gravity="center"/>
 
 </LinearLayout>

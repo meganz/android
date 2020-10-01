@@ -546,6 +546,7 @@
     textColorHint is the hint color when the field is empty and NOT focused. -->
     <style name="TextInputLayout" parent="Widget.Design.TextInputLayout">
         <item name="colorControlNormal">@color/textinputlayout_underline_unfocused</item>
+        <item name="android:textColorHint">?attr/textColorHint</item>
     </style>
 
     <style name="TextInputLayout.Password">

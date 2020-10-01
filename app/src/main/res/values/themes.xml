@@ -71,7 +71,7 @@
         <item name="android:textColorSecondary">@color/grey_alpha_054</item>
 
         <!-- Used by the hint text color of TextInputLayout -->
-        <item name="textColorHint">@color/grey_alpha_060</item>
+        <item name="textColorHint">@color/grey_alpha_038</item>
 
 <!--        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>-->
 
