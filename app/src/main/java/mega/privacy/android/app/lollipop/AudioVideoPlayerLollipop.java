@@ -68,11 +68,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -84,13 +82,10 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -100,7 +95,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,6 +111,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -126,7 +124,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -175,6 +173,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
+
+    private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+            = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
 
     private boolean fromChatSavedInstance = false;
     private int[] screenPosition;
@@ -376,6 +377,14 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
     };
+
+    public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
+        DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
+    }
+
+    public static void removeDraggingThumbnailCallback(Class<?> clazz) {
+        DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1031,17 +1040,14 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     void createPlayer () {
         logDebug("createPlayer");
-        //Create a default TrackSelector
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-
-        //Create a default LoadControl
-        LoadControl loadControl = new DefaultLoadControl();
-
         createPlayListErrorCounter = 0;
         //Create the player
-        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
+        MappingTrackSelector trackSelector = new DefaultTrackSelector(this);
+        player = new SimpleExoPlayer.Builder(this,
+                new DefaultRenderersFactory(this)
+                        .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON))
+                .setTrackSelector(trackSelector)
+                .build();
 
         //Set media controller
         playerView.setUseController(true);
@@ -1556,7 +1562,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER ||adapterType == SEARCH_BY_ADAPTER) {
-            CameraUploadsFragment.setDraggingThumbnailVisibility(visibility);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
         }
         else if (adapterType == OFFLINE_ADAPTER) {
             if (OfflineFragmentLollipop.imageDrag != null){
@@ -1618,7 +1628,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
         }
         else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-            CameraUploadsFragment.getDraggingThumbnailLocationOnScreen(location);
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(CameraUploadsFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
         else if (adapterType == OFFLINE_ADAPTER){
             if (OfflineFragmentLollipop.imageDrag != null){
@@ -3411,6 +3425,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 
+        DRAGGING_THUMBNAIL_CALLBACKS.clear();
+
         super.onDestroy();
     }
 
@@ -3712,6 +3728,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (getIntent() != null) {
             screenPosition = getIntent().getIntArrayExtra("screenPosition");
             draggableView.setScreenPosition(screenPosition);
+            int[] screenPositionForSwipeDismiss = getIntent().getIntArrayExtra(INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS);
+            if (screenPositionForSwipeDismiss != null) {
+                screenPosition = screenPositionForSwipeDismiss;
+                draggableView.setScreenPosition(screenPosition);
+            }
         }
         draggableView.setDraggableListener(this);
         ivShadow = new ImageView(this);
