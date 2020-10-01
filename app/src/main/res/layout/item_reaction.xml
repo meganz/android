@@ -2,9 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/general_rl"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentEnd="true">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:id="@+id/item_reaction_layout"
@@ -56,8 +55,9 @@
         android:id="@+id/more_reactions_layout"
         android:layout_width="40dp"
         android:layout_height="28dp"
+        android:layout_alignParentEnd="true"
         android:background="@drawable/rounded_add_reaction"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <ImageView
             android:layout_width="24dp"

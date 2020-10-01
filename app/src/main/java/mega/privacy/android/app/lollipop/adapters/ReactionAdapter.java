@@ -44,6 +44,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     private AndroidMegaChatMessage megaMessage;
     private MegaChatRoom chatRoom;
     private RecyclerView recyclerViewFragment;
+    private DisplayMetrics outMetrics;
 
     public ReactionAdapter(Context context, RecyclerView recyclerView, ArrayList<String> listReactions, long chatid, AndroidMegaChatMessage megaMessage) {
         this.context = context;
@@ -54,6 +55,10 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         this.messageId = megaMessage.getMessage().getMsgId();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         chatRoom = megaChatApi.getChatRoom(chatId);
+
+        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
     }
 
     @Override
@@ -88,10 +93,27 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         }
 
         if (reaction.equals(INVALID_REACTION)) {
+            RelativeLayout.LayoutParams paramsMoreReaction = new RelativeLayout.LayoutParams(holder.moreReactionsLayout.getLayoutParams());
+
+            if(megaMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()){
+                paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_END);
+            }else{
+                paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_START);
+            }
+            holder.moreReactionsLayout.setLayoutParams(paramsMoreReaction);
+
             holder.moreReactionsLayout.setVisibility(View.VISIBLE);
             holder.itemReactionLayout.setVisibility(View.GONE);
             return;
         }
+
+        RelativeLayout.LayoutParams paramsMoreReaction = new RelativeLayout.LayoutParams(holder.itemReactionLayout.getLayoutParams());
+        if(megaMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()){
+            paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_END);
+        }else{
+            paramsMoreReaction.addRule(RelativeLayout.ALIGN_PARENT_START);
+        }
+        holder.itemReactionLayout.setLayoutParams(paramsMoreReaction);
 
         holder.itemReactionLayout.setVisibility(View.VISIBLE);
         holder.moreReactionsLayout.setVisibility(View.GONE);
@@ -109,9 +131,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             if (!holder.itemNumUsersReaction.getText().equals(text)) {
                 holder.itemNumUsersReaction.setText(text);
             }
-            Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-            DisplayMetrics outMetrics = new DisplayMetrics ();
-            display.getMetrics(outMetrics);
 
             if(emoji == null){
                 holder.itemEmojiReaction.setVisibility(View.GONE);

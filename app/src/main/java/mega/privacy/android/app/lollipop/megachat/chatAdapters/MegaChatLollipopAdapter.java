@@ -153,7 +153,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private final static int TYPE_ITEM = 1;
 
     private final static int LAYOUT_WIDTH = 330;
-    private static int MAX_COLUMNS = 3;
     private static int REACTION_SPACE = 8;
 
     Context context;
@@ -181,7 +180,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     DatabaseHandler dbH = null;
     MegaChatRoom chatRoom;
 
-    private EqualSpacingItemDecoration itemDecoration = new EqualSpacingItemDecoration(REACTION_SPACE, EqualSpacingItemDecoration.HORIZONTAL);
+    private EqualSpacingItemDecoration itemDecorationContact = new EqualSpacingItemDecoration(REACTION_SPACE, EqualSpacingItemDecoration.HORIZONTAL);
+    private EqualSpacingItemDecoration itemDecorationOwn = new EqualSpacingItemDecoration(REACTION_SPACE, EqualSpacingItemDecoration.VERTICAL);
     private HashMap<Long, Long> pendingPreviews = new HashMap<>();
 
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
@@ -896,7 +896,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(true);
             holder.ownMessageReactionsRecycler.setHasFixedSize(true);
             holder.ownMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
-            holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
+            holder.ownMessageReactionsRecycler.addItemDecoration(itemDecorationOwn);
             holder.ownMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.previewFramePort = v.findViewById(R.id.preview_frame_portrait);
@@ -1106,7 +1106,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((SimpleItemAnimator) holder.contactMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(true);
             holder.contactMessageReactionsRecycler.setHasFixedSize(true);
             holder.contactMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
-            holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
+            holder.contactMessageReactionsRecycler.addItemDecoration(itemDecorationContact);
             holder.contactMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);

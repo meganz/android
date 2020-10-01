@@ -417,8 +417,8 @@ public class ChatUtil {
                 paint.setTypeface(Typeface.DEFAULT);
                 paint.setTextSize(14f);
                 int newWidth = (int) paint.measureText(text);
-                int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 2 : newWidth + 4;
-                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2sp(sizeText, outMetrics);
+                int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 1 : newWidth + 4;
+                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2dp(sizeText, outMetrics);
                 if (possibleNewSize > initSize) {
                     initSize = possibleNewSize;
                 }
