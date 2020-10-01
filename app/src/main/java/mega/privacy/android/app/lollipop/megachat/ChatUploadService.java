@@ -452,6 +452,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 			megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
 		}
+
+		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+				&& !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown()) {
+			sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
+		}
 	}
 
 	/*
@@ -866,11 +871,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 			logDebug("onTransferUpdate: " + transfer.getNodeHandle());
-
-			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-					&& !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown()) {
-				sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
-			}
 
 			String appData = transfer.getAppData();
 
