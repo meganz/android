@@ -887,7 +887,7 @@ public final class ChatAdvancedNotificationBuilder {
         collapsedViews.setTextViewText(R.id.chat_title, titleChat);
         collapsedViews.setTextViewText(R.id.call_title, titleCall);
 
-        if (avatarIcon == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || avatarIcon == null) {
             collapsedViews.setViewVisibility(R.id.avatar_layout, GONE);
         } else {
             collapsedViews.setImageViewBitmap(R.id.avatar_image, avatarIcon);
@@ -906,7 +906,7 @@ public final class ChatAdvancedNotificationBuilder {
         expandedView.setTextViewText(R.id.chat_title, titleChat);
         expandedView.setTextViewText(R.id.call_title, titleCall);
 
-        if (avatarIcon == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || avatarIcon == null) {
             expandedView.setViewVisibility(R.id.avatar_layout, GONE);
         } else {
             expandedView.setImageViewBitmap(R.id.avatar_image, avatarIcon);
@@ -1082,7 +1082,7 @@ public final class ChatAdvancedNotificationBuilder {
         collapsedViews.setTextViewText(R.id.chat_title, titleChat);
         collapsedViews.setTextViewText(R.id.call_title, titleCall);
 
-        if(avatarIcon == null){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || avatarIcon == null) {
             collapsedViews.setViewVisibility(R.id.avatar_layout, GONE);
         }else {
             collapsedViews.setImageViewBitmap(R.id.avatar_image, avatarIcon);
@@ -1095,7 +1095,7 @@ public final class ChatAdvancedNotificationBuilder {
         expandedView.setTextViewText(R.id.chat_title, titleChat);
         expandedView.setTextViewText(R.id.call_title, titleCall);
 
-        if(avatarIcon == null){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || avatarIcon == null) {
             expandedView.setViewVisibility(R.id.avatar_layout, GONE);
         }else {
             expandedView.setImageViewBitmap(R.id.avatar_image, avatarIcon);
