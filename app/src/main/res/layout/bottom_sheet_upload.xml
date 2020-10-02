@@ -122,8 +122,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
-                    android:src="@drawable/ic_b_scan_document"
+                    android:src="@drawable/ic_scan_document"
                     android:visibility="visible" />
 
                 <TextView
