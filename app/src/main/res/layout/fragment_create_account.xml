@@ -335,11 +335,11 @@
                     android:layout_marginTop="5dp"
                     android:text="@string/create_account_creating_account" />
 
-                <ProgressBar
+                <com.google.android.material.progressindicator.ProgressIndicator
                     android:id="@+id/create_account_progress_bar"
-                    style="@style/UsedSpaceProgressBar"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
+                    style="@style/ProgressIndicator.Linear"
                     android:layout_gravity="center"
                     android:layout_marginTop="30dp"
                     android:layout_marginBottom="30dp"/>

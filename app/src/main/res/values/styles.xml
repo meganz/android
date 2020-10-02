@@ -561,4 +561,10 @@
         <item name="android:colorAccent">@color/checkbox_background</item>
         <item name="colorAccent">@color/checkbox_background</item>
     </style>
+
+    <style name="ProgressIndicator.Linear" parent="Widget.MaterialComponents.ProgressIndicator.Linear.Indeterminate">
+        <item name="indicatorColor">@color/linear_progress_indicator</item>
+        <item name="trackColor">@color/linear_progress_track</item>
+        <item name="indicatorWidth">@dimen/linear_progress_size</item>
+    </style>
 </resources>

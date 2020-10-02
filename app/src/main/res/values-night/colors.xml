@@ -3,6 +3,7 @@
     <color name="background">@color/dark_grey</color>
 
     <color name="name_my_account">@color/white_alpha_087</color>
+    <color name="mail_my_account">@color/white_alpha_054</color>
     <color name="background_create_account">@color/dark_grey</color>
     <color name="pass_very_weak">@color/red_300</color>
     <color name="pass_weak">#F5F595</color>
@@ -12,6 +13,10 @@
 
     <color name="checkbox_border">@color/white_alpha_054</color>
     <color name="checkbox_background">@color/teal_200</color>
+
+    <!-- ProgressIndicator -->
+    <color name="linear_progress_track">@color/white_alpha_023</color>
+
     <color name="textinputlayout_underline_unfocused">@color/white_alpha_012</color>
 
     <color name="password_visible_icon">@color/white_alpha_038</color>

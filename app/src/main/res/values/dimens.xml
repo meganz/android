@@ -88,4 +88,6 @@
 
     <dimen name="btn_padding_vertical">10dp</dimen>
     <dimen name="btn_padding_horizontal">16dp</dimen>
+
+    <dimen name="linear_progress_size">4dp</dimen>
 </resources>

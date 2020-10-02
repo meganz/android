@@ -2,11 +2,9 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.Html;
@@ -112,10 +110,6 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 		misspelt = v.findViewById(R.id.confirm_email_misspelled);
 		resendButton = v.findViewById(R.id.confirm_email_new_email_resend);
 		cancelButton = v.findViewById(R.id.confirm_email_cancel);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			resendButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-		}
 
 		String textMispelled = String.format(getString(R.string.confirm_email_misspelled));
 		try {

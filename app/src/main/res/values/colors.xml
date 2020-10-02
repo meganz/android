@@ -235,6 +235,7 @@
      The "390" is simply deduced from the relative color saturation against red_400 -->
     <color name="white">#FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
+    <color name="white_alpha_023">#3AFFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
     <color name="white_alpha_054">#89FFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
@@ -290,4 +291,8 @@
 
     <color name="checkbox_border">@color/grey_alpha_054</color>
     <color name="checkbox_background">@color/teal_300</color>
+
+    <!-- ProgressIndicator -->
+    <color name="linear_progress_indicator">@color/teal_300</color>
+    <color name="linear_progress_track">@color/grey_alpha_012</color>
 </resources>

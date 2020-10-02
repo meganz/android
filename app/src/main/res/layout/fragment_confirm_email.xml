@@ -4,30 +4,25 @@
     android:id="@+id/scroll_view_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:stackFromBottom="true"
-    tools:context="mega.privacy.android.app.lollipop.ConfirmEmailFragmentLollipop">
+    >
 
     <RelativeLayout
         android:id="@+id/confirm_email_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        tools:context=".lollipop.ConfirmEmailFragmentLollipop">
+        >
 
         <TextView
             android:id="@+id/confirm_email_awaiting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/confirm_email_text"
-            android:textSize="16sp"
-            android:textColor="@color/name_my_account"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             android:layout_marginTop="17dp"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
-            android:textAllCaps="true"
-            android:fontFamily="sans-serif-light"
-            android:textStyle="bold"/>
+            />
 
         <ImageView
             android:id="@+id/confirm_email_icon"
@@ -43,13 +38,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/confirm_email_explanation"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceCaption"
             android:textColor="@color/name_my_account"
+            android:fontFamily="Roboto"
             android:layout_below="@id/confirm_email_icon"
             android:layout_marginTop="12dp"
             android:layout_marginLeft="26dp"
             android:layout_marginRight="24dp"
-            android:fontFamily="Roboto"/>
+            />
 
         <RelativeLayout
             android:id="@+id/email_content"
@@ -66,16 +62,17 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/email_text"
                 app:errorEnabled="true"
-                app:errorTextAppearance="@style/InputTextAppearanceError">
+                app:errorTextAppearance="@style/InputTextAppearanceError"
+                >
 
-                <androidx.appcompat.widget.AppCompatEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/confirm_email_new_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:imeOptions="actionDone"
                     android:inputType="textEmailAddress"
-                    android:theme="@style/ColorControlStyle"/>
+                    />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -116,28 +113,18 @@
                 android:id="@+id/confirm_email_new_email_resend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:textColor="@color/white"
-                android:minHeight="0dp"
+                style="@style/Button"
                 android:text="@string/confirm_email_misspelled_resend"
-                android:background="@color/accentColor"
-                android:elevation="@dimen/elevation_upgrade_low"
-                android:stateListAnimator="@anim/button_upgrade_elevation"
-                android:tint="@android:color/white"/>
-
+                />
 
             <Button
                 android:id="@+id/confirm_email_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
+                style="?attr/borderlessButtonStyle"
                 android:layout_marginLeft="16dp"
-                android:minHeight="0dp"
-                android:textColor="@color/accentColor"
                 android:text="@string/general_cancel"
-                android:background="@color/white"
-                android:elevation="0dp"
-                android:stateListAnimator="@null" />
+                />
         </LinearLayout>
 
     </RelativeLayout>
