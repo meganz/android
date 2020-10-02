@@ -908,6 +908,9 @@ public class CallUtil {
      * @param user    The mega User.
      */
     public static void startNewCall(Activity activity, MegaUser user) {
+        if(user == null)
+            return;
+
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 

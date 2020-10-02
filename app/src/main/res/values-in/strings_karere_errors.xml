@@ -6,5 +6,5 @@
     <string name="error_noent" context="Label to show that an error related to a non-existent resource occurs during a Mega Chat operation.">Sumber daya tidak ada.</string>
     <string name="error_exist" context="Label to show that an error related to an already existing resource occurs during a Mega Chat operation.">Sumber daya sudah ada.</string>
     <string name="error_unknown" context="Label to show that an error related with an unknown error occurs during a SDK operation.">Error tidak diketahui</string>
-    <string name="error_toomany" context="Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation.">Too many uses for this resource.</string>
+    <string name="error_toomany" context="Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation.">Terlalu banyak kegunaan sumber daya ini.</string>
 </resources>
