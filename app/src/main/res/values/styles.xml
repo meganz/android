@@ -556,9 +556,9 @@
     </style>
 
     <style name="CheckBoxStyle" parent="Theme.AppCompat">
-        <item name="android:colorControlNormal">@color/text_secondary</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
-        <item name="android:colorAccent">@color/text_secondary</item>
-        <item name="colorAccent">@color/text_secondary</item>
+        <item name="android:colorControlNormal">@color/checkbox_border</item>
+        <item name="colorControlNormal">@color/checkbox_border</item>
+        <item name="android:colorAccent">@color/checkbox_background</item>
+        <item name="colorAccent">@color/checkbox_background</item>
     </style>
 </resources>

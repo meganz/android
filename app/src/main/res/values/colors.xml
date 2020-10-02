@@ -287,4 +287,7 @@
     <color name="pass_medium">#31B500</color>
     <color name="pass_good">#13E03C</color>
     <color name="pass_strong">#2BA6DE</color>
+
+    <color name="checkbox_border">@color/grey_alpha_054</color>
+    <color name="checkbox_background">@color/teal_300</color>
 </resources>
