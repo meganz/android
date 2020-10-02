@@ -142,8 +142,6 @@
     <color name="disable_fab_invite_contact">#A9E3D8</color>
 
 	<color name="disabled_radio_button_label">#FF8C8F90</color>
-    <color name="pass_weak">#FFFFD300</color>
-    <color name="pass_good">#FF13E03C</color>
 
     <color name="color_background_versions">#FFF2F2F2</color>
 
@@ -282,4 +280,14 @@
 
     <!-- The divider between List view items -->
     <color name="list_item_divider">@color/grey_alpha_012</color>
+
+    <!-- password strength -->
+    <color name="pass_very_weak">#FF333A</color>
+    <color name="pass_weak">#FFD300</color>
+    <color name="pass_medium">#31B500</color>
+    <color name="pass_good">#13E03C</color>
+    <color name="pass_strong">#2BA6DE</color>
+
+    <color name="checkbox_border">@color/grey_alpha_054</color>
+    <color name="checkbox_background">@color/teal_300</color>
 </resources>

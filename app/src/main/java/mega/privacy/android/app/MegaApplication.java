@@ -89,7 +89,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -193,7 +192,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private PowerManager.WakeLock wakeLock;
 	private CallListener callListener = new CallListener();
 
-	public static int sNightMode = AppCompatDelegate.MODE_NIGHT_YES;
+	public static int sNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
 
     @Override
 	public void networkAvailable() {
