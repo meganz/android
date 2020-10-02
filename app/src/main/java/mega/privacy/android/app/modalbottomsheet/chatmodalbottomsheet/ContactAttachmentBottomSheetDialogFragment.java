@@ -163,7 +163,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     optionInvite.setVisibility(View.VISIBLE);
                 }
 
-                setImageAvatar(contact.getHandle(), userEmail, userName, contactImageView);
+                setImageAvatar(userHandle, userEmail, userName, contactImageView);
             }
         } else {
             MegaUser contact;

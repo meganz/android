@@ -267,6 +267,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
+    public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
@@ -439,6 +440,7 @@ public class Constants {
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
     public static final int ERROR_LINK = -1;
+    public static final int INVALID_STATE_CALL = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";
@@ -616,8 +618,8 @@ public class Constants {
     public static final String ACCOUNT_NOT_BLOCKED = "0";
     public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
     public static final String MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK = "300";
-    public static final String DISABLED_ACCOUNT_BLOCK = "400";
-    public static final String REMOVED_ACCOUNT_BLOCK = "401";
+    public static final String DISABLED_BUSINESS_ACCOUNT_BLOCK = "400";
+    public static final String REMOVED_BUSINESS_ACCOUNT_BLOCK = "401";
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
     public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
 

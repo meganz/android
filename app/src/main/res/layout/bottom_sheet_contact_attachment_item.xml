@@ -194,7 +194,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_send_message"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/name_my_account"
                     android:textSize="16sp" />
             </LinearLayout>
 
