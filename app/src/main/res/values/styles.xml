@@ -313,18 +313,6 @@
         <item name="android:layout">@layout/my_category_preference</item>
     </style>
 
-    <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/dark_primary_color</item>
-    </style>
-
-    <style name="InputTextAppearanceVeryWeak" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/login_warning</item>
-    </style>
-
-    <style name="InputTextAppearanceWeak" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_weak</item>
-    </style>
-
 	<style name="SMSVerificationStyle" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="colorPrimaryDark">#3490B1</item>
 		<item name="android:windowNoTitle">true</item>
@@ -347,17 +335,6 @@
 <!--        <item name="android:textSize">14sp</item>-->
 <!--    </style>-->
 
-    <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/green_unlocked_rewards</item>
-    </style>
-
-    <style name="InputTextAppearanceGood" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_good</item>
-    </style>
-
-    <style name="InputTextAppearanceStrong" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/blue_unlocked_rewards</item>
-    </style>
     <style name="CardViewTheme" parent="CardView">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
@@ -566,5 +543,29 @@
         <item name="indicatorColor">@color/linear_progress_indicator</item>
         <item name="trackColor">@color/linear_progress_track</item>
         <item name="indicatorWidth">@dimen/linear_progress_size</item>
+    </style>
+
+    <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/input_error_hint</item>
+    </style>
+
+    <style name="InputTextAppearanceVeryWeak" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_very_weak</item>
+    </style>
+
+    <style name="InputTextAppearanceWeak" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_weak</item>
+    </style>
+
+    <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_medium</item>
+    </style>
+
+    <style name="InputTextAppearanceGood" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_good</item>
+    </style>
+
+    <style name="InputTextAppearanceStrong" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_strong</item>
     </style>
 </resources>

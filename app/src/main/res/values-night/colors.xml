@@ -31,4 +31,6 @@
     <color name="list_item_more">@color/white_alpha_054</color>
 
     <color name="list_item_divider">@color/white_alpha_012</color>
+
+    <color name="input_error_hint">@color/red_400</color>
 </resources>
