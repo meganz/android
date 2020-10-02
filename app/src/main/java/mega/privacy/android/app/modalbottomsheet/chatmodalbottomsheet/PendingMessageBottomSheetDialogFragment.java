@@ -63,7 +63,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
         LinearLayout separator = contentView.findViewById(R.id.separator);
 
         PendingMessageSingle pMsg = dbH.findPendingMessageById(messageId);
-        isUploadingMessage = pMsg != null && pMsg.getState() == PendingMessageSingle.STATE_UPLOADING;
+        isUploadingMessage = pMsg != null && pMsg.getState() != PendingMessageSingle.STATE_ERROR_UPLOADING && pMsg.getState() != PendingMessageSingle.STATE_ERROR_ATTACHING;
 
         if (isUploadingMessage) {
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
