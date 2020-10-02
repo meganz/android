@@ -3852,12 +3852,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void sendMessagesToUI(ArrayList<AndroidMegaChatMessage> messages) {
-        for (AndroidMegaChatMessage message : messages) {
-            sendMessageToUI(message);
-        }
-    }
-
     /**
      * Method for copying a message.
      *
@@ -3961,7 +3955,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             activateActionMode();
 
             for (int position : recoveredSelectedPositions) {
-                AndroidMegaChatMessage msg = adapter.getMessageAtPosition(position);
+                AndroidMegaChatMessage msg = adapter.getMessageAtMessagesPosition(position);
                 if(msg != null) {
                     adapter.toggleSelection(msg.getMessage().getMsgId());
                 }
@@ -9026,5 +9020,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         adapter.updatePausedUploadingMessages(mLayoutManager.findFirstVisibleItemPosition(),
                 mLayoutManager.findLastVisibleItemPosition());
+    }
+
+
+    /*
+     * Gets the position of an attachment message if it is visible and exists.
+     *
+     * @param handle The handle of the attachment.
+     * @return The position of the message if it is visible and exists, INVALID_POSITION otherwise.
+     */
+    public int getPositionOfAttachmentMessageIfVisible(long handle) {
+        if (mLayoutManager == null || adapter == null) {
+            return INVALID_POSITION;
+        }
+
+        int firstVisiblePosition = mLayoutManager.findFirstVisibleItemPosition();
+        if (firstVisiblePosition == INVALID_POSITION || firstVisiblePosition == 0) {
+            firstVisiblePosition = 1;
+        }
+
+        int lastVisiblePosition = mLayoutManager.findLastVisibleItemPosition();
+        if (lastVisiblePosition == INVALID_POSITION) {
+            lastVisiblePosition = adapter.getItemCount() - 1;
+        }
+
+        for (int i = lastVisiblePosition; i >= firstVisiblePosition; i--) {
+            AndroidMegaChatMessage msg = adapter.getMessageAtAdapterPosition(i);
+            MegaChatMessage chatMessage = msg.getMessage();
+            if (chatMessage != null
+                    && chatMessage.getMegaNodeList() != null
+                    && chatMessage.getMegaNodeList().get(0) != null
+                    && chatMessage.getMegaNodeList().get(0).getHandle() == handle) {
+                return i;
+            }
+        }
+
+        return INVALID_POSITION;
     }
 }
