@@ -173,7 +173,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String action = null;
     private String url = null;
     private long parentHandle = -1;
-    private long idChatToJoin = -1;
 
     private String emailTemp = null;
     private String passwdTemp = null;
@@ -882,7 +881,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
-                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
 
                     MegaNode rootNode = megaApi.getRootNode();
@@ -1033,7 +1031,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
-                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
                 }
             }
@@ -1834,9 +1831,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
                                 intent.setAction(action);
                                 intent.setData(Uri.parse(url));
-                                if (idChatToJoin != -1) {
-                                    intent.putExtra("idChatToJoin", idChatToJoin);
-                                }
                             }
                         }
                     }
@@ -1900,11 +1894,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
                                     intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
                                 }
-                                else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-                                    if (idChatToJoin != -1) {
-                                        intent.putExtra("idChatToJoin", idChatToJoin);
-                                    }
-                                }
+
                                 intent.setAction(action);
                                 if (url != null){
                                     intent.setData(Uri.parse(url));

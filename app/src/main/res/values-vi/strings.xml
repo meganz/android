@@ -89,7 +89,6 @@
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
 
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
@@ -363,6 +362,8 @@
         <item context="Message when a download finishes. Singular 1 file" quantity="one">Tải lên đã hoàn tất</item>
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d phiên tải lên đã hoàn tất</item>
     </plurals>
+
+    <string name="folder_empty" context="Warning shown when it tries to download an empty folder">Folder is empty</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -507,6 +508,7 @@
     <string name="number_correctly_removed" context="success message when moving a node">Đã xóa bỏ %d mục khỏi MEGA thành công</string>
     <string name="number_no_removed" context="error message when moving a node">%d mục chưa xóa xong</string>
     <string name="number_correctly_leaved" context="success message when moving a node">Đã rời khỏi %d thư mục thành công</string>
+    <string name="share_left" context="Message shown when a share has been left">Đã rời khỏi chia sẻ</string>
     <string name="number_no_leaved" context="error message when moving a node">Phát sinh lỗi khi thực hiện việc từ chối %d thư mục chia sẻ</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">Tệp tin đã được gửi tới cho %d người thành công</string>
     <string name="number_no_sent" context="error message when sending multiple files">Lỗi. Tệp tin chưa được gửi tới cho %d tên liên lạc</string>
@@ -720,6 +722,7 @@
 	<string name="verify_account_title" context="enter verification code page title">Xác thực tài khoản</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Tài khoản của quý khách tạm thời bị khóa do xác định có thể bị lạm dụng. Xin xác thực số điện thoại để mở khóa tài khoản.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Quốc gia</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Region</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Số điện thoại của bạn</string>
     <string name="general_back_button" context="Button label - go to previous page">Quay lại</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Không phải lúc này</string>
@@ -1667,7 +1670,6 @@
     <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Bạn có chắc muốn chuyển thư mục này vào Thùng Rác? Thao tác ngày sẽ ngưng tính năng đăng tải thư mục Secondary Media.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Bỏ vào thùng rác?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Xóa khỏi MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Nếu rời khỏi thư mục này, bạn sẽ không bao giờ tìm lại được nữa.</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">Đang tải lên&#8230;</string>
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Âm báo chát</string>
@@ -1722,6 +1724,11 @@
     <plurals name="context_share_folders">
         <item context="menu item" quantity="one">Chia sẻ thư mục này</item>
         <item context="menu items" quantity="other">Chia sẻ thư mục</item>
+    </plurals>
+
+    <plurals name="confirmation_leave_share_folder">
+        <item context="Confirmation message before leaving an incoming shared folder" quantity="one">Nếu rời khỏi thư mục này, bạn sẽ không bao giờ tìm lại được nữa.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">If you leave the folders, you will not be able to see them again.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Không có thư mục chia sẻ nào</string>
@@ -2014,6 +2021,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Quá nhiều lời yêu cầu. Xin chờ.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">Đang hủy bỏ quá trình đăng nhập. Xin chờ&#8230;</string>
 
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Lỗi. Tệp tin bị hư hỏng hoặc không có tồn tại.</string>
 
 
@@ -2101,6 +2109,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Xem Trước Nội Dung</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Việc truyền tải không thể thực hiện được và tệp tin chưa có tải về</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">We were not able to open the file due to the lack of network connection.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Tệp tin đã có sẵn trong phần Lưu về Ngoại Tuyến</string>
 
     <plurals name="error_forwarding_messages">
@@ -2199,7 +2208,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">Trong sổ liên lạc đã có tên %s rồi.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Chia sẻ với %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">Nhóm chát mới</string>
-    <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Thêm tên liên lạc</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Send contacts</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Đã đăng xuất</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Tài khoản đã được kích hoạt rồi. Xin đăng nhập.</string>
@@ -2267,7 +2276,7 @@
 	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">Kích thước tối thiểu là %1$s và kích thước tối đa là %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Dọn dữ liệu tồn đọng hơn</string>
-    <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d ngày</string>
+    <string name="settings_rb_scheduler_select_days_subtitle" context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics">%d ngày</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Nhắc cho tôi biết khi kích thước của tệp tin lớn hơn</string>
 
 	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Nếu videos cần nén có kích thước lớn hơn</string>
@@ -2280,6 +2289,8 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Bật Luân Phiên Mã Khóa</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Luân phiên mã khóa giúp cho việc an ninh được nâng cấp hơn, nhưng sẽ không cho phép bất kỳ ai tạo ra đường liên kết tới cuộc chát và người mới tham gia vào chát sẽ không thấy các tin nhắn diễn ra từ trước.</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">Luân phiên mã khóa bị tắt đối với các cuộc trò chuyện có hơn 100 thành viên.</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Unable to convert this chat to private because the participants limit was exceeded.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] vừa tạo đường liên kết tới cuộc chát.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] đã xóa đường liên kết tới cuộc chát.[/B]</string>
@@ -2443,6 +2454,8 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d thành viên</item>
     </plurals>
 
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more”&gt;%1$s and %2$d more.">%1$s và %2$d mục nữa</string>
+
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Trước khi tạo ra đường liên kết tới cuộc chát này, chủ đề phòng chát cần phải được chọn trước:</string>
 
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Đường liên kết tới chát đã được ghi vào bộ nhớ</string>
@@ -2502,7 +2515,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s vừa tham gia vào cuộc gọi</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s đã rời khỏi cuộc gọi</string>
 
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">You are not allowed to start a call because the participants limit was exceeded.</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Không thể tham gia cuộc gọi này vì đã quá mức số lượng thành viên đang có trong cuộc gọi.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">You are not allowed to join this call as the group has reached the maximum number of participants.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Không thể bật video cho cuộc gọi này được vì quá mức số lượng thành viên tham gia cuộc gọi đang sử dụng video.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Lỗi. Không mở được tệp tin.</string>
@@ -2565,7 +2580,6 @@
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Đang chuẩn bị cho tệp tin</string>
     <string name="sent_as_message" context="Label indicating some content has been sent as message">Đã được gửi đi bằng tin nhắn.</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Lỗi. Tệp tin chưa gửi được tới cuộc chat đã chọn.</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Không có[/A] [B]Mục nào[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">Xoá các phiên bản cũ</string>
     <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Xóa các phiên bản cũ?</string>
@@ -2711,7 +2725,8 @@
     <string name="user_label" context="Business user role">Nhân viên</string>
     <string name="status_label" context="General label to show the status of something or someone">Trạng thái</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Còn</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Giai đoạn ân hạn</string>
+    <string name="payment_required_label" context="Business account status. Payment is overdue, but the account still active in grace period">Yêu cầu giải quyết thanh toán</string>
+    <string name="payment_overdue_label" context="Business expired account Overdue payment page header.">Thánh toán bị quá hạn</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">Bộ quản lý nhân viên cỉ hỗ trợ trên phiên bản trình duyệt web dành cho máy tính.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Lượng Dùng</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Chi tiết không gian đang sử dụng</string>
@@ -2760,6 +2775,7 @@
     <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Đã xóa biêt danh</string>
     <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">Lỗi phát sinh khi thực hiện thêm tên biêt danh</string>
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Biêt danh</string>
+    <string name="phonenumber_title" context="Text related to verified phone number. Used as title or cell description.">Số điện thoại</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Đang kết nối lại</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Cuộc gọi đã được kết nối trở lại.</string>
@@ -2781,6 +2797,25 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chát tạo vào ngày %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Chọn tin nhắn</string>
 
+    <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Hết Không Gian Lưu Trữ</string>
+    <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Dữ liệu sắp bị mất!</string>
+    <plurals name="over_disk_quota_paywall_text">
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have %5$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">We have contacted you by email to %1$s on %2$s and %3$s, but you still have %4$s files taking up %5$s in your MEGA account, which requires you to have %6$s.</item>
+    </plurals>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
+    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left">[B]You must act immediately to save your data[/B].</string>
+
+    <plurals name="label_time_in_days_full">
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 day</item>
+        <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d ngày</item>
+    </plurals>
+    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
+    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
+    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
+
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Kiểm tra chứng thực</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Chưa có xác thực</string>
     <string name="label_verified" context="Action indicating something was verified.">Đã xác thực</string>
@@ -2790,9 +2825,21 @@
     <string name="action_reset" context="Button to reset credentials">Đặt lại</string>
     <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
 
+    <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Đang tham gia&#8230;</string>
+    <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Đang rời khỏi&#8230;</string>
+
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Xóa số điện thoại?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Số điện thoại đã được xóa bỏ thành công.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Xóa số điện thoại không thành công.</string>
+
+    <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">Tài khoản bạn đang cố khôi phục đang bị chặn.</string>
+    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Tài khoản của quý khách bị khóa. Vui lòng liên hệ support&#64;mega.nz</string>
+
+    <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Sửa</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
+    <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">Thao tác này sẽ xóa số điện thoại hiện tại và bắt đầu quy trình gắn kết số điện thoại mới cho tài khoản này.</string>
+    <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">Thao tác này sẽ xóa số điện thoại hiện có trong tài khoản. Nếu sau này muốn thêm số điện thoại khác, hệ thống sẽ yêu cầu xác thực số điện thoại đó.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Xem</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Chứng thực của %s</string>
