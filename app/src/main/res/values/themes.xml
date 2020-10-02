@@ -73,7 +73,7 @@
         <!-- Used by the hint text color of TextInputLayout -->
         <item name="textColorHint">@color/grey_alpha_038</item>
 
-<!--        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>-->
+        <item name="textInputStyle">@style/TextInputLayout</item>
 
 <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->

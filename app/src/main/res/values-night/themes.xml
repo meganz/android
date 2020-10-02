@@ -51,6 +51,6 @@
         <item name="android:textColorSecondary">@color/white_alpha_054</item>
 
         <!-- Used by the hint text color of TextInputLayout -->
-        <item name="textColorHint">@color/white_alpha_060</item>
+        <item name="textColorHint">@color/white_alpha_054</item>
     </style>
 </resources>
