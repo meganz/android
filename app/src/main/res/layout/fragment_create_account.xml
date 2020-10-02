@@ -28,8 +28,17 @@
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="24dp"
                     android:layout_marginBottom="46dp"
-                    android:layout_marginTop="12dp"
                     android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/create_account_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:text="@string/create_account_title"
+                        android:layout_marginTop="17dp"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -41,8 +50,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
                             android:hint="@string/first_name_text"
-                            style="@style/TextInputLayout"
-                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true"
                             >
 
@@ -79,8 +86,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/lastname_text"
-                            style="@style/TextInputLayout"
-                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true"
                             >
 
@@ -117,8 +122,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/email_text"
-                            style="@style/TextInputLayout"
-                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true"
                             >
 
@@ -360,10 +363,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
+                android:layout_gravity="start"
                 android:layout_marginTop="18dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="24dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="13dp"
                 android:orientation="horizontal" >
 
                 <CheckBox
@@ -392,32 +395,25 @@
                 layout="@layout/checkbox_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="24dp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="13dp"
+                android:layout_marginTop="8dp"
+                />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_gravity="left"
-                android:layout_marginTop="18dp"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
-                android:layout_marginBottom="17dp">
+                android:layout_gravity="start"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="20dp">
 
                 <Button
                     android:id="@+id/button_create_account_create"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="@style/Button"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16dp"
-                    android:paddingLeft="16dp"
-                    android:stateListAnimator="@null"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
                     android:layout_gravity="center_vertical"
                     tools:text="create account"
                     />
@@ -427,15 +423,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="?attr/borderlessButtonStyle"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16dp"
-                    android:paddingLeft="16dp"
-                    android:stateListAnimator="@null"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="16dp"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
+                    android:layout_marginStart="8dp"
                     tools:text="login"
                     />
 

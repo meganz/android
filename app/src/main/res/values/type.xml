@@ -13,7 +13,7 @@
 
     <!-- Normal text caption, Roboto regular, 12sp, 0px, textColorPrimary, AllCaps=false -->
     <style name="TextAppearance.Mega.Caption2" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textColor">@color/text_login</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:letterSpacing">0</item>
     </style>
 

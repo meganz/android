@@ -555,7 +555,7 @@
         <item name="endIconTint">@color/password_color_toggle</item>
     </style>
 
-    <style name="CheckBoxStyle" parent="Theme.Megaactionbar">
+    <style name="CheckBoxStyle" parent="Theme.AppCompat">
         <item name="android:colorControlNormal">@color/text_secondary</item>
         <item name="colorControlNormal">@color/text_secondary</item>
         <item name="android:colorAccent">@color/text_secondary</item>
