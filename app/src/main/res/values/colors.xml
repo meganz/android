@@ -282,4 +282,9 @@
 
     <!-- The divider between List view items -->
     <color name="list_item_divider">@color/grey_alpha_012</color>
+
+    <!-- password strength -->
+    <color name="pass_very_weak">@color/login_warning</color>
+    <color name="pass_medium">@color/green_unlocked_rewards</color>
+    <color name="pass_strong">@color/blue_unlocked_rewards</color>
 </resources>

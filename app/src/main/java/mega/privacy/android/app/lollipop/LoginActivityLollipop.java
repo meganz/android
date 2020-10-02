@@ -300,7 +300,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                resetStatusBarColor(this, this.getWindow());
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
@@ -314,7 +314,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                resetStatusBarColor(this, this.getWindow());
                 break;
 
             }
@@ -345,7 +345,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 
-                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+                resetStatusBarColor(this, this.getWindow());
                 break;
             }
         }

@@ -554,4 +554,11 @@
         <item name="endIconDrawable">@drawable/ic_b_see</item>
         <item name="endIconTint">@color/password_color_toggle</item>
     </style>
+
+    <style name="CheckBoxStyle" parent="Theme.Megaactionbar">
+        <item name="android:colorControlNormal">@color/text_secondary</item>
+        <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="android:colorAccent">@color/text_secondary</item>
+        <item name="colorAccent">@color/text_secondary</item>
+    </style>
 </resources>

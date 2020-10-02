@@ -11,6 +11,12 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <!-- Normal text caption, Roboto regular, 12sp, 0px, textColorPrimary, AllCaps=false -->
+    <style name="TextAppearance.Mega.Caption2" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/text_login</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
     <!-- Title on action bar, Medium, bold, 16sp, 0.2px, textColorPrimary-->
     <style name="TextAppearance.Mega.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textSize">16sp</item>

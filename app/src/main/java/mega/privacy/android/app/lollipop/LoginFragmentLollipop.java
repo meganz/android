@@ -290,6 +290,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
 
         et_passwordLayout = v.findViewById(R.id.login_password_text_layout);
+        et_passwordLayout.setEndIconVisible(false);
         et_password = v.findViewById(R.id.login_password_text);
         et_passwordError = v.findViewById(R.id.login_password_text_error_icon);
         et_passwordError.setVisibility(View.GONE);

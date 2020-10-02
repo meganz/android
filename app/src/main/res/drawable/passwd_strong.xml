@@ -2,5 +2,5 @@
 <shape	android:shape="rectangle"	xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="2dp"/>
     <size android:height="4dp"/>
-    <solid android:color="@color/blue_unlocked_rewards" />
+    <solid android:color="@color/pass_strong" />
 </shape>

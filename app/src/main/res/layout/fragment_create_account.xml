@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
     >
 
     <ScrollView
@@ -29,17 +28,8 @@
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="24dp"
                     android:layout_marginBottom="46dp"
+                    android:layout_marginTop="12dp"
                     android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/create_account_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left"
-                        android:text="@string/create_account_title"
-                        android:layout_marginTop="17dp"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -294,7 +284,7 @@
                                 android:textSize="16sp"
                                 android:imeOptions="actionDone"
                                 android:inputType="textPassword"
-                                android:theme="@style/ColorControlStyle"/>
+                                />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -381,17 +371,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:theme="@style/ColorControlStyle"/>
+                    android:theme="@style/CheckBoxStyle"
+                    />
+
 
                 <TextView
                     android:id="@+id/tos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/text_login"
                     android:layout_marginRight="16dp"
                     android:singleLine="false"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Caption2"
+                    tools:text="term of service"
+                    />
 
             </LinearLayout>
 
@@ -418,10 +411,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="@style/Button"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingRight="16dp"
+                    android:paddingLeft="16dp"
                     android:stateListAnimator="@null"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
-                    android:elevation="6dp"
                     android:layout_gravity="center_vertical"
                     tools:text="create account"
                     />
@@ -431,6 +427,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="?attr/borderlessButtonStyle"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingRight="16dp"
+                    android:paddingLeft="16dp"
                     android:stateListAnimator="@null"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
