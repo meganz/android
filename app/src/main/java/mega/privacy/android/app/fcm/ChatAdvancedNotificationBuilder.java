@@ -1145,7 +1145,6 @@ public final class ChatAdvancedNotificationBuilder {
         } else {
             long[] pattern = {0, 1000};
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
@@ -1154,6 +1153,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setCustomBigContentView(expandedView)
                     .setContentIntent(callScreen)
                     .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
                     .setAutoCancel(false)
                     .setDeleteIntent(pendingIntentIgnore)
