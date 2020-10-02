@@ -558,4 +558,15 @@
         <item name="android:maxHeight">212dp</item>
         <item name="android:maxWidth">212dp</item>
     </style>
+
+    <style name="PreviewMessage">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:maxHeight">212dp</item>
+        <item name="android:maxWidth">212dp</item>
+        <item name="android:layout_gravity">center_horizontal|center_vertical</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
 </resources>

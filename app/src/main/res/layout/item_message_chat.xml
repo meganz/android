@@ -723,13 +723,7 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="212dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
 
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_own_message_thumb_portrait_gif_view"
@@ -737,7 +731,7 @@
                             rounded:roundWithOverlayColor="@color/white"
                             rounded:roundedCornerRadius="10dp"
                             rounded:roundingBorderColor="@color/mail_my_account"
-                            rounded:roundingBorderWidth="0.5dp" />
+                            rounded:roundingBorderWidth="1px" />
 
                         <ImageView
                             android:id="@+id/content_own_message_thumb_portrait_gif"
@@ -885,13 +879,7 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="212dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
 
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_own_message_thumb_landscape_gif_view"
@@ -899,7 +887,7 @@
                             rounded:roundWithOverlayColor="@color/white"
                             rounded:roundedCornerRadius="10dp"
                             rounded:roundingBorderColor="@color/mail_my_account"
-                            rounded:roundingBorderWidth="0.5dp" />
+                            rounded:roundingBorderWidth="1px" />
 
                         <ImageView
                             android:id="@+id/content_own_message_thumb_landscape_gif"
@@ -1779,13 +1767,7 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="212dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
 
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_contact_message_thumb_portrait_gif_view"
@@ -1793,7 +1775,7 @@
                             rounded:roundWithOverlayColor="@color/white"
                             rounded:roundedCornerRadius="10dp"
                             rounded:roundingBorderColor="@color/mail_my_account"
-                            rounded:roundingBorderWidth="0.5dp" />
+                            rounded:roundingBorderWidth="1px" />
 
                         <ImageView
                             android:id="@+id/content_contact_message_thumb_portrait_gif"
@@ -1882,13 +1864,7 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="212dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
 
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_contact_message_thumb_landscape_gif_view"
@@ -1896,7 +1872,7 @@
                             rounded:roundWithOverlayColor="@color/white"
                             rounded:roundedCornerRadius="10dp"
                             rounded:roundingBorderColor="@color/mail_my_account"
-                            rounded:roundingBorderWidth="0.5dp" />
+                            rounded:roundingBorderWidth="1px" />
 
                         <ImageView
                             android:id="@+id/content_contact_message_thumb_landscape_gif"
