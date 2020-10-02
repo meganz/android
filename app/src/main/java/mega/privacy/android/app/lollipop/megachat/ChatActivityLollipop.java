@@ -2123,7 +2123,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             checkSelectOption();
-
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
             if (chatRoom.isGroup()) {
@@ -8516,7 +8515,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     break;
                 }
 
-                if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && app.getCallLayoutStatus(idChat)) {
+                if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && (MegaApplication.getCallLayoutStatus(idChat) || !megaApi.isChatNotifiable(idChat))) {
                     tapToReturnLayout(call, getString(R.string.call_in_progress_layout));
                     break;
                 }
