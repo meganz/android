@@ -14,7 +14,7 @@
 
     <color name="textinputlayout_underline_unfocused">@color/white_alpha_012</color>
 
-    <color name="password_visible_icon">@color/white_alpha_012</color>
+    <color name="password_visible_icon">@color/white_alpha_038</color>
 
     <color name="badge_background">@color/red_300</color>
     <color name="badge_background_secondary">@color/red_300</color>

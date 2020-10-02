@@ -45,9 +45,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="44dp"
                         android:hint="@string/email_text"
-                        style="@style/TextInputLayout"
-                        android:theme="@style/TextInputLayout"
-                        app:errorEnabled="true">
+                        app:errorEnabled="true"
+                        android:theme="@style/TextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/login_email_text"
