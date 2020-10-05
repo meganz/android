@@ -21,10 +21,8 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.text.util.Linkify;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -41,7 +39,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -68,8 +65,7 @@ import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.reaction.AutoFitGridRecyclerView;
-import mega.privacy.android.app.components.twemoji.reaction.AutoFitRtlRecyclerView;
+import mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView;
 import mega.privacy.android.app.components.voiceClip.DetectorSeekBar;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -608,7 +604,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
         private RelativeLayout ownMessageReactionsLayout;
-        private AutoFitRtlRecyclerView ownMessageReactionsRecycler;
+        private AutoFitRecyclerView ownMessageReactionsRecycler;
         private ReactionAdapter ownReactionsAdapter = null;
         private RelativeLayout ownMessageSelectLayout;
         private ImageView ownMessageSelectIcon;
@@ -739,7 +735,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RoundedImageView contactImageView;
         RelativeLayout contentContactMessageLayout;
         private RelativeLayout contactMessageReactionsLayout;
-        private AutoFitGridRecyclerView contactMessageReactionsRecycler;
+        private AutoFitRecyclerView contactMessageReactionsRecycler;
         private ReactionAdapter contactReactionsAdapter = null;
         private RelativeLayout contactMessageSelectLayout;
         private ImageView contactMessageSelectIcon;
@@ -893,6 +889,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
             holder.ownMessageReactionsRecycler = v.findViewById(R.id.own_message_reactions_recycler);
+            holder.ownMessageReactionsRecycler.initialization(true);
             ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(true);
             holder.ownMessageReactionsRecycler.setHasFixedSize(true);
             holder.ownMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);
@@ -1103,6 +1100,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contactMessageReactionsLayout = v.findViewById(R.id.contact_message_reactions_layout);
             holder.contactMessageReactionsRecycler = v.findViewById(R.id.contact_message_reactions_recycler);
+            holder.contactMessageReactionsRecycler.initialization(false);
             ((SimpleItemAnimator) holder.contactMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(true);
             holder.contactMessageReactionsRecycler.setHasFixedSize(true);
             holder.contactMessageReactionsRecycler.getItemAnimator().setChangeDuration(0);

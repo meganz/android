@@ -65,7 +65,8 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatUtil {
-    private static int MIN_WIDTH = 44;
+    private static final int MIN_WIDTH = 44;
+    private static final float TEXT_SIZE = 14f;
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
@@ -415,7 +416,7 @@ public class ChatUtil {
                 String text = numUsers + "";
                 Paint paint = new Paint();
                 paint.setTypeface(Typeface.DEFAULT);
-                paint.setTextSize(14f);
+                paint.setTextSize(TEXT_SIZE);
                 int newWidth = (int) paint.measureText(text);
                 int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 1 : newWidth + 4;
                 int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2dp(sizeText, outMetrics);

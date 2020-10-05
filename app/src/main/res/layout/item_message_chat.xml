@@ -1227,7 +1227,7 @@
             android:background="@null"
             android:visibility="gone">
 
-            <mega.privacy.android.app.components.twemoji.reaction.AutoFitRtlRecyclerView
+            <mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView
                 android:id="@+id/own_message_reactions_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -2121,7 +2121,7 @@
                 android:gravity="start"
                 android:visibility="gone">
 
-                <mega.privacy.android.app.components.twemoji.reaction.AutoFitGridRecyclerView
+                <mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView
                     android:id="@+id/contact_message_reactions_recycler"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
