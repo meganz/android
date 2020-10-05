@@ -215,7 +215,7 @@
     <color name="background_recording">#78252525</color>
 
 
-    <!-- LABELS -->
+    <!-- NODE LABELS -->
     <color name="label_red">#FF625D</color>
     <color name="label_orange">#F9A646</color>
     <color name="label_yellow">#F4CE4A</color>

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -50,6 +51,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -108,6 +110,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView publicLinkImage;
         public ImageView takenDownImage;
         public TextView textViewFileName;
+        public ImageView imageFavorite;
+        public ImageView imageLabel;
         public EmojiTextView textViewFileSize;
         public long document;
         public RelativeLayout itemLayout;
@@ -524,6 +528,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holderList.textViewFileName = v.findViewById(R.id.file_list_filename);
 
+            holderList.imageLabel = v.findViewById(R.id.img_label);
+            holderList.imageFavorite = v.findViewById(R.id.img_favorite);
+
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderList.textViewFileName.setMaxWidth(scaleWidthPx(275, outMetrics));
             } else {
@@ -854,6 +861,16 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
+
+        holder.imageFavorite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
+
+        Drawable labelDrawable = MegaNodeUtil.getNodeLabelDrawable(holder.itemView.getResources(), node);
+        if (labelDrawable != null) {
+            holder.imageLabel.setImageDrawable(labelDrawable);
+            holder.imageLabel.setVisibility(View.VISIBLE);
+        } else {
+            holder.imageLabel.setVisibility(View.GONE);
+        }
 
         holder.publicLinkImage.setVisibility(View.INVISIBLE);
         holder.permissionsIcon.setVisibility(View.GONE);
