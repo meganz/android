@@ -31,8 +31,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
     int max_items = 0;
     long chatId = -1;
 
-    private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-
     public MultipleAttachChatListener(Context context, long chatId, int counter) {
         super();
         this.context = context;
@@ -57,9 +55,9 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
         if (e.getErrorCode() != MegaError.API_OK){
             error++;
             logError("Attach node error: " + e.getErrorString() + "__" + e.getErrorCode());
+        } else if (context instanceof ChatActivityLollipop) {
+            ((ChatActivityLollipop) context).sendMessageToUI(new AndroidMegaChatMessage(request.getMegaChatMessage()));
         }
-
-        messages.add(new AndroidMegaChatMessage(request.getMegaChatMessage()));
 
         logDebug("Counter: " + counter);
         logDebug("Error: " + error);
@@ -141,7 +139,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                 }
             } else if (context instanceof ChatActivityLollipop) {
                 if (success > 0) {
-                    ((ChatActivityLollipop) context).sendMessagesToUI(messages);
                     ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, success, success), -1);
 
                 } else {
