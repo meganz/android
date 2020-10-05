@@ -51,6 +51,7 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.ViewExtensionsKt;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -670,12 +671,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         if (node.isTakenDown()) {
             holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
             holder.takenDownImage.setVisibility(View.VISIBLE);
             holder.takenDownImageForFile.setVisibility(View.VISIBLE);
         } else {
             holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.black));
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
+            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
             holder.takenDownImageForFile.setVisibility(View.GONE);
         }
@@ -837,7 +838,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setImageResource(R.drawable.ic_select_folder);
         }
         else {
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.itemLayout.setBackground(null);
             holder.imageView.setImageResource(folderDrawableResId);
         }
     }
@@ -869,17 +870,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
             holder.takenDownImage.setVisibility(View.VISIBLE);
         } else {
-            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
+            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
         }
 
         if (node.isFolder()) {
 
             logDebug("Node is folder");
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.itemLayout.setBackground(null);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
             params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
             params.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
@@ -921,10 +922,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
 
                 if (node.isTakenDown()) {
-                    holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+                    holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
                     holder.takenDownImage.setVisibility(View.VISIBLE);
                 } else {
-                    holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
+                    holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
                     holder.takenDownImage.setVisibility(View.GONE);
                 }
 
@@ -976,7 +977,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (!isMultipleSelect()) {
                 logDebug("Not multiselect");
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
+                holder.itemLayout.setBackground(null);
                 holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1005,7 +1006,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     holder.imageView.setLayoutParams(paramsMultiselect);
                     holder.imageView.setImageResource(R.drawable.ic_select_folder);
                 } else {
-                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.white));
+                    holder.itemLayout.setBackground(null);
                     logDebug("Check the thumb");
 
                     if (node.hasThumbnail()) {

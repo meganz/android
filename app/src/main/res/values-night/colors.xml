@@ -5,6 +5,7 @@
     <color name="name_my_account">@color/white_alpha_087</color>
     <color name="mail_my_account">@color/white_alpha_054</color>
     <color name="background_create_account">@color/dark_grey</color>
+    <color name="new_multiselect_color">@android:color/transparent</color>
     <color name="pass_very_weak">@color/red_300</color>
     <color name="pass_weak">#F5F595</color>
     <color name="pass_medium">#4EB64E</color>

@@ -1,39 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".FileBrowserListFragment">
+    >
 
 	<RelativeLayout
 		android:id="@+id/content_layout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
-
-		<include layout="@layout/item_call_in_progress_layout"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:visibility="gone"
-			android:layout_alignParentTop="true" />
-
-		<RelativeLayout
-			android:id="@+id/relative_layout_file_list_browser_camera_upload_on_off"
-			android:layout_width="match_parent"
-			android:layout_height="48dp"
-			android:layout_alignParentBottom="true"
-			android:background="@android:color/transparent"
-			android:gravity="center"
-			android:visibility="gone">
-
-			<TextView
-				android:id="@+id/file_list_browser_camera_upload_on_off"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_centerInParent="true"
-				android:fontFamily="sans-serif-medium"
-				android:textColor="@color/accentColor" />
-
-		</RelativeLayout>
 
 		<RelativeLayout
 			android:layout_width="wrap_content"
@@ -66,11 +39,9 @@
 
 		<RelativeLayout
 			android:id="@+id/relative_layout_recycler"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:layout_below="@id/call_in_progress_layout"
-			android:layout_above="@id/relative_layout_file_list_browser_camera_upload_on_off">
-
+			>
 			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/file_list_view_browser"
 				android:layout_width="match_parent"
@@ -82,12 +53,9 @@
 				android:orientation="vertical"
 				android:layout_width="wrap_content"
 				android:layout_height="match_parent"
-				android:layout_alignParentRight="true"
-				android:gravity="right"/>
+				android:layout_alignParentEnd="true"
+				android:gravity="end"/>
 		</RelativeLayout>
 
 	</RelativeLayout>
-
-	<include layout="@layout/general_progress_bar"/>
-
 </RelativeLayout>
