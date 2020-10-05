@@ -558,8 +558,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 			String strAction = intent.getAction();
 
-			if ((strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF)) && rtcAudioManagerRingInCall != null) {
-				rtcAudioManagerRingInCall.muteOrUnmuteIncomingCall(true);
+			if (strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF)) {
+				muteOrUnmute(true);
 			}
 		}
 	};
@@ -579,14 +579,20 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
+	public void muteOrUnmute(boolean mute){
+		if (rtcAudioManagerRingInCall != null) {
+			rtcAudioManagerRingInCall.muteOrUnmuteIncomingCall(mute);
+		}
+	}
+
 	BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction()) && rtcAudioManagerRingInCall != null) {
-				rtcAudioManagerRingInCall.muteOrUnmuteIncomingCall(true);
+			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+				muteOrUnmute(true);
 			}
 		}
 	};
