@@ -256,7 +256,9 @@
     <color name="red_300">#F46762</color>
     <color name="red_390">#F0373A</color>
     <color name="red_400">#FD3E38</color>
+    <color name="red_500">#FF2310</color>
     <color name="red_600">#F30C14</color>
+    <color name="red_800">#D50004</color>
     <color name="red_900">#C70000</color>
 
     <!-- ============ Color names by purpose ============== -->
@@ -296,4 +298,7 @@
     <!-- ProgressIndicator -->
     <color name="linear_progress_indicator">@color/teal_300</color>
     <color name="linear_progress_track">@color/grey_alpha_012</color>
+
+    <color name="twofa_toolbar_color">@color/red_600</color>
+    <color name="twofa_status_bar_color">@color/red_800</color>
 </resources>

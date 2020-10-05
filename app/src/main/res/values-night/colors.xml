@@ -31,4 +31,7 @@
     <color name="list_item_more">@color/white_alpha_054</color>
 
     <color name="list_item_divider">@color/white_alpha_012</color>
+
+    <color name="twofa_toolbar_color">@color/red_300</color>
+    <color name="twofa_status_bar_color">@color/red_500</color>
 </resources>

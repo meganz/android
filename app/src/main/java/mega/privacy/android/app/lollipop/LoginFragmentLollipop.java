@@ -1054,7 +1054,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginLoggingIn.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
         closeCancelDialog();
-        scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
         loginCreateAccount.setVisibility(View.VISIBLE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -1167,9 +1166,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-//					generatingKeysText.setVisibility(View.VISIBLE);
-//					megaApi.fastLogin(gSession, this);
 
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1187,12 +1183,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         gSession = credentials.getSession();
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-//						generatingKeysText.setVisibility(View.VISIBLE);
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
         loggingInText.setVisibility(View.VISIBLE);
@@ -1256,7 +1250,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1271,10 +1264,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         generatingKeysText.setVisibility(View.VISIBLE);
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1303,7 +1294,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1319,7 +1309,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
         generatingKeysText.setVisibility(View.VISIBLE);
@@ -1352,10 +1341,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
 
             loginLogin.setVisibility(View.GONE);
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
             loginCreateAccount.setVisibility(View.GONE);
             loginLoggingIn.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
             generatingKeysText.setVisibility(View.VISIBLE);
             loginProgressBar.setVisibility(View.VISIBLE);
             loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1408,7 +1395,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1635,7 +1621,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginLogin.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
         forgotPassLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
 
     public void hideForgotPassLayout(){
@@ -1645,7 +1630,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountLayout.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
         closeCancelDialog();
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
     }
 
     public void showParkAccountLayout(){
@@ -1654,7 +1638,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginLogin.setVisibility(View.GONE);
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
 
     public void hideParkAccountLayout(){
@@ -1664,7 +1647,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountLayout.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
         closeCancelDialog();
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
     }
 
     /*
@@ -1677,10 +1659,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         generatingKeysText.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.VISIBLE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -2003,7 +1983,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     is2FAEnabled = true;
                     ((LoginActivityLollipop) context).showAB(tB);
                     loginLogin.setVisibility(View.GONE);
-                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
                     loginCreateAccount.setVisibility(View.GONE);
                     loginLoggingIn.setVisibility(View.GONE);
                     generatingKeysText.setVisibility(View.GONE);
@@ -2072,7 +2051,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop) context).hideAB();
                 }
 
-                scrollView.setBackgroundColor(getResources().getColor(R.color.white));
                 loginLogin.setVisibility(View.GONE);
                 loginLoggingIn.setVisibility(View.VISIBLE);
                 loginProgressBar.setVisibility(View.VISIBLE);
@@ -2159,7 +2137,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
                 closeCancelDialog();
-                scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 generatingKeysText.setVisibility(View.GONE);
                 loggingInText.setVisibility(View.GONE);
@@ -2199,7 +2176,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             String s = "";
             loginLogin.setVisibility(View.VISIBLE);
             closeCancelDialog();
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             bForgotPass.setVisibility(View.INVISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
             loginLoggingIn.setVisibility(View.GONE);
@@ -2249,7 +2225,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             else{
                 loginLogin.setVisibility(View.VISIBLE);
                 closeCancelDialog();
-                scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 loginLoggingIn.setVisibility(View.GONE);
                 generatingKeysText.setVisibility(View.GONE);

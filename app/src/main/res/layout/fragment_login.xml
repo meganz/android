@@ -192,18 +192,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                android:background="@color/dark_primary_color"
+                android:background="@color/twofa_toolbar_color"
                 android:elevation="4dp"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:titleTextAppearance="@style/ToolbarTitle.Secondary"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                tools:context=".lollipop.twofa.LoginActivityLollipop" />
+                />
 
             <RelativeLayout
                 android:id="@+id/container_confirm_2fa_login"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/toolbar">
+                >
 
                 <TextView
                     android:id="@+id/explain_confirm_2fa_login"
@@ -308,7 +307,7 @@
                     android:textSize="12sp"
                     android:layout_marginBottom="40dp"
                     android:text="@string/pin_error_2fa"
-                    android:textColor="@color/login_warning"
+                    android:textColor="?attr/colorError"
                     android:fontFamily="roboto"
                     android:layout_below="@+id/six_pin_login_layout"
                     android:layout_centerHorizontal="true"
@@ -328,7 +327,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/lost_your_authenticator_device"
-                        android:textColor="@color/accentColor"
+                        android:textColor="?attr/colorSecondary"
                         android:textSize="13sp"
                         android:layout_centerHorizontal="true"/>
 
@@ -353,7 +352,7 @@
             android:layout_height="fill_parent"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:background="@color/white">
+            >
 
             <ImageView
                 android:id="@+id/login_mega_logo"

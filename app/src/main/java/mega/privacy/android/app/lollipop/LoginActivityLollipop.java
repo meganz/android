@@ -759,7 +759,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         aB.setDisplayHomeAsUpEnabled(true);
 
         if (visibleFragment == LOGIN_FRAGMENT) {
-            changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color_secondary);
+            changeStatusBarColor(this, this.getWindow(), R.color.twofa_status_bar_color);
         }
     }
 
