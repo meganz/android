@@ -146,6 +146,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatGeolocation;
+import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
@@ -3196,7 +3197,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             chatC.prepareForDownload(intent, parentPath);
         } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
-            sendGiphyMessage(intent.getParcelableExtra(GIF_DATA));
+            sendGiphyMessageFromGifData(intent.getParcelableExtra(GIF_DATA));
         } else{
             logError("Error onActivityResult");
         }
@@ -3777,21 +3778,50 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         sendMessageToUI(androidMsgSent);
     }
 
-    public void sendGiphyMessage(GifData gifData){
+    /**
+     * Sends a Giphy message from MegaChatGiphy object.
+     *
+     * @param giphy Giphy to send.
+     */
+    public void sendGiphyMessageFromMegaChatGiphy(MegaChatGiphy giphy) {
+        if (giphy == null) {
+            logWarning("MegaChatGiphy is null");
+            return;
+        }
+        sendGiphyMessage(giphy.getMp4Src(), giphy.getWebpSrc(), giphy.getMp4Size(), giphy.getWebpSize(),
+                giphy.getWidth(), giphy.getHeight(), giphy.getTitle());
+
+    }
+
+    /**
+     * Sends a Giphy message from GifData object.
+     *
+     * @param gifData   Giphy to send.
+     */
+    public void sendGiphyMessageFromGifData(GifData gifData) {
         if (gifData == null) {
             logWarning("GifData is null");
             return;
         }
 
-        MegaChatMessage giphyMessage = megaChatApi.sendGiphy(idChat,
-                gifData.getMp4Url(),
-                gifData.getWebpUrl(),
-                gifData.getMp4Size(),
-                gifData.getWebpSize(),
-                gifData.getWidth(),
-                gifData.getHeight(),
-                gifData.getTitle());
-        if(giphyMessage == null) return;
+        sendGiphyMessage(gifData.getMp4Url(), gifData.getWebpUrl(), gifData.getMp4Size(), gifData.getWebpSize(),
+                gifData.getWidth(), gifData.getHeight(), gifData.getTitle());
+    }
+
+    /**
+     * Sends a Giphy message.
+     *
+     * @param srcMp4    Source location of the mp4
+     * @param srcWebp   Source location of the webp
+     * @param sizeMp4   Size in bytes of the mp4
+     * @param sizeWebp  Size in bytes of the webp
+     * @param width     Width of the giphy
+     * @param height    Height of the giphy
+     * @param title     Title of the giphy
+     */
+    public void sendGiphyMessage(String srcMp4, String srcWebp, long sizeMp4, long sizeWebp, int width, int height, String title) {
+        MegaChatMessage giphyMessage = megaChatApi.sendGiphy(idChat, srcMp4, srcWebp, sizeMp4, sizeWebp, width, height, title);
+        if (giphyMessage == null) return;
 
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(giphyMessage);
         sendMessageToUI(androidMsgSent);
@@ -4144,12 +4174,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     logDebug("Chat without permissions || without preview");
 
                     boolean showCopy = true;
-                    for(int i=0; i<selected.size();i++) {
+                    for (int i = 0; i < selected.size(); i++) {
                         MegaChatMessage msg = selected.get(i).getMessage();
-                        if ((showCopy) && (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType()  == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || msg.getType()  == MegaChatMessage.TYPE_VOICE_CLIP || ((msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) && (msg.getContainsMeta() != null) && (msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION))) ) {
+                        if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT
+                                || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT
+                                || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP
+                                || (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && msg.getContainsMeta() != null
+                                && (msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
+                                || msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY))) {
                             showCopy = false;
+                            break;
                         }
                     }
+
                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
@@ -4267,10 +4304,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 }
                             }
 
-                            if((messageSelected.getType() == MegaChatMessage.TYPE_CONTAINS_META) && (messageSelected.getContainsMeta()!=null && messageSelected.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION)){
-                                logDebug("TYPE_CONTAINS_META && CONTAINS_META_GEOLOCATION");
+                            if (messageSelected.getType() == MegaChatMessage.TYPE_CONTAINS_META
+                                    && messageSelected.getContainsMeta() != null
+                                    && (messageSelected.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
+                                        || messageSelected.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY)) {
                                 menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            }else{
+                            } else {
                                 menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
                             }
 
@@ -4337,7 +4376,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                             MegaChatMessage msg = selected.get(i).getMessage();
 
-                            if ((showCopy) && (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType()  == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || msg.getType()  == MegaChatMessage.TYPE_VOICE_CLIP || ((msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) && (msg.getContainsMeta() != null) && (msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION))) ) {
+                            if (showCopy
+                                    && (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT
+                                    || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT
+                                    || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP
+                                    || (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && msg.getContainsMeta() != null
+                                        && (msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
+                                            || msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY)))) {
                                 showCopy = false;
                             }
 
@@ -4569,7 +4614,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
                 if (meta == null || meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID)
                     return;
-                if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW || meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW
+                        || meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
+                        || meta.getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY) {
                     showGeneralChatMessageBottomSheet(m, positionInMessages);
                 }
                 break;

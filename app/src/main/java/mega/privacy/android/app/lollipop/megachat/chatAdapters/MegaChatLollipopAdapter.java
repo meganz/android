@@ -7759,7 +7759,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.content_own_message_thumb_landscape_gif_view:
             case R.id.content_contact_message_thumb_portrait_gif_view:
             case R.id.content_contact_message_thumb_landscape_gif_view:
-                if (checkIfIsGiphyOrGifMessage(currentPositionInAdapter - 1, holder)) {
+                if (!isMultipleSelect() && checkIfIsGiphyOrGifMessage(currentPositionInAdapter - 1, holder)) {
                     break;
                 }
 

@@ -97,6 +97,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         } else {
             int typeMessage = message.getMessage().getType();
+            boolean isGiphyMessage = message.getMessage().getContainsMeta() != null && message.getMessage().getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY;
 
             optionSelect.setVisibility(View.VISIBLE);
 
@@ -119,14 +120,13 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 } else {
                     optionForward.setVisibility(View.VISIBLE);
                 }
-                if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isEditable()) {
-                    optionEdit.setVisibility(View.GONE);
+
+                if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()
+                        && message.getMessage().isEditable()
+                        && typeMessage == MegaChatMessage.TYPE_NORMAL || (typeMessage == MegaChatMessage.TYPE_CONTAINS_META && !isGiphyMessage)) {
+                    optionEdit.setVisibility(View.VISIBLE);
                 } else {
-                    if (typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META) {
-                        optionEdit.setVisibility(View.VISIBLE);
-                    } else {
-                        optionEdit.setVisibility(View.GONE);
-                    }
+                    optionEdit.setVisibility(View.GONE);
                 }
 
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {

@@ -14,6 +14,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
@@ -105,7 +106,17 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
             } else {
                 megaChatApi.sendGeolocation(chatHandles[value], longitude, latitude, image);
             }
+        } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY) {
+            MegaChatGiphy giphy = meta.getGiphy();
+
+            if (chatHandles[value] == idChat) {
+                ((ChatActivityLollipop) context).sendGiphyMessageFromMegaChatGiphy(giphy);
+            } else {
+                megaChatApi.sendGiphy(chatHandles[value], giphy.getMp4Src(), giphy.getWebpSrc(), giphy.getMp4Size(), giphy.getWebpSize()
+                        , giphy.getWidth(), giphy.getHeight(), giphy.getTitle());
+            }
         }
+
         checkTotalMessages();
     }
 
