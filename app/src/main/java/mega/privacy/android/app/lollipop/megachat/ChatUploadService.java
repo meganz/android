@@ -33,7 +33,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -90,7 +89,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private boolean isForeground = false;
 	private boolean canceled;
 
-    private String editedFileName;
+    private HashMap<String, String> fileNames = new HashMap<>();
 
 	boolean sendOriginalAttachments=false;
 
@@ -247,7 +246,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
 		parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE));
-        editedFileName = intent.getStringExtra(EXTRA_NAME_EDITED);
+		if (intent.hasExtra(EXTRA_NAME_EDITED)) {
+            fileNames = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_NAME_EDITED);
+        }
 
 		if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
 			fileExplorerUpload = true;
@@ -381,8 +382,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				uploadPath = pendingMsg.getFilePath();
 			}
 
-			if (editedFileName != null) {
-                megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, editedFileName);
+            String fileName = fileNames.get(pendingMsg.name);
+			if (fileName != null) {
+                megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, fileName);
             } else {
                 megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
             }
@@ -426,8 +428,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						pendingMessages.add(pendMsg);
 					}
 
-                    if (editedFileName != null) {
-                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, editedFileName);
+                    String fileName = fileNames.get(pendingMsg.name);
+                    if (fileName != null) {
+                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, fileName);
                     } else {
                         megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
                     }
@@ -449,8 +452,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					pendingMessages.add(pendMsg);
 				}
 
-                if (editedFileName != null) {
-                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, editedFileName);
+                String fileName = fileNames.get(pendingMsg.name);
+                if (fileName != null) {
+                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, fileName);
                 } else {
                     megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
                 }
@@ -465,8 +469,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if((type!=null)&&(type.equals(EXTRA_VOICE_CLIP))){
 				data = EXTRA_VOICE_CLIP+"-"+data;
 			}
-            if (editedFileName != null) {
-                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false, editedFileName);
+
+            String fileName = fileNames.get(pendingMsg.name);
+            if (fileName != null) {
+                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false, fileName);
             } else {
                 megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
             }
@@ -556,6 +562,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		numberVideosPending--;
 
 		File downFile = null;
+		String fileName = null;
 
 		if(success){
 			mapVideoDownsampling.put(returnedFile, 100);
@@ -563,6 +570,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			for(int i=0; i<pendingMessages.size();i++){
 				PendingMessageSingle pendMsg = pendingMessages.get(i);
+
+				if (idPendingMessage == pendMsg.id) {
+                    fileName = fileNames.get(pendMsg.name);
+                }
+
 				if(pendMsg.getVideoDownSampled()!=null && pendMsg.getVideoDownSampled().equals(returnedFile)){
 					String fingerPrint = megaApi.getFingerprint(returnedFile);
 					if (fingerPrint != null) {
@@ -576,6 +588,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			for(int i=0; i<pendingMessages.size();i++){
 				PendingMessageSingle pendMsg = pendingMessages.get(i);
+
+                if (idPendingMessage == pendMsg.id) {
+                    fileName = fileNames.get(pendMsg.name);
+                }
 
 				if(pendMsg.getVideoDownSampled()!=null){
 					if(pendMsg.getVideoDownSampled().equals(returnedFile)){
@@ -595,8 +611,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
         if (downFile != null) {
-            if (editedFileName != null) {
-                megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + idPendingMessage, false, editedFileName);
+            if (fileName != null) {
+                megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + idPendingMessage, false, fileName);
             } else {
                 megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + idPendingMessage, false);
             }
