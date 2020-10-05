@@ -7,11 +7,12 @@ import android.view.MotionEvent;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import mega.privacy.android.app.components.RtlGridLayoutManager;
-import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+
+import static mega.privacy.android.app.utils.Constants.INVALID_DIMENSION;
 
 public class AutoFitRecyclerView extends RecyclerView {
     private GridLayoutManager manager;
-    private int columnWidth = INVALID_POSITION;
+    private int columnWidth = INVALID_DIMENSION;
     private static final int SPAN_COUNT = 4;
     private Context context;
     private AttributeSet attrs;
@@ -50,14 +51,16 @@ public class AutoFitRecyclerView extends RecyclerView {
                 };
 
                 TypedArray array = context.obtainStyledAttributes(attrs, attrsArray);
-                columnWidth = array.getDimensionPixelSize(0, INVALID_POSITION);
+                columnWidth = array.getDimensionPixelSize(0, INVALID_DIMENSION);
                 array.recycle();
             }
+
             if (isReverse) {
                 manager = new RtlGridLayoutManager(context, SPAN_COUNT, RecyclerView.VERTICAL, false);
             } else {
                 manager = new GridLayoutManager(context, SPAN_COUNT, RecyclerView.VERTICAL, false);
             }
+
             setLayoutManager(manager);
         }catch (Exception e){
             e.printStackTrace();

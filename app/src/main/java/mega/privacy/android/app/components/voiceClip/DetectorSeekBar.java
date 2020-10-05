@@ -28,8 +28,8 @@ public class DetectorSeekBar  extends AppCompatSeekBar {
 
     public void setEventListener(IListener listener) {
         mListener = listener;
-        mLongClickChecker.setLongClickListener(listener);
-        mClickChecker.setClickListener(listener);
+        mLongClickChecker.setLongClickListener(mListener);
+        mClickChecker.setClickListener(mListener);
     }
 
     @Override
@@ -117,15 +117,12 @@ public class DetectorSeekBar  extends AppCompatSeekBar {
 
         boolean checkCondition(MotionEvent upEvent) {
             if (upEvent != null) {
-                // have moved cancel click
                 if (mMoved) {
-                    mMoved = false;
-                    return false;
+                    return mMoved = false;
                 }
-                //ACTION_DOWN  ACTION_UP time too long cancel click
+
                 boolean timeCorrect = upEvent.getEventTime() - time < LONG_CLICK_DELAY;
                 time = 0;
-
                 return timeCorrect;
             }
             return false;

@@ -32,6 +32,7 @@ import nz.mega.sdk.MegaHandleList;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.px2dp;
 
 public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHolderReaction> implements View.OnClickListener, View.OnLongClickListener {
@@ -78,7 +79,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         holder.itemEmojiReactionText.setVisibility(View.GONE);
         holder.moreReactionsLayout.setOnClickListener(this);
         holder.itemReactionLayout.setOnClickListener(this);
-        holder.itemReactionLayout.setOnLongClickListener(chatRoom.isGroup() ? this : null);
+        holder.itemReactionLayout.setOnLongClickListener(this);
         v.setTag(holder);
         return holder;
     }
@@ -86,7 +87,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolderReaction holder, int position) {
         String reaction = getItemAtPosition(position);
-        if (reaction == null) {
+        if (isTextEmpty(reaction)) {
             holder.moreReactionsLayout.setVisibility(View.GONE);
             holder.itemReactionLayout.setVisibility(View.GONE);
             return;
@@ -120,7 +121,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
         Emoji emoji = null;
-        if(emojis != null && !emojis.isEmpty() && emojis.get(0) != null){
+        if(!emojis.isEmpty() && emojis.get(0) != null){
             emoji = emojis.get(0).emoji;
         }
 
@@ -301,7 +302,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     @Override
     public boolean onLongClick(View v) {
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
-        if (holder == null)
+        if (holder == null || !chatRoom.isGroup())
             return true;
 
         int currentPosition = holder.getAdapterPosition();

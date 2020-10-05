@@ -473,6 +473,7 @@ public class Constants {
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
     public static final int INVALID_TYPE_PERMISSIONS = -1;
+    public static final int INVALID_DIMENSION = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 

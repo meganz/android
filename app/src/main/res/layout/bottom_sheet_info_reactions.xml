@@ -43,7 +43,7 @@
                 android:textColor="@color/mail_my_account"
                 android:layout_centerVertical="true"
                 android:layout_alignParentStart="true"
-                android:textSize="12dp"/>
+                android:textSize="12sp"/>
         </RelativeLayout>
 
         <androidx.viewpager.widget.ViewPager

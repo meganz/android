@@ -67,7 +67,7 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLayout.getParent());
-        mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+        mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if (newState == BottomSheetBehavior.STATE_DRAGGING) {
