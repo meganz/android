@@ -28,6 +28,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaPricing;
@@ -361,7 +362,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         //Currently the API side doesn't return this value, so we have to hardcode.
         String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.label_storage_upgrade_account)+" ";
         try{
-            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'#000000\'>");
+            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                    + "\'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
         }
         catch (Exception e){}
@@ -377,7 +380,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith).toUpperCase()+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
         try{
-            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'#000000\'>");
+            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                    + "\'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
         }catch (Exception e){}
         Spanned resultFreeBandwidth = null;
@@ -436,7 +441,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowPro1Storage = "[A] "+ getSizeStringGBBased(account.getStorage()) +" [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
-                    textToShowPro1Storage = textToShowPro1Storage.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowPro1Storage = textToShowPro1Storage.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowPro1Storage = textToShowPro1Storage.replace("[/A]", "</font>");
                 }
                 catch (Exception e){}
@@ -451,7 +458,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowPro1Bandwidth = "[A] "+ getSizeStringGBBased(account.getTransfer()) +" [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
-                    textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}
                 Spanned resultPro1Bandwidth = null;
@@ -499,7 +508,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowPro2Storage = "[A] " + getSizeStringGBBased(account.getStorage()) +" [/A] " + getString(R.string.label_storage_upgrade_account);
                 try{
-                    textToShowPro2Storage = textToShowPro2Storage.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowPro2Storage = textToShowPro2Storage.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowPro2Storage = textToShowPro2Storage.replace("[/A]", "</font>");
                 }
                 catch (Exception e){}
@@ -514,7 +525,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowPro2Bandwidth = "[A] "+ getSizeStringGBBased(account.getTransfer()) + " [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
-                    textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}
                 Spanned resultPro2Bandwidth  = null;
@@ -561,7 +574,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowPro3Storage = "[A] " + getSizeStringGBBased(account.getStorage()) + " [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
-                    textToShowPro3Storage = textToShowPro3Storage.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowPro3Storage = textToShowPro3Storage.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowPro3Storage = textToShowPro3Storage.replace("[/A]", "</font>");
                 }
                 catch (Exception e){}
@@ -576,7 +591,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowPro3Bandwidth = "[A] " + getSizeStringGBBased(account.getTransfer()) + " [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
-                    textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}
                 Spanned resultPro3Bandwidth = null;
@@ -622,7 +639,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowLiteStorage = "[A] " + getSizeStringGBBased(account.getStorage()) + " [/A] " + getString(R.string.label_storage_upgrade_account);
                 try{
-                    textToShowLiteStorage = textToShowLiteStorage.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowLiteStorage = textToShowLiteStorage.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowLiteStorage = textToShowLiteStorage.replace("[/A]", "</font>");
                 }
                 catch (Exception e){}
@@ -637,7 +656,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowLiteBandwidth = "[A] " + getSizeStringGBBased(account.getTransfer()) + " [/A] " + getString(R.string.label_transfer_quota_upgrade_account);
                 try{
-                    textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[A]", "<font color=\'#000000\'>");
+                    textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + "\'>");
                     textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}
                 Spanned resultLiteBandwidth = null;

@@ -301,4 +301,6 @@
 
     <color name="twofa_toolbar_color">@color/red_600</color>
     <color name="twofa_status_bar_color">@color/red_800</color>
+
+    <color name="account_capacity_text_color">@color/black</color>
 </resources>

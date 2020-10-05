@@ -2,7 +2,6 @@
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:orientation="vertical"
-	android:background="@color/white"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools">
 
@@ -12,16 +11,12 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:minHeight="?attr/actionBarSize"
-		android:background="@color/white"
-		app:popupTheme="@style/Theme.Megaactionbar"
 		app:titleTextAppearance="@style/ToolbarTitle"
-		app:theme="@style/Theme.Megaactionbar"
 		tools:context=".lollipop.LoginActivityLollipop" />
 
-	<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	<ScrollView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:background="@color/white"
 		android:id="@+id/scroll_view_choose_account">
 
 		<LinearLayout
@@ -29,13 +24,12 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:background="@android:color/transparent">
+			>
 
 			<!-- FREE -->
 			<RelativeLayout
 				android:id="@+id/choose_account_free_layout"
 				android:layout_width="match_parent"
-				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -52,7 +46,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -155,7 +148,6 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_prolite_layout"
 				android:layout_width="match_parent"
-				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -172,7 +164,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -279,7 +270,6 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_pro_i_layout"
 				android:layout_width="match_parent"
-				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -296,7 +286,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:layout_marginTop="4dp">
@@ -401,7 +390,6 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_pro_ii_layout"
 				android:layout_width="match_parent"
-				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -418,7 +406,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:layout_marginTop="4dp">
@@ -523,7 +510,6 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_pro_iii_layout"
 				android:layout_width="match_parent"
-				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -540,7 +526,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -644,7 +629,6 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_business_layout"
 				android:layout_width="match_parent"
-				android:background="@color/white"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -661,7 +645,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -727,7 +710,7 @@
 										android:id="@+id/storage_business"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/black"
+										android:textColor="@color/account_capacity_text_color"
 										android:textSize="15sp"/>
 								</RelativeLayout>
 							</TableRow>
@@ -743,7 +726,7 @@
 										android:id="@+id/bandwidth_business"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/black"
+										android:textColor="@color/account_capacity_text_color"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -767,7 +750,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:orientation="vertical"
-				android:background="@android:color/transparent"
 				android:layout_marginLeft="16dp"
 				android:layout_marginRight="16dp"
 				android:layout_marginTop="10dp"

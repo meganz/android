@@ -74,4 +74,9 @@ object ColorUtils {
     fun resetEditTextUnderlineColor(editText: EditText) {
         doSetEditTextUnderlineColor(editText, true, 0)
     }
+
+    @JvmStatic
+    fun getColorHexString(context: Context, @ColorRes color: Int): String {
+        return String.format("#%06X", context.resources.getColor(color) and 0xFFFFFF)
+    }
 }
