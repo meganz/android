@@ -64,7 +64,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="2dp"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="@color/input_error_hint"
+                        android:tint="?attr/colorError"
                         android:layout_alignBottom="@+id/login_email_text_layout"/>
 
                 </RelativeLayout>
@@ -100,7 +100,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="2dp"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="@color/input_error_hint"
+                        android:tint="?attr/colorError"
                         android:layout_alignBottom="@+id/login_password_text_layout"/>
 
                 </RelativeLayout>

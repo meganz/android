@@ -546,7 +546,7 @@
     </style>
 
     <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/input_error_hint</item>
+        <item name="android:textColor">?attr/colorError</item>
     </style>
 
     <style name="InputTextAppearanceVeryWeak" parent="TextAppearance.Design.Error">

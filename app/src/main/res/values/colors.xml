@@ -296,6 +296,4 @@
     <!-- ProgressIndicator -->
     <color name="linear_progress_indicator">@color/teal_300</color>
     <color name="linear_progress_track">@color/grey_alpha_012</color>
-
-    <color name="input_error_hint">@color/red_900</color>
 </resources>

@@ -26,7 +26,7 @@
         <!-- e.g. the color of the bottom sheet, overflow menu(with some auto-alpha?) -->
         <item name="colorSurface">@color/white</item>
         <!-- e.g. the color of the invalid email address hint -->
-        <item name="colorError">@color/red_600</item>
+        <item name="colorError">@color/red_900</item>
 
         <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
         <!--on which they appear.-->
