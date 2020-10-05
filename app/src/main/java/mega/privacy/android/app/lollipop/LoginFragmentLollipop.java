@@ -1464,7 +1464,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private void disableLoginButton() {
         logDebug("Disable login button");
         //disbale login button
-        bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
         bLogin.setEnabled(false);
         //display login info
         loginInProgressPb.setVisibility(View.VISIBLE);
@@ -1475,7 +1474,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private void enableLoginButton() {
         logDebug("Enable login button");
         bLogin.setEnabled(true);
-        bLogin.setBackground(context.getDrawable(R.drawable.background_accent_button));
         loginInProgressPb.setVisibility(View.GONE);
         loginInProgressInfo.setVisibility(View.GONE);
     }
