@@ -469,7 +469,9 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         int hour = cal.get(Calendar.HOUR_OF_DAY);
-        return hour < INITIAL_PERIOD_TIME && hour <= TIME_OF_CHANGE;
+        int minute = cal.get(Calendar.MINUTE);
+        return hour >= INITIAL_PERIOD_TIME &&
+                (hour < TIME_OF_CHANGE || (hour == TIME_OF_CHANGE && minute == INITIAL_PERIOD_TIME));
     }
 
     /**
