@@ -61,7 +61,9 @@
 
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+        <!-- this will cause the navigation bar become white on light mode,
+        and navigation button would be unclear -->
+        <!--<item name="android:navigationBarColor">?attr/colorPrimary</item>-->
 
         <item name="borderlessButtonStyle">@style/BorderlessButton</item>
 
