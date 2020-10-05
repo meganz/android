@@ -214,4 +214,14 @@
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
 
+
+    <!-- LABELS -->
+    <color name="label_red">#FF625D</color>
+    <color name="label_orange">#F9A646</color>
+    <color name="label_yellow">#F4CE4A</color>
+    <color name="label_green">#6DCB50</color>
+    <color name="label_blue">#4BB8F3</color>
+    <color name="label_purple">#D088E1</color>
+    <color name="label_grey">#A4A4A7</color>
+
 </resources>

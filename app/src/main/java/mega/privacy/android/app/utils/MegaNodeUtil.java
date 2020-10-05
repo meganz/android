@@ -3,8 +3,13 @@ package mega.privacy.android.app.utils;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -633,5 +638,40 @@ public class MegaNodeUtil {
                     MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_DESTROY_ACTION_MODE));
                 })
                 .setNegativeButton(R.string.general_cancel, null).show();
+    }
+
+    @Nullable
+    public static Drawable getNodeLabelDrawable(Resources resources, MegaNode node) {
+        int colorRes;
+        switch (node.getLabel()) {
+            case MegaNode.NODE_LBL_RED:
+                colorRes = R.color.label_red;
+                break;
+            case MegaNode.NODE_LBL_ORANGE:
+                colorRes = R.color.label_orange;
+                break;
+            case MegaNode.NODE_LBL_YELLOW:
+                colorRes = R.color.label_yellow;
+                break;
+            case MegaNode.NODE_LBL_GREEN:
+                colorRes = R.color.label_green;
+                break;
+            case MegaNode.NODE_LBL_BLUE:
+                colorRes = R.color.label_blue;
+                break;
+            case MegaNode.NODE_LBL_PURPLE:
+                colorRes = R.color.label_purple;
+                break;
+            case MegaNode.NODE_LBL_GREY:
+                colorRes = R.color.label_grey;
+                break;
+            default:
+                return null;
+        }
+
+        int color = ResourcesCompat.getColor(resources, colorRes, null);
+        Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_circle_label, null);
+        drawable.setTint(color);
+        return drawable;
     }
 }
