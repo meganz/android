@@ -8,6 +8,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.View.VISIBLE
+import android.view.View.GONE
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -23,6 +27,7 @@ import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_PICK_GIF
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
 import retrofit2.Call
@@ -41,6 +46,8 @@ class GiphyActivity : PinActivityLollipop() {
 
     private var toolbar: Toolbar? = null
     private var gifList: RecyclerView? = null
+    private var emptyView: RelativeLayout? = null
+    private var emptyText: TextView? = null
 
     private var giphyAdapter: GiphyAdapter? = null
 
@@ -76,6 +83,20 @@ class GiphyActivity : PinActivityLollipop() {
             layoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
             itemAnimator = DefaultItemAnimator()
         }
+
+        emptyView = findViewById(R.id.empty_giphy_view)
+        emptyView?.visibility = GONE
+        emptyText = findViewById(R.id.empty_giphy_text)
+
+        var emptyTextSearch = getString(R.string.empty_search_giphy)
+        try {
+            emptyTextSearch = emptyTextSearch.replace("[A]", "<font color=\'#000000\'>")
+            emptyTextSearch = emptyTextSearch.replace("[/A]", "</font>")
+        } catch (e: Exception) {
+            logWarning("Exception formatting string", e)
+        }
+
+        emptyText?.text = getSpannedHtmlText(emptyTextSearch)
 
         giphyService = GiphyService.buildService()
         requestTrendingData()
@@ -129,7 +150,10 @@ class GiphyActivity : PinActivityLollipop() {
      */
     private fun requestTrendingData() {
         if (trendingData == null) getAndSetData(giphyService?.getGiphyTrending(), true)
-        else updateAdapter(trendingData)
+        else {
+            cancelPreviousRequests()
+            updateAdapter(trendingData)
+        }
     }
 
     /**
@@ -143,6 +167,7 @@ class GiphyActivity : PinActivityLollipop() {
         if (searchValue == null) {
             getAndSetData(giphyService?.getGiphySearch(query), false)
         } else {
+            cancelPreviousRequests()
             updateAdapter(searchValue)
         }
     }
@@ -155,9 +180,7 @@ class GiphyActivity : PinActivityLollipop() {
      * @param call  Indicates the type of the request. It can be Trending or Search.
      */
     private fun getAndSetData(call: Call<GiphyResponse>?, isTrendingData: Boolean) {
-        if (previousRequest?.isCanceled == false) {
-            previousRequest?.cancel()
-        }
+        cancelPreviousRequests()
 
         call?.enqueue(object : Callback<GiphyResponse> {
             override fun onResponse(call: Call<GiphyResponse>, response: Response<GiphyResponse>) {
@@ -182,6 +205,12 @@ class GiphyActivity : PinActivityLollipop() {
         })
 
         previousRequest = call
+    }
+
+    private fun cancelPreviousRequests() {
+        if (previousRequest?.isCanceled == false) {
+            previousRequest?.cancel()
+        }
     }
 
     /**
@@ -273,5 +302,18 @@ class GiphyActivity : PinActivityLollipop() {
         startActivityForResult(Intent(this@GiphyActivity, GiphyViewerActivity::class.java)
                 .putExtra(GIF_DATA, gifData),
                 REQUEST_CODE_PICK_GIF)
+    }
+
+    /**
+     * Shows the empty state if the result of the request is empty.
+     */
+    fun setEmptyState(emptyState: Boolean) {
+        if (emptyState) {
+            emptyView?.visibility = VISIBLE
+            gifList?.visibility = GONE
+        } else {
+            emptyView?.visibility = GONE
+            gifList?.visibility = VISIBLE
+        }
     }
 }

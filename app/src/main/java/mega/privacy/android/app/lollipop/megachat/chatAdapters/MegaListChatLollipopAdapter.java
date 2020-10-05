@@ -59,6 +59,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatContainsMeta;
+import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -1888,9 +1889,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(message==null) return;
 
 				MegaChatContainsMeta meta = message.getContainsMeta();
-				if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+				if (meta == null) {
+					logWarning("MegaChatContainsMeta is null.");
+					return;
+				}
+
+				long lastMsgSender = chat.getLastMessageSender();
+
+				if(meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
 					logDebug("Message type TYPE_CONTAINS_META:CONTAINS_META_GEOLOCATION");
-					long lastMsgSender = chat.getLastMessageSender();
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(R.string.title_geolocation_message);
 					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
@@ -1950,7 +1957,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 					}
 				}
-				else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
+				else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
 					logDebug("Rich link message");
 					if(lastMessageString==null){
 						logWarning("Message Type-> " + messageType + " last content is NULL");
@@ -1960,7 +1967,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						logDebug("Message Type-> " + messageType + " last content: " + lastMessageString + "length: " + lastMessageString.length());
 					}
 
-					long lastMsgSender = chat.getLastMessageSender();
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 						logDebug("The last message is mine: " + lastMsgSender);
@@ -2033,10 +2039,66 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 						}
 					}
-				}
-				else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
+				} else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY) {
+					MegaChatGiphy giphy = meta.getGiphy();
+					String giphyTitle = null;
+
+					if (giphy != null) {
+						giphyTitle = giphy.getTitle();
+					}
+
+					if (isTextEmpty(giphyTitle)) {
+						giphyTitle = lastMessageString;
+
+						if (isTextEmpty(giphyTitle)) {
+							giphyTitle = context.getString(R.string.error_message_unrecognizable);
+						}
+					}
+
+					int contentColor = chat.getUnreadCount() == 0 ? R.color.file_list_second_row : R.color.accentColor;
+					CharSequence giphyTextContent = null;
+
+					if (lastMsgSender == megaChatApi.getMyUserHandle()) {
+						Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+						Spannable myMessage = new SpannableString(giphyTitle);
+						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+						giphyTextContent = TextUtils.concat(me, myMessage);
+						contentColor = R.color.file_list_second_row;
+					} else if (chat.isGroup()) {
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
+
+						((ViewHolderNormalChatList) holder).currentPosition = position;
+						((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
+
+						String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
+
+						if (isTextEmpty(fullNameAction) && !(((ViewHolderNormalChatList) holder).nameRequestedAction) && chatRoom != null) {
+							fullNameAction = context.getString(R.string.unknown_name_label);
+							((ViewHolderNormalChatList) holder).nameRequestedAction = true;
+							((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
+							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
+							megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+							megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+							megaChatApi.getUserEmail(lastMsgSender, listener);
+						}
+
+						Spannable name = new SpannableString(fullNameAction + ": ");
+						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+						Spannable myMessage = new SpannableString(giphyTitle);
+						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, contentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+						giphyTextContent = TextUtils.concat(name, myMessage);
+					}
+
+					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, contentColor));
+					((ViewHolderNormalChatList) holder).textViewContent.setText(giphyTextContent != null ? giphyTextContent : giphyTitle);
+
+				} else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
 					logWarning("Invalid meta message");
-					long lastMsgSender = chat.getLastMessageSender();
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 						logDebug("The last message is mine: " + lastMsgSender);

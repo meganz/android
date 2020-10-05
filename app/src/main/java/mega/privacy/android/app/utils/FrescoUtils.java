@@ -180,11 +180,6 @@ public class FrescoUtils {
 
                     @Override
                     public void onFailure(String id, Throwable throwable) {
-                        gifImgDisplay.setVisibility(View.GONE);
-
-                        if (pb != null) {
-                            pb.setVisibility(View.GONE);
-                        }
                         logWarning("Load gif failed, error: " + throwable.getMessage());
                     }
                 })

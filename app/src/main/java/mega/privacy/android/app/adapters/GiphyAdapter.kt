@@ -71,6 +71,7 @@ class GiphyAdapter(private var gifs: ArrayList<Data>?, private val context: Cont
 
     fun setGifs(newGifs: ArrayList<Data>?) {
         gifs = newGifs
+        (context as GiphyActivity).setEmptyState(gifs?.isEmpty() ?: true)
         notifyDataSetChanged()
     }
 
