@@ -513,8 +513,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 			}
 
-			boolean isNotifiable = megaApi.isChatNotifiable(chatId);
-			if (intent.getAction().equals(ACTION_UPDATE_CALL) && isNotifiable) {
+			if (intent.getAction().equals(ACTION_UPDATE_CALL)) {
 				stopService(new Intent(getInstance(), IncomingCallService.class));
 			}
 
@@ -532,8 +531,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							logError("Calls not found");
 							return;
 						}
-						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN && isNotifiable) {
-							createRTCAudioManager(false, callStatus);
+						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+							createRTCAudioManager(false, callStatus, chatId);
 						}
 
 						if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS
@@ -543,7 +542,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							clearIncomingCallNotification(callId);
 						}
 
-						if(isNotifiable) {
+						if(megaApi.isChatNotifiable(chatId)) {
 							if (listAllCalls.size() == 1) {
 								checkOneCall(listAllCalls.get(0));
 							} else {
@@ -1433,12 +1432,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param isSpeakerOn Speaker status.
      * @param callStatus  Call status.
      */
-    public void createRTCAudioManager(boolean isSpeakerOn, int callStatus) {
+    public void createRTCAudioManager(boolean isSpeakerOn, int callStatus, long chatId) {
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-            if (rtcAudioManagerRingInCall != null) {
-                removeRTCAudioManagerRingIn();
-            }
-            rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
+        	if(megaApi.isChatNotifiable(chatId)) {
+				if (rtcAudioManagerRingInCall != null) {
+					removeRTCAudioManagerRingIn();
+				}
+				rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
+			}
         } else {
             if (rtcAudioManager != null) {
                 return;
@@ -1499,13 +1500,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param isSpeakerOn If the speaker is on.
      * @param callStatus  Call status.
      */
-    public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus) {
+    public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus, long chatId) {
         if (rtcAudioManager != null) {
             rtcAudioManager.updateSpeakerStatus(isSpeakerOn, callStatus);
             return;
         }
 
-        createRTCAudioManager(isSpeakerOn, callStatus);
+        createRTCAudioManager(isSpeakerOn, callStatus, chatId);
     }
 
     /**
