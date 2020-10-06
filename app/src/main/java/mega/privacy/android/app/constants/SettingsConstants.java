@@ -19,7 +19,6 @@ public class SettingsConstants {
     public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 
     public static final String GENERAL_SETTINGS = "general_preference_screen";
-    public static final String CATEGORY_PIN_LOCK = "settings_pin_lock";
     public static final String CATEGORY_FEATURES = "settings_features";
     public static final String CATEGORY_STORAGE = "settings_storage";
     public static final String CATEGORY_SECURITY = "settings_security";

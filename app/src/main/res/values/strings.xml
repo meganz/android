@@ -805,7 +805,7 @@
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
     <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Change PIN</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN Lock</string>
+    <string name="settings_pin_lock_switch" context="settings of the pin lock">Passcode Lock</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>

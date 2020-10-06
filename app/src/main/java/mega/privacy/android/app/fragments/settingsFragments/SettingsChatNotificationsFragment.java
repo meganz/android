@@ -4,23 +4,34 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaPushNotificationSettings;
 
-import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_DND;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_NOTIFICATIONS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_SOUND;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_VIBRATE;
+import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsChatAlertDialog;
+import static mega.privacy.android.app.utils.ChatUtil.getGeneralNotification;
+import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_X_TIME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class SettingsChatFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsChatNotificationsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     ChatSettings chatSettings;
 
@@ -29,7 +40,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
     private SwitchPreferenceCompat chatVibrateSwitch;
     private SwitchPreferenceCompat chatDndSwitch;
 
-    public SettingsChatFragment () {
+    public SettingsChatNotificationsFragment () {
         super();
 
         chatSettings = dbH.getChatSettings();
@@ -151,15 +162,56 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
 
         switch (preference.getKey()) {
             case KEY_CHAT_NOTIFICATIONS:
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, MEGACHAT_INVALID_HANDLE);
                 break;
 
             case KEY_CHAT_VIBRATE:
+                if (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled())) {
+                    dbH.setVibrationEnabledChat(false + "");
+                    chatSettings.setVibrationEnabled(false + "");
+                } else {
+                    dbH.setVibrationEnabledChat(true + "");
+                    chatSettings.setVibrationEnabled(true + "");
+                }
                 break;
 
             case KEY_CHAT_SOUND:
+                ((ChatNotificationsPreferencesActivity) context).changeSound(chatSettings.getNotificationsSound());
                 break;
         }
 
         return true;
     }
+
+    public void setNotificationSound (Uri uri){
+
+        String chosenSound = "-1";
+        if(uri!=null){
+            Ringtone sound = RingtoneManager.getRingtone(context, uri);
+
+            String title = sound.getTitle(context);
+
+            if(title!=null){
+                logDebug("Title sound notification: " + title);
+                chatSoundPreference.setSummary(title);
+            }
+
+            chosenSound = uri.toString();
+        }
+        else{
+            chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
+        }
+
+        if(chatSettings==null){
+            chatSettings = new ChatSettings();
+            chatSettings.setNotificationsSound(chosenSound);
+            dbH.setChatSettings(chatSettings);
+        }
+        else{
+            chatSettings.setNotificationsSound(chosenSound);
+            dbH.setNotificationSoundChat(chosenSound);
+        }
+
+    }
 }
+

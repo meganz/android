@@ -47,6 +47,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
@@ -77,6 +78,11 @@ import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
 import static mega.privacy.android.app.utils.ChatUtil.getGeneralNotification;
+import static mega.privacy.android.app.utils.ChatUtil.lockOrientationLandscape;
+import static mega.privacy.android.app.utils.ChatUtil.lockOrientationPortrait;
+import static mega.privacy.android.app.utils.ChatUtil.lockOrientationReverseLandscape;
+import static mega.privacy.android.app.utils.ChatUtil.lockOrientationReversePortrait;
+import static mega.privacy.android.app.utils.ChatUtil.unlockOrientation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -95,10 +101,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
     Handler handler = new Handler();
 	PreferenceScreen preferenceScreen;
 
-	PreferenceCategory pinLockCategory;
-	SwitchPreferenceCompat pinLockEnableSwitch;
-	Preference pinLockCode;
-
 	PreferenceCategory featuresCategory;
 	Preference cameraUploadsPreference;
 	Preference chatPreference;
@@ -109,6 +111,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 	PreferenceCategory securityCategory;
 	Preference backupRecoveryKeyPreference;
+	SwitchPreferenceCompat pinLockEnableSwitch;
+	Preference pinLockCode;
 	Preference changePasswordPrefence;
 	SwitchPreferenceCompat twoFASwitch;
 	SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
@@ -137,7 +141,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	PreferenceCategory chatEnabledCategory;
 	PreferenceCategory cameraUploadCategory;
 	PreferenceCategory autoawayChatCategory;
-	PreferenceCategory persistenceChatCategory;
 	PreferenceCategory fileManagementCategory;
 
 	SwitchPreferenceCompat richLinksSwitch;
@@ -147,7 +150,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	//New autoaway
 	SwitchPreferenceCompat autoAwaySwitch;
 	Preference chatAutoAwayPreference;
-	TwoLineCheckPreference chatPersistenceCheck;
 
 	Preference cameraUploadOn;
 	ListPreference cameraUploadHow;
@@ -230,11 +232,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		addPreferencesFromResource(R.xml.preferences);
 
 		preferenceScreen = findPreference(GENERAL_SETTINGS);
-		pinLockCategory = findPreference(CATEGORY_PIN_LOCK);
-		pinLockEnableSwitch = findPreference(KEY_PIN_LOCK_ENABLE);
-		pinLockEnableSwitch.setOnPreferenceClickListener(this);
-		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
-		pinLockCode.setOnPreferenceClickListener(this);
 
 		featuresCategory = findPreference(CATEGORY_FEATURES);
 		cameraUploadsPreference = findPreference(KEY_FEATURES_CAMERA_UPLOAD);
@@ -253,9 +250,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		securityCategory = findPreference(CATEGORY_SECURITY);
 		backupRecoveryKeyPreference = findPreference(KEY_SECURITY_RECOVERY_KEY);
 		backupRecoveryKeyPreference.setOnPreferenceClickListener(this);
+		pinLockEnableSwitch = findPreference(KEY_PIN_LOCK_ENABLE);
+		pinLockEnableSwitch.setOnPreferenceClickListener(this);
+		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
+		pinLockCode.setOnPreferenceClickListener(this);
 		changePasswordPrefence = findPreference(KEY_SECURITY_CHANGE_PASSWORD);
 		changePasswordPrefence.setOnPreferenceClickListener(this);
-
 		twoFASwitch = findPreference(KEY_SECURITY_2FA);
 		twoFASwitch.setOnPreferenceClickListener(this);
 		qrCodeAutoAcceptSwitch = findPreference(KEY_SECURITY_QRCODE);
@@ -293,8 +293,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		chatEnabledCategory.setVisible(false);
 		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
 		autoawayChatCategory.setVisible(false);
-		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
-		persistenceChatCategory.setVisible(false);
 		fileManagementCategory = (PreferenceCategory) findPreference(CATEGORY_FILE_MANAGEMENT);
 		fileManagementCategory.setVisible(false);
 
@@ -325,9 +323,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		chatAutoAwayPreference.setOnPreferenceClickListener(this);
 		chatAutoAwayPreference.setVisible(false);
 
-		chatPersistenceCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_PERSISTENCE);
-		chatPersistenceCheck.setOnPreferenceClickListener(this);
-		chatPersistenceCheck.setVisible(false);
 
 //		useHttpsOnly = (TwoLineCheckPreference) findPreference("settings_use_https_only");
 //		useHttpsOnly.setOnPreferenceClickListener(this);
@@ -853,11 +848,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				}
 			}
 			pinLockCode.setSummary(ast);
-			pinLockCategory.addPreference(pinLockCode);
+			securityCategory.addPreference(pinLockCode);
 		}
 		else{
 //			pinLockEnableSwitch.setTitle(getString(R.string.settings_pin_lock_on));
-			pinLockCategory.removePreference(pinLockCode);
+			securityCategory.removePreference(pinLockCode);
 		}
 
 		useHttpsOnlyValue = Boolean.parseBoolean(dbH.getUseHttpsOnly());
@@ -1022,7 +1017,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		chatEnabledCategory.setEnabled(isOnline);
 		chatPreference.setEnabled(isOnline);
 		autoawayChatCategory.setEnabled(isOnline);
-		persistenceChatCategory.setEnabled(isOnline);
 		cameraUploadCategory.setEnabled(isOnline);
 		rubbishFileManagement.setEnabled(isOnline);
 		clearVersionsFileManagement.setEnabled(isOnline);
@@ -1217,6 +1211,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	public boolean onPreferenceClick(Preference preference) {
 		prefs = dbH.getPreferences();
 		logDebug("KEY pressed: " + preference.getKey());
+
 		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0) {
 			numberOfClicksSDK++;
 			if (numberOfClicksSDK == 5) {
@@ -1275,6 +1270,26 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		} else {
 			numberOfClicksAppVersion = 0;
 		}
+
+		switch (preference.getKey()) {
+			case KEY_FEATURES_CAMERA_UPLOAD:
+				startActivity(new Intent(context, CameraUploadsPreferencesActivity.class));
+				break;
+
+			case KEY_FEATURES_CHAT:
+				startActivity(new Intent(context, ChatPreferencesActivity.class));
+				break;
+
+			case KEY_STORAGE_DOWNLOAD_LOCATION:
+				startActivity(new Intent(context, DownloadPreferencesActivity.class));
+				break;
+
+			default:
+				break;
+
+		}
+
+
 
 		if (preference.getKey().compareTo(KEY_CACHE) == 0){
 			logDebug("Clear Cache!");
@@ -1413,7 +1428,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				dbH.setPinLockEnabled(false);
 				dbH.setPinLockCode("");
 //				pinLockEnableSwitch.setTitle(getString(R.string.settings_pin_lock_on));
-				pinLockCategory.removePreference(pinLockCode);
+				securityCategory.removePreference(pinLockCode);
 			}
 		} else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0) {
 			logDebug("KEY_AUTOAWAY_ENABLE");
@@ -1542,10 +1557,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				logDebug("Change persistence chat to true");
 				megaChatApi.setPresencePersist(true);
 			}
-		} else if (preference.getKey().compareTo(KEY_FEATURES_CHAT) == 0) {
-			startActivity(new Intent(context, ChatPreferencesActivity.class));
-		} else if (preference.getKey().equals(KEY_STORAGE_DOWNLOAD_LOCATION)) {
-			startActivity(new Intent(context, DownloadPreferencesActivity.class));
 		} else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
 			logDebug("KEY_PIN_LOCK_CODE");
@@ -1972,7 +1983,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			}
 		}
 		pinLockCode.setSummary(ast);
-		pinLockCategory.addPreference(pinLockCode);
+		securityCategory.addPreference(pinLockCode);
 		dbH.setPinLockEnabled(true);
 	}
 
@@ -2110,7 +2121,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		logDebug("waitPresenceConfig: ");
 
 		preferenceScreen.removePreference(autoawayChatCategory);
-		preferenceScreen.removePreference(persistenceChatCategory);
 
 		statusChatListPreference.setValue(MegaChatApi.STATUS_OFFLINE+"");
 		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
@@ -2127,28 +2137,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		if(statusConfig.getOnlineStatus()!= MegaChatApi.STATUS_ONLINE){
 			preferenceScreen.removePreference(autoawayChatCategory);
-			if(statusConfig.getOnlineStatus()== MegaChatApi.STATUS_OFFLINE){
-				preferenceScreen.removePreference(persistenceChatCategory);
-			}
-			else{
-				preferenceScreen.addPreference(persistenceChatCategory);
-				if(statusConfig.isPersist()){
-					chatPersistenceCheck.setChecked(true);
-				}
-				else{
-					chatPersistenceCheck.setChecked(false);
-				}
-			}
+
 		}
 		else if(statusConfig.getOnlineStatus()== MegaChatApi.STATUS_ONLINE){
 			//I'm online
-			preferenceScreen.addPreference(persistenceChatCategory);
-			if(statusConfig.isPersist()){
-				chatPersistenceCheck.setChecked(true);
-			}
-			else{
-				chatPersistenceCheck.setChecked(false);
-			}
+
 
 			if(statusConfig.isPersist()){
 				preferenceScreen.removePreference(autoawayChatCategory);
@@ -2207,7 +2200,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		getPreferenceScreen().removePreference(chatPreference);
 		getPreferenceScreen().removePreference(autoawayChatCategory);
-		getPreferenceScreen().removePreference(persistenceChatCategory);
 		chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 		chatEnabledCategory.removePreference(richLinksSwitch);
 		chatEnabledCategory.removePreference(enableLastGreenChatSwitch);
