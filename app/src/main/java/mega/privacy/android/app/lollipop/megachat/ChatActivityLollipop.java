@@ -98,6 +98,7 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
@@ -129,11 +130,11 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.FileUtils;
@@ -165,7 +166,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
-
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
@@ -175,11 +176,13 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -310,7 +313,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     boolean setAsRead = false;
 
     boolean isOpeningChat = true;
-
     public int selectedPosition = INVALID_POSITION;
     public long selectedMessageId = -1;
     MegaChatRoom chatRoom;
@@ -508,6 +510,24 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         preservedMsgSelected = messagesSelected;
         preservedMsgToImport = messagesToImport;
         preservedMessagesSelected = null;
+    }
+
+    /**
+     * Method for finding out if the selected message is deleted.
+     *
+     * @param messageSelected The message selected.
+     * @return True if it's removed. False, otherwise.
+     */
+    public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
+        if (removedMessages != null && !removedMessages.isEmpty()) {
+            for (int i = 0; i < removedMessages.size(); i++) {
+                if (messageSelected.getMsgId() == removedMessages.get(i).msgId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private class UserTyping {
@@ -960,7 +980,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         handlerEmojiKeyboard = new Handler();
 
         emojiKeyboard = findViewById(R.id.emojiView);
-        emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
+        emojiKeyboard.initEmoji(this, textChat, keyboardTwemojiButton);
         emojiKeyboard.setListenerActivated(true);
 
         observersLayout = findViewById(R.id.observers_layout);
@@ -1438,6 +1458,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (chatRoom == null) {
             logError("Chatroom is NULL - finish activity!!");
             finish();
+        }
+
+        if (adapter != null) {
+            adapter.updateChatRoom(chatRoom);
         }
 
         megaChatApi.closeChatRoom(idChat, this);
@@ -2342,12 +2366,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case R.id.cab_menu_select_messages:
                 activateActionMode();
                 break;
-            case R.id.cab_menu_invite_chat:{
-                if(recordView.isRecordingNow()) break;
+
+            case R.id.cab_menu_invite_chat:
+                if(recordView.isRecordingNow())
+                    break;
 
                 chooseAddParticipantDialog();
                 break;
-            }
+
             case R.id.cab_menu_contact_info_chat:{
                 if(recordView.isRecordingNow()) break;
 
@@ -3959,12 +3985,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void sendMessagesToUI(ArrayList<AndroidMegaChatMessage> messages) {
-        for (AndroidMegaChatMessage message : messages) {
-            sendMessageToUI(message);
-        }
-    }
-
     /**
      * Method for copying a message.
      *
@@ -4068,7 +4088,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             activateActionMode();
 
             for (int position : recoveredSelectedPositions) {
-                AndroidMegaChatMessage msg = adapter.getMessageAtPosition(position);
+                AndroidMegaChatMessage msg = adapter.getMessageAtMessagesPosition(position);
                 if(msg != null) {
                     adapter.toggleSelection(msg.getMessage().getMsgId());
                 }
@@ -4114,13 +4134,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     finishMultiselectionMode();
                     String text = "";
                     if (messagesSelected.size() == 1) {
-                       text = copyMessage(messagesSelected.get(0));
+                        text = copyMessage(messagesSelected.get(0));
                     } else {
                         text = copyMessages(messagesSelected);
                     }
                     copyToClipboard(text);
                     break;
-
                 case R.id.chat_cab_menu_delete:
                     finishMultiselectionMode();
                     //Delete
@@ -4129,8 +4148,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 case R.id.chat_cab_menu_download:
                     logDebug("chat_cab_menu_download ");
-                    clearSelections();
-                    hideMultipleSelect();
+                    finishMultiselectionMode();
+
                     if (!checkPermissionWriteStorage(REQUEST_WRITE_STORAGE)) {
                         preservedMessagesSelected = messagesSelected;
                         return false;
@@ -4590,6 +4609,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (adapter != null) {
             adapter.setMultipleSelect(false);
         }
+
         if (actionMode != null) {
             actionMode.finish();
         }
@@ -4623,6 +4643,28 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    /**
+     * Method for displaying feedback dialogue in a message.
+     *
+     * @param chatId      The chat ID.
+     * @param megaMessage The message.
+     * @param reaction    The reaction.
+     */
+    public void openInfoReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage, String reaction) {
+        if (chatRoom.getChatId() != chatId)
+            return;
+
+        showReactionBottomSheet(megaMessage, messages.indexOf(megaMessage), reaction);
+    }
+
+    public void openReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage) {
+        if (chatRoom.getChatId() != chatId)
+            return;
+
+        int positionInMessages = messages.indexOf(megaMessage);
+        showReactionBottomSheet(megaMessage, positionInMessages, null);
+    }
+
     public void itemLongClick(int positionInAdapter) {
         int positionInMessages = positionInAdapter - 1;
         if (positionInMessages >= messages.size())
@@ -4635,19 +4677,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         int type = m.getMessage().getType();
         switch (type) {
             case MegaChatMessage.TYPE_NODE_ATTACHMENT:
-                showNodeAttachmentBottomSheet(m, positionInMessages);
-                break;
             case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
-                showContactAttachmentBottomSheet(m, positionInMessages);
-                break;
             case MegaChatMessage.TYPE_VOICE_CLIP:
             case MegaChatMessage.TYPE_NORMAL:
                 showGeneralChatMessageBottomSheet(m, positionInMessages);
                 break;
+
             case MegaChatMessage.TYPE_CONTAINS_META:
                 MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
                 if (meta == null || meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID)
                     return;
+
                 if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW || meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
                     showGeneralChatMessageBottomSheet(m, positionInMessages);
                 }
@@ -4720,7 +4760,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         }
                         else{
                             if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                                logDebug("itemCLick: TYPE_NODE_ATTACHMENT");
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                                 if(nodeList.size()==1){
                                     MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
@@ -4732,7 +4771,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         }
                                         else{
                                             logDebug("Image without preview - show node attachment panel for one node");
-                                            showNodeAttachmentBottomSheet(m, positionInMessages);
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
@@ -4849,7 +4888,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                                 startActivity(mediaIntent);
                                             }else{
                                                 logDebug("noAvailableIntent");
-                                                showNodeAttachmentBottomSheet(m, positionInMessages);
+                                                showGeneralChatMessageBottomSheet(m, positionInMessages);
                                             }
                                         }
                                         overridePendingTransition(0,0);
@@ -4943,18 +4982,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         }
                                         else{
                                             logWarning("noAvailableIntent");
-                                            showNodeAttachmentBottomSheet(m, positionInMessages);
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                         overridePendingTransition(0,0);
                                     }
                                     else{
                                         logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        showNodeAttachmentBottomSheet(m, positionInMessages);
+                                        showGeneralChatMessageBottomSheet(m, positionInMessages);
                                     }
                                 }
                                 else{
                                     logDebug("show node attachment panel");
-                                    showNodeAttachmentBottomSheet(m, positionInMessages);
+                                    showGeneralChatMessageBottomSheet(m, positionInMessages);
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
@@ -4963,12 +5002,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 if (isOnline(this)) {
                                     if (!chatC.isInAnonymousMode() && m != null) {
                                         if (m.getMessage().getUsersCount() == 1) {
-                                            long userHandle = m.getMessage().getUserHandle(0);
-                                            if(userHandle != megaChatApi.getMyUserHandle()){
-                                                showContactAttachmentBottomSheet(m, positionInMessages);
-                                            }
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }else{
-                                            showContactAttachmentBottomSheet(m, positionInMessages);
+                                            showGeneralChatMessageBottomSheet(m, positionInMessages);
                                         }
                                     }
                                 }
@@ -4976,7 +5012,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                     //No shown - is not possible to know is it already contact or not - megaApi not working
                                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                                 }
-                            } else if (m.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META) {
+                            }
+                            else if (m.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META) {
                                 logDebug("TYPE_CONTAINS_META");
                                 MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
                                 if (meta == null || meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID)
@@ -5021,6 +5058,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         openMegaLink(url, richLinkMessage.getNode() != null ? richLinkMessage.getNode().isFile() : richLinkMessage.isFile());
                                     }
                                 }
+
                             }
                         }
                     }
@@ -5894,6 +5932,21 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     @Override
+    public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
+        MegaChatMessage message = api.getMessage(idChat, msgid);
+        if (adapter == null || message == null) {
+            logWarning("Message not found");
+            return;
+        }
+
+        adapter.checkReactionUpdated(idChat, message, reaction, count);
+
+        if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof InfoReactionsBottomSheet) {
+            ((InfoReactionsBottomSheet) bottomSheetDialogFragment).changeInReactionReceived(msgid, idChat, reaction, count);
+        }
+    }
+
+    @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("msgID "+ msg.getMsgId());
         logDebug("onMessageUpdate ");
@@ -6013,7 +6066,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void disableMultiselection(){
-        if(adapter == null || !adapter.isMultipleSelect()) return;
+        if (adapter == null || !adapter.isMultipleSelect())
+            return;
+
         finishMultiselectionMode();
     }
 
@@ -6397,7 +6452,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             updateActionModeTitle();
             reDoTheSelectionAfterRotation();
             recoveredSelectedPositions = null;
-
         }
 
         logDebug("AFTER updateMessagesLoaded: " + messages.size() + " messages in list");
@@ -7065,18 +7119,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void showNodeAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("showNodeAttachmentBottomSheet: "+position);
-        selectedPosition = position;
-
-        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-        selectedMessageId = message.getMessage().getMsgId();
-
-        bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-    }
-
     public void showSendAttachmentBottomSheet(){
         logDebug("showSendAttachmentBottomSheet");
 
@@ -7098,18 +7140,30 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void showContactAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("showContactAttachmentBottomSheet: "+position);
+    public void showReactionBottomSheet(AndroidMegaChatMessage message, int position, String reaction) {
+        if (message == null || message.getMessage() == null)
+            return;
+
         selectedPosition = position;
-
-        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
+        hideBottomSheet();
         selectedMessageId = message.getMessage().getMsgId();
-        bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+
+        if (reaction == null) {
+            bottomSheetDialogFragment = new ReactionsBottomSheet();
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        } else if (chatRoom != null && !chatRoom.isPreview() && chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
+            bottomSheetDialogFragment = new InfoReactionsBottomSheet(this, reaction);
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        }
     }
 
-    public void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position) {
+    public void hideBottomSheet() {
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            bottomSheetDialogFragment.dismissAllowingStateLoss();
+        }
+    }
+
+    private void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position) {
         selectedPosition = position;
 
         if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
@@ -7220,7 +7274,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-
     private void createAdapter() {
         //Create adapter
         adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, removedMessages, listView);
@@ -7228,6 +7281,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         listView.setLayoutManager(mLayoutManager);
         listView.setAdapter(adapter);
         updateMessages();
+    }
+
+    public void updateReactionAdapter(MegaChatMessage msg, String reaction, int count) {
+        adapter.checkReactionUpdated(idChat, msg, reaction, count);
     }
 
     @Override
@@ -7984,17 +8041,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
-    }
-
-    public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
-        if (removedMessages != null && !removedMessages.isEmpty()) {
-            for (int i = 0; i < removedMessages.size(); i++) {
-                if (messageSelected.getMsgId() == removedMessages.get(i).msgId) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /*
@@ -9272,5 +9318,40 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public void setLastIdMsgSeen(long lastIdMsgSeen) {
         this.lastIdMsgSeen = lastIdMsgSeen;
+    }
+
+    /**
+     * Gets the position of an attachment message if it is visible and exists.
+     *
+     * @param handle The handle of the attachment.
+     * @return The position of the message if it is visible and exists, INVALID_POSITION otherwise.
+     */
+    public int getPositionOfAttachmentMessageIfVisible(long handle) {
+        if (mLayoutManager == null || adapter == null) {
+            return INVALID_POSITION;
+        }
+
+        int firstVisiblePosition = mLayoutManager.findFirstVisibleItemPosition();
+        if (firstVisiblePosition == INVALID_POSITION || firstVisiblePosition == 0) {
+            firstVisiblePosition = 1;
+        }
+
+        int lastVisiblePosition = mLayoutManager.findLastVisibleItemPosition();
+        if (lastVisiblePosition == INVALID_POSITION) {
+            lastVisiblePosition = adapter.getItemCount() - 1;
+        }
+
+        for (int i = lastVisiblePosition; i >= firstVisiblePosition; i--) {
+            AndroidMegaChatMessage msg = adapter.getMessageAtAdapterPosition(i);
+            MegaChatMessage chatMessage = msg.getMessage();
+            if (chatMessage != null
+                    && chatMessage.getMegaNodeList() != null
+                    && chatMessage.getMegaNodeList().get(0) != null
+                    && chatMessage.getMegaNodeList().get(0).getHandle() == handle) {
+                return i;
+            }
+        }
+
+        return INVALID_POSITION;
     }
 }

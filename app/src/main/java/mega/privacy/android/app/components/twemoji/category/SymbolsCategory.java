@@ -53,6 +53,7 @@ public final class SymbolsCategory implements EmojiCategory {
     new Emoji(0x2653, R.drawable.emoji_twitter_2653),
     new Emoji(0x1f194, R.drawable.emoji_twitter_1f194),
     new Emoji(0x269b, R.drawable.emoji_twitter_269b),
+    new Emoji(0x267e, R.drawable.emoji_twitter_267e),
     new Emoji(0x1f251, R.drawable.emoji_twitter_1f251),
     new Emoji(0x2622, R.drawable.emoji_twitter_2622),
     new Emoji(0x2623, R.drawable.emoji_twitter_2623),

@@ -217,4 +217,5 @@
     <color name="background_recording">#78252525</color>
     <color name="border_avatar_call">#4DFFFFFF</color>
     <color name="another_call_on_hold">#E600BFA5</color>
+    <color name="background_own_reaction_added">#0F00BFA5</color>
 </resources>

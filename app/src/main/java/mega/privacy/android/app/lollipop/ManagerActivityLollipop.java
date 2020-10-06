@@ -5645,14 +5645,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setToolbarTitle();
 
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-		if (rChatFL == null){
+		if (rChatFL == null) {
 			rChatFL = RecentChatsFragmentLollipop.newInstance();
-			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
-		}
-		else{
+		} else {
 			refreshFragment(FragmentTag.RECENT_CHAT.getTag());
-			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 		}
+
+		replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}

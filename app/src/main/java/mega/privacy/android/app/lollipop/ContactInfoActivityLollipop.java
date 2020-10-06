@@ -377,7 +377,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
 		contactInfoActivityLollipop = this;
 		if (megaApi == null) {
@@ -559,8 +558,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			chatHandle = extras.getLong("handle",-1);
 			userEmailExtra = extras.getString(NAME);
-			if (chatHandle != -1) {
 
+			if (megaChatApi == null) {
+				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+			}
+
+			if (chatHandle != -1) {
 				logDebug("From chat!!");
 				fromContacts = false;
 				chat = megaChatApi.getChatRoom(chatHandle);
@@ -588,11 +591,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				user = megaApi.getContact(userEmailExtra);
 				if (user != null) {
 					checkNickname(user.getHandle());
+					chat = megaChatApi.getChatRoomByUser(user.getHandle());
 				} else {
 					withoutNickname(userEmailExtra);
-				}
+					chat = null;
 
-				chat = megaChatApi.getChatRoomByUser(user.getHandle());
+				}
 
 				if (chat != null) {
 					chatHandle = chat.getChatId();
@@ -613,9 +617,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					dividerSharedFilesLayout.setVisibility(View.GONE);
 				}
 
-				if (megaChatApi == null) {
-					megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
-				}
+
 			}
 
 			updateVerifyCredentialsLayout();
@@ -1151,6 +1153,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	public void setAvatar() {
 		logDebug("setAvatar");
+		if(user == null)
+			return;
+
 		File avatar = buildAvatarFile(this,user.getEmail() + ".jpg");
 		if (isFileAvailable(avatar)) {
 			setProfileAvatar(avatar);

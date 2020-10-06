@@ -353,7 +353,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 checkScroll();
             }
         });
-//        listView.setClipToPadding(false);
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
@@ -517,18 +516,19 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if (adapterList == null) {
                         logWarning("AdapterList is NULL");
                         adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
-
-                        if (listView != null) {
-                            listView.setAdapter(adapterList);
-                            fastScroller.setRecyclerView(listView);
-                            visibilityFastScroller();
-                        }
                     } else {
                         adapterList.setChats(chats);
                     }
 
                     if (listView != null) {
                         listView.setVisibility(View.VISIBLE);
+
+                        if (listView.getAdapter() == null) {
+                            listView.setAdapter(adapterList);
+                            fastScroller.setRecyclerView(listView);
+                        }
+
+                        visibilityFastScroller();
                     }
 
                     if (emptyLayout != null) {
