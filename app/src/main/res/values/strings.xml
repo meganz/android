@@ -291,6 +291,7 @@
     <string name="file_properties_available_offline" context="The file are available “offline” (without a network Wi-Fi mobile data connection)">Available offline</string>
     <string name="file_properties_favourite" context="Mark node as Favourite">Favourite</string>
     <string name="file_properties_unfavourite" context="Remove node as Favourite">Remove Favourite</string>
+    <string name="file_properties_label" context="Node Label">Label…</string>
     <!--
     <string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
     -->

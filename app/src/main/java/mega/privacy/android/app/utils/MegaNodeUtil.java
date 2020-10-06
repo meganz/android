@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.DialogFragment;
@@ -641,8 +643,9 @@ public class MegaNodeUtil {
     }
 
     @Nullable
-    public static Drawable getNodeLabelDrawable(Resources resources, MegaNode node) {
-        int colorRes;
+    public static Drawable getNodeLabelDrawable(MegaNode node, @DrawableRes int drawableRes, Resources resources) {
+        @ColorRes int colorRes;
+
         switch (node.getLabel()) {
             case MegaNode.NODE_LBL_RED:
                 colorRes = R.color.label_red;
@@ -670,7 +673,7 @@ public class MegaNodeUtil {
         }
 
         int color = ResourcesCompat.getColor(resources, colorRes, null);
-        Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_circle_label, null);
+        Drawable drawable = ResourcesCompat.getDrawable(resources, drawableRes, null);
         drawable.setTint(color);
         return drawable;
     }

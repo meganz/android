@@ -202,6 +202,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
@@ -10753,6 +10754,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		selectedNode = node;
 		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+	}
+
+	public void showNodeLabelsPanel(@NonNull MegaNode node){
+		logDebug("showNodeLabelsPanel");
+
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            bottomSheetDialogFragment.dismiss();
+        }
+
+		selectedNode = node;
+        bottomSheetDialogFragment = new NodeLabelBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showOptionsPanel(MegaOffline sNode){
