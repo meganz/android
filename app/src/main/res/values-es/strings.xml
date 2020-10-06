@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA ofrece un servicio de almacenamiento en la nube y de chat cifrado y controlado por el usuario a través del navegador web y de la aplicación para dispositivos móviles. A diferencia de otros proveedores de almacenamiento en la nube, tus datos son cifrados y descifrados únicamente en tus dispositivos y nunca por nosotros.\n\nSube tus archivos desde tu smartphone o tablet, luego busca, almacena, descarga, muestra, reproduce, comparte, renombra o elimina tus archivos en cualquier momento, desde cualquier dispositivo, en cualquier lugar. Comparte carpetas con tus contactos y comprueba sus actualizaciones en tiempo real. El cifrado nos impide conocer o restablecer tu contraseña, por lo que DEBES recordarla (o tener una copia de seguridad de tu Clave de recuperación) o perderás el acceso a tus archivos almacenados.\n\nLas videollamadas cifrada punto a punto de MEGA permiten una privacidad absoluta y llevan estando disponibles en el navegador desde 2016. Se proporcionan también en nuestra app para móvil, con el historial de chat accesible a través de múltiples dispositivos. Además los usuarios pueden añadir fácilmente archivos a un chat directamente desde su nube MEGA.\n\nMEGA brinda un almacenamiento gratuito de 50 GB sujeto al programa de logros para todos los usuarios registrados, y ofrece planes de pago con límites mucho más amplios:\n\n\nSuscripción PRO LITE: 4,99€ al mes o 49,99€ al año, con 400 GB de espacio de almacenamiento y 1 TB de cuota de transferencia al mes.\nSuscripción PRO I: 9,99€ al mes o 99,99€ al año, con 2 TB de espacio de almacenamiento y 2 TB de cuota de transferencia al mes.\nSuscripción PRO II: 19,99€ al mes o 199,99€ al año, con 8 TB de espacio de almacenamiento y 8 TB de cuota de transferencia al mes.\nSuscripción PRO III: 29,99€ al mes o 299,99€ al año, con 16 TB de espacio de almacenamiento y 16 TB de cuota de transferencia al mes.\n\nLa suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Para gestionar tu suscripción, ve a la Play Store en tu dispositivo móvil, inicia sesión con tu Google ID (si aún no lo has hecho) y luego pulsa en la aplicación de MEGA. Desde aquí, podrás gestionar tu suscripción.\n\nPermisos de la aplicación:\nWRITE_EXTERNAL_STORAGE -> Descarga tus archivos de MEGA a tu dispositivo y sube archivos desde tu dispositivo a MEGA\nCAMERA -> Haz fotos y súbelas a MEGA\nREAD_CONTACTS -> Añade contactos desde tu dispositivo a MEGA\nRECORD_AUDIO y CAPTURE_VIDEO_OUTPUT (micrófono y cámara) -> MEGA proporciona llamadas y videollamadas cifradas punto a punto\n\n\nPara que los usuarios confíen plenamente en el sistema de MEGA, todo el código del cliente es público y los ingenieros de seguridad podrán evaluar nuestro proceso de cifrado. El código de nuestra aplicación móvil se encuentra en: https://github.com/meganz/android\n\nPara obtener más información, consulta nuestro sitio web:\nhttps://mega.nz/terms\n\n\nDesde ordenador - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA ofrece un servicio de almacenamiento en la nube y de chat cifrado y controlado por el usuario a través del navegador web y de la aplicación para dispositivos móviles. A diferencia de otros proveedores de almacenamiento en la nube, tus datos son cifrados y descifrados únicamente en tus dispositivos y nunca por nosotros.\n\nSube tus archivos desde tu smartphone o tablet, luego busca, almacena, descarga, muestra, reproduce, comparte, renombra o elimina tus archivos en cualquier momento, desde cualquier dispositivo, en cualquier lugar. Comparte carpetas con tus contactos y comprueba sus actualizaciones en tiempo real. El cifrado nos impide conocer o restablecer tu contraseña, por lo que DEBES recordarla (o tener una copia de seguridad de tu Clave de recuperación) o perderás el acceso a tus archivos almacenados.\n\nLas videollamadas cifradas punto a punto de MEGA permiten una privacidad absoluta y llevan estando disponibles en el navegador desde 2016. Se proporcionan también en nuestra app para móvil, con el historial de chat accesible a través de múltiples dispositivos. Además los usuarios pueden añadir fácilmente archivos a un chat directamente desde su nube MEGA.\n\nMEGA brinda un almacenamiento gratuito de 50 GB sujeto al programa de logros para todos los usuarios registrados, y ofrece planes de pago con límites mucho más amplios:\n\n\nSuscripción PRO LITE: 4,99€ al mes o 49,99€ al año, con 400 GB de espacio de almacenamiento y 1 TB de cuota de transferencia al mes.\nSuscripción PRO I: 9,99€ al mes o 99,99€ al año, con 2 TB de espacio de almacenamiento y 2 TB de cuota de transferencia al mes.\nSuscripción PRO II: 19,99€ al mes o 199,99€ al año, con 8 TB de espacio de almacenamiento y 8 TB de cuota de transferencia al mes.\nSuscripción PRO III: 29,99€ al mes o 299,99€ al año, con 16 TB de espacio de almacenamiento y 16 TB de cuota de transferencia al mes.\n\nLa suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Para gestionar tu suscripción, ve a la Play Store en tu dispositivo móvil, inicia sesión con tu Google ID (si aún no lo has hecho) y luego pulsa en la aplicación de MEGA. Desde aquí, podrás gestionar tu suscripción.\n\nPermisos de la aplicación:\nWRITE_EXTERNAL_STORAGE -> Descarga tus archivos de MEGA a tu dispositivo y sube archivos desde tu dispositivo a MEGA\nCAMERA -> Haz fotos y súbelas a MEGA\nREAD_CONTACTS -> Añade contactos desde tu dispositivo a MEGA\nRECORD_AUDIO y CAPTURE_VIDEO_OUTPUT (micrófono y cámara) -> MEGA proporciona llamadas y videollamadas cifradas punto a punto\n\n\nPara que los usuarios confíen plenamente en el sistema de MEGA, todo el código del cliente es público y los ingenieros de seguridad podrán evaluar nuestro proceso de cifrado. El código de nuestra aplicación móvil se encuentra en: https://github.com/meganz/android\n\nPara obtener más información, consulta nuestro sitio web:\nhttps://mega.nz/terms\n\n\nDesde ordenador - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA es almacenamiento en la nube con privacidad permanente y sin iguales.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Visor de PDF MEGA</string>
@@ -363,7 +363,10 @@
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">Han finalizado %1$d subidas</item>
     </plurals>
 
-    <string name="folder_empty" context="Warning shown when it tries to download an empty folder">Folder is empty</string>
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -722,7 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">Verifica tu cuenta</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Tu cuenta ha sido bloqueada temporalmente debido a un posible mal uso de la misma. Verifica tu número de teléfono para desbloquear tu cuenta.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">País</string>
-    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Region</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">País</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Tu número de teléfono</string>
     <string name="general_back_button" context="Button label - go to previous page">Atrás</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Ahora no</string>
@@ -892,7 +895,7 @@
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Dirección 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Dirección 2 (opcional)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">Ciudad</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Región / Provincia</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">País/Provincia</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">País</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Código postal</string>
 
@@ -1050,7 +1053,7 @@
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Establecer fecha de caducidad</string>
     <string name="title_set_password_protection" context="Title of the dialog to get link with password">Activa la protección por contraseña</string>
     <string name="subtitle_set_expiry_date" context="Subtitle of the dialog to get link">(SOLO PRO)</string>
-    <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">Activa la protección por contraseña</string>
+    <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">Establecer contraseña</string>
     <string name="hint_set_password_protection_dialog" context="Hint of the dialog to get link with password">Introduce la contraseña</string>
     <string name="hint_confirm_password_protection_dialog" context="Hint of the confirmation dialog to get link with password">Confirmar contraseña</string>
     <string name="link_request_status" context="Status text at the beginning of getting a link">Procesando&#8230;</string>
@@ -1112,6 +1115,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">Archivar</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1728,7 +1732,7 @@
 
     <plurals name="confirmation_leave_share_folder">
         <item context="Confirmation message before leaving an incoming shared folder" quantity="one">Si abandonas la carpeta, no podrás acceder a ella de nuevo.</item>
-        <item context="confirmation message before leaving some incoming shared folders" quantity="other">If you leave the folders, you will not be able to see them again.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">Si abandonas la compartición, no podrás volver a acceder a estas carpetas.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Ninguna carpeta compartida</string>
@@ -2021,7 +2025,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Demasiadas peticiones. Por favor espera.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">Cancelando inicio de sesión. Por favor, espera&#8230;</string>
 
-    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Tipo de archivo no soportado.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. El archivo está dañado o no existe.</string>
 
 
@@ -2109,7 +2113,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Vista previa del contenido</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">No se puede hacer streaming y el archivo no se ha descargado</string>
-    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">We were not able to open the file due to the lack of network connection.</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">No se ha podido abrir el archivo debido a la falta de conexión de red.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">El archivo ya está en la sección Sin conexión</string>
 
     <plurals name="error_forwarding_messages">
@@ -2208,7 +2212,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">Ya has añadido al contacto %s.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">¿Compartir con %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">Nuevo chat de grupo</string>
-    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Send contacts</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Enviar contactos</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Sesión cerrada</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Tu cuenta está activa. Por favor, inicia sesión.</string>
@@ -2259,7 +2263,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]de %2$s usado[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">¿Cambiar a un servidor de prueba?</string>
-    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">¿Estás seguro de que quieres cambiar a un servidor de prueba? Tu cuenta podría sufrir daños irreparables.</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">¿Estás seguro de que quieres cambiar a un servidor de prueba? Tu cuenta podría sufrir daños irreparables.</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Abrir cámara?</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Si abres la cámara, la transmisión de video se pausará durante esta llamada.</string>
@@ -2290,7 +2294,7 @@
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Activar rotación de la clave de cifrado</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotación de la clave es ligeramente más segura, pero no podrás crear un enlace del chat y los nuevos participantes no verán los mensajes anteriores.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotación de claves está desactivada en los chats con más de 100 participantes.</string>
-    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Unable to convert this chat to private because the participants limit was exceeded.</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">No se puede convertir este chat en privado porque se ha superado el límite de participantes.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] ha creado un enlace del chat.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] ha eliminado un enlace del chat.[/B]</string>
@@ -2454,7 +2458,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participantes</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more”&gt;%1$s and %2$d more.">%1$s y %2$d más</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s y %2$d más</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
 
@@ -2515,9 +2519,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s se ha unido a la llamada</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s ha abandonado la llamada</string>
 
-    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">You are not allowed to start a call because the participants limit was exceeded.</string>
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">No se ha podido iniciar la llamada porque se ha superado el límite de participantes.</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">No puedes unirte a esta llamada ya que se ha alcanzado el número máximo de participantes.</string>
-    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">You are not allowed to join this call as the group has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">No puedes unirte a esta llamada porque el chat de grupo ha superado el límite de participantes.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">No puedes activar el video ya que se alcanzado el número máximo de participantes que usan el video en esta llamada.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">No se ha podido abrir el archivo.</string>
@@ -2742,7 +2746,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Algo ha ido mal</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Ponte en contacto con el administrador de tu cuenta Business para resolver el problema y activar tu cuenta.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Sujeto a uso comercial legítimo</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Almacenamiento[/A] ILIMITADO **</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Almacenamiento[/A] ILIMITADO **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Cuota de transferencia[/A] ILIMITADA **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Cuando cierres sesión, los archivos de la sección Sin conexión se eliminarán de tu dispositivo.</string>
@@ -2800,16 +2804,16 @@
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Almacenamiento lleno</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">¡Tus datos están en riesgo!</string>
     <plurals name="over_disk_quota_paywall_text">
-        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have %5$s.</item>
-        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">We have contacted you by email to %1$s on %2$s and %3$s, but you still have %4$s files taking up %5$s in your MEGA account, which requires you to have %6$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">Te hemos contactado por email a %1$s el %2$s pero sigues teniendo %3$s archivos que ocupan %4$s en tu cuenta de MEGA, lo cual requiere una cuenta %5$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">Te hemos contactado por email a %1$s el %2$s y el %3$s pero sigues teniendo %4$s archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
     </plurals>
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">Te hemos contactado por email a %1$s pero sigues teniendo %2$s archivos que ocupan %3$s en tu cuenta de MEGA, lo cual requiere una cuenta %4$s.</string>
     <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
     <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left">[B]You must act immediately to save your data[/B].</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Debe actuar de inmediato para conservar tus datos.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 day</item>
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 día</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d días</item>
     </plurals>
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
@@ -2823,7 +2827,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Esto es mejor hacerlo en persona, cara a cara. Si tienes algún otro canal ya verificado, como OTR o PGP, podrías utilizarlo.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Tus credenciales</string>
     <string name="action_reset" context="Button to reset credentials">Restablecer</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Se están actualizando las credenciales. Vuelve a intentarlo más tarde</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Entrando&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Saliendo&#8230;</string>
@@ -2834,10 +2838,12 @@
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">La cuenta que intentas restablecer está bloqueada.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Tu cuenta ha sido bloqueada. Por favor contacta con support&#64;mega.nz</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Tu cuenta ha sido desactivada por tu administrador. Ponte en contacto con el administrador de tu cuenta Business para más información.</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">Tu cuenta ha sido eliminada por tu administrador. Ponte en contacto con el administrador de tu cuenta Business para más información.</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modificar</string>
-    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
-    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modificar número de teléfono</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Eliminar número de teléfono</string>
     <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">Se eliminará tu número de teléfono actual y empezará el proceso para vincular el nuevo número de teléfono a tu cuenta.</string>
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">Este numero de teléfono se desvinculará de tu cuenta. Si quisieras añadir un número de teléfono en el futuro, tendrás que verificarlo.</string>
 

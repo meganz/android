@@ -363,7 +363,10 @@
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d个上传已完成</item>
     </plurals>
 
-    <string name="folder_empty" context="Warning shown when it tries to download an empty folder">Folder is empty</string>
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -722,7 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">验证您的帐户</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">由于滥用行为，您的帐户已被暂时锁定。请通过验证手机号解锁帐户。</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">国家</string>
-    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Region</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">地区</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">您的手机号码</string>
     <string name="general_back_button" context="Button label - go to previous page">返回</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">不用了</string>
@@ -1112,6 +1115,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">聊天[A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">存档</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1728,7 +1732,7 @@
 
     <plurals name="confirmation_leave_share_folder">
         <item context="Confirmation message before leaving an incoming shared folder" quantity="one">离开此文件夹后将无法再次查看</item>
-        <item context="confirmation message before leaving some incoming shared folders" quantity="other">If you leave the folders, you will not be able to see them again.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">离开此共享文件夹后将无法再次查看</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">没有分享的文件夹</string>
@@ -2021,7 +2025,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">请求太多。请稍候。</string>
     <string name="login_in_progress" context="message when previous login is being canceled">正在取消登录进程。请等待&#8230;&#8230;</string>
 
-    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">不支持的文件类型</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">出错了。文件损坏或不存在。</string>
 
 
@@ -2109,7 +2113,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">预览内容</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">无法执行流式传输，文件未下载</string>
-    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">We were not able to open the file due to the lack of network connection.</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">由于无网络连接，无法打开此文件。</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">文件已存于离线储存</string>
 
     <plurals name="error_forwarding_messages">
@@ -2208,7 +2212,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">您已添加联系人%s。</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">与%s分享？</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">新分组聊天</string>
-    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Send contacts</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">发送联系人</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">已注销</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">您的账号已被激活。请登录。</string>
@@ -2259,7 +2263,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]的 %2$s已使用[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">更改为测试服务器？</string>
-    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">您确定要更改为测试服务器吗？ 您的帐户可能会遇到无法解决的问题</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">您确定要更改为测试服务器吗？您的帐户可能会遇到一些问题。</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">打开相机吗？</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">如果您打开相机，您的视频将在当前通话中暂停。</string>
@@ -2290,7 +2294,7 @@
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">启用加密密钥轮换</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">密钥轮换相对更为安全，但不允许您创建聊天链接，新参与者将无法看到过去的消息。</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">密钥轮换将被禁用当参与者超过100人时。</string>
-    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Unable to convert this chat to private because the participants limit was exceeded.</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">由于参与人数已达上限，无法将此聊天转换为私密聊天。</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B]创建一个聊天链接[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B]已删除该聊天链接。[/B]</string>
@@ -2454,7 +2458,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d 人参与</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more”&gt;%1$s and %2$d more.">%1$s和%2$d及更多</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s和%2$d及更多</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">您可以为聊天生成一个链接，但在此之前您需要先设置话题：</string>
 
@@ -2515,9 +2519,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s已加入通话</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s已离开通话</string>
 
-    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">You are not allowed to start a call because the participants limit was exceeded.</string>
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">由于参与人数已达上限，您无法开始通话。</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">参与人数已达上限，您无法加入此通话。</string>
-    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">You are not allowed to join this call as the group has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">由于参与人数已达上限，您无法加入通话。</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">已使用视频的参与人数已达上限，您无法开启视频。</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">错误。此文件无法打开。</string>
@@ -2742,7 +2746,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出错了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">请联系您的企业帐户管理员解决此问题并激活帐户。</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**用于真正的商业目的</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">无限 [A]存储空间[/A] **</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">无限 [A]存储空间[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">无限 [A]传输流量[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，“离线”中的文件将从您的设备中删除。</string>
@@ -2800,21 +2804,21 @@
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">空间已满</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">您的数据存在风险！</string>
     <plurals name="over_disk_quota_paywall_text">
-        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have %5$s.</item>
-        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">We have contacted you by email to %1$s on %2$s and %3$s, but you still have %4$s files taking up %5$s in your MEGA account, which requires you to have %6$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">我们已经在%2$s向您的邮箱%1$s发送了邮件，您的MEGA帐户中仍然存在%3$s个文件并占有%4$s的存储空间，请尽快升级您的帐户到%5$s以保留您的数据。</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">我们已经分别在%2$s和%3$s向您的邮箱%1$s发送了邮件，您的MEGA帐户中仍然存在%4$s个文件并占有%5$s的存储空间，请尽快升级您的帐户到%6$s以保留您的数据。</item>
     </plurals>
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">我们已经向您的邮箱%1$s发送了邮件，您的MEGA帐户中仍然存在%2$s个文件并占有%3$s的存储空间，请尽快升级您的帐户到%4$s以保留您的数据。</string>
     <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
     <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left">[B]You must act immediately to save your data[/B].</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]您必须立即采取行动以保存您的数据。[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 day</item>
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1天</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d 天</item>
     </plurals>
-    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
-    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
-    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
+    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%d小时</string>
+    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%d分钟</string>
+    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%d秒</string>
 
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">验证凭证</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">未验证</string>
@@ -2823,7 +2827,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">这最好由实际面对面来完成。如您有其他已验证管道，如已验证的OTR或PGP，也可以使采用。</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">您的凭证</string>
     <string name="action_reset" context="Button to reset credentials">重置密码</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">正在更新凭证，请稍后再试</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">正在加入&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">正在离开&#8230;</string>
@@ -2834,10 +2838,12 @@
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">您要重置的账号已被封锁。</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">您的账号已被锁定。请连系support&#64;mega.nz</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">您的帐户已被管理员禁用。请联系您的企业帐户管理员了解详情。</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">您的帐户已被管理员移除。请联系您的企业帐户管理员了解详情。</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">修改</string>
-    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
-    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">修改手机号码</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">解除手机号码绑定</string>
     <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">此操作将解除与您当前手机号的绑定状态，并将您的新手机号与您的帐户关联。</string>
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">这将从您的帐户中删除您当前所关联的手机号。如需再次添加手机号，则需要进行验证。</string>
 
