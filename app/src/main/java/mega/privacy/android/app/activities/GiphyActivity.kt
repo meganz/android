@@ -8,8 +8,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.VISIBLE
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
@@ -230,6 +230,8 @@ class GiphyActivity : PinActivityLollipop() {
 
         val searchMenuItem = menu?.findItem(R.id.action_search)
         val searchView = searchMenuItem?.actionView as SearchView
+        searchView.maxWidth = Int.MAX_VALUE
+
         val line = searchView.findViewById(androidx.appcompat.R.id.search_plate) as View
         line.setBackgroundColor(resources.getColor(android.R.color.transparent))
 

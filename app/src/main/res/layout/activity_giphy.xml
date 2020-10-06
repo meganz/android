@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/giphy_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        android:elevation="8dp"
+        android:minHeight="?attr/actionBarSize"
+        app:collapseIcon="@drawable/ic_arrow_back_grey"
         app:popupTheme="@style/Theme.Megaactionbar"
         app:titleTextAppearance="@style/LightToolbarTitle"
-        app:collapseIcon="@drawable/ic_arrow_back_grey"
-        tools:context=".activities.GiphyActivity"
-        android:elevation="8dp"/>
+        tools:context=".activities.GiphyActivity" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/giphy_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <RelativeLayout
         android:id="@+id/empty_giphy_view"
@@ -34,7 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="140dp"/>
+            android:layout_marginTop="152dp"
+            android:src="@drawable/ic_no_gifs" />
 
         <TextView
             android:id="@+id/empty_giphy_text"
@@ -42,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/empty_giphy_image"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
             android:textAllCaps="true"
             android:textColor="@color/grey_info_menu"
             android:textSize="14sp" />
