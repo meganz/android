@@ -5,12 +5,13 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
@@ -36,6 +37,10 @@ public final class EmojiImageView extends AppCompatImageView {
   private ImageLoadingTask imageLoadingTask;
 
   private boolean hasVariants;
+
+  public EmojiImageView(final Context context) {
+    super(context);
+  }
 
   public EmojiImageView(final Context context, final AttributeSet attrs) {
     super(context, attrs);
@@ -87,7 +92,27 @@ public final class EmojiImageView extends AppCompatImageView {
     }
   }
 
-  void setEmoji(@NonNull final Emoji emoji) {
+  public Emoji getEmoji() {
+    return currentEmoji;
+  }
+
+  public void setEmoji(@NonNull final Emoji emoji, boolean isInfoReaction) {
+    if(emoji.equals(currentEmoji))
+      return;
+
+      setImageDrawable(null);
+      currentEmoji = emoji;
+      hasVariants = !isInfoReaction;
+
+      if (imageLoadingTask != null) {
+        imageLoadingTask.cancel(true);
+      }
+
+      imageLoadingTask = new ImageLoadingTask(this);
+      imageLoadingTask.execute(emoji);
+  }
+
+  public void setEmoji(@NonNull final Emoji emoji) {
     if (!emoji.equals(currentEmoji)) {
       setImageDrawable(null);
 
@@ -98,11 +123,9 @@ public final class EmojiImageView extends AppCompatImageView {
         imageLoadingTask.cancel(true);
       }
 
-      setOnClickListener(new OnClickListener() {
-        @Override public void onClick(final View view) {
-          if (clickListener != null) {
-            clickListener.onEmojiClick(EmojiImageView.this, currentEmoji);
-          }
+      setOnClickListener(view -> {
+        if (clickListener != null) {
+          clickListener.onEmojiClick(EmojiImageView.this, currentEmoji);
         }
       });
 

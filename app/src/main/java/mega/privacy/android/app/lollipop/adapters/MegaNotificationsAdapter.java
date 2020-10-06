@@ -128,12 +128,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		logDebug("Position: " + position);
 
 		MegaUserAlert alert = (MegaUserAlert) getItem(position);
-
 		int alertType = alert.getType();
-
 		String section = alert.getHeading();
-		logDebug("****" + alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + " "+alert.getString(0));
-		logDebug("****" + alert.getTypeString() + ": " + alert.getNodeHandle() + " " + alert.getPath());
 
 		final LinearLayout.LayoutParams params;
 

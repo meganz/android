@@ -509,7 +509,7 @@
                                     android:layout_height="wrap_content"/>
                             </RelativeLayout>
 
-                            <SeekBar
+                            <mega.privacy.android.app.components.voiceClip.DetectorSeekBar
                                 android:id="@+id/content_own_message_voice_clip_seekBar"
                                 android:layout_width="145dp"
                                 android:layout_height="wrap_content"
@@ -1209,6 +1209,31 @@
                 android:gravity="right"/>
 
         </RelativeLayout>
+
+        <!--chat reactions layout-->
+        <RelativeLayout
+            android:id="@+id/own_message_reactions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/content_own_message_layout"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="-4dp"
+            android:layout_alignEnd="@id/content_own_message_layout"
+            android:gravity="end"
+            android:background="@null"
+            android:visibility="gone">
+
+            <mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView
+                android:id="@+id/own_message_reactions_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numColumns="auto_fit"
+                android:columnWidth="51dp"
+                android:layout_alignParentEnd="true"
+                android:orientation="horizontal"/>
+        </RelativeLayout>
     </RelativeLayout>
 
     <!--CONTACT LAYOUT MESSAGE -->
@@ -1301,6 +1326,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:layout_marginBottom="6dp"
                 android:layout_below="@+id/title_contact_message_layout">
 
                 <!--contact mini avatar-->
@@ -1450,10 +1476,8 @@
                             android:id="@+id/url_contact_message_enable_layout_inside"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:layout_marginEnd="12dp"
-                            android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_marginStart="12dp"
                             android:orientation="vertical"
                             android:layout_gravity="center_vertical"
@@ -1601,7 +1625,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
                         </RelativeLayout>
-                        <SeekBar
+                        <mega.privacy.android.app.components.voiceClip.DetectorSeekBar
                             android:id="@+id/content_contact_message_voice_clip_seekBar"
                             android:layout_width="145dp"
                             android:layout_height="wrap_content"
@@ -2080,6 +2104,30 @@
                 <!--End RelativeLayout contact-->
 
             </RelativeLayout>
+
+            <!--chat reactions layout-->
+            <RelativeLayout
+                android:id="@+id/contact_message_reactions_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/content_contact_message_layout"
+                android:layout_alignStart="@id/content_contact_message_layout"
+                android:layout_marginStart="48dp"
+                android:layout_marginBottom="6dp"
+                android:layout_marginTop="-4dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="start"
+                android:visibility="gone">
+
+                <mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView
+                    android:id="@+id/contact_message_reactions_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:numColumns="auto_fit"
+                    android:columnWidth="51dp"
+                    android:orientation="horizontal"/>
+            </RelativeLayout>
+
         </RelativeLayout>
 
     </RelativeLayout>
