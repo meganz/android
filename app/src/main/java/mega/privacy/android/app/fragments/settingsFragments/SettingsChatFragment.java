@@ -55,9 +55,9 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         chatDndSwitch.setVisible(false);
         chatDndSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
             if (((SwitchPreferenceCompat) preference).isChecked()) {
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, null);
             } else {
-                createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), MEGACHAT_INVALID_HANDLE);
+                createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), null);
             }
             return false;
         });
@@ -151,7 +151,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
 
         switch (preference.getKey()) {
             case KEY_CHAT_NOTIFICATIONS:
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, MEGACHAT_INVALID_HANDLE);
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, null);
                 break;
 
             case KEY_CHAT_VIBRATE:

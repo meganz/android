@@ -3,8 +3,10 @@ package mega.privacy.android.app.components;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaPushNotificationSettingsAndroid;
@@ -56,37 +58,65 @@ public class PushNotificationSettingManagement {
     }
 
     /**
+     * Method that controls the change in the notifications of a specific chat.
+     *
+     * @param context Context of Activity.
+     * @param option  Muting option selected.
+     * @param chatId  Chat ID.
+     */
+    public void controlMuteNotificationsOfAChat(Context context, String option, long chatId) {
+        ArrayList<MegaChatListItem> chats = new ArrayList<>();
+        MegaChatListItem chat = MegaApplication.getInstance().getMegaChatApi().getChatListItem(chatId);
+        if (chat != null) {
+            chats.add(chat);
+            controlMuteNotifications(context, option, chats);
+        }
+    }
+
+    /**
      * Method that controls the change in general and specific chat notifications.
      *
      * @param context Context of Activity.
      * @param option  Muting option selected
-     * @param chatId  Chat ID.
+     * @param chats  List of Chats.
      */
-    public void controlMuteNotifications(Context context, String option, long chatId) {
+    public void controlMuteNotifications(Context context, String option, ArrayList<MegaChatListItem> chats) {
         switch (option) {
             case NOTIFICATIONS_DISABLED:
-                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                if (chats == null) {
                     push.enableChats(false);
                 } else {
-                    push.enableChat(chatId, false);
+                    for (MegaChatListItem chat : chats) {
+                        if (chat != null) {
+                            push.enableChat(chat.getChatId(), false);
+                        }
+                    }
                 }
                 break;
 
             case NOTIFICATIONS_ENABLED:
-                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                if (chats == null) {
                     push.enableChats(true);
                 } else {
-                    push.enableChat(chatId, true);
+                    for (MegaChatListItem chat : chats) {
+                        if (chat != null) {
+                            push.enableChat(chat.getChatId(), true);
+                        }
+                    }
                 }
                 break;
 
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
                 long timestamp = getCalendarSpecificTime(option).getTimeInMillis()/1000;
-                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                if (chats == null) {
                     push.setGlobalChatsDnd(timestamp);
                 } else {
-                    push.setChatDnd(chatId, timestamp);
+                    for (MegaChatListItem chat : chats) {
+                        if (chat != null) {
+                            push.setChatDnd(chat.getChatId(), timestamp);
+                        }
+                    }
                 }
                 break;
 
@@ -109,10 +139,14 @@ public class PushNotificationSettingManagement {
                 }
 
                 long time = newCalendar.getTimeInMillis()/1000;
-                if (chatId == MEGACHAT_INVALID_HANDLE) {
+                if (chats == null) {
                     push.setGlobalChatsDnd(time);
                 } else {
-                    push.setChatDnd(chatId, time);
+                    for (MegaChatListItem chat : chats) {
+                        if (chat != null) {
+                            push.setChatDnd(chat.getChatId(), time);
+                        }
+                    }
                 }
         }
 

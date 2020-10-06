@@ -281,9 +281,9 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             case R.id.chat_list_mute_chat_layout:
                 if (context instanceof ManagerActivityLollipop) {
                     if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
-                        createMuteNotificationsChatAlertDialog((Activity) context, chat.getChatId());
+                        createMuteNotificationsAlertDialogOfAChat((Activity) context, chat.getChatId());
                     } else {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chat.getChatId());
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(context, NOTIFICATIONS_ENABLED, chat.getChatId());
                     }
                 }
                 break;

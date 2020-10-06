@@ -1679,16 +1679,16 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     break;
                 }
                 case R.id.cab_menu_mute:
-                    if (context instanceof ManagerActivityLollipop) {
-                        createMuteNotificationsChatAlertDialog((Activity) context, chats.get(0).getChatId());
+                    if (context instanceof ManagerActivityLollipop && chats != null && !chats.isEmpty()) {
+                        createMuteNotificationsChatAlertDialog((Activity) context, chats);
                         clearSelections();
                         hideMultipleSelect();
                     }
                     break;
 
                 case R.id.cab_menu_unmute:
-                    if (context instanceof ManagerActivityLollipop) {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chats.get(0).getChatId());
+                    if (context instanceof ManagerActivityLollipop && chats != null && !chats.isEmpty()) {
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chats);
                         clearSelections();
                         hideMultipleSelect();
                     }
@@ -1796,21 +1796,31 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
 
-                    if (selected.size() == 1 && context instanceof ManagerActivityLollipop && selected.get(0) != null) {
-                        if (isEnableChatNotifications(selected.get(0).getChatId())) {
-                            showUnmute = true;
-                            showMute = false;
-                        } else {
-                            showMute = true;
-                            showUnmute = false;
+                    boolean allChatsAreMuted = true;
+                    boolean allChatAreUnmuted = true;
+                    for (MegaChatListItem chat : selected) {
+                        if (chat != null) {
+                            if (isEnableChatNotifications(chat.getChatId())) {
+                                allChatsAreMuted = false;
+                            } else {
+                                allChatAreUnmuted = false;
+                            }
                         }
+                    }
+
+                    if (allChatsAreMuted) {
+                        showUnmute = true;
+                        showMute = false;
+                    } else if (allChatAreUnmuted) {
+                        showUnmute = false;
+                        showMute = true;
                     } else {
                         showMute = false;
                         showUnmute = false;
                     }
 
-                    menu.findItem(R.id.cab_menu_mute).setVisible(showUnmute);
-                    menu.findItem(R.id.cab_menu_unmute).setVisible(showMute);
+                    menu.findItem(R.id.cab_menu_mute).setVisible(showMute);
+                    menu.findItem(R.id.cab_menu_unmute).setVisible(showUnmute);
                     menu.findItem(R.id.chat_list_leave_chat_layout).setVisible(showLeaveChat);
                     if (showLeaveChat) {
                         menu.findItem(R.id.chat_list_leave_chat_layout).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -1827,8 +1837,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
             } else if (context instanceof ArchivedChatsActivity) {
                 menu.findItem(R.id.cab_menu_delete).setVisible(false);
-                menu.findItem(R.id.cab_menu_mute).setVisible(showUnmute);
-                menu.findItem(R.id.cab_menu_unmute).setVisible(showMute);
+                menu.findItem(R.id.cab_menu_mute).setVisible(showMute);
+                menu.findItem(R.id.cab_menu_unmute).setVisible(showUnmute);
                 menu.findItem(R.id.chat_list_leave_chat_layout).setVisible(showLeaveChat);
 
                 if (selected.size() != 0) {

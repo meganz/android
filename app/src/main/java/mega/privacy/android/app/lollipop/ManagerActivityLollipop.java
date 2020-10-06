@@ -7009,7 +7009,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_menu_do_not_disturb:
 				if (drawerItem == DrawerItem.CHAT){
 					if(getGeneralNotification().equals(NOTIFICATIONS_ENABLED)) {
-						createMuteNotificationsChatAlertDialog(this, MEGACHAT_INVALID_HANDLE);
+						createMuteNotificationsChatAlertDialog(this, null);
 					}else{
 						showSnackbar(MUTE_NOTIFICATIONS_SNACKBAR_TYPE, null, -1);
 					}

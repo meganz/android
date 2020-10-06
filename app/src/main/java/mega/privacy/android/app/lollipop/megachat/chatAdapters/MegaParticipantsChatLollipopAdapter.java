@@ -611,9 +611,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
                 if (holderHeader != null) {
                     if (holderHeader.notificationsSwitch.isChecked()) {
-                        createMuteNotificationsChatAlertDialog(groupChatInfoActivity, chatId);
+                        createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
                     } else {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
                     }
                 }
                 break;
