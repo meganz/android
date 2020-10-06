@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/general_rl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/item_reaction_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:paddingStart="10dp"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:background="@drawable/contact_reaction_added"
+        android:visibility="gone">
+
+        <mega.privacy.android.app.components.twemoji.reaction.ReactionImageView
+            android:id="@+id/item_emoji_reaction"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="6dp"
+            android:adjustViewBounds="true"
+            android:background="@null" />
+
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
+            android:id="@+id/item_emoji_reaction_text"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:layout_marginEnd="6dp"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            app:emojiSize="20dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/item_number_users_reaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:lines="1"
+            android:layout_toEndOf="@id/item_emoji_reaction"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/mail_my_account"
+            android:textSize="14sp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/more_reactions_layout"
+        android:layout_width="40dp"
+        android:layout_height="28dp"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/rounded_add_reaction"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:src="@drawable/ic_emoji_add" />
+    </RelativeLayout>
+</RelativeLayout>
