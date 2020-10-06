@@ -105,7 +105,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.8_325";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.9_327";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 
@@ -169,6 +169,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static boolean isBlockedDueToWeakAccount = false;
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
+	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
@@ -532,7 +533,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							return;
 						}
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-							createRTCAudioManager(false, callStatus);
+							createRTCAudioManager(false, callStatus, chatId);
 						}
 
 						if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS
@@ -542,10 +543,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							clearIncomingCallNotification(callId);
 						}
 
-						if (listAllCalls.size() == 1) {
-							checkOneCall(listAllCalls.get(0));
-						} else {
-							checkSeveralCall(listAllCalls, callStatus);
+						if(megaApi.isChatNotifiable(chatId)) {
+							if (listAllCalls.size() == 1) {
+								checkOneCall(listAllCalls.get(0));
+							} else {
+								checkSeveralCall(listAllCalls, callStatus);
+							}
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
@@ -1123,7 +1126,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					AccountController aC = new AccountController(this);
 					aC.logoutConfirmed(this);
 
-					if (isIsLoggingRunning()) {
+					if (isLoggingRunning()) {
 						logDebug("Already in Login Activity, not necessary to launch it again");
 						return;
 					}
@@ -1404,7 +1407,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			if ((termCode == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || termCode == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !isIgnored) {
 				logDebug("TERM_CODE_ANSWER_TIMEOUT");
-				if (!isLocalTermCode) {
+				if (!isLocalTermCode && megaApi.isChatNotifiable(chatId)) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
@@ -1430,12 +1433,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param isSpeakerOn Speaker status.
      * @param callStatus  Call status.
      */
-    public void createRTCAudioManager(boolean isSpeakerOn, int callStatus) {
+    public void createRTCAudioManager(boolean isSpeakerOn, int callStatus, long chatId) {
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-            if (rtcAudioManagerRingInCall != null) {
-                removeRTCAudioManagerRingIn();
-            }
-            rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
+        	if(megaApi.isChatNotifiable(chatId)) {
+				if (rtcAudioManagerRingInCall != null) {
+					removeRTCAudioManagerRingIn();
+				}
+				rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
+			}
         } else {
             if (rtcAudioManager != null) {
                 return;
@@ -1496,13 +1501,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param isSpeakerOn If the speaker is on.
      * @param callStatus  Call status.
      */
-    public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus) {
+    public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus, long chatId) {
         if (rtcAudioManager != null) {
             rtcAudioManager.updateSpeakerStatus(isSpeakerOn, callStatus);
             return;
         }
 
-        createRTCAudioManager(isSpeakerOn, callStatus);
+        createRTCAudioManager(isSpeakerOn, callStatus, chatId);
     }
 
     /**
@@ -1713,6 +1718,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return isBlockedDueToWeakAccount;
 	}
 
+	public static boolean isIsReactionFromKeyboard() {
+		return isReactionFromKeyboard;
+	}
+
+	public static void setIsReactionFromKeyboard(boolean isReactionFromKeyboard) {
+		MegaApplication.isReactionFromKeyboard = isReactionFromKeyboard;
+	}
+
 	public static void setIsWebOpenDueToEmailVerification(boolean isWebOpenDueToEmailVerification) {
 		MegaApplication.isWebOpenDueToEmailVerification = isWebOpenDueToEmailVerification;
 	}
@@ -1725,7 +1738,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		MegaApplication.isLoggingRunning = isLoggingRunning;
 	}
 
-	public boolean isIsLoggingRunning() {
+	public boolean isLoggingRunning() {
 		return isLoggingRunning;
 	}
 

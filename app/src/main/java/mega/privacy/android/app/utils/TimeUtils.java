@@ -403,7 +403,6 @@ public class TimeUtils implements Comparator<Calendar> {
         java.text.DateFormat df = new SimpleDateFormat("h", Locale.getDefault());
         df.setTimeZone(tz);
         String time = df.format(calendar.getTime());
-
         return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ?
                 context.getString(R.string.success_muting_a_chat_until_this_morning, time) :
                 context.getString(R.string.success_muting_a_chat_until_tomorrow_morning, context.getString(R.string.label_tomorrow).toLowerCase(), time);
@@ -417,7 +416,7 @@ public class TimeUtils implements Comparator<Calendar> {
      */
     public static String getCorrectStringDependingOnOptionSelected(long timestamp) {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestamp*1000);
+        cal.setTimeInMillis(timestamp * 1000);
 
         Calendar calToday = Calendar.getInstance();
         calToday.setTimeInMillis(System.currentTimeMillis());
@@ -425,20 +424,13 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calTomorrow = Calendar.getInstance();
         calTomorrow.add(Calendar.DATE, +1);
 
-        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         java.text.DateFormat df;
         Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
         df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
 
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
-        Date date = cal.getTime();
-        String formattedDate = df.format(date);
-        if (tc.compare(cal, calToday) == 0) {
-            return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_today, formattedDate);
-        }
-
-        return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_tomorrow, formattedDate);
+        return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_today, df.format(cal.getTime()));
     }
 
     /**
@@ -469,7 +461,9 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         int hour = cal.get(Calendar.HOUR_OF_DAY);
-        return hour < INITIAL_PERIOD_TIME && hour <= TIME_OF_CHANGE;
+        int minute = cal.get(Calendar.MINUTE);
+        return hour >= INITIAL_PERIOD_TIME &&
+                (hour < TIME_OF_CHANGE || (hour == TIME_OF_CHANGE && minute == INITIAL_PERIOD_TIME));
     }
 
     /**

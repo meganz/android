@@ -49,7 +49,7 @@ LOCAL_MODULE := jniPdfium
 LOCAL_CFLAGS += -DHAVE_PTHREADS
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/$(PDFVIEWER)/include
 LOCAL_SHARED_LIBRARIES += aospPdfium
-LOCAL_LDLIBS += -llog -landroid -ljnigraphics -latomic
+LOCAL_LDLIBS += -llog -landroid -ljnigraphics
 
 LOCAL_SRC_FILES :=  $(LOCAL_PATH)/$(PDFVIEWER)/src/mainJNILib.cpp
 

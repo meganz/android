@@ -230,6 +230,10 @@ public class Constants {
     public static final String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
     public static final String ACTION_OPEN_CONTACTS_SECTION = "ACTION_OPEN_CONTACTS_SECTION";
 
+    public static final String TYPE_EMOJI = "TYPE_EMOJI";
+    public static final String TYPE_REACTION = "TYPE_REACTION";
+    public static final String INVALID_REACTION = "INVALID_REACTION";
+
     public static final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
 
     public static final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
@@ -263,6 +267,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
+    public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
@@ -479,6 +484,7 @@ public class Constants {
     public static final int INVALID_ID = -1;
     public static final String INVALID_OPTION = "-1";
     public static final int INVALID_TYPE_PERMISSIONS = -1;
+    public static final int INVALID_DIMENSION = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 
@@ -624,8 +630,8 @@ public class Constants {
     public static final String ACCOUNT_NOT_BLOCKED = "0";
     public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
     public static final String MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK = "300";
-    public static final String DISABLED_ACCOUNT_BLOCK = "400";
-    public static final String REMOVED_ACCOUNT_BLOCK = "401";
+    public static final String DISABLED_BUSINESS_ACCOUNT_BLOCK = "400";
+    public static final String REMOVED_BUSINESS_ACCOUNT_BLOCK = "401";
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
     public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
 

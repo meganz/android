@@ -165,6 +165,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private View archiveChatSeparator;
         private RelativeLayout observersLayout;
         private TextView observersNumberText;
+        private RelativeLayout participantsLayout;
         private View observersSeparator;
         private RoundedImageView avatarImageView;
         private EmojiTextView infoTitleChatText;
@@ -240,6 +241,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 //Observers layout
                 holderHeader.observersLayout = v.findViewById(R.id.chat_group_observers_layout);
                 holderHeader.observersNumberText = v.findViewById(R.id.chat_group_observers_number_text);
+                holderHeader.participantsLayout =  v.findViewById(R.id.chat_group_contact_properties_participants_title);
                 holderHeader.observersSeparator = v.findViewById(R.id.divider_observers_layout);
 
                 v.setTag(holderHeader);
@@ -287,6 +289,15 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         }
     }
 
+    /**
+     * Method to know if a chat is inactive and no participants should be shown.
+     *
+     * @return True, in case the participant section has to be hidden. False, in the opposite case.
+     */
+    private boolean isNecessaryToHideParticipants() {
+        return getChat().getPeerCount() == 0 && !getChat().isActive();
+    }
+
     @Override
     public void onBindViewHolder(ViewHolderParticipants holder, int position) {
         switch (getItemViewType(position)) {
@@ -307,6 +318,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 }
 
                 long participantsCount = getChat().getPeerCount();
+                holderHeader.participantsLayout.setVisibility(isNecessaryToHideParticipants() ? View.GONE : View.VISIBLE);
 
                 if (isPreview) {
                     holderHeader.notificationsLayout.setVisibility(View.GONE);
@@ -372,18 +384,19 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         groupChatInfoActivity.setChatLink(null);
                     }
 
-                    if (getChat().isArchived()) {
-                        holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
-                        holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_unarchive));
+                    if (getChat().isActive()) {
+                        holderHeader.notificationsLayout.setVisibility(View.VISIBLE);
+                        holderHeader.dividerNotifications.setVisibility(View.VISIBLE);
                     } else {
-                        holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_archive));
-                        holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_archive));
+                        holderHeader.notificationsLayout.setVisibility(View.GONE);
+                        holderHeader.dividerNotifications.setVisibility(View.GONE);
                     }
-
                     checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
                 }
 
-                holderHeader.infoNumParticipantsText.setText(groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
+                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants() ?
+                        groupChatInfoActivity.getString(R.string.inactive_chat) :
+                        groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
 
                 if (getChat().getNumPreviewers() < 1) {
                     holderHeader.observersSeparator.setVisibility(View.GONE);
@@ -397,6 +410,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
             case ITEM_VIEW_TYPE_NORMAL:
                 ViewHolderParticipantsList holderParticipantsList = (ViewHolderParticipantsList) holder;
+                holderParticipantsList.itemLayout.setVisibility(isNecessaryToHideParticipants() ? View.GONE : View.VISIBLE);
+
                 MegaChatParticipant participant = getParticipant(position);
                 if (participant == null) return;
 

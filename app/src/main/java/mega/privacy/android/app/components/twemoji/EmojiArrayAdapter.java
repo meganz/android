@@ -20,7 +20,7 @@ import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickLis
 import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
 
 
-final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
+public final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
   @Nullable private final VariantEmoji variantManager;
   @Nullable private final OnEmojiClickListener listener;
   @Nullable private final OnEmojiLongClickListener longListener;
