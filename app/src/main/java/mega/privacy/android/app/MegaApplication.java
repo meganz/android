@@ -169,6 +169,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static boolean isBlockedDueToWeakAccount = false;
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
+	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
@@ -1715,6 +1716,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static boolean isBlockedDueToWeakAccount() {
 		return isBlockedDueToWeakAccount;
+	}
+
+	public static boolean isIsReactionFromKeyboard() {
+		return isReactionFromKeyboard;
+	}
+
+	public static void setIsReactionFromKeyboard(boolean isReactionFromKeyboard) {
+		MegaApplication.isReactionFromKeyboard = isReactionFromKeyboard;
 	}
 
 	public static void setIsWebOpenDueToEmailVerification(boolean isWebOpenDueToEmailVerification) {
