@@ -110,7 +110,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView publicLinkImage;
         public ImageView takenDownImage;
         public TextView textViewFileName;
-        public ImageView imageFavorite;
+        public ImageView imageFavourite;
         public ImageView imageLabel;
         public EmojiTextView textViewFileSize;
         public long document;
@@ -529,7 +529,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderList.textViewFileName = v.findViewById(R.id.file_list_filename);
 
             holderList.imageLabel = v.findViewById(R.id.img_label);
-            holderList.imageFavorite = v.findViewById(R.id.img_favorite);
+            holderList.imageFavourite = v.findViewById(R.id.img_favourite);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderList.textViewFileName.setMaxWidth(scaleWidthPx(275, outMetrics));
@@ -862,7 +862,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
 
-        holder.imageFavorite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
+        holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
 
         Drawable labelDrawable = MegaNodeUtil.getNodeLabelDrawable(holder.itemView.getResources(), node);
         if (labelDrawable != null) {

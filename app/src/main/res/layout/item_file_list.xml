@@ -88,7 +88,7 @@
             tools:text="Test title" />
 
         <ImageView
-            android:id="@+id/img_favorite"
+            android:id="@+id/img_favourite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="4dp"
-            android:layout_toEndOf="@+id/img_favorite"
+            android:layout_toEndOf="@+id/img_favourite"
             android:layout_alignBottom="@id/file_list_filename"
             android:layout_alignTop="@id/file_list_filename"
             android:src="@drawable/ic_circle_label"

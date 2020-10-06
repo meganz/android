@@ -176,6 +176,36 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/option_favourite_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_favourite_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:alpha="0.54"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_add_favourite" />
+
+                <TextView
+                    android:id="@+id/option_favourite_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/file_properties_favourite"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/option_download_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

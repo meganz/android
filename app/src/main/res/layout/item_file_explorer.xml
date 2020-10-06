@@ -51,7 +51,7 @@
                 tools:text="Test title"/>
 
             <ImageView
-                android:id="@+id/img_favorite"
+                android:id="@+id/img_favourite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

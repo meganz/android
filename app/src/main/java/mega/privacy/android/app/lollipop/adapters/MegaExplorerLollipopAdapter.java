@@ -105,7 +105,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		public ImageView permissionsIcon;
         public TextView textViewFileName;
 		public TextView textViewFileSize;
-		public ImageView imageFavorite;
+		public ImageView imageFavourite;
 		public ImageView imageLabel;
 
 
@@ -192,7 +192,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
 			holder.permissionsIcon = v.findViewById(R.id.file_explorer_permissions);
 			holder.imageLabel = v.findViewById(R.id.img_label);
-			holder.imageFavorite = v.findViewById(R.id.img_favorite);
+			holder.imageFavourite = v.findViewById(R.id.img_favourite);
             holder.textViewFileName.setOnClickListener(this);
             holder.textViewFileName.setTag(holder);
 			v.setTag(holder);
@@ -256,7 +256,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
         holder.textViewFileName.setText(node.getName());
 
-        holder.imageFavorite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
+        holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
 
         Drawable labelDrawable = MegaNodeUtil.getNodeLabelDrawable(holder.itemView.getResources(), node);
         if (labelDrawable != null) {

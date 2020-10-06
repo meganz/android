@@ -1722,4 +1722,8 @@ public class NodeController {
         intent.putExtra(DownloadService.EXTRA_TARGET_URI, uri);
         return intent;
     }
+
+    public void markNodeAsFavourite(MegaNode node, boolean isFavourite) {
+        megaApi.setNodeFavourite(node, isFavourite);
+    }
 }

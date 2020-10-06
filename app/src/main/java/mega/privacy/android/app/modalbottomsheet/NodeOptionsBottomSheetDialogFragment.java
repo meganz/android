@@ -92,6 +92,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
         TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
 //      counterSave
+        LinearLayout optionFavourite = contentView.findViewById(R.id.option_favourite_layout);
+        ImageView imageFavourite = contentView.findViewById(R.id.option_favourite_image);
+        TextView textFavourite = contentView.findViewById(R.id.option_favourite_text);
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
         SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
@@ -117,6 +120,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
         LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
+        optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -864,6 +868,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
 
+        textFavourite.setText(node.isFavourite() ? R.string.file_properties_unfavourite : R.string.file_properties_favourite);
+        imageFavourite.setImageResource(node.isFavourite() ? R.drawable.ic_remove_favourite : R.drawable.ic_add_favourite);
+
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
     }
@@ -898,6 +905,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         switch (v.getId()) {
             case R.id.option_download_layout:
                 nC.prepareForDownload(handleList, false);
+                break;
+
+            case R.id.option_favourite_layout:
+                nC.markNodeAsFavourite(node, !node.isFavourite());
                 break;
 
             case R.id.file_properties_switch:
