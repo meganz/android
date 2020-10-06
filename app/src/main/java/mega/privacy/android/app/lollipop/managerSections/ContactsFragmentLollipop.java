@@ -109,8 +109,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	MyAccountInfo myAccountInfo;
-	TextView initialLetter;
-
 	Context context;
 	RecyclerView recyclerView;
 	MegaContactsLollipopAdapter adapter;

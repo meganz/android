@@ -9,7 +9,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 
 public class ChatBaseListener implements MegaChatRequestListenerInterface {
 
-    Context context;
+    protected Context context;
 
     public ChatBaseListener(Context context) {
         this.context = context;
