@@ -217,4 +217,7 @@
     <color name="light_toolbar_title">#A8A8A8</color>
     <color name="giphy_search_text">#121212</color>
     <color name="giphy_loading_background">#ECECEC</color>
+
+    <color name="background_own_reaction_added">#0F00BFA5</color>
+
 </resources>

@@ -569,4 +569,12 @@
         <item name="android:layout_gravity">center_horizontal|center_vertical</item>
         <item name="android:background">@android:color/transparent</item>
     </style>
+
+    <style name="AppBottomSheetDialogThemeReactions" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyleReactions</item>
+    </style>
+
+    <style name="AppModalStyleReactions" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
 </resources>
