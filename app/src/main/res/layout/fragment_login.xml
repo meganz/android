@@ -192,10 +192,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                android:background="@color/twofa_toolbar_color"
-                android:elevation="4dp"
-                app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 />
 
             <RelativeLayout

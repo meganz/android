@@ -286,7 +286,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                resetStatusBarColor(this, this.getWindow());
+                resetStatusBarColor(this, getWindow());
                 break;
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
@@ -300,7 +300,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                resetStatusBarColor(this, this.getWindow());
+                resetStatusBarColor(this, getWindow());
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
@@ -314,7 +314,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                resetStatusBarColor(this, this.getWindow());
+                resetStatusBarColor(this, getWindow());
                 break;
 
             }
@@ -345,7 +345,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 
-                resetStatusBarColor(this, this.getWindow());
+                resetStatusBarColor(this, getWindow());
                 break;
             }
         }
@@ -759,7 +759,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         aB.setDisplayHomeAsUpEnabled(true);
 
         if (visibleFragment == LOGIN_FRAGMENT) {
-            changeStatusBarColor(this, this.getWindow(), R.color.twofa_status_bar_color);
+            resetStatusBarColor(this, getWindow());
         }
     }
 
