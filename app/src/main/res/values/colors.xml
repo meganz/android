@@ -308,4 +308,6 @@
     <color name="grid_item_bg_solid_color">?android:attr/colorBackground</color>
     <color name="grid_item_selected_bg_stroke_color">@color/teal_300</color>
     <color name="grid_item_selected_bg_solid_color">?android:attr/colorBackground</color>
+    <color name="empty_hint_text_normal_color">#7A7A7A</color>
+    <color name="empty_hint_text_highlight_color">@color/black</color>
 </resources>

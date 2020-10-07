@@ -41,4 +41,5 @@
     <color name="grid_item_bg_solid_color">@color/white_alpha_005</color>
     <color name="grid_item_selected_bg_stroke_color">@color/teal_200</color>
     <color name="grid_item_selected_bg_solid_color">@color/white_alpha_005</color>
+    <color name="empty_hint_text_highlight_color">@color/white</color>
 </resources>
