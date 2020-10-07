@@ -1,46 +1,27 @@
 package mega.privacy.android.app.fragments.homepage.main
 
-import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.functions.Consumer
-import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
+import androidx.lifecycle.*
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.avatarChange
 import mega.privacy.android.app.fragments.homepage.scrolling
-import mega.privacy.android.app.listeners.DefaultMegaChatListener
-import mega.privacy.android.app.listeners.DefaultMegaGlobalListener
 import mega.privacy.android.app.listeners.DefaultMegaRequestListener
-import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
-import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.RxUtil.logErr
-import mega.privacy.android.app.utils.Util.getCircleAvatar
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaChatApi.*
-import java.util.*
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 
 class HomePageViewModel @ViewModelInject constructor(
-    private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
-    @ApplicationContext private val context: Context
-) : BaseRxViewModel(), DefaultMegaGlobalListener, DefaultMegaChatListener {
-    private val _notification = MutableLiveData<Int>()
+    private val repository: HomepageRepository
+) : ViewModel() {
     private val _avatar = MutableLiveData<Bitmap>()
-    private val _chatStatus = MutableLiveData<Int>()
     private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
 
-    val notification: LiveData<Int> = _notification
+    val notification: LiveData<Int> = repository.getNotificationLiveData()
     val avatar: LiveData<Bitmap> = _avatar
-    val chatStatus: LiveData<Int> = _chatStatus
+    val chatStatus: LiveData<Int> = repository.getChatStatusLiveData()
     val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
@@ -52,16 +33,14 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     init {
-        updateNotification()
-        updateChatStatus(megaChatApi.onlineStatus)
+        repository.registerDataListeners()
 
-        megaApi.addGlobalListener(this)
-        megaChatApi.addChatListener(this)
+        viewModelScope.launch {
+            val defaultAvatar = repository.getDefaultAvatar()
+            _avatar.value = defaultAvatar
+            loadAvatar()
+        }
 
-        _avatar.value = getDefaultAvatar(
-            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
-        )
-        loadAvatar()
         avatarChange.observeForever(avatarChangeObserver)
         scrolling.observeForever(scrollingObserver)
     }
@@ -69,83 +48,33 @@ class HomePageViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        megaApi.removeGlobalListener(this)
-        megaChatApi.removeChatListener(this)
+        repository.unregisterDataListeners()
+
         avatarChange.removeObserver(avatarChangeObserver)
         scrolling.removeObserver(scrollingObserver)
     }
 
     private fun loadAvatar() {
-        add(Single.fromCallable { getCircleAvatar(context, megaApi.myEmail) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer {
-                if (it != null) {
-                    _avatar.value = it
-                } else {
-                    createAvatar()
-                }
-            }, logErr("loadAvatar"))
-        )
-    }
-
-    private fun createAvatar() {
-        megaApi.getUserAvatar(
-            megaApi.myUser,
-            buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
-            object : DefaultMegaRequestListener {
-                override fun onRequestFinish(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    e: MegaError
-                ) {
-                    if (request.type == MegaRequest.TYPE_GET_ATTR_USER
-                        && request.paramType == MegaApiJava.USER_ATTR_AVATAR
-                        && e.errorCode == MegaError.API_OK
+        viewModelScope.launch {
+            val avatarBitmap = repository.loadAvatar()
+            if (avatarBitmap != null) {
+                _avatar.value = avatarBitmap
+            } else {
+                repository.createAvatar(object : DefaultMegaRequestListener {
+                    override fun onRequestFinish(
+                        api: MegaApiJava,
+                        request: MegaRequest,
+                        e: MegaError
                     ) {
-                        loadAvatar()
+                        if (request.type == MegaRequest.TYPE_GET_ATTR_USER
+                            && request.paramType == MegaApiJava.USER_ATTR_AVATAR
+                            && e.errorCode == MegaError.API_OK
+                        ) {
+                            loadAvatar()
+                        }
                     }
-                }
-            })
-    }
-
-    override fun onUserAlertsUpdate(
-        api: MegaApiJava,
-        userAlerts: ArrayList<MegaUserAlert>?
-    ) {
-        updateNotification()
-    }
-
-    override fun onContactRequestsUpdate(
-        api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>?
-    ) {
-        updateNotification()
-    }
-
-    private fun updateNotification() {
-        _notification.value =
-            megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
-    }
-
-    override fun onChatOnlineStatusUpdate(
-        api: MegaChatApiJava,
-        userhandle: Long,
-        status: Int,
-        inProgress: Boolean
-    ) {
-        if (userhandle == megaChatApi.myUserHandle) {
-            updateChatStatus(status)
-        }
-    }
-
-    private fun updateChatStatus(status: Int) {
-        _chatStatus.value = when (status) {
-            STATUS_ONLINE -> R.drawable.ic_online
-            STATUS_AWAY -> R.drawable.ic_away
-            STATUS_BUSY -> R.drawable.ic_busy
-            STATUS_OFFLINE -> R.drawable.ic_offline
-            else -> 0
+                })
+            }
         }
     }
 }
