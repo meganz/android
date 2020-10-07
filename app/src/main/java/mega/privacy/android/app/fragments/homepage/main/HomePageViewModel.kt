@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.homepage.main
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
@@ -35,14 +34,12 @@ class HomePageViewModel @ViewModelInject constructor(
     init {
         repository.registerDataListeners()
 
-        viewModelScope.launch {
-            val defaultAvatar = repository.getDefaultAvatar()
-            _avatar.value = defaultAvatar
-            loadAvatar()
-        }
-
         avatarChange.observeForever(avatarChangeObserver)
         scrolling.observeForever(scrollingObserver)
+
+        showDefaultAvatar().invokeOnCompletion {
+            loadAvatar(true)
+        }
     }
 
     override fun onCleared() {
@@ -54,26 +51,33 @@ class HomePageViewModel @ViewModelInject constructor(
         scrolling.removeObserver(scrollingObserver)
     }
 
-    private fun loadAvatar() {
+    private fun showDefaultAvatar() = viewModelScope.launch {
+        _avatar.value = repository.getDefaultAvatar()
+    }
+
+    private fun loadAvatar(retry: Boolean = false) {
         viewModelScope.launch {
-            val avatarBitmap = repository.loadAvatar()
-            if (avatarBitmap != null) {
-                _avatar.value = avatarBitmap
-            } else {
-                repository.createAvatar(object : DefaultMegaRequestListener {
-                    override fun onRequestFinish(
-                        api: MegaApiJava,
-                        request: MegaRequest,
-                        e: MegaError
-                    ) {
-                        if (request.type == MegaRequest.TYPE_GET_ATTR_USER
-                            && request.paramType == MegaApiJava.USER_ATTR_AVATAR
-                            && e.errorCode == MegaError.API_OK
+            repository.loadAvatar()?.also {
+                when {
+                    it.first -> _avatar.value = it.second
+                    retry -> repository.createAvatar(object : DefaultMegaRequestListener {
+                        override fun onRequestFinish(
+                            api: MegaApiJava,
+                            request: MegaRequest,
+                            e: MegaError
                         ) {
-                            loadAvatar()
+                            if (request.type == MegaRequest.TYPE_GET_ATTR_USER
+                                && request.paramType == MegaApiJava.USER_ATTR_AVATAR
+                                && e.errorCode == MegaError.API_OK
+                            ) {
+                                loadAvatar()
+                            } else {
+                                showDefaultAvatar()
+                            }
                         }
-                    }
-                })
+                    })
+                    else -> showDefaultAvatar()
+                }
             }
         }
     }

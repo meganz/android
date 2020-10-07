@@ -2,6 +2,7 @@ package mega.privacy.android.app.fragments.homepage.main
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -95,7 +96,7 @@ class HomepageRepository @Inject constructor(
         )
     }
 
-    suspend fun loadAvatar(): Bitmap? = withContext(Dispatchers.IO) {
+    suspend fun loadAvatar(): Pair<Boolean, Bitmap>? = withContext(Dispatchers.IO) {
         Util.getCircleAvatar(context, megaApi.myEmail)
     }
 

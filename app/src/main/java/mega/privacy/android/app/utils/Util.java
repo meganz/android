@@ -57,6 +57,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1295,10 +1296,10 @@ public class Util {
     }
 
     @Nullable
-    public static Bitmap getCircleAvatar(Context context, String email) {
+	public static Pair<Boolean, Bitmap> getCircleAvatar(Context context, String email) {
 		File avatar = buildAvatarFile(context, email + ".jpg");
 		if (!(isFileAvailable(avatar) && avatar.length() > 0)) {
-			return null;
+			return Pair.create(false, null);
 		}
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
@@ -1312,7 +1313,7 @@ public class Util {
 		Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 		if (bitmap == null) {
 			avatar.delete();
-			return null;
+			return Pair.create(false, null);
 		}
 
 		Bitmap circleBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
@@ -1331,7 +1332,7 @@ public class Util {
 		}
 
 		canvas.drawCircle(bitmap.getWidth() / 2F, bitmap.getHeight() / 2F, radius, paint);
-		return circleBitmap;
+		return Pair.create(true, circleBitmap);
 	}
 
 	public static Bitmap getCircleBitmap(Bitmap bitmap) {
