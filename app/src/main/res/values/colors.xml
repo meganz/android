@@ -313,4 +313,5 @@
     <color name="bottom_nav_menu_color_normal">@color/grey_alpha_054</color>
     <color name="bottom_nav_menu_color_checked">@color/red_600</color>
     <color name="bottom_nav_menu_color_disabled">@color/grey_alpha_038</color>
+    <color name="login_loading_logo_color">@color/red_600</color>
 </resources>
