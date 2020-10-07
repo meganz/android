@@ -21,6 +21,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
 public class TransferWidget {
+    private static final int NO_TYPE = -1;
 
     private Context context;
     private MegaApiAndroid megaApi;
@@ -54,14 +55,14 @@ public class TransferWidget {
      * Updates the view of the widget without indicating the type of transfer.
      */
     public void update() {
-        update(-1);
+        update(NO_TYPE);
     }
 
     /**
      * Updates the view of the widget taking into account the type of the transfer.
      *
      * @param transferType  type of the transfer:
-     *                          - -1 if no type
+     *                          - NO_TYPE if no type
      *                          - MegaTransfer.TYPE_DOWNLOAD if download transfer
      *                          - MegaTransfer.TYPE_UPLOAD if upload transfer
      */
@@ -183,7 +184,7 @@ public class TransferWidget {
      *
      * @param progress      the progress of the transfers
      * @param typeTransfer  type of the transfer:
-     *                          - -1 if no type
+     *                          - NO_TYPE if no type
      *                          - MegaTransfer.TYPE_DOWNLOAD if download transfer
      *                          - MegaTransfer.TYPE_UPLOAD if upload transfer
      */

@@ -1853,8 +1853,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void refreshOfflineFragment(){
-		Intent intent = new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST);
-		sendBroadcast(intent);
+		sendBroadcast(new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST));
 	}
 
 	private void refreshSettingsFragment() {

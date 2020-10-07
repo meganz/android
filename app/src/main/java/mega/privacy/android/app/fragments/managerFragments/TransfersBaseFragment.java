@@ -48,7 +48,6 @@ public class TransfersBaseFragment extends BaseFragment {
 
         emptyImage = v.findViewById(R.id.transfers_empty_image);
         emptyText = v.findViewById(R.id.transfers_empty_text);
-
         getMoreQuotaView = v.findViewById(R.id.get_more_quota_view);
         v.findViewById(R.id.get_more_quota_upgrade_button).setOnClickListener(v1 -> ((ManagerActivityLollipop) context).navigateToUpgradeAccount());
 

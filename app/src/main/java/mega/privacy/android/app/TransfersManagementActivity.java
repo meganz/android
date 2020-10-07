@@ -62,6 +62,7 @@ public class TransfersManagementActivity extends PinActivityLollipop {
             } else {
                 openTransfersSection();
             }
+
             if (isOnTransferOverQuota()) {
                 MegaApplication.getTransfersManagement().setHasNotToBeShowDueToTransferOverQuota(true);
             }

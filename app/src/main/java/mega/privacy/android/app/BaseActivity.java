@@ -214,6 +214,7 @@ public class BaseActivity extends AppCompatActivity {
         unregisterReceiver(transferFinishedReceiver);
         unregisterReceiver(showSnackbarReceiver);
         unregisterReceiver(transferOverQuotaReceiver);
+        unregisterReceiver(resumeTransfersReceiver);
 
         if (transferGeneralOverQuotaWarning != null) {
             transferGeneralOverQuotaWarning.dismiss();

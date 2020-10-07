@@ -754,8 +754,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-        Intent intent;
-        intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		switch (isOverquota) {
