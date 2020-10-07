@@ -140,10 +140,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/dark_primary_color"
                 app:itemIconTint="@drawable/bottom_navigation_item_tint"
-                app:itemTextColor="@drawable/bottom_navigation_item_tint"
-                app:menu="@menu/bottom_navigation_items" />
+                app:menu="@menu/bottom_navigation_items"
+                style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
+                />
 
         </RelativeLayout>
 
