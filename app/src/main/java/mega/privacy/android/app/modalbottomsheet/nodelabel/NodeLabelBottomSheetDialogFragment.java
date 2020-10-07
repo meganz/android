@@ -22,7 +22,7 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
 
     private BottomSheetNodeLabelBinding binding;
     private MegaApiAndroid megaApi; // TODO Inject MegaApiAndroid when available
-    private MegaNode node = null; // TODO Get MegaNode by argument
+    private MegaNode node = null;
 
     @Nullable
     @Override
@@ -34,11 +34,10 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         megaApi = MegaApplication.getInstance().getMegaApi();
-        node = ((ManagerActivityLollipop) getActivity()).getSelectedNode();
+        node = ((ManagerActivityLollipop) getActivity()).getSelectedNode(); // TODO Get MegaNode by argument
 
         showCurrentNodeLabel();
 
-        binding.txtRemoveLabel.setOnClickListener(v -> resetNodeLabel());
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
     }
 
@@ -71,43 +70,38 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
 
         if (binding.radioGroupLabel.getCheckedRadioButtonId() != radioButtonResId) {
             binding.radioGroupLabel.check(radioButtonResId);
-            binding.txtRemoveLabel.setVisibility(View.VISIBLE);
+            binding.radioRemove.setVisibility(View.VISIBLE);
         }
     }
 
     private void updateNodeLabel(int checkedId) {
-        int nodeLabel = MegaNode.NODE_LBL_UNKNOWN;
-
         switch (checkedId) {
             case R.id.radio_label_red:
-                nodeLabel = MegaNode.NODE_LBL_RED;
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_RED);
                 break;
             case R.id.radio_label_orange:
-                nodeLabel = MegaNode.NODE_LBL_ORANGE;
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_ORANGE);
                 break;
             case R.id.radio_label_yellow:
-                nodeLabel = MegaNode.NODE_LBL_YELLOW;
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_YELLOW);
                 break;
             case R.id.radio_label_green:
-                nodeLabel = MegaNode.NODE_LBL_GREEN;
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREEN);
                 break;
             case R.id.radio_label_blue:
-                nodeLabel = MegaNode.NODE_LBL_BLUE;
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_BLUE);
                 break;
             case R.id.radio_label_purple:
-                nodeLabel = MegaNode.NODE_LBL_PURPLE;
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_PURPLE);
                 break;
             case R.id.radio_label_grey:
-                nodeLabel = MegaNode.NODE_LBL_GREY;
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREY);
+                break;
+            case R.id.radio_remove:
+                megaApi.resetNodeLabel(node);
                 break;
         }
 
-        megaApi.setNodeLabel(node, nodeLabel);
-        dismiss();
-    }
-
-    private void resetNodeLabel() {
-        megaApi.resetNodeLabel(node);
         dismiss();
     }
 }

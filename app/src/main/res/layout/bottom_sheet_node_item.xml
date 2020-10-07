@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/node_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <RelativeLayout
         android:id="@+id/node_title_layout"
@@ -231,8 +233,25 @@
                     android:paddingTop="2dp"
                     android:text="@string/file_properties_label"
                     android:layout_marginLeft="18dp"
+                    android:layout_weight="5"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/option_label_current"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:drawablePadding="6dp"
+                    android:gravity="end|center_vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="16sp"
+                    tools:drawableRight="@drawable/ic_circle_label"
+                    tools:text="@string/label_red"
+                    tools:textColor="@color/label_red"
+                    />
             </LinearLayout>
 
             <LinearLayout

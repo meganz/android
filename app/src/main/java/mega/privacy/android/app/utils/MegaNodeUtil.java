@@ -7,14 +7,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,16 +15,23 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.DialogFragment;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.ExportListener;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -642,39 +641,49 @@ public class MegaNodeUtil {
                 .setNegativeButton(R.string.general_cancel, null).show();
     }
 
-    @Nullable
-    public static Drawable getNodeLabelDrawable(MegaNode node, @DrawableRes int drawableRes, Resources resources) {
-        @ColorRes int colorRes;
-
-        switch (node.getLabel()) {
-            case MegaNode.NODE_LBL_RED:
-                colorRes = R.color.label_red;
-                break;
-            case MegaNode.NODE_LBL_ORANGE:
-                colorRes = R.color.label_orange;
-                break;
-            case MegaNode.NODE_LBL_YELLOW:
-                colorRes = R.color.label_yellow;
-                break;
-            case MegaNode.NODE_LBL_GREEN:
-                colorRes = R.color.label_green;
-                break;
-            case MegaNode.NODE_LBL_BLUE:
-                colorRes = R.color.label_blue;
-                break;
-            case MegaNode.NODE_LBL_PURPLE:
-                colorRes = R.color.label_purple;
-                break;
-            case MegaNode.NODE_LBL_GREY:
-                colorRes = R.color.label_grey;
-                break;
-            default:
-                return null;
-        }
-
-        int color = ResourcesCompat.getColor(resources, colorRes, null);
-        Drawable drawable = ResourcesCompat.getDrawable(resources, drawableRes, null);
-        drawable.setTint(color);
+    public static Drawable getNodeLabelDrawable(int nodeLabel, Resources resources) {
+        Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_circle_label, null);
+        drawable.setTint(ResourcesCompat.getColor(resources, getNodeLabelColor(nodeLabel), null));
         return drawable;
+    }
+
+    @StringRes
+    public static int getNodeLabelText(int nodeLabel) {
+        switch (nodeLabel) {
+            case MegaNode.NODE_LBL_RED:
+                return R.string.label_red;
+            case MegaNode.NODE_LBL_ORANGE:
+                return R.string.label_orange;
+            case MegaNode.NODE_LBL_YELLOW:
+                return R.string.label_yellow;
+            case MegaNode.NODE_LBL_GREEN:
+                return R.string.label_green;
+            case MegaNode.NODE_LBL_BLUE:
+                return R.string.label_blue;
+            case MegaNode.NODE_LBL_PURPLE:
+                return R.string.label_purple;
+            default:
+                return R.string.label_grey;
+        }
+    }
+
+    @ColorRes
+    public static int getNodeLabelColor(int nodeLabel) {
+        switch (nodeLabel) {
+            case MegaNode.NODE_LBL_RED:
+                return R.color.label_red;
+            case MegaNode.NODE_LBL_ORANGE:
+                return R.color.label_orange;
+            case MegaNode.NODE_LBL_YELLOW:
+                return R.color.label_yellow;
+            case MegaNode.NODE_LBL_GREEN:
+                return R.color.label_green;
+            case MegaNode.NODE_LBL_BLUE:
+                return R.color.label_blue;
+            case MegaNode.NODE_LBL_PURPLE:
+                return R.color.label_purple;
+            default:
+                return R.color.label_grey;
+        }
     }
 }

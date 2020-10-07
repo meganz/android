@@ -1,9 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/file_explorer_item_layout"
     android:layout_width="fill_parent"
     android:layout_height="72dp"
-    android:descendantFocusability="blocksDescendants">
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/file_explorer_item_layout" >
 
     <ImageView
         android:id="@+id/file_list_saved_offline"
@@ -20,56 +19,27 @@
         android:layout_height="48dp"
         android:layout_centerVertical="true"
         android:scaleType="fitCenter"
-        android:layout_toRightOf="@id/file_list_saved_offline"
-        tools:src="@android:drawable/ic_menu_report_image"/>
+        android:layout_toRightOf="@id/file_list_saved_offline"/>
 
     <HorizontalScrollView
         android:id="@+id/scroll_view_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginLeft="13dp"
+        android:layout_marginRight="12dp"
         android:overScrollMode="never"
         android:layout_toRightOf="@id/file_explorer_thumbnail"
         android:scrollbars="none">
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/file_explorer_filename"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/file_explorer_filename"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="middle"
-                android:scrollHorizontally="true"
-                android:singleLine="true"
-                android:textColor="@color/file_list_first_row"
-                android:textSize="16sp"
-                tools:text="Test title"/>
-
-            <ImageView
-                android:id="@+id/img_favourite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="4dp"
-                android:src="@drawable/ic_favorite"
-                android:visibility="gone"
-                tools:visibility="visible"/>
-
-            <ImageView
-                android:id="@+id/img_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="4dp"
-                android:src="@drawable/ic_circle_label"
-                android:visibility="gone"
-                tools:visibility="visible"/>
-        </LinearLayout>
+            android:scrollHorizontally="true"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/file_list_first_row"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textSize="16sp"/>
     </HorizontalScrollView>
     
     <TextView
@@ -84,8 +54,7 @@
         android:textSize="14sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:maxLines="1"
-        tools:text="4.6 MB"/>
+        android:maxLines="1"/>
 
     <ImageView
         android:id="@+id/file_explorer_permissions"

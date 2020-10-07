@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -12,11 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentManager;
+import androidx.core.content.ContextCompat;
 
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.File;
@@ -29,6 +27,7 @@ import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -101,6 +100,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         ImageView imageFavourite = contentView.findViewById(R.id.option_favourite_image);
         TextView textFavourite = contentView.findViewById(R.id.option_favourite_text);
         LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
+        TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
         SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
@@ -877,6 +877,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         textFavourite.setText(node.isFavourite() ? R.string.file_properties_unfavourite : R.string.file_properties_favourite);
         imageFavourite.setImageResource(node.isFavourite() ? R.drawable.ic_remove_favourite : R.drawable.ic_add_favourite);
+
+        if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+            int color = ContextCompat.getColor(context, getNodeLabelColor(node.getLabel()));
+            Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), getResources());
+            optionLabelCurrent.setText(MegaNodeUtil.getNodeLabelText(node.getLabel()));
+            optionLabelCurrent.setTextColor(color);
+            optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
+            optionLabelCurrent.setVisibility(View.VISIBLE);
+        } else {
+            optionLabelCurrent.setVisibility(View.GONE);
+        }
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);

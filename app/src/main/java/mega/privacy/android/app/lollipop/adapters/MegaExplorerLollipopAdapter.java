@@ -6,7 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -19,9 +20,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,26 +36,21 @@ import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
-import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.MegaApiUtils.getInfoFolder;
-import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
-import static mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
-import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
-import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
-import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 	public static int MAX_WIDTH_FILENAME_LAND=500;
@@ -105,8 +98,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		public ImageView permissionsIcon;
         public TextView textViewFileName;
 		public TextView textViewFileSize;
-		public ImageView imageFavourite;
-		public ImageView imageLabel;
 
 
 		public ViewHolderListExplorerLollipop(View itemView) {
@@ -191,8 +182,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
             holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
 			holder.permissionsIcon = v.findViewById(R.id.file_explorer_permissions);
-			holder.imageLabel = v.findViewById(R.id.img_label);
-			holder.imageFavourite = v.findViewById(R.id.img_favourite);
             holder.textViewFileName.setOnClickListener(this);
             holder.textViewFileName.setTag(holder);
 			v.setTag(holder);
@@ -255,16 +244,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         holder.document = node.getHandle();
 
         holder.textViewFileName.setText(node.getName());
-
-        holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
-
-        Drawable labelDrawable = MegaNodeUtil.getNodeLabelDrawable(node, R.drawable.ic_circle_label, holder.itemView.getResources());
-        if (labelDrawable != null) {
-            holder.imageLabel.setImageDrawable(labelDrawable);
-            holder.imageLabel.setVisibility(View.VISIBLE);
-        } else {
-            holder.imageLabel.setVisibility(View.GONE);
-        }
 
         if (node.isFolder()){
             setImageParams(holder.imageView, 48, 0);

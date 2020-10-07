@@ -864,9 +864,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
 
-        Drawable labelDrawable = MegaNodeUtil.getNodeLabelDrawable(node, R.drawable.ic_circle_label, holder.itemView.getResources());
-        if (labelDrawable != null) {
-            holder.imageLabel.setImageDrawable(labelDrawable);
+        if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+            Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+            holder.imageLabel.setImageDrawable(drawable);
             holder.imageLabel.setVisibility(View.VISIBLE);
         } else {
             holder.imageLabel.setVisibility(View.GONE);

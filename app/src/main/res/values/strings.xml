@@ -2853,4 +2853,14 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
+    <string name="action_remove_label">Remove label</string>
+    <string name="title_label">Label</string>
+    <string name="label_red">Red</string>
+    <string name="label_orange">Orange</string>
+    <string name="label_yellow">Yellow</string>
+    <string name="label_green">Green</string>
+    <string name="label_blue">Blue</string>
+    <string name="label_purple">Purple</string>
+    <string name="label_grey">Grey</string>
+
 </resources>
