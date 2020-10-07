@@ -234,6 +234,7 @@
     not the values from Material design. Some colors cannot be found in the table (e.g. red_390),
      The "390" is simply deduced from the relative color saturation against red_400 -->
     <color name="white">#FFFFFF</color>
+    <color name="white_alpha_005">#0CFFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
@@ -303,4 +304,8 @@
     <color name="twofa_status_bar_color">@color/red_800</color>
 
     <color name="account_capacity_text_color">@color/black</color>
+    <color name="grid_item_bg_stoke_color">@color/grey_alpha_012</color>
+    <color name="grid_item_bg_solid_color">?android:attr/colorBackground</color>
+    <color name="grid_item_selected_bg_stroke_color">@color/teal_300</color>
+    <color name="grid_item_selected_bg_solid_color">?android:attr/colorBackground</color>
 </resources>

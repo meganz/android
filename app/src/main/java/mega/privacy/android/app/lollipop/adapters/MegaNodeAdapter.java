@@ -670,12 +670,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
-            holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+            holder.textViewFileNameForFile.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
             holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
             holder.takenDownImage.setVisibility(View.VISIBLE);
             holder.takenDownImageForFile.setVisibility(View.VISIBLE);
         } else {
-            holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.black));
+            holder.textViewFileNameForFile.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
             holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
             holder.takenDownImageForFile.setVisibility(View.GONE);

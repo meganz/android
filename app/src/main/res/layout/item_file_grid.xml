@@ -5,7 +5,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="2dp"
-    android:background="@drawable/background_item_grid"
     android:descendantFocusability="blocksDescendants"
     android:padding="1dp">
 
@@ -13,14 +12,13 @@
         android:id="@+id/item_file_grid_folder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_item_grid_new"
         android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/file_grid_thumbnail_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@color/new_background_fragment">
+            >
 
             <ImageView
                 android:id="@+id/file_grid_icon"
@@ -43,7 +41,6 @@
                 android:layout_toEndOf="@+id/file_grid_icon"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textColor="#DE000000"
                 android:textSize="14sp" />
 
             <ImageView
@@ -64,6 +61,7 @@
                 android:layout_centerVertical="true"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
+                android:tint="@color/list_item_more"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </RelativeLayout>
@@ -72,7 +70,6 @@
         android:id="@+id/item_file_grid_file"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_item_grid_new"
         android:visibility="gone">
 
         <RelativeLayout
@@ -162,7 +159,6 @@
                 android:layout_toStartOf="@+id/file_grid_taken_down_for_file"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textColor="#DE000000"
                 android:textSize="14sp" />
 
             <ImageView
@@ -173,6 +169,7 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="22dp"
                 android:src="@drawable/ic_input_warning"
+                android:tint="?attr/colorError"
                 tools:ignore="ContentDescription" />
 
             <ImageButton
@@ -183,6 +180,7 @@
                 android:layout_centerVertical="true"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
+                android:tint="@color/list_item_more"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </RelativeLayout>

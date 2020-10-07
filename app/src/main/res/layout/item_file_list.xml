@@ -94,9 +94,9 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="6dp"
             android:layout_toEndOf="@+id/file_list_filename"
-            android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
+            android:tint="@color/list_item_more"
             tools:ignore="ContentDescription" />
 
         <ImageView
@@ -107,6 +107,7 @@
             android:layout_marginEnd="6dp"
             android:layout_toEndOf="@+id/file_list_filename"
             android:src="@drawable/ic_input_warning"
+            android:tint="?attr/colorError"
             tools:ignore="ContentDescription" />
 
     </RelativeLayout>

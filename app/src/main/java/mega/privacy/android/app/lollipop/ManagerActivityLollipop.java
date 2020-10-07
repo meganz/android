@@ -6907,10 +6907,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private void setGridListIcon() {
 		if (isList){
 			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-			thumbViewMenuItem.setIcon(tintIcon(this, R.drawable.ic_thumbnail_view));
+			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_thumbnail_view));
 		}
 		else{
-			thumbViewMenuItem.setTitle(getString(R.string.action_list));
+			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_list_view));
 			thumbViewMenuItem.setIcon(tintIcon(this, R.drawable.ic_list_view));
 		}
 	}

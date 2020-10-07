@@ -37,4 +37,8 @@
     <color name="twofa_status_bar_color">@color/red_500</color>
 
     <color name="account_capacity_text_color">@color/white_alpha_087</color>
+    <color name="grid_item_bg_stoke_color">@color/white_alpha_012</color>
+    <color name="grid_item_bg_solid_color">@color/white_alpha_005</color>
+    <color name="grid_item_selected_bg_stroke_color">@color/teal_200</color>
+    <color name="grid_item_selected_bg_solid_color">@color/white_alpha_005</color>
 </resources>

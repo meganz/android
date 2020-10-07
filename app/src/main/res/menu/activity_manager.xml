@@ -177,6 +177,7 @@
         android:orderInCategory="120"
         android:title="@string/action_grid"
         android:visible="false"
+        MEGA:iconTint="?attr/colorControlNormal"
         MEGA:showAsAction="always" />
 
     <item

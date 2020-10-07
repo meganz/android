@@ -1,27 +1,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/fragment_container_file_browser_grid"
-    android:background="@color/white"
-    tools:context=".FileBrowserGridFragment" >
+    >
 
     <RelativeLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/item_call_in_progress_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_alignParentTop="true" />
-
         <RelativeLayout
             android:id="@+id/content_grid_text_layout"
             android:layout_width="fill_parent"
             android:layout_height="36dp"
-            android:background="@color/white"
             android:visibility="gone">
 
             <ProgressBar
@@ -71,67 +62,28 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/linear_layout_recycler"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <RelativeLayout
+            android:orientation="vertical"
+            >
+            <mega.privacy.android.app.components.NewGridRecyclerView
+                android:id="@+id/file_grid_view_browser"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:id="@+id/content_text_nested_layout"
-                android:visibility="gone">
+                android:layout_height="match_parent"
+                android:choiceMode="multipleChoice"
+                android:columnWidth ="172dp"
+                android:paddingRight="4dp"
+                android:paddingLeft="4dp"
+                />
 
-                <TextView
-                    android:id="@+id/content_grid_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/mail_my_account"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="72dp"
-                    android:textSize="14sp" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <mega.privacy.android.app.components.NewGridRecyclerView
-                    android:id="@+id/file_grid_view_browser"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
-                    android:choiceMode="multipleChoice"
-                    android:columnWidth ="172dp"
-
-                    android:paddingRight="4dp"
-                    android:paddingLeft="4dp"/>
-
-                <mega.privacy.android.app.components.scrollBar.FastScroller
-                    android:id="@+id/fastscroll"
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"/>
-            </RelativeLayout>
-
+            <mega.privacy.android.app.components.scrollBar.FastScroller
+                android:id="@+id/fastscroll"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:gravity="end"
+                />
         </LinearLayout>
-
-
-        <TextView
-            android:id="@+id/file_grid_browser_camera_upload_on_off"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="@color/accentColor"
-            android:visibility="gone" />
-
     </RelativeLayout>
-
-    <include layout="@layout/general_progress_bar"/>
-
 </RelativeLayout>

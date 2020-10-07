@@ -1,13 +1,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-	<item>
-		<shape android:shape="rectangle">
-			<stroke android:width="2dp" android:color="#FF00BFA5" />
-			<solid android:color="#FFE4F8F6"/>
-			<corners
-				android:bottomLeftRadius="5dp"
-				android:bottomRightRadius="5dp"
-				android:topLeftRadius="5dp"
-				android:topRightRadius="5dp"/>
-		</shape>
-	</item>
+  <item>
+    <shape android:shape="rectangle">
+			<stroke
+					android:color="@color/grid_item_selected_bg_stroke_color"
+					android:width="2dp" />
+			<solid android:color="@color/grid_item_selected_bg_solid_color" />
+      <corners android:radius="5dp" />
+    </shape>
+  </item>
 </layer-list>
