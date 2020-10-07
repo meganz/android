@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
-    <style name="Theme.Mega" parent="Base.Theme.Mega" >
+    <style name="Theme.Mega" parent="Theme.Mega.Night" >
+    </style>
+
+    <style name="Theme.Mega.Night" parent="Base.Theme.Mega" >
         <!--Material color attributes (light theme) -->
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
