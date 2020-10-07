@@ -843,8 +843,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView loadingMessages;
     }
 
-    ViewHolderMessageChat holder;
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
@@ -866,7 +864,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             cC = new ChatController(context);
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
-            holder = new ViewHolderMessageChat(v);
+            ViewHolderMessageChat holder = new ViewHolderMessageChat(v);
             holder.contentVisible = true;
             holder.itemLayout = v.findViewById(R.id.message_chat_item_layout);
             holder.dateLayout = v.findViewById(R.id.message_chat_date_layout);
@@ -4732,7 +4730,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        setMessageThumbnailDrawable(position, holder);
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
@@ -4753,6 +4750,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         holder.previewFramePort.setVisibility(View.GONE);
         holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
+        holder.contentOwnMessageThumbPort.setImageBitmap(null);
         holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
         holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
         holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
@@ -4764,6 +4762,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         holder.previewFrameLand.setVisibility(View.GONE);
         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
+        holder.contentOwnMessageThumbLand.setImageBitmap(null);
         holder.gradientOwnMessageThumbLand.setVisibility(View.GONE);
         holder.videoIconOwnMessageThumbLand.setVisibility(View.GONE);
         holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -4784,6 +4783,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         holder.contentContactMessageAttachLayout.setVisibility(View.GONE);
         holder.contentContactMessageThumbPort.setVisibility(View.GONE);
+        holder.contentContactMessageThumbPort.setImageBitmap(null);
         holder.gradientContactMessageThumbPort.setVisibility(View.GONE);
         holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
         holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
@@ -4791,6 +4791,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
 
         holder.contentContactMessageThumbLand.setVisibility(View.GONE);
+        holder.contentContactMessageThumbLand.setImageBitmap(null);
         holder.gradientContactMessageThumbLand.setVisibility(View.GONE);
         holder.videoIconContactMessageThumbLand.setVisibility(View.GONE);
         holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
@@ -5023,47 +5024,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        if (!isGiphy) {
-            setMessageThumbnailDrawable(position, holder);
-        }
-
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
-    }
-
-    /**
-     * Sets a background if the content is the view is visible.
-     *
-     * @param position  Position of holder in adapter.
-     * @param holder    ViewHolderMessageChat in which the drawables have to be set.
-     */
-    private void setMessageThumbnailDrawable(int position, ViewHolderMessageChat holder) {
-        if (isHolderNull(position, holder) || holder.contentVisible) {
-            return;
-        }
-
-        if (holder.contentOwnMessageThumbLand.getVisibility() == View.VISIBLE) {
-            holder.contentOwnMessageThumbLand.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
-        }
-
-        if (holder.contentOwnMessageThumbPort.getVisibility() == View.VISIBLE) {
-            holder.contentOwnMessageThumbPort.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
-        }
-
-        if (holder.contentOwnMessageFileThumb.getVisibility() == View.VISIBLE) {
-            holder.contentOwnMessageFileThumb.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
-        }
-
-        if (holder.contentContactMessageThumbLand.getVisibility() == View.VISIBLE) {
-            holder.contentContactMessageThumbLand.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
-        }
-
-        if (holder.contentContactMessageThumbPort.getVisibility() == View.VISIBLE) {
-            holder.contentContactMessageThumbPort.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
-        }
-
-        if (holder.contentContactMessageFileThumb.getVisibility() == View.VISIBLE) {
-            holder.contentContactMessageFileThumb.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
-        }
     }
 
     /**
@@ -5124,13 +5085,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     /**
      * Updates the background and dimensions of gif view.
      *
+     * @param holder            ViewHolderMessageChat where the background and dimensions have to be updated.
      * @param backgroundColor   The color to set as background.
      * @param isPortrait        True if the view is portrait, false otherwise.
      * @param isOwnMessage      True if the message is own, false otherwise.
      * @param width             Width of the GIF.
      * @param height            Height of the GIF.
      */
-    private void updateGifViewBackgroundAndDimensions(int backgroundColor, boolean isPortrait, boolean isOwnMessage, int width, int height) {
+    private void updateGifViewBackgroundAndDimensions(ViewHolderMessageChat holder, int backgroundColor, boolean isPortrait, boolean isOwnMessage, int width, int height) {
+        if (holder == null) {
+            return;
+        }
+
         if (isPortrait) {
             if (isOwnMessage) {
                 holder.gifViewOwnMessageThumbPort.setBackgroundColor(backgroundColor);
@@ -5164,7 +5130,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         boolean shouldAutoPlay = giphy.getWebpSize() <= MAX_SIZE_GIF_AUTO_PLAY;
 
-        updateGifViewBackgroundAndDimensions(ContextCompat.getColor(context, R.color.giphy_loading_background),
+        if (isPortrait) {
+            if (isOwnMessage) {
+                holder.gifViewOwnMessageThumbPort.setVisibility(View.VISIBLE);
+            } else {
+                holder.gifViewContactMessageThumbPort.setVisibility(View.VISIBLE);
+            }
+        } else if (isOwnMessage) {
+            holder.gifViewOwnMessageThumbLand.setVisibility(View.VISIBLE);
+        } else {
+            holder.gifViewContactMessageThumbLand.setVisibility(View.VISIBLE);
+        }
+
+        updateGifViewBackgroundAndDimensions(holder, ContextCompat.getColor(context, R.color.giphy_loading_background),
                 isPortrait, isOwnMessage, giphy.getWidth(), giphy.getHeight());
         setGIFAndGiphyProperties(shouldAutoPlay, shouldAutoPlay ? Uri.parse(giphy.getWebpSrc()) : null, holder, isPortrait, isOwnMessage);
     }
@@ -5185,7 +5163,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         Bitmap preview = getPreviewFromCache(node);
         if (preview != null) {
-            updateGifViewBackgroundAndDimensions(Color.TRANSPARENT, isPortrait, isOwnMessage, preview.getWidth(), preview.getHeight());
+            updateGifViewBackgroundAndDimensions(holder, Color.TRANSPARENT, isPortrait, isOwnMessage, preview.getWidth(), preview.getHeight());
         }
 
         setGIFAndGiphyProperties(node.getSize() <= MAX_SIZE_GIF_AUTO_PLAY, getUri(node), holder, isPortrait, isOwnMessage);
@@ -5202,6 +5180,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @param isOwnMessage      True if the message is own, false if it is of a contact.
      */
     private void setGIFAndGiphyProperties(boolean shouldAutoPlay, Uri uri, ViewHolderMessageChat holder, boolean isPortrait, boolean isOwnMessage) {
+        if (holder == null) {
+            return;
+        }
+
         boolean alreadyPlayed = animationsPlaying.contains(uri);
         if (alreadyPlayed || shouldAutoPlay) {
             if (uri != null) {
@@ -5210,6 +5192,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 holder.isPlayingAnimation = true;
+
                 if (isPortrait) {
                     if (isOwnMessage) {
                         holder.gifIconOwnMessageThumbPort.setVisibility(View.GONE);
@@ -7682,18 +7665,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     } else if (holder.gifViewOwnMessageThumbLand.getVisibility() == View.VISIBLE) {
                         imageView = (SimpleDraweeView) v.findViewById(R.id.content_own_message_thumb_landscape_gif_view);
                     }
-                } else {
-                    if (holder.contentContactMessageThumbPort.getVisibility() == View.VISIBLE) {
-                        imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
-                    } else if (holder.contentContactMessageThumbLand.getVisibility() == View.VISIBLE) {
-                        imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
-                    } else if (holder.contentContactMessageFileThumb.getVisibility() == View.VISIBLE) {
-                        imageView = v.findViewById(R.id.content_contact_message_file_thumb);
-                    } else if (holder.gifViewContactMessageThumbPort.getVisibility() == View.VISIBLE) {
-                        imageView = (SimpleDraweeView) v.findViewById(R.id.content_contact_message_thumb_portrait_gif_view);
-                    } else if (holder.gifViewContactMessageThumbLand.getVisibility() == View.VISIBLE) {
-                        imageView = (SimpleDraweeView) v.findViewById(R.id.content_contact_message_thumb_landscape_gif_view);
-                    }
+                } else if (holder.contentContactMessageThumbPort.getVisibility() == View.VISIBLE) {
+                    imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
+                } else if (holder.contentContactMessageThumbLand.getVisibility() == View.VISIBLE) {
+                    imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
+                } else if (holder.contentContactMessageFileThumb.getVisibility() == View.VISIBLE) {
+                    imageView = v.findViewById(R.id.content_contact_message_file_thumb);
+                } else if (holder.gifViewContactMessageThumbPort.getVisibility() == View.VISIBLE) {
+                    imageView = (SimpleDraweeView) v.findViewById(R.id.content_contact_message_thumb_portrait_gif_view);
+                } else if (holder.gifViewContactMessageThumbLand.getVisibility() == View.VISIBLE) {
+                    imageView = (SimpleDraweeView) v.findViewById(R.id.content_contact_message_thumb_landscape_gif_view);
                 }
             }
         }
@@ -7852,7 +7833,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     int width = giphy.getWidth();
                     int height = giphy.getHeight();
                     boolean isPortrait = width < height;
-                    updateGifViewBackgroundAndDimensions(ContextCompat.getColor(context, R.color.giphy_loading_background), isPortrait, isOwnMessage, width, height);
+                    updateGifViewBackgroundAndDimensions(holder, ContextCompat.getColor(context, R.color.giphy_loading_background), isPortrait, isOwnMessage, width, height);
                     setGIFAndGiphyProperties(true, Uri.parse(giphy.getWebpSrc()), holder, giphy.getWidth() < giphy.getHeight(), isOwnMessage);
                 }
 
@@ -7868,7 +7849,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         int width = preview.getWidth();
                         int height = preview.getHeight();
                         boolean isPortrait = width < height;
-                        updateGifViewBackgroundAndDimensions(Color.TRANSPARENT, isPortrait, isOwnMessage, width, height);
+                        updateGifViewBackgroundAndDimensions(holder, Color.TRANSPARENT, isPortrait, isOwnMessage, width, height);
                         setGIFAndGiphyProperties(true, getUri(node), holder, isPortrait, isOwnMessage);
 
                         return true;

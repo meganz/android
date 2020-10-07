@@ -207,6 +207,9 @@ class GiphyActivity : PinActivityLollipop() {
         previousRequest = call
     }
 
+    /**
+     * Cancels the previous request if exist and is in progress.
+     */
     private fun cancelPreviousRequests() {
         if (previousRequest?.isCanceled == false) {
             previousRequest?.cancel()

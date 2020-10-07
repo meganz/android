@@ -44,7 +44,7 @@ class GiphyViewerActivity: PinActivityLollipop() {
         gifData = intent.getParcelableExtra(GIF_DATA)
         updateGifDimensionsView()
 
-        loadGif(gifView, pB, null, Uri.parse(gifData?.webpUrl))
+        loadGif(gifView, pB, false, null, Uri.parse(gifData?.webpUrl))
     }
 
     /**

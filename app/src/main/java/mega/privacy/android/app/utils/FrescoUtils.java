@@ -151,7 +151,9 @@ public class FrescoUtils {
             return;
         }
 
-        gifImgDisplay.setVisibility(View.VISIBLE);
+        if (gifImgDisplay.getVisibility() != View.VISIBLE) {
+            gifImgDisplay.setVisibility(View.VISIBLE);
+        }
 
         if (pb != null) {
             pb.setVisibility(View.VISIBLE);
@@ -169,7 +171,7 @@ public class FrescoUtils {
                             pb.setVisibility(View.GONE);
                         }
 
-                        if (fileView != null) {
+                        if (fileView != null && fileView.getVisibility() != View.GONE) {
                             fileView.setVisibility(View.GONE);
                         }
 
