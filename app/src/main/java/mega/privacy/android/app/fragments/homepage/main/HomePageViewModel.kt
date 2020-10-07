@@ -58,10 +58,8 @@ class HomePageViewModel @ViewModelInject constructor(
         megaApi.addGlobalListener(this)
         megaChatApi.addChatListener(this)
 
-        _avatar.value = getDefaultAvatar(
-            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
-        )
-        loadAvatar()
+        showDefaultAvatar()
+        loadAvatar(true)
         avatarChange.observeForever(avatarChangeObserver)
         scrolling.observeForever(scrollingObserver)
     }
@@ -75,15 +73,18 @@ class HomePageViewModel @ViewModelInject constructor(
         scrolling.removeObserver(scrollingObserver)
     }
 
-    private fun loadAvatar() {
+    private fun loadAvatar(retry: Boolean = false) {
         add(Single.fromCallable { getCircleAvatar(context, megaApi.myEmail) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
-                if (it != null) {
-                    _avatar.value = it
-                } else {
-                    createAvatar()
+                // actually it won't be null
+                it?.apply {
+                    when {
+                        it.first -> _avatar.value = it.second
+                        retry -> createAvatar()
+                        else -> showDefaultAvatar()
+                    }
                 }
             }, logErr("loadAvatar"))
         )
@@ -104,9 +105,17 @@ class HomePageViewModel @ViewModelInject constructor(
                         && e.errorCode == MegaError.API_OK
                     ) {
                         loadAvatar()
+                    } else {
+                        showDefaultAvatar()
                     }
                 }
             })
+    }
+
+    private fun showDefaultAvatar() {
+        _avatar.value = getDefaultAvatar(
+            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
+        )
     }
 
     override fun onUserAlertsUpdate(
