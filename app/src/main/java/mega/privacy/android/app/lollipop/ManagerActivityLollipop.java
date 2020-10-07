@@ -10756,16 +10756,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void showNodeLabelsPanel(@NonNull MegaNode node){
-		logDebug("showNodeLabelsPanel");
+        logDebug("showNodeLabelsPanel");
 
         if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
             bottomSheetDialogFragment.dismiss();
         }
 
-		selectedNode = node;
-        bottomSheetDialogFragment = new NodeLabelBottomSheetDialogFragment();
+        selectedNode = node;
+        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(node.getHandle());
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
+    }
 
 	public void showOptionsPanel(MegaOffline sNode){
 		logDebug("showNodeOptionsPanel-Offline");

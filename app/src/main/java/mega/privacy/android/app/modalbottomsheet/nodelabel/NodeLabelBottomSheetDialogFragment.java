@@ -14,15 +14,24 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Constants.HANDLE;
 
 public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     private BottomSheetNodeLabelBinding binding;
     private MegaApiAndroid megaApi; // TODO Inject MegaApiAndroid when available
     private MegaNode node = null;
+
+    public static NodeLabelBottomSheetDialogFragment newInstance(long nodeHandle) {
+        NodeLabelBottomSheetDialogFragment nodeLabelFragment = new NodeLabelBottomSheetDialogFragment();
+        Bundle arguments = new Bundle();
+        arguments.putLong(HANDLE, nodeHandle);
+        nodeLabelFragment.setArguments(arguments);
+        return nodeLabelFragment;
+    }
 
     @Nullable
     @Override
@@ -34,7 +43,7 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         megaApi = MegaApplication.getInstance().getMegaApi();
-        node = ((ManagerActivityLollipop) getActivity()).getSelectedNode(); // TODO Get MegaNode by argument
+        node = megaApi.getNodeByHandle(getArguments().getLong(HANDLE));
 
         showCurrentNodeLabel();
 

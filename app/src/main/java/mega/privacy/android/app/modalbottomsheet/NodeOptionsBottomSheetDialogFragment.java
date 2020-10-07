@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
@@ -879,11 +879,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         imageFavourite.setImageResource(node.isFavourite() ? R.drawable.ic_remove_favourite : R.drawable.ic_add_favourite);
 
         if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
-            int color = ContextCompat.getColor(context, getNodeLabelColor(node.getLabel()));
+            int color = ResourcesCompat.getColor(getResources(), getNodeLabelColor(node.getLabel()), null);
             Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), getResources());
+            optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
             optionLabelCurrent.setText(MegaNodeUtil.getNodeLabelText(node.getLabel()));
             optionLabelCurrent.setTextColor(color);
-            optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
             optionLabelCurrent.setVisibility(View.VISIBLE);
         } else {
             optionLabelCurrent.setVisibility(View.GONE);
@@ -926,7 +926,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_favourite_layout:
-                nC.markNodeAsFavourite(node, !node.isFavourite());
+                megaApi.setNodeFavourite(node, !node.isFavourite());
                 break;
 
             case R.id.option_label_layout:
