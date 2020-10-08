@@ -1,31 +1,23 @@
 package mega.privacy.android.app.listeners;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
@@ -107,26 +99,6 @@ public class GetAttrUserListener extends BaseListener {
                     updateDBNickname(api, context, request.getMegaStringMap());
                 } else {
                     logError("Error recovering the alias" + e.getErrorCode());
-                }
-                break;
-
-            case USER_ATTR_CAMERA_UPLOADS_FOLDER:
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    long[] handles = getCUHandles(request);
-                    synchronized (this) {
-                        handle(handles[0], false, e);
-                        handle(handles[1], true, e);
-                    }
-                } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    // only when both CU and MU are not set, will return API_ENOENT
-                    initCUFolderFromScratch(context, false);
-                    if (context instanceof CameraUploadsService) {
-                        // The unique process run within shoudRun method in CameraUploadsService
-                        ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e, true);
-                    }
-                } else {
-                    logWarning("Get CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
-                    JobUtil.stopRunningCameraUploadService(context);
                 }
                 break;
 
@@ -223,62 +195,6 @@ public class GetAttrUserListener extends BaseListener {
     private void updateAvatar(MegaRequest request) {
         if (context instanceof GroupChatInfoActivityLollipop) {
             ((GroupChatInfoActivityLollipop) context).updateParticipantAvatar(holderPosition, request.getEmail());
-        }
-    }
-
-    /**
-     * Get CU and MU folders handle from MegaRequest object.
-     *
-     * @param request MegaRequest object which contains CU and MU folders handle.
-     * @return An array with CU folder handle at the first element, and MU folder handle at the second element.
-     */
-    private long[] getCUHandles(MegaRequest request) {
-        long primaryHandle = INVALID_HANDLE, secondaryHandle = INVALID_HANDLE;
-        MegaStringMap map = request.getMegaStringMap();
-        if (map != null) {
-            String h = map.get("h");
-            if (h != null) {
-                primaryHandle = MegaApiJava.base64ToHandle(h);
-            }
-            String sh = map.get("sh");
-            if (sh != null) {
-                secondaryHandle = MegaApiJava.base64ToHandle(sh);
-            }
-        } else {
-            logError("MegaStringMap is null.");
-        }
-        return new long[]{primaryHandle, secondaryHandle};
-    }
-
-    /**
-     * Process CU or MU folder handle after get them from CU attributes.
-     *
-     * @param handle Folder handle.
-     * @param isSecondary Is the handle CU handle or MU handle.
-     * @param e MegaError object.
-     */
-    private void handle(long handle, boolean isSecondary, MegaError e) {
-        if (isNodeInRubbishOrDeleted(handle)) {
-            initCUFolderFromScratch(context, isSecondary);
-        } else {
-            boolean shouldCUStop = compareAndUpdateLocalFolderAttribute(handle, isSecondary);
-            //stop CU if destination has changed
-            if (shouldCUStop && CameraUploadsService.isServiceRunning) {
-                JobUtil.stopRunningCameraUploadService(context);
-            }
-
-            //notify manager activity to update UI
-            if (!(context instanceof MegaApplication)) {
-                forceUpdateCameraUploadFolderIcon(isSecondary, handle);
-            }
-        }
-        if (context instanceof CameraUploadsService) {
-            // The unique process run within shoudRun method in CameraUploadsService
-            if (isSecondary) {
-                ((CameraUploadsService) context).onGetSecondaryFolderAttribute(handle, e);
-            } else {
-                ((CameraUploadsService) context).onGetPrimaryFolderAttribute(handle, e, false);
-            }
         }
     }
 }
