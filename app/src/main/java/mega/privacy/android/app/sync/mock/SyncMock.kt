@@ -1,6 +1,5 @@
 package mega.privacy.android.app.sync.mock
 
-import ash.TL
 import mega.privacy.android.app.sync.name
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import kotlin.random.Random
@@ -23,7 +22,6 @@ fun setBackupMock(
     listener: MockListener
 ) {
     logDebug("Set backup in SDK: $backupType $backupName $localFolder $targetNode(${targetNode.name()})")
-    TL.log("Set backup in SDK: $backupType $backupName $localFolder $targetNode(${targetNode.name()})")
     val result = true//randomResult()
     if (result) {
         listener.onFinish(
@@ -58,7 +56,6 @@ fun updateBackupMock(
     listener: MockListener
 ) {
     logDebug("Update backup in SDK: $backupId $localFolder $targetNode(${targetNode?.name()})")
-    TL.log("Update backup in SDK: $backupId $localFolder $targetNode(${targetNode?.name()})")
     val result = true//randomResult()
     if (result) {
         listener.onFinish(updateResult(backupId, targetNode, localFolder), 0)
@@ -72,7 +69,6 @@ fun deleteBackupMock(
     listener: MockListener
 ) {
     logDebug("Delete backup in SDK: $backupId")
-    TL.log("Delete backup in SDK: $backupId")
     val result = true//randomResult()
     if (result) {
         listener.onFinish(deleteResult(backupId), 0)

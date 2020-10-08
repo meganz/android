@@ -1,10 +1,8 @@
 package mega.privacy.android.app.sync.cusync.callback
 
-import ash.TL
 import mega.privacy.android.app.sync.SyncEventCallback
 import mega.privacy.android.app.sync.mock.RequestType
 import mega.privacy.android.app.sync.mock.SyncEventResult
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -32,7 +30,7 @@ class UpdateSyncCallback: SyncEventCallback {
                 }
             }
             getDatabase().updateSync(syncPair)
-            TL.log("Successful callback: update $syncPair.")
+            logDebug("Successful callback: update $syncPair.")
         }
     }
 }
