@@ -50,6 +50,7 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
@@ -61,6 +62,8 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.CameraUploadUtil;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -313,9 +316,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
 						megaApi.getMyChatFilesFolder(listener);
 					}
-					//Ask for MU and CU folder when App in init state
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
-				}
+                    //Ask for MU and CU folder when App in init state
+                    logDebug("Get CU attribute on fetch nodes.");
+                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
+                }
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 				if (e.getErrorCode() == MegaError.API_OK) {
@@ -669,8 +673,22 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
+
+        initCuSync();
 	}
 
+    /**
+     * If the client has enabled CU, but hasn't set backup, here create the backup for current account.
+     */
+    private void initCuSync() {
+	    if(CameraUploadUtil.isPrimaryEnabled() && dbH.getCuSyncPair() == null) {
+	        new CuSyncManager().setPrimaryBackup();
+        }
+
+        if(CameraUploadUtil.isSecondaryEnabled() && dbH.getMuSyncPair() == null) {
+            new CuSyncManager().setSecondaryBackup();
+        }
+    }
 
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");

@@ -66,6 +66,8 @@ import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatPresenceConfig;
@@ -209,6 +211,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	boolean setAutoaccept = false;
     AlertDialog compressionQueueSizeDialog;
     private EditText queueSizeInput;
+
+    private CuSyncManager syncManager = new CuSyncManager();
 
     private SetAttrUserListener setAttrUserListener;
 	@Override
@@ -1711,6 +1715,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				dbH.setCamSyncLocalPath(pickedDir.getName());
 				localCameraUploadFolder.setSummary(pickedDir.getName());
 				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
+
+				// Update sync when primary local folder changed.
+                syncManager.updatePrimaryLocalPath(pickedDir.getName());
 			}
 			else{
 				logWarning("pickedDirNAme NULL");
@@ -1746,6 +1753,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
             resetCUTimestampsAndCache();
             rescheduleCameraUpload(context);
+
+            // Update sync when primary local folder changed.
+            syncManager.updatePrimaryLocalPath(cameraPath);
 		}
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
@@ -1761,6 +1771,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			dbH.setSecVideoSyncTimeStamp(0);
 			prefs.setLocalPathSecondaryFolder(secondaryPath);
 			rescheduleCameraUpload(context);
+
+            // Update sync when secondary local folder changed.
+            syncManager.updateSecondaryLocalPath(secondaryPath);
 		}
 		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Secondary folder to sync
