@@ -47,10 +47,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.listeners.CreateFolderListener;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -72,6 +73,7 @@ import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
+import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVALID_NON_NULL_VALUE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -136,11 +138,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private DatabaseHandler dbH;
 
     private MegaPreferences prefs;
-    private String localPath = "";
+    private String localPath = INVALID_NON_NULL_VALUE;
     private boolean removeGPS = true;
     private long cameraUploadHandle = INVALID_HANDLE;
     private boolean secondaryEnabled;
-    private String localPathSecondary = "";
+    private String localPathSecondary = INVALID_NON_NULL_VALUE;
     private long secondaryUploadHandle = INVALID_HANDLE;
     private MegaNode secondaryUploadNode;
 
@@ -223,7 +225,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     };
 
-    private GetAttrUserListener getAttrUserListener;
+    private GetCuAttributeListener getAttrUserListener;
     private SetAttrUserListener setAttrUserListener;
     private CreateFolderListener createFolderListener;
 
@@ -232,7 +234,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         registerReceiver(chargingStopReceiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
-        getAttrUserListener = new GetAttrUserListener(this);
+        getAttrUserListener = new GetCuAttributeListener(this);
         setAttrUserListener = new SetAttrUserListener(this);
         createFolderListener = new CreateFolderListener(this, INIT_CU);
     }
@@ -242,6 +244,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Service destroys.");
         super.onDestroy();
         isServiceRunning = false;
+        JobUtil.hasStartedCU = false;
         uploadingInProgress = false;
         if (receiver != null) {
             unregisterReceiver(receiver);
@@ -949,13 +952,29 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (!checkPrimaryLocalFolder()) {
             localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable, LOCAL_FOLDER_REMINDER_PRIMARY);
             disableCameraUploadSettingProcess();
-            dbH.setCamSyncLocalPath(INVALID_PATH);
-            dbH.setSecondaryFolderPath(INVALID_PATH);
+            dbH.setCamSyncLocalPath(INVALID_NON_NULL_VALUE);
+            dbH.setSecondaryFolderPath(INVALID_NON_NULL_VALUE);
             //refresh settings fragment UI
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_PRIMARY);
+        }
+
+        // To see if secondary sync is enabled.
+        if (prefs.getSecondaryMediaFolderEnabled() == null) {
+            logDebug("Secondary upload setting not defined, so not enabled");
+            dbH.setSecondaryUploadEnabled(false);
+            secondaryEnabled = false;
+        } else if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
+            secondaryEnabled = true;
+            localPathSecondary = prefs.getLocalPathSecondaryFolder();
+            if (!localPathSecondary.endsWith(SEPARATOR)) {
+                localPathSecondary += SEPARATOR;
+            }
+        } else {
+            logDebug("Not enabled Secondary");
+            secondaryEnabled = false;
         }
 
         if (!checkSecondaryLocalFolder()) {
@@ -1055,17 +1074,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * @return true, if primary secondary folder is available. false， when it's unavailable.
      */
     private boolean checkSecondaryLocalFolder() {
-        // check secondary local folder if media upload is enabled
-        if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-            String path = prefs.getLocalPathSecondaryFolder();
-            // First time enable media upload, haven't set local path.
-            if (INVALID_PATH.equals(path)) {
-                return true;
-            } else {
-                return path != null && new File(path).exists();
-            }
+        if(secondaryEnabled && localPathSecondary != null) {
+            return new File(localPathSecondary).exists();
         }
-        // if not enable secondary
         return true;
     }
 
@@ -1077,22 +1088,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * SETTING_USER_ATTRIBUTE, set CU attributes with valid hanle. CU process will launch after the setting completes.
      */
     private int checkTargetFolders() {
-        // To see if secondary sync is enabled.
-        if (prefs.getSecondaryMediaFolderEnabled() == null) {
-            logDebug("Secondary upload setting not defined, so not enabled");
-            dbH.setSecondaryUploadEnabled(false);
-            secondaryEnabled = false;
-        } else if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-            secondaryEnabled = true;
-            localPathSecondary = prefs.getLocalPathSecondaryFolder();
-            if (!localPathSecondary.endsWith(SEPARATOR)) {
-                localPathSecondary += SEPARATOR;
-            }
-        } else {
-            logDebug("Not enabled Secondary");
-            secondaryEnabled = false;
-        }
-
         long primaryToSet = INVALID_HANDLE;
         // If CU folder in local setting is deleted, then need to reset.
         boolean needToSetPrimary = isNodeInRubbishOrDeleted(cameraUploadHandle);
@@ -1148,6 +1143,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (needToSetPrimary || needToSetSecondary) {
+            logDebug("Set CU attribute: " + primaryToSet + " " + secondaryToSet);
             megaApi.setCameraUploadsFolders(primaryToSet, secondaryToSet, setAttrUserListener);
             return SETTING_USER_ATTRIBUTE;
         }
@@ -1398,14 +1394,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * Callback when getting CU folder handle from CU attributes completes.
      *
      * @param handle      CU folder hanlde stored in CU atrributes.
-     * @param e           Used to get error code to see if the request is successful.
+     * @param errorCode           Used to get error code to see if the request is successful.
      * @param shouldStart If should start CU process.
      */
-    public void onGetPrimaryFolderAttribute(long handle, MegaError e, boolean shouldStart) {
-        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+    public void onGetPrimaryFolderAttribute(long handle, int errorCode, boolean shouldStart) {
+        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
             isPrimaryHandleSynced = true;
             if (cameraUploadHandle != handle) cameraUploadHandle = handle;
             if (shouldStart) {
+                logDebug("On get primary, start work thread.");
                 startWorkerThread();
             }
         } else {
@@ -1418,12 +1415,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * Callback when getting MU folder handle from CU attributes completes.
      *
      * @param handle MU folder hanlde stored in CU atrributes.
-     * @param e      Used to get error code to see if the request is successful.
+     * @param errorCode      Used to get error code to see if the request is successful.
      */
-    public void onGetSecondaryFolderAttribute(long handle, MegaError e) {
-        if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+    public void onGetSecondaryFolderAttribute(long handle, int errorCode) {
+        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
             if (handle != secondaryUploadHandle) secondaryUploadHandle = handle;
             // Start to upload. Unlike onGetPrimaryFolderAttribute needs to wait for getting MU folder handle completes.
+            logDebug("On get secondary, start work thread.");
             startWorkerThread();
         } else {
             logWarning("Get secondary handle faild, finish process.");
@@ -1432,6 +1430,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     public void onSetFolderAttribute() {
+        logDebug("On set CU folder, start work thread.");
         startWorkerThread();
     }
 
