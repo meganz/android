@@ -10,7 +10,7 @@ public class TextUtil {
     }
 
     /**
-     * Method to remove the format in the placeholders.
+     * Method to remove the format placeholders.
      *
      * @param text The string to be processed.
      * @return The processed string.
