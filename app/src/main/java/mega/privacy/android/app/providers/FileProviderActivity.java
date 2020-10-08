@@ -87,6 +87,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -970,6 +971,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 						REQUEST_WRITE_STORAGE);
 			}
+		}
+
+		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
 		}
 
 		File destination = null;

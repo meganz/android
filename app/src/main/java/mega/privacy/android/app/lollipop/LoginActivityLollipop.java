@@ -50,6 +50,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -136,6 +137,21 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         }
     };
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        intentReceived = intent;
+        setIntent(intentReceived);
+
+        visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        if (visibleFragment == LOGIN_FRAGMENT) {
+            loginFragment = new LoginFragmentLollipop();
+        }
+
+        showFragment(visibleFragment);
+    }
 
     @Override
     protected void onDestroy() {
@@ -309,9 +325,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             case TOUR_FRAGMENT: {
                 logDebug("Show TOUR_FRAGMENT");
 
-                if (tourFragment == null) {
-                    tourFragment = new TourFragmentLollipop();
+                String recoveryKeyUrl = null;
+                if (intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_RESET_PASS)) {
+                    recoveryKeyUrl = intentReceived.getDataString();
                 }
+                tourFragment = TourFragmentLollipop.newInstance(recoveryKeyUrl);
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment).commit();
@@ -459,7 +477,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         logDebug("firstTimeCam: " + firstNameTemp + "time: " + time);
         if (firstTimeCam) {
             Intent intent = new Intent(this, ManagerActivityLollipop.class);
-            intent.putExtra("firstLogin", true);
+            intent.putExtra(EXTRA_FIRST_LOGIN, true);
             startActivity(intent);
             finish();
         } else {

@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -80,9 +79,13 @@ import nz.mega.sdk.MegaUser;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
@@ -170,7 +173,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String action = null;
     private String url = null;
     private long parentHandle = -1;
-    private long idChatToJoin = -1;
 
     private String emailTemp = null;
     private String passwdTemp = null;
@@ -778,25 +780,25 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     }
                 } else if (action.equals(ACTION_PASS_CHANGED)) {
-                    int result = intentReceived.getIntExtra("RESULT", -20);
-                    if (result == 0) {
-                        logDebug("Show success mesage");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.pass_changed_alert));
-                        return v;
-                    } else if (result == MegaError.API_EARGS) {
-                        logWarning("Incorrect arguments!");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
-                        return v;
-                    } else if (result == MegaError.API_EKEY) {
-                        logWarning("Incorrect MK when changing pass");
-//                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.incorrect_MK));
-                        ((LoginActivityLollipop)context).showAlertIncorrectRK();
-                        return v;
-                    } else {
-                        logError("Error when changing pass - show error message");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
-                        return v;
+                    int result = intentReceived.getIntExtra(RESULT, MegaError.API_OK);
+                    switch (result) {
+                        case MegaError.API_OK:
+                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.pass_changed_alert));
+                            break;
+
+                        case MegaError.API_EKEY:
+                            ((LoginActivityLollipop)context).showAlertIncorrectRK();
+                            break;
+
+                        case MegaError.API_EBLOCKED:
+                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_reset_account_blocked));
+                            break;
+
+                        default:
+                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                     }
+
+                    return v;
                 } else if (action.equals(ACTION_PARK_ACCOUNT)) {
                     String link = intentReceived.getDataString();
                     if (link != null) {
@@ -812,6 +814,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 else if (action.equals(ACTION_CANCEL_DOWNLOAD)) {
                     ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
 
+                } else if (action.equals(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)) {
+                    String accountBlockedString = intentReceived.getStringExtra(ACCOUNT_BLOCKED_STRING);
+                    if (!isTextEmpty(accountBlockedString)) {
+                        showErrorAlertDialog(accountBlockedString, false, getActivity());
+                    }
                 }
             }
             else{
@@ -874,7 +881,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
-                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
 
                     MegaNode rootNode = megaApi.getRootNode();
@@ -1025,7 +1031,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
-                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
                 }
             }
@@ -1816,7 +1821,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (firstTime){
                         logDebug("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
-                        intent.putExtra("firstLogin", true);
+                        intent.putExtra(EXTRA_FIRST_LOGIN, true);
                         if (action != null){
                             logDebug("Action not NULL");
                             if (action.equals(ACTION_EXPORT_MASTER_KEY)){
@@ -1826,9 +1831,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
                                 intent.setAction(action);
                                 intent.setData(Uri.parse(url));
-                                if (idChatToJoin != -1) {
-                                    intent.putExtra("idChatToJoin", idChatToJoin);
-                                }
                             }
                         }
                     }
@@ -1852,7 +1854,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                         else{
                             intent = new Intent(context,ManagerActivityLollipop.class);
-                            intent.putExtra("firstLogin", true);
+                            intent.putExtra(EXTRA_FIRST_LOGIN, true);
                             initialCam = true;
                         }
 
@@ -1892,11 +1894,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
                                     intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
                                 }
-                                else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-                                    if (idChatToJoin != -1) {
-                                        intent.putExtra("idChatToJoin", idChatToJoin);
-                                    }
-                                }
+
                                 intent.setAction(action);
                                 if (url != null){
                                     intent.setData(Uri.parse(url));
@@ -1932,7 +1930,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         intent.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                     }
 
-                    loginActivityLollipop.startActivity(intent);
+                    if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+                        showOverDiskQuotaPaywallWarning(true);
+                    } else {
+                        loginActivityLollipop.startActivity(intent);
+                    }
                     loginActivityLollipop.finish();
                 }
             }

@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
-import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -22,20 +21,17 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
-
-	private static final String REQUIRES_TRANSFER_SESSION = "fm/";
 
 	private DatabaseHandler dbH = null;
 
@@ -97,11 +93,18 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
+		if (matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS)) {
+			logDebug("Open business invite link");
+			openWebLink(url);
+			return;
+		}
+
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
 			logDebug("Open link url");
 
 			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
+			openFileIntent.putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false));
 			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
 			openFileIntent.setData(Uri.parse(url));
@@ -128,6 +131,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			logDebug("Folder link url");
 
 			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
+			openFolderIntent.putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false));
 			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 			openFolderIntent.setData(Uri.parse(url));
@@ -411,15 +415,9 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	}
 
 	private void checkIfRequiresTransferSession(String url) {
-		if (url.contains(REQUIRES_TRANSFER_SESSION)) {
-			int start = url.indexOf(REQUIRES_TRANSFER_SESSION);
-			if (start != -1) {
-				String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
-				megaApi.getSessionTransferURL(path, new SessionTransferURLListener(this));
-				return;
-			}
+		if (!requiresTransferSession(this, url)) {
+			openWebLink(url);
 		}
-		openWebLink(url);
 	}
 
 	public void openWebLink(String url) {

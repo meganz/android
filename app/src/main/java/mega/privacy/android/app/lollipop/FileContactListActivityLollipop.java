@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.Looper;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -62,11 +64,13 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileContactListActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaGlobalListenerInterface {
 
@@ -216,12 +220,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				}
 				case R.id.cab_menu_select_all:{
 					selectAll();
-					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
-					actionMode.invalidate();
 					break;
 				}
 			}
@@ -460,21 +462,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	public void checkScroll() {
 		if (listView != null) {
-			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-				changeActionBarElevation(true);
-			}
-			else if ((adapter != null && !adapter.isMultipleSelect())) {
-				changeActionBarElevation(false);
-			}
-		}
-	}
-
-	public void changeActionBarElevation(boolean whitElevation){
-		if (whitElevation) {
-			aB.setElevation(px2dp(4, outMetrics));
-		}
-		else {
-			aB.setElevation(0);
+			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
 		}
 	}
 	
@@ -575,7 +563,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				
 				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
-			updateActionModeTitle();
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	
@@ -742,6 +730,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			showSnackbar(getString(R.string.upload_can_not_open));
 		}
 		else {
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
 			showSnackbar(getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);

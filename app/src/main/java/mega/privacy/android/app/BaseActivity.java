@@ -43,10 +43,12 @@ import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -95,7 +97,6 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
 
         baseActivity = this;
 
@@ -112,9 +113,8 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
 
-        IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
-        filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
+        registerReceiver(accountBlockedReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED));
 
         LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
@@ -122,8 +122,11 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
+        registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
+
+        registerReceiver(showSnackbarReceiver,
+                new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -142,21 +145,18 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        logDebug("onPause");
         checkMegaObjects();
-        MegaApplication.activityPaused();
         isPaused = true;
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        logDebug("onResume");
         super.onResume();
+
         setAppFontSize(this);
 
         checkMegaObjects();
-        MegaApplication.activityResumed();
         isPaused = false;
 
         retryConnectionsAndSignalPresence();
@@ -164,14 +164,14 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        logDebug("onDestroy");
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
+        unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
+        unregisterReceiver(transferFinishedReceiver);
+        unregisterReceiver(showSnackbarReceiver);
 
         super.onDestroy();
     }
@@ -211,7 +211,9 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver accountBlockedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_EVENT_ACCOUNT_BLOCKED)) return;
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED))
+                return;
 
             checkWhyAmIBlocked(intent.getLongExtra(EVENT_NUMBER, -1), intent.getStringExtra(EVENT_TEXT));
         }
@@ -276,7 +278,12 @@ public class BaseActivity extends AppCompatActivity {
     private BroadcastReceiver transferFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null) {
+            if (intent == null || isPaused) {
+                return;
+            }
+
+            if (intent.getBooleanExtra(FILE_EXPLORER_CHAT_UPLOAD, false)) {
+                Util.showSnackbar(baseActivity, MESSAGE_SNACKBAR_TYPE, null, intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE));
                 return;
             }
 
@@ -294,6 +301,20 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             Util.showSnackbar(baseActivity, message);
+        }
+    };
+
+    private BroadcastReceiver showSnackbarReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPaused || intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_SHOW_SNACKBAR))
+                return;
+
+            String message = intent.getStringExtra(SNACKBAR_TEXT);
+            if (!isTextEmpty(message)) {
+                Util.showSnackbar(baseActivity, message);
+            }
         }
     };
 
@@ -449,7 +470,7 @@ public class BaseActivity extends AppCompatActivity {
         try {
             switch (type) {
                 case MESSAGE_SNACKBAR_TYPE:
-                    snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
+                    snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_LONG);
                     break;
                 case NOT_SPACE_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
@@ -590,13 +611,20 @@ public class BaseActivity extends AppCompatActivity {
 //                I am not blocked
                 break;
             case COPYRIGHT_ACCOUNT_BLOCK:
-                showErrorAlertDialog(getString(R.string.account_suspended_breache_ToS), false, this);
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_breache_ToS)));
                 break;
             case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
-                showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
-                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.account_suspended_multiple_breaches_ToS)));
                 break;
+
+            case DISABLED_BUSINESS_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_disabled)));
+                break;
+
+            case REMOVED_BUSINESS_ACCOUNT_BLOCK:
+                megaChatApi.logout(new ChatLogoutListener(this, getString(R.string.error_business_removed)));
+                break;
+
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
                 if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return;
 
@@ -621,15 +649,16 @@ public class BaseActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(NAME_USER_LOCKED, true);
                 startActivity(intent);
-
                 break;
+
             case WEAK_PROTECTION_ACCOUNT_BLOCK:
-                if (app.isBlockedDueToWeakAccount() || app.isWebOpenDueToEmailVerification()) {
+                if (MegaApplication.isBlockedDueToWeakAccount() || MegaApplication.isWebOpenDueToEmailVerification()) {
                     break;
                 }
                 intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
                 startActivity(intent);
                 break;
+
             default:
                 showErrorAlertDialog(stringError, false, this);
         }

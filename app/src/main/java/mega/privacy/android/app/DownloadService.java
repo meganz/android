@@ -18,16 +18,20 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -155,6 +159,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private BroadcastReceiver pauseBroadcastReceiver;
 	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
 
+	private final CompositeDisposable rxSubscriptions = new CompositeDisposable();
+	private final Handler uiHandler = new Handler(Looper.getMainLooper());
+
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -225,6 +232,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             purgeDirectory(fs[1]);
         }
         pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
+		rxSubscriptions.clear();
 		super.onDestroy();
 	}
 
@@ -245,7 +253,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return START_NOT_STICKY;
 		}
 
-		onHandleIntent(intent);
+		rxSubscriptions.add(Single.just(intent)
+			.observeOn(Schedulers.single())
+			.subscribe(this::onHandleIntent,
+					throwable -> logError("onHandleIntent onError", throwable)));
 		return START_NOT_STICKY;
 	}
 
@@ -459,10 +470,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(total <= 0){
 			logDebug("onQueueComplete: reset total downloads");
 			if (megaApi.getTotalDownloads() > 0) {
-				Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
-				intent.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER);
-				intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
-				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+						.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER)
+						.putExtra(NUMBER_FILES, megaApi.getTotalDownloads()));
 			}
 
 			megaApi.resetTotalDownloads();
@@ -498,21 +508,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				&& isFileDownloadedLatest(currentFile, document)) {
 
 			currentFile.setReadable(true, false);
-//			Toast.makeText(getApplicationContext(), document.getName() + " " +  getString(R.string.general_already_downloaded), Toast.LENGTH_SHORT).show();
 
 			return false;
 		}
 
-		if(document.getSize() > ((long)1024*1024*1024*4))
-		{
+		if(document.getSize() > ((long)1024*1024*1024*4)) {
 			logDebug("Show size alert: " + document.getSize());
-	    	Toast.makeText(getApplicationContext(), getString(R.string.error_file_size_greater_than_4gb),
-	    			Toast.LENGTH_LONG).show();
-	    	Toast.makeText(getApplicationContext(), getString(R.string.error_file_size_greater_than_4gb),
-	    			Toast.LENGTH_LONG).show();
-	    	Toast.makeText(getApplicationContext(), getString(R.string.error_file_size_greater_than_4gb),
-	    			Toast.LENGTH_LONG).show();
+			uiHandler.post(() -> Toast.makeText(getApplicationContext(),
+					getString(R.string.error_file_size_greater_than_4gb),
+					Toast.LENGTH_LONG).show());
 		}
+
 		return true;
 	}
 
@@ -1454,6 +1460,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+		rxSubscriptions.add(Single.just(transfer)
+				.observeOn(Schedulers.single())
+				.subscribe(this::doOnTransferStart,
+						throwable -> logError("doOnTransferStart onError", throwable)));
+	}
+
+	private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads());
 
 		if (isVoiceClipType(transfer.getAppData())) return;
@@ -1465,6 +1478,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
+		rxSubscriptions.add(Single.just(true)
+				.observeOn(Schedulers.single())
+				.subscribe(ignored -> doOnTransferFinish(transfer, error),
+						throwable -> logError("doOnTransferFinish onError", throwable)));
+	}
+
+	private void doOnTransferFinish(MegaTransfer transfer, MegaError error) {
 		logDebug("Node handle: " + transfer.getNodeHandle() + ", Type = " + transfer.getType());
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
@@ -1699,6 +1719,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		rxSubscriptions.add(Single.just(transfer)
+				.observeOn(Schedulers.single())
+				.subscribe(this::doOnTransferUpdate,
+						throwable -> logError("doOnTransferUpdate onError", throwable)));
+	}
+
+	private void doOnTransferUpdate(MegaTransfer transfer) {
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 			if (canceled) {
 				logDebug("Transfer cancel: " + transfer.getNodeHandle());
@@ -1722,6 +1749,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
+		rxSubscriptions.add(Single.just(true)
+				.observeOn(Schedulers.single())
+				.subscribe(ignored -> doOnTransferTemporaryError(transfer, e),
+						throwable -> logError("doOnTransferTemporaryError onError", throwable)));
+	}
+
+	private void doOnTransferTemporaryError(MegaTransfer transfer, MegaError e) {
 		logWarning("Download Temporary Error - Node Handle: " + transfer.getNodeHandle() +
 				"\nError: " + e.getErrorCode() + " " + e.getErrorString());
 
