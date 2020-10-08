@@ -780,10 +780,10 @@ public class ChatUtil {
         AtomicReference<Integer> itemClicked = new AtomicReference<>();
 
         ArrayList<String> stringsArray = new ArrayList<>();
-        stringsArray.add(0, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
-        stringsArray.add(1, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
-        stringsArray.add(2, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
-        stringsArray.add(3, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
+        stringsArray.add(0, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
+        stringsArray.add(1, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
+        stringsArray.add(2, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
+        stringsArray.add(3, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
         stringsArray.add(4, optionUntil);
 
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
@@ -817,13 +817,13 @@ public class ChatUtil {
         Context context = MegaApplication.getInstance().getBaseContext();
         switch (option) {
             case NOTIFICATIONS_30_MINUTES:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30));
             case NOTIFICATIONS_1_HOUR:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1));
             case NOTIFICATIONS_6_HOURS:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6));
             case NOTIFICATIONS_24_HOURS:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
         }
 
         return null;
