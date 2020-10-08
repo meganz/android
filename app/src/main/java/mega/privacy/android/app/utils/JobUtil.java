@@ -37,6 +37,8 @@ public class JobUtil {
 
     private static final int PHOTOS_UPLOAD_JOB_ID = Constants.PHOTOS_UPLOAD_JOB_ID;
 
+    public static volatile boolean hasStartedCU;
+
     private static synchronized boolean isJobScheduled(Context context, int id) {
         JobScheduler js = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
@@ -96,7 +98,8 @@ public class JobUtil {
                 ", hasStoragePermission:" + hasReadPermission +
                 ", isCameraUploadEnabled:" + isEnabled +
                 ", isRunning:" + CameraUploadsService.isServiceRunning);
-        if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission && isEnabled) {
+        if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission && isEnabled && !hasStartedCU) {
+            hasStartedCU = true;
             Intent newIntent = new Intent(context, CameraUploadsService.class);
             newIntent.putExtra(EXTRA_IGNORE_ATTR_CHECK, shouldIgnoreAttr);
             postIntent(context, newIntent);
@@ -109,7 +112,8 @@ public class JobUtil {
     }
 
     public static synchronized void stopRunningCameraUploadService(Context context) {
-        logDebug("stopRunningCameraUploadService");
+        if (!isCameraUploadEnabled(context) && !CameraUploadsService.isServiceRunning) return;
+        logDebug("Stop CU.");
         Intent stopIntent = new Intent(context, CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_STOP);
         postIntent(context, stopIntent);
