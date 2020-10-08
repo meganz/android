@@ -1987,13 +1987,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
 		}
-        registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+		// Need to use LocalBroadcastManager, otherwise, receiver cannot receive event.
+        LocalBroadcastManager.getInstance(this).registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
         IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
         filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
         filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
         filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
-        registerReceiver(updateCUSettingsReceiver, filter);
+        // Need to use LocalBroadcastManager, otherwise, receiver cannot receive event.
+        LocalBroadcastManager.getInstance(this).registerReceiver(updateCUSettingsReceiver, filter);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -4617,8 +4619,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
 
-        unregisterReceiver(cameraUploadLauncherReceiver);
-        unregisterReceiver(updateCUSettingsReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraUploadLauncherReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateCUSettingsReceiver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();
@@ -12452,6 +12454,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 				}
 				storageState = newStorageState;
+                logDebug("Try to start CU, false.");
                 startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
@@ -12476,6 +12479,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					showStorageAlmostFullDialog();
 				}
 				storageState = newStorageState;
+                logDebug("Try to start CU, false.");
                 startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
