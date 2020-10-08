@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components.twemoji;
+package mega.privacy.android.app.components.twemoji.listeners;
 
 
 public interface OnPlaceButtonListener {
