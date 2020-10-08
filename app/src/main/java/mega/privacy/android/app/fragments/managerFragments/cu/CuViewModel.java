@@ -288,7 +288,6 @@ class CuViewModel extends BaseRxViewModel {
     public void enableCuForBusinessFirstTime(boolean enableCellularSync, boolean syncVideo) {
         add(Completable.fromCallable(
                 () -> {
-                    mDbHandler.setCamSyncEnabled(true);
                     File localFile =
                             Environment.getExternalStoragePublicDirectory(
                                     Environment.DIRECTORY_DCIM);
@@ -302,6 +301,8 @@ class CuViewModel extends BaseRxViewModel {
                     mDbHandler.setCameraUploadVideoQuality(MEDIUM);
                     mDbHandler.setConversionOnCharging(true);
                     mDbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+                    // After target and local folder setup, then enable CU.
+                    mDbHandler.setCamSyncEnabled(true);
                     return true;
                 })
                 .subscribeOn(Schedulers.io())
