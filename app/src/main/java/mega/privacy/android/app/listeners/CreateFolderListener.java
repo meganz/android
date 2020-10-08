@@ -49,6 +49,7 @@ public class CreateFolderListener extends BaseListener {
                 CameraUploadsService.isCreatingPrimary = false;
                 //set primary only
                 if (e.getErrorCode() == MegaError.API_OK) {
+                    logDebug("Set CU primary attribute on create folder: " + handle);
                     api.setCameraUploadsFolders(handle, MegaApiJava.INVALID_HANDLE, new SetAttrUserListener(context));
                 } else {
                     logWarning("Create CU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
@@ -58,6 +59,7 @@ public class CreateFolderListener extends BaseListener {
                 CameraUploadsService.isCreatingSecondary = false;
                 //set secondary only
                 if (e.getErrorCode() == MegaError.API_OK) {
+                    logDebug("Set CU secondary attribute on create folder: " + handle);
                     api.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE, handle, new SetAttrUserListener(context));
                 } else {
                     logWarning("Create MU folder failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());

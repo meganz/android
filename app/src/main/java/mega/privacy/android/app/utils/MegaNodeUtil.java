@@ -634,4 +634,16 @@ public class MegaNodeUtil {
                 })
                 .setNegativeButton(R.string.general_cancel, null).show();
     }
+
+    /**
+     * Get a node's name by its handle.
+     *
+     * @param handle Hanlde of node.
+     * @return The node's name, if exists otherwise null.
+     */
+    public static String getNodeName(long handle) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        MegaNode node = megaApi.getNodeByHandle(handle);
+        return node != null ? node.getName() : null;
+    }
 }

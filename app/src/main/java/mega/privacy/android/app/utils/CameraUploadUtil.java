@@ -204,6 +204,16 @@ public class CameraUploadUtil {
         return getUploadFolderHandle(false);
     }
 
+    public static boolean isPrimaryEnabled() {
+        MegaPreferences prefs = dbH.getPreferences();
+        return prefs != null && Boolean.parseBoolean(prefs.getCamSyncEnabled());
+    }
+
+    public static boolean isSecondaryEnabled() {
+        MegaPreferences prefs = dbH.getPreferences();
+        return prefs != null && Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+    }
+
     /**
      * @param isPrimary whether the primary upload's folder is returned
      * @return the primary or secondary upload folder's handle
@@ -290,6 +300,7 @@ public class CameraUploadUtil {
         // Find previous camera upload folder, whose name is "Camera Uploads" in English
         long primaryHandle = findDefaultFolder(CAMERA_UPLOADS_ENGLISH);
         if (primaryHandle != INVALID_HANDLE) {
+            logDebug("Set CU primary attribute: " + primaryHandle + "(" + MegaNodeUtil.getNodeName(primaryHandle) + ")");
             api.setCameraUploadsFolders(primaryHandle, INVALID_HANDLE, new SetAttrUserListener(context));
             // if current device language is not English, rename this folder as "Camera Uploads" in other language
             if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
@@ -304,6 +315,7 @@ public class CameraUploadUtil {
         long secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS_ENGLISH);
         if (secondaryHandle != INVALID_HANDLE) {
             // if current device language is not English, rename this folder as "Media Uploads" in other language
+            logDebug("Set CU secondary attribute: " + secondaryHandle + "(" + MegaNodeUtil.getNodeName(secondaryHandle) + ")");
             api.setCameraUploadsFolders(INVALID_HANDLE, secondaryHandle, new SetAttrUserListener(context));
             if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(secondaryHandle), context.getString(R.string.section_secondary_media_uploads), new RenameListener(context));
@@ -328,13 +340,11 @@ public class CameraUploadUtil {
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
 
-
         //save changes to local DB
         if (isSecondary && handleInUserAttr != secondaryHandle) {
             dbH.setSecondaryFolderHandle(handleInUserAttr);
             resetSecondaryTimeline();
             shouldCUStop = true;
-
         } else if (!isSecondary && handleInUserAttr != primaryHandle) {
             dbH.setCamSyncHandle(handleInUserAttr);
             resetPrimaryTimeline();
