@@ -16,6 +16,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
 
+/**
+ * Credit: https://github.com/FutureMind/recycler-fast-scroll
+ */
 public class FastScroller extends LinearLayout{
 
 
@@ -70,6 +73,9 @@ public class FastScroller extends LinearLayout{
         handle = viewProvider.provideHandleView(this);
         addView(handle);
 
+        bubbleOffset = viewProvider.getBubbleOffset();
+        initHandleMovement();
+        applyStyling();
     }
 
     public void setRecyclerView(RecyclerView recyclerView) {
@@ -104,24 +110,17 @@ public class FastScroller extends LinearLayout{
         invalidate();
     }
 
-    public void addScrollerListener(RecyclerViewScrollListener.ScrollerListener listener) {
-        scrollListener.addScrollerListener(listener);
-    }
-
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
 
-        initHandleMovement();
-        bubbleOffset = viewProvider.getBubbleOffset();
-
-        applyStyling();
-        if (!isInEditMode()) {
-            if(recyclerView!=null){
-                scrollListener.updateHandlePosition(recyclerView);
-
-            }
+        if (!isInEditMode() && recyclerView != null) {
+            scrollListener.updateHandlePosition(recyclerView);
         }
+    }
+
+    public void addScrollerListener(RecyclerViewScrollListener.ScrollerListener listener) {
+        scrollListener.addScrollerListener(listener);
     }
 
     private void applyStyling() {
@@ -176,7 +175,7 @@ public class FastScroller extends LinearLayout{
     }
 
     private void invalidateVisibility() {
-        if (recyclerView == null || recyclerView.getAdapter() == null || recyclerView.getAdapter().getItemCount() == 0 || recyclerView.getChildAt(0) == null || isRecyclerViewNotScrollable() || maxVisibility != View.VISIBLE) {
+        if (isRecyclerViewNotScrollable() || maxVisibility != View.VISIBLE) {
             super.setVisibility(INVISIBLE);
         } else {
             super.setVisibility(VISIBLE);
@@ -184,10 +183,14 @@ public class FastScroller extends LinearLayout{
     }
 
     private boolean isRecyclerViewNotScrollable() {
+        if (recyclerView == null) {
+            return true;
+        }
+
         if (isVertical()) {
-            return recyclerView.getChildAt(0).getHeight() * recyclerView.getAdapter().getItemCount() <= recyclerView.getHeight();
+            return !recyclerView.canScrollVertically(1) && !recyclerView.canScrollVertically(-1);
         } else {
-            return recyclerView.getChildAt(0).getWidth() * recyclerView.getAdapter().getItemCount() <= recyclerView.getWidth();
+            return !recyclerView.canScrollHorizontally(1) && !recyclerView.canScrollHorizontally(-1);
         }
     }
 

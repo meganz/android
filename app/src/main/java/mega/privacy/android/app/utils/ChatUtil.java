@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.Nullable;
@@ -19,6 +21,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,16 +30,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
-import mega.privacy.android.app.components.SimpleSpanBuilder;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -48,6 +54,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaStringList;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -55,9 +62,11 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatUtil {
-
+    private static final int MIN_WIDTH = 44;
+    private static final float TEXT_SIZE = 14f;
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
@@ -277,20 +286,6 @@ public class ChatUtil {
         return EmojiUtilsShortcodes.emojify(text);
     }
 
-    public static SimpleSpanBuilder formatText(Context context, String text) {
-
-        SimpleSpanBuilder result;
-
-        try {
-            RTFFormatter formatter = new RTFFormatter(text, context);
-            result = formatter.setRTFFormat();
-        } catch (Exception e) {
-            logError("FORMATTER EXCEPTION!!!", e);
-            result = null;
-        }
-        return result;
-    }
-
     public static boolean areDrawablesIdentical(Drawable drawableA, Drawable drawableB) {
         Drawable.ConstantState stateA = drawableA.getConstantState();
         Drawable.ConstantState stateB = drawableB.getConstantState();
@@ -400,6 +395,99 @@ public class ChatUtil {
         fileBitmap.recycle();
 
         return outFile;
+    }
+
+    /**
+     * Method for obtaining the reaction with the largest width.
+     * @param receivedChatId The chat ID.
+     * @param receivedMessageId The msg ID.
+     * @param listReactions The reactions list.
+     * @return The size.
+     */
+    public static int getMaxWidthItem(long receivedChatId, long receivedMessageId, ArrayList<String> listReactions, DisplayMetrics outMetrics) {
+        if (listReactions == null || listReactions.isEmpty()) {
+            return 0;
+        }
+
+        int initSize = px2dp(MIN_WIDTH, outMetrics);
+        for (String reaction : listReactions) {
+            int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
+            if (numUsers > 0) {
+                String text = numUsers + "";
+                Paint paint = new Paint();
+                paint.setTypeface(Typeface.DEFAULT);
+                paint.setTextSize(TEXT_SIZE);
+                int newWidth = (int) paint.measureText(text);
+                int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 1 : newWidth + 4;
+                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2dp(sizeText, outMetrics);
+                if (possibleNewSize > initSize) {
+                    initSize = possibleNewSize;
+                }
+            }
+        }
+        return initSize;
+    }
+
+    /**
+     * Method that transforms an emoji into the right format to add a reaction.
+     *
+     * @param context        Context of Activity.
+     * @param chatId         The chat ID.
+     * @param messageId      The msg ID.
+     * @param emoji          The chosen emoji.
+     * @param isFromKeyboard If it's from the keyboard.
+     */
+    public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
+        if (!(context instanceof ChatActivityLollipop))
+            return;
+
+        EmojiEditText editText = new EmojiEditText(context);
+        editText.input(emoji);
+        String reaction = editText.getText().toString();
+        addReactionInMsg(context, chatId, messageId, reaction, isFromKeyboard);
+    }
+
+    /**
+     * Method for adding a reaction in a msg.
+     *
+     * @param context        Context of Activity.
+     * @param chatId         The chat ID.
+     * @param messageId      The msg ID.
+     * @param reaction       The String with the reaction.
+     * @param isFromKeyboard If it's from the keyboard.
+     */
+    public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
+        if (!(context instanceof ChatActivityLollipop))
+            return;
+
+        MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
+        MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+    }
+
+    public static boolean shouldReactionBeClicked(MegaChatRoom chatRoom) {
+        return !chatRoom.isPreview() &&
+                (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD ||
+                        chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
+    }
+
+    /**
+     * Method of obtaining the reaction list
+     *
+     * @param listReactions   The string list.
+     * @param invalidReaction The invalid reaction
+     * @return The reaction list.
+     */
+    public static ArrayList<String> getReactionsList(MegaStringList listReactions, boolean invalidReaction) {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0; i < listReactions.size(); i++) {
+            list.add(i, listReactions.get(i));
+        }
+
+        if (invalidReaction) {
+            list.add(INVALID_REACTION);
+        }
+
+        return list;
     }
 
     /**
@@ -548,12 +636,22 @@ public class ChatUtil {
      * @return True, if it has been successful. False, if not.
      */
     public static boolean getAudioFocus(AudioManager mAudioManager, AudioFocusListener listener, AudioFocusRequest request, int focusType, int streamType) {
+        if (mAudioManager == null) {
+            logWarning("Audio Manager is NULL");
+            return false;
+        }
+
         int focusRequest;
         if (SHOULD_BUILD_FOCUS_REQUEST) {
+            if (request == null) {
+                logWarning("Audio Focus Request is NULL");
+                return false;
+            }
             focusRequest = mAudioManager.requestAudioFocus(request);
         } else {
             focusRequest = mAudioManager.requestAudioFocus(listener, streamType, focusType);
         }
+
         return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 

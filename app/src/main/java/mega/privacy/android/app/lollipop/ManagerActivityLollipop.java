@@ -159,7 +159,6 @@ import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
-import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
@@ -183,6 +182,7 @@ import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipo
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -228,6 +228,7 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -239,9 +240,12 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -285,6 +289,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
 	private static final String INDEX_CLOUD = "INDEX_CLOUD";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
+    public static final String JOINING_CHAT_LINK = "JOINING_CHAT_LINK";
+    public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
+    public static final String CONNECTED = "CONNECTED";
 
 	public static final int ERROR_TAB = -1;
 	public static final int CLOUD_TAB = 0;
@@ -466,7 +473,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS, ASK_PERMISSIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -573,6 +580,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
+	private boolean askPermissions = false;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -585,8 +593,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //	private boolean isListCloudDrive = true;
 //	private boolean isListOffline = true;
 //	private boolean isListRubbishBin = true;
-	public boolean isListCameraUploads = false;
-//	public boolean isLargeGridCameraUploads = true;
 	public boolean isSmallGridCameraUploads = false;
 
 	//	private boolean isListInbox = true;
@@ -635,12 +641,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
 	private SettingsFragmentLollipop sttFLol;
-	private CameraUploadFragmentLollipop muFLol;
 	private UpgradeAccountFragmentLollipop upAFL;
 	private FortumoFragmentLollipop fFL;
 	private CentiliFragmentLollipop ctFL;
 	private CreditCardFragmentLollipop ccFL;
-	private CameraUploadFragmentLollipop cuFL;
+	private CameraUploadsFragment cuFragment;
+	private CameraUploadsFragment muFragment;
 	private RecentChatsFragmentLollipop rChatFL;
 	private NotificationsFragmentLollipop notificFragment;
 	private TurnOnNotificationsFragment tonF;
@@ -750,8 +756,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	View chatBadge;
 	View callBadge;
 
-	private boolean joiningToChatLink = false;
-	private long idJoinToChatLink = -1;
+	private boolean connected;
+
+	private boolean joiningToChatLink;
+	private String linkJoinToChatLink;
 
 	private boolean onAskingPermissionsFragment = false;
 	public boolean onAskingSMSVerificationFragment = false;
@@ -800,7 +808,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 if (ACTION_STORAGE_STATE_CHANGED.equals(intent.getAction())) {
                     storageStateFromBroadcast = intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
                     if (!showStorageAlertWithDelay) {
-                        checkStorageStatus(storageStateFromBroadcast, false);
+                        checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
+								storageStateFromBroadcast : app.getStorageState(), false);
                     }
                     updateAccountDetailsVisibleInfo();
                     return;
@@ -1152,104 +1161,33 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 					else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-						Long handle = intent.getLongExtra("handle", -1);
-						cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-						if (cuFL != null){
-
-							if (isListCameraUploads){
-								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = cuFL.getNodesArray();
-								for (int i=0; i<listNodes.size(); i++){
-									if (listNodes.get(i).getHandle() == handle){
-										position = i + placeholderCount;
-										break;
-									}
-								}
-							}
-							else {
-								ArrayList<MegaMonthPicLollipop> listNodes = cuFL.getMonthPics();
-								ArrayList<Long> handles;
-								int count = 0;
-								boolean found = false;
-								for (int i=0; i<listNodes.size(); i++){
-									handles = listNodes.get(i).getNodeHandles();
-									for (int j=0; j<handles.size(); j++){
-										count++;
-										String h1 = handles.get(j).toString();
-										String h2 = handle.toString();
-										if (h1.equals(h2)){
-											position = count + placeholderCount;
-											found = true;
-											break;
-										}
-									}
-									count++;
-									if (found){
-										break;
-									}
-								}
-							}
-
-							if (actionType == UPDATE_IMAGE_DRAG) {
-								imageDrag = cuFL.getImageDrag(position);
-								if (cuFL.imageDrag != null){
-									cuFL.imageDrag.setVisibility(View.VISIBLE);
-								}
-								if (imageDrag != null){
-									cuFL.imageDrag = imageDrag;
-									cuFL.imageDrag.setVisibility(View.GONE);
-								}
-							}
-							else if (actionType == SCROLL_TO_POSITION) {
-								cuFL.updateScrollPosition(position);
+						long handle = intent.getLongExtra("handle", -1);
+						cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+								.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+						if (cuFragment != null) {
+							switch (actionType) {
+								case SCROLL_TO_POSITION:
+									cuFragment.scrollToNode(handle);
+									break;
+								case UPDATE_IMAGE_DRAG:
+									cuFragment.hideDraggingThumbnail(handle);
+									break;
+								default:
+									break;
 							}
 						}
-						muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-						if (muFLol != null){
-							if (isListCameraUploads){
-								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = muFLol.getNodesArray();
-								for (int i=0; i<listNodes.size(); i++){
-									if (listNodes.get(i).getHandle() == handle){
-										position = i + placeholderCount;
-										break;
-									}
-								}
-							}
-							else {
-								ArrayList<MegaMonthPicLollipop> listNodes = muFLol.getMonthPics();
-								ArrayList<Long> handles;
-								int count = 0;
-								boolean found = false;
-								for (int i=0; i<listNodes.size(); i++){
-									handles = listNodes.get(i).getNodeHandles();
-									for (int j=0; j<handles.size(); j++){
-										count++;
-										String h1 = handles.get(j).toString();
-										String h2 = String.valueOf(handle);
-										if (h1.equals(h2)){
-											position = count + placeholderCount;
-											found = true;
-											break;
-										}
-									}
-									count++;
-									if (found){
-										break;
-									}
-								}
-							}
-
-							if (actionType == UPDATE_IMAGE_DRAG) {
-								imageDrag = muFLol.getImageDrag(position);
-								if (muFLol.imageDrag != null){
-									muFLol.imageDrag.setVisibility(View.VISIBLE);
-								}
-								if (imageDrag != null){
-									muFLol.imageDrag = imageDrag;
-									muFLol.imageDrag.setVisibility(View.GONE);
-								}
-							}
-							else if (actionType == SCROLL_TO_POSITION) {
-								muFLol.updateScrollPosition(position);
+						muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+								.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+						if (muFragment != null) {
+							switch (actionType) {
+								case SCROLL_TO_POSITION:
+									muFragment.scrollToNode(handle);
+									break;
+								case UPDATE_IMAGE_DRAG:
+									muFragment.hideDraggingThumbnail(handle);
+									break;
+								default:
+									break;
 							}
 						}
 					}
@@ -1699,10 +1637,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
                 } else {
-                    if(!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])){
-                        cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-                        if(cuFL != null){
-                            cuFL.onStoragePermissionRefused();
+                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this,permissions[0])) {
+                        cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+								.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                        if (cuFragment != null) {
+							cuFragment.onStoragePermissionRefused();
                         }
                     } else {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
@@ -1775,7 +1714,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		outState.putSerializable("drawerItem", drawerItem);
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
-		outState.putBoolean("firstLogin", firstLogin);
+		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -1889,6 +1828,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		outState.putInt(TYPE_CALL_PERMISSION, typesCameraPermission);
+		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
+		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
+		outState.putBoolean(CONNECTED, connected);
 	}
 
 	@Override
@@ -1934,7 +1876,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
 			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			searchDate = savedInstanceState.getLongArray("searchDate");
-			firstLogin = savedInstanceState.getBoolean("firstLogin");
+			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
+			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
@@ -1987,6 +1930,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			typesCameraPermission = savedInstanceState.getInt(TYPE_CALL_PERMISSION, INVALID_TYPE_PERMISSIONS);
+			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
+			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
+			connected = savedInstanceState.getBoolean(CONNECTED, false);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -2002,7 +1948,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
 			deepBrowserTreeLinks = 0;
-			this.setPathNavigationOffline("/");
+			this.setPathNavigationOffline(OFFLINE_ROOT);
 		}
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -2074,7 +2020,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		transfersInProgress = new ArrayList<Integer>();
 
 		//sync local contacts to see who's on mega.
-		if (hasPermissions(this, Manifest.permission.READ_CONTACTS)) {
+		if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
 			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
@@ -2140,14 +2086,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if (prefs == null){
 			firstTimeAfterInstallation = true;
 			isList=true;
-			isListCameraUploads=false;
 			isSmallGridCameraUploads = false;
 		}
 		else{
-
 			if (prefs.getFirstTime() == null){
 				firstTimeAfterInstallation = true;
-				isListCameraUploads=false;
 			}else{
 				firstTimeAfterInstallation = Boolean.parseBoolean(prefs.getFirstTime());
 			}
@@ -2157,17 +2100,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			else{
 				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
 			}
-			if (prefs.getPreferredViewListCameraUploads() == null){
-				isListCameraUploads = false;
-			}
-			else{
-				isListCameraUploads = Boolean.parseBoolean(prefs.getPreferredViewListCameraUploads());
-			}
 
 			isSmallGridCameraUploads = dbH.isSmallGridCamera();
 		}
 		logDebug("Preferred View List: " + isList);
-		logDebug("Preferred View List for camera uploads: " + isListCameraUploads);
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -2897,6 +2833,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						else {
 							actionOpenFolder(handleIntent);
 						}
+
+						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
 						int result = getIntent().getIntExtra(RESULT, MegaError.API_OK);
@@ -2976,15 +2914,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						setIntent(null);
 					}
 					else if (getIntent().getAction().equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-						drawerItem=DrawerItem.CHAT;
-						selectDrawerItemLollipop(drawerItem);
-						selectDrawerItemPending = false;
-
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
-						idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
+						linkJoinToChatLink = getIntent().getDataString();
 						joiningToChatLink = true;
-						if (idJoinToChatLink == -1) {
-							showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+
+						if (connected) {
+							megaChatApi.checkChatLink(linkJoinToChatLink, this);
 						}
 
 						getIntent().setAction(null);
@@ -3118,24 +3052,33 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
 	        	Intent intent = getIntent();
 	        	if (intent != null){
-	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
-					newAccount = getIntent().getBooleanExtra("newAccount", false);
+	        		boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
+					newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
 					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
+					firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+					askPermissions = getIntent().getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
 
                     //reset flag to fix incorrect view loaded when orientation changes
-                    getIntent().removeExtra("newAccount");
-                    getIntent().removeExtra("upgradeAccount");
+                    getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
+                    getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
+					getIntent().removeExtra(EXTRA_FIRST_LOGIN);
+					getIntent().removeExtra(EXTRA_ASK_PERMISSIONS);
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
-						int accountType = getIntent().getIntExtra("accountType", 0);
+						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						switch (accountType){
-							case 0:{
-								logDebug("Intent firstTimeAfterInstallation==true");
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
+							case FREE:{
+								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+									logDebug("First login. Go to Camera Uploads configuration.");
+									drawerItem = DrawerItem.CAMERA_UPLOADS;
+								} else {
+									drawerItem = DrawerItem.ACCOUNT;
+									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+									displayedAccountType = -1;
+								}
 								setIntent(null);
-								displayedAccountType = -1;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case PRO_I:{
@@ -3173,9 +3116,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 	        		}
 	        		else{
-						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
-                        if (firstLogin){
-							logDebug("intent firstLogin==true");
+						if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+							logDebug("First login. Go to Camera Uploads configuration.");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -3186,25 +3128,30 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("DRAWERITEM NOT NULL: " + drawerItem);
 				Intent intentRec = getIntent();
 	        	if (intentRec != null){
-					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
-					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
+					newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
                     newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 					//reset flag to fix incorrect view loaded when orientation changes
-                    getIntent().removeExtra("newAccount");
-                    getIntent().removeExtra("upgradeAccount");
-					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
+                    getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
+                    getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
+					firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+					askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
-						int accountType = getIntent().getIntExtra("accountType", 0);
+						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						switch (accountType){
 							case FREE:{
-								logDebug("Intent firstTimeAfterInstallation==true");
-
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
-								displayedAccountType = -1;
+								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+									logDebug("First login. Go to Camera Uploads configuration.");
+									drawerItem = DrawerItem.CAMERA_UPLOADS;
+								} else {
+									drawerItem = DrawerItem.ACCOUNT;
+									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+									displayedAccountType = -1;
+								}
 								setIntent(null);
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case PRO_I:{
@@ -3244,18 +3191,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					else{
 						if (firstLogin && !joiningToChatLink) {
 							logDebug("Intent firstTimeCam==true");
-							if (prefs != null){
-								if (prefs.getCamSyncEnabled() != null){
-									firstLogin = false;
-								}
-								else{
-									firstLogin = true;
+							if (prefs != null && prefs.getCamSyncEnabled() != null) {
+								firstLogin = false;
+							} else {
+								firstLogin = true;
+								if (app.getStorageState() != STORAGE_STATE_PAYWALL) {
 									drawerItem = DrawerItem.CAMERA_UPLOADS;
 								}
-							}
-							else{
-								firstLogin = true;
-								drawerItem = DrawerItem.CAMERA_UPLOADS;
 							}
 							setIntent(null);
 						}
@@ -3327,11 +3269,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			return;
 		}
 
-		if (firstTimeAfterInstallation) {
+		if (firstTimeAfterInstallation || askPermissions) {
 			//haven't verified phone number
 			if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
 				askForSMSVerification();
 			} else {
+				drawerItem = DrawerItem.ASK_PERMISSIONS;
 				askForAccess();
 			}
 		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
@@ -3449,15 +3392,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 sttFLol.enableCameraUpload();
             }
         } else if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
-            cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-            if (cuFL == null) {
+            cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+            if (cuFragment == null) {
                 return;
             }
 
             if (businessCUFirstTime) {
-                cuFL.cameraOnOffFirstTime();
+				cuFragment.enableCuForBusinessFirstTime();
             } else {
-                cuFL.cameraOnOff();
+				cuFragment.enableCuForBusiness();
             }
         }
     }
@@ -3509,7 +3453,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     }
 
 	public void askForAccess () {
-        showStorageAlertWithDelay = true;
+        askPermissions = false;
+    	showStorageAlertWithDelay = true;
     	//If mobile device, only portrait mode is allowed
 		if (!isTablet(this)) {
 			logDebug("Mobile only portrait mode");
@@ -3586,6 +3531,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
+
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			drawerItem = DrawerItem.CLOUD_DRIVE;
+		} else {
+			firstLogin = true;
+			drawerItem = DrawerItem.CAMERA_UPLOADS;
+		}
+
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -3966,8 +3919,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									if(sttFLol != null  && sttFLol.isResumed()){
 										sttFLol.disableCameraUpload();
 									}
-									if(cuFL != null && cuFL.isResumed()){
-										cuFL.resetSwitchButtonLabel();
+									if (cuFragment != null && cuFragment.isResumed()) {
+										cuFragment.resetSwitchButtonLabel();
 									}
                                 }
                             });
@@ -4436,23 +4389,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						emailError = comparedToCurrentEmail(value, managerActivity);
 					}
 					if (emailError != null) {
-//						inputMail.setError(emailError);
 						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					} else if (valueFirstName.equals("") || valueFirstName.isEmpty()) {
 						logWarning("First name input is empty");
-//						inputFirstName.setError(getString(R.string.invalid_string));
 						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(getString(R.string.invalid_string));
+						textError_firtName.setText(R.string.error_enter_username);
 						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					} else if (valueLastName.equals("") || valueLastName.isEmpty()) {
 						logWarning("Last name input is empty");
-//						inputLastName.setError(getString(R.string.invalid_string));
 						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_lastName.setText(getString(R.string.invalid_string));
+                        textError_lastName.setText(R.string.error_enter_userlastname);
 						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					} else {
@@ -4594,7 +4544,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					emailError = comparedToCurrentEmail(value, managerActivity);
 				}
 				if (emailError != null) {
-//					inputMail.setError(emailError);
 					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
@@ -4602,17 +4551,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					logWarning("Input is empty");
-//					inputFirstName.setError(getString(R.string.invalid_string));
 					inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError_firtName.setText(getString(R.string.invalid_string));
+                    textError_firtName.setText(R.string.error_enter_username);
 					error_layout_firtName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
 				}
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
 					logWarning("Input is empty");
-//					inputLastName.setError(getString(R.string.invalid_string));
 					inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError_lastName.setText(getString(R.string.invalid_string));
+                    textError_lastName.setText(R.string.error_enter_userlastname);
 					error_layout_lastName.setVisibility(View.VISIBLE);
 					inputLastName.requestFocus();
 				}
@@ -4751,7 +4698,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("selectDrawerItemCloudDrive");
         if (showStorageAlertWithDelay) {
             showStorageAlertWithDelay = false;
-            checkStorageStatus(storageStateFromBroadcast, false);
+            checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
+					storageStateFromBroadcast : app.getStorageState(), false);
         }
 		tB.setVisibility(View.VISIBLE);
 
@@ -4963,7 +4911,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					firstNavigationLevel = false;
 				} else if(pathNavigationOffline != null){
 					logDebug("AFTER PathNavigation is: " + pathNavigationOffline);
-					if (pathNavigationOffline.equals("/")){
+					if (pathNavigationOffline.equals(OFFLINE_ROOT)){
 						aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
 						firstNavigationLevel=true;
 					}
@@ -5020,11 +4968,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case SEARCH:{
 				aB.setSubtitle(null);
-				if(textsearchQuery){
-					if (getSearchFragment() != null) {
-						sFLol.setAllowedMultiselect(true);
-					}
-				}
 				if(parentHandleSearch==-1){
 					firstNavigationLevel = true;
 					if(searchQuery!=null){
@@ -5681,14 +5624,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setToolbarTitle();
 
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-		if (rChatFL == null){
+		if (rChatFL == null) {
 			rChatFL = RecentChatsFragmentLollipop.newInstance();
-			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
-		}
-		else{
+		} else {
 			refreshFragment(FragmentTag.RECENT_CHAT.getTag());
-			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 		}
+
+		replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -5802,7 +5744,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		if (item != DrawerItem.CHAT) {
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
-			removeFragment(rChatFL);
+			removeFragment(getChatsFragment());
 		}
 
     	switch (item){
@@ -5856,14 +5798,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				replaceFragment(oFLol, FragmentTag.OFFLINE.getTag());
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-						ActivityCompat.requestPermissions(this,
-								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								REQUEST_WRITE_STORAGE);
-					}
-				}
-
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
 				showFabButton();
@@ -5874,16 +5808,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
     			break;
     		}
-    		case CAMERA_UPLOADS:{
+    		case CAMERA_UPLOADS: {
 				tB.setVisibility(View.VISIBLE);
-				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-				if (cuFL == null) {
-					cuFL = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_CAMERA);
+				cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+				if (cuFragment == null) {
+					cuFragment = CameraUploadsFragment.newInstance(
+							CameraUploadsFragment.TYPE_CAMERA);
 				} else {
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 				}
 
-				replaceFragment(cuFL, FragmentTag.CAMERA_UPLOADS.getTag());
+				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
 
 				setToolbarTitle();
     			supportInvalidateOptionsMenu();
@@ -5895,19 +5831,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
       			break;
     		}
-    		case MEDIA_UPLOADS:{
+    		case MEDIA_UPLOADS: {
 				tB.setVisibility(View.VISIBLE);
 
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-				muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-				if (muFLol == null) {
-					muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
+				muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+				if (muFragment == null) {
+					muFragment = CameraUploadsFragment.newInstance(
+							CameraUploadsFragment.TYPE_MEDIA);
 				} else {
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
 				}
 
-				replaceFragment(muFLol, FragmentTag.MEDIA_UPLOADS.getTag());
+				replaceFragment(muFragment, FragmentTag.MEDIA_UPLOADS.getTag());
 
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
@@ -6134,12 +6072,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 break;
             }
             case CAMERA_UPLOADS: {
-				cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-                if (cuFL != null) {
-                    cuFL.checkScroll();
+				cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                if (cuFragment != null) {
+					cuFragment.checkScroll();
                 }
                 break;
             }
+			case MEDIA_UPLOADS: {
+				muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+						.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+				if (muFragment != null) {
+					muFragment.checkScroll();
+				}
+				break;
+			}
             case INBOX: {
             	iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
                 if (iFLol != null) {
@@ -6188,13 +6135,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             case SEARCH: {
 				if (getSearchFragment() != null) {
                     sFLol.checkScroll();
-                }
-                break;
-            }
-            case MEDIA_UPLOADS: {
-				muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-                if (muFLol != null) {
-                    muFLol.checkScroll();
                 }
                 break;
             }
@@ -6346,8 +6286,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void offlineSearch() {
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if (oFLol != null) {
+		if (getOfflineFragment() != null) {
 			oFLol.filterOffline(searchQuery);
 		}
 	}
@@ -6396,7 +6335,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					levelsSearch = -1;
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
-				} else if (drawerItem == DrawerItem.CHAT){
+				} else {
 					resetActionBar(aB);
 				}
 				hideCallMenuItem();
@@ -6411,15 +6350,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setCallWidget();
 				setCallMenuItem();
 				if (drawerItem == DrawerItem.CHAT) {
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if (rChatFL != null) {
+					if (getChatsFragment() != null) {
 						rChatFL.closeSearch();
 						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-					if (oFLol != null) {
+					if (getOfflineFragment() != null) {
 						oFLol.closeSearch();
 						supportInvalidateOptionsMenu();
 					}
@@ -6478,21 +6415,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					searchQuery = newText;
 					offlineSearch();
+				} else if (textSubmitted) {
+					textSubmitted = false;
 				} else {
-					getSearchFragment();
-
-					if (textSubmitted) {
-						if (sFLol != null) {
-							sFLol.setAllowedMultiselect(true);
-						}
-						textSubmitted = false;
-					} else {
-						if (!textsearchQuery) {
-							searchQuery = newText;
-						}
-						if (sFLol != null) {
-							sFLol.newSearchNodesTask();
-						}
+					if (!textsearchQuery) {
+						searchQuery = newText;
+					}
+					if (getSearchFragment() != null) {
+						sFLol.newSearchNodesTask();
 					}
 				}
 				return true;
@@ -6610,29 +6540,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					rubbishBinMenuItem.setVisible(true);
 
-					if ((drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFL.getItemCount() > 0)
-							|| (drawerItem == DrawerItem.MEDIA_UPLOADS && getMediaUploadFragment() != null && muFLol.getItemCount() > 0)) {
-						sortByMenuItem.setVisible(true);
-						thumbViewMenuItem.setVisible(true);
-
-						if (firstNavigationLevel) {
-							searchByDate.setVisible(true);
-						}
-
-						if (isListCameraUploads) {
-							thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-							thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-						} else {
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-							thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-							if (isSmallGridCameraUploads) {
-								gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-							} else {
-								gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-							}
-							gridSmallLargeMenuItem.setVisible(true);
-						}
-					}
+					updateCuFragmentOptionsMenu();
 					break;
 
 				case INBOX:
@@ -6804,6 +6712,34 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	public void updateCuFragmentOptionsMenu() {
+		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
+			return;
+		}
+
+		if ((drawerItem == DrawerItem.CAMERA_UPLOADS
+				&& getCameraUploadFragment() != null
+				&& cuFragment.getItemCount() > 0)
+				|| (drawerItem == DrawerItem.MEDIA_UPLOADS
+				&& getMediaUploadFragment() != null
+				&& muFragment.getItemCount() > 0)) {
+			sortByMenuItem.setVisible(true);
+
+			if (firstNavigationLevel) {
+				searchByDate.setVisible(true);
+			}
+
+			if (isSmallGridCameraUploads) {
+				gridSmallLargeMenuItem.setIcon(
+						mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
+			} else {
+				gridSmallLargeMenuItem.setIcon(
+						mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
+			}
+			gridSmallLargeMenuItem.setVisible(true);
+		}
+	}
+
 	private void setGridListIcon() {
 		if (isList){
 			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -6880,32 +6816,24 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							lF.onBackPressed();
 						}
 		    		}
-					else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-						cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-						if (cuFL != null){
-							long cameraUploadHandle = cuFL.getPhotoSyncHandle();
-							MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-							if (nps != null){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-								cuFL.setNodes(nodes);
-								isSearchEnabled=false;
-								setToolbarTitle();
-								invalidateOptionsMenu();
-							}
+					else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+						cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+								.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+						if (cuFragment != null) {
+							cuFragment.setSearchDate(null, orderCamera);
+							isSearchEnabled = false;
+							setToolbarTitle();
+							invalidateOptionsMenu();
 							return true;
 						}
 					}else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-						muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-						if (muFLol != null){
-							long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-							MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-							if (nps != null){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-								muFLol.setNodes(nodes);
-								setToolbarTitle();
-								isSearchEnabled=false;
-								invalidateOptionsMenu();
-							}
+						muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+								.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+						if (muFragment != null) {
+							muFragment.setSearchDate(null, orderCamera);
+							isSearchEnabled = false;
+							setToolbarTitle();
+							invalidateOptionsMenu();
 							return true;
 						}
 					}
@@ -7213,13 +7141,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					case MEDIA_UPLOADS:
 						if (getMediaUploadFragment() != null) {
-							muFLol.selectAll();
+							muFragment.selectAll();
 						}
 						break;
 
 					case CAMERA_UPLOADS:
 						if (getCameraUploadFragment() != null) {
-							cuFL.selectAll();
+							cuFragment.selectAll();
 						}
 						break;
 				}
@@ -7256,48 +7184,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("action_grid selected");
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 					logDebug("action_grid_list in CameraUploads");
-	        		isListCameraUploads = !isListCameraUploads;
-	    			dbH.setPreferredViewListCamera(isListCameraUploads);
-					logDebug("dbH.setPreferredViewListCamera: " + isListCameraUploads);
-					if (isListCameraUploads){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					if(!firstLogin) {
+						gridSmallLargeMenuItem.setVisible(true);
+					}else{
 						gridSmallLargeMenuItem.setVisible(false);
-						searchMenuItem.setVisible(true);
 					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstLogin) {
-							gridSmallLargeMenuItem.setVisible(true);
-						}else{
-							gridSmallLargeMenuItem.setVisible(false);
-						}
-						searchMenuItem.setVisible(false);
-
-					}
+					searchMenuItem.setVisible(false);
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	        	}
 	        	else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 					logDebug("action_grid_list in MediaUploads");
-	        		isListCameraUploads = !isListCameraUploads;
-	    			dbH.setPreferredViewListCamera(isListCameraUploads);
-					logDebug("dbH.setPreferredViewListCamera: " + isListCameraUploads);
-
-					if (isListCameraUploads){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					if (!firstLogin) {
+						gridSmallLargeMenuItem.setVisible(true);
+					} else {
 						gridSmallLargeMenuItem.setVisible(false);
-						searchMenuItem.setVisible(true);
 					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstLogin) {
-							gridSmallLargeMenuItem.setVisible(true);
-						}else{
-							gridSmallLargeMenuItem.setVisible(false);
-						}
-						searchMenuItem.setVisible(false);
-
-					}
-
+					searchMenuItem.setVisible(false);
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
         		}
 	        	else{
@@ -7874,16 +7776,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     		}
     	}
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-			if (cuFL != null && cuFL.onBackPressed() == 0){
+			cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+			if (cuFragment != null && cuFragment.onBackPressed() == 0){
 				visibilitySearch(false);
 				backToDrawerItem(-1);
 				return;
 			}
     	}
 		else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-			muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-			if (muFLol != null && muFLol.onBackPressed() == 0){
+			muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+			if (muFragment != null && muFragment.onBackPressed() == 0){
 				visibilitySearch(false);
 				backToDrawerItem(CLOUD_DRIVE_BNV);
 				return;
@@ -7921,6 +7825,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		selectDrawerItemLollipop(drawerItem);
+
+        // Hide fragment (required to check if show ODQ Paywall)
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.hide(upAFL);
+        ft.commitNow();
 	}
 
 	public void backToDrawerItem(int item) {
@@ -7953,11 +7862,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem, DrawerItem newDrawerItem) {
-    	if (!searchExpand || oldDrawerItem == newDrawerItem) return;
+	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem) {
+    	if (!searchExpand) return;
 
 		if (oldDrawerItem == DrawerItem.CHAT || oldDrawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
 			searchExpand = false;
+
+			if (oldDrawerItem == DrawerItem.SAVED_FOR_OFFLINE && getOfflineFragment() != null) {
+				oFLol.closeSearch();
+			}
 		}
 	}
 
@@ -7969,6 +7882,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			Menu nVMenu = nV.getMenu();
 			resetNavigationViewMenu(nVMenu);
 		}
+
+		checkOfflineSearch(menuItem.getItemId());
 
 		DrawerItem oldDrawerItem = drawerItem;
 
@@ -7999,8 +7914,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case R.id.bottom_navigation_item_offline: {
 				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
-					if (!pathNavigationOffline.equals("/")){
-						pathNavigationOffline = "/";
+					if (!pathNavigationOffline.equals(OFFLINE_ROOT)){
+						pathNavigationOffline = OFFLINE_ROOT;
 						refreshFragment(FragmentTag.OFFLINE.getTag());
 					}
 				} else {
@@ -8037,7 +7952,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
-		checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+		checkIfShouldCloseSearchView(oldDrawerItem);
 		selectDrawerItemLollipop(drawerItem);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -9353,19 +9268,29 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}catch (Exception e){}
 	}
 
-	public void showChatLink(String link){
+	public void showChatLink(String link) {
 		logDebug("Link: " + link);
 		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+
 		if (joiningToChatLink) {
 			openChatLinkIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-		}
-		else {
+			resetJoiningChatLink();
+		} else {
 			openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
 		}
+
 		openChatLinkIntent.setData(Uri.parse(link));
 		startActivity(openChatLinkIntent);
 		drawerItem = DrawerItem.CHAT;
 		selectDrawerItemLollipop(drawerItem);
+	}
+
+	/**
+	 * Initializes the variables to join chat by default.
+	 */
+	private void resetJoiningChatLink() {
+		joiningToChatLink = false;
+		linkJoinToChatLink = null;
 	}
 
 	public void checkPermissions(){
@@ -10545,31 +10470,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	}
 
-	public void showConfirmationLeaveMultipleShares (final ArrayList<Long> handleList){
-		logDebug("showConfirmationleaveMultipleShares");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	nC.leaveMultipleIncomingShares(handleList);
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
 		if (shares.size() == 1) {
 			showConfirmationRemoveAllSharingContacts(megaApi.getOutShares(shares.get(0)), shares.get(0));
@@ -10639,32 +10539,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.show();
 
 		refreshAfterMovingToRubbish();
-	}
-
-	public void showConfirmationLeaveIncomingShare (final MegaNode n){
-		logDebug("showConfirmationLeaveIncomingShare");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE: {
-					nC.leaveIncomingShare(managerActivity, n);
-					break;
-				}
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
 	}
 
 	public void showConfirmationLeaveChat (final MegaChatRoom c){
@@ -11023,6 +10897,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
+			case MegaApiJava.STORAGE_STATE_PAYWALL:
 				((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
 				usedSpacePB.setProgressDrawable(getResources().getDrawable(
 						R.drawable.custom_progress_bar_horizontal_exceed));
@@ -11117,24 +10992,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshSharesPageAdapter();
 	}
 
-	public void selectSortUploads(int orderCamera){
+	public void selectSortUploads(int orderCamera) {
 		logDebug("selectSortUploads");
 
-        setOrderCamera(orderCamera);
-		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-		if (cuFL != null){
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), orderCamera);
-			cuFL.setNodes(nodes);
-			cuFL.setOrderBy(orderCamera);
-			cuFL.getRecyclerView().invalidate();
+		setOrderCamera(orderCamera);
+		cuFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(
+				FragmentTag.CAMERA_UPLOADS.getTag());
+		if (cuFragment != null) {
+			cuFragment.setOrderBy(orderCamera);
 		}
 
-		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-		if (muFLol != null){
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(muFLol.getPhotoSyncHandle()), orderCamera);
-			muFLol.setNodes(nodes);
-            muFLol.setOrderBy(orderCamera);
-			muFLol.getRecyclerView().invalidate();
+		muFragment = (CameraUploadsFragment) getSupportFragmentManager().findFragmentByTag(
+				FragmentTag.MEDIA_UPLOADS.getTag());
+		if (muFragment != null) {
+			muFragment.setOrderBy(orderCamera);
 		}
 	}
 
@@ -11308,7 +11179,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				isEnable2FADialogShown = false;
 				Intent intent = new Intent(this, TwoFactorAuthenticationActivity.class);
-				intent.putExtra("newAccount", true);
+				intent.putExtra(EXTRA_NEW_ACCOUNT, true);
 				startActivity(intent);
 				break;
 			}
@@ -11326,7 +11197,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = MY_ACCOUNT_FRAGMENT;
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+					checkIfShouldCloseSearchView(oldDrawerItem);
 					selectDrawerItemLollipop(drawerItem);
 				}
 				break;
@@ -11334,28 +11205,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.inbox_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.INBOX;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.CONTACTS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.NOTIFICATIONS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.settings_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.SETTINGS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -11366,7 +11237,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -11444,14 +11315,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showConfirmationRemoveFromOffline(){
 		logDebug("showConfirmationRemoveFromOffline");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
-		}
-
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -11492,12 +11355,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showConfirmationRemoveSomeFromOffline(final List<MegaOffline> documents){
 		logDebug("showConfirmationRemoveSomeFromOffline");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-			}
-		}
-
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -11650,6 +11507,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			Uri treeUri = intent.getData();
 			logDebug("Create the document : " + treeUri);
 			long handleToDownload = intent.getLongExtra("handleToDownload", -1);
@@ -11728,50 +11590,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 		}
-		else if(requestCode == ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK){
+		else if(requestCode == ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK) {
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
 			}
 			searchDate = intent.getLongArrayExtra("SELECTED_DATE");
-			cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-			if (cuFL != null){
-				long cameraUploadHandle = cuFL.getPhotoSyncHandle();
-				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-				if (nps != null){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-					if((searchByDate) != null && (searchDate!=null)){
-						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
-						cuFL.setNodes(nodesSearch);
-						if (nodesSearch.size() == 0) {
-							cuFL.showEmptySearchResults();
-						}
-						isSearchEnabled = true;
-					}else{
-						cuFL.setNodes(nodes);
 
-					}
-
-				}
+			cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+			if (cuFragment != null && searchDate != null) {
+				cuFragment.setSearchDate(searchDate, orderCamera);
+				isSearchEnabled = true;
+				setToolbarTitle();
 			}
 
-			muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-			if (muFLol != null){
-				long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-				if (nps != null){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-					if((searchByDate) != null && (searchDate!=null)){
-						ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
-						muFLol.setNodes(nodesSearch);
-						isSearchEnabled = true;
-					}else{
-						muFLol.setNodes(nodes);
-
-					}
-				}
+			muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+					.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+			if (muFragment != null && searchDate != null) {
+				muFragment.setSearchDate(searchDate, orderCamera);
+				isSearchEnabled = true;
+				setToolbarTitle();
 			}
-
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_FOLDER");
@@ -12237,6 +12077,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				parentNode = megaApi.getRootNode();
 			}
 
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()), -1);
 			for (String path : paths) {
 				try {
@@ -12644,12 +12489,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				break;
 
+			case MegaApiJava.STORAGE_STATE_PAYWALL:
+				logWarning("STORAGE STATE PAYWALL");
+				break;
+
 			default:
 				return;
 		}
 
-		app.setStorageState(storageState);
 		storageState = newStorageState;
+		app.setStorageState(storageState);
 	}
 
 	/**
@@ -13072,6 +12921,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
+
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
 
 			for (ShareInfo info : infos) {
@@ -13162,6 +13016,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private void createFile(String name, String data, MegaNode parentNode){
 
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
+
 		File file = createTemporalTextFile(this, name, data);
 		if(file!=null){
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, 1, 1), -1);
@@ -13233,9 +13092,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("CONNECT CHAT finished ");
-				if (joiningToChatLink && idJoinToChatLink != -1) {
-					megaChatApi.autojoinPublicChat(idJoinToChatLink, this);
+				connected = true;
+
+				if (joiningToChatLink && !isTextEmpty(linkJoinToChatLink)) {
+					megaChatApi.checkChatLink(linkJoinToChatLink, this);
 				}
+
 				if(drawerItem == DrawerItem.CHAT){
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if(rChatFL!=null){
@@ -13321,6 +13183,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
+				if (joiningToChatLink && isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE) {
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
+					resetJoiningChatLink();
+					return;
+				}
+
 				showChatLink(request.getLink());
 				dismissOpenLinkDialog();
 			}
@@ -13340,22 +13208,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             }
             else{
 				logError("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: " + e.getErrorType());
-			}
-		}
-		else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
-			joiningToChatLink = false;
-			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
-				showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
-			}
-			else{
-				logError("Error joining to chat: " + e.getErrorString());
-				MegaChatRoom chatRoom = megaChatApi.getChatRoom(request.getChatHandle());
-				if (chatRoom != null && (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR
-						|| chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO)) {
-					logWarning("Error joining to chat: I'm already a participant");
-					return;
-				}
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
 			}
 		}
 	}
@@ -14724,6 +14576,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshCloudDrive();
 	}
 
+    public void onNodesRecentsUpdate() {
+        if (isRecentsAdded()) {
+            ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
+            rF.fillRecentItems(getBucketSaved(), buckets);
+            rF.refreshRecentsActions();
+        }
+    }
+
 	public void onNodesInboxUpdate() {
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
@@ -14818,9 +14678,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		onNodesCloudDriveUpdate();
 
-		if(cloudPageAdapter!=null){
-			cloudPageAdapter.notifyDataSetChanged();
-		}
+		onNodesRecentsUpdate();
 
 		onNodesSearchUpdate();
 
@@ -14830,63 +14688,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		checkCameraUploadFolder(false,updatedNodes);
 
-		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-		if (cuFL != null){
-			long cameraUploadHandle = cuFL.getPhotoSyncHandle();
-			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-			logDebug("Camera Uploads Handle: " + cameraUploadHandle);
-			if (nps != null){
-				logDebug("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-
-				if(firstNavigationLevel){
-					cuFL.setNodes(nodes);
-				}else{
-					if(getIsSearchEnabled()){
-						if((searchByDate != null)&&(searchDate !=null)){
-							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
-							cuFL.setNodes(nodesSearch);
-							isSearchEnabled = true;
-						}else{
-							cuFL.setNodes(nodes);
-
-						}
-					}else{
-						cuFL.setNodes(nodes);
-
-					}
-
-
-				}
-			}
+		cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+		if (cuFragment != null) {
+			cuFragment.reloadNodes(orderCamera);
 		}
 
-		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-		if (muFLol != null){
-			long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-			logDebug("Media Uploads Handle: " + cameraUploadHandle);
-			if (nps != null){
-				logDebug("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
-				if(firstNavigationLevel){
-					muFLol.setNodes(nodes);
-				}else{
-					if(getIsSearchEnabled()){
-						if((searchByDate != null)&&(searchDate !=null)){
-							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
-							muFLol.setNodes(nodesSearch);
-							isSearchEnabled = true;
-						}else{
-							muFLol.setNodes(nodes);
-						}
-					}else{
-						muFLol.setNodes(nodes);
-
-					}
-
-				}
-			}
+		muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+		if (muFragment != null) {
+			muFragment.reloadNodes(orderCamera);
 		}
 
 		setToolbarTitle();
@@ -15300,8 +15111,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public boolean isListCameraUploads() {
-		return isListCameraUploads;
+		return false;
 	}
+
 	public boolean isSmallGridCameraUploads() {
 		return isSmallGridCameraUploads;
 	}
@@ -15316,8 +15128,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		firstLogin = flag;
 	}
 
-	public void setListCameraUploads(boolean isListCameraUploads) {
-		this.isListCameraUploads = isListCameraUploads;
+	public boolean getAskPermissions() {
+		return askPermissions;
 	}
 
 	public void setOrderCloud(int orderCloud) {
@@ -16384,69 +16196,39 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return searchQuery != null && !searchQuery.isEmpty();
 	}
 
-	public void openSearchNode(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
-		if (node.isFolder()) {
-			switch (drawerItem) {
-				case CLOUD_DRIVE: {
-					setParentHandleBrowser(node.getHandle());
-					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-					if (cloudPageAdapter != null) {
-						cloudPageAdapter.notifyDataSetChanged();
-					}
-					break;
-				}
-				case SHARED_ITEMS: {
-					if (viewPagerShares == null || sharesPageAdapter == null) break;
+    public void openSearchFolder(MegaNode node) {
+        switch (drawerItem) {
+            case CLOUD_DRIVE:
+                setParentHandleBrowser(node.getHandle());
+                refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+                if (cloudPageAdapter != null) {
+                    cloudPageAdapter.notifyDataSetChanged();
+                }
+                break;
 
-					if (getTabItemShares() == INCOMING_TAB) {
-						setParentHandleIncoming(node.getHandle());
-						increaseDeepBrowserTreeIncoming();
-					} else if (getTabItemShares() == OUTGOING_TAB) {
-						setParentHandleOutgoing(node.getHandle());
-						increaseDeepBrowserTreeOutgoing();
-					} else if (getTabItemShares() == LINKS_TAB) {
-						setParentHandleLinks(node.getHandle());
-						increaseDeepBrowserTreeLinks();
-					}
-					refreshSharesPageAdapter();
+            case SHARED_ITEMS:
+                if (viewPagerShares == null || sharesPageAdapter == null) break;
 
-					break;
-				}
-				case INBOX: {
-					setParentHandleInbox(node.getHandle());
-					refreshFragment(FragmentTag.INBOX.getTag());
-					break;
-				}
-			}
-		} else {
-			switch (drawerItem) {
-				case CLOUD_DRIVE: {
-					if (isCloudAdded()) {
-						fbFLol.openFile(node, position, screenPosition, imageView);
-					}
-					break;
-				}
-				case SHARED_ITEMS: {
-					if (viewPagerShares == null || sharesPageAdapter == null) break;
+                if (getTabItemShares() == INCOMING_TAB) {
+                    setParentHandleIncoming(node.getHandle());
+                    increaseDeepBrowserTreeIncoming();
+                } else if (getTabItemShares() == OUTGOING_TAB) {
+                    setParentHandleOutgoing(node.getHandle());
+                    increaseDeepBrowserTreeOutgoing();
+                } else if (getTabItemShares() == LINKS_TAB) {
+                    setParentHandleLinks(node.getHandle());
+                    increaseDeepBrowserTreeLinks();
+                }
+                refreshSharesPageAdapter();
 
-					if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
-						inSFLol.openFile(node, INCOMING_SHARES_ADAPTER, position, screenPosition, imageView);
-					} else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
-						outSFLol.openFile(node, OUTGOING_SHARES_ADAPTER, position, screenPosition, imageView);
-					} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
-					    lF.openFile(node, LINKS_ADAPTER, position, screenPosition, imageView);
-                    }
-					break;
-				}
-				case INBOX: {
-					if (getInboxFragment() != null) {
-						iFLol.openFile(node, position, screenPosition, imageView);
-					}
-					break;
-				}
-			}
-		}
-	}
+                break;
+
+            case INBOX:
+                setParentHandleInbox(node.getHandle());
+                refreshFragment(FragmentTag.INBOX.getTag());
+                break;
+        }
+    }
 
 	public boolean isSearchViewExpanded() {
 		if (searchMenuItem != null) {
@@ -16465,12 +16247,32 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void setTextSubmitted () {
 	    if (searchView != null) {
 	    	if (!isValidSearchQuery()) {
-				searchExpand = false;
 				return;
 			}
 	        searchView.setQuery(searchQuery, true);
         }
     }
+
+	/**
+	 * Checks if it is necessary to close the search view on Offline section
+	 * when a bottom navigation item has been pressed before go to other section
+	 * or on the contrary to go to Offline root.
+	 *
+	 * @param itemClicked	bottom navigation view item clicked
+	 */
+	private void checkOfflineSearch(int itemClicked) {
+		if (drawerItem != DrawerItem.SAVED_FOR_OFFLINE || !searchExpand)
+			return;
+
+		if (itemClicked == R.id.bottom_navigation_item_offline) {
+			pathNavigationOffline = OFFLINE_ROOT;
+			if (getOfflineFragment() != null) {
+				oFLol.setPathNavigation(OFFLINE_ROOT);
+			}
+		}
+
+		closeSearchView();
+	}
 
 	public boolean isSearchOpen() {
 		return searchQuery != null && searchExpand;
@@ -16802,12 +16604,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 	}
 
-	private CameraUploadFragmentLollipop getCameraUploadFragment() {
-		return cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+	private CameraUploadsFragment getCameraUploadFragment() {
+		return cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
-	private CameraUploadFragmentLollipop getMediaUploadFragment() {
-		return muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+	private CameraUploadsFragment getMediaUploadFragment() {
+		return muFragment = (CameraUploadsFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 	}
 
 	private InboxFragmentLollipop getInboxFragment() {

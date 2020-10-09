@@ -34,6 +34,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -154,7 +155,12 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             MegaNode parentNode = megaApi.getNodeByHandle(bucket.getParentHandle());
             if (parentNode == null) return;
 
-            holder.subtitle.setText(parentNode.getName());
+            String parentName = parentNode.getName();
+            if (!isTextEmpty(parentName) && parentName.equals("Cloud Drive")) {
+                parentName = context.getString(R.string.section_cloud_drive);
+            }
+
+            holder.subtitle.setText(parentName);
 
             String mail = bucket.getUserEmail();
             String user;

@@ -16,6 +16,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -67,11 +70,13 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class SearchFragmentLollipop extends RotatableFragment{
 
@@ -107,8 +112,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	private boolean allFiles = true;
 	private String downloadLocationDefaultPath;
-
-	private boolean multiselectBoolean=false;
 
     private int placeholderCount;
 
@@ -254,6 +257,10 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_send_to_chat:{
 					logDebug("Send files to chat");
+					if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+						showOverDiskQuotaPaywallWarning();
+						break;
+					}
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
@@ -288,6 +295,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
+			((ManagerActivityLollipop) context).setTextSubmitted();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
@@ -714,9 +722,10 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			logDebug("nodes.size(): "+nodes.size());
 			((ManagerActivityLollipop) context).setTextSubmitted();
 
-			if (!((ManagerActivityLollipop) context).isValidSearchQuery()) {
+			// If nothing is input, then click a folder in search view, redirect to CD.
+			if (!((ManagerActivityLollipop) context).isValidSearchQuery() && nodes.get(position).isFolder()) {
 				((ManagerActivityLollipop) context).closeSearchView();
-				((ManagerActivityLollipop) context).openSearchNode(nodes.get(position), position, screenPosition, imageView);
+				((ManagerActivityLollipop) context).openSearchFolder(nodes.get(position));
 				return;
 			}
 
@@ -1082,8 +1091,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 			}
-			
-			updateActionModeTitle();
+
+			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
 	
@@ -1289,14 +1298,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
-	}
-
-	public boolean isAllowedMultiselect(){
-		return multiselectBoolean;
-	}
-
-	public void setAllowedMultiselect(boolean option){
-		multiselectBoolean = option;
 	}
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {

@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
@@ -133,6 +134,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 int state = (int) event.getNumber();
                 if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
                     api.getAccountDetails(null);
+                } else if (state == MegaApiJava.STORAGE_STATE_PAYWALL) {
+                    megaApplication.setStorageState(state);
+                    showOverDiskQuotaPaywallWarning();
                 } else {
                     megaApplication.setStorageState(state);
 

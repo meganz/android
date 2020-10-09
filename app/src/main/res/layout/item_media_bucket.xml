@@ -10,7 +10,6 @@
         android:paddingLeft="2dp"
         android:paddingRight="2dp" />
 
-
     <RelativeLayout
         android:id="@+id/video_layout"
         android:layout_width="72dp"

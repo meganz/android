@@ -1,13 +1,17 @@
 package mega.privacy.android.app.components.dragger;
 
 import android.app.Activity;
+import android.graphics.RectF;
+import android.view.SurfaceView;
+import android.view.View;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorListenerAdapter;
 import androidx.core.view.ViewPropertyAnimatorUpdateListener;
-import android.view.SurfaceView;
-import android.view.View;
-import android.widget.ImageView;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -15,7 +19,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT;
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
 
@@ -40,6 +44,14 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                     scaleY = ((float) screenPosition[3]) / touchImageView.getImageHeight();
                     logDebug("Scale: " + scaleX + " " + scaleY + " dimensions: " + touchImageView.getImageWidth() + " " + touchImageView.getImageHeight() + " position: " + screenPosition[0] + " " + screenPosition[1]);
                 }
+                else if (currentView instanceof SimpleDraweeView){
+                    SimpleDraweeView simpleDraweeView = (SimpleDraweeView) currentView;
+                    RectF bounds = new RectF();
+                    simpleDraweeView.getHierarchy().getActualImageBounds(bounds);
+                    scaleX = ((float)screenPosition[2]) / (bounds.right - bounds.left);
+                    scaleY = ((float)screenPosition[3]) / (bounds.bottom - bounds.top);
+                    logDebug("SimpleDraweeView scale: " + scaleX + " " + scaleY);
+                }
                 else if (currentView instanceof ImageView){
                     imageView = (ImageView) currentView;
                     scaleX = ((float)screenPosition[2]) / imageView.getDrawable().getIntrinsicWidth();
@@ -50,7 +62,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                     surfaceView = (SurfaceView) currentView;
                     scaleX = ((float) screenPosition[2]) / ((float) surfaceView.getWidth());
                     scaleY = ((float) screenPosition[3]) / ((float) surfaceView.getHeight());
-                    logDebug("Scale: " + scaleX + " " + scaleY + " dimensions: " + surfaceView.getWidth() + " " + surfaceView.getHeight() + " position: " + screenPosition[2] + " " + screenPosition[3]);
+                    logDebug("Scale: " + scaleX + " " + scaleY + " dimensions: " + surfaceView.getWidth() + " " + surfaceView.getHeight() + " position: " + screenPosition[0] + " " + screenPosition[1]);
                 }
 
                 ViewCompat.animate(draggableView)

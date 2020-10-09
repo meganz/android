@@ -32,6 +32,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     protected static final int HEIGHT_HEADER_LOW = 48;
 
     protected Context context;
+    protected MegaApplication app;
     protected MegaApiAndroid megaApi;
     protected MegaChatApiAndroid megaChatApi;
     protected DatabaseHandler dbH;
@@ -39,7 +40,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     protected DisplayMetrics outMetrics;
     private int halfHeightDisplay;
     private int heightHeader;
-    private BottomSheetBehavior mBehavior;
+    protected BottomSheetBehavior mBehavior;
 
     protected View contentView;
     protected LinearLayout mainLinearLayout;
@@ -49,7 +50,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MegaApplication app = MegaApplication.getInstance();
+        app = MegaApplication.getInstance();
         if (app == null || getActivity() == null) {
             logError("MegaApplication or FragmentActivity is null");
             return;

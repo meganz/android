@@ -205,10 +205,16 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
 
         VerifyCredentialsListener verifyCredentialsListener = new VerifyCredentialsListener(this);
         credentialsButton.setOnClickListener(v -> {
-            if (megaApi.areCredentialsVerified(contact)) {
-                megaApi.resetCredentials(contact, verifyCredentialsListener);
+            if (MegaApplication.isVerifyingCredentials()) {
+                showSnackbar(getString(R.string.already_verifying_credentials));
             } else {
-                megaApi.verifyCredentials(contact, verifyCredentialsListener);
+                credentialsButton.setAlpha(0.5f);
+
+                if (megaApi.areCredentialsVerified(contact)) {
+                    megaApi.resetCredentials(contact, verifyCredentialsListener);
+                } else {
+                    megaApi.verifyCredentials(contact, verifyCredentialsListener);
+                }
             }
         });
 
@@ -277,6 +283,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
      */
     private void updateButtonText() {
         credentialsButton.setText(megaApi.areCredentialsVerified(contact) ? R.string.action_reset : R.string.general_verify);
+        credentialsButton.setAlpha(MegaApplication.isVerifyingCredentials() ? 0.5f : 1f);
     }
 
     /**
