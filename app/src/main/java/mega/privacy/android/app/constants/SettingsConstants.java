@@ -57,9 +57,6 @@ public class SettingsConstants {
     public static final String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_preference";
     public static final String KEY_AUTOAWAY_ENABLE = "settings_autoaway_chat_switch";
 
-    public static final String CATEGORY_PERSISTENCE_CHAT = "settings_persistence_chat";
-    public static final String KEY_CHAT_PERSISTENCE = "settings_persistence_chat_checkpreference";
-
     public static final String KEY_STORAGE_DOWNLOAD_CATEGORY = "download_setting";
     public static final String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
     public static final String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
@@ -111,10 +108,26 @@ public class SettingsConstants {
     public static final int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
 
     /**
-     * Chat settings
+     * Chat notifications settings
      */
     public static final String KEY_CHAT_NOTIFICATIONS = "settings_chat_notifications";
     public static final String KEY_CHAT_SOUND = "settings_chat_sound";
     public static final String KEY_CHAT_VIBRATE = "settings_chat_vibrate";
     public static final String KEY_CHAT_DND = "settings_chat_dnd";
+
+    /**
+     * Chat setting
+     */
+    public static final String KEY_CHAT_NOTIFICATIONS_CHAT = "settings_chat_notification_chat";
+    public static final String KEY_CHAT_STATUS = "settings_chat_list_status";
+    public static final String KEY_CHAT_AUTOAWAY_SWITCH = "settings_chat_autoaway_switch";
+    public static final String KEY_CHAT_AUTOAWAY_PREFERENCE= "settings_chat_autoaway_preference";
+
+    public static final String KEY_CHAT_PERSISTENCE= "settings_chat_persistence";
+
+    public static final String KEY_CHAT_LAST_GREEN= "settings_chat_last_green";
+
+    public static final String KEY_CHAT_SEND_ORIGINALS= "settings_chat_send_originals";
+    public static final String KEY_CHAT_RICH_LINK= "settings_chat_rich_links_enable";
+
 }

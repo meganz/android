@@ -48,7 +48,7 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.preferences_chat);
+        addPreferencesFromResource(R.xml.preferences_chat_notifications);
 
         chatNotificationsSwitch = findPreference(KEY_CHAT_NOTIFICATIONS);
         chatNotificationsSwitch.setOnPreferenceClickListener(this);

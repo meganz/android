@@ -9,8 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
-
+import mega.privacy.android.app.fragments.settingsFragments.SettingsChatNotificationsFragment;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
 import static mega.privacy.android.app.utils.Constants.SELECT_NOTIFICATION_SOUND;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -18,7 +17,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivity {
 
-    private SettingsChatFragment sttChat;
+    private SettingsChatNotificationsFragment sttChat;
 
     private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -38,7 +37,7 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
 
         aB.setTitle(getString(R.string.title_properties_chat_notifications_contact).toUpperCase());
 
-        sttChat = new SettingsChatFragment();
+        sttChat = new SettingsChatNotificationsFragment();
         replaceFragment(sttChat);
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
