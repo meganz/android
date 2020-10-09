@@ -250,7 +250,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_alignParentLeft="true"
-					android:text="Previous versions"
+					android:text="@string/file_properties_folder_previous_versions"
 					android:textSize="14sp"
 					android:textColor="@color/mail_my_account"/>
 
