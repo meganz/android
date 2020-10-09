@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -136,6 +137,21 @@ public class TransfersManagement {
      */
     public static void launchTransferUpdateIntent(int transferType) {
         MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
+    }
+
+    /**
+     * Adds the completed transfer to the DB and
+     * sends a broadcast to update the completed transfers tab.
+     *
+     * @param completedTransfer AndroidCompletedTransfer to add.
+     */
+    public static void addCompletedTransfer(AndroidCompletedTransfer completedTransfer) {
+        MegaApplication app = MegaApplication.getInstance();
+
+        long id = app.getDbH().setCompletedTransfer(completedTransfer);
+        completedTransfer.setId(id);
+        app.sendBroadcast(new Intent(BROADCAST_ACTION_TRANSFER_FINISH)
+                .putExtra(COMPLETED_TRANSFER, completedTransfer));
     }
 
     /**

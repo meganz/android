@@ -1527,7 +1527,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-            dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, e));
+            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e));
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {

@@ -1576,7 +1576,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			if (completedTransfer != null) {
-				dbH.setCompletedTransfer(completedTransfer);
+				addCompletedTransfer(completedTransfer);
 			}
 
 			if(isVoiceClip) return;

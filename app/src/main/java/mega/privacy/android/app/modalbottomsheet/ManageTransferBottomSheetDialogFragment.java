@@ -33,7 +33,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
     private AndroidCompletedTransfer transfer;
     private long handle;
-    private int transferId;
+    private long transferId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -188,6 +188,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(TRANSFER_ID, transferId);
+        outState.putLong(TRANSFER_ID, transferId);
     }
 }

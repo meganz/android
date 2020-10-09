@@ -792,6 +792,32 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
+
+	/**
+	 * Broadcast to update the completed transfers tab.
+	 */
+	private BroadcastReceiver transferFinishReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (!isTransfersCompletedAdded()) {
+				return;
+			}
+
+			if (intent == null || intent.getAction() == null
+					|| !intent.getAction().equals(BROADCAST_ACTION_TRANSFER_FINISH)) {
+				return;
+			}
+
+			AndroidCompletedTransfer completedTransfer = intent.getParcelableExtra(COMPLETED_TRANSFER);
+			if (completedTransfer == null) {
+				return;
+			}
+
+			completedTFLol.transferFinish(completedTransfer);
+		}
+	};
+
+
 	/**
 	 * Broadcast to show a "transfer over quota" warning if it is on Transfers section.
 	 */
@@ -2013,6 +2039,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
 		registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
+
+		registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -4657,6 +4685,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		unregisterReceiver(chatCallUpdateReceiver);
 		unregisterReceiver(receiverCUAttrChanged);
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
+		unregisterReceiver(transferFinishReceiver);
 
         unregisterReceiver(cameraUploadLauncherReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
@@ -14878,28 +14907,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
-	/**
-	 * Add a completed transfer to the Completed tab in Transfers section.
-	 *
-	 * @param transfer	the completed transfer to add
-	 * @param e			the error received in onTransferFinish()
-	 */
-	public void addCompletedTransfer(MegaTransfer transfer, MegaError e){
-		if (isTransfersCompletedAdded()) {
-			AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, e);
-			TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
-			if (transfersManagement != null) {
-				Map<String, String> targetPaths = transfersManagement.getTargetPaths();
-				String targetPath = targetPaths.get(transfer.getPath());
-				if (!isTextEmpty(targetPath)) {
-					completedTransfer.setPath(targetPath);
-				}
-			}
-
-			completedTFLol.transferFinish(completedTransfer);
-		}
-	}
-
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getNodeHandle() + " - " + transfer.getTag());
@@ -14959,8 +14966,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else{
 					logDebug("The transferInProgress is EMPTY");
 				}
-
-				addCompletedTransfer(transfer, e);
 
 				int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 

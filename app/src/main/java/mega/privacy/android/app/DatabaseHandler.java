@@ -1812,7 +1812,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 *
 	 * @param id	the identifier of the transfer to delete
 	 */
-	public void deleteTransfer(int id) {
+	public void deleteTransfer(long id) {
 		db.delete(TABLE_COMPLETED_TRANSFERS, KEY_ID + "=" + id, null);
 	}
 
@@ -1822,7 +1822,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param id	the identifier of the transfer to get
 	 * @return The completed transfer which has the id value as identifier.
 	 */
-	public AndroidCompletedTransfer getcompletedTransfer(int id) {
+	public AndroidCompletedTransfer getcompletedTransfer(long id) {
 		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " WHERE " + KEY_ID + " = '" + id + "'";
 
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -1843,7 +1843,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @return The extracted completed transfer.
 	 */
 	private AndroidCompletedTransfer extractAndroidCompletedTransfer(Cursor cursor) {
-		int id = Integer.parseInt(cursor.getString(0));
+		long id = Integer.parseInt(cursor.getString(0));
 		String filename = decrypt(cursor.getString(1));
 		String type = decrypt(cursor.getString(2));
 		int typeInt = Integer.parseInt(type);
@@ -1861,7 +1861,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
 	}
 
-	public void setCompletedTransfer(AndroidCompletedTransfer transfer){
+	public long setCompletedTransfer(AndroidCompletedTransfer transfer){
 		ContentValues values = new ContentValues();
 		values.put(KEY_TRANSFER_FILENAME, encrypt(transfer.getFileName()));
 		values.put(KEY_TRANSFER_TYPE, encrypt(transfer.getType()+""));
@@ -1875,11 +1875,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.getOriginalPath()));
 		values.put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.getParentHandle() + ""));
 
-		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
+		long id = db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 
 		if (DatabaseUtils.queryNumEntries(db, TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
 			deleteOldestTransfer();
 		}
+
+		return id;
 	}
 
 	public void emptyCompletedTransfers(){

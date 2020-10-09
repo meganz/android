@@ -1,6 +1,9 @@
 package mega.privacy.android.app;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.File;
 
 import nz.mega.sdk.MegaApiAndroid;
@@ -14,9 +17,9 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class AndroidCompletedTransfer {
+public class AndroidCompletedTransfer implements Parcelable {
 
-    private int id;
+    private long id;
     private String fileName;
     private int type;
     private int state;
@@ -29,7 +32,7 @@ public class AndroidCompletedTransfer {
     private String originalPath;
     private long parentHandle;
 
-    public AndroidCompletedTransfer(int id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp, String error, String originalPath, long parentHandle) {
+    public AndroidCompletedTransfer(long id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp, String error, String originalPath, long parentHandle) {
         this.id = id;
         this.fileName = fileName;
         this.type = type;
@@ -113,11 +116,11 @@ public class AndroidCompletedTransfer {
         this.isOfflineFile = isOfflineFile;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -199,5 +202,53 @@ public class AndroidCompletedTransfer {
 
         setIsOfflineFile(false);
         return "";
+    }
+
+    protected AndroidCompletedTransfer(Parcel in) {
+        id = in.readLong();
+        fileName = in.readString();
+        type = in.readInt();
+        state = in.readInt();
+        size = in.readString();
+        nodeHandle = in.readString();
+        path = in.readString();
+        isOfflineFile = in.readByte() != 0;
+        timeStamp = in.readLong();
+        error = in.readString();
+        originalPath = in.readString();
+        parentHandle = in.readLong();
+    }
+
+    public static final Creator<AndroidCompletedTransfer> CREATOR = new Creator<AndroidCompletedTransfer>() {
+        @Override
+        public AndroidCompletedTransfer createFromParcel(Parcel in) {
+            return new AndroidCompletedTransfer(in);
+        }
+
+        @Override
+        public AndroidCompletedTransfer[] newArray(int size) {
+            return new AndroidCompletedTransfer[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(fileName);
+        dest.writeInt(type);
+        dest.writeInt(state);
+        dest.writeString(size);
+        dest.writeString(nodeHandle);
+        dest.writeString(path);
+        dest.writeByte((byte) (isOfflineFile ? 1 : 0));
+        dest.writeLong(timeStamp);
+        dest.writeString(error);
+        dest.writeString(originalPath);
+        dest.writeLong(parentHandle);
     }
 }
