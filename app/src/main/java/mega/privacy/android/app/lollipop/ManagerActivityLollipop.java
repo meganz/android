@@ -16445,9 +16445,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				return;
 			}
 
-			long[] handleList = new long[1];
-			handleList[0] = node.getHandle();
-			nC.checkSizeBeforeDownload(transfer.getPath(), null, node.getSize(), handleList, false);
+			if (transfer.getIsOfflineFile()) {
+				File offlineFile = new File(transfer.getOriginalPath());
+				saveOffline(offlineFile.getParentFile(), node, this, ManagerActivityLollipop.this);
+			} else {
+				long[] handleList = new long[1];
+				handleList[0] = node.getHandle();
+				nC.checkSizeBeforeDownload(transfer.getPath(), null, node.getSize(), handleList, false);
+			}
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 			String originalPath = transfer.getOriginalPath();
 			int lastSeparator = originalPath.lastIndexOf(SEPARATOR);

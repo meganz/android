@@ -43,7 +43,7 @@ public class OfflineUtils {
     public static final String DB_FILE = "0";
     private static final String DB_FOLDER = "1";
 
-    public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
+    public static void saveOffline (File destination, MegaNode node, Context context, Activity activity){
 
         if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
@@ -62,6 +62,7 @@ public class OfflineUtils {
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             logDebug("Is Folder");
+            MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
             getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
         } else {
             logDebug("Is File");

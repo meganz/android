@@ -1408,9 +1408,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			String targetPath = targetPaths.get(path);
 
 			if (!transfer.isFolderTransfer()) {
-				completedTransfer = new AndroidCompletedTransfer(transfer, error);
-				if (!isTextEmpty(targetPath)) {
-					completedTransfer.setPath(targetPath);
+				if (!isVoiceClip) {
+					completedTransfer = new AndroidCompletedTransfer(transfer, error);
+					if (!isTextEmpty(targetPath)) {
+						completedTransfer.setPath(targetPath);
+					}
 				}
 
 				launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);

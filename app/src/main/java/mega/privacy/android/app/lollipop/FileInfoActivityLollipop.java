@@ -1736,7 +1736,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						}
 
                         logDebug("Handle to save for offline : " + node.getHandle());
-                        saveOffline(destination, node, this, fileInfoActivityLollipop, megaApi);
+                        saveOffline(destination, node, this, fileInfoActivityLollipop);
 
 						supportInvalidateOptionsMenu();
 					}
@@ -1771,7 +1771,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 									return;
 								}
 							}
-							saveOffline(destination, node, this, fileInfoActivityLollipop, megaApi);
+							saveOffline(destination, node, this, fileInfoActivityLollipop);
 						}
 						else{
                             logWarning("result=findIncomingParentHandle NOT result!");

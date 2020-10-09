@@ -1084,7 +1084,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         // Save the new file to offline
-        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
+        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context);
     }
 
     @Override
