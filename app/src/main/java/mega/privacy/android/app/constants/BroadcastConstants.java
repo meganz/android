@@ -17,6 +17,9 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_LEFT_CHAT = "INTENT_LEFT_CHAT";
     public static final String BROADCAST_ACTION_SHOW_SNACKBAR = "INTENT_SHOW_SNACKBAR";
     public static final String BROADCAST_ACTION_DESTROY_ACTION_MODE = "INTENT_DESTROY_ACTION_MODE";
+    public static final String BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE = "INTENT_RICH_LINK_SETTING_UPDATE";
+    public static final String BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE = "INTENT_STATUS_SETTING_UPDATE";
+    public static final String BROADCAST_ACTION_INTENT_NOTIFICATIONS_CHAT_SETTING_UPDATE = "INTENT_NOTIFICATIONS_CHAT_SETTING_UPDATE";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -62,4 +65,5 @@ public class BroadcastConstants {
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";
     public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
     public static final String SNACKBAR_TEXT = "SNACKBAR_TEXT";
+    public static final String PRESENCE_CANCELLED = "PRESENCE_CANCELLED";
 }

@@ -19,7 +19,11 @@ public class SettingsConstants {
     public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 
     public static final String GENERAL_SETTINGS = "general_preference_screen";
+
     public static final String CATEGORY_FEATURES = "settings_features";
+    public static final String KEY_FEATURES_CAMERA_UPLOAD = "settings_features_camera_upload";
+    public static final String KEY_FEATURES_CHAT = "settings_features_chat";
+
     public static final String CATEGORY_STORAGE = "settings_storage";
     public static final String CATEGORY_SECURITY = "settings_security";
     public static final String CATEGORY_HELP = "settings_help";
@@ -27,8 +31,6 @@ public class SettingsConstants {
 
     public static final String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
     public static final String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
-    public static final String KEY_FEATURES_CAMERA_UPLOAD = "settings_features_camera_upload";
-    public static final String KEY_FEATURES_CHAT = "settings_features_chat";
     public static final String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
     public static final String KEY_STORAGE_FILE_MANAGEMENT = "settings_storage_file_management";
     public static final String KEY_SECURITY_RECOVERY_KEY = "settings_security_recovey_key";
@@ -50,12 +52,6 @@ public class SettingsConstants {
     public static final String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
     public static final String CATEGORY_FILE_MANAGEMENT = "settings_file_management";
     public static final String KEY_CHAT_ENABLE = "settings_chat_enable";
-
-    public static final String KEY_RICH_LINKS_ENABLE = "settings_rich_links_enable";
-
-    public static final String CATEGORY_AUTOAWAY_CHAT = "settings_autoaway_chat";
-    public static final String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_preference";
-    public static final String KEY_AUTOAWAY_ENABLE = "settings_autoaway_chat_switch";
 
     public static final String KEY_STORAGE_DOWNLOAD_CATEGORY = "download_setting";
     public static final String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";

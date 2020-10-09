@@ -118,73 +118,6 @@
 	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory
-		android:key="settings_chat"
-		android:title="@string/section_chat"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false"
-		app:isPreferenceVisible="false">
-
-		<androidx.preference.ListPreference
-			android:key="settings_chat_list_status"
-			android:title="@string/set_status_option_label"
-			android:entries="@array/settings_status_entries"
-			android:entryValues="@array/settings_chat_status_values"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_last_green_chat_switch"
-			android:title="@string/option_enable_last_green_chat"
-			android:summary="@string/subtitle_option_enable_last_green_chat"
-			android:defaultValue="false"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.ListPreference
-			android:key="settings_chat_send_originals"
-			android:title="@string/settings_chat_upload_quality"
-			android:entries="@array/settings_chat_upload_quality_entries"
-			android:entryValues="@array/settings_chat_upload_quality_values"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_rich_links_enable"
-			android:title="@string/option_enable_chat_rich_preview"
-			android:defaultValue="false"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-	</androidx.preference.PreferenceCategory>
-
-	<androidx.preference.PreferenceCategory
-		android:key="settings_autoaway_chat"
-		android:title="@string/settings_autoaway_title"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false">
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_autoaway_chat_switch"
-			android:title="@string/settings_autoaway_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_autoaway_chat_preference"
-			android:title="@string/settings_autoaway_subtitle"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-	</androidx.preference.PreferenceCategory>
-
-
-	<androidx.preference.PreferenceCategory
 		android:key="settings_file_management"
 		android:title="@string/settings_file_management_category"
 		app:allowDividerAbove="false"
@@ -251,6 +184,9 @@
 
 	</androidx.preference.PreferenceCategory>
 
+
+
+
 	<androidx.preference.PreferenceCategory
 		android:key="settings_features"
 		android:title="@string/settings_features"
@@ -262,6 +198,7 @@
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
+
 		<androidx.preference.Preference
 			android:key="settings_features_chat"
 			android:title="@string/section_chat"

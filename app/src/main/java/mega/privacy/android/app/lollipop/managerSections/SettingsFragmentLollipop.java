@@ -8,11 +8,9 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.Settings;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -51,7 +49,6 @@ import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPrefe
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -68,21 +65,13 @@ import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
-import static mega.privacy.android.app.utils.ChatUtil.getGeneralNotification;
-import static mega.privacy.android.app.utils.ChatUtil.lockOrientationLandscape;
-import static mega.privacy.android.app.utils.ChatUtil.lockOrientationPortrait;
-import static mega.privacy.android.app.utils.ChatUtil.lockOrientationReverseLandscape;
-import static mega.privacy.android.app.utils.ChatUtil.lockOrientationReversePortrait;
-import static mega.privacy.android.app.utils.ChatUtil.unlockOrientation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -90,13 +79,12 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @SuppressLint("NewApi")
-public class SettingsFragmentLollipop extends SettingsBaseFragment implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     Handler handler = new Handler();
 	PreferenceScreen preferenceScreen;
@@ -138,18 +126,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 //	PreferenceCategory twoFACategory;
     SwitchPreferenceCompat autoPlaySwitch;
 
-	PreferenceCategory chatEnabledCategory;
 	PreferenceCategory cameraUploadCategory;
-	PreferenceCategory autoawayChatCategory;
 	PreferenceCategory fileManagementCategory;
-
-	SwitchPreferenceCompat richLinksSwitch;
-
-	SwitchPreferenceCompat enableLastGreenChatSwitch;
-
-	//New autoaway
-	SwitchPreferenceCompat autoAwaySwitch;
-	Preference chatAutoAwayPreference;
 
 	Preference cameraUploadOn;
 	ListPreference cameraUploadHow;
@@ -179,12 +157,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	SwitchPreferenceCompat enableRbSchedulerSwitch;
 	Preference daysRbSchedulerPreference;
 
-	ListPreference statusChatListPreference;
-	ListPreference chatAttachmentsChatListPreference;
-
 //	TwoLineCheckPreference useHttpsOnly;
-
-	MegaChatPresenceConfig statusConfig;
 
 	Preference recoveryKey;
 	Preference changePass;
@@ -238,8 +211,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		cameraUploadsPreference.setOnPreferenceClickListener(this);
 		chatPreference = findPreference(KEY_FEATURES_CHAT);
 		chatPreference.setOnPreferenceClickListener(this);
-		chatPreference.setOnPreferenceChangeListener(this);
-		updateNotifChat();
 
 		storageCategory = findPreference(CATEGORY_STORAGE);
 		downloadLocationPreference = findPreference(KEY_STORAGE_DOWNLOAD_LOCATION);
@@ -289,20 +260,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		cameraUploadCategory = (PreferenceCategory) findPreference(CATEGORY_CAMERA_UPLOAD);
 		cameraUploadCategory.setVisible(false);
-		chatEnabledCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_ENABLED);
-		chatEnabledCategory.setVisible(false);
-		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
-		autoawayChatCategory.setVisible(false);
+
 		fileManagementCategory = (PreferenceCategory) findPreference(CATEGORY_FILE_MANAGEMENT);
 		fileManagementCategory.setVisible(false);
-
-
-		richLinksSwitch = (SwitchPreferenceCompat) findPreference(KEY_RICH_LINKS_ENABLE);
-		richLinksSwitch.setOnPreferenceClickListener(this);
-		richLinksSwitch.setVisible(false);
-		autoAwaySwitch = (SwitchPreferenceCompat) findPreference(KEY_AUTOAWAY_ENABLE);
-		autoAwaySwitch.setOnPreferenceClickListener(this);
-		autoAwaySwitch.setVisible(false);
 
 		autoPlaySwitch = (SwitchPreferenceCompat) findPreference(KEY_AUTO_PLAY_SWITCH);
         autoPlaySwitch.setOnPreferenceClickListener(this);
@@ -311,17 +271,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		boolean autoPlayEnabled = prefs.isAutoPlayEnabled();
         autoPlaySwitch.setChecked(autoPlayEnabled);
 
-		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
-		chatAttachmentsChatListPreference.setOnPreferenceChangeListener(this);
-		chatAttachmentsChatListPreference.setVisible(false);
 
-		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
-		statusChatListPreference.setOnPreferenceChangeListener(this);
-		statusChatListPreference.setVisible(false);
-
-		chatAutoAwayPreference = findPreference(KEY_CHAT_AUTOAWAY);
-		chatAutoAwayPreference.setOnPreferenceClickListener(this);
-		chatAutoAwayPreference.setVisible(false);
 
 
 //		useHttpsOnly = (TwoLineCheckPreference) findPreference("settings_use_https_only");
@@ -406,10 +356,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		updateEnabledFileVersions();
 		enableRbSchedulerSwitch = (SwitchPreferenceCompat) findPreference(KEY_ENABLE_RB_SCHEDULER);
-		enableLastGreenChatSwitch = (SwitchPreferenceCompat) findPreference(KEY_ENABLE_LAST_GREEN_CHAT);
 		daysRbSchedulerPreference = (Preference) findPreference(KEY_DAYS_RB_SCHEDULER);
 		enableRbSchedulerSwitch.setVisible(false);
-		enableLastGreenChatSwitch.setVisible(false);
 		daysRbSchedulerPreference.setVisible(false);
 
 		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
@@ -655,38 +603,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			dbH.setVibrationEnabledChat(true + "");
 		}
 
-		//Get chat status
-		statusConfig = megaChatApi.getPresenceConfig();
-		if (statusConfig != null) {
-			logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
-			logDebug("Status: " + statusConfig.getOnlineStatus());
-
-			statusChatListPreference.setValue(statusConfig.getOnlineStatus() + "");
-			if (statusConfig.getOnlineStatus() == MegaChatApi.STATUS_INVALID) {
-				statusChatListPreference.setSummary(getString(R.string.recovering_info));
-			} else {
-				statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-			}
-
-			showPresenceChatConfig();
-
-			if (megaChatApi.isSignalActivityRequired()) {
-				megaChatApi.signalPresenceActivity();
-			}
-		} else {
-			waitPresenceConfig();
-		}
-
-		boolean sendOriginalAttachment = isSendOriginalAttachments();
-		if (sendOriginalAttachment) {
-			chatAttachmentsChatListPreference.setValue(1 + "");
-		} else {
-			chatAttachmentsChatListPreference.setValue(0 + "");
-		}
-		chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
-
-		boolean richLinks = MegaApplication.isEnabledRichLinks();
-		richLinksSwitch.setChecked(richLinks);
 
 //		cacheAdvancedOptions.setSummary(getString(R.string.settings_advanced_features_calculating));
 		offlineFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
@@ -1014,10 +930,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	}
 
 	public void setOnlineOptions(boolean isOnline){
-		chatEnabledCategory.setEnabled(isOnline);
+		featuresCategory.setEnabled(isOnline);
 		chatPreference.setEnabled(isOnline);
-		autoawayChatCategory.setEnabled(isOnline);
 		cameraUploadCategory.setEnabled(isOnline);
+
 		rubbishFileManagement.setEnabled(isOnline);
 		clearVersionsFileManagement.setEnabled(isOnline);
 		securityCategory.setEnabled(isOnline);
@@ -1160,36 +1076,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 			pinLockCode.setSummary(ast);
 			logDebug("Object: " + newValue);
-		}
-		else if (preference.getKey().compareTo("settings_chat_list_status") == 0){
-			logDebug("Change status (CHAT)");
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				return false;
-			}
-			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-			int newStatus= Integer.parseInt((String)newValue);
-			megaChatApi.setOnlineStatus(newStatus, (ManagerActivityLollipop) context);
-		}
-		else if (preference.getKey().compareTo("settings_chat_send_originals") == 0){
-			logDebug("Change send originals (CHAT)");
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				return false;
-			}
-
-			int newStatus= Integer.parseInt((String)newValue);
-			if(newStatus==0){
-				dbH.setSendOriginalAttachments(false+"");
-				chatAttachmentsChatListPreference.setValue(0+"");
-			}
-			else if(newStatus==1){
-				dbH.setSendOriginalAttachments(true+"");
-				chatAttachmentsChatListPreference.setValue(1+"");
-			}
-			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
-		} else if (preference.getKey().compareTo(KEY_FEATURES_CHAT) == 0) {
-			updateNotifChat();
 		}
 
 		return true;
@@ -1430,42 +1316,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 //				pinLockEnableSwitch.setTitle(getString(R.string.settings_pin_lock_on));
 				securityCategory.removePreference(pinLockCode);
 			}
-		} else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0) {
-			logDebug("KEY_AUTOAWAY_ENABLE");
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				return false;
-			}
-			statusConfig = megaChatApi.getPresenceConfig();
-			if(statusConfig!=null){
-				if(statusConfig.isAutoawayEnabled()){
-					logDebug("Change AUTOAWAY chat to false");
-					megaChatApi.setPresenceAutoaway(false, 0);
-					autoawayChatCategory.removePreference(chatAutoAwayPreference);
-				}
-				else{
-					logDebug("Change AUTOAWAY chat to true");
-					megaChatApi.setPresenceAutoaway(true, 300);
-					autoawayChatCategory.addPreference(chatAutoAwayPreference);
-					chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, 5));
-				}
-			}
-		}
-		else if (preference.getKey().compareTo(KEY_RICH_LINKS_ENABLE) == 0){
-
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				return false;
-			}
-
-			if(richLinksSwitch.isChecked()){
-				logDebug("Enable rich links");
-				megaApi.enableRichPreviews(true, (ManagerActivityLollipop)context);
-			}
-			else{
-				logDebug("Disable rich links");
-				megaApi.enableRichPreviews(false, (ManagerActivityLollipop)context);
-			}
 		}
 		else if (preference.getKey().compareTo(KEY_ENABLE_VERSIONS) == 0){
 			logDebug("Change KEY_ENABLE_VERSIONS");
@@ -1518,45 +1368,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			}
 
 			((ManagerActivityLollipop)context).showRbSchedulerValueDialog(false);
-		}
-		else if (preference.getKey().compareTo(KEY_ENABLE_LAST_GREEN_CHAT) == 0){
-			logDebug("Change KEY_ENABLE_LAST_GREEN_CHAT");
-
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				return false;
-			}
-
-			if(!enableLastGreenChatSwitch.isChecked()){
-				logDebug("Disable last green");
-				((ManagerActivityLollipop)context).enableLastGreen(false);
-			}
-			else{
-				logDebug("Enable last green");
-				((ManagerActivityLollipop)context).enableLastGreen(true);
-			}
-		}
-		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				return false;
-			}
-			((ManagerActivityLollipop)context).showAutoAwayValueDialog();
-		}
-		else if(preference.getKey().compareTo(KEY_CHAT_PERSISTENCE) == 0){
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				return false;
-			}
-
-			if(statusConfig.isPersist()){
-				logDebug("Change persistence chat to false");
-				megaChatApi.setPresencePersist(false);
-			}
-			else{
-				logDebug("Change persistence chat to true");
-				megaChatApi.setPresencePersist(true);
-			}
 		} else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
 			logDebug("KEY_PIN_LOCK_CODE");
@@ -1908,7 +1719,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		taskGetSizeOffline();
 
 		if(!isOnline(context)){
-			chatEnabledCategory.setEnabled(false);
+			featuresCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
 		super.onResume();
@@ -2013,48 +1824,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		startActivity(intent);
 	}
 
-	public void updateNotifChat() {
-		MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
-
-		String option = NOTIFICATIONS_ENABLED;
-		if (pushNotificationSettings != null && pushNotificationSettings.isGlobalChatsDndEnabled()) {
-			option = pushNotificationSettings.getGlobalChatsDnd() == 0 ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_DISABLED_X_TIME;
-		}
-
-		switch (option) {
-			case NOTIFICATIONS_DISABLED:
-				chatPreference.setSummary(getString(R.string.mute_chatroom_notification_option_off));
-				break;
-
-			case NOTIFICATIONS_ENABLED:
-				chatPreference.setSummary(getString(R.string.mute_chat_notification_option_on));
-				break;
-
-			default:
-				chatPreference.setSummary(getCorrectStringDependingOnOptionSelected(pushNotificationSettings.getGlobalChatsDnd()));
-		}
-	}
-
-	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){
-		logDebug("updatePresenceConfigChat: " + cancelled);
-
-		if(!cancelled){
-			statusConfig = config;
-		}
-
-		showPresenceChatConfig();
-	}
-
-	public void updateEnabledRichLinks(){
-		logDebug("updateEnabledRichLinks");
-
-		if(MegaApplication.isEnabledRichLinks()!=richLinksSwitch.isChecked()){
-			richLinksSwitch.setOnPreferenceClickListener(null);
-			richLinksSwitch.setChecked(MegaApplication.isEnabledRichLinks());
-			richLinksSwitch.setOnPreferenceClickListener(this);
-		}
-	}
-
 	public void updateEnabledFileVersions(){
 		logDebug("updateEnabledFileVersions: " + MegaApplication.isDisableFileVersions());
 
@@ -2117,74 +1886,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		}
 	}
 
-	public void waitPresenceConfig(){
-		logDebug("waitPresenceConfig: ");
-
-		preferenceScreen.removePreference(autoawayChatCategory);
-
-		statusChatListPreference.setValue(MegaChatApi.STATUS_OFFLINE+"");
-		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-
-		enableLastGreenChatSwitch.setEnabled(false);
-
-	}
-
-	public void showPresenceChatConfig(){
-		logDebug("showPresenceChatConfig: " + statusConfig.getOnlineStatus());
-
-		statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
-		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-
-		if(statusConfig.getOnlineStatus()!= MegaChatApi.STATUS_ONLINE){
-			preferenceScreen.removePreference(autoawayChatCategory);
-
-		}
-		else if(statusConfig.getOnlineStatus()== MegaChatApi.STATUS_ONLINE){
-			//I'm online
-
-
-			if(statusConfig.isPersist()){
-				preferenceScreen.removePreference(autoawayChatCategory);
-			}
-			else{
-				preferenceScreen.addPreference(autoawayChatCategory);
-				if(statusConfig.isAutoawayEnabled()){
-					int timeout = (int)statusConfig.getAutoawayTimeout()/60;
-					autoAwaySwitch.setChecked(true);
-					autoawayChatCategory.addPreference(chatAutoAwayPreference);
-					chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, timeout));
-				}
-				else{
-					autoAwaySwitch.setChecked(false);
-					autoawayChatCategory.removePreference(chatAutoAwayPreference);
-				}
-			}
-		}
-		else{
-			hidePreferencesChat();
-		}
-
-		//Show configuration last green
-		if(statusConfig.isLastGreenVisible()){
-			logDebug("Last visible ON");
-			enableLastGreenChatSwitch.setEnabled(true);
-			if(!enableLastGreenChatSwitch.isChecked()){
-				enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
-				enableLastGreenChatSwitch.setChecked(true);
-			}
-			enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
-		}
-		else{
-			logDebug("Last visible OFF");
-			enableLastGreenChatSwitch.setEnabled(true);
-			if(enableLastGreenChatSwitch.isChecked()){
-				enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
-				enableLastGreenChatSwitch.setChecked(false);
-			}
-			enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
-		}
-	}
-
 
 	public void cancelSetPinLock(){
 		logDebug("cancelSetPinkLock");
@@ -2196,14 +1897,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	}
 
 	public void hidePreferencesChat(){
-		logDebug("hidePreferencesChat");
-
 		getPreferenceScreen().removePreference(chatPreference);
-		getPreferenceScreen().removePreference(autoawayChatCategory);
-		chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
-		chatEnabledCategory.removePreference(richLinksSwitch);
-		chatEnabledCategory.removePreference(enableLastGreenChatSwitch);
-		chatEnabledCategory.removePreference(statusChatListPreference);
 	}
 
 	public void setValueOfAutoaccept (boolean autoAccept) {

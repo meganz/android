@@ -17,7 +17,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivity {
 
-    private SettingsChatNotificationsFragment sttChat;
+    private SettingsChatNotificationsFragment sttChatNotifications;
 
     private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -26,7 +26,7 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
                 return;
 
             if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
-                sttChat.updateSwitch();
+                sttChatNotifications.updateSwitch();
             }
         }
     };
@@ -37,8 +37,8 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
 
         aB.setTitle(getString(R.string.title_properties_chat_notifications_contact).toUpperCase());
 
-        sttChat = new SettingsChatNotificationsFragment();
-        replaceFragment(sttChat);
+        sttChatNotifications = new SettingsChatNotificationsFragment();
+        replaceFragment(sttChatNotifications);
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
@@ -76,9 +76,9 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
 
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 
-            if (sttChat != null) {
-                if (sttChat.isAdded()) {
-                    sttChat.setNotificationSound(uri);
+            if (sttChatNotifications != null) {
+                if (sttChatNotifications.isAdded()) {
+                    sttChatNotifications.setNotificationSound(uri);
                 }
             }
         }

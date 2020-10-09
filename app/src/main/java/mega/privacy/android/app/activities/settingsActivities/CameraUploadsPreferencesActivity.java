@@ -24,9 +24,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
-
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
     }

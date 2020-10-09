@@ -42,7 +42,6 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
 
     public SettingsChatNotificationsFragment () {
         super();
-
         chatSettings = dbH.getChatSettings();
     }
 
@@ -103,6 +102,10 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
         }
 
         chatNotificationsSwitch.setChecked(option.equals(NOTIFICATIONS_ENABLED));
+
+        if(chatSettings == null){
+            chatSettings = dbH.getChatSettings();
+        }
 
         if (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled())) {
             dbH.setVibrationEnabledChat(true + "");
@@ -184,7 +187,6 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
     }
 
     public void setNotificationSound (Uri uri){
-
         String chosenSound = "-1";
         if(uri!=null){
             Ringtone sound = RingtoneManager.getRingtone(context, uri);
@@ -195,7 +197,6 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
                 logDebug("Title sound notification: " + title);
                 chatSoundPreference.setSummary(title);
             }
-
             chosenSound = uri.toString();
         }
         else{
@@ -211,7 +212,6 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
             chatSettings.setNotificationsSound(chosenSound);
             dbH.setNotificationSoundChat(chosenSound);
         }
-
     }
 }
 

@@ -1293,9 +1293,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (getChatsFragment() != null) {
 					rChatFL.notifyPushChanged();
 				}
-				if(getSettingsFragment() != null){
-					sttFLol.updateNotifChat();
-				}
 			}
 		}
 	};
@@ -9874,113 +9871,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void enableLastGreen(boolean enable){
-		logDebug("Enable Last Green: "+ enable);
-
-		if(megaChatApi!=null){
-			megaChatApi.setLastGreenVisible(enable, this);
-		}
-	}
-
-	public void showAutoAwayValueDialog(){
-		logDebug("showAutoAwayValueDialog");
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View v = inflater.inflate(R.layout.dialog_autoaway, null);
-        builder.setView(v);
-
-        final EditText input = v.findViewById(R.id.autoaway_edittext);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = validateAutoAway(v.getText());
-					if (value != null) {
-						setAutoAwayValue(value, false);
-					}
-					newFolderDialog.dismiss();
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.requestFocus();
-
-		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
-		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
-		set.setOnClickListener(new OnClickListener() {
-            @Override
-			public void onClick(View v) {
-				String value = validateAutoAway(input.getText());
-				if (value != null) {
-					setAutoAwayValue(value, false);
-				}
-				newFolderDialog.dismiss();
-			}
-        });
-		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
-	    cancel.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAutoAwayValue("-1", true);
-				newFolderDialog.dismiss();
-            }
-        });
-
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-	}
-
-	private String validateAutoAway(CharSequence value) {
-		int timeout;
-		try {
-			timeout = Integer.parseInt(value.toString().trim());
-			if (timeout <= 0) {
-				timeout = 1;
-			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
-				timeout = MAX_AUTOAWAY_TIMEOUT;
-			}
-			return String.valueOf(timeout);
-		} catch (Exception e) {
-			logWarning("Unable to parse user input, user entered: '" + value + "'");
-			return null;
-		}
-	}
-
-	public void setAutoAwayValue(String value, boolean cancelled){
-		logDebug("Value: " + value);
-		if(cancelled){
-			if(getSettingsFragment() != null){
-				sttFLol.updatePresenceConfigChat(true, null);
-			}
-		}
-		else{
-			int timeout = Integer.parseInt(value);
-			if(megaChatApi!=null){
-				megaChatApi.setPresenceAutoaway(true, timeout*60);
-			}
-		}
-	}
-
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
 			MegaNode rootNode = megaApi.getRootNode();
@@ -13425,9 +13315,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("change isRickLinkEnabled - USER_ATTR_RICH_PREVIEWS finished");
 				if (e.getErrorCode() != MegaError.API_OK){
 					logError("ERROR:USER_ATTR_RICH_PREVIEWS");
-					if(getSettingsFragment() != null){
-						sttFLol.updateEnabledRichLinks();
-					}
+					sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
 				}
 			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
@@ -13602,10 +13490,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:" + request.getFlag());
 
 					MegaApplication.setEnabledRichLinks(request.getFlag());
-
-                    if(getSettingsFragment() != null){
-						sttFLol.updateEnabledRichLinks();
-                    }
+					sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
 				}
             }
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
@@ -15752,12 +15637,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("Config is pending - do not update UI");
 			}
 			else{
-				if(getSettingsFragment() != null){
-					sttFLol.updatePresenceConfigChat(false, config);
-				}
-				else{
-					logWarning("sttFLol no added or null");
-				}
+				Intent intentPresence = new Intent(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE);
+				intentPresence.putExtra(PRESENCE_CANCELLED, false);
+				sendBroadcast(intentPresence);
 			}
 		}
 		else{
