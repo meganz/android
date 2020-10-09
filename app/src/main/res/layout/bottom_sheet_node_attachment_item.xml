@@ -211,14 +211,23 @@
 
                 <TextView
                     android:id="@+id/option_save_offline_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:layout_weight="5"
                     android:text="@string/save_to_offline"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/option_save_offline_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    />
             </LinearLayout>
 
 
