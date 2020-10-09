@@ -4,11 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.ProgressBar
-import com.facebook.drawee.view.SimpleDraweeView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyActivity.Companion.GIF_DATA
+import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
@@ -17,9 +15,7 @@ import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
 class GiphyViewerActivity: PinActivityLollipop() {
 
-    private var gifView: SimpleDraweeView? = null
-    private var pB: ProgressBar? = null
-    private var sendFab: FloatingActionButton? = null
+    private lateinit var binding: ActivityGiphyViewerBinding
 
     private var gifData: GifData? = null
 
@@ -27,24 +23,22 @@ class GiphyViewerActivity: PinActivityLollipop() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_giphy_viewer)
-        window.statusBarColor = resources.getColor(R.color.black)
+        binding = ActivityGiphyViewerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        gifView = findViewById(R.id.gif_image)
-        pB = findViewById(R.id.gif_progress_bar)
-        sendFab = findViewById(R.id.send_fab)
+        window.statusBarColor = resources.getColor(R.color.black)
 
         if(intent.action.equals(ACTION_PREVIEW_GIPHY)) {
             picking = false
-            sendFab?.visibility = View.GONE
+            binding.sendFab.visibility = View.GONE
         } else {
-            sendFab?.setOnClickListener { sendGifToChat() }
+            binding.sendFab.setOnClickListener { sendGifToChat() }
         }
 
         gifData = intent.getParcelableExtra(GIF_DATA)
         updateGifDimensionsView()
 
-        loadGif(gifView, pB, false, null, Uri.parse(gifData?.webpUrl))
+        loadGif(binding.gifImage, binding.gifProgressBar, false, null, Uri.parse(gifData?.webpUrl))
     }
 
     /**
@@ -52,7 +46,7 @@ class GiphyViewerActivity: PinActivityLollipop() {
      * depending on the available space on screen and orientation.
      */
     private fun updateGifDimensionsView() {
-        val params = gifView?.layoutParams
+        val params = binding.gifImage.layoutParams ?: return
         val gifWidth = gifData?.width
         val gifHeight = gifData?.height
         val gifScreenWidth: Int
@@ -69,7 +63,7 @@ class GiphyViewerActivity: PinActivityLollipop() {
             }
 
             if (gifScreenHeight > 0) {
-                params?.height = gifScreenHeight
+                params.height = gifScreenHeight
             }
         } else {
             gifScreenHeight = outMetrics.heightPixels
@@ -82,11 +76,11 @@ class GiphyViewerActivity: PinActivityLollipop() {
             }
 
             if (gifScreenWidth > 0) {
-                params?.width = gifScreenWidth
+                params.width = gifScreenWidth
             }
         }
 
-        gifView?.layoutParams = params
+        binding.gifImage.layoutParams = params
     }
 
     /**

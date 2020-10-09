@@ -7,7 +7,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface GiphyEndPointsInterface {
-    @GET("v1/gifs/search?")
+    @GET("v1/gifs/search")
     fun getGiphySearch(@Query("q") q: String? = null,
                        @Query("limit") limit: Int? = null,
                        @Query("offset") offset: Int? = null,

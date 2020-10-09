@@ -40,16 +40,16 @@ public class FrescoUtils {
      * @param gifImgDisplay            The SimpleDraweeView to display the GIF/WEBP.
      * @param pb                       Progress bar showing when loading.
      * @param shouldDisplayPlaceHolder If true, a placeholder should be shown while the animated image is loading.
-     * @param drawable                 Used as placeholder, before the GIF/WEBP is fully loaded.
+     * @param placeholder                 Used as placeholder, before the GIF/WEBP is fully loaded.
      * @param uri                      The uri of GIF/WEBP. May be from url or local path.
      */
-    public static void loadGif(SimpleDraweeView gifImgDisplay, ProgressBar pb, boolean shouldDisplayPlaceHolder, @Nullable Drawable drawable, Uri uri) {
+    public static void loadGif(SimpleDraweeView gifImgDisplay, @Nullable ProgressBar pb, boolean shouldDisplayPlaceHolder, @Nullable Drawable placeholder, Uri uri) {
         // Set placeholder and its scale type here rather than in xml.
         if (shouldDisplayPlaceHolder) {
-            if (drawable == null) {
+            if (placeholder == null) {
                 gifImgDisplay.getHierarchy().setPlaceholderImage(R.drawable.ic_image_thumbnail, ScalingUtils.ScaleType.CENTER_INSIDE);
             } else {
-                gifImgDisplay.getHierarchy().setPlaceholderImage(drawable, ScalingUtils.ScaleType.CENTER_INSIDE);
+                gifImgDisplay.getHierarchy().setPlaceholderImage(placeholder, ScalingUtils.ScaleType.CENTER_INSIDE);
             }
         }
 
@@ -84,11 +84,11 @@ public class FrescoUtils {
      *
      * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
      * @param pb            Progress bar showing when loading.
-     * @param drawable      Used as placeholder, before the GIF/WEBP is fully loaded.
+     * @param placeholder      Used as placeholder, before the GIF/WEBP is fully loaded.
      * @param uri           The uri of GIF/WEBP. May be from url or local path.
      */
-    public static void loadGif(SimpleDraweeView gifImgDisplay, ProgressBar pb, @Nullable Drawable drawable, Uri uri) {
-        loadGif(gifImgDisplay, pb, true, drawable, uri);
+    public static void loadGif(SimpleDraweeView gifImgDisplay, @Nullable ProgressBar pb, @Nullable Drawable placeholder, Uri uri) {
+        loadGif(gifImgDisplay, pb, true, placeholder, uri);
     }
 
     /**

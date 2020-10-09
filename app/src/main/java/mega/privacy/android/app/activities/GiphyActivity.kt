@@ -10,16 +10,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.GiphyAdapter
+import mega.privacy.android.app.databinding.ActivityGiphyBinding
 import mega.privacy.android.app.interfaces.GiphyEndPointsInterface
+import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
@@ -34,7 +33,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GiphyActivity : PinActivityLollipop() {
+class GiphyActivity : PinActivityLollipop(), GiphyInterface{
 
     companion object {
         private const val NUM_COLUMNS_PORTRAIT = 2
@@ -44,10 +43,7 @@ class GiphyActivity : PinActivityLollipop() {
         const val GIF_DATA = "GIF_DATA"
     }
 
-    private var toolbar: Toolbar? = null
-    private var gifList: RecyclerView? = null
-    private var emptyView: RelativeLayout? = null
-    private var emptyText: TextView? = null
+    private lateinit var binding: ActivityGiphyBinding
 
     private var giphyAdapter: GiphyAdapter? = null
 
@@ -63,30 +59,28 @@ class GiphyActivity : PinActivityLollipop() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_giphy)
+        binding = ActivityGiphyBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         window.statusBarColor = resources.getColor(R.color.dark_primary_color)
 
-        toolbar = findViewById(R.id.giphy_toolbar)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.giphyToolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_grey)
-        toolbar?.title = getString(R.string.search_giphy_title)
+        binding.giphyToolbar.title = getString(R.string.search_giphy_title)
 
-        screenOrientation = if (isScreenInPortrait(this@GiphyActivity)) ORIENTATION_PORTRAIT else ORIENTATION_LANDSCAPE
+        screenOrientation = resources.configuration.orientation
         updateView()
 
-        gifList = findViewById(R.id.giphy_list)
-        gifList?.apply {
+        binding.giphyList.apply {
             setHasFixedSize(true)
             clipToPadding = false
             layoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
             itemAnimator = DefaultItemAnimator()
         }
 
-        emptyView = findViewById(R.id.empty_giphy_view)
-        emptyView?.visibility = GONE
-        emptyText = findViewById(R.id.empty_giphy_text)
+        binding.emptyGiphyView.visibility = GONE
 
         var emptyTextSearch = getString(R.string.empty_search_giphy)
         try {
@@ -96,7 +90,7 @@ class GiphyActivity : PinActivityLollipop() {
             logWarning("Exception formatting string", e)
         }
 
-        emptyText?.text = getSpannedHtmlText(emptyTextSearch)
+        binding.emptyGiphyText.text = getSpannedHtmlText(emptyTextSearch)
 
         giphyService = GiphyService.buildService()
         requestTrendingData()
@@ -105,6 +99,11 @@ class GiphyActivity : PinActivityLollipop() {
     override fun onBackPressed() {
         setResult(RESULT_CANCELED)
         super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        cancelPreviousRequests()
+        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -137,11 +136,9 @@ class GiphyActivity : PinActivityLollipop() {
             numColumns = NUM_COLUMNS_LANDSCAPE
             widthScreen = outMetrics.heightPixels
         }
-        numColumns = if (screenOrientation == ORIENTATION_PORTRAIT) NUM_COLUMNS_PORTRAIT else NUM_COLUMNS_LANDSCAPE
-
 
         screenGifWidth = (widthScreen / numColumns) - (px2dp(GIF_MARGIN, outMetrics) * numColumns)
-        gifList?.layoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
+        binding.giphyList.layoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
         giphyAdapter?.notifyDataSetChanged()
     }
 
@@ -149,7 +146,7 @@ class GiphyActivity : PinActivityLollipop() {
      * Requests trending data to the Giphy API.
      */
     private fun requestTrendingData() {
-        if (trendingData == null) getAndSetData(giphyService?.getGiphyTrending(), true)
+        if (trendingData == null) getAndSetData(giphyService?.getGiphyTrending(), null)
         else {
             cancelPreviousRequests()
             updateAdapter(trendingData)
@@ -165,7 +162,7 @@ class GiphyActivity : PinActivityLollipop() {
         val searchValue = searchData[query]
 
         if (searchValue == null) {
-            getAndSetData(giphyService?.getGiphySearch(query), false)
+            getAndSetData(giphyService?.getGiphySearch(query), query)
         } else {
             cancelPreviousRequests()
             updateAdapter(searchValue)
@@ -177,9 +174,10 @@ class GiphyActivity : PinActivityLollipop() {
      *  showing the result on screen if everything was correct.
      *  If there is already a request in progress, cancels it to launch the new one.
      *
-     * @param call  Indicates the type of the request. It can be Trending or Search.
+     * @param call              Indicates the type of the request. It can be Trending or Search.
+     * @param query             Search query if is a search request, null otherwise.
      */
-    private fun getAndSetData(call: Call<GiphyResponse>?, isTrendingData: Boolean) {
+    private fun getAndSetData(call: Call<GiphyResponse>?, query: String?) {
         cancelPreviousRequests()
 
         call?.enqueue(object : Callback<GiphyResponse> {
@@ -187,11 +185,7 @@ class GiphyActivity : PinActivityLollipop() {
                 if (response.isSuccessful) {
                     val gifData = response.body()?.data
 
-                    if (isTrendingData) trendingData = gifData
-                    else {
-                        val url = call.request().url().url().toString()
-                        searchData[url.split("q=").last()] = gifData
-                    }
+                    if (query == null) trendingData = gifData else searchData[query] = gifData
 
                     updateAdapter(gifData)
                 } else {
@@ -222,7 +216,7 @@ class GiphyActivity : PinActivityLollipop() {
     private fun updateAdapter(gifsData: ArrayList<Data>?) {
         if (giphyAdapter == null) {
             giphyAdapter = GiphyAdapter(gifsData, this@GiphyActivity)
-            gifList?.adapter = giphyAdapter
+            binding.giphyList.adapter = giphyAdapter
         } else {
             giphyAdapter?.setGifs(gifsData)
         }
@@ -279,15 +273,23 @@ class GiphyActivity : PinActivityLollipop() {
         }
     }
 
-    /**
-     * Gets the height of a GIF to display on screen from its real width, real height and width available on the screen.
-     * The width available on the screen will depend on the dimensions of the current device and the current columns displayed.
-     *
-     * @param gifWidth  Real width of the GIF.
-     * @param gifHeight Real height of the GIF.
-     * @return The height to display on screen.
-     */
-    fun getScreenGifHeight(gifWidth: Int, gifHeight: Int): Int {
+    override fun openGifViewer(gifData: GifData?) {
+        startActivityForResult(Intent(this@GiphyActivity, GiphyViewerActivity::class.java)
+                .putExtra(GIF_DATA, gifData),
+                REQUEST_CODE_PICK_GIF)
+    }
+
+    override fun setEmptyState(emptyState: Boolean) {
+        if (emptyState) {
+            binding.emptyGiphyView.visibility = VISIBLE
+            binding.giphyList.visibility = GONE
+        } else {
+            binding.emptyGiphyView.visibility = GONE
+            binding.giphyList.visibility = VISIBLE
+        }
+    }
+
+    override fun getScreenGifHeight(gifWidth: Int, gifHeight: Int): Int {
         if (gifWidth == gifHeight) {
             return screenGifWidth
         }
@@ -296,29 +298,5 @@ class GiphyActivity : PinActivityLollipop() {
         val screenGifHeight = gifHeight * factor
 
         return screenGifHeight.toInt()
-    }
-
-    /**
-     * Opens the GIF viewer showing the selected GIF.
-     *
-     * @param gifData   Object containing all the necessary GIF data.
-     */
-    fun openGifViewer(gifData: GifData?) {
-        startActivityForResult(Intent(this@GiphyActivity, GiphyViewerActivity::class.java)
-                .putExtra(GIF_DATA, gifData),
-                REQUEST_CODE_PICK_GIF)
-    }
-
-    /**
-     * Shows the empty state if the result of the request is empty.
-     */
-    fun setEmptyState(emptyState: Boolean) {
-        if (emptyState) {
-            emptyView?.visibility = VISIBLE
-            gifList?.visibility = GONE
-        } else {
-            emptyView?.visibility = GONE
-            gifList?.visibility = VISIBLE
-        }
     }
 }
