@@ -458,6 +458,9 @@ public class Constants {
     public static final int ERROR_LINK = -1;
     public static final int INVALID_STATE_CALL = -1;
 
+    public static final int BACK_PRESS_NOT_HANDLED = 0;
+    public static final int BACK_PRESS_HANDLED = 1;
+
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";
     public static final String MESSAGE_ID = "messageId";
