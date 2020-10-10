@@ -40,9 +40,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -58,13 +56,10 @@ class HomepageFragment : Fragment() {
     private lateinit var fabMaskMain: FloatingActionButton
     private lateinit var fabMaskLayout: View
     private lateinit var viewPager: ViewPager2
-    private lateinit var tabs: TabLayout
+    private lateinit var tabLayout: TabLayout
     private var currentSelectedTabFragment: Fragment? = null
     private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
-
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -139,12 +134,10 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showOnlineMode() {
-        if (megaApi.rootNode == null) {
-            return
-        }
+        if (viewModel.isRootNodeNull()) return
+
         viewPager.isUserInputEnabled = true
-        rootView.findViewById<View>(R.id.category).isVisible = true
-        //rootView.findViewById<View>(R.id.banner).isVisible = true
+        rootView.category.isVisible = true
         fullyCollapseBottomSheet()
 
         tabsChildren.forEach { tab ->
@@ -155,12 +148,11 @@ class HomepageFragment : Fragment() {
     private fun showOfflineMode() {
         viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
         viewPager.isUserInputEnabled = false
-        rootView.findViewById<View>(R.id.category).isVisible = false
-        //rootView.findViewById<View>(R.id.banner).isVisible = false
+        rootView.category.isVisible = false
         fullyExpandBottomSheet()
 
         if (tabsChildren.isEmpty()) {
-            tabs.touchables.forEach { tab ->
+            tabLayout.touchables.forEach { tab ->
                 tab.isEnabled = false
                 tabsChildren.add(tab)
             }
@@ -227,8 +219,8 @@ class HomepageFragment : Fragment() {
         viewPager.offscreenPageLimit = adapter.itemCount
         viewPager.adapter = adapter
         // Attach the view pager to the tab layout
-        tabs = rootView.findViewById(R.id.tabs)
-        val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->
+        tabLayout = rootView.findViewById(R.id.tabs)
+        val mediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTabTitle(position)
         }
         mediator.attach()
@@ -250,7 +242,7 @@ class HomepageFragment : Fragment() {
 
         viewModel.isScrolling.observe(viewLifecycleOwner) {
             if (it.first == currentSelectedTabFragment) {
-                changeTabEleveation(it.second)
+                changeTabElevation(it.second)
             }
         }
     }
@@ -268,11 +260,9 @@ class HomepageFragment : Fragment() {
     }
 
     private fun getTabTitle(position: Int): String? {
-        val resources = activity.resources
-
         when (position) {
-            BottomSheetPagerAdapter.RECENT_INDEX -> return resources?.getString(R.string.tab_recents)
-            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources?.getString(R.string.tab_offline)
+            BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.tab_recents)
+            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.tab_offline)
         }
 
         return ""
@@ -332,10 +322,10 @@ class HomepageFragment : Fragment() {
         })
     }
 
-    private fun changeTabEleveation(withElevation: Boolean) = if (withElevation) {
-        tabs.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
+    private fun changeTabElevation(withElevation: Boolean) = if (withElevation) {
+        tabLayout.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
     } else {
-        tabs.elevation = 0f
+        tabLayout.elevation = 0f
     }
 
     private fun setupFabs() {

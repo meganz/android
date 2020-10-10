@@ -157,4 +157,6 @@ class HomePageViewModel @ViewModelInject constructor(
             else -> 0
         }
     }
+
+    fun isRootNodeNull() = (megaApi.rootNode == null)
 }

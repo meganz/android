@@ -154,7 +154,6 @@ dependencies {
 
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
-    implementation "com.facebook.fresco:fresco:$frescoVersion"
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
@@ -164,9 +163,6 @@ dependencies {
     implementation "com.facebook.fresco:animated-gif:$frescoVersion"
     implementation "com.facebook.fresco:animated-webp:$frescoVersion"
     implementation "com.facebook.fresco:webpsupport:$frescoVersion"
-
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 }
