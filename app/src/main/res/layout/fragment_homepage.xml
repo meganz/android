@@ -48,7 +48,17 @@
                 app:layout_constraintTop_toBottomOf="@id/searchView" />
 
             <!-- The banner layout will be shown in next version of Homepage -->
-<!--            <include-->
+
+            <com.zhpan.bannerview.BannerViewPager
+                android:id="@+id/banner_view"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                app:bvp_indicator_visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/category" />
+
+            <!--            <include-->
 <!--                android:id="@+id/banner"-->
 <!--                layout="@layout/homepage_banner"-->
 <!--                android:layout_width="0dp"-->

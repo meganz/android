@@ -27,21 +27,26 @@ class HomepageRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) : DefaultMegaGlobalListener, DefaultMegaChatListener {
 
-    private val _notification = MutableLiveData<Int>()
-    private val _chatStatus = MutableLiveData<Int>()
+    private val notification = MutableLiveData<Int>()
+    private val chatStatus = MutableLiveData<Int>()
+    private val bannerList = MutableLiveData<MegaBannerList>()
 
     fun getNotificationLiveData(): LiveData<Int> {
         updateNotificationCount()
-        return _notification
+        return notification
     }
 
     fun getChatStatusLiveData(): LiveData<Int> {
         updateChatStatus(megaChatApi.onlineStatus)
-        return _chatStatus
+        return chatStatus
+    }
+
+    fun getBannerListLiveData(): LiveData<MegaBannerList?> {
+        return bannerList
     }
 
     private fun updateNotificationCount() {
-        _notification.value =
+        notification.value =
             megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
     }
 
@@ -81,7 +86,7 @@ class HomepageRepository @Inject constructor(
     }
 
     private fun updateChatStatus(status: Int) {
-        _chatStatus.value = when (status) {
+        chatStatus.value = when (status) {
             MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online
             MegaChatApi.STATUS_AWAY -> R.drawable.ic_away
             MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy
@@ -106,6 +111,20 @@ class HomepageRepository @Inject constructor(
             CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
             listener
         )
+    }
+
+    suspend fun loadBannerList() = withContext(Dispatchers.IO) {
+        megaApi.getBanners(object : DefaultMegaRequestListener {
+            override fun onRequestFinish(
+                api: MegaApiJava,
+                request: MegaRequest,
+                e: MegaError
+            ) {
+                if (e.errorCode == MegaError.API_OK) {
+                    bannerList.value = request.megaBannerList
+                }
+            }
+        })
     }
 
     fun isRootNodeNull() = (megaApi.rootNode == null)

@@ -10,11 +10,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.view.Window
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -25,6 +28,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.zhpan.bannerview.BannerViewPager
+import com.zhpan.bannerview.BaseBannerAdapter
+import com.zhpan.bannerview.constants.IndicatorGravity
+import com.zhpan.bannerview.utils.BannerUtils
+import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_homepage.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
@@ -33,6 +41,7 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.fragments.homepage.banner.BannerViewHolder
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
@@ -41,6 +50,11 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import mega.privacy.android.app.utils.displayMetrics
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaBanner
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -52,6 +66,7 @@ class HomepageFragment : Fragment() {
     private lateinit var rootView: View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private lateinit var searchInputView: FloatingSearchView
+    private lateinit var bannerViewPager: BannerViewPager<MegaBanner, BannerViewHolder>
     private lateinit var fabMain: FloatingActionButton
     private lateinit var fabMaskMain: FloatingActionButton
     private lateinit var fabMaskLayout: View
@@ -108,6 +123,7 @@ class HomepageFragment : Fragment() {
 
         setupMask()
         setupSearchView()
+        setupBannerView()
         setupCategories()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
@@ -124,6 +140,8 @@ class HomepageFragment : Fragment() {
         if (!isOnline(context)) {
             showOfflineMode()
         }
+
+        viewModel.updateBannersIfNeeded()
     }
 
     override fun onDestroyView() {
@@ -138,6 +156,7 @@ class HomepageFragment : Fragment() {
 
         viewPager.isUserInputEnabled = true
         rootView.category.isVisible = true
+        rootView.banner_view.isVisible = true
         fullyCollapseBottomSheet()
 
         tabsChildren.forEach { tab ->
@@ -149,6 +168,7 @@ class HomepageFragment : Fragment() {
         viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
         viewPager.isUserInputEnabled = false
         rootView.category.isVisible = false
+        rootView.banner_view.isVisible  = false
         fullyExpandBottomSheet()
 
         if (tabsChildren.isEmpty()) {
@@ -247,6 +267,55 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun setupBannerView() {
+        bannerViewPager =
+            viewDataBinding.bannerView as BannerViewPager<MegaBanner, BannerViewHolder>
+        bannerViewPager.setIndicatorSliderGap(BannerUtils.dp2px(6f))
+            .setScrollDuration(800)
+            .setLifecycleRegistry(lifecycle)
+            .setIndicatorStyle(IndicatorStyle.CIRCLE)
+            .setIndicatorSliderGap(Util.dp2px(6f, displayMetrics()))
+            .setIndicatorSliderRadius(Util.dp2px(4f, displayMetrics()), Util.dp2px(4f, displayMetrics()))
+            .setIndicatorGravity(IndicatorGravity.CENTER)
+            .setIndicatorSliderColor(ContextCompat.getColor(requireContext(), R.color.grey_info_menu),
+                ContextCompat.getColor(requireContext(), R.color.white))
+            .setOnPageClickListener(null)
+            .setAdapter(object : BaseBannerAdapter<MegaBanner, BannerViewHolder>() {
+                override fun createViewHolder(itemView: View?, viewType: Int): BannerViewHolder {
+                    return BannerViewHolder(itemView!!)
+                }
+
+                override fun onBind(
+                    holder: BannerViewHolder?,
+                    data: MegaBanner?,
+                    position: Int,
+                    pageSize: Int
+                ) {
+                    holder?.bindData(data, position, pageSize)
+                }
+
+                override fun getLayoutId(viewType: Int): Int {
+                    return R.layout.item_banner_view
+                }
+            })
+            .create()
+
+        viewModel.bannerList.observe(viewLifecycleOwner) {
+            if (it == null) {
+                Log.i("Alex", "null bannerlist")
+                bannerViewPager.removeAllViews()
+                bannerViewPager.visibility = GONE
+            } else {
+                val banners = mutableListOf<MegaBanner>()
+                for (i in 0..it.size()) {
+                    banners.add(it[i])
+                }
+                bannerViewPager.refreshData(banners)
+            }
+        }
+    }
+
     private fun setupMask() {
         windowContent = activity.window?.findViewById(Window.ID_ANDROID_CONTENT)
         fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
@@ -277,7 +346,7 @@ class HomepageFragment : Fragment() {
 
     private fun setBottomSheetPeekHeight() {
         rootView.viewTreeObserver?.addOnPreDrawListener {
-            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.category.root.bottom
+            bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
             true
         }
     }

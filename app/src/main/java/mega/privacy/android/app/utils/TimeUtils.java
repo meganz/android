@@ -30,6 +30,8 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
 
+    public static final int DAY = 24 * 60 * 60 * 1000;
+
     int type;
 
     public TimeUtils(int type){

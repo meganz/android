@@ -8,13 +8,17 @@ import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.avatarChange
 import mega.privacy.android.app.fragments.homepage.scrolling
 import mega.privacy.android.app.listeners.DefaultMegaRequestListener
+import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaBannerList
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
 class HomePageViewModel @ViewModelInject constructor(
     private val repository: HomepageRepository
 ) : ViewModel() {
+    private var lastGetBannerTime = 0L
+
     private val _avatar = MutableLiveData<Bitmap>()
     private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
 
@@ -22,6 +26,7 @@ class HomePageViewModel @ViewModelInject constructor(
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = repository.getChatStatusLiveData()
     val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
+    val bannerList: LiveData<MegaBannerList?> = repository.getBannerListLiveData()
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
         loadAvatar()
@@ -83,4 +88,13 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     fun isRootNodeNull() = repository.isRootNodeNull()
+
+    fun updateBannersIfNeeded() {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastGetBannerTime > TimeUtils.DAY) {
+            viewModelScope.launch { repository.loadBannerList() }
+        }
+
+        lastGetBannerTime = currentTime
+    }
 }

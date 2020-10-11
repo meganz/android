@@ -36,6 +36,7 @@ android {
 
     buildTypes {
         debug {
+            debuggable true
             //  minifyEnabled false
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -164,6 +165,8 @@ dependencies {
     implementation "com.facebook.fresco:webpsupport:$frescoVersion"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+
+    implementation "com.github.zhpanvip:BannerViewPager:$bannerViewPagerVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'

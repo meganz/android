@@ -68,4 +68,5 @@ ext {
     rxAndroidVersion = '3.0.0'
     ankoVersion = '0.10.8'
     frescoVersion = '2.3.0'
+    bannerViewPagerVersion = '3.1.6'
 }

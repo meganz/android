@@ -593,18 +593,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
 
-		boolean staging = false;
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null && attrs.getStaging() != null) {
-				staging = Boolean.parseBoolean(attrs.getStaging());
-			}
-		}
+//		boolean staging = true;
+//		if (dbH != null) {
+//			MegaAttributes attrs = dbH.getAttributes();
+//			if (attrs != null && attrs.getStaging() != null) {
+//				staging = Boolean.parseBoolean(attrs.getStaging());
+//			}
+//		}
 
-		if (staging) {
+//		if (staging) {
+		Log.i("Alex", "using sandbox server");
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+//			megaApi.changeApiUrl("https://nz2-api-sandbox3.developers.mega.co.nz/");
 			megaApiFolder.changeApiUrl("https://staging.api.mega.co.nz/");
-		}
+//			megaApiFolder.changeApiUrl("https://nz2-api-sandbox3.developers.mega.co.nz/");
+//		}
 
 		boolean useHttpsOnly = false;
 		if (dbH != null) {
