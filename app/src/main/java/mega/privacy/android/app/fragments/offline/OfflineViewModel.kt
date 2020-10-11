@@ -20,6 +20,8 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
+import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
+import mega.privacy.android.app.utils.Constants.BACK_PRESS_NOT_HANDLED
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
 import mega.privacy.android.app.utils.FileUtils.isFileAvailable
@@ -281,7 +283,7 @@ class OfflineViewModel @ViewModelInject constructor(
     fun navigateOut(initPath: String): Int {
         // no search action in back stack, should dismiss OfflineFragment
         if (path == "" || (path == initPath && searchQuery == null)) {
-            return 0
+            return BACK_PRESS_NOT_HANDLED
         }
 
         val query = searchQuery
@@ -290,7 +292,7 @@ class OfflineViewModel @ViewModelInject constructor(
         if (query != null) {
             logDebug("navigateOut exit search mode, path $path")
             navigateTo(path, titleFromPath(path), 0)
-            return 2
+            return BACK_PRESS_HANDLED
         }
 
         val searchPath = historySearchPath
@@ -305,7 +307,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 historySearchQuery = null
                 historySearchPath = null
                 navigateTo(path, titleFromPath(path))
-                return 1
+                return BACK_PRESS_HANDLED
             }
         }
 
@@ -320,7 +322,7 @@ class OfflineViewModel @ViewModelInject constructor(
         }
         navigateTo(path, titleFromPath(path), autoScrollPos)
 
-        return 2
+        return BACK_PRESS_HANDLED
     }
 
     private fun titleFromPath(path: String): String {

@@ -81,4 +81,6 @@ class HomePageViewModel @ViewModelInject constructor(
             }
         }
     }
+
+    fun isRootNodeNull() = repository.isRootNodeNull()
 }

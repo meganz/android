@@ -532,4 +532,12 @@
         <item name="android:visibility">gone</item>
         <item name="borderWidth">0dp</item>
     </style>
+
+    <style name="AppBottomSheetDialogThemeReactions" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyleReactions</item>
+    </style>
+
+    <style name="AppModalStyleReactions" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
 </resources>

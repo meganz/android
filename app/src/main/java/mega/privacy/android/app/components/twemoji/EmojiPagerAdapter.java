@@ -9,12 +9,10 @@ import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickLis
 
 public final class EmojiPagerAdapter extends PagerAdapter {
   private static final int RECENT_POSITION = 0;
-
   private final OnEmojiClickListener listener;
   private final OnEmojiLongClickListener longListener;
   private final RecentEmoji recentEmoji;
   private final VariantEmoji variantManager;
-
   private RecentEmojiGridView recentEmojiGridView;
 
   EmojiPagerAdapter(final OnEmojiClickListener listener,
@@ -32,14 +30,12 @@ public final class EmojiPagerAdapter extends PagerAdapter {
   }
 
   @Override public Object instantiateItem(final ViewGroup pager, final int position) {
-    final View newView;
-
+    View newView;
     if (position == RECENT_POSITION) {
       newView = new RecentEmojiGridView(pager.getContext()).init(listener, longListener, recentEmoji);
       recentEmojiGridView = (RecentEmojiGridView) newView;
     } else {
-      newView = new EmojiGridView(pager.getContext()).init(listener, longListener,
-              EmojiManager.getInstance().getCategories()[position - 1], variantManager);
+      newView = new EmojiGridView(pager.getContext()).init(listener, longListener, EmojiManager.getInstance().getCategories()[position - 1], variantManager);
     }
 
     pager.addView(newView);
@@ -49,7 +45,7 @@ public final class EmojiPagerAdapter extends PagerAdapter {
   @Override public void destroyItem(final ViewGroup pager, final int position, final Object view) {
     pager.removeView((View) view);
 
-    if (position == RECENT_POSITION) {
+    if (recentEmoji != null && position == RECENT_POSITION) {
       recentEmojiGridView = null;
     }
   }
@@ -62,8 +58,8 @@ public final class EmojiPagerAdapter extends PagerAdapter {
     return recentEmoji.getRecentEmojis().size();
   }
 
-  void invalidateRecentEmojis() {
-    if (recentEmojiGridView != null) {
+  public void invalidateRecentEmojis() {
+    if (recentEmoji != null && recentEmojiGridView != null) {
       recentEmojiGridView.invalidateEmojis();
     }
   }

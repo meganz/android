@@ -230,6 +230,10 @@ public class Constants {
     public static final String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
     public static final String ACTION_OPEN_CONTACTS_SECTION = "ACTION_OPEN_CONTACTS_SECTION";
 
+    public static final String TYPE_EMOJI = "TYPE_EMOJI";
+    public static final String TYPE_REACTION = "TYPE_REACTION";
+    public static final String INVALID_REACTION = "INVALID_REACTION";
+
     public static final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
 
     public static final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
@@ -454,6 +458,9 @@ public class Constants {
     public static final int ERROR_LINK = -1;
     public static final int INVALID_STATE_CALL = -1;
 
+    public static final int BACK_PRESS_NOT_HANDLED = 0;
+    public static final int BACK_PRESS_HANDLED = 1;
+
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";
     public static final String MESSAGE_ID = "messageId";
@@ -485,6 +492,7 @@ public class Constants {
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
     public static final int INVALID_TYPE_PERMISSIONS = -1;
+    public static final int INVALID_DIMENSION = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 

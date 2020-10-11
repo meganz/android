@@ -303,10 +303,9 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
 
     public static ArrayList<MegaNode> getSearchedNodes(ArrayList<String> handles) {
         long[] handleValues = new long[handles.size()];
-        int index = 0;
-        for (String handle : handles) {
-            handleValues[index] = Long.parseLong(handle);
-            index++;
+
+        for (int i = 0; i < handles.size(); i++) {
+            handleValues[i] = Long.parseLong(handles.get(i));
         }
 
         return getSearchedNodes(handleValues);

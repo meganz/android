@@ -17,56 +17,34 @@ import android.widget.LinearLayout;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
+import mega.privacy.android.app.components.twemoji.listeners.OnEmojiSelectedListener;
+import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class EmojiKeyboard extends LinearLayout {
 
+    private View rootView;
+    private String type;
+    private int keyboardHeight;
+
+    private VariantEmoji variantEmoji;
+    private EmojiVariantPopup variantPopup;
+    private RecentEmoji recentEmoji;
+
     private boolean isListenerActivated = true;
     private Activity activity;
     private EmojiEditTextInterface editInterface;
-    private RecentEmoji recentEmoji;
-    private VariantEmoji variantEmoji;
-    private EmojiVariantPopup variantPopup;
-
-    private final OnEmojiLongClickListener longClickListener = new OnEmojiLongClickListener() {
-        @Override
-        public void onEmojiLongClick(@NonNull final EmojiImageView view, @NonNull final Emoji emoji) {
-            if (isListenerActivated) {
-                variantPopup.show(view, emoji);
-            }
-        }
-    };
-
-    private View rootView;
     private ImageButton emojiIcon;
-    private int keyboardHeight;
-
-    //Click in EMOJI
-    private final OnEmojiClickListener clickListener = new OnEmojiClickListener() {
-        @Override
-        public void onEmojiClick(@NonNull final EmojiImageView imageView, @NonNull final Emoji emoji) {
-            if (isListenerActivated) {
-                editInterface.input(emoji);
-                recentEmoji.addEmoji(emoji);
-                imageView.updateEmoji(emoji);
-                variantPopup.dismiss();
-            }
-        }
-    };
-
     private OnPlaceButtonListener buttonListener;
     private boolean isLetterKeyboardShown = false;
     private boolean isEmojiKeyboardShown = false;
 
-    public EmojiKeyboard(Context context) {
-        super(context);
-        init(null, 0);
-    }
+    private OnEmojiSelectedListener emojiSelectedListener;
 
     public EmojiKeyboard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -84,43 +62,79 @@ public class EmojiKeyboard extends LinearLayout {
         init(attrs, defStyleAttr);
     }
 
-    public void setOnPlaceButtonListener(OnPlaceButtonListener buttonListener) {
-        this.buttonListener = buttonListener;
-    }
-
     private void init(AttributeSet attrs, int defStyle) {
-        // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiKeyboard, defStyle, 0);
         a.recycle();
+    }
+
+    private void initializeCommonVariables(String type, int height) {
+        this.type = type;
         this.rootView = getRootView();
-        this.variantEmoji = new VariantEmojiManager(getContext());
-        this.recentEmoji = new RecentEmojiManager(getContext());
+        this.variantEmoji = new VariantEmojiManager(getContext(), type);
+        this.recentEmoji = new RecentEmojiManager(getContext(), type);
         this.variantPopup = new EmojiVariantPopup(rootView, clickListener);
 
-        final EmojiView emojiView = new EmojiView(getContext(), clickListener, longClickListener, recentEmoji, variantEmoji);
-        emojiView.setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener() {
-            @Override
-            public void onEmojiBackspaceClick(final View v) {
-                editInterface.backspace();
-            }
-        });
+        final EmojiView emojiView = new EmojiView(getContext(), clickListener, longClickListener, recentEmoji, variantEmoji, type);
+        if (type.equals(TYPE_EMOJI)) {
+            emojiView.setOnEmojiBackspaceClickListener(v -> editInterface.backspace());
+        }
         addView(emojiView);
+        this.keyboardHeight = height;
+        requestLayout();
+    }
+
+    public void initEmoji(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon) {
+        this.activity = context;
+        this.editInterface = editText;
+        this.emojiIcon = emojiIcon;
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+        initializeCommonVariables(TYPE_EMOJI, (outMetrics.heightPixels / 2) - getActionBarHeight(activity, getResources()));
+    }
+
+    public void initReaction(int height) {
+        initializeCommonVariables(TYPE_REACTION, height);
+    }
+
+    private final OnEmojiLongClickListener longClickListener = new OnEmojiLongClickListener() {
+        @Override
+        public void onEmojiLongClick(@NonNull final EmojiImageView view, @NonNull final Emoji emoji) {
+            if (type.equals(TYPE_REACTION) || isListenerActivated) {
+                variantPopup.show(view, emoji);
+            }
+        }
+    };
+
+    private final OnEmojiClickListener clickListener = new OnEmojiClickListener() {
+        @Override
+        public void onEmojiClick(@NonNull final EmojiImageView imageView, @NonNull final Emoji emoji) {
+            if (type.equals(TYPE_REACTION) || isListenerActivated) {
+                if (type.equals(TYPE_EMOJI)) {
+                    editInterface.input(emoji);
+                }
+
+                recentEmoji.addEmoji(emoji);
+                variantEmoji.addVariant(emoji);
+                imageView.updateEmoji(emoji);
+                variantPopup.dismiss();
+
+                if (type.equals(TYPE_REACTION)) {
+                    if (emojiSelectedListener == null)
+                        return;
+
+                    emojiSelectedListener.emojiSelected(emoji);
+                }
+            }
+        }
+    };
+
+    public void setOnPlaceButtonListener(OnPlaceButtonListener buttonListener) {
+        this.buttonListener = buttonListener;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(keyboardHeight, MeasureSpec.EXACTLY));
-    }
-
-    public void init(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon) {
-        this.editInterface = editText;
-        this.emojiIcon = emojiIcon;
-        this.activity = context;
-
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-        keyboardHeight = (outMetrics.heightPixels / 2) - getActionBarHeight(activity, getResources());
-        requestLayout();
     }
 
     private void needToReplace() {
@@ -179,6 +193,7 @@ public class EmojiKeyboard extends LinearLayout {
         isLetterKeyboardShown = false;
         needToReplace();
     }
+
     public void hideKeyboardFromFileStorage(){
         hideEmojiKeyboard();
         hideLetterKeyboard();
@@ -220,6 +235,15 @@ public class EmojiKeyboard extends LinearLayout {
 
     public boolean getEmojiKeyboardShown() {
         return isEmojiKeyboardShown;
+    }
+
+    public void setOnEmojiSelectedListener(OnEmojiSelectedListener emojiSelectedListener) {
+        this.emojiSelectedListener = emojiSelectedListener;
+    }
+
+    public void persistReactionList() {
+        recentEmoji.persist();
+        variantEmoji.persist();
     }
 }
 

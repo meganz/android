@@ -2194,7 +2194,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(),db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2219,7 +2219,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(),db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2244,7 +2244,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(), db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2341,10 +2341,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public MegaOffline findByHandle(String handle) {
-		return findByHandle(handle, db);
-	}
-
-	public MegaOffline findByHandle(String handle, SQLiteDatabase db) {
 		//Get the foreign key of the node
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '"
 				+ encrypt(handle) + "'";

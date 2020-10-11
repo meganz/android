@@ -3,7 +3,6 @@ package mega.privacy.android.app.fragments.homepage.photos
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
@@ -12,11 +11,12 @@ import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeDiffCallback
 
 class PhotosBrowseAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel
-) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(PhotoDiffCallback()),
+) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(NodeDiffCallback()),
     SectionTitleProvider {
 
     private var itemDimen = 0
@@ -62,20 +62,6 @@ class PhotosBrowseAdapter constructor(
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         holder.bind(actionModeViewModel, itemOperationViewModel, getItem(position))
-    }
-
-    private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNodeItem>() {
-        override fun areItemsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
-            return oldItem.node?.handle == newItem.node?.handle
-        }
-
-        override fun areContentsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
-            if (newItem.uiDirty) {
-                return false
-            }
-
-            return true
-        }
     }
 
     fun setItemDimen(dimen: Int) {

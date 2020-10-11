@@ -107,4 +107,6 @@ class HomepageRepository @Inject constructor(
             listener
         )
     }
+
+    fun isRootNodeNull() = (megaApi.rootNode == null)
 }

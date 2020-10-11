@@ -36,6 +36,7 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+import android.util.Pair;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
@@ -1296,7 +1297,7 @@ public class Util {
     }
 
     @Nullable
-	public static Pair<Boolean, Bitmap> getCircleAvatar(Context context, String email) {
+    public static Pair<Boolean, Bitmap> getCircleAvatar(Context context, String email) {
 		File avatar = buildAvatarFile(context, email + ".jpg");
 		if (!(isFileAvailable(avatar) && avatar.length() > 0)) {
 			return Pair.create(false, null);

@@ -40,7 +40,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     protected DisplayMetrics outMetrics;
     private int halfHeightDisplay;
     private int heightHeader;
-    private BottomSheetBehavior mBehavior;
+    protected BottomSheetBehavior mBehavior;
 
     protected View contentView;
     protected LinearLayout mainLinearLayout;

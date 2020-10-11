@@ -3,17 +3,17 @@ package mega.privacy.android.app.fragments.homepage.photos
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeDiffCallback
 
 class PhotosSearchAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel
-) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(PhotoDiffCallback()),
+) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(NodeDiffCallback()),
     SectionTitleProvider {
 
     override fun getItemViewType(position: Int): Int {
@@ -39,20 +39,6 @@ class PhotosSearchAdapter constructor(
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         holder.bind(actionModeViewModel, itemOperationViewModel, getItem(position))
-    }
-
-    private class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoNodeItem>() {
-        override fun areItemsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
-            return oldItem.node?.handle == newItem.node?.handle
-        }
-
-        override fun areContentsTheSame(oldItem: PhotoNodeItem, newItem: PhotoNodeItem): Boolean {
-            if (newItem.uiDirty) {
-                return false
-            }
-
-            return true
-        }
     }
 
     override fun getSectionTitle(position: Int) = if (position < 0 || position >= itemCount) {
