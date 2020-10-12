@@ -185,10 +185,12 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         focusChangeListener = listener
     }
 
-    fun setShowLeftDot(showLeftDot: Boolean) {
-        menuBtnShowDot = showLeftDot
+    fun setLeftNotificationCount(count: Int) {
+        menuBtnShowDot = count > 0
         val searchInputHasFocus = searchInput.hasFocus()
-        menuBtnDrawable?.setBadgeEnabled(showLeftDot && !searchInputHasFocus)
+        menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot && !searchInputHasFocus)
+        menuBtnDrawable?.text =
+            if (count > MAX_NOTIFICATION_COUNT) MAX_NOTIFICATION_COUNT_TEXT else count.toString()
     }
 
     fun setAvatar(avatar: Bitmap) {
@@ -213,10 +215,10 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     private fun initDrawables() {
         menuBtnDrawable = BadgeDrawerArrowDrawable(context, R.color.badge_background,
             R.color.badge_big_background, R.color.badge_text_color)
+
         menuBtnDrawable?.backgroundColor =
             ContextCompat.getColor(context, R.color.dark_primary_color)
         menuBtnDrawable?.setBigBackgroundColor(Color.WHITE)
-        menuBtnDrawable?.setShowDot(true)
         menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot)
         iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)
     }
@@ -428,5 +430,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         private const val MENU_ICON_ANIM_DURATION: Long = 250
         private const val MENU_BUTTON_PROGRESS_ARROW = 1.0f
         private const val MENU_BUTTON_PROGRESS_HAMBURGER = 0.0f
+        private const val MAX_NOTIFICATION_COUNT = 9
+        private const val MAX_NOTIFICATION_COUNT_TEXT = "9+"
     }
 }

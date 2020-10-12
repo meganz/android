@@ -22,11 +22,15 @@ if [ -z "${BUILD_ARCHS}" ]; then
 fi
 ##################################################
 if [ ! -d "${NDK_ROOT}" ]; then
-    echo "* NDK_ROOT not set. Please download ndk 21 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk and try again."
+    echo "* NDK_ROOT not set. Please download NDK 21 and export NDK_ROOT variable or create a link at ${HOME}/android-ndk to point to your Android NDK installation path and try again."
     exit 1
 fi
 if [ ! -d "${ANDROID_HOME}" ]; then
-    echo "* ANDROID_HOME not set. Please download Android sdk and export ANDROID_HOME variable or create a link at ${HOME}/android-sdk and try again."
+    echo "* ANDROID_HOME not set. Please download Android SDK and export ANDROID_HOME variable or create a link at ${HOME}/android-sdk to point to your Android SDK installation path and try again."
+    exit 1
+fi
+if [ ! -d "${ANDROID_HOME}" ]; then
+    echo "* JAVA_HOME not set. Please download JDK and export JAVA_HOME variable or create a link at ${HOME}/android-jdk to point to your JDK installation path and try again."
     exit 1
 fi
 
@@ -433,6 +437,7 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     fi
     ENABLED_DECODERS=(ac3)
     cd "${FFMPEG_EXT_PATH}"
+    sed -i "s/APP_PLATFORM.*/APP_PLATFORM := ${APP_PLATFORM}/" Application.mk
     echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
     cd "${FFMPEG_EXT_PATH}"

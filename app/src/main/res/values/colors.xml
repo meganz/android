@@ -102,7 +102,7 @@
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
 
-    <color name="fab_mask">#6B6B6B</color>
+    <color name="fab_mask">#D96B6B6B</color>
 
     <color name="login_warning">#FFFF333A</color>
     <color name="login_title">#FFD90007</color>
@@ -212,20 +212,17 @@
     <color name="reconnecting_bar">#FFF5A623</color>
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
+    
+    <color name="background_own_reaction_added">#0F00BFA5</color>
 
     <color name="pressed_color">#E7E7E7</color>
-    <color name="transparent">#00000000</color>
 
     <color name="homepage_background">#EEF2F1</color>
-    <color name="fab_upload_background_tint">#333333</color>
-
-    <color name="sort_by_title_color">#89000000</color>
-    <color name="sort_by_selected_color">#00bfa5</color>
-    <color name="sort_by_unselected_color">#dd000000</color>
 
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
 
+    <color name="homepage_fab_label_text_color">#ff373737</color>
 
     <!-- ======================= Dark mode refactoring =====================  -->
 

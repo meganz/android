@@ -66,9 +66,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun setSelectedColor(text: TextView) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            text.setTextColor(resources.getColor(R.color.sort_by_selected_color, null))
+            text.setTextColor(resources.getColor(R.color.accentColor, null))
         } else {
-            text.setTextColor(resources.getColor(R.color.sort_by_selected_color))
+            text.setTextColor(resources.getColor(R.color.accentColor))
         }
     }
 

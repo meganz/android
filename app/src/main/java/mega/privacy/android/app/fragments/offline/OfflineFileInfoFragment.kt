@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog.Builder
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -19,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
@@ -72,8 +72,10 @@ class OfflineFileInfoFragment : Fragment() {
                     )
 
                     binding.toolbarNodeIcon.isVisible = true
-                    binding.containsTitle.isVisible = true
-                    binding.containsValue.isVisible = true
+                    if (it.node.isFolder) {
+                        binding.containsTitle.isVisible = true
+                        binding.containsValue.isVisible = true
+                    }
 
                     requireActivity().window.statusBarColor =
                         ContextCompat.getColor(requireContext(), R.color.status_bar_search)
@@ -146,7 +148,7 @@ class OfflineFileInfoFragment : Fragment() {
             }
         }
 
-        Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
             .setPositiveButton(R.string.general_remove, dialogClickListener)
             .setNegativeButton(R.string.general_cancel, dialogClickListener)

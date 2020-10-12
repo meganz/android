@@ -5,12 +5,9 @@ import android.content.Intent
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.FileUtils.copyFile
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getTotalSize
 import mega.privacy.android.app.utils.SDCardOperator
@@ -23,6 +20,13 @@ class OfflineNodeSaver @Inject constructor(
     dbHandler: DatabaseHandler
 ) : NodeSaver(context, dbHandler) {
 
+    /**
+     * Save an offline node into device.
+     *
+     * @param node the offline node to save
+     * @param highPriority whether this download is high priority or not
+     * @param activityStarter a high-order function to launch activity when needed
+     */
     fun save(node: MegaOffline, highPriority: Boolean, activityStarter: (Intent, Int) -> Unit) {
         save(activityStarter) {
             OfflineSaving(getTotalSize(getOfflineFile(context, node)), highPriority, node)
@@ -38,6 +42,7 @@ class OfflineNodeSaver @Inject constructor(
             getOfflineFile(context, (saving as OfflineSaving).node),
             parentPath, externalSDCard, sdCardOperator
         )
+
         runOnUiThread {
             showSnackbar(
                 context, context.resources.getQuantityString(R.plurals.download_finish, 1, 1)
@@ -53,10 +58,13 @@ class OfflineNodeSaver @Inject constructor(
     ) {
         if (file.isDirectory) {
             val dstDir = File(parentPath, file.name)
+
             if (!externalSDCard) {
                 dstDir.mkdirs()
             }
+
             val children = file.listFiles() ?: return
+
             children.forEach {
                 doDownload(it, dstDir.absolutePath, externalSDCard, sdCardOperator)
             }
@@ -69,29 +77,6 @@ class OfflineNodeSaver @Inject constructor(
                 }
             } else {
                 copyFile(file, File(parentPath, file.name))
-            }
-        }
-    }
-
-    class OfflineSaving(
-        totalSize: Long,
-        highPriority: Boolean,
-        val node: MegaOffline
-    ) : Saving(totalSize, highPriority) {
-
-        override fun hasUnsupportedFile(context: Context): Boolean {
-            return if (node.isFolder) {
-                false
-            } else {
-                unsupportedFileName = node.name
-                val checkIntent = Intent(Intent.ACTION_GET_CONTENT)
-                checkIntent.type = MimeTypeList.typeForName(node.name).type
-                try {
-                    !MegaApiUtils.isIntentAvailable(context, checkIntent)
-                } catch (e: Exception) {
-                    LogUtil.logWarning("isIntentAvailable error", e)
-                    true
-                }
             }
         }
     }

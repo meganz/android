@@ -125,7 +125,6 @@ import java.util.regex.Pattern;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -152,6 +151,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
+import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
@@ -2296,6 +2296,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.badge_background,
 				R.color.badge_big_background, R.color.badge_text_color);
+
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
 		// Navi button Chat
 		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
@@ -5625,14 +5626,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setToolbarTitle();
 
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-		if (rChatFL == null){
+		if (rChatFL == null) {
 			rChatFL = RecentChatsFragmentLollipop.newInstance();
-			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
-		}
-		else{
+		} else {
 			refreshFragment(FragmentTag.RECENT_CHAT.getTag());
-			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 		}
+
+		replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -7882,7 +7882,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (getSearchFragment() == null || sFLol.onBackPressed() == 0) {
     			closeSearchSection();
     		}
-    	} else {
+        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+            HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
+            if(fragment != null && fragment.isFabExpanded()) {
+                fragment.collapseFab();
+            } else {
+                super.onBackPressed();
+            }
+        } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
 		}
 	}

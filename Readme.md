@@ -7,11 +7,11 @@ This document will guide you to build the application on a Linux machine with An
 
 ### Setup development environment
 
-* [Android Studio](http://developer.android.com/intl/es/sdk/index.html)
+* [Android Studio](https://developer.android.com/studio)
 
-* [Android SDK Tools](http://developer.android.com/intl/es/sdk/index.html#Other)
+* [Android SDK Tools](https://developer.android.com/studio#Other)
 
-* [Android NDK](http://developer.android.com/intl/es/ndk/downloads/index.html)
+* [Android NDK](https://developer.android.com/ndk/downloads)
 
 ### Build & Run the application
 
@@ -21,7 +21,7 @@ This document will guide you to build the application on a Linux machine with An
 git clone --recursive https://github.com/meganz/android.git
 ```
 
-2. Install in your system the [Android NDK 21](https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip).
+2. Install in your system the [Android NDK 21](https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip) (latest version tested: NDK r21d).
 
 3. Export `NDK_ROOT` variable or create a symbolic link at `${HOME}/android-ndk` to point to your Android NDK installation path.
 

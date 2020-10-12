@@ -32,15 +32,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
+import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -56,11 +56,10 @@ class HomepageFragment : Fragment() {
     private lateinit var fabMaskMain: FloatingActionButton
     private lateinit var fabMaskLayout: View
     private lateinit var viewPager: ViewPager2
-    private lateinit var tabs: TabLayout
+    private lateinit var tabLayout: TabLayout
+    private var currentSelectedTabFragment: Fragment? = null
     private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
-
-    @Inject lateinit var megaApi: MegaApiAndroid
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -74,7 +73,7 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private var isFabExpanded = false
+    var isFabExpanded = false
 
     private val categoryClickListener = OnClickListener {
         with(viewDataBinding.category) {
@@ -98,6 +97,8 @@ class HomepageFragment : Fragment() {
         rootView = viewDataBinding.root
 
         activity = (getActivity() as ManagerActivityLollipop)
+
+        isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
         return rootView
     }
@@ -133,12 +134,10 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showOnlineMode() {
-        if (megaApi.rootNode == null) {
-            return
-        }
+        if (viewModel.isRootNodeNull()) return
+
         viewPager.isUserInputEnabled = true
-        rootView.findViewById<View>(R.id.category).isVisible = true
-        //rootView.findViewById<View>(R.id.banner).isVisible = true
+        rootView.category.isVisible = true
         fullyCollapseBottomSheet()
 
         tabsChildren.forEach { tab ->
@@ -149,12 +148,11 @@ class HomepageFragment : Fragment() {
     private fun showOfflineMode() {
         viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
         viewPager.isUserInputEnabled = false
-        rootView.findViewById<View>(R.id.category).isVisible = false
-        //rootView.findViewById<View>(R.id.banner).isVisible = false
+        rootView.category.isVisible = false
         fullyExpandBottomSheet()
 
         if (tabsChildren.isEmpty()) {
-            tabs.touchables.forEach { tab ->
+            tabLayout.touchables.forEach { tab ->
                 tab.isEnabled = false
                 tabsChildren.add(tab)
             }
@@ -191,7 +189,7 @@ class HomepageFragment : Fragment() {
         )
 
         viewModel.notification.observe(viewLifecycleOwner) {
-            searchInputView.setShowLeftDot(it)
+            searchInputView.setLeftNotificationCount(it)
         }
         viewModel.avatar.observe(viewLifecycleOwner) {
             searchInputView.setAvatar(it)
@@ -209,12 +207,20 @@ class HomepageFragment : Fragment() {
         })
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
+    }
+
     private fun setupBottomSheetUI() {
         viewPager = rootView.findViewById(R.id.view_pager)
-        viewPager.adapter = BottomSheetPagerAdapter(this)
+        val adapter = BottomSheetPagerAdapter(this)
+        // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
+        viewPager.offscreenPageLimit = adapter.itemCount
+        viewPager.adapter = adapter
         // Attach the view pager to the tab layout
-        tabs = rootView.findViewById(R.id.tabs)
-        val mediator = TabLayoutMediator(tabs, viewPager) { tab, position ->
+        tabLayout = rootView.findViewById(R.id.tabs)
+        val mediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTabTitle(position)
         }
         mediator.attach()
@@ -222,13 +228,23 @@ class HomepageFragment : Fragment() {
         // Pass selected page view to HomepageBottomSheetBehavior which would seek for
         // the nested scrolling child views and deal with the logic of nested scrolling
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+
             override fun onPageSelected(position: Int) {
+                currentSelectedTabFragment = childFragmentManager.findFragmentByTag("f$position")
                 bottomSheetBehavior.invalidateScrollingChild(
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
-                    childFragmentManager.findFragmentByTag("f$position")?.view
+                    currentSelectedTabFragment?.view
                 )
+
+                (currentSelectedTabFragment as? Scrollable)?.checkScroll()
             }
         })
+
+        viewModel.isScrolling.observe(viewLifecycleOwner) {
+            if (it.first == currentSelectedTabFragment) {
+                changeTabElevation(it.second)
+            }
+        }
     }
 
     private fun setupMask() {
@@ -244,11 +260,9 @@ class HomepageFragment : Fragment() {
     }
 
     private fun getTabTitle(position: Int): String? {
-        val resources = activity.resources
-
         when (position) {
-            BottomSheetPagerAdapter.RECENT_INDEX -> return resources?.getString(R.string.tab_recents)
-            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources?.getString(R.string.tab_offline)
+            BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.tab_recents)
+            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.tab_offline)
         }
 
         return ""
@@ -308,34 +322,58 @@ class HomepageFragment : Fragment() {
         })
     }
 
+    private fun changeTabElevation(withElevation: Boolean) = if (withElevation) {
+        tabLayout.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
+    } else {
+        tabLayout.elevation = 0f
+    }
+
     private fun setupFabs() {
         fabMain = rootView.fab_home_main
         fabMaskMain = fabMaskLayout.fab_main
-        val fabChat = fabMaskLayout.fab_chat
-        val fabUpload = fabMaskLayout.fab_upload
-        val textChat = fabMaskLayout.text_chat
-        val textUpload = fabMaskLayout.text_upload
 
         fabMain.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback()
         }
 
         fabMaskMain.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+            fabMainClickCallback()
         }
 
-        fabChat.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+        fabMaskLayout.setOnClickListener {
+            fabMainClickCallback()
+        }
+
+        fabMaskLayout.fab_chat.setOnClickListener {
+            fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 openChatActivity()
             }
         }
 
-        fabUpload.setOnClickListener {
-            fabMainClickCallback(fabChat, fabUpload, textChat, textUpload)
+        fabMaskLayout.text_chat.setOnClickListener {
+            fabMainClickCallback()
+            runDelay(FAB_MASK_OUT_DELAY) {
+                openChatActivity()
+            }
+        }
+
+        fabMaskLayout.fab_upload.setOnClickListener {
+            fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 showUploadPanel()
             }
+        }
+
+        fabMaskLayout.text_upload.setOnClickListener {
+            fabMainClickCallback()
+            runDelay(FAB_MASK_OUT_DELAY) {
+                showUploadPanel()
+            }
+        }
+
+        if (isFabExpanded) {
+            expandFab()
         }
     }
 
@@ -367,30 +405,43 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun fabMainClickCallback(
-        fabChat: View,
-        fabUpload: View,
-        textChat: View,
-        textUpload: View
-    ) {
+    private fun fabMainClickCallback() {
         if (isFabExpanded) {
-            rotateFab()
-            showOut(fabChat, fabUpload, textChat, textUpload)
-            // After animation completed, then remove mask.
-            runDelay(FAB_MASK_OUT_DELAY) {
-                removeMask()
-                fabMain.visibility = View.VISIBLE
-                isFabExpanded = !isFabExpanded
-            }
+            collapseFab()
         } else {
-            fabMain.visibility = View.GONE
-            addMask()
-            // Need to do so, otherwise, fabMaskMain.background is null.
-            post {
-                rotateFab()
-                showIn(fabChat, fabUpload, textChat, textUpload)
-                isFabExpanded = !isFabExpanded
-            }
+            expandFab()
+        }
+    }
+
+    fun collapseFab() {
+        rotateFab(false)
+        showOut(
+            fabMaskLayout.fab_chat,
+            fabMaskLayout.fab_upload,
+            fabMaskLayout.text_chat,
+            fabMaskLayout.text_upload
+        )
+        // After animation completed, then remove mask.
+        runDelay(FAB_MASK_OUT_DELAY) {
+            removeMask()
+            fabMain.visibility = View.VISIBLE
+            isFabExpanded = false
+        }
+    }
+
+    private fun expandFab() {
+        fabMain.visibility = View.GONE
+        addMask()
+        // Need to do so, otherwise, fabMaskMain.background is null.
+        post {
+            rotateFab(true)
+            showIn(
+                fabMaskLayout.fab_chat,
+                fabMaskLayout.fab_upload,
+                fabMaskLayout.text_chat,
+                fabMaskLayout.text_upload
+            )
+            isFabExpanded = true
         }
     }
 
@@ -414,22 +465,22 @@ class HomepageFragment : Fragment() {
         windowContent?.removeView(fabMaskLayout)
     }
 
-    private fun rotateFab() {
+    private fun rotateFab(isExpand: Boolean) {
         val rotateAnim = ObjectAnimator.ofFloat(
             fabMaskMain, "rotation",
-            if (isFabExpanded) FAB_DEFAULT_ANGEL else FAB_ROTATE_ANGEL
+            if (isExpand) FAB_ROTATE_ANGEL else FAB_DEFAULT_ANGEL
         )
 
         // The tint of the icon in the middle of the FAB
         val tintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.drawable.mutate(), "tint",
-            if (isFabExpanded) Color.WHITE else Color.BLACK
+            if (isExpand) Color.BLACK else Color.WHITE
         )
 
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isFabExpanded) resources.getColor(R.color.accentColor) else Color.WHITE
+            if (isExpand) Color.WHITE else resources.getColor(R.color.accentColor)
         )
 
         AnimatorSet().apply {
@@ -475,5 +526,6 @@ class HomepageFragment : Fragment() {
         private const val FAB_ROTATE_ANGEL = 135f
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
         private const val KEY_CONTACT_TYPE = "contactType"
+        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
     }
 }

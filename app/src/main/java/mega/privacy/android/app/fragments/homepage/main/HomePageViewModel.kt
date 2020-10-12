@@ -12,7 +12,9 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.avatarChange
+import mega.privacy.android.app.fragments.homepage.scrolling
 import mega.privacy.android.app.listeners.DefaultMegaChatListener
 import mega.privacy.android.app.listeners.DefaultMegaGlobalListener
 import mega.privacy.android.app.listeners.DefaultMegaRequestListener
@@ -31,16 +33,22 @@ class HomePageViewModel @ViewModelInject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) : BaseRxViewModel(), DefaultMegaGlobalListener, DefaultMegaChatListener {
-    private val _notification = MutableLiveData<Boolean>()
+    private val _notification = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
+    private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
 
-    val notification: LiveData<Boolean> = _notification
+    val notification: LiveData<Int> = _notification
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
+    val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
         loadAvatar()
+    }
+
+    private val scrollingObserver = androidx.lifecycle.Observer<Pair<Scrollable, Boolean>> {
+        _isScrolling.value = it
     }
 
     init {
@@ -50,11 +58,10 @@ class HomePageViewModel @ViewModelInject constructor(
         megaApi.addGlobalListener(this)
         megaChatApi.addChatListener(this)
 
-        _avatar.value = getDefaultAvatar(
-            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
-        )
-        loadAvatar()
+        showDefaultAvatar()
+        loadAvatar(true)
         avatarChange.observeForever(avatarChangeObserver)
+        scrolling.observeForever(scrollingObserver)
     }
 
     override fun onCleared() {
@@ -63,17 +70,21 @@ class HomePageViewModel @ViewModelInject constructor(
         megaApi.removeGlobalListener(this)
         megaChatApi.removeChatListener(this)
         avatarChange.removeObserver(avatarChangeObserver)
+        scrolling.removeObserver(scrollingObserver)
     }
 
-    private fun loadAvatar() {
+    private fun loadAvatar(retry: Boolean = false) {
         add(Single.fromCallable { getCircleAvatar(context, megaApi.myEmail) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
-                if (it != null) {
-                    _avatar.value = it
-                } else {
-                    createAvatar()
+                // actually it won't be null
+                it?.apply {
+                    when {
+                        it.first -> _avatar.value = it.second
+                        retry -> createAvatar()
+                        else -> showDefaultAvatar()
+                    }
                 }
             }, logErr("loadAvatar"))
         )
@@ -94,9 +105,17 @@ class HomePageViewModel @ViewModelInject constructor(
                         && e.errorCode == MegaError.API_OK
                     ) {
                         loadAvatar()
+                    } else {
+                        showDefaultAvatar()
                     }
                 }
             })
+    }
+
+    private fun showDefaultAvatar() {
+        _avatar.value = getDefaultAvatar(
+            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
+        )
     }
 
     override fun onUserAlertsUpdate(
@@ -115,7 +134,7 @@ class HomePageViewModel @ViewModelInject constructor(
 
     private fun updateNotification() {
         _notification.value =
-            megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0) > 0
+            megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
     }
 
     override fun onChatOnlineStatusUpdate(
@@ -138,4 +157,6 @@ class HomePageViewModel @ViewModelInject constructor(
             else -> 0
         }
     }
+
+    fun isRootNodeNull() = (megaApi.rootNode == null)
 }

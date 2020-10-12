@@ -16,9 +16,9 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog.Builder
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -26,6 +26,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
+import mega.privacy.android.app.R.style
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_FROM_SETTINGS
@@ -54,6 +55,20 @@ import mega.privacy.android.app.utils.Util.scaleWidthPx
 import mega.privacy.android.app.utils.Util.showNotEnoughSpaceSnackbar
 import java.io.File
 
+/**
+ * A class that encapsulate all the procedure of saving a node into device,
+ * including choose save to internal storage or external sdcard,
+ * choose save path, check download size, check other apps that could open this file, etc,
+ * the final step that really download the node into a file is handled in sub-classes,
+ * by implementing the abstract doDownload function.
+ *
+ * The initiation API of save should also be added by sub-classes, because it's usually
+ * related with the final download step.
+ *
+ * It simplifies code in activity/fragment where a node need to be saved,
+ * currently it's only used by OfflineFragment, we could use it in more screens
+ * when new screens need this feature.
+ */
 abstract class NodeSaver(
     protected val context: Context,
     private val dbHandler: DatabaseHandler
@@ -63,23 +78,38 @@ abstract class NodeSaver(
     protected var saving = Saving.NOTHING
     private var activityStarter: (Intent, Int) -> Unit = { _, _ -> }
 
+    /**
+     * Handle activity result from FileStorageActivityLollipop launched by requestLocalFolder,
+     * and take actions according to the state and result.
+     *
+     * It should be called in onActivityResult (but this doesn't mean NodeSaver should be
+     * owned by a fragment or activity).
+     *
+     * @param requestCode the requestCode from onActivityResult
+     * @param resultCode the resultCode from onActivityResult
+     * @param intent the intent from onActivityResult
+     * @return whether NodeSaver handles this result, if this method return false,
+     * fragment/activity should handle the result by other code.
+     */
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == Activity.RESULT_OK) {
             logDebug("REQUEST_CODE_SELECT_LOCAL_FOLDER")
             if (intent == null) {
                 logWarning("Intent null")
-                return true
+                return false
             }
 
             val parentPath = intent.getStringExtra(EXTRA_PATH)
             if (parentPath == null) {
                 logWarning("parentPath null")
-                return true
+                return false
             }
 
             add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
+
+            return true
         } else if (requestCode == REQUEST_CODE_TREE) {
             if (intent == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
@@ -94,30 +124,43 @@ abstract class NodeSaver(
                 }
                 return false
             }
+
             val uri = intent.data
             if (uri == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: tree uri is null!")
                 return false
             }
+
             val pickedDir = DocumentFile.fromTreeUri(context, uri)
             if (pickedDir == null || !pickedDir.canWrite()) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: pickedDir not writable")
                 return false
             }
+
             dbHandler.sdCardUri = uri.toString()
+
             val parentPath = getFullPathFromTreeUri(uri, context)
             if (parentPath == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: parentPath is null")
                 return false
             }
+
             add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
+
+            return true
         }
 
         return false
     }
 
+    /**
+     * Initiate the saving.
+     *
+     * @param activityStarter a high-order function to launch activity when needed
+     * @param savingProducer a high-order function to produce internal state needed for later use
+     */
     protected fun save(activityStarter: (Intent, Int) -> Unit, savingProducer: () -> Saving) {
         if (lackPermission()) {
             return
@@ -128,16 +171,16 @@ abstract class NodeSaver(
                 saving = savingProducer()
                 this.activityStarter = activityStarter
                 val downloadLocationDefaultPath = getDownloadLocation()
+
                 if (askMe(context)) {
-                    logDebug("askMe")
                     val fs = context.getExternalFilesDirs(null)
+
                     if (fs.size <= 1 || fs[1] == null) {
                         requestLocalFolder(null, null, activityStarter)
                     } else {
                         runOnUiThread { showSelectDownloadLocationDialog(activityStarter) }
                     }
                 } else {
-                    logDebug("NOT askMe")
                     File(downloadLocationDefaultPath).mkdirs()
                     checkSizeBeforeDownload(downloadLocationDefaultPath)
                 }
@@ -147,7 +190,7 @@ abstract class NodeSaver(
     }
 
     private fun showSelectDownloadLocationDialog(activityStarter: (Intent, Int) -> Unit) {
-        Builder(context)
+        MaterialAlertDialogBuilder(context, style.MaterialAlertDialogStyle)
             .setTitle(R.string.title_select_download_location)
             .setNegativeButton(R.string.general_cancel) { dialog, _ -> dialog.cancel() }
             .setItems(R.array.settings_storage_download_location_array) { _, which ->
@@ -164,6 +207,7 @@ abstract class NodeSaver(
         try {
             val sdCardOperator = SDCardOperator(context)
             val sdCardRoot = sdCardOperator.sdCardRoot
+
             if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
                 requestLocalFolder(sdCardRoot, null, activityStarter)
             } else {
@@ -203,12 +247,15 @@ abstract class NodeSaver(
         intent.putExtra(EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select))
         intent.putExtra(EXTRA_FROM_SETTINGS, false)
         intent.setClass(context, FileStorageActivityLollipop::class.java)
+
         if (sdRoot != null) {
             intent.putExtra(EXTRA_SD_ROOT, sdRoot)
         }
+
         if (prompt != null) {
             intent.putExtra(EXTRA_PROMPT, prompt)
         }
+
         activityStarter(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER)
     }
 
@@ -271,7 +318,7 @@ abstract class NodeSaver(
         }
     }
 
-    fun download(parentPath: String) {
+    private fun download(parentPath: String) {
         add(Completable
             .fromCallable {
                 checkParentPathAndDownload(parentPath)
@@ -285,6 +332,7 @@ abstract class NodeSaver(
     private fun checkParentPathAndDownload(parentPath: String) {
         val externalSDCard = SDCardOperator.isSDCardPath(parentPath)
         var sdCardOperator: SDCardOperator? = null
+
         if (externalSDCard) {
             try {
                 sdCardOperator = SDCardOperator(context)
@@ -295,6 +343,7 @@ abstract class NodeSaver(
                 )
             }
         }
+
         if (externalSDCard && sdCardOperator == null) {
             return
         }
@@ -306,6 +355,7 @@ abstract class NodeSaver(
                     context, R.string.old_sdcard_unavailable, Toast.LENGTH_LONG
                 ).show()
             }
+
             runOnUiThreadDelayed(1500) {
                 showSelectDownloadLocationDialog(activityStarter)
             }
@@ -325,6 +375,14 @@ abstract class NodeSaver(
         doDownload(parentPath, externalSDCard, sdCardOperator)
     }
 
+    /**
+     * The final step to download a node into a file.
+     *
+     * @param parentPath the parent path where the file should be inside
+     * @param externalSDCard whether it's download into external sdcard
+     * @param sdCardOperator SDCardOperator used when download to external sdcard,
+     * will be null if download to internal storage
+     */
     abstract fun doDownload(
         parentPath: String,
         externalSDCard: Boolean,
@@ -379,6 +437,10 @@ abstract class NodeSaver(
         compositeDisposable.add(disposable)
     }
 
+    /**
+     * Clear all internal state and cancel all flying operation, should be called
+     * in onDestroy lifecycle callback.
+     */
     fun destroy() {
         compositeDisposable.dispose()
     }
@@ -393,21 +455,5 @@ abstract class NodeSaver(
 
     companion object {
         const val CONFIRM_SIZE_MIN_BYTES = 100 * 1024 * 1024L
-    }
-
-    abstract class Saving(
-        val totalSize: Long,
-        val highPriority: Boolean
-    ) {
-        var unsupportedFileName = ""
-            protected set
-
-        abstract fun hasUnsupportedFile(context: Context): Boolean
-
-        companion object {
-            val NOTHING = object : Saving(0, false) {
-                override fun hasUnsupportedFile(context: Context): Boolean = false
-            }
-        }
     }
 }

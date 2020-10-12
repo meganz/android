@@ -51,10 +51,12 @@
     <dimen name="category_padding">16dp</dimen>
 
     <!-- Homepage Fab -->
-    <dimen name="mask_view_alpha">0.7</dimen>
-    <dimen name="label_padding">8dp</dimen>
+    <dimen name="fab_size_normal">56dp</dimen>
+    <dimen name="fab_size_small">48dp</dimen>
+    <dimen name="label_padding">6dp</dimen>
     <dimen name="label_margin_end">16dp</dimen>
     <dimen name="fab_margin_span">16dp</dimen>
+    <dimen name="fab_margin_vertical">24dp</dimen>
 
     <dimen name="icon_selected_size">23dp</dimen>
     <dimen name="icon_selected_margin">7dp</dimen>

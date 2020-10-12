@@ -1120,6 +1120,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">Archive</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -2840,8 +2841,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been removed successfully.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number removal failed.</string>
 
-    <string name="search_hint">Search in MEGA</string>
-    <string name="homepage_bottom_sheet_behavior">mega.privacy.android.app.fragments.homepage.main.HomepageBottomSheetBehavior</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support&#64;mega.nz</string>
@@ -2857,20 +2857,18 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
-    <string name="category_photos">Photos</string>
-    <string name="category_documents">Documents</string>
-    <string name="category_audio">Audio</string>
-    <string name="category_video">Video</string>
+    <string name="category_photos" context="The label under the button of opening all-videos screen">Photos</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_audio" context="The label under the button of opening all-audio screen">Audio</string>
+    <string name="category_video" context="The label under the button of opening all-video screen">Video</string>
 
-    <string name="fab_label_new_chat">New Chat</string>
-    <string name="fab_label_upload">Upload</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
 
-    <string name="tab_recents">Recents</string>
-    <string name="tab_favourites">Favourites</string>
-    <string name="tab_offline">Offline</string>
+    <string name="tab_recents" context="The title of the tab showing the Recents content">Recents</string>
+    <string name="tab_offline" context="The title of the tab showing the offline content">Offline</string>
 
-    <string name="homepage_empty_hint_photos">No photos to show</string>
-    <string name="homepage_empty_hint_documents">No documents to show</string>
-    <string name="homepage_empty_hint_audio">No audios to show</string>
-    <string name="homepage_empty_hint_video">No videos to show</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there's no photo to show">No photos to show</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there's no document to show">No documents to show</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there's no audio to show">No audios to show</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there's no video to show">No videos to show</string>
 </resources>

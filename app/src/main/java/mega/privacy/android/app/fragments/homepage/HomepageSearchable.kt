@@ -5,7 +5,6 @@ interface HomepageSearchable {
         return true
     }
     fun searchReady() {}
-    fun searchDone() {}
     fun exitSearch() {}
     fun searchQuery(query: String) {}
 }

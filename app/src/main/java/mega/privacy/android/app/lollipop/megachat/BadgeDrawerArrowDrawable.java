@@ -24,7 +24,6 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     private Paint bigBackgroundPaint;
     private Paint textPaint;
     private String text;
-    private boolean showDot;
     private boolean badgeEnabled = true;
 
     public BadgeDrawerArrowDrawable(Context context, @ColorRes int backgroundColor
@@ -56,21 +55,6 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         }
 
         final Rect bounds = getBounds();
-
-        if (showDot) {
-            bigBackgroundPaint.setAlpha((int) ((1 - getProgress()) * 255));
-            backgroundPaint.setAlpha((int) ((1 - getProgress()) * 255));
-
-            final float x = 0.8f * bounds.width();
-            final float y = 0.25f * bounds.height();
-            canvas.drawCircle(x, y, 0.16f * bounds.width(), bigBackgroundPaint);
-
-            final float x1 = 0.8f * bounds.width() + 2;
-            final float y1 = 0.25f * bounds.height() - 2;
-            canvas.drawCircle(x1, y1, 0.16f * bounds.width() - 2, backgroundPaint);
-
-            return;
-        }
 
         if (text == null || text.length() == 0) {
             return;
@@ -105,10 +89,6 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
     public String getText() {
         return text;
-    }
-
-    public void setShowDot(boolean showDot) {
-        this.showDot = showDot;
     }
 
     public void setBackgroundColor(int color) {
