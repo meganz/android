@@ -232,6 +232,7 @@
      The "390" is simply deduced from the relative color saturation against red_400 -->
     <color name="white">#FFFFFF</color>
     <color name="white_alpha_005">#0CFFFFFF</color>
+    <color name="white_alpha_009">#16FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>

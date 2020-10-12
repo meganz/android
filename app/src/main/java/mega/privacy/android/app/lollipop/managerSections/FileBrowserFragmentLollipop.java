@@ -318,7 +318,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			inflater.inflate(R.menu.cloud_storage_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -330,7 +329,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -388,10 +386,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			}
 
 			if (showSendToChat) {
-				menu.findItem(R.id.cab_menu_send_to_chat)
-						.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-								R.color.white));
-
 				control.sendToChat().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}

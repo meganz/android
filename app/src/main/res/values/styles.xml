@@ -143,27 +143,20 @@
         <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
-    <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.Light">
-        <item name="colorControlNormal">@color/white</item>
+    <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.DayNight">
+        <item name="colorControlNormal">?attr/colorSecondary</item>
     </style>
 
     <style name="Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
-        <item name="titleTextStyle">@style/TitleTextStyle</item>
-        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+        <item name="titleTextStyle">@style/ActionModeTitleTextStyle</item>
+        <item name="android:titleTextStyle">@style/ActionModeTitleTextStyle</item>
     </style>
 
-    <style name="TitleTextStyle" parent="@style/Widget.AppCompat.ActionMode">
-        <item name="textColor">@color/white</item>
-        <item name="android:textColor">@color/white</item>
+    <style name="ActionModeTitleTextStyle" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="textColor">?attr/colorSecondary</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
         <item name="textSize">20sp</item>
         <item name="android:textSize">20sp</item>
-    </style>
-
-    <style name="ActionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-        <item name="srcCompat">@drawable/ic_dots_vertical_white</item>
-        <item name="android:src">@drawable/ic_dots_vertical_white</item>
-        <item name="background">@drawable/ic_dots_vertical_white</item>
-        <item name="android:background">@drawable/ic_dots_vertical_white</item>
     </style>
 
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">

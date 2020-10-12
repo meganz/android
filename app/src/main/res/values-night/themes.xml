@@ -55,5 +55,11 @@
 
         <!-- Used by the hint text color of TextInputLayout -->
         <item name="textColorHint">@color/white_alpha_054</item>
+
+        <!-- workaround for action mode elevation overlay: we need hide normal toolbar when
+             enter action mode, or use a non-transparent background to cover it,
+             while non-transparent background will break MaterialToolbar's overlay,
+             so let's set a similar non-transparent background for action mode. -->
+        <item name="actionModeBackground">@drawable/action_mode_backgroud_dark</item>
     </style>
 </resources>

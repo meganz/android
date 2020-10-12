@@ -35,8 +35,8 @@ import android.os.SystemClock;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.app.AppCompatDialog;
 import androidx.navigation.NavOptions;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -218,7 +218,6 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -247,7 +246,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -401,8 +399,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	DisplayMetrics outMetrics;
     float scaleText;
 	FragmentContainerView fragmentContainer;
-//	boolean tranfersPaused = false;
     ActionBar aB;
+    MaterialToolbar toolbar;
     AppBarLayout abL;
 
 	int selectedPaymentMethod;
@@ -2195,7 +2193,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
 
-		setSupportActionBar(findViewById(R.id.toolbar));
+		toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 		aB = getSupportActionBar();
 
 		aB.setHomeButtonEnabled(true);
@@ -15946,23 +15945,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     }
 
 	public void changeActionBarElevation(boolean withElevation){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (withElevation) {
-				abL.setElevation(px2dp(4, outMetrics));
-				if (elevation > 0) {
-					elevation = 0;
-					abL.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							abL.setElevation(px2dp(4, outMetrics));
-						}
-					}, 100);
-				}
+		if (withElevation) {
+			doSetActionBarElevation(getResources().getDimension(R.dimen.toolbar_elevation));
+			if (elevation > 0) {
+				elevation = 0;
+				abL.postDelayed(() -> doSetActionBarElevation(
+						getResources().getDimension(R.dimen.toolbar_elevation)), 100);
 			}
-			else {
-				abL.setElevation(0);
-			}
+		} else {
+			doSetActionBarElevation(0);
 		}
+	}
+
+	private void doSetActionBarElevation(float elevation) {
+		toolbar.setElevation(elevation);
+		abL.setElevation(elevation);
 	}
 
 	public long getParentHandleInbox() {
@@ -16042,12 +16039,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			result = Html.fromHtml(textToShow);
 		}
 		notificationsSectionText.setText(result);
-	}
-
-	@Override
-	public void onActionModeStarted(ActionMode mode) {
-		super.onActionModeStarted(mode);
-		getTheme().applyStyle(R.style.ActionOverflowButtonStyle, true);
 	}
 
 	public void setChatBadge() {

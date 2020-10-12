@@ -48,11 +48,10 @@
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">?attr/colorSecondary</item>
-        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="actionModeBackground">?attr/colorPrimary</item>
+        <item name="actionModeCloseDrawable">@drawable/action_mode_close</item>
         <item name="actionModeStyle">@style/Widget.ActionMode</item>
         <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
-<!--        <item name="elevation">0dp</item>-->
 
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
 

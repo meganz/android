@@ -14,7 +14,6 @@
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
       >
-<!--        android:background="@color/white"-->
 
         <LinearLayout
             android:id="@+id/fragment_layout"
@@ -26,20 +25,19 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-<!--                android:theme="@style/Theme.Megaactionbar">-->
+                android:layout_height="wrap_content"
+                app:elevation="0dp"
+                >
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorPrimary"
                     android:minHeight="?attr/actionBarSize"
                     app:subtitleTextAppearance="@style/ToolbarSubtitle"
                     app:titleTextAppearance="@style/ToolbarTitle"
-                    tools:context=".ManagerActivityLollipop" />
-<!--                app:popupTheme="@style/Theme.Megaactionbar"-->
-<!--                app:theme="@style/Theme.Megaactionbar"-->
+                    style="@style/Widget.MaterialComponents.Toolbar.Surface"
+                    />
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_contacts"
