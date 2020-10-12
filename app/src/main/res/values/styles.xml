@@ -179,7 +179,7 @@
     </style>
 
     <style name="HomepageBottomTabLayout" parent="MyCustomTabLayout">
-        <item name="tabBackground">@color/transparent</item>
+        <item name="tabBackground">@android:color/transparent</item>
     </style>
 
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">

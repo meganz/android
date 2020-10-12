@@ -219,14 +219,8 @@
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
     <color name="pressed_color">#E7E7E7</color>
-    <color name="transparent">#00000000</color>
 
     <color name="homepage_background">#EEF2F1</color>
-    <color name="fab_upload_background_tint">#333333</color>
-
-    <color name="sort_by_title_color">#89000000</color>
-    <color name="sort_by_selected_color">#00bfa5</color>
-    <color name="sort_by_unselected_color">#dd000000</color>
 
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>

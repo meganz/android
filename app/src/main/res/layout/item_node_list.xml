@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginTop="1dp"
-        android:background="@{item.selected ? @color/new_multiselect_color : @color/transparent}"
+        android:background="@{item.selected ? @color/new_multiselect_color : @android:color/transparent}"
         android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item)}"
         android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
 
