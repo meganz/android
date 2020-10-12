@@ -2,8 +2,8 @@
   <item>
     <shape android:shape="rectangle">
 			<stroke
-					android:color="@color/grid_item_selected_bg_stroke_color"
-					android:width="2dp" />
+          android:width="1dp"
+					android:color="@color/grid_item_selected_bg_stroke_color" />
 			<solid android:color="@color/grid_item_selected_bg_solid_color" />
       <corners android:radius="5dp" />
     </shape>
