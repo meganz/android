@@ -7,6 +7,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
@@ -84,15 +85,8 @@ class ActionModeCallback constructor(
             val inflater = it.menuInflater
             inflater.inflate(R.menu.cloud_storage_action, menu)
         }
-
-        Util.changeStatusBarColor(
-            mainActivity, mainActivity.window,
-            R.color.accentColorDark
-        )
-
-        mainActivity.apply {
-            changeActionBarElevation(true)
-        }
+        mainActivity.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT)
+        mainActivity.changeActionBarElevation(true)
 
         return true
     }
@@ -141,14 +135,8 @@ class ActionModeCallback constructor(
     override fun onDestroyActionMode(mode: ActionMode?) {
         viewModel.clearSelection()
 
-        Util.changeStatusBarColor(
-            mainActivity, mainActivity.window,
-            R.color.black
-        )
-
-        mainActivity.apply {
-            changeActionBarElevation(false)
-        }
+        mainActivity.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY)
+        mainActivity.changeActionBarElevation(false)
 
         viewModel.actionModeDestroy()
     }

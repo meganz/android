@@ -900,10 +900,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         logDebug("ActionBarCallBack::onCreateActionMode")
         val inflater = mode!!.menuInflater
         inflater.inflate(R.menu.offline_browser_action, menu)
-        callManager {
-            it.showHideBottomNavigationView(true)
-            it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT)
-        }
+        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT) }
         checkScroll()
         return true
     }
