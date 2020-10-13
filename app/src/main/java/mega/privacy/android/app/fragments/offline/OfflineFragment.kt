@@ -40,6 +40,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
@@ -252,7 +253,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         binding.offlineBrowserList.layoutManager = LinearLayoutManager(context)
 
-        binding.offlineBrowserGrid.layoutManager?.spanSizeLookup = object : SpanSizeLookup() {
+        (binding.offlineBrowserGrid.layoutManager as CustomizedGridLayoutManager).spanSizeLookup = object : SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return if (adapter?.getItemViewType(position) == OfflineAdapter.TYPE_HEADER) {
                     binding.offlineBrowserGrid.spanCount

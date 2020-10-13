@@ -156,7 +156,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.linearLayoutManager?.scrollToPosition(0)
+                listView.layoutManager?.scrollToPosition(0)
             }
         })
         gridAdapter =
