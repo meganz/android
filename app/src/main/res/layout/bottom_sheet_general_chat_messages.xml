@@ -466,7 +466,7 @@
                         android:id="@+id/option_offline_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="18dp"
+                        android:layout_marginStart="15dp"
                         android:layout_weight="5"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
