@@ -10,7 +10,8 @@ import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.utils.FrescoUtils
 
-class GiphyViewHolder(val view: View, private val giphyInterface: GiphyInterface) : RecyclerView.ViewHolder(view) {
+class GiphyViewHolder(val view: View, private val giphyInterface: GiphyInterface) :
+    RecyclerView.ViewHolder(view) {
     private var gifImage: SimpleDraweeView = view.findViewById(R.id.gif_image)
     var gifData: GifData? = null
 
@@ -19,13 +20,15 @@ class GiphyViewHolder(val view: View, private val giphyInterface: GiphyInterface
         val gifWidth = imageAttributes.width
         val gifHeight = imageAttributes.height
 
-        gifData = GifData(imageAttributes.mp4,
-                imageAttributes.webp,
-                imageAttributes.mp4Size,
-                imageAttributes.webpSize,
-                gifWidth,
-                gifHeight,
-                gif.title)
+        gifData = GifData(
+            imageAttributes.mp4,
+            imageAttributes.webp,
+            imageAttributes.mp4Size,
+            imageAttributes.webpSize,
+            gifWidth,
+            gifHeight,
+            gif.title
+        )
 
         updateLayoutParams(gifWidth, gifHeight)
         view.tag = this@GiphyViewHolder

@@ -13,7 +13,7 @@ import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
-class GiphyViewerActivity: PinActivityLollipop() {
+class GiphyViewerActivity : PinActivityLollipop() {
 
     private lateinit var binding: ActivityGiphyViewerBinding
 
@@ -28,7 +28,7 @@ class GiphyViewerActivity: PinActivityLollipop() {
 
         window.statusBarColor = resources.getColor(R.color.black)
 
-        if(intent.action.equals(ACTION_PREVIEW_GIPHY)) {
+        if (intent.action.equals(ACTION_PREVIEW_GIPHY)) {
             picking = false
             binding.sendFab.visibility = View.GONE
         } else {

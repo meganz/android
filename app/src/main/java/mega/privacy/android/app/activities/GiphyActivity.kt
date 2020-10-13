@@ -33,7 +33,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GiphyActivity : PinActivityLollipop(), GiphyInterface{
+class GiphyActivity : PinActivityLollipop(), GiphyInterface {
 
     companion object {
         private const val NUM_COLUMNS_PORTRAIT = 2
@@ -138,7 +138,8 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface{
         }
 
         screenGifWidth = (widthScreen / numColumns) - (px2dp(GIF_MARGIN, outMetrics) * numColumns)
-        binding.giphyList.layoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
+        binding.giphyList.layoutManager =
+            StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
         giphyAdapter?.notifyDataSetChanged()
     }
 
@@ -232,7 +233,8 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface{
         val line = searchView.findViewById(androidx.appcompat.R.id.search_plate) as View
         line.setBackgroundColor(resources.getColor(android.R.color.transparent))
 
-        val searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
+        val searchAutoComplete =
+            searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
         searchAutoComplete.setTextColor(resources.getColor(R.color.giphy_search_text))
         searchAutoComplete.hint = ""
 
@@ -274,9 +276,11 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface{
     }
 
     override fun openGifViewer(gifData: GifData?) {
-        startActivityForResult(Intent(this@GiphyActivity, GiphyViewerActivity::class.java)
+        startActivityForResult(
+            Intent(this@GiphyActivity, GiphyViewerActivity::class.java)
                 .putExtra(GIF_DATA, gifData),
-                REQUEST_CODE_PICK_GIF)
+            REQUEST_CODE_PICK_GIF
+        )
     }
 
     override fun setEmptyState(emptyState: Boolean) {

@@ -9,7 +9,8 @@ import mega.privacy.android.app.adapters.viewHolders.GiphyViewHolder
 import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.objects.Data
 
-class GiphyAdapter(private var gifs: List<Data>?, private val giphyInterface: GiphyInterface): RecyclerView.Adapter<GiphyViewHolder>(), View.OnClickListener {
+class GiphyAdapter(private var gifs: List<Data>?, private val giphyInterface: GiphyInterface) :
+    RecyclerView.Adapter<GiphyViewHolder>(), View.OnClickListener {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GiphyViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.gif_item, parent, false)

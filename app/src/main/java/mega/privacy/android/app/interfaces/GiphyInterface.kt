@@ -8,7 +8,7 @@ interface GiphyInterface {
      *
      * @param gifData   Object containing all the necessary GIF data.
      */
-    fun openGifViewer(gifData : GifData?)
+    fun openGifViewer(gifData: GifData?)
 
     /**
      * Shows the empty state if the result of the request is empty.

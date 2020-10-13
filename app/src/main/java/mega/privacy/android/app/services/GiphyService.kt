@@ -9,9 +9,9 @@ object GiphyService {
     const val BASE_URL = "https://giphy.mega.nz/"
 
     private val retrofit = Retrofit.Builder()
-            .baseUrl(TEST_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        .baseUrl(TEST_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     fun buildService(): GiphyEndPointsInterface {
         return retrofit.create(GiphyEndPointsInterface::class.java)
