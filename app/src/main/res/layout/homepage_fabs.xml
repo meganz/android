@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fabCustomSize="@dimen/fab_size_small"
-        android:backgroundTint="@color/fab_upload_background_tint"
+        android:backgroundTint="@color/copyright_text"
         android:layout_marginTop="@dimen/fab_margin_vertical"
         android:layout_marginBottom="@dimen/fab_margin_vertical"
         android:src="@drawable/ic_upload"

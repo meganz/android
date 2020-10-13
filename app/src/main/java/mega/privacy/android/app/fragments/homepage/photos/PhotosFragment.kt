@@ -293,7 +293,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.linearLayoutManager?.scrollToPosition(0)
+                listView.layoutManager?.scrollToPosition(0)
             }
         })
 
