@@ -14,6 +14,7 @@ data class PhotoNodeItem(
     override var selected: Boolean = false,
     override var uiDirty: Boolean = true   // Force refresh the newly created Node list item
 ) : NodeItem(node, index, false, modifiedDate, thumbnail, selected, uiDirty) {
+
     companion object {
         const val TYPE_TITLE = 0   // The datetime header
         const val TYPE_PHOTO = 1

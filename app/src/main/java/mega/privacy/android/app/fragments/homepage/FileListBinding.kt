@@ -85,7 +85,10 @@ fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbn
 
         val radius = resources.getDimensionPixelSize(R.dimen.homepage_node_grid_round_corner_radius)
             .toFloat()
-        hierarchy.roundingParams = RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
+        hierarchy.roundingParams = RoundingParams.fromCornersRadii(
+            radius, radius, 0F,
+            0F
+        )
     }
 }
 

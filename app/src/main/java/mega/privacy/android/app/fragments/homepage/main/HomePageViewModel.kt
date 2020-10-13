@@ -33,6 +33,7 @@ class HomePageViewModel @ViewModelInject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) : BaseRxViewModel(), DefaultMegaGlobalListener, DefaultMegaChatListener {
+
     private val _notification = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()

@@ -97,8 +97,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 return
             }
 
-            if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0) == Constants.OFFLINE_ADAPTER) {
+            if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0)
+                == Constants.OFFLINE_ADAPTER
+            ) {
                 val handle = intent.getLongExtra("handle", INVALID_HANDLE)
+
                 when (intent.getIntExtra("actionType", -1)) {
                     Constants.SCROLL_TO_POSITION -> {
                         scrollToNode(handle)
@@ -192,11 +195,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         setupView()
         observeLiveData()
+
         if (viewModel.path == "" || viewModel.path == args.path) {
             setViewModelDisplayParam(args.path)
         } else {
             setViewModelDisplayParam(viewModel.path)
         }
+
         setupDraggingThumbnailCallback()
     }
 
@@ -244,6 +249,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     viewModel.onNodeOptionsClicked(position, node)
                 }
             })
+
         adapter?.setHasStableIds(true)
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -253,15 +259,16 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         binding.offlineBrowserList.layoutManager = LinearLayoutManager(context)
 
-        (binding.offlineBrowserGrid.layoutManager as CustomizedGridLayoutManager).spanSizeLookup = object : SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if (adapter?.getItemViewType(position) == OfflineAdapter.TYPE_HEADER) {
-                    binding.offlineBrowserGrid.spanCount
-                } else {
-                    1
+        (binding.offlineBrowserGrid.layoutManager as CustomizedGridLayoutManager).spanSizeLookup =
+            object : SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return if (adapter?.getItemViewType(position) == OfflineAdapter.TYPE_HEADER) {
+                        binding.offlineBrowserGrid.spanCount
+                    } else {
+                        1
+                    }
                 }
             }
-        }
 
         setupRecyclerView(binding.offlineBrowserList)
         setupRecyclerView(binding.offlineBrowserGrid)
@@ -289,7 +296,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         } else {
             binding.emptyHintImage.setImageResource(R.drawable.ic_empty_offline)
         }
+
         var textToShow = getString(R.string.context_empty_offline)
+
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>")
             textToShow = textToShow.replace("[/A]", "</font>")
@@ -299,6 +308,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             e.printStackTrace()
             logError("Exception formatting string", e)
         }
+
         binding.emptyHintText.text = if (VERSION.SDK_INT >= VERSION_CODES.N) {
             Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
         } else {
@@ -337,25 +347,30 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 }
             }
         }
+
         viewModel.openFolderFullscreen.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
                 manager.openFullscreenOfflineFragment(it)
             }
         })
+
         viewModel.showOptionsPanel.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
                 manager.showOptionsPanel(it)
             }
         })
+
         viewModel.nodeToOpen.observe(viewLifecycleOwner, EventObserver {
             openNode(it.first, it.second)
         })
+
         viewModel.urlFileOpenAsUrl.observe(viewLifecycleOwner, EventObserver {
             logDebug("Is URL - launch browser intent")
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(it)
             startActivity(intent)
         })
+
         viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner, EventObserver {
             openFile(it, MimeTypeList.typeForName(it.name))
         })
@@ -366,6 +381,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
             val actionModeVal = actionMode
+
             if (visible) {
                 if (actionModeVal == null) {
                     callManager {
@@ -373,6 +389,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                         it.setTextSubmitted()
                     }
                 }
+
                 actionMode?.title = viewModel.getSelectedNodesCount().toString()
                 actionMode?.invalidate()
             } else {
@@ -382,6 +399,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 }
             }
         }
+
         viewModel.actionBarTitle.observe(viewLifecycleOwner) {
             callManager { manager ->
                 if (viewModel.selecting) {
@@ -393,27 +411,32 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 }
             }
         }
+
         viewModel.pathLiveData.observe(viewLifecycleOwner) {
             callManager { manager ->
                 manager.pathNavigationOffline = it
             }
         }
+
         viewModel.submitSearchQuery.observe(viewLifecycleOwner) {
             callManager { manager ->
                 manager.setTextSubmitted()
             }
         }
+
         viewModel.closeSearchView.observe(viewLifecycleOwner) {
             callManager { manager ->
                 manager.textSubmitted = true
                 manager.closeSearchView()
             }
         }
+
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
                 manager.showNewSortByPanel()
             }
         })
+
         observeAnimatedItems()
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
@@ -434,6 +457,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     private fun scrollToPosition(position: Int) {
         val layoutManager = recyclerView?.layoutManager
+
         if (layoutManager is LinearLayoutManager && position >= 0) {
             layoutManager.scrollToPositionWithOffset(position, 0)
         }
@@ -441,6 +465,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
+
         viewModel.nodesToAnimate.observe(viewLifecycleOwner) {
             val rvAdapter = adapter ?: return@observe
 
@@ -536,6 +561,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     private fun openNode(position: Int, node: OfflineNode) {
         val file = getOfflineFile(context, node.node)
         val mime = MimeTypeList.typeForName(file.name)
+
         when {
             mime.isZip -> {
                 logDebug("MimeTypeList ZIP")
@@ -700,6 +726,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     private fun openFile(file: File, mime: MimeTypeList) {
         logDebug("openFile")
         val viewIntent = Intent(Intent.ACTION_VIEW)
+
         if (VERSION.SDK_INT >= VERSION_CODES.N) {
             viewIntent.setDataAndType(
                 FileProvider.getUriForFile(
@@ -711,11 +738,14 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         } else {
             viewIntent.setDataAndType(Uri.fromFile(file), mime.type)
         }
+
         viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
         if (MegaApiUtils.isIntentAvailable(context, viewIntent)) {
             startActivity(viewIntent)
         } else {
             val intentShare = Intent(Intent.ACTION_SEND)
+
             if (VERSION.SDK_INT >= VERSION_CODES.N) {
                 intentShare.setDataAndType(
                     FileProvider.getUriForFile(
@@ -730,7 +760,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     MimeTypeList.typeForName(file.name).type
                 )
             }
+
             intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
             if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
                 startActivity(intentShare)
             }
@@ -743,6 +775,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     override fun checkScroll() {
         val rv = recyclerView
+
         if (rv != null) {
             callManager {
                 it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
@@ -776,9 +809,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     fun scrollToNode(handle: Long) {
         logDebug("scrollToNode, handle $handle")
-
         val position = adapter?.getNodePosition(handle) ?: return
         logDebug("scrollToNode, handle $handle, position $position")
+
         if (position != INVALID_POSITION) {
             recyclerView?.scrollToPosition(position)
             notifyThumbnailLocationOnScreen()
@@ -831,6 +864,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
             binding.offlineBrowserGrid
         }
+
         setViewModelDisplayParam(viewModel.path)
     }
 
@@ -868,6 +902,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         val viewHolder: ViewHolder =
             recyclerView?.findViewHolderForLayoutPosition(position) ?: return
         val res = adapter?.getThumbnailLocationOnScreen(viewHolder) ?: return
+
         res[0] += res[2] / 2
         res[1] += res[3] / 2
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
@@ -894,15 +929,18 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 viewModel.clearSelection()
             }
         }
+
         return false
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         logDebug("ActionBarCallBack::onCreateActionMode")
         val inflater = mode!!.menuInflater
+
         inflater.inflate(R.menu.offline_browser_action, menu)
         callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT) }
         checkScroll()
+
         return true
     }
 
@@ -919,6 +957,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         logDebug("ActionBarCallBack::onDestroyActionMode")
+
         viewModel.clearSelection()
         callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY) }
         checkScroll()
@@ -934,6 +973,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         override fun getLocationOnScreen(location: IntArray) {
             val fragment = fragmentRef.get()
+
             if (fragment != null) {
                 val position =
                     fragment.adapter?.getNodePosition(fragment.draggingNodeHandle) ?: return

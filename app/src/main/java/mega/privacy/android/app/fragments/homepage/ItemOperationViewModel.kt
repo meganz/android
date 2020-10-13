@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class ItemOperationViewModel @ViewModelInject constructor() : ViewModel() {
+
     private val _openItemEvent = MutableLiveData<Event<NodeItem>>()
     val openItemEvent: LiveData<Event<NodeItem>> = _openItemEvent
 

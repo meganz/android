@@ -28,6 +28,7 @@ class TypedFilesRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context
 ) {
+
     private var order = ORDER_DEFAULT_ASC
     private var type = NODE_UNKNOWN
 

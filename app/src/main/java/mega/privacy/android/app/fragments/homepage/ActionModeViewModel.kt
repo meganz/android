@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
+
     // The full set of nodes
     private lateinit var nodesData: List<NodeItem>
 

@@ -76,7 +76,7 @@ class RecentsBucketFragment : BaseFragment() {
         viewModel.cachedActionList.value = selectedBucketModel.currentActionList.value
 
         viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
-            if(it) Navigation.findNavController(view).popBackStack()
+            if (it) Navigation.findNavController(view).popBackStack()
         }
 
         viewModel.items.observe(viewLifecycleOwner) {
@@ -91,17 +91,22 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun setupListView(nodes: List<MegaNode>) {
         mAdapter = MultipleBucketAdapter(managerActivity, this, nodes, bucket.isMedia)
+
         if (bucket.isMedia) {
             val numCells: Int = if (Util.isScreenInPortrait(managerActivity)) 4 else 6
             val gridLayoutManager =
-                GridLayoutManager(managerActivity, numCells, GridLayoutManager.VERTICAL, false)
-            listView.layoutManager = gridLayoutManager
+                GridLayoutManager(
+                    managerActivity, numCells, GridLayoutManager.VERTICAL, false
+                )
 
+            listView.layoutManager = gridLayoutManager
         } else {
             val linearLayoutManager = LinearLayoutManager(managerActivity)
+
             listView.layoutManager = linearLayoutManager
             listView.addItemDecoration(SimpleDividerItemDecoration(managerActivity, outMetrics))
         }
+
         listView.adapter = mAdapter
         listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
@@ -128,11 +133,13 @@ class RecentsBucketFragment : BaseFragment() {
         if (!bucket.isMedia) {
             val folder = megaApi.getNodeByHandle(bucket.parentHandle) ?: return
             binding.folderNameText.text = folder.name
+
             if (bucket.isUpdate) {
                 binding.actionImage.setImageResource(R.drawable.ic_versions_small)
             } else {
                 binding.actionImage.setImageResource(R.drawable.ic_recents_up)
             }
+
             binding.dateText.text = TimeUtils.formatBucketDate(managerActivity, bucket.timestamp)
             binding.headerInfoLayout.visibility = View.VISIBLE
         }
@@ -196,6 +203,7 @@ class RecentsBucketFragment : BaseFragment() {
         val intent = Intent(context, PdfViewerActivityLollipop::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
+
         val paramsSetSuccessfully =
             if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
                 FileUtils.setLocalIntentParams(managerActivity, node, intent, localPath, false)
@@ -215,6 +223,7 @@ class RecentsBucketFragment : BaseFragment() {
             if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
                 FileUtils.setURLIntentParams(context, node, intent, localPath)
             } else false
+
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
     }
 
@@ -232,6 +241,7 @@ class RecentsBucketFragment : BaseFragment() {
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
+
         if (isMedia) {
             intent.putExtra(NODE_HANDLES, getNodesHandles(false))
             intent.putExtra(AudioVideoPlayerLollipop.IS_PLAYLIST, true)
@@ -253,6 +263,7 @@ class RecentsBucketFragment : BaseFragment() {
                 intent.setDataAndType(intent.data, "audio/*")
             }
         }
+
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
     }
 
@@ -279,10 +290,12 @@ class RecentsBucketFragment : BaseFragment() {
         node: MegaNode
     ) {
         val intent = Intent(managerActivity, FullScreenImageViewerLollipop::class.java)
+
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
         intent.putExtra(HANDLE, node.handle)
         intent.putExtra(NODE_HANDLES, getNodesHandles(true))
+
         startActivity(intent)
         managerActivity.overridePendingTransition(0, 0)
     }
@@ -307,6 +320,7 @@ class RecentsBucketFragment : BaseFragment() {
             RecentsBucketFragment::class.java,
             RecentsBucketDraggingThumbnailCallback(WeakReference(this))
         )
+
         AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
             RecentsBucketFragment::class.java,
             RecentsBucketDraggingThumbnailCallback(WeakReference(this))
@@ -324,6 +338,7 @@ class RecentsBucketFragment : BaseFragment() {
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {
         val position = viewModel.getItemPositionByHandle(handle)
         val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
+
         // List and grid have different thumnail ImageView
         return if (bucket.isMedia) {
             viewHolder.itemView.findViewById(R.id.thumbnail_media)
@@ -334,6 +349,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun getThumbnailLocationOnScreen(imageView: ImageView): IntArray {
         val topLeft = IntArray(2)
+
         imageView.getLocationOnScreen(topLeft)
         return intArrayOf(topLeft[0], topLeft[1], imageView.width, imageView.height)
     }

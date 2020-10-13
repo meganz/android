@@ -16,6 +16,7 @@ class OfflineListViewHolder(
     listener: OfflineAdapterListener,
     itemGetter: (Int) -> OfflineNode
 ) : OfflineViewHolder(binding.root, listener, itemGetter) {
+
     init {
         binding.threeDots.setOnClickListener {
             val position = adapterPosition
@@ -42,11 +43,13 @@ class OfflineListViewHolder(
             } else {
                 binding.thumbnail.setActualImageResource(if (node.node.isFolder) R.drawable.ic_folder_list else placeHolderRes)
             }
+
             binding.thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(5F)
         }
 
         val res = binding.root.resources.displayMetrics
         val param = binding.thumbnail.layoutParams as FrameLayout.LayoutParams
+
         if (node.thumbnail == null || node.selected) {
             param.width = px2dp(LARGE_IMAGE_WIDTH, res)
             param.height = param.width
@@ -56,6 +59,7 @@ class OfflineListViewHolder(
             param.height = param.width
             param.marginStart = px2dp(SMALL_IMAGE_MARGIN_LEFT, res)
         }
+
         binding.thumbnail.layoutParams = param
 
         binding.filename.text = node.node.name

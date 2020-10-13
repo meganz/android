@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 class SortByHeaderViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
     var order = ORDER_DEFAULT_ASC
         private set
     var isList = true

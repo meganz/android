@@ -123,6 +123,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }

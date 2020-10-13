@@ -143,6 +143,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<PhotoNodeItem>(it)
+
         if (viewModel.searchMode) {
             searchAdapter.submitList(newList)
         } else {
@@ -152,6 +153,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -167,6 +169,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         listView = binding.photoList
         preventListItemBlink()
         elevateToolbarWhenScrolling()
+
         itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
 
@@ -312,6 +315,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         if (actionMode != null) {
             RunOnUIThreadUtils.post { activity.hideKeyboardSearch() }
         }
+
         if (viewModel.searchMode) return
 
         listView.switchToLinear()
@@ -350,6 +354,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
+
         viewModel.searchQuery = query
         viewModel.loadPhotos()
     }

@@ -176,6 +176,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
+
             if (listView.itemDecorationCount == 0) {
                 listView.addItemDecoration(itemDecoration)
             }
@@ -195,6 +196,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<NodeItem>(it)
+
         if (sortByHeaderViewModel.isList) {
             listAdapter.submitList(newList)
         } else {
@@ -204,6 +206,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -416,8 +419,8 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         if (node == null) {
             return
         }
-        var screenPosition: IntArray? = null
 
+        var screenPosition: IntArray? = null
         val localPath = FileUtils.getLocalFile(context, node.name, node.size)
 
         listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(

@@ -91,7 +91,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
-    @Inject lateinit var megaApi: MegaApiAndroid
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
     private var draggingNodeHandle = INVALID_HANDLE
 
@@ -195,6 +196,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
+
             if (listView.itemDecorationCount == 0) {
                 listView.addItemDecoration(itemDecoration)
             }
@@ -213,6 +215,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (node == null) {
             return
         }
+
         val file: MegaNode = node
 
         val internalIntent = isInternalIntent(node)
@@ -277,6 +280,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<NodeItem>(it)
+
         if (sortByHeaderViewModel.isList) {
             listAdapter.submitList(newList)
         } else {
@@ -286,6 +290,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -476,6 +481,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
+
         viewModel.searchQuery = query
         viewModel.loadAudio()
     }
@@ -490,6 +496,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {
         val position = viewModel.getNodePositionByHandle(handle)
         val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
+
         return viewHolder.itemView.findViewById(R.id.thumbnail)
     }
 
@@ -524,8 +531,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     companion object {
-        private class AudioDraggingThumbnailCallback(private val fragmentRef: WeakReference<AudioFragment>) :
-            DraggingThumbnailCallback {
+        private class AudioDraggingThumbnailCallback(
+            private val fragmentRef: WeakReference<AudioFragment>
+        ) : DraggingThumbnailCallback {
 
             override fun setVisibility(visibility: Int) {
                 val fragment = fragmentRef.get() ?: return

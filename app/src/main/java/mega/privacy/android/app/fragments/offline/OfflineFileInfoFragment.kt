@@ -61,7 +61,6 @@ class OfflineFileInfoFragment : Fragment() {
             if (it == null) {
                 requireActivity().finish()
             } else {
-
                 if (it.node.isFolder || it.thumbnail == null) {
                     binding.toolbarNodeIcon.setImageResource(
                         if (it.node.isFolder) {
@@ -72,6 +71,7 @@ class OfflineFileInfoFragment : Fragment() {
                     )
 
                     binding.toolbarNodeIcon.isVisible = true
+
                     if (it.node.isFolder) {
                         binding.containsTitle.isVisible = true
                         binding.containsValue.isVisible = true
@@ -90,12 +90,14 @@ class OfflineFileInfoFragment : Fragment() {
                             R.color.name_my_account
                         )
                     )
+
                     binding.collapseToolbar.setExpandedTitleColor(
                         ContextCompat.getColor(
                             requireContext(),
                             R.color.white
                         )
                     )
+
                     binding.collapseToolbar.setStatusBarScrimColor(
                         ContextCompat.getColor(
                             requireContext(),
@@ -117,6 +119,7 @@ class OfflineFileInfoFragment : Fragment() {
                         }
                     })
                 }
+
                 binding.collapseToolbar.title = it.node.name
 
                 binding.availableOfflineSwitch.setOnClickListener { _ ->
@@ -127,12 +130,15 @@ class OfflineFileInfoFragment : Fragment() {
                 }
             }
         }
+
         viewModel.totalSize.observe(viewLifecycleOwner) {
             binding.totalSizeValue.text = it
         }
+
         viewModel.contains.observe(viewLifecycleOwner) {
             binding.containsValue.text = it
         }
+
         viewModel.added.observe(viewLifecycleOwner) {
             binding.addedValue.text = it
         }

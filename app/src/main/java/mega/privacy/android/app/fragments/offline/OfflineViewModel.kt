@@ -47,6 +47,7 @@ class OfflineViewModel @ViewModelInject constructor(
     private val repo: MegaNodeRepo,
     private val nodeSaver: OfflineNodeSaver
 ) : BaseRxViewModel() {
+
     private var order = ORDER_DEFAULT_ASC
     private var searchQuery: String? = null
     private var historySearchQuery: String? = null
@@ -128,15 +129,16 @@ class OfflineViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         super.onCleared()
-
         nodeSaver.destroy()
     }
 
     fun getSelectedNodes(): List<MegaOffline> {
         val list = ArrayList<MegaOffline>()
+
         for (i in 0 until selectedNodes.size()) {
             list.add(selectedNodes.valueAt(i))
         }
+
         return list
     }
 
@@ -152,6 +154,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 return true
             }
         }
+
         return false
     }
 
@@ -159,6 +162,7 @@ class OfflineViewModel @ViewModelInject constructor(
         val nodeList = nodes.value?.first ?: return
 
         val animNodeIndices = mutableSetOf<Int>()
+
         for ((position, node) in nodeList.withIndex()) {
             if (node == OfflineNode.HEADER || node == OfflineNode.PLACE_HOLDER) {
                 continue
@@ -170,6 +174,7 @@ class OfflineViewModel @ViewModelInject constructor(
             node.uiDirty = true
             selectedNodes.put(node.node.id, node.node)
         }
+
         _nodesToAnimate.value = animNodeIndices
         selecting = true
         _nodes.value = Pair(ArrayList(nodeList), -1)
@@ -187,6 +192,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
         val animNodeIndices = mutableSetOf<Int>()
         val nodeList = nodes.value?.first ?: return
+
         for ((position, node) in nodeList.withIndex()) {
             if (node.selected) {
                 animNodeIndices.add(position)
@@ -194,6 +200,7 @@ class OfflineViewModel @ViewModelInject constructor(
             node.selected = false
             node.uiDirty = true
         }
+
         _nodesToAnimate.value = animNodeIndices
         _nodes.value = Pair(ArrayList(nodeList), -1)
     }
@@ -203,6 +210,7 @@ class OfflineViewModel @ViewModelInject constructor(
             handleSelection(position, node)
         } else {
             val nodeFile = getOfflineFile(context, node.node)
+
             if (isFileAvailable(nodeFile) && nodeFile.isDirectory) {
                 navigateIn(node.node, firstVisiblePosition)
             } else if (isFileAvailable(nodeFile) && nodeFile.isFile) {
@@ -215,6 +223,7 @@ class OfflineViewModel @ViewModelInject constructor(
         if (!rootFolderOnly) {
             selecting = true
         }
+
         onNodeClicked(position, node, INVALID_POSITION)
     }
 
@@ -228,6 +237,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     private fun handleSelection(position: Int, node: OfflineNode) {
         val nodes = _nodes.value?.first
+
         if (nodes == null || position < 0 || position >= nodes.size
             || nodes[position].node.id != node.node.id
         ) {
@@ -235,11 +245,13 @@ class OfflineViewModel @ViewModelInject constructor(
         }
 
         nodes[position].selected = !nodes[position].selected
+
         if (nodes[position].selected) {
             selectedNodes.put(node.node.id, node.node)
         } else {
             selectedNodes.remove(node.node.id)
         }
+
         nodes[position].uiDirty = true
         selecting = !selectedNodes.isEmpty
         _actionMode.value = selecting
@@ -255,6 +267,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
         val query = searchQuery
         searchQuery = null
+
         // submit search query and push search action into back stack when click folder
         when {
             query != null -> {
@@ -263,6 +276,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 navigationDepthInSearch++
                 _submitSearchQuery.value = true
             }
+
             historySearchQuery != null -> {
                 navigationDepthInSearch++
             }
@@ -288,6 +302,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
         val query = searchQuery
         searchQuery = null
+
         // has active search, should exit search mode
         if (query != null) {
             logDebug("navigateOut exit search mode, path $path")
@@ -296,6 +311,7 @@ class OfflineViewModel @ViewModelInject constructor(
         }
 
         val searchPath = historySearchPath
+
         // has search action in back stack, should pop back stack
         if (navigationDepthInSearch > 0 && searchPath != null) {
             navigationDepthInSearch--
@@ -315,11 +331,13 @@ class OfflineViewModel @ViewModelInject constructor(
         // if back stack isn't empty, or no search action in back stack, just navigate out
         path = path.substring(0, path.length - 1)
         path = path.substring(0, path.lastIndexOf("/") + 1)
+
         val autoScrollPos = if (!searchMode() && firstVisiblePositionStack.isNotEmpty()) {
             firstVisiblePositionStack.pop()
         } else {
             -1
         }
+
         navigateTo(path, titleFromPath(path), autoScrollPos)
 
         return BACK_PRESS_HANDLED
@@ -327,6 +345,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     private fun titleFromPath(path: String): String {
         val query = searchQuery
+
         return when {
             query != null -> {
                 context.getString(R.string.action_search).toUpperCase(Locale.ROOT) + ": " + query
@@ -389,6 +408,7 @@ class OfflineViewModel @ViewModelInject constructor(
         this.isList = isList
         gridSpanCount = spanCount
         this.path = path
+
         if (!rootFolderOnly) {
             this.order = order
         }
@@ -399,6 +419,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun refreshActionBarTitle() {
         val title = _actionBarTitle.value
+
         if (title != null) {
             _actionBarTitle.value = title
         }
@@ -444,6 +465,7 @@ class OfflineViewModel @ViewModelInject constructor(
         if (path == "") {
             return
         }
+
         add(Single.fromCallable { repo.loadOfflineNodes(path, order, searchQuery) }
             .map {
                 val nodes = ArrayList<OfflineNode>()
