@@ -33,6 +33,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
+import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.navigation.NavOptions;
@@ -218,6 +219,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -525,8 +527,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	LinearLayout fragmentLayout;
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
-	RelativeLayout usedSpaceLayout;
-    RelativeLayout accountInfoFrame;
+	LinearLayout usedSpaceLayout;
 	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
 	TextView businessLabel;
@@ -758,14 +759,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public long comesFromNotificationHandleSaved = -1;
 	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
 
-	RelativeLayout myAccountHeader;
+	LinearLayout myAccountHeader;
 	ImageView contactStatus;
-	RelativeLayout myAccountSection;
-	RelativeLayout inboxSection;
-	RelativeLayout contactsSection;
-	RelativeLayout notificationsSection;
-	RelativeLayout settingsSection;
-	RelativeLayout themeSection;
+	FrameLayout myAccountSection;
+	FrameLayout inboxSection;
+	FrameLayout contactsSection;
+	FrameLayout notificationsSection;
+	FrameLayout settingsSection;
+	FrameLayout themeSection;
 	Button upgradeAccount;
 	TextView contactsSectionText;
 	TextView notificationsSectionText;
@@ -2254,26 +2255,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		});
         nV = (NavigationView) findViewById(R.id.navigation_view);
 
-		myAccountHeader = (RelativeLayout) findViewById(R.id.navigation_drawer_account_section);
+		myAccountHeader = findViewById(R.id.navigation_drawer_account_section);
 		myAccountHeader.setOnClickListener(this);
 		contactStatus = (ImageView) findViewById(R.id.contact_state);
-        myAccountSection = (RelativeLayout) findViewById(R.id.my_account_section);
+        myAccountSection = findViewById(R.id.my_account_section);
         myAccountSection.setOnClickListener(this);
-        inboxSection = (RelativeLayout) findViewById(R.id.inbox_section);
+        inboxSection = findViewById(R.id.inbox_section);
         inboxSection.setOnClickListener(this);
-        contactsSection = (RelativeLayout) findViewById(R.id.contacts_section);
+        contactsSection = findViewById(R.id.contacts_section);
         contactsSection.setOnClickListener(this);
-		notificationsSection = (RelativeLayout) findViewById(R.id.notifications_section);
+		notificationsSection = findViewById(R.id.notifications_section);
 		notificationsSection.setOnClickListener(this);
 		notificationsSectionText = (TextView) findViewById(R.id.notification_section_text);
         contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
 		findViewById(R.id.offline_section).setOnClickListener(this);
-        settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
+        settingsSection = findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
-		themeSection = (RelativeLayout) findViewById(R.id.theme_section);
+		themeSection = findViewById(R.id.theme_section);
 		themeSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
-        upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
         upgradeAccount.setOnClickListener(this);
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
@@ -2308,7 +2308,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		callBadge.setVisibility(View.GONE);
 		setCallBadge();
 
-		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
+		usedSpaceLayout = findViewById(R.id.nv_used_space_layout);
 
 		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
@@ -10977,9 +10977,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				String textToShow = String.format(getResources().getString(R.string.used_space), info.getUsedFormatted(), info.getTotalFormatted());
 				try {
-					textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(this, R.color.drawer_used_storage_text_color)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(this, R.color.drawer_total_storage_text_color)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				} catch (Exception e) {
 					logWarning("Exception formatting string", e);
@@ -12297,7 +12301,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	void disableNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(false);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
 		}
 
 		if (inboxSection != null){
@@ -12309,7 +12313,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if(hasChildren){
 					inboxSection.setEnabled(false);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
 				}
 				else{
 					inboxSection.setVisibility(View.GONE);
@@ -12333,7 +12337,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
 		}
 
 		if (notificationsSection != null) {
@@ -12351,13 +12355,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setFormattedNotificationsTitleSection(unread, false);
 			}
 
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
 		}
 
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(false);
-			upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_disable));
-			upgradeAccount.setTextColor(ContextCompat.getColor(this, R.color.accent_color_30_opacity));
 		}
 	}
 
@@ -12397,7 +12399,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void resetNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(true);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
 		}
 
 		if (inboxSection != null){
@@ -12410,7 +12412,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if(hasChildren){
 					inboxSection.setEnabled(true);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
 				}
 				else{
 					logDebug("Inbox Node NO children");
@@ -12424,7 +12426,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (contactsSectionText == null) {
 				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
 			}
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
 			setContactTitleSection();
 		}
 
@@ -12433,14 +12435,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (notificationsSectionText == null) {
 				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
 			}
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
 			setNotificationsTitleSection();
 		}
 
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(true);
-			upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
-			upgradeAccount.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
 		}
 	}
 
@@ -16021,10 +16021,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		String textToShow = String.format(getString(R.string.section_notification_with_unread), unread);
 		try {
 			if (enable) {
-				textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+				textToShow = textToShow.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(this, R.color.drawer_notification_count_color)
+						+ "\'>");
 			}
 			else {
-				textToShow = textToShow.replace("[A]", "<font color=\'#ffcccc\'>");
+				textToShow = textToShow.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(this, R.color.drawer_notification_count_color_disabled)
+						+ "\'>");
 			}
 			textToShow = textToShow.replace("[/A]", "</font>");
 		}

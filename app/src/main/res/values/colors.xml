@@ -202,7 +202,6 @@
     <color name="expired_business_user_statusbar">#29A6D1</color>
     <color name="expired_business_admin">#966B87</color>
     <color name="expired_business_user">#44BCE6</color>
-    <color name="business_color">#2BA6DE</color>
 
     <color name="black_40_alpha">#66000000</color>
 
@@ -243,7 +242,9 @@
     <color name="black">#000000</color>
     <color name="dark_grey">#121212</color>
     <color name="grey_alpha_012">#1E000000</color>
+    <color name="grey_alpha_015">#26000000</color>
     <color name="grey_alpha_026">#42000000</color>
+    <color name="grey_alpha_033">#54000000</color>
     <color name="grey_alpha_038">#60000000</color>
     <color name="grey_alpha_054">#89000000</color>
     <color name="grey_alpha_060">#99000000</color>
@@ -259,6 +260,9 @@
     <color name="red_600">#F30C14</color>
     <color name="red_800">#D50004</color>
     <color name="red_900">#C70000</color>
+
+    <color name="red_600_alpha_038">#60F30C14</color>
+    <color name="red_300_alpha_038">#60F46762</color>
 
     <!-- ============ Color names by purpose ============== -->
 
@@ -319,4 +323,21 @@
     <color name="bottom_nav_menu_color_disabled">@color/grey_alpha_038</color>
 
     <color name="login_loading_logo_color">@color/red_600</color>
+
+    <color name="business_color">#2BA6DE</color>
+
+    <color name="progress_bar_normal_background">@color/grey_alpha_015</color>
+    <color name="progress_bar_normal_progress">@color/teal_300</color>
+
+    <!-- app drawer related related colors -->
+    <color name="drawer_item_text_color">@color/grey_alpha_087</color>
+    <color name="drawer_item_text_color_disabled">@color/grey_alpha_033</color>
+    <color name="drawer_add_phone_number_background">#F9F9F9</color>
+    <color name="drawer_add_phone_number_button_stroke">@color/teal_300</color>
+    <color name="drawer_notification_count_color">@color/red_600</color>
+    <color name="drawer_notification_count_color_disabled">@color/red_600_alpha_038</color>
+    <color name="drawer_used_storage_text_color">@color/teal_300</color>
+    <color name="drawer_total_storage_text_color">@color/grey_alpha_087</color>
+    <color name="drawer_email_text_color">@color/grey_alpha_087</color>
+    <color name="drawer_upgrade_button_text_color">@color/teal_300</color>
 </resources>

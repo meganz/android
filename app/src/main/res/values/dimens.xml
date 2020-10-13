@@ -94,4 +94,5 @@
     <dimen name="linear_progress_size">4dp</dimen>
 
     <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="drawer_item_height">48dp</dimen>
 </resources>

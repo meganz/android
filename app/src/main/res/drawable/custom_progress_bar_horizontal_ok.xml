@@ -5,11 +5,9 @@
 		android:id="@android:id/background">
 		<shape>
 			<gradient
-				android:startColor="#26000000"
-				android:centerColor="#26000000"
-				android:centerY="0.50"
-				android:endColor="#26000000"
-				android:angle="270" />
+				android:startColor="@color/progress_bar_normal_background"
+				android:endColor="@color/progress_bar_normal_background"
+				android:angle="90" />
 		</shape>
 	</item>
 	<item
@@ -28,8 +26,8 @@
 		<clip>
 			<shape>
 				<gradient
-					android:startColor="@color/accentColor"
-					android:endColor="@color/accentColor"
+					android:startColor="@color/progress_bar_normal_progress"
+					android:endColor="@color/progress_bar_normal_progress"
 					android:angle="90" />
 			</shape>
 		</clip>
