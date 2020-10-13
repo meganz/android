@@ -36,7 +36,7 @@
                     android:minHeight="?attr/actionBarSize"
                     app:subtitleTextAppearance="@style/ToolbarSubtitle"
                     app:titleTextAppearance="@style/ToolbarTitle"
-                    style="@style/Widget.MaterialComponents.Toolbar.Surface"
+                    style="@style/MEGAToolBar"
                     />
 
                 <com.google.android.material.tabs.TabLayout
