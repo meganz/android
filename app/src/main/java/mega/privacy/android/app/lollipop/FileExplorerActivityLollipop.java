@@ -374,7 +374,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if (importFragmentSelected != -1) {
 					chooseFragment(importFragmentSelected);
                 } else if (ACTION_UPLOAD_TO_CHAT.equals(action)) {
-					chooseFragment(CHAT_FRAGMENT);
+                    chooseFragment(CHAT_FRAGMENT);
                 } else {
                     chooseFragment(IMPORT_FRAGMENT);
                 }

@@ -571,7 +571,6 @@
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
     <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
 
-    <string name="menu_scan_document" context="Menu item to scan a document">Scan document</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -2852,4 +2851,22 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
+    <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+    <string name="action_retake" context="Action text to retake current scan picture">Retake</string>
+    <string name="title_crop" context="Screen title for cropping current scan">Crop</string>
+    <string name="title_save_scan" context="Screen title for saving current scan">Save scan</string>
+    <string name="scan_file_type" context="Input field description in the document save screen">File type</string>
+    <string name="scan_quality" context="Input field description in the document save screen">Quality</string>
+    <string name="scan_destination" context="Input field description in the document save screen">Destination</string>
+    <string name="scan_file_type_pdf" context="Document scanner PDF file type option">PDF</string>
+    <string name="scan_file_type_jpg" context="Document scanner JPG file type option">JPG</string>
+    <string name="scan_quality_high" context="Document scanner high quality option">High</string>
+    <string name="scan_quality_medium" context="Document scanner medium quality option">Medium</string>
+    <string name="scan_quality_low" context="Document scanner low quality option">Low</string>
+    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">Discard scan?</string>
+    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">The current scan will be lost</string>
+    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">Discard all scans?</string>
+    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">The current document will be lost</string>
+    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">Delete current scan?</string>
+    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Camera permissions are needed to scan documents</string>
 </resources>
