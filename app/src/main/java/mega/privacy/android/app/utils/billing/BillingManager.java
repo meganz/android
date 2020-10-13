@@ -248,7 +248,6 @@ public class BillingManager implements PurchasesUpdatedListener {
                 AcknowledgePurchaseParams acknowledgePurchaseParams =
                         AcknowledgePurchaseParams.newBuilder()
                                 .setPurchaseToken(purchase.getPurchaseToken())
-                                .setDeveloperPayload(payload)
                                 .build();
                 mBillingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
             }
