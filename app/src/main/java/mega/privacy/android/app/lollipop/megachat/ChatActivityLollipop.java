@@ -8575,6 +8575,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             stopChronometers(call);
         }
 
+        chatIdBanner = call.getChatid();
+
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setAlpha(1);
             callInProgressLayout.setVisibility(View.VISIBLE);
@@ -8750,7 +8752,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 getString(anotherActiveCall != null ? R.string.call_in_progress_layout : R.string.call_on_hold));
                         returnCallOnHoldButton.setVisibility(View.VISIBLE);
                         returnCallOnHoldButtonText.setText(getResources().getString(R.string.title_join_call));
-                        returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_transfers_pause);
+                        returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
                     }
                 }else{
 
