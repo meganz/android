@@ -217,7 +217,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:layout_weight="5"
-                    android:text="@string/save_to_offline"
+                    android:text="@string/file_properties_available_offline"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
 
