@@ -753,33 +753,36 @@ public class AppRTCAudioManager {
             audioDeviceSetUpdated = true;
         }
 
-        // Correct user selected audio devices if needed.
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
-            // If BT is not available, it can't be the user selection.
-            userSelectedAudioDevice = AudioDevice.NONE;
+            logWarning("Bluetooth is not available");
+            userSelectedAudioDevice = AudioDevice.EARPIECE;
         }
 
-        if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice == AudioDevice.EARPIECE) {
-            userSelectedAudioDevice = AudioDevice.NONE;
-        }
-
-        if (hasWiredHeadset && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
-            // If user selected speaker phone, but then plugged wired headset then make
-            // wired headset as user selected device.
+        if (userSelectedAudioDevice == AudioDevice.NONE) {
+            if (isSpeakerOn) {
+                userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
+            } else {
+                if (hasWiredHeadset) {
+                    userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
+                } else if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
+                    userSelectedAudioDevice = AudioDevice.BLUETOOTH;
+                } else {
+                    userSelectedAudioDevice = AudioDevice.EARPIECE;
+                }
+            }
+        }else if (hasWiredHeadset && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
             userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
-        }
-
-        if (!hasWiredHeadset && userSelectedAudioDevice == AudioDevice.WIRED_HEADSET) {
-            // If user selected wired headset, but then unplugged wired headset then make
-            // speaker phone as user selected device.
-            userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
+        } else if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
+            userSelectedAudioDevice = AudioDevice.BLUETOOTH;
+        } else if (userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
+            userSelectedAudioDevice = AudioDevice.EARPIECE;
         }
 
         // Need to start Bluetooth if it is available and user either selected it explicitly or
         // user did not select any output device.
         boolean needBluetoothAudioStart =
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
-                        && (userSelectedAudioDevice == AudioDevice.NONE
+                        && (userSelectedAudioDevice == AudioDevice.EARPIECE
                         || userSelectedAudioDevice == AudioDevice.BLUETOOTH);
 
         // Need to stop Bluetooth audio if user selected different device and
@@ -787,7 +790,7 @@ public class AppRTCAudioManager {
         boolean needBluetoothAudioStop =
                 (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED
                         || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING)
-                        && (userSelectedAudioDevice != AudioDevice.NONE
+                        && (userSelectedAudioDevice != AudioDevice.EARPIECE
                         && userSelectedAudioDevice != AudioDevice.BLUETOOTH);
 
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
@@ -820,6 +823,7 @@ public class AppRTCAudioManager {
     private void updateAudioDevice(boolean audioDeviceSetUpdated){
         // Update selected audio device.
         AudioDevice newAudioDevice;
+
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED) {
             // If a Bluetooth is connected, then it should be used as output audio
             // device. Note that it is not sufficient that a headset is available;
