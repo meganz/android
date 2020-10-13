@@ -32,7 +32,7 @@ class PsaViewModel(
             return
         }
 
-        megaApi.getPSA(object : BaseListener(getApplication()) {
+        megaApi.getPSAWithUrl(object : BaseListener(getApplication()) {
             override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
                 super.onRequestFinish(api, request, e)
 
