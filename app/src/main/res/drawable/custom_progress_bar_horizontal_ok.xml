@@ -26,11 +26,10 @@
 		<clip>
 			<shape>
 				<gradient
-					android:startColor="@color/progress_bar_normal_progress"
-					android:endColor="@color/progress_bar_normal_progress"
+					android:startColor="?attr/colorSecondary"
+					android:endColor="?attr/colorSecondary"
 					android:angle="90" />
 			</shape>
 		</clip>
 	</item>
 </layer-list>
-

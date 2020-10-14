@@ -79,4 +79,9 @@ object ColorUtils {
     fun getColorHexString(context: Context, @ColorRes color: Int): String {
         return String.format("#%06X", context.resources.getColor(color) and 0xFFFFFF)
     }
+
+    @JvmStatic
+    fun getThemeColorHexString(context: Context, @AttrRes attr: Int): String {
+        return String.format("#%06X", context.themeColor(attr) and 0xFFFFFF)
+    }
 }

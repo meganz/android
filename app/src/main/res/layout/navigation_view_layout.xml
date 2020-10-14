@@ -63,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:textColor="@color/drawer_item_text_color"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="20sp"
                     app:emojiSize="18sp"
                     tools:text="User Name"
@@ -75,8 +75,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textColor="@color/drawer_email_text_color"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     tools:text="email@domain.com"
                     />
 
@@ -113,9 +112,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="9dp"
-                    android:fontFamily="sans-serif-light"
+                    android:textAppearance="@style/Drawer.Item"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    tools:text="25 GB of 50 GB used"
+                    />
             </LinearLayout>
 
         </LinearLayout>
@@ -308,9 +308,6 @@
             android:text="@string/my_account_upgrade_pro"
             android:textColor="@color/drawer_upgrade_button_text_color_selector"
             android:backgroundTint="@color/drawer_upgrade_button_background_selector"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif-light"
-            android:textStyle="bold"
             />
 
     </LinearLayout>

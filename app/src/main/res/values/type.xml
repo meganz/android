@@ -46,11 +46,11 @@
         <item name="android:letterSpacing">0.009375</item>
     </style>
 
-    <!-- Regular, 14sp, textColorPrimary -->
+    <!-- Medium, 14sp, textColorPrimary -->
     <style name="Drawer.Item" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="android:textColor">@color/drawer_item_text_color</item>
-        <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:textStyle">bold</item>
+        <!-- Fake Roboto Medium. -->
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
 </resources>

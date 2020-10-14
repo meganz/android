@@ -73,7 +73,6 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.ActionMode;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -224,6 +223,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.ViewExtensionsKt;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -10971,11 +10971,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				String textToShow = String.format(getResources().getString(R.string.used_space), info.getUsedFormatted(), info.getTotalFormatted());
 				try {
 					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getColorHexString(this, R.color.drawer_used_storage_text_color)
+							+ ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary)
 							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
 					textToShow = textToShow.replace("[B]", "<font color=\'"
-							+ ColorUtils.getColorHexString(this, R.color.drawer_total_storage_text_color)
+							+ ColorUtils.getThemeColorHexString(this, android.R.attr.textColorPrimary)
 							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				} catch (Exception e) {
@@ -12392,7 +12392,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void resetNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(true);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(
+					ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
 		}
 
 		if (inboxSection != null){
@@ -12405,7 +12406,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if(hasChildren){
 					inboxSection.setEnabled(true);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(
+							ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
 				}
 				else{
 					logDebug("Inbox Node NO children");
@@ -12419,7 +12421,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (contactsSectionText == null) {
 				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
 			}
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
+			contactsSectionText.setTextColor(
+					ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
 			setContactTitleSection();
 		}
 
@@ -12428,7 +12431,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (notificationsSectionText == null) {
 				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
 			}
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color));
+			notificationsSectionText.setTextColor(
+					ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
 			setNotificationsTitleSection();
 		}
 

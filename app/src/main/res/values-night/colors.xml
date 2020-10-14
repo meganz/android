@@ -13,7 +13,6 @@
     <color name="pass_strong">#5BB5DE</color>
 
     <color name="checkbox_border">@color/white_alpha_054</color>
-    <color name="checkbox_background">@color/teal_200</color>
 
     <!-- ProgressIndicator -->
     <color name="linear_progress_track">@color/white_alpha_023</color>
@@ -40,7 +39,6 @@
 
     <color name="grid_item_bg_stoke_color">@color/white_alpha_012</color>
     <color name="grid_item_bg_solid_color">@color/white_alpha_005</color>
-    <color name="grid_item_selected_bg_stroke_color">@color/teal_200</color>
     <color name="grid_item_selected_bg_solid_color">@color/white_alpha_005</color>
 
     <color name="empty_hint_text_normal_color">#A0A0A0</color>
@@ -52,19 +50,14 @@
 
     <color name="login_loading_logo_color">@color/red_300</color>
 
-    <color name="drawer_item_text_color">@color/white</color>
-    <color name="drawer_item_text_color_disabled">@color/white_alpha_038</color>
+    <color name="business_color">#7ABEDD</color>
+
+    <color name="progress_bar_normal_background">@color/white_alpha_023</color>
+
+    <color name="drawer_item_text_color_disabled">@color/white_alpha_033</color>
     <color name="drawer_add_phone_number_background">@color/white_alpha_087</color>
     <color name="drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>
     <color name="drawer_notification_count_color">@color/red_300</color>
     <color name="drawer_notification_count_color_disabled">@color/red_300_alpha_038</color>
-    <color name="drawer_used_storage_text_color">@color/teal_200</color>
-    <color name="drawer_total_storage_text_color">@color/white_alpha_087</color>
-    <color name="drawer_email_text_color">@color/white_alpha_087</color>
     <color name="drawer_upgrade_button_text_color">@color/dark_grey</color>
-
-    <color name="business_color">#7ABEDD</color>
-
-    <color name="progress_bar_normal_background">@color/white_alpha_023</color>
-    <color name="progress_bar_normal_progress">@color/teal_200</color>
 </resources>

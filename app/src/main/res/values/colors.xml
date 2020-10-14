@@ -234,6 +234,7 @@
     <color name="white_alpha_009">#16FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
+    <color name="white_alpha_033">#54FFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
     <color name="white_alpha_054">#89FFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
@@ -296,7 +297,6 @@
     <color name="pass_strong">#2BA6DE</color>
 
     <color name="checkbox_border">@color/grey_alpha_054</color>
-    <color name="checkbox_background">@color/teal_300</color>
 
     <!-- ProgressIndicator -->
     <color name="linear_progress_indicator">@color/teal_300</color>
@@ -310,7 +310,6 @@
     <!-- grid item background related colors -->
     <color name="grid_item_bg_stoke_color">@color/grey_alpha_012</color>
     <color name="grid_item_bg_solid_color">?android:attr/colorBackground</color>
-    <color name="grid_item_selected_bg_stroke_color">@color/teal_300</color>
     <color name="grid_item_selected_bg_solid_color">?android:attr/colorBackground</color>
 
     <!-- empty hint view related colors -->
@@ -327,17 +326,12 @@
     <color name="business_color">#2BA6DE</color>
 
     <color name="progress_bar_normal_background">@color/grey_alpha_015</color>
-    <color name="progress_bar_normal_progress">@color/teal_300</color>
 
     <!-- app drawer related related colors -->
-    <color name="drawer_item_text_color">@color/grey_alpha_087</color>
     <color name="drawer_item_text_color_disabled">@color/grey_alpha_033</color>
     <color name="drawer_add_phone_number_background">#F9F9F9</color>
     <color name="drawer_add_phone_number_button_stroke">@color/teal_300</color>
     <color name="drawer_notification_count_color">@color/red_600</color>
     <color name="drawer_notification_count_color_disabled">@color/red_600_alpha_038</color>
-    <color name="drawer_used_storage_text_color">@color/teal_300</color>
-    <color name="drawer_total_storage_text_color">@color/grey_alpha_087</color>
-    <color name="drawer_email_text_color">@color/grey_alpha_087</color>
     <color name="drawer_upgrade_button_text_color">@color/teal_300</color>
 </resources>
