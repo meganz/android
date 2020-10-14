@@ -43,7 +43,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -394,6 +394,7 @@ public class CallService extends Service{
     public void onDestroy() {
         unregisterReceiver(chatCallUpdateReceiver);
         mNotificationManager.cancel(getCurrentCallNotifId());
+
         MegaApplication.setOpenCallChatId(-1);
 
         super.onDestroy();

@@ -30,6 +30,7 @@ public class CallListener implements MegaChatCallListenerInterface {
         if (megaApplication == null) {
             megaApplication = MegaApplication.getInstance();
         }
+
         Intent intentGeneral = new Intent(ACTION_UPDATE_CALL);
         intentGeneral.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
         intentGeneral.putExtra(UPDATE_CALL_ID, call.getId());

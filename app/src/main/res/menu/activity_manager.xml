@@ -219,6 +219,14 @@
 		android:visible="false"/>
 
 	<item
+		android:id="@+id/action_menu_retry_transfers"
+		android:orderInCategory="165"
+		android:title="@string/option_to_retry_transfers"
+		android:icon="@drawable/ic_action_bar_null"
+		MEGA:showAsAction="never"
+		android:visible="false"/>
+
+	<item
 		android:id="@+id/action_menu_clear_completed_transfers"
 		android:orderInCategory="165"
 		android:title="@string/option_to_clear_transfers"

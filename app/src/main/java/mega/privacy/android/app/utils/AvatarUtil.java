@@ -29,7 +29,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -158,7 +158,7 @@ public class AvatarUtil {
     public static int getSpecificAvatarColor(String typeColor) {
         switch (typeColor) {
             case AVATAR_GROUP_CHAT_COLOR:
-                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.divider_upgrade_account);
+                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.black_12_alpha);
             case AVATAR_PHONE_COLOR:
                 return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.color_default_avatar_phone);
             default:

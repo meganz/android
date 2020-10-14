@@ -105,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/scan_document_layout"
@@ -173,7 +173,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/divider_upgrade_account"
+                android:background="@color/black_12_alpha"
                 android:orientation="vertical"/>
 
             <LinearLayout

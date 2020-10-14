@@ -72,7 +72,7 @@
             android:id="@+id/divider_info_options_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <!-- CHAT ACTIONS LAYOUT -->
         <LinearLayout
@@ -195,7 +195,7 @@
             android:id="@+id/divider_chat_options_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <!-- INCOMING SHARED FOLDERS LAYOUT -->
 
@@ -244,7 +244,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <!-- NOTIFICATIONS LAYOUT -->
 
@@ -287,7 +287,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <!-- SHARE CONTACT LAYOUT -->
 
@@ -325,7 +325,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <!-- VERIFY CREDENTIALS LAYOUT -->
 
@@ -393,7 +393,7 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -434,7 +434,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
 
         <!-- CLEAR LAYOUT -->
@@ -474,7 +474,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <!-- REMOVE CONTACT LAYOUT -->
 

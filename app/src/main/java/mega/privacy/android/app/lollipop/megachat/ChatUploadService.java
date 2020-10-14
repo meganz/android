@@ -58,11 +58,12 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
@@ -140,7 +141,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	/** the receiver and manager for the broadcast to listen to the pause event */
 	private BroadcastReceiver pauseBroadcastReceiver;
-	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
 
 	@SuppressLint("NewApi")
 	@Override
@@ -189,7 +189,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}, 1000);
 			}
 		};
-		pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+		registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
 	@Override
@@ -210,7 +210,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             megaChatApi.saveCurrentState();
         }
 
-		pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
+		unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -477,6 +477,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                 megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
             }
 		}
+
+		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+				&& !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown()) {
+			sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
+		}
 	}
 
 	/*
@@ -534,6 +539,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		isForeground = false;
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
+		MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(false);
 		stopSelf();
 		logDebug("After stopSelf");
 
@@ -787,11 +793,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		Intent intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
 		switch (isOverquota) {
 			case 0:
 			default:
 				intent.setAction(ACTION_SHOW_TRANSFERS);
+				intent.putExtra(OPENED_FROM_CHAT, true);
 				break;
 			case 1:
 				intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -804,7 +813,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String actionString = isOverquota == 0 ? getString(R.string.chat_upload_title_notification) :
 				getString(R.string.general_show_info);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, 0);
+		PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		Notification notification;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -977,8 +986,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
-			LocalBroadcastManager.getInstance(getApplicationContext())
-					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {

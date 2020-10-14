@@ -74,6 +74,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -883,7 +885,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         IntentFilter filterProximitySensor = new IntentFilter(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
-        LocalBroadcastManager.getInstance(this).registerReceiver(proximitySensorReceiver, filterProximitySensor);
+        registerReceiver(proximitySensorReceiver, filterProximitySensor);
     }
 
     @Override
@@ -1080,7 +1082,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         unregisterReceiver(chatCallUpdateReceiver);
         unregisterReceiver(chatSessionUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(proximitySensorReceiver);
+        unregisterReceiver(proximitySensorReceiver);
 
         super.onDestroy();
     }
