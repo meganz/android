@@ -186,10 +186,17 @@ public class BillingManager implements PurchasesUpdatedListener {
 
             BillingFlowParams purchaseParams = builder.build();
 
-            // Work around, check intent's nullity first, otherwise billing library crashes internally.
-            if(mActivity.getIntent() != null) {
-                mBillingClient.launchBillingFlow(mActivity, purchaseParams);
+            /*
+                If do a full login, ManagerActivity's mIntent will be set as null.
+                Work around, check the intent's nullity first, if null, set an empty Intent, as we don't use "PROXY_PACKAGE",
+                otherwise billing library crashes internally.
+                @see com.android.billingclient.api.BillingClientImpl -> var1.getIntent().getStringExtra("PROXY_PACKAGE")
+             */
+            if(mActivity.getIntent() == null) {
+                mActivity.setIntent(new Intent());
             }
+
+            mBillingClient.launchBillingFlow(mActivity, purchaseParams);
         };
 
         executeServiceRequest(purchaseFlowRequest);
