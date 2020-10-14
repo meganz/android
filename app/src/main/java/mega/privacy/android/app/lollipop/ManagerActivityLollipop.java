@@ -1406,13 +1406,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                     logDebug("Purchase " + sku + " is being processed or in unknown state.");
                     message = getString(R.string.message_user_payment_pending);
                 }
-                showAlert(this, message, null);
             } else {
                 //down grade case
                 logDebug("Downgrade, the new subscription takes effect when the old one expires.");
                 message = getString(R.string.message_user_purchased_subscription_down_grade);
-                showAlert(this, message, null);
             }
+            showAlert(this, message, null);
             drawerItem = DrawerItem.CLOUD_DRIVE;
             selectDrawerItemLollipop(drawerItem);
         } else {
@@ -1452,7 +1451,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             }
 		}
 
-        if(max != null && mBillingManager.isPayloadValid(max.getDeveloperPayload())){
+        if(max != null && mBillingManager.isPurchaseBelongToCurrentAccount(max)){
             myAccountInfo.setActiveGooglePlaySubscription(max);
         }
 
