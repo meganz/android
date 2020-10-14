@@ -7,13 +7,10 @@ import android.graphics.BitmapFactory;
 import java.io.File;
 
 import mega.privacy.android.app.ThumbnailCache;
-import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 

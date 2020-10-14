@@ -31,7 +31,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -1084,7 +1084,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         // Save the new file to offline
-        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
+        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context);
     }
 
     @Override

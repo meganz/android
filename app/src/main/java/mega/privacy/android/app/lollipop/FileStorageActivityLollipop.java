@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,40 +11,36 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PersistableBundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GestureDetectorCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.text.Editable;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -65,25 +62,45 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.SDCardOperator;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
-	public static final String IS_CU_OR_MU_FOLDER = "IS_CU_OR_MU_FOLDER";
+	private static final String PATH = "PATH";
+	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
+
+	public enum PickFolderType {
+		CU_FOLDER("CU_FOLDER"),
+		MU_FOLDER("MU_FOLDER"),
+		DOWNLOAD_FOLDER("DOWNLOAD_FOLDER"),
+		NONE_ONLY_DOWNLOAD("NONE_ONLY_DOWNLOAD");
+
+		private String folderType;
+
+		PickFolderType(String folderType) {
+			this.folderType = folderType;
+		}
+
+		public String getFolderType() {
+			return folderType;
+		}
+	}
 
 	public static final String EXTRA_URL = "fileurl";
 	public static final String EXTRA_SIZE = "filesize";
@@ -91,9 +108,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
 	public static final String EXTRA_FROM_SETTINGS = "from_settings";
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
-	public static final String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
-	public static final String EXTRA_SD_ROOT = "sd_root";
 	public static final String EXTRA_PATH = "filepath";
 	public static final String EXTRA_FILES = "fileslist";
     public static final String EXTRA_PROMPT = "prompt";
@@ -103,7 +118,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		// Select single folder
 		PICK_FOLDER("ACTION_PICK_FOLDER"),
 		// Pick one or multiple files or folders
-		PICK_FILE("ACTION_PICK_FILE");
+		PICK_FILE("ACTION_PICK_FILE"),
+		//Browse files
+		BROWSE_FILES("ACTION_BROWSE_FILES");
 
 		private String action;
 
@@ -118,52 +135,51 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public static Mode getFromIntent(Intent intent) {
 			if (intent.getAction().equals(PICK_FILE.getAction())) {
 				return PICK_FILE;
+			} else if (intent.getAction().equals(BROWSE_FILES.getAction())) {
+				return BROWSE_FILES;
 			} else {
 				return PICK_FOLDER;
 			}
 		}
 	}
-	MegaPreferences prefs;
-	DatabaseHandler dbH;
-	Mode mode;
+
+	private MegaPreferences prefs;
+	private Mode mode;
 	
 	private MenuItem newFolderMenuItem;
 	
 	private File path;
-	private String camSyncLocalPath;
 	private File root;
 	private RelativeLayout viewContainer;
 	private Button button;
 	private TextView contentText;
 	private RecyclerView listView;
-	LinearLayoutManager mLayoutManager;
+	private LinearLayoutManager mLayoutManager;
 	private Button cancelButton;
-	GestureDetectorCompat detector;
-	ImageView emptyImageView;
-	TextView emptyTextView;
+	private ImageView emptyImageView;
+	private TextView emptyTextView;
+	private LinearLayout buttonsContainer;
+
+	private LinearLayout rootLevelLayout;
+	private RelativeLayout internalStorageLayout;
+	private RelativeLayout externalStorageLayout;
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
-	private Boolean cameraFolderSettings;
-	private Boolean isCUOrMUFolder;
+	private PickFolderType pickFolderType;
 	private String sdRoot;
 	private boolean hasSDCard;
     private String prompt;
 
-	Stack<Integer> lastPositionStack;
+	private Stack<Integer> lastPositionStack;
 	
 	private String url;
 	private long size;
 	private long[] documentHashes;
 	private ArrayList<String> serializedNodes;
 
-	FileStorageLollipopAdapter adapter;
-	Toolbar tB;
-	ActionBar aB;
-	
-	float scaleH, scaleW;
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
+	private FileStorageLollipopAdapter adapter;
+	private Toolbar tB;
+	private ActionBar aB;
 	
 	private ActionMode actionMode;
 	
@@ -172,73 +188,56 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
 
-	String regex = "[*|\\?:\"<>\\\\\\\\/]";
+	private String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
-	Handler handler;
+	private Handler handler;
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
+	private boolean pickingFromSDCard;
 
-	    public void onLongPress(MotionEvent e) {
-			logDebug("onLongPress");
-	    	
-			if (mode == Mode.PICK_FILE) {
-				logDebug("Mode.PICK_FILE");
-				// handle long press
-				if (!adapter.isMultipleSelect()){
-					adapter.setMultipleSelect(true);
-
-					actionMode = startSupportActionMode(new ActionBarCallBack());
-				}
-				super.onLongPress(e);
-			}
-	    }
-	}
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
 
 		// Handle presses on the action bar items
-	    switch (item.getItemId()) {
-		    case android.R.id.home:{
-		    	onBackPressed();
-		    	return true;
-		    }
-		    case R.id.cab_menu_create_folder:{
-		    	showNewFolderDialog();
-		    	return true;
-		    }
-		    case R.id.cab_menu_select_all:{
-		    	selectAll();
-		    	return true;
-		    }
-		    case R.id.cab_menu_unselect_all:{
-		    	clearSelections();
-		    	return true;
-		    }
-		    default:{
-	            return super.onOptionsItemSelected(item);
-	        }
-	    }
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            case R.id.cab_menu_create_folder:
+                showNewFolderDialog();
+                return true;
+
+            case R.id.cab_menu_select_all:
+                selectAll();
+                return true;
+
+            case R.id.cab_menu_unselect_all:
+                clearSelections();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
 		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			
-			switch(item.getItemId()){
-				case R.id.cab_menu_select_all:{
-					selectAll();
-					break;
-				}
-				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					break;
-				}
-			}
-			return false;
-		}
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            switch (item.getItemId()) {
+                case R.id.cab_menu_select_all:
+                    selectAll();
+                    break;
+
+                case R.id.cab_menu_unselect_all:
+                    clearSelections();
+                    break;
+            }
+
+            return false;
+        }
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -314,14 +313,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		newFolderMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
-		
-		if (mode == Mode.PICK_FOLDER) {
-            newFolderMenuItem.setVisible(true);
-		}
-		else{
-			newFolderMenuItem.setVisible(false);
-		}
+
+        newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -329,16 +322,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 		logDebug("onPrepareOptionsMenu");
-		if (mode == Mode.PICK_FOLDER) {
-			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-            newFolderMenuItem.setVisible(true);
-		}else{
-			newFolderMenuItem.setVisible(false);
-			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 
-		}
+		menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+		menu.findItem(R.id.cab_menu_select_all).setVisible(mode == Mode.PICK_FILE);
+		newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
@@ -353,29 +341,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						REQUEST_WRITE_STORAGE);
 			}
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-		}
+		changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
-		
-		display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-		
-	    scaleW = getScaleW(outMetrics, density);
-	    scaleH = getScaleH(outMetrics, density);
 
 	    handler = new Handler();
 
 		setContentView(R.layout.activity_filestorage);
-		
-		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 		
 		//Set toolbar
 		tB = findViewById(R.id.toolbar_filestorage);
@@ -383,10 +356,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-
-		viewContainer = findViewById(R.id.file_storage_container);
-		contentText = findViewById(R.id.file_storage_content_text);
-		listView = findViewById(R.id.file_storage_list_view);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
 
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
@@ -395,10 +365,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
-		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
-		isCUOrMUFolder = intent.getBooleanExtra(IS_CU_OR_MU_FOLDER, false);
-		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
-		hasSDCard = (sdRoot != null);
+
+		setPickFolderType(intent.getStringExtra(PICK_FOLDER_TYPE));
+
+		File[] fs = getExternalFilesDirs(null);
+		hasSDCard = fs.length > 1 && fs[1] != null;
 		
 		mode = Mode.getFromIntent(intent);
 		if (mode == Mode.PICK_FOLDER) {
@@ -406,14 +377,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			serializedNodes = intent.getStringArrayListExtra(EXTRA_SERIALIZED_NODES);
 			url = intent.getExtras().getString(EXTRA_URL);
 			size = intent.getExtras().getLong(EXTRA_SIZE);
-			aB.setTitle(getString(R.string.general_select_to_download));
-		} else {
-			aB.setTitle(getString(R.string.general_select_to_upload));
+			aB.setTitle(getString(R.string.general_select_to_download).toUpperCase());
+		} else if (mode == Mode.BROWSE_FILES) {
+			aB.setTitle(getString(R.string.browse_files_label).toUpperCase());
+		} else{
+			aB.setTitle(getString(R.string.general_select_to_upload).toUpperCase());
 		}
 		
 		if (savedInstanceState != null) {
-			if (savedInstanceState.containsKey("path")) {
-				path = new File(savedInstanceState.getString("path"));
+			if (savedInstanceState.containsKey(PATH)) {
+				path = new File(savedInstanceState.getString(PATH));
 			}
 
 			fromSaveRecoveryKey = savedInstanceState.getBoolean(EXTRA_SAVE_RECOVERY_KEY, false);
@@ -421,6 +394,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			isSetDownloadLocationShown = savedInstanceState.getBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, false);
 			confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
 		}
+		
+        viewContainer = findViewById(R.id.file_storage_container);
+		contentText = findViewById(R.id.file_storage_content_text);
+		listView = findViewById(R.id.file_storage_list_view);
+
+		buttonsContainer = findViewById(R.id.options_file_storage_layout);
 
 		cancelButton = findViewById(R.id.file_storage_cancel_button);
 		cancelButton.setOnClickListener(this);
@@ -429,129 +408,253 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		button = findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 
+		boolean actionButtonAccentStyle = true;
+
 		if (fromSaveRecoveryKey) {
 			button.setText(getString(R.string.save_action).toUpperCase(Locale.getDefault()));
 		} else if (fromSettings) {
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+		} else if (mode == Mode.PICK_FOLDER) {
+			button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
+		} else if (mode == Mode.PICK_FILE){
+			actionButtonAccentStyle = false;
+			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+		} else if (mode == Mode.BROWSE_FILES) {
+			buttonsContainer.setVisibility(View.GONE);
+		}
+
+		if (actionButtonAccentStyle) {
+			button.setTextColor(ContextCompat.getColor(this, R.color.white));
+			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_accent_button));
 		} else {
-			if (mode == Mode.PICK_FOLDER) {
-				button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
-			} else {
-				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-			}
+			button.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
 		}
-		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
-		emptyTextView = (TextView) findViewById(R.id.file_storage_empty_text);
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-		}else{
-			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-		}
+
+		rootLevelLayout = findViewById(R.id.root_level_layout);
+		rootLevelLayout.setVisibility(View.GONE);
+		internalStorageLayout = findViewById(R.id.internal_storage_layout);
+		internalStorageLayout.setOnClickListener(this);
+		externalStorageLayout = findViewById(R.id.external_storage_layout);
+		externalStorageLayout.setOnClickListener(this);
+
+		emptyImageView = findViewById(R.id.file_storage_empty_image);
+		emptyTextView = findViewById(R.id.file_storage_empty_text);
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+
 		String textToShow = String.format(getString(R.string.file_browser_empty_folder_new));
-		try{
+		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting text, ", e);
 		}
-		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
-		emptyTextView.setText(result);
+		emptyTextView.setText(getSpannedHtmlText(textToShow));
 
-		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView = findViewById(R.id.file_storage_list_view);
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this, getOutMetrics()));
 		mLayoutManager = new LinearLayoutManager(this);
-		listView.addOnItemTouchListener(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
 		
 		if (adapter == null){
-			
 			adapter = new FileStorageLollipopAdapter(this, listView, mode);
 			listView.setAdapter(adapter);
-			
 		}
 
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			root = buildExternalStorageFile("");
-			if (root == null){
-				root = new File(File.separator);
-			}
-		}
-		else{
-			root = new File(File.separator);
-		}
-		//pick file from SD card
-		if(hasSDCard) {
-		    root = new File(sdRoot);
-        }
-
-		lastPositionStack = new Stack<>();
+        lastPositionStack = new Stack<>();
 
 		prefs = dbH.getPreferences();
-		if(!hasSDCard) {
-            if (prefs == null){
-                path = buildExternalStorageFile(DOWNLOAD_DIR);
-            }
-            else{
-                String lastFolder = prefs.getLastFolderUpload();
-                if(lastFolder!=null){
-                    path = new File(prefs.getLastFolderUpload());
-                    if(!path.exists())
-                    {
-                        path = null;
-                    }
-                }
-                else{
-                    path = buildExternalStorageFile(DOWNLOAD_DIR);
-                }
-                if (cameraFolderSettings){
-                    camSyncLocalPath = prefs.getCamSyncLocalPath();
-                }
-            }
-            if (path == null) {
-                path = buildExternalStorageFile(DOWNLOAD_DIR);
-            }
-        } else {
-		    //always pick from SD card root
-		    path = new File(sdRoot);
-        }
 
-		if (cameraFolderSettings) {
-			if (Environment.getExternalStorageDirectory() != null) {
-				path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+		if (mode == Mode.BROWSE_FILES) {
+			if (intent.getExtras() != null) {
+				String extraPath = intent.getExtras().getString(EXTRA_PATH);
+				if (!isTextEmpty(extraPath)) {
+					root = path = new File(extraPath);
+				}
 			}
+		    checkPath();
+		} else if (hasSDCard) {
+			showRootWithSDView(true);
+		} else {
+			openPickFromInternalStorage();
 		}
-		
-		if (path == null){
-			finish();
-			return;
-		}
-		
-		path.mkdirs();
-		changeFolder(path);
-		logDebug("Path to show: " + path);
 
 		if (isSetDownloadLocationShown) {
 			showConfirmationSaveInSameLocation();
 		}
 	}
 
+	/**
+	 * Sets the type of pick folder action.
+	 *
+	 * @param pickFolderString	the type of pick folder action.
+	 */
+	private void setPickFolderType(String pickFolderString) {
+		if (isTextEmpty(pickFolderString)) {
+			pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD;
+		} else if (pickFolderString.equals(PickFolderType.CU_FOLDER.getFolderType())) {
+			pickFolderType = PickFolderType.CU_FOLDER;
+			dbH.setCameraFolderExternalSDCard(false);
+		} else if (pickFolderString.equals(PickFolderType.MU_FOLDER.getFolderType())) {
+			pickFolderType = PickFolderType.MU_FOLDER;
+			dbH.setMediaFolderExternalSdCard(false);
+		} else if (pickFolderString.equals(PickFolderType.DOWNLOAD_FOLDER.getFolderType())) {
+			pickFolderType = PickFolderType.DOWNLOAD_FOLDER;
+		}
+	}
+
+	/**
+	 * Sets the view to pick from Internal Storage.
+	 */
+	private void openPickFromInternalStorage() {
+		pickingFromSDCard = false;
+		root = buildExternalStorageFile("");
+
+		if (pickFolderType.equals(PickFolderType.CU_FOLDER) && Environment.getExternalStorageDirectory() != null) {
+			path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+		} else if (pickFolderType.equals(PickFolderType.MU_FOLDER) && Environment.getExternalStorageDirectory() != null) {
+			path = Environment.getExternalStorageDirectory();
+		} else if (prefs != null && prefs.getLastFolderUpload() != null) {
+			path = new File(prefs.getLastFolderUpload());
+		}
+
+		if (path == null) {
+			path = buildDefaultDownloadDir(this);
+		}
+
+		path.mkdirs();
+
+		checkPath();
+	}
+
+	/**
+	 * Sets the view to pick from SD card.
+	 */
+	private void openPickFromSDCard() {
+		pickingFromSDCard = true;
+
+		SDCardOperator sdCardOperator;
+		try {
+			sdCardOperator = new SDCardOperator(this);
+		} catch (SDCardOperator.SDCardException e) {
+			e.printStackTrace();
+			logError("Initialize SDCardOperator failed", e);
+			//sd card is not available, choose internal storage location
+			showRootWithSDView(false);
+			openPickFromInternalStorage();
+			return;
+		}
+
+		String sdCardRoot = sdCardOperator.getSDCardRoot();
+		if (mode.equals(Mode.PICK_FILE) || sdCardOperator.canWriteWithFile(sdCardRoot)) {
+			sdRoot = sdCardRoot;
+		} else if (isBasedOnFileStorage()) {
+			try {
+				sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+				sdRoot = sdCardRoot;
+			} catch (SDCardOperator.SDCardException e) {
+				e.printStackTrace();
+				logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
+				requestSDCardPermission(sdCardRoot);
+			}
+		} else {
+			requestSDCardPermission(sdCardRoot);
+		}
+
+		if (sdRoot != null) {
+			openSDCardPath();
+		}
+	}
+
+	/**
+	 * Opens a SD card path.
+	 */
+	private void openSDCardPath() {
+		path = new File(sdRoot);
+		showRootWithSDView(false);
+		checkPath();
+	}
+
+	/**
+	 * Requests SD card permissions.
+	 *
+	 * @param sdCardRoot	the root path of the SD card.¡
+	 */
+	private void requestSDCardPermission(String sdCardRoot) {
+		Intent intent = null;
+		if (isBasedOnFileStorage()) {
+			StorageManager sm = getSystemService(StorageManager.class);
+			if (sm != null) {
+				StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
+				if (volume != null) {
+					intent = volume.createAccessIntent(null);
+				}
+			}
+		}
+
+		//for below N or above P, open SAF
+		if (intent == null) {
+			intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+		}
+
+		startActivityForResult(intent, REQUEST_CODE_TREE);
+	}
+
+	/**
+	 * Shows or hides the root view with Internal storage and External storage.
+	 *
+	 * @param show	true if the root with both storages has to be shown, false otherwise
+	 */
+	private void showRootWithSDView(boolean show) {
+		if (show) {
+			contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
+			rootLevelLayout.setVisibility(View.VISIBLE);
+			buttonsContainer.setVisibility(View.GONE);
+			showEmptyState();
+		} else {
+			rootLevelLayout.setVisibility(View.GONE);
+			buttonsContainer.setVisibility(View.VISIBLE);
+		}
+	}
+
+	/**
+	 * Shows the empty view or the list view depending on if there are items in the adapter.
+	 * Hides both if the root view with Internal storage and External storage is shown.
+	 */
+	private void showEmptyState() {
+		if (rootLevelLayout.getVisibility() == View.VISIBLE) {
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		} else if (adapter != null && adapter.getItemCount() > 0) {
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		} else {
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+		}
+	}
+
+	/**
+	 * Changes the path shown in the screen or finish the activity it the current one is not valid.
+	 */
+	private void checkPath() {
+		if (path == null){
+			finish();
+		}
+
+		changeFolder(path);
+	}
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		if (isScreenInPortrait(this)) {
-			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-		} else {
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-		}
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
 	}
 
 	@Override
@@ -562,8 +665,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onSaveInstanceState(Bundle state) {
-		state.putString("path", path.getAbsolutePath());
+		if (path != null) {
+			state.putString(PATH, path.getAbsolutePath());
+		}
 		state.putBoolean(EXTRA_SAVE_RECOVERY_KEY, fromSaveRecoveryKey);
+		state.putBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, isSetDownloadLocationShown);
+		state.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
+
 		super.onSaveInstanceState(state);
 	}
 	
@@ -577,8 +685,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		setFiles(newPath);
 		path = newPath;
-		contentText.setText(makeBold(path.getAbsolutePath(), path.getName()));
-//		windowTitle.setText(makeBold(path.getAbsolutePath(), path.getName()));
+		contentText.setText(path.getAbsolutePath());
 		invalidateOptionsMenu();
         if (mode == Mode.PICK_FILE) {
 			clearSelections();
@@ -596,6 +703,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					true, this);
 			return;
 		}
+
 		File[] files = path.listFiles();
 
 		if(files != null)
@@ -610,19 +718,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 			Collections.sort(documents, new CustomComparator());
 		}
-		if(documents.size()==0){
-			logDebug("Documents SIZE 0");
-			listView.setVisibility(View.GONE);
-			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.VISIBLE);
-		}
-		else{
-			logDebug("Documents: " + documents.size());
-			adapter.setFiles(documents);
-			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-		}
+
+		adapter.setFiles(documents);
+		showEmptyState();
 	}
 
 	private void updateActionModeTitle() {
@@ -697,12 +795,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		logDebug("onClick");
 
 		switch (v.getId()) {
-			case R.id.file_storage_button:{
+			case R.id.file_storage_button:
                 //don't record last upload folder for SD card upload
                 if(!hasSDCard) {
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
+					boolean isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER) || pickFolderType.equals(PickFolderType.MU_FOLDER);
+
 					if (!isCUOrMUFolder && (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
 							&& dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
@@ -745,13 +845,20 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					}.execute();			
 				}
 				break;
-			}
-			case R.id.file_storage_cancel_button:{
+
+			case R.id.file_storage_cancel_button:
 				finish();
 				break;
-			}
+
+			case R.id.internal_storage_layout:
+				showRootWithSDView(false);
+				openPickFromInternalStorage();
+				break;
+
+			case R.id.external_storage_layout:
+				openPickFromSDCard();
+				break;
 		}
-		
 	}
 
 	/**
@@ -818,14 +925,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-		outState.putBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, isSetDownloadLocationShown);
-		outState.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
-
-		super.onSaveInstanceState(outState, outPersistentState);
-	}
-
-	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
 	        // do nothing
@@ -838,39 +937,48 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		logDebug("Position: " + position);
 
 		FileDocument document = adapter.getDocumentAt(position);
-		if(document == null) {
+		if (document == null) {
 			return;
 		}
-		
-		if (adapter.isMultipleSelect()){
-			logDebug("MULTISELECT ON");
+
+		if (adapter.isMultipleSelect()) {
 			adapter.toggleSelection(position);
 			List<FileDocument> selected = adapter.getSelectedDocuments();
-			if (selected.size() > 0){
+			if (selected.size() > 0) {
 				updateActionModeTitle();
+			}
+		} else if (document.isFolder()) {
+			lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+			changeFolder(document.getFile());
+		} else if (mode == Mode.PICK_FILE) {
+			//Multiselect on to select several files if desired
+			checkActionMode();
+			adapter.toggleSelection(position);
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
+		} else if (mode == Mode.BROWSE_FILES) {
+			File f = adapter.getItem(position).getFile();
+
+			if (isFileAvailable(f)) {
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				Uri uri = isAndroidNougatOrUpper() ? FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, f)
+						: Uri.fromFile(f);
+
+				if (uri != null) {
+					intent.setDataAndType(uri, MimeTypeList.typeForName(f.getName()).getType());
+				} else {
+					logWarning("The file cannot be opened, uri is null");
+					return;
+				}
+
+				if (isIntentAvailable(this, intent)) {
+					startActivity(intent);
+				}
+			} else {
+				showSnackbar(viewContainer, getString(R.string.corrupt_video_dialog_text));
 			}
 		}
-		else{
-			if (document.isFolder()) {
-
-				int lastFirstVisiblePosition = 0;
-
-				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-
-				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
-				lastPositionStack.push(lastFirstVisiblePosition);
-
-				changeFolder(document.getFile());
-			}
-			else if (mode == Mode.PICK_FILE) {
-				//Multiselect on to select several files if desired
-				adapter.setMultipleSelect(true);				
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-				adapter.toggleSelection(position);
-				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
-			}
-		}		
 	}
 	
 	/*
@@ -887,16 +995,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 	
 	/*
-	 * Count all selected items
-	 */
-	public int getItemCount(){
-		if(adapter!=null){
-			return adapter.getItemCount();
-		}
-		return 0;
-	}
-	
-	/*
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
@@ -909,21 +1007,28 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	@Override
 	public void onBackPressed() {
-		logDebug("onBackPressed");
 		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
-		if (path.equals(root)) {
+		boolean isRoot;
+		if (hasSDCard && !mode.equals(Mode.BROWSE_FILES)) {
+			isRoot = rootLevelLayout.getVisibility() == View.VISIBLE;
+		} else {
+			isRoot = path.equals(root);
+		}
+
+		if (isRoot) {
 			super.onBackPressed();
-		// Go one level higher otherwise
+			// Go one level higher otherwise
+		} else if (hasSDCard && ((pickingFromSDCard && path.equals(new File(sdRoot)) || !pickingFromSDCard && path.equals(root)))) {
+			path = null;
+			showRootWithSDView(true);
 		} else {
 			changeFolder(path.getParentFile());
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
@@ -937,13 +1042,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, getOutMetrics()), scaleWidthPx(20, getOutMetrics()), scaleWidthPx(17, getOutMetrics()), 0);
 
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
+		params1.setMargins(scaleWidthPx(20, getOutMetrics()), 0, scaleWidthPx(17, getOutMetrics()), 0);
 
 		final RelativeLayout error_layout = new RelativeLayout(FileStorageActivityLollipop.this);
 		layout.addView(error_layout, params1);
@@ -966,7 +1071,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error.setMargins(scaleWidthPx(3, getOutMetrics()), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.login_warning));
@@ -1115,6 +1220,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
             e.printStackTrace();
             logError("Initialize SDCardOperator failed", e);
         }
+
         if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
             try {
                 sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
@@ -1127,6 +1233,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
         } else {
             createFolderWithFile(value);
         }
+
         setFiles(path);
     }
 
@@ -1143,47 +1250,93 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		return m.find();
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
+	/**
+	 * Starts the action mode if needed.
+	 */
+	public void checkActionMode() {
+		if (mode != Mode.PICK_FILE) return;
+
+		if (adapter != null && !adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+		}
 	}
 
 	@Override
-	public void onShowPress(MotionEvent e) {
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+
+		if (requestCode == REQUEST_CODE_TREE) {
+			if (intent == null) {
+				logWarning("intent NULL");
+				if (resultCode != Activity.RESULT_OK) {
+					if (isBasedOnFileStorage()) {
+						showSnackbar(viewContainer, getString(R.string.download_requires_permission));
+					}
+				} else {
+					onCannotWriteOnSDCard();
+				}
+				return;
+			}
+
+			Uri treeUri = intent.getData();
+			if (treeUri == null) {
+				logWarning("tree uri is null!");
+				onCannotWriteOnSDCard();
+				return;
+			}
+
+			DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
+			if (pickedDir == null || !pickedDir.canWrite()) {
+				logWarning("PickedDir null or cannot write.");
+				return;
+			}
+
+			dbH.setSDCardUri(treeUri.toString());
+
+			SDCardOperator sdCardOperator = null;
+			try {
+				sdCardOperator = new SDCardOperator(this);
+			} catch (SDCardOperator.SDCardException e) {
+				e.printStackTrace();
+				logError("SDCardOperator initialize failed", e);
+			}
+
+			if (sdCardOperator == null) {
+				onCannotWriteOnSDCard();
+				return;
+			}
+
+			if (isBasedOnFileStorage()) {
+				sdRoot = sdCardOperator.getSDCardRoot();
+				openSDCardPath();
+			} else {
+				String pathString = getFullPathFromTreeUri(treeUri, this);
+				if (isTextEmpty(pathString)) {
+					logWarning("getFullPathFromTreeUri is Null.");
+					return;
+				}
+
+				path = new File(pathString);
+
+				if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
+					dbH.setCameraFolderExternalSDCard(true);
+					dbH.setUriExternalSDCard(treeUri.toString());
+				} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
+					dbH.setMediaFolderExternalSdCard(true);
+					dbH.setUriMediaExternalSdCard(treeUri.toString());
+				}
+
+				finishPickFolder();
+			}
+		}
 	}
 
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
+	/**
+	 * Shows a warning indicating no SD card was detected.
+	 */
+	private void onCannotWriteOnSDCard() {
+		showSnackbar(viewContainer, getString(R.string.no_external_SD_card_detected));
+		new Handler().postDelayed(this::openPickFromInternalStorage, 2000);
 	}
 }

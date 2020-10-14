@@ -67,14 +67,16 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
+import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.ImageProcessor.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -85,8 +87,8 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
@@ -691,8 +693,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        logDebug("Upload file which last modify timestamp is: " + lastModified);
-                        megaApi.startUpload(path, parent, file.getFileName(), lastModified / 1000, this);
+                        megaApi.startUpload(path, parent, CU_UPLOAD, file.getFileName(), lastModified / 1000, this);
                     }
                 } else {
                     logDebug("Local file is unavailable, delete record from database.");
@@ -952,7 +953,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             dbH.setCamSyncLocalPath(INVALID_PATH);
             dbH.setSecondaryFolderPath(INVALID_PATH);
             //refresh settings fragment UI
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
+            sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_PRIMARY);
@@ -963,7 +964,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             // disable media upload only
             disableMediaUploadProcess();
             dbH.setSecondaryFolderPath(INVALID_PATH);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING));
+            sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_SECONDARY);
@@ -1040,9 +1041,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             Uri uri = Uri.parse(prefs.getUriExternalSDCard());
             DocumentFile file = DocumentFile.fromTreeUri(this, uri);
             if (file == null) {
-                logError("Local folder on sd card is unavailabe.");
+                logError("Local folder on sd card is unavailable.");
                 return false;
             }
+
             return file.exists();
         } else {
             return new File(localPath).exists();
@@ -1051,17 +1053,30 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     /**
      * Check the availability of secondary local folder.
+     * If it's a path in internal storage, just check its existence.
+     * If it's a path in SD card, check the corresponding DocumentFile's existence.
      *
-     * @return true, if primary secondary folder is available. false， when it's unavailable.
+     * @return true, if secondary local folder is available. false， when it's unavailable.
      */
     private boolean checkSecondaryLocalFolder() {
         // check secondary local folder if media upload is enabled
         if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-            String path = prefs.getLocalPathSecondaryFolder();
-            // First time enable media upload, haven't set local path.
-            if (INVALID_PATH.equals(path)) {
-                return true;
+            if (dbH.getMediaFolderExternalSdCard()) {
+                Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+                DocumentFile file = DocumentFile.fromTreeUri(this, uri);
+                if (file == null) {
+                    logError("Local media folder on sd card is unavailable.");
+                    return false;
+                }
+
+                return file.exists();
             } else {
+                String path = prefs.getLocalPathSecondaryFolder();
+                // First time enable media upload, haven't set local path.
+                if (INVALID_PATH.equals(path)) {
+                    return true;
+                }
+
                 return path != null && new File(path).exists();
             }
         }
@@ -1084,7 +1099,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             secondaryEnabled = false;
         } else if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
             secondaryEnabled = true;
-            localPathSecondary = prefs.getLocalPathSecondaryFolder();
+
+            if (dbH.getMediaFolderExternalSdCard()) {
+                Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+                localPathSecondary = getFullPathFromTreeUri(uri,this);
+            } else {
+                localPathSecondary = prefs.getLocalPathSecondaryFolder();
+            }
+
             if (!localPathSecondary.endsWith(SEPARATOR)) {
                 localPathSecondary += SEPARATOR;
             }
@@ -1360,24 +1382,18 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
             logDebug("Cancel transfer received");
             if (e.getErrorCode() == MegaError.API_OK) {
-                //clear pause state and reset
-                megaApi.pauseTransfers(false, this);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (megaApi.getNumPendingUploads() <= 0) {
-                            megaApi.resetTotalUploads();
-                        }
+                new Handler().postDelayed(() -> {
+                    if (megaApi.getNumPendingUploads() <= 0) {
+                        megaApi.resetTotalUploads();
                     }
                 }, 200);
             } else {
                 finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
-            logDebug("Cancel all uploads received");
-            megaApi.pauseTransfers(false, this);
-            megaApi.resetTotalUploads();
+            if (e.getErrorCode() == MegaError.API_OK && megaApi.getNumPendingUploads() <= 0) {
+                megaApi.resetTotalUploads();
+            }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             logDebug("Pausetransfer false received");
             if (e.getErrorCode() == MegaError.API_OK) {
@@ -1454,10 +1470,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
         cuTransfers.add(transfer);
+        launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
     }
 
     @Override
-    public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+    public void onTransferUpdate(MegaApiJava api,MegaTransfer transfer) {
         transferUpdated(transfer);
     }
 
@@ -1495,6 +1512,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Image sync finished, error code: " + e.getErrorCode() + ", handle: " + transfer.getNodeHandle() + ", size: " + transfer.getTransferredBytes());
 
         try {
+            launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
             transferFinished(transfer, e);
         } catch (Throwable th) {
             logError("onTransferFinish error", th);
@@ -1509,9 +1527,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-            String size = getSizeString(transfer.getTotalBytes());
-            AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "", transfer.getParentPath());
-            dbH.setCompletedTransfer(completedTransfer);
+            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e));
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {
