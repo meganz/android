@@ -110,9 +110,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingTop="8dp"
+            android:paddingBottom="65dp"
             android:layout_above="@id/separator_3"
             android:layout_below="@id/content_text"
-            android:choiceMode="multipleChoice" />
+            android:choiceMode="multipleChoice"
+            android:clipToPadding="false"/>
+
+        <include
+            layout="@layout/transfers_widget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/options_folder_link_layout"
+            android:layout_alignParentEnd="true"/>
+
     </RelativeLayout>
 
     <RelativeLayout
