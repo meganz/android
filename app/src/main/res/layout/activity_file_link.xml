@@ -90,6 +90,7 @@
     <include layout="@layout/content_file_link_info_activity" />
     <!--Buttons-->
     <RelativeLayout
+        android:id="@+id/buttons_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom">
@@ -97,7 +98,7 @@
             android:id="@+id/separator_3"
             android:layout_width="match_parent"
             android:layout_height="1dip"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -133,6 +134,14 @@
                 android:text="IMPORT"/>
         </LinearLayout>
     </RelativeLayout>
+
+    <include
+        layout="@layout/transfers_widget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@+id/buttons_layout"
+        app:layout_anchorGravity="top|end"
+        android:layout_gravity="end"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
