@@ -50,6 +50,10 @@
         android:theme="@style/Theme.Megaactionbar"
         android:usesCleartextTraffic="true">
 
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true"/>
+
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <meta-data

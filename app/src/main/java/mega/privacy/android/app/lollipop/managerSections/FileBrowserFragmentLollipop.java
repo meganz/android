@@ -35,6 +35,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +128,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	String downloadLocationDefaultPath;
     
     private int placeholderCount;
+
+	private PublisherAdView adView;
 
 	@Override
 	protected MegaNodeAdapter getAdapter() {
@@ -557,6 +565,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
+
+			// Create an ad request.
+			MobileAds.setRequestConfiguration(
+					new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("0091B3C4EC4436CA1BA032C562D3B583"))
+							.build());
+			PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+			adView = v.findViewById(R.id.ad_view);
+			// Start loading the ad in the background.
+			adView.loadAd(adRequest);
+
             return v;
 
         } else {
