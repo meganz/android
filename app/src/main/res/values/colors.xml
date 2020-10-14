@@ -46,8 +46,6 @@
  	<color name="lollipop_dark_primary_color_file_properties">#2284b1</color>
     
  <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
-    
-    <color name="green_free_account">#31B404</color>
 
     <color name="divider_upgrade_account">#1F000000</color>
 
@@ -56,7 +54,6 @@
     <color name="black_87_opacity">#DE000000</color>
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
-    <color name="upgrade_orange">#ffa500</color>
     <color name="upgrade_grey">#8d8d8d</color>
     <color name="filter_icon">#8d8d94</color>
     <color name="upgrade_white">#b9ffffff</color>
@@ -182,8 +179,6 @@
     <color name="yellow_notif_shares">#FFFFA500</color>
     <color name="green_notif_contacts">#FF00897B</color>
 
-    <color name="free_account">#2bb200</color>
-
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>
     <color name="dialog_text">#FF666666</color>
@@ -289,6 +284,9 @@
     <!-- The divider between List view items -->
     <color name="list_item_divider">@color/grey_alpha_012</color>
 
+    <!-- solid black/white text color -->
+    <color name="text_color_primary_solid">@color/black</color>
+
     <!-- password strength -->
     <color name="pass_very_weak">#FF333A</color>
     <color name="pass_weak">#FFD300</color>
@@ -302,11 +300,6 @@
     <color name="linear_progress_indicator">@color/teal_300</color>
     <color name="linear_progress_track">@color/grey_alpha_012</color>
 
-    <color name="twofa_toolbar_color">@color/red_600</color>
-    <color name="twofa_status_bar_color">@color/red_800</color>
-
-    <color name="account_capacity_text_color">@color/black</color>
-
     <!-- grid item background related colors -->
     <color name="grid_item_bg_stoke_color">@color/grey_alpha_012</color>
     <color name="grid_item_bg_solid_color">?android:attr/colorBackground</color>
@@ -314,7 +307,6 @@
 
     <!-- empty hint view related colors -->
     <color name="empty_hint_text_normal_color">#999999</color>
-    <color name="empty_hint_text_highlight_color">@color/black</color>
 
     <!-- bottom navigation related related colors -->
     <color name="bottom_nav_menu_color_normal">@color/grey_alpha_054</color>
@@ -334,4 +326,9 @@
     <color name="drawer_notification_count_color">@color/red_600</color>
     <color name="drawer_notification_count_color_disabled">@color/red_600_alpha_038</color>
     <color name="drawer_upgrade_button_text_color">@color/teal_300</color>
+
+    <!-- choose & upgrade related colors -->
+    <color name="free_account">#2BB200</color>
+    <color name="upgrade_orange">#FFA500</color>
+    <color name="upgrade_red">@color/red_390</color>
 </resources>

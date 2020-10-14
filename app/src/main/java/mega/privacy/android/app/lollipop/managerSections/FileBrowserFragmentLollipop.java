@@ -1064,7 +1064,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 String textToShow = context.getString(R.string.context_empty_cloud_drive);
                 try {
                     textToShow = textToShow.replace("[A]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_highlight_color)
+							+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
@@ -1090,7 +1090,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 String textToShow = context.getString(R.string.file_browser_empty_folder_new);
                 try {
                     textToShow = textToShow.replace("[A]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_highlight_color)
+							+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
@@ -1363,7 +1363,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					String textToShow = context.getString(R.string.context_empty_cloud_drive);
 					try {
 						textToShow = textToShow.replace("[A]","<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_highlight_color)
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
 						textToShow = textToShow.replace("[B]","<font color="
@@ -1390,7 +1390,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					String textToShow = context.getString(R.string.file_browser_empty_folder_new);
 					try {
 						textToShow = textToShow.replace("[A]","<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_highlight_color)
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
 						textToShow = textToShow.replace("[B]","<font color=\'"

@@ -363,7 +363,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.label_storage_upgrade_account)+" ";
         try{
             textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                    + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                     + "\'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
         }
@@ -381,7 +381,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith).toUpperCase()+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
         try{
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                    + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                     + "\'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
         }catch (Exception e){}
@@ -442,7 +442,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowPro1Storage = "[A] "+ getSizeStringGBBased(account.getStorage()) +" [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowPro1Storage = textToShowPro1Storage.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowPro1Storage = textToShowPro1Storage.replace("[/A]", "</font>");
                 }
@@ -459,7 +459,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowPro1Bandwidth = "[A] "+ getSizeStringGBBased(account.getTransfer()) +" [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}
@@ -509,7 +509,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowPro2Storage = "[A] " + getSizeStringGBBased(account.getStorage()) +" [/A] " + getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowPro2Storage = textToShowPro2Storage.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowPro2Storage = textToShowPro2Storage.replace("[/A]", "</font>");
                 }
@@ -526,7 +526,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowPro2Bandwidth = "[A] "+ getSizeStringGBBased(account.getTransfer()) + " [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}
@@ -575,7 +575,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowPro3Storage = "[A] " + getSizeStringGBBased(account.getStorage()) + " [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowPro3Storage = textToShowPro3Storage.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowPro3Storage = textToShowPro3Storage.replace("[/A]", "</font>");
                 }
@@ -592,7 +592,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowPro3Bandwidth = "[A] " + getSizeStringGBBased(account.getTransfer()) + " [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}
@@ -640,7 +640,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowLiteStorage = "[A] " + getSizeStringGBBased(account.getStorage()) + " [/A] " + getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowLiteStorage = textToShowLiteStorage.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowLiteStorage = textToShowLiteStorage.replace("[/A]", "</font>");
                 }
@@ -657,7 +657,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 String textToShowLiteBandwidth = "[A] " + getSizeStringGBBased(account.getTransfer()) + " [/A] " + getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.account_capacity_text_color)
+                            + ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
                             + "\'>");
                     textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[/A]", "</font>");
                 }catch (Exception e){}

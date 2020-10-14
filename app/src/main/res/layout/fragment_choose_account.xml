@@ -62,10 +62,11 @@
 								android:id="@+id/choose_account_free_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/green_free_account"
+								android:textColor="@color/free_account"
 								android:layout_below="@+id/image_free"
 								android:textAllCaps="true"
-								android:textSize="18sp"/>
+								android:textSize="18sp"
+								tools:text="free"/>
 						</RelativeLayout>
 					</RelativeLayout>
 
@@ -138,7 +139,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/choose_account_free_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 
 			</RelativeLayout>
@@ -261,7 +262,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/choose_account_prolite_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 			</RelativeLayout>
 			<!-- End PRO LITE -->
@@ -301,7 +302,7 @@
 								android:id="@+id/choose_account_pro_i_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/login_warning"
+								android:textColor="@color/upgrade_red"
 								android:text="@string/pro1_account"
 								android:layout_below="@+id/image_pro_i"
 								android:textAllCaps="true"
@@ -381,7 +382,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/choose_account_pro_i_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 			</RelativeLayout>
 			<!-- END PRO I -->
@@ -422,7 +423,7 @@
 								android:id="@+id/choose_account_pro_ii_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/login_warning"
+								android:textColor="@color/upgrade_red"
 								android:text="@string/pro2_account"
 								android:layout_below="@+id/image_pro_ii"
 								android:textAllCaps="true"
@@ -501,7 +502,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/choose_account_pro_ii_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 			</RelativeLayout>
 			<!--END PRO II-->
@@ -541,7 +542,7 @@
 								android:id="@+id/choose_account_pro_iii_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/login_warning"
+								android:textColor="@color/upgrade_red"
 								android:text="@string/pro3_account"
 								android:layout_below="@+id/image_pro_iii"
 								android:textAllCaps="true"
@@ -619,7 +620,7 @@
 					android:layout_height="1dp"
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:layout_alignBottom="@id/choose_account_pro_iii_layout_content"
 					android:orientation="horizontal"/>
 			</RelativeLayout>
@@ -710,7 +711,7 @@
 										android:id="@+id/storage_business"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/account_capacity_text_color"
+										android:textColor="@color/text_color_primary_solid"
 										android:textSize="15sp"/>
 								</RelativeLayout>
 							</TableRow>
@@ -726,7 +727,7 @@
 										android:id="@+id/bandwidth_business"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/account_capacity_text_color"
+										android:textColor="@color/text_color_primary_solid"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -740,7 +741,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/choose_account_business_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 
 			</RelativeLayout>

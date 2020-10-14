@@ -33,6 +33,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -526,17 +527,17 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					break;
 				}
 				case PRO_I:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_red));
 					paymentTitle.setText(getString(R.string.pro1_account));
 					break;
 				}
 				case PRO_II:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_red));
 					paymentTitle.setText(getString(R.string.pro2_account));
 					break;
 				}
 				case PRO_III:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_red));
 					paymentTitle.setText(getString(R.string.pro3_account));
 					break;
 				}
@@ -555,7 +556,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
             String textGoogleWallet = getString(R.string.payment_method_google_wallet);
             try{
-                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'#000000\'>");
+                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+						+ "\'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
             }
             catch (Exception e){}
@@ -572,7 +575,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			creditCardText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_text);
 			String textCreditCardText = getString(R.string.payment_method_credit_card);
 			try{
-				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'#000000\'>");
+				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+						+ "\'>");
 				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
 			}
 			catch (Exception e){}
@@ -589,7 +594,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 			String textFortumoText = getString(R.string.payment_method_fortumo);
 			try{
-				textFortumoText = textFortumoText.replace("[A]", "<font color=\'#000000\'>");
+				textFortumoText = textFortumoText.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+						+ "\'>");
 				textFortumoText = textFortumoText.replace("[/A]", "</font>");
 			}
 			catch (Exception e){}
@@ -606,7 +613,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 			String textCentiliText = getString(R.string.payment_method_centili);
 			try{
-				textCentiliText = textCentiliText.replace("[A]", "<font color=\'#000000\'>");
+				textCentiliText = textCentiliText.replace("[A]", "<font color=\'"
+						+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+						+ "\'>");
 				textCentiliText = textCentiliText.replace("[/A]", "</font>");
 			}
 			catch (Exception e){}
@@ -718,7 +727,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 											   .toString();
 
 		try {
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 		} catch (NullPointerException ex) {
 			logError("NullPointerException happens when getting the storage string", ex);

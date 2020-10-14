@@ -1,14 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:background="@color/white"
 	android:id="@+id/rl_view_upgrade">
 
 	<ScrollView
 		android:id="@+id/scroll_view_upgrade"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:background="@color/white">
+		>
 
 		<LinearLayout
 			android:id="@+id/linear_layout_upgrade"
@@ -21,7 +20,6 @@
 				android:layout_height="36dp"
 				android:layout_gravity="center_vertical"
 				android:gravity="center_vertical"
-				android:background="@color/white"
 				android:paddingLeft="72dp">
 				<TextView
 					android:id="@+id/text_of_my_account"
@@ -35,7 +33,6 @@
 				android:id="@+id/upgrade_prolite_layout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:background="@color/white"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
 
@@ -43,7 +40,7 @@
 					android:id="@+id/upgrade_prolite_layout_content"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:background="@android:color/transparent">
+					>
 
 					<!-- Left side (image and title) -->
 					<RelativeLayout
@@ -52,7 +49,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -148,7 +144,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/upgrade_prolite_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 
 				<RelativeLayout
@@ -164,7 +160,6 @@
 			<RelativeLayout
 				android:id="@+id/upgrade_pro_i_layout"
 				android:layout_width="match_parent"
-				android:background="@color/white"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -180,7 +175,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:layout_marginTop="4dp">
@@ -196,7 +190,7 @@
 								android:id="@+id/upgrade_pro_i_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/login_warning"
+								android:textColor="@color/upgrade_red"
 								android:text="@string/pro1_account"
 								android:layout_below="@+id/image_pro_i"
 								android:textAllCaps="true"
@@ -275,7 +269,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/upgrade_pro_i_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 
 				<RelativeLayout
@@ -291,7 +285,6 @@
 			<RelativeLayout
 				android:id="@+id/upgrade_pro_ii_layout"
 				android:layout_width="match_parent"
-				android:background="@color/white"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -307,7 +300,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -323,7 +315,7 @@
 								android:id="@+id/upgrade_pro_ii_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/login_warning"
+								android:textColor="@color/upgrade_red"
 								android:text="@string/pro2_account"
 								android:layout_below="@+id/image_pro_ii"
 								android:textAllCaps="true"
@@ -404,7 +396,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/upgrade_pro_ii_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_ii_layout_transparent"
@@ -418,7 +410,6 @@
 			<RelativeLayout
 				android:id="@+id/upgrade_pro_iii_layout"
 				android:layout_width="match_parent"
-				android:background="@color/white"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -435,7 +426,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -451,7 +441,7 @@
 								android:id="@+id/upgrade_pro_iii_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/login_warning"
+								android:textColor="@color/upgrade_red"
 								android:text="@string/pro3_account"
 								android:layout_below="@+id/image_pro_iii"
 								android:textAllCaps="true"
@@ -551,14 +541,13 @@
 				android:layout_height="1dp"
 				android:layout_marginLeft="16dp"
 				android:layout_marginRight="16dp"
-				android:background="@color/grid_item_separator"
+				android:background="@color/list_item_divider"
 				android:orientation="horizontal" />
 
 			<!-- Business -->
 			<RelativeLayout
 				android:id="@+id/upgrade_business_layout"
 				android:layout_width="match_parent"
-				android:background="@color/white"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:paddingTop="8dp">
@@ -575,7 +564,6 @@
 						android:layout_height="wrap_content"
 						android:gravity="center_horizontal">
 						<RelativeLayout
-							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:paddingTop="4dp">
@@ -641,7 +629,7 @@
 										android:id="@+id/storage_business"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/black"
+										android:textColor="@color/text_color_primary_solid"
 										android:textSize="15sp"/>
 								</RelativeLayout>
 							</TableRow>
@@ -657,7 +645,7 @@
 										android:id="@+id/bandwidth_business"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/black"
+										android:textColor="@color/text_color_primary_solid"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -671,7 +659,7 @@
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"
 					android:layout_alignBottom="@id/upgrade_business_layout_content"
-					android:background="@color/grid_item_separator"
+					android:background="@color/list_item_divider"
 					android:orientation="horizontal" />
 
 			</RelativeLayout>
@@ -679,7 +667,6 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:background="@android:color/transparent"
 				android:layout_marginLeft="16dp"
 				android:layout_marginRight="16dp"
 				android:layout_marginTop="10dp"
