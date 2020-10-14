@@ -119,7 +119,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.hideFabButton();
                 managerActivity.showHideBottomNavigationView(true);
-                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             }
             checkScroll();
             return true;
@@ -236,7 +235,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.showFabButton();
                 managerActivity.showHideBottomNavigationView(false);
-                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             }
             checkScroll();
         }

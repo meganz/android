@@ -4102,9 +4102,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             inflater.inflate(R.menu.messages_chat_action, menu);
 
             importIcon = menu.findItem(R.id.chat_cab_menu_import);
-            menu.findItem(R.id.chat_cab_menu_offline).setIcon(mutateIconSecondary(chatActivity, R.drawable.ic_b_save_offline, R.color.white));
-
-            changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 1);
             return true;
         }
 
@@ -4115,7 +4112,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             editingMessage = false;
             recoveredSelectedPositions = null;
             clearSelections();
-            changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 0);
         }
 
         @Override

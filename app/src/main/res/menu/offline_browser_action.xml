@@ -7,6 +7,7 @@
       android:orderInCategory="80"
       android:tint="@color/white"
       android:title="@string/general_share"
+      app:iconTint="?attr/colorSecondary"
       app:showAsAction="always" />
 
   <item
@@ -14,6 +15,7 @@
       android:icon="@drawable/ic_close_white"
       android:orderInCategory="90"
       android:title="@string/context_delete_offline"
+      app:iconTint="?attr/colorSecondary"
       app:showAsAction="always" />
 
   <item

@@ -1,109 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/pdf_viewer_get_link"
-        android:orderInCategory="115"
-        android:title="@string/context_get_link_menu"
-        android:icon="@drawable/link_ic_white"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_get_link"
+      android:icon="@drawable/link_ic_white"
+      android:orderInCategory="115"
+      android:title="@string/context_get_link_menu"
+      android:visible="true"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/pdf_viewer_remove_link"
-        android:orderInCategory="115"
-        android:title="@string/context_remove_link_menu"
-        android:icon="@drawable/ic_remove_link_w"
-        MEGA:showAsAction="always"
-        android:visible="false" />
+  <item
+      android:id="@+id/pdf_viewer_remove_link"
+      android:icon="@drawable/ic_remove_link_w"
+      android:orderInCategory="115"
+      android:title="@string/context_remove_link_menu"
+      android:visible="false"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/pdf_viewer_share"
-        android:orderInCategory="110"
-        android:title="@string/general_share"
-        android:icon="@drawable/ic_social_share_white"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_share"
+      android:icon="@drawable/ic_social_share_white"
+      android:orderInCategory="110"
+      android:title="@string/general_share"
+      android:visible="true"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/pdf_viewer_chat"
-        android:orderInCategory="110"
-        android:title="@string/general_share"
-        android:icon="@drawable/ic_send_to_contact"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_chat"
+      android:icon="@drawable/ic_send_to_contact"
+      android:orderInCategory="110"
+      android:title="@string/general_share"
+      android:visible="true"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/pdf_viewer_properties"
-        android:orderInCategory="105"
-        android:title="@string/general_file_info"
-        android:icon="@drawable/info_ic_white"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_properties"
+      android:icon="@drawable/info_ic_white"
+      android:orderInCategory="105"
+      android:title="@string/general_file_info"
+      android:visible="true"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/pdf_viewer_download"
-        android:orderInCategory="100"
-        android:title="@string/general_save_to_device"
-        android:icon="@drawable/ic_download_white"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_download"
+      android:icon="@drawable/ic_download_white"
+      android:orderInCategory="100"
+      android:title="@string/general_save_to_device"
+      android:visible="true"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/pdf_viewer_rename"
-        android:orderInCategory="100"
-        android:title="@string/context_rename"
-        MEGA:showAsAction="never"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_rename"
+      android:orderInCategory="100"
+      android:title="@string/context_rename"
+      android:visible="true"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/pdf_viewer_move"
-        android:orderInCategory="105"
-        android:title="@string/context_move"
-        MEGA:showAsAction="never"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_move"
+      android:orderInCategory="105"
+      android:title="@string/context_move"
+      android:visible="true"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/pdf_viewer_copy"
-        android:orderInCategory="110"
-        android:title="@string/context_copy"
-        MEGA:showAsAction="never"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_copy"
+      android:orderInCategory="110"
+      android:title="@string/context_copy"
+      android:visible="true"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/pdf_viewer_move_to_trash"
-        android:orderInCategory="115"
-        android:title="@string/context_move_to_trash"
-        MEGA:showAsAction="never"
-        android:visible="true"/>
+  <item
+      android:id="@+id/pdf_viewer_move_to_trash"
+      android:orderInCategory="115"
+      android:title="@string/context_move_to_trash"
+      android:visible="true"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/pdf_viewer_remove"
-        android:orderInCategory="115"
-        android:title="@string/context_remove"
-        MEGA:showAsAction="never"
-        android:visible="false"/>
+  <item
+      android:id="@+id/pdf_viewer_remove"
+      android:orderInCategory="115"
+      android:title="@string/context_remove"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/chat_pdf_viewer_import"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_import_to_cloud_white"
-        android:title="@string/add_to_cloud"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
+  <item
+      android:id="@+id/chat_pdf_viewer_import"
+      android:icon="@drawable/ic_import_to_cloud_white"
+      android:orderInCategory="100"
+      android:title="@string/add_to_cloud"
+      android:visible="true"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/chat_pdf_viewer_save_for_offline"
-        android:orderInCategory="110"
-        android:title="@string/save_for_offline"
-        MEGA:showAsAction="always"
-        android:visible="true"/>
+  <item
+      android:id="@+id/chat_pdf_viewer_save_for_offline"
+      android:orderInCategory="110"
+      android:title="@string/save_for_offline"
+      android:visible="true"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/chat_pdf_viewer_remove"
-        android:orderInCategory="115"
-        android:title="@string/context_remove"
-        MEGA:showAsAction="never"
-        android:visible="true"/>
+  <item
+      android:id="@+id/chat_pdf_viewer_remove"
+      android:orderInCategory="115"
+      android:title="@string/context_remove"
+      android:visible="true"
+      app:showAsAction="never" />
 </menu>

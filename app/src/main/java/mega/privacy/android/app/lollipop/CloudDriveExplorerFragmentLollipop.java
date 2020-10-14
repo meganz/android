@@ -164,7 +164,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -177,7 +176,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override

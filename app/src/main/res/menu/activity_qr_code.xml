@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/qr_code_share"
-        android:orderInCategory="110"
-        android:title="@string/general_share"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_social_share_white"
-        android:visible="true" />
+  <item
+      android:id="@+id/qr_code_share"
+      android:icon="@drawable/ic_social_share_white"
+      android:orderInCategory="110"
+      android:title="@string/general_share"
+      android:visible="true"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/qr_code_save"
-        android:orderInCategory="110"
-        android:title="@string/save_action"
-        MEGA:showAsAction="never"
-        android:visible="true" />
+  <item
+      android:id="@+id/qr_code_save"
+      android:orderInCategory="110"
+      android:title="@string/save_action"
+      android:visible="true"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/qr_code_settings"
-        android:orderInCategory="110"
-        android:title="@string/action_settings"
-        MEGA:showAsAction="never"
-        android:visible="true" />
+  <item
+      android:id="@+id/qr_code_settings"
+      android:orderInCategory="110"
+      android:title="@string/action_settings"
+      android:visible="true"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/qr_code_reset"
-        android:orderInCategory="110"
-        android:title="@string/action_reset_qr"
-        MEGA:showAsAction="never"
-        android:visible="true" />
+  <item
+      android:id="@+id/qr_code_reset"
+      android:orderInCategory="110"
+      android:title="@string/action_reset_qr"
+      android:visible="true"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/qr_code_delete"
-        android:orderInCategory="110"
-        android:title="@string/action_delete_qr"
-        MEGA:showAsAction="never"
-        android:visible="true" />
-
+  <item
+      android:id="@+id/qr_code_delete"
+      android:orderInCategory="110"
+      android:title="@string/action_delete_qr"
+      android:visible="true"
+      app:showAsAction="never" />
 </menu>

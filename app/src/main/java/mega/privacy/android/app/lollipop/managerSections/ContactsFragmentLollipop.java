@@ -677,7 +677,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.contact_fragment_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -688,7 +687,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -696,7 +694,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaUser> selected = adapter.getSelectedUsers();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-			menu.findItem(R.id.cab_menu_send_file).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
@@ -706,11 +703,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-				menu.findItem(R.id.cab_menu_start_conversation).setIcon(mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
 				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
-				menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(getContext(), R.drawable.ic_share_contact, R.color.white));
 				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 				if(selected.size()==adapter.getItemCount()){
@@ -730,8 +725,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			menu.findItem(R.id.cab_menu_help).setVisible(false);
 			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
-			//menu.findItem(R.id.cab_menu_settings).setVisible(false);
-//			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}		
 	}

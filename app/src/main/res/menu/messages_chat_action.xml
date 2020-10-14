@@ -1,66 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/chat_cab_menu_forward"
+        android:icon="@drawable/ic_forward_white"
         android:orderInCategory="105"
         android:title="@string/forward_menu_item"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_forward_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_download"
+        android:icon="@drawable/ic_download_white"
         android:orderInCategory="105"
         android:title="@string/context_download"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_download_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_import"
+        android:icon="@drawable/ic_import_to_cloud_white"
         android:orderInCategory="105"
         android:title="@string/add_to_cloud"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_import_to_cloud_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_offline"
+        android:icon="@drawable/ic_b_save_offline"
         android:orderInCategory="105"
         android:title="@string/save_for_offline"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_b_save_offline"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_edit"
+        android:icon="@drawable/ic_rename_white"
         android:orderInCategory="105"
         android:title="@string/title_edit_profile_info"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_rename_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_copy"
+        android:icon="@drawable/ic_copy_white"
         android:orderInCategory="105"
         android:title="@string/context_copy"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_copy_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/chat_cab_menu_delete"
+        android:icon="@drawable/ic_close_white"
         android:orderInCategory="110"
         android:title="@string/context_delete"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_close_white"/>
-
-<!--    <item
-        android:id="@+id/cab_menu_select_all"
-        android:orderInCategory="120"
-        android:title="@string/action_select_all"
-        MEGA:showAsAction="never" />
-
-    <item
-        android:id="@+id/cab_menu_unselect_all"
-        android:orderInCategory="120"
-        android:title="@string/action_unselect_all"
-        MEGA:showAsAction="never" />-->
-
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 </menu>

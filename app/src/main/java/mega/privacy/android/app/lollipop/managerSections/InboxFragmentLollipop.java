@@ -324,7 +324,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             checkScroll();
 			return true;
 		}
@@ -334,7 +333,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             checkScroll();
 		}
 
@@ -348,8 +346,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-
-			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 

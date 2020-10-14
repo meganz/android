@@ -58,10 +58,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			} else {
 				if (areAllFileNodes(selected)) {
-					menu.findItem(R.id.cab_menu_send_to_chat)
-							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-									R.color.white));
-
 					control.sendToChat().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}

@@ -1,36 +1,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/cab_menu_search"
-        android:orderInCategory="85"
-        android:title="@string/action_search"
-        android:icon="@drawable/ic_menu_search"
-        MEGA:actionViewClass="androidx.appcompat.widget.SearchView"
-        MEGA:showAsAction="ifRoom|collapseActionView"/>
-    
-    <item
-        android:id="@+id/cab_menu_create_folder"
-        android:orderInCategory="100"
-        android:title="@string/action_create_folder"
-        android:icon="@drawable/ic_b_new_folder"
-        MEGA:showAsAction="always" />
+  <item
+      android:id="@+id/cab_menu_search"
+      android:icon="@drawable/ic_menu_search"
+      android:orderInCategory="85"
+      android:title="@string/action_search"
+      app:actionViewClass="androidx.appcompat.widget.SearchView"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="ifRoom|collapseActionView" />
 
-    <item
-        android:id="@+id/cab_menu_new_chat"
-        android:orderInCategory="100"
-        android:title="@string/section_chat"
-        MEGA:showAsAction="always" />
+  <item
+      android:id="@+id/cab_menu_create_folder"
+      android:icon="@drawable/ic_b_new_folder"
+      android:orderInCategory="100"
+      android:title="@string/action_create_folder"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/cab_menu_grid_list"
-        android:orderInCategory="90"
-        android:title="@string/action_grid"
-        MEGA:showAsAction="always" />
+  <item
+      android:id="@+id/cab_menu_new_chat"
+      android:orderInCategory="100"
+      android:title="@string/section_chat"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/cab_menu_sort"
-        android:orderInCategory="100"
-        android:title="@string/action_sort_by"
-        MEGA:showAsAction="always" />
+  <item
+      android:id="@+id/cab_menu_grid_list"
+      android:orderInCategory="90"
+      android:title="@string/action_grid"
+      app:showAsAction="always" />
+
+  <item
+      android:id="@+id/cab_menu_sort"
+      android:orderInCategory="100"
+      android:title="@string/action_sort_by"
+      app:showAsAction="always" />
 </menu>

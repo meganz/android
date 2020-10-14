@@ -6892,25 +6892,26 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				searchByDate.setVisible(true);
 			}
 
-			if (isSmallGridCameraUploads) {
-				gridSmallLargeMenuItem.setIcon(
-						mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-			} else {
-				gridSmallLargeMenuItem.setIcon(
-						mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-			}
+			setCuThumbnailTypeIcon();
 			gridSmallLargeMenuItem.setVisible(true);
+		}
+	}
+
+	private void setCuThumbnailTypeIcon() {
+		if (isSmallGridCameraUploads) {
+			gridSmallLargeMenuItem.setIcon(R.drawable.ic_thumbnail_view);
+		} else {
+			gridSmallLargeMenuItem.setIcon(R.drawable.ic_menu_gridview_small);
 		}
 	}
 
 	private void setGridListIcon() {
 		if (isList){
 			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_thumbnail_view));
+			thumbViewMenuItem.setIcon(R.drawable.ic_thumbnail_view);
 		}
 		else{
-			thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_list_view));
-			thumbViewMenuItem.setIcon(tintIcon(this, R.drawable.ic_list_view));
+			thumbViewMenuItem.setIcon(R.drawable.ic_list_view);
 		}
 	}
 
@@ -7290,11 +7291,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					isSmallGridCameraUploads = !isSmallGridCameraUploads;
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-					}else{
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-					}
+					setCuThumbnailTypeIcon();
 
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	        	}
@@ -7302,11 +7299,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					isSmallGridCameraUploads = !isSmallGridCameraUploads;
 					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-					if (isSmallGridCameraUploads){
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
-					}else{
-						gridSmallLargeMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-					}
+					setCuThumbnailTypeIcon();
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
 	        	}
 	        	return true;

@@ -897,7 +897,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	    inflater.inflate(R.menu.file_explorer_action, menu);
 
 	    searchMenuItem = menu.findItem(R.id.cab_menu_search);
-	    searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 	    gridListMenuItem = menu.findItem(R.id.cab_menu_grid_list);

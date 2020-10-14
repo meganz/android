@@ -319,7 +319,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
-            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 1);
             return true;
         }
         
@@ -328,7 +327,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             logDebug("onDestroyActionMode");
             clearSelections();
             adapter.setMultipleSelect(false);
-            changeStatusBarColorActionMode(context, ((ContactInfoActivityLollipop) context).getWindow(), handler, 2);
         }
         
         @Override

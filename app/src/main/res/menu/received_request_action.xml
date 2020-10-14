@@ -1,39 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
     <item
         android:id="@+id/cab_menu_select_all"
         android:orderInCategory="100"
-        android:showAsAction="never"
         android:title="@string/action_select_all"
-        MEGA:showAsAction="never" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_unselect_all"
         android:orderInCategory="100"
-        android:showAsAction="never"
         android:title="@string/action_unselect_all"
-        MEGA:showAsAction="never" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_accept"
         android:orderInCategory="105"
-        android:showAsAction="never"
         android:title="@string/contact_accept"
-        MEGA:showAsAction="never" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_ignore"
         android:orderInCategory="105"
-        android:showAsAction="never"
         android:title="@string/contact_ignore"
-        MEGA:showAsAction="never" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_decline"
         android:orderInCategory="105"
-        android:showAsAction="never"
         android:title="@string/contact_decline"
-        MEGA:showAsAction="never" />
-
+        app:showAsAction="never" />
 </menu>

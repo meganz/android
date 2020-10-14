@@ -202,7 +202,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         menu.findItem(R.id.cab_menu_sort).setVisible(false);
         menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
         searchMenuItem = menu.findItem(R.id.cab_menu_search);
-        searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
         newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 

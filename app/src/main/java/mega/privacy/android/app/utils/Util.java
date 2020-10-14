@@ -1420,40 +1420,6 @@ public class Util {
 		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
-	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
-		logDebug("changeStatusBarColor");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			if (option ==  1) {
-				window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
-			}
-			else if (option == 2) {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(0);
-					}
-				}, 500);
-			}
-			else if (option == 3) {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(context, R.color.status_bar_search));
-					}
-				}, 500);
-			}
-			else {
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(context, R.color.dark_primary_color_secondary));
-					}
-				}, 500);
-			}
-		}
-	}
     public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);

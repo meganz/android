@@ -178,7 +178,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			fab.hide();
-			changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
 			checkScroll();
 			return true;
 		}
@@ -189,7 +188,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			setFabVisibility(megaApi.getNodeByHandle(parentHandle));
-			changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 3);
 			checkScroll();
 		}
 

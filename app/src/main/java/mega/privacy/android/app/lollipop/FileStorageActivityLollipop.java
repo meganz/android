@@ -245,8 +245,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_storage_action, menu);
 			MenuItem newFolderItem = menu.findItem(R.id.cab_menu_create_folder);
-			newFolderItem.setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_b_new_folder, R.color.white));
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 
@@ -254,7 +252,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public void onDestroyActionMode(ActionMode arg0) {
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -314,8 +311,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		newFolderMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
-		
+
 		if (mode == Mode.PICK_FOLDER) {
             newFolderMenuItem.setVisible(true);
 		}

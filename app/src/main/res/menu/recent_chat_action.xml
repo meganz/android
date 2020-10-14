@@ -1,60 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/cab_menu_archive"
+        android:icon="@drawable/ic_w_archive"
         android:orderInCategory="100"
         android:title="@string/tab_archive_chat"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_w_archive"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/cab_menu_unarchive"
+        android:icon="@drawable/ic_w_unarchive"
         android:orderInCategory="100"
         android:title="@string/general_unarchive"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_w_unarchive"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/cab_menu_mute"
+        android:icon="@drawable/ic_mute_white"
         android:orderInCategory="100"
         android:title="@string/general_mute"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_mute_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/cab_menu_unmute"
+        android:icon="@drawable/ic_unmute_white"
         android:orderInCategory="100"
         android:title="@string/general_unmute"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_unmute_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/cab_menu_delete"
+        android:icon="@drawable/ic_close_white"
         android:orderInCategory="110"
         android:title="@string/context_delete"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_close_white"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/cab_menu_select_all"
         android:orderInCategory="120"
         android:title="@string/action_select_all"
-        MEGA:showAsAction="never" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_unselect_all"
         android:orderInCategory="120"
         android:title="@string/action_unselect_all"
-        MEGA:showAsAction="never" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/chat_list_leave_chat_layout"
+        android:icon="@drawable/ic_leave_chat_w"
         android:orderInCategory="100"
         android:title="@string/general_leave"
-        MEGA:showAsAction="never"
         android:visible="false"
-        android:icon="@drawable/ic_leave_chat_w"/>
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
 
 </menu>

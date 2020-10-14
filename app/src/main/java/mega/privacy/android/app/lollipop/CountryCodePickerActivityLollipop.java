@@ -136,7 +136,6 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_country_picker,menu);
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setIcon(Util.mutateIcon(this,R.drawable.ic_menu_search,R.color.black));
         SearchView searchView = (SearchView)searchMenuItem.getActionView();
         if (searchView != null) {
             searchView.setIconifiedByDefault(true);

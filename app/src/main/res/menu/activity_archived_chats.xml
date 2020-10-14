@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_search"
-        android:orderInCategory="85"
-        android:title="@string/action_search"
-        android:icon="@drawable/ic_menu_search"
-        MEGA:actionViewClass="androidx.appcompat.widget.SearchView"
-        MEGA:showAsAction="ifRoom|collapseActionView"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+  <item
+      android:id="@+id/action_search"
+      android:icon="@drawable/ic_menu_search"
+      android:orderInCategory="85"
+      android:title="@string/action_search"
+      app:actionViewClass="androidx.appcompat.widget.SearchView"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="ifRoom|collapseActionView" />
 </menu>

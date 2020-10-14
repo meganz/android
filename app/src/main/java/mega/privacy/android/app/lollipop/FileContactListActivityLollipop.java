@@ -236,7 +236,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
-			changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 1);
 			checkScroll();
 			return true;
 		}
@@ -247,7 +246,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
-			changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 3);
 			checkScroll();
 		}
 
@@ -507,7 +505,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		unSelectMenuItem.setVisible(false);
 
 		addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-		addSharingContact.setIcon(mutateIconSecondary(this, R.drawable.ic_share_white, R.color.black));
 		addSharingContact.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	    
 	    return super.onCreateOptionsMenu(menu);

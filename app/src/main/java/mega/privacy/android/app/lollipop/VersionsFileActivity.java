@@ -189,7 +189,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 			menu.findItem(R.id.action_download_versions).setVisible(false);
 			menu.findItem(R.id.action_delete_versions).setVisible(false);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 		
@@ -198,15 +197,12 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			logDebug("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 3);
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
-
-			menu.findItem(R.id.action_revert_version).setIcon(mutateIconSecondary(versionsFileActivity, R.drawable.ic_restore_black_24dp, R.color.white));
 
 			if (selected.size() != 0) {
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);

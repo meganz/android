@@ -478,7 +478,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             logDebug("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
-            getWindow().setStatusBarColor(ContextCompat.getColor(fileInfoActivityLollipop, R.color.accentColorDark));
             return true;
         }
 
@@ -487,7 +486,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             logDebug("onDestroyActionMode");
             adapter.clearSelections();
             adapter.setMultipleSelect(false);
-            getWindow().setStatusBarColor(ContextCompat.getColor(fileInfoActivityLollipop, R.color.status_bar_search));
             supportInvalidateOptionsMenu();
         }
 

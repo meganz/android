@@ -266,7 +266,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.rubbish_bin_action, menu);
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -276,15 +275,11 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			menu.findItem(R.id.cab_menu_restore_from_rubbish)
-					.setIcon(mutateIconSecondary(context, R.drawable.ic_restore,
-							R.color.white));
 			menu.findItem(R.id.cab_menu_select_all)
 					.setVisible(adapter.getSelectedItemCount()
 							< adapter.getItemCount() - adapter.getPlaceholderCount());

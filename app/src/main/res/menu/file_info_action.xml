@@ -1,87 +1,90 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/cab_menu_file_info_download"
-        android:orderInCategory="95"
-        android:title="@string/general_save_to_device"
-        android:icon="@drawable/ic_download_white"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_download"
+      android:icon="@drawable/ic_download_white"
+      android:orderInCategory="95"
+      android:title="@string/general_save_to_device"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_share_folder"
-        android:tint="@color/white"
-        android:orderInCategory="100"
-        android:title="@string/context_share_folder"
-        android:icon="@drawable/ic_share_white"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_share_folder"
+      android:icon="@drawable/ic_share_white"
+      android:orderInCategory="100"
+      android:title="@string/context_share_folder"
+      android:visible="false"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_get_link"
-        android:orderInCategory="100"
-        android:tint="@color/white"
-        android:title="@string/context_get_link_menu"
-        android:icon="@drawable/link_ic_white"
-        MEGA:showAsAction="never"  />
+  <item
+      android:id="@+id/cab_menu_file_info_get_link"
+      android:icon="@drawable/link_ic_white"
+      android:orderInCategory="100"
+      android:title="@string/context_get_link_menu"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_send_to_chat"
-        android:orderInCategory="115"
-        android:tint="@color/white"
-        android:title="@string/context_send_file_to_chat"
-        android:icon="@drawable/ic_send_to_contact"
-        MEGA:showAsAction="never"  />
+  <item
+      android:id="@+id/cab_menu_file_info_send_to_chat"
+      android:icon="@drawable/ic_send_to_contact"
+      android:orderInCategory="115"
+      android:title="@string/context_send_file_to_chat"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_edit_link"
-        android:orderInCategory="100"
-        android:title="@string/edit_link_option"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_edit_link"
+      android:orderInCategory="100"
+      android:title="@string/edit_link_option"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_remove_link"
-        android:orderInCategory="100"
-        android:title="@string/context_remove_link_menu"
-        android:icon="@drawable/ic_remove_link_w"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_remove_link"
+      android:icon="@drawable/ic_remove_link_w"
+      android:orderInCategory="100"
+      android:title="@string/context_remove_link_menu"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_rename"
-        android:orderInCategory="105"
-        android:title="@string/context_rename"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_rename"
+      android:orderInCategory="105"
+      android:title="@string/context_rename"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_move"
-        android:orderInCategory="110"
-        android:title="@string/general_move"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_move"
+      android:orderInCategory="110"
+      android:title="@string/general_move"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_copy"
-        android:orderInCategory="110"
-        android:title="@string/context_copy"
-        android:icon="@drawable/ic_copy_white"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_copy"
+      android:icon="@drawable/ic_copy_white"
+      android:orderInCategory="110"
+      android:title="@string/context_copy"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_rubbish"
-        android:orderInCategory="110"
-        android:title="@string/context_move_to_trash"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_rubbish"
+      android:orderInCategory="110"
+      android:title="@string/context_move_to_trash"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_leave"
-        android:orderInCategory="100"
-        android:title="@string/general_leave"
-        android:icon="@drawable/ic_leave_share_w"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/cab_menu_file_info_leave"
+      android:icon="@drawable/ic_leave_share_w"
+      android:orderInCategory="100"
+      android:title="@string/general_leave"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/cab_menu_file_info_delete"
-        android:orderInCategory="110"
-        android:title="@string/general_remove"
-        MEGA:showAsAction="never" />
-
+  <item
+      android:id="@+id/cab_menu_file_info_delete"
+      android:orderInCategory="110"
+      android:title="@string/general_remove"
+      app:showAsAction="never" />
 </menu>

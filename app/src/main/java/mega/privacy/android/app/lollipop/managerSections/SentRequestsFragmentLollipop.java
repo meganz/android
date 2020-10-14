@@ -119,7 +119,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.sent_request_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -129,7 +128,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			clearSelections();
 			adapterList.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-            ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 

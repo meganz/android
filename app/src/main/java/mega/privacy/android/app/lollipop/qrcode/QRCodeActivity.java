@@ -204,7 +204,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         inflater.inflate(R.menu.activity_qr_code, menu);
 
         shareMenuItem = menu.findItem(R.id.qr_code_share);
-        shareMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_social_share_white, R.color.black));
         saveMenuItem = menu.findItem(R.id.qr_code_save);
         settingsMenuItem = menu.findItem(R.id.qr_code_settings);
         resetQRMenuItem = menu.findItem(R.id.qr_code_reset);

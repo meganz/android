@@ -239,7 +239,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         inflater.inflate(R.menu.activity_archived_chats, menu);
 
         searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
 
         searchView = (SearchView) searchMenuItem.getActionView();
 

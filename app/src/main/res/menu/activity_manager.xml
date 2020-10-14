@@ -1,253 +1,258 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_return_call"
-        android:icon="@drawable/ic_call_menu"
-        android:orderInCategory="80"
-        android:title="@string/call_in_progress_layout"
-        android:visible="false"
-        MEGA:actionLayout="@layout/layout_menu_return_call"
-        MEGA:showAsAction="always" />
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+  <item
+      android:id="@+id/action_return_call"
+      android:icon="@drawable/ic_call_menu"
+      android:orderInCategory="80"
+      android:title="@string/call_in_progress_layout"
+      android:visible="false"
+      app:actionLayout="@layout/layout_menu_return_call"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_menu_search"
-        android:orderInCategory="85"
-        android:title="@string/action_search"
-        android:visible="false"
-        MEGA:actionViewClass="androidx.appcompat.widget.SearchView"
-        MEGA:iconTint="?attr/colorControlNormal"
-        MEGA:showAsAction="ifRoom|collapseActionView" />
+  <item
+      android:id="@+id/action_search"
+      android:icon="@drawable/ic_menu_search"
+      android:orderInCategory="85"
+      android:title="@string/action_search"
+      android:visible="false"
+      app:actionViewClass="androidx.appcompat.widget.SearchView"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="ifRoom|collapseActionView" />
 
-    <item
-        android:id="@+id/action_grid_view_large_small"
-        android:icon="@drawable/ic_thumbnail_view"
-        android:orderInCategory="90"
-        android:title="@string/action_grid"
-        android:visible="false"
-        MEGA:showAsAction="ifRoom" />
+  <item
+      android:id="@+id/action_grid_view_large_small"
+      android:icon="@drawable/ic_thumbnail_view"
+      android:orderInCategory="90"
+      android:title="@string/action_grid"
+      android:visible="false"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_play"
-        android:icon="@drawable/ic_play_white"
-        android:orderInCategory="100"
-        android:title="@string/action_play"
-        android:visible="false"
-        MEGA:showAsAction="ifRoom" />
+  <item
+      android:id="@+id/action_play"
+      android:icon="@drawable/ic_play_white"
+      android:orderInCategory="100"
+      android:title="@string/action_play"
+      android:visible="false"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_pause"
-        android:icon="@drawable/ic_pause_white"
-        android:orderInCategory="100"
-        android:title="@string/action_pause"
-        android:visible="false"
-        MEGA:showAsAction="ifRoom" />
+  <item
+      android:id="@+id/action_pause"
+      android:icon="@drawable/ic_pause_white"
+      android:orderInCategory="100"
+      android:title="@string/action_pause"
+      android:visible="false"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_menu_kill_all_sessions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/action_kill_all_sessions"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_kill_all_sessions"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="90"
+      android:title="@string/action_kill_all_sessions"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_change_pass"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/my_account_change_password"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_change_pass"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="90"
+      android:title="@string/my_account_change_password"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_forgot_pass"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/forgot_pass_menu"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_forgot_pass"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="90"
+      android:title="@string/forgot_pass_menu"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_export_MK"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="95"
-        android:title="@string/action_export_master_key"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_export_MK"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="95"
+      android:title="@string/action_export_master_key"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_add"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/action_add"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_add"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="100"
+      android:title="@string/action_add"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_invite"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/contact_invite"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_invite"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="100"
+      android:title="@string/contact_invite"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_add_contact"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/menu_add_contact"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_add_contact"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="100"
+      android:title="@string/menu_add_contact"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_scan_qr"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/menu_item_scan_code"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_scan_qr"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="100"
+      android:title="@string/menu_item_scan_code"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_pause_restart_transfers"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/menu_pause_transfers"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_pause_restart_transfers"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="100"
+      android:title="@string/menu_pause_transfers"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_take_picture"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/menu_take_picture"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_take_picture"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="100"
+      android:title="@string/menu_take_picture"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_new_folder"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="105"
-        android:title="@string/action_create_folder"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_new_folder"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="105"
+      android:title="@string/action_create_folder"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_import_link"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="110"
-        android:title="@string/action_open_link"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_import_link"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="110"
+      android:title="@string/action_open_link"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_select"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="110"
-        android:title="@string/action_select_all"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_select"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="110"
+      android:title="@string/action_select_all"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_unselect"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="110"
-        android:title="@string/action_unselect_all"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_unselect"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="110"
+      android:title="@string/action_unselect_all"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_sort_by"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="115"
-        android:title="@string/action_sort_by"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_sort_by"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="115"
+      android:title="@string/action_sort_by"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_search_by_date"
-        android:icon="@drawable/ic_menu_search"
-        android:orderInCategory="115"
-        android:title="@string/action_search_by_date"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_search_by_date"
+      android:icon="@drawable/ic_menu_search"
+      android:orderInCategory="115"
+      android:title="@string/action_search_by_date"
+      android:visible="false"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_grid"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="120"
-        android:title="@string/action_grid"
-        android:visible="false"
-        MEGA:iconTint="?attr/colorControlNormal"
-        MEGA:showAsAction="always" />
+  <item
+      android:id="@+id/action_grid"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="120"
+      android:title="@string/action_grid"
+      android:visible="false"
+      app:iconTint="?attr/colorControlNormal"
+      app:showAsAction="always" />
 
-    <item
-        android:id="@+id/action_menu_refresh"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="130"
-        android:title="@string/action_refresh"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_refresh"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="130"
+      android:title="@string/action_refresh"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_help"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="135"
-        android:title="@string/action_help"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_help"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="135"
+      android:title="@string/action_help"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_upgrade_account"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="140"
-        android:title="@string/action_upgrade_account"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_upgrade_account"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="140"
+      android:title="@string/action_upgrade_account"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_clear_rubbish_bin"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="150"
-        android:title="@string/context_clear_rubbish"
-        android:visible="false"
-        MEGA:showAsAction="never" />
-    <item
-        android:id="@+id/action_menu_cancel_subscriptions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="155"
-        android:title="@string/action_cancel_subscriptions"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_clear_rubbish_bin"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="150"
+      android:title="@string/context_clear_rubbish"
+      android:visible="false"
+      app:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_cancel_subscriptions"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="155"
+      android:title="@string/action_cancel_subscriptions"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_clear_completed_transfers"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="165"
-        android:title="@string/option_to_clear_transfers"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_clear_completed_transfers"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="165"
+      android:title="@string/option_to_clear_transfers"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_cancel_all_transfers"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="165"
-        android:title="@string/menu_cancel_all_transfers"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_cancel_all_transfers"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="165"
+      android:title="@string/menu_cancel_all_transfers"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_rubbish_bin"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="170"
-        android:title="@string/section_rubbish_bin"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_rubbish_bin"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="170"
+      android:title="@string/section_rubbish_bin"
+      android:visible="false"
+      app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_logout"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="175"
-        android:title="@string/action_logout"
-        android:visible="false"
-        MEGA:showAsAction="never" />
+  <item
+      android:id="@+id/action_menu_logout"
+      android:icon="@drawable/ic_action_bar_null"
+      android:orderInCategory="175"
+      android:title="@string/action_logout"
+      android:visible="false"
+      app:showAsAction="never" />
 </menu>

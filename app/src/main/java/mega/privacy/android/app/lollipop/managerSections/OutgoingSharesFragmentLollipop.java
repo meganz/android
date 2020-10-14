@@ -75,9 +75,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 					control.removeShare().setVisible(true);
 				}
 			} else {
-				menu.findItem(R.id.cab_menu_remove_share)
-						.setIcon(mutateIconSecondary(context, R.drawable.ic_remove_share,
-								R.color.white));
 				control.removeShare().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
@@ -87,10 +84,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			if (managerActivity.getDeepBrowserTreeOutgoing() > 0) {
 				if (areAllFileNodes(selected)) {
-					menu.findItem(R.id.cab_menu_send_to_chat)
-							.setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact,
-									R.color.white));
-
 					control.sendToChat().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}

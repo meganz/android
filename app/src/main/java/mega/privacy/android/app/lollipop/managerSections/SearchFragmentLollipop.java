@@ -296,7 +296,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
 			((ManagerActivityLollipop) context).setTextSubmitted();
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
@@ -307,7 +306,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -326,8 +324,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			boolean showRemoveLink = false;
 			boolean showTrash = false;
 			boolean itemsSelected = false;
-
-			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {

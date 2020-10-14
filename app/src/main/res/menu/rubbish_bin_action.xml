@@ -6,6 +6,7 @@
       android:icon="@drawable/ic_restore"
       android:orderInCategory="100"
       android:title="@string/context_restore"
+      app:iconTint="?attr/colorSecondary"
       app:showAsAction="always"/>
 
   <item
@@ -13,6 +14,7 @@
       android:icon="@drawable/ic_close_white"
       android:orderInCategory="110"
       android:title="@string/context_delete_offline"
+      app:iconTint="?attr/colorSecondary"
       app:showAsAction="always" />
 
   <item
@@ -26,5 +28,4 @@
       android:orderInCategory="110"
       android:title="@string/action_unselect_all"
       app:showAsAction="never" />
-
 </menu>

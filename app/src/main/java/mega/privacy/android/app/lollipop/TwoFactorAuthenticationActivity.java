@@ -910,11 +910,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){

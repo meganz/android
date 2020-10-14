@@ -901,7 +901,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         logDebug("ActionBarCallBack::onCreateActionMode")
         val inflater = mode!!.menuInflater
         inflater.inflate(R.menu.offline_browser_action, menu)
-        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT) }
         checkScroll()
         return true
     }
@@ -920,7 +919,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     override fun onDestroyActionMode(mode: ActionMode?) {
         logDebug("ActionBarCallBack::onDestroyActionMode")
         viewModel.clearSelection()
-        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY) }
         checkScroll()
     }
 

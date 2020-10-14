@@ -893,9 +893,7 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 			inflater.inflate(R.menu.messages_node_history_action, menu);
 
 			importIcon = menu.findItem(R.id.chat_cab_menu_import);
-			menu.findItem(R.id.chat_cab_menu_offline).setIcon(mutateIconSecondary(nodeAttachmentHistoryActivity, R.drawable.ic_b_save_offline, R.color.white));
 			changeViewElevation(aB, true, outMetrics);
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 
@@ -905,7 +903,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			checkScroll();
-			changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
