@@ -1425,7 +1425,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		int temp = -1;
 		Purchase max = null;
 		for (Purchase purchase : purchases) {
-			logDebug(purchase.getSku() + " (JSON): " + purchase.getOriginalJson());
+			if(!mBillingManager.isPurchaseBelongToCurrentAccount(purchase)) continue;
+
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
@@ -1451,7 +1452,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             }
 		}
 
-        if(max != null && mBillingManager.isPurchaseBelongToCurrentAccount(max)){
+        if(max != null ){
+            logDebug("Set current max subscription: " + max);
             myAccountInfo.setActiveGooglePlaySubscription(max);
         }
 

@@ -16,6 +16,8 @@
 package mega.privacy.android.app.utils.billing;
 
 import android.app.Activity;
+import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -144,7 +146,8 @@ public class BillingManager implements PurchasesUpdatedListener {
         }
 
         // If no updated purchase belongs to current MEGA account, return.
-        if(!hasMyChange) return;
+        // When downgrade, purchases is null too, still need to handle.
+        if(!hasMyChange && purchases != null) return;
 
         int resultCode = billingResult.getResponseCode();
         logDebug("Purchases updated, response code is " + resultCode);
