@@ -49,7 +49,7 @@
     
     <color name="green_free_account">#31B404</color>
 
-    <color name="divider_upgrade_account">#1F000000</color>
+    <color name="black_12_alpha">#1F000000</color>
 
     <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
@@ -135,7 +135,6 @@
     <color name="camera_uploads_list_view">#FFF5F5F5</color>
     <color name="transparent_black2">#99000000</color>
 
-    <color name="keyboard_chat_separator">#1F000000</color>
     <color name="background_chat">#FFFFFFFF</color>
     <color name="disable_fab_chat_call">#444444</color>
     <color name="disable_fab_invite_contact">#A9E3D8</color>
@@ -213,5 +212,8 @@
     <color name="reconnecting_bar">#FFF5A623</color>
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
+
+    <color name="over_quota_yellow">#FFFFB42B</color>
+
     <color name="background_own_reaction_added">#0F00BFA5</color>
 </resources>

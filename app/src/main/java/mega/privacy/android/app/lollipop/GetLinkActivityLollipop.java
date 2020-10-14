@@ -195,8 +195,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (isBusinessExpired()) {
 			setFinishActivityAtError(true);
-			LocalBroadcastManager.getInstance(getApplicationContext())
-					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 		}
 	}
 

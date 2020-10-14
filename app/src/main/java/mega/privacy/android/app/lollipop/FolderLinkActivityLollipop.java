@@ -69,15 +69,14 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -91,7 +90,8 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.DownloadUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -100,7 +100,8 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class FolderLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener{
+public class FolderLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
+
 	private static final String TAG_DECRYPT = "decrypt";
 
 	public static ImageView imageDrag;
@@ -391,7 +392,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
 					Intent intent1 =  new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
-					LocalBroadcastManager.getInstance(folderLinkActivity).sendBroadcast(intent1);
+					sendBroadcast(intent1);
 				}
 			}
 		}
@@ -427,7 +428,8 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		megaApi = app.getMegaApi();
 		megaApi.httpServerStop();
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerTransfersReceiver();
 
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
 
@@ -528,7 +530,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
+		listView.setItemAnimator(new DefaultItemAnimator());
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
 		separator = (View) findViewById(R.id.separator_3);
@@ -660,6 +662,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
     	
     	aB.setTitle("MEGA - " + getString(R.string.general_loading));
 
+		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
 		
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -685,7 +688,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 //			megaApiFolder.logout();
 		}
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		unregisterReceiver(receiver);
 		handler.removeCallbacksAndMessages(null);
 
 		super.onDestroy();
@@ -716,27 +719,17 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		logDebug("onResume");
 	}
 
-	public void toSelectFolder(long [] hashes, long size, String sdRoot, String prompt) {
+	public void toSelectFolder(long [] hashes, long size, String prompt) {
         Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
         intent.setClass(this, FileStorageActivityLollipop.class);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-        if(sdRoot != null) {
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
-        }
+
         if(prompt != null) {
             intent.putExtra(FileStorageActivityLollipop.EXTRA_PROMPT, prompt);
         }
         startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-    }
-
-    public void showSelectDownloadLocationDialog(long[] hashes, long size) {
-        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(this, SelectDownloadLocationDialog.From.FOLDER_LINK);
-        selector.setFolderLinkActivity(this);
-        selector.setSize(size);
-        selector.setHashes(hashes);
-        selector.show();
     }
 
 	@SuppressLint("NewApi")
@@ -763,12 +756,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
         downloadLocationDefaultPath = getDownloadLocation();
 
         if (askMe) {
-            File[] fs = getExternalFilesDirs(null);
-            if (fs.length <= 1 || fs[1] == null) {
-                toSelectFolder(hashes, size, null, null);
-            } else {
-                showSelectDownloadLocationDialog(hashes, size);
-            }
+			toSelectFolder(hashes, size, null);
         } else {
             downloadTo(downloadLocationDefaultPath, null, size, hashes);
         }
@@ -796,22 +784,11 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			return;
 		}
 
-        boolean downloadToSDCard = false;
-        String downloadRoot = null;
-        SDCardOperator sdCardOperator = null;
-        if(SDCardOperator.isSDCardPath(parentPath)) {
-            DownloadChecker checker = new DownloadChecker(this, parentPath, SelectDownloadLocationDialog.From.FOLDER_LINK);
-            checker.setFolderLinkActivity(this);
-            checker.setSize(size);
-            checker.setHashes(hashes);
-            if (checker.check()) {
-                downloadRoot = checker.getDownloadRoot();
-                sdCardOperator = checker.getSdCardOperator();
-                downloadToSDCard = (downloadRoot != null);
-            } else {
-                return;
-            }
-        }
+        SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(this, parentPath);
+		if(sdCardOperator == null) {
+			toSelectFolder(hashes, size, getString(R.string.no_external_SD_card_detected));
+			return;
+		}
 
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
@@ -830,16 +807,16 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
 				Map<Long, String> targets = new HashMap<>();
 				if (node.getType() == MegaNode.TYPE_FOLDER) {
-                    if (downloadToSDCard) {
+                    if (sdCardOperator.isSDCardDownload()) {
                         sdCardOperator.buildFileStructure(targets, parentPath, megaApiFolder, node);
-                        getDlList(dlFiles, node, new File(downloadRoot, node.getName()));
+                        getDlList(dlFiles, node, new File(sdCardOperator.getDownloadRoot(), node.getName()));
                     } else {
                         getDlList(dlFiles, node, new File(parentPath, node.getName()));
                     }
 				} else {
-                    if (downloadToSDCard) {
+                    if (sdCardOperator.isSDCardDownload()) {
                         targets.put(node.getHandle(), parentPath);
-                        dlFiles.put(node, downloadRoot);
+                        dlFiles.put(node, sdCardOperator.getDownloadRoot());
                     } else {
                         dlFiles.put(node, parentPath);
                     }
@@ -881,7 +858,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 						logDebug("start service");
 						logDebug("EXTRA_HASH: " + document.getHandle());
 						Intent service = new Intent(this, DownloadService.class);
-                        if(downloadToSDCard) {
+                        if(sdCardOperator.isSDCardDownload()) {
                             service = NodeController.getDownloadToSDCardIntent(service,path, targetPath, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
@@ -954,10 +931,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			logDebug("URL: " + url + "___SIZE: " + size);
 	
 			downloadTo (parentPath, url, size, hashes);
-		} else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, null);
-        }
-		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 
 			if(!isOnline(this)) {
 				try{

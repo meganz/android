@@ -143,7 +143,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -170,7 +170,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -197,7 +197,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
@@ -223,9 +223,35 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
+
+		<RelativeLayout
+			android:id="@+id/transfers_section"
+			android:layout_width="match_parent"
+			android:layout_height="56dp">
+
+			<TextView
+				android:id="@+id/transfers_section_text"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:gravity="left|center_vertical"
+				android:layout_centerVertical="true"
+				android:textSize="14sp"
+				android:fontFamily="sans-serif-light"
+				android:textStyle="bold"
+				android:textColor="@color/name_my_account"
+				android:text="@string/section_transfers"/>
+
+			<View
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_marginTop="16dp"
+				android:background="@color/black_12_alpha"
+				android:layout_alignParentBottom="true"/>
+
+		</RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/settings_section"
@@ -251,7 +277,7 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account" />
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
 
