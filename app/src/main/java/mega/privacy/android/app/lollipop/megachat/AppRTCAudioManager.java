@@ -761,16 +761,14 @@ public class AppRTCAudioManager {
         if (userSelectedAudioDevice == AudioDevice.NONE) {
             if (isSpeakerOn) {
                 userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
+            } else if (hasWiredHeadset) {
+                userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
+            } else if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
+                userSelectedAudioDevice = AudioDevice.BLUETOOTH;
             } else {
-                if (hasWiredHeadset) {
-                    userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
-                } else if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
-                    userSelectedAudioDevice = AudioDevice.BLUETOOTH;
-                } else {
-                    userSelectedAudioDevice = AudioDevice.EARPIECE;
-                }
+                userSelectedAudioDevice = AudioDevice.EARPIECE;
             }
-        }else if (hasWiredHeadset && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
+        } else if (hasWiredHeadset && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
             userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
         } else if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
             userSelectedAudioDevice = AudioDevice.BLUETOOTH;
