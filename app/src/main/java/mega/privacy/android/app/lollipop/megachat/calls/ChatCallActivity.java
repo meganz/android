@@ -2845,7 +2845,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 app.muteOrUnmute(false);
-                return false;
+                return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 app.muteOrUnmute(true);
                 return true;

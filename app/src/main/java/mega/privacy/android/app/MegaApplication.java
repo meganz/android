@@ -557,9 +557,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null)
 				return;
-			String strAction = intent.getAction();
 
-			if (strAction.equals(Intent.ACTION_USER_PRESENT) || strAction.equals(Intent.ACTION_SCREEN_OFF)) {
+			if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 				muteOrUnmute(true);
 			}
 		}
@@ -1367,7 +1366,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 		int callStatus = callToLaunch.getStatus();
-		if (callToLaunch == null || callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS){
+		if (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS){
 			logWarning("Launch not in correct status");
 			return;
 		}
