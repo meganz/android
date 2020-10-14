@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Thư mục trống.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Các thư mục trống.</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -492,7 +492,7 @@
     <string name="context_no_copied" context="error message">Lỗi. Chưa sao chép được</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">Xin chọn thư mục đích</string>
     <string name="context_correctly_moved" context="success message when moving a node">Chuyển đi hoàn tất</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d mục đã được di chuyển thành công</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d mục đã được di chuyển thành công.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d mục chưa được xóa xong</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Đã di chuyển vào thùng rác thành công</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">Đã di chuyển %d mục đến Thùng Rác thành công</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Lỗi. Chưa xóa được</string>
     <string name="number_correctly_removed" context="success message when moving a node">Đã xóa bỏ %d mục khỏi MEGA thành công</string>
     <string name="number_no_removed" context="error message when moving a node">%d mục chưa xóa xong</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">Đã rời khỏi %d thư mục thành công</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">Đã rời khỏi %d thư mục thành công.</string>
     <string name="share_left" context="Message shown when a share has been left">Đã rời khỏi chia sẻ</string>
     <string name="number_no_leaved" context="error message when moving a node">Phát sinh lỗi khi thực hiện việc từ chối %d thư mục chia sẻ</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">Tệp tin đã được gửi tới cho %d người thành công</string>
@@ -2827,7 +2827,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Đây là cách tốt nhất để tạo các buổi meeting người thật với nhau. Nếu bạn đã có phương thức xác minh khác như OTR hay PGP, bạn cũng có thể dùng được.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Chứng Thực của Bạn</string>
     <string name="action_reset" context="Button to reset credentials">Đặt lại</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Đang cập nhật chứng thực. Xin thử lại sau</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Đang cập nhật chứng thực. Xin thử lại sau.</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Đang tham gia&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Đang rời khỏi&#8230;</string>

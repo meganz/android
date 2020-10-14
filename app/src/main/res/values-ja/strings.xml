@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">フォルダが空です</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">フォルダが空です</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">エラー発生。MEGA から削除されていません。</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d個の項目がMEGAから成功に削除されました。</string>
     <string name="number_no_removed" context="error message when moving a node">%d項目が正常に削除されませんでした</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d個のフォルダが正常に残りました。</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d個のフォルダが正常に残りました。</string>
     <string name="share_left" context="Message shown when a share has been left">共有から出ました</string>
     <string name="number_no_leaved" context="error message when moving a node">%d個のフォルダはうまく残りませんでした</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">%d件の連絡先にファイルが正常に送信されました</string>

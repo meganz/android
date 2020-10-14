@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">폴더가 비어있습니다.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">폴더들이 비어있습니다.</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">오류. MEGA에서 삭제되지 않았습니다</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d개의 항목이 MEGA에서 제거되었습니다</string>
     <string name="number_no_removed" context="error message when moving a node">%d개의 항목이 제거되지 않았습니다</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d개의 폴더에서 성공적으로 떠났습니다.</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d개의 폴더에서 성공적으로 떠났습니다.</string>
     <string name="share_left" context="Message shown when a share has been left">공유 떠남</string>
     <string name="number_no_leaved" context="error message when moving a node">%d개의 폴더에서 성공적으로 떠나지 못했습니다</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">%d개의 연락처에게 파일이 잘 전송되었습니다</string>

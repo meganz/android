@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Map is leeg.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Mappen zijn leeg.</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -492,7 +492,7 @@
     <string name="context_no_copied" context="error message">Foutmelding. Niet gekopieerd</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">Kies een bestemmingsmap</string>
     <string name="context_correctly_moved" context="success message when moving a node">Correct verplaatst</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d items met succes verplaatst</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d items succesvol verplaatst.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d items waren niet succesvol verplaatst</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Succesvol verplaatst naar de prullenbak</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items succesvol verplaatst naar de prullenbak</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Foutmelding. Niet verwijderd van MEGA</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d items met succes verwijderd uit MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d items waren niet succesvol verwijderd</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d mappen met succes verlaten</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d mappen succesvol verlaten</string>
     <string name="share_left" context="Message shown when a share has been left">Gedeeld document verlaten</string>
     <string name="number_no_leaved" context="error message when moving a node">%d mappen waren niet succesvol verlaten</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">Bestand succesvol verzonden naar %d contacten</string>
@@ -2749,8 +2749,8 @@
     <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">ONGELIMITEERDE [A]Opslag[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">ONGELIMITEERD [A]Overdracht tegoed[/A] **</string>
 
-    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u uitlogt, worden bestanden van uw Offline sectie verwijderd van uw apparaat.</string>
-    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u uitlogt, worden voortgaande overdrachten geannuleerd.</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
     <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Wanneer u uitlogt, worden bestanden vanuit uw Offline sectie verwijderd van uw apparaat en voortgaande overdrachten worden geannuleerd.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Onbekende naam</string>
@@ -2827,7 +2827,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Dit kan het beste gebeuren door elkaar in het echte leven, face to face te ontmoeten. Als u een andere al geverifieerde kanaal heeft, zoals geverifieerd OTR of PGP, dan kunt u deze ook gebruiken.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Uw Identiteit</string>
     <string name="action_reset" context="Button to reset credentials">Reset</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Inloggegevens bijwerken. Probeer het later nogmaals</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Inloggegevens bijwerken. Probeer het later opnieuw.</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Deelnemen&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Verlaten&#8230;</string>

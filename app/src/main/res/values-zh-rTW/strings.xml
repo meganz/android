@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">資料夾是空的。</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">資料夾是空的。</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">錯誤。未從MEGA移除</string>
     <string name="number_correctly_removed" context="success message when moving a node">已成功移除MEGA中的 %d 項目</string>
     <string name="number_no_removed" context="error message when moving a node">未能移除%d個項目</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">已成功留下%d資料夾。</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">已成功留下%d資料夾。</string>
     <string name="share_left" context="Message shown when a share has been left">已離開該共享</string>
     <string name="number_no_leaved" context="error message when moving a node">未成功保留%d個資料夾</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">已成功發送檔案給%d個聯絡人</string>

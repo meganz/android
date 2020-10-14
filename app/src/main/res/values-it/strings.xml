@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">La cartella è vuota.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Le cartelle sono vuote.</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Cancellazione fallita a causa di un errore</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d oggetti rimossi con successo da MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d oggetti non sono stati rimossi con successo</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d cartelle lasciate con successo.</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d cartelle lasciate con successo.</string>
     <string name="share_left" context="Message shown when a share has been left">Condivisione abbandonata</string>
     <string name="number_no_leaved" context="error message when moving a node">%d cartelle non sono state lasciate con successo</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">File inviato a %d contatti con successo</string>

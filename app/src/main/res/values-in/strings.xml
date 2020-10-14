@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Error. Belum dipindahkan dari MEGA</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d item berhasil dihapus dari MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d item tidak berhasil dihapus</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d folder berhasil ditinggalkan</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d folder berhasil ditinggalkan</string>
     <string name="share_left" context="Message shown when a share has been left">Berbagi ditinggalkan</string>
     <string name="number_no_leaved" context="error message when moving a node">%d folder tidak berhasil dibiarkan</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">File dikirim ke %d kontak dengan sukses</string>

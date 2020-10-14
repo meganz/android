@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">โฟลเดอร์ว่างเปล่า</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">โฟลเดอร์ว่างเปล่า</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -492,7 +492,7 @@
     <string name="context_no_copied" context="error message">ผิดพลาด ยังไมไ่ด้คัดลอก</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">กรุณาเลือกโฟลเดอร์ปลายทาง</string>
     <string name="context_correctly_moved" context="success message when moving a node">ย้ายเรียบร้อยแล้ว</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d รายการถูกย้ายเรียบร้อยแล้ว</string>
+    <string name="number_correctly_moved" context="success message when moving a node">ย้าย %d รายการสำเร็จ</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">ไม่สามารถย้ายรายการ %d ได้สำเร็จ</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">ย้ายไปถังขยะเรียบร้อยแล้ว</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d รายการถูกย้ายไปถังขยะเรียบร้อยแล้ว</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">ข้อผิดพลาด ลบไม่สำเร็จ</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d รายการถูกย้ายออกจาก MEGA เรียบร้อยแล้ว</string>
     <string name="number_no_removed" context="error message when moving a node">รายการ %d ถูกเอาออกเรียบร้อยแล้ว</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d โฟลเดอร์ที่ออกเรียบร้อยแล้ว</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">ออกแล้ว %d โฟลเดอร์</string>
     <string name="share_left" context="Message shown when a share has been left">แชร์ที่เหลือ</string>
     <string name="number_no_leaved" context="error message when moving a node">โฟลเดอร์ %d ถูกทิ้งเรียบร้อยแล้ว</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">ไฟล์ที่ส่งไปยังผู้ติดต่อ %d สำเร็จแล้ว</string>
@@ -2750,7 +2750,7 @@
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]โควต้าการถ่ายโอน[/A] ไม่จำกัด **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์</string>
-    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">เมื่อคุณออกจากระบบ การถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิกด้วย</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">เมื่อคุณออกจากระบบ การถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิก</string>
     <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์ และการถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิกด้วยเช่นกัน</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">ชื่อที่ไม่รู้จัก</string>

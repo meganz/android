@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">文件夹为空</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">文件夹为空</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -492,7 +492,7 @@
     <string name="context_no_copied" context="error message">错误。未复制</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">请选择目标文件夹</string>
     <string name="context_correctly_moved" context="success message when moving a node">移动成功</string>
-    <string name="number_correctly_moved" context="success message when moving a node">已成功移动%d 项目</string>
+    <string name="number_correctly_moved" context="success message when moving a node">已移动%d个项目。</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d 个项目移动不成功</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">已移至垃圾箱</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">已成功将%d 项目移至垃圾桶</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">错误。删除失败</string>
     <string name="number_correctly_removed" context="success message when moving a node">已成功从MEGA云盘删除%d个项目</string>
     <string name="number_no_removed" context="error message when moving a node">%d文件未成功删除</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">已成功留下%d 文件夹</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">已离开%d文件夹。</string>
     <string name="share_left" context="Message shown when a share has been left">已离开该共享</string>
     <string name="number_no_leaved" context="error message when moving a node">离开共享文件夹%d失败</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">文件已成功发送到%d联系人</string>
@@ -2749,7 +2749,7 @@
     <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">无限 [A]存储空间[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">无限 [A]传输流量[/A] **</string>
 
-    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，“离线”中的文件将从您的设备中删除。</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，保存在“离线”中的文件将从您的设备中删除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">登出帐户后，正在进行的传输将被取消。</string>
     <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">登出帐户后，离线中的文件将从您的设备中删除，传输中的文件将取消。</string>
 

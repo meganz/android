@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Fehler. Nicht von MEGA gelöscht</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d Dateien und Ordner entfernt</string>
     <string name="number_no_removed" context="error message when moving a node">%d Elemente konnten nicht entfernt werden.</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d Ordnerfreigaben erfolgreich verlassen.</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d Ordnerfreigaben erfolgreich verlassen.</string>
     <string name="share_left" context="Message shown when a share has been left">Ordnerfreigabe verlassen</string>
     <string name="number_no_leaved" context="error message when moving a node">%d Ordnerfreigaben konnten nicht storniert werden.</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">Datei an %d Kontakte versandt.</string>

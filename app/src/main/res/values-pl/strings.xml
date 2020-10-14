@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder jest pusty.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Foldery są puste.</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Błąd. Nie usunięto z MEGA</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d elementów usunięto z MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d elementów nie zostało usuniętych</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d folderów zostało pomyślnie opuszczonych.</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d folderów zostało pomyślnie opuszczonych.</string>
     <string name="share_left" context="Message shown when a share has been left">Pozostawione</string>
     <string name="number_no_leaved" context="error message when moving a node">%d katalogów wciąż jesteś dodany</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">Pliki zostały wysłane do %d kontaktów</string>

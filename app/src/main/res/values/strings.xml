@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Error. Deletion failed</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d items removed successfully from MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d items are not removed successfully</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d folders left successfully.</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d folders left successfully.</string>
     <string name="share_left" context="Message shown when a share has been left">Share left</string>
     <string name="number_no_leaved" context="error message when moving a node">%d folders were not left successfully</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">File sent to %d contacts successfully</string>

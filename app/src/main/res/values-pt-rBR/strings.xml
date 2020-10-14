@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">A pasta está vazia.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">As pastas estão vazias.</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -492,7 +492,7 @@
     <string name="context_no_copied" context="error message">Erro. Não foi copiado</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">Escolha a pasta de destino</string>
     <string name="context_correctly_moved" context="success message when moving a node">Movido corretamente</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d itens movidos com êxito</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d itens movidos corretamente.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d itens não foram movidos</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Movido à lixeira</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d itens movidos para a Lixeira com sucesso</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">Erro. Não foi removido do MEGA</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d itens removidos corretamente do MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d itens não foram removidos</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">Você saiu de %d pastas corretamente</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">Você saiu de %d pastas corretamente</string>
     <string name="share_left" context="Message shown when a share has been left">esquerda compartilhada</string>
     <string name="number_no_leaved" context="error message when moving a node">%d pastas não foram deixadas corretamente</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">O arquivo foi enviado a %d contatos</string>
@@ -2827,7 +2827,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">O melhor jeito de fazer isso é pessoalmente, na vida real. Se você tiver outro canal confiável como OTR ou PGP, você também pode usá-lo.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Suas credenciais</string>
     <string name="action_reset" context="Button to reset credentials">Resetar</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Atualizando as credenciais - tente novamente mais tarde</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Atualizando as credenciais - tente novamente mais tarde.</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Entrando&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Saindo&#8230;</string>

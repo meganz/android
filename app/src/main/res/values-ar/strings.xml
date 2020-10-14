@@ -364,8 +364,8 @@
     </plurals>
 
     <plurals name="empty_folders">
-        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder is empty.</item>
-        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folders are empty.</item>
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">المجلد فارغ.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">المجلدات فارغة.</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -510,7 +510,7 @@
     <string name="context_no_removed" context="error message">خطأ. لم يتم إزالتها من MEGA</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d عناصر تم إزالتها بنجاح من MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d عناصر لم يتم إزالتها بنجاح</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d مجلدات تم مغادرتها بنجاح</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d مجلدات تم مغادرتها بنجاح</string>
     <string name="share_left" context="Message shown when a share has been left">تم الغاء المشاركة</string>
     <string name="number_no_leaved" context="error message when moving a node">%d مجلدات لم يتم مغادرتها بنجاح</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">الملف تم إرساله إلى %d جهات الاتصال بنجاح</string>

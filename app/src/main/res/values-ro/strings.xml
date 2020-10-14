@@ -492,7 +492,7 @@
     <string name="context_no_copied" context="error message">Eroare. Nu a fost copiat</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">Te rugăm să selectezi un folder de destinație</string>
     <string name="context_correctly_moved" context="success message when moving a node">Mutat cu succes</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d elemente mutate cu succes</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d elemente mutate cu succes.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d elemente nu au fost mutate cu succes</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Mutat în coșul de gunoi cu succes</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d elemente mutate în coșul de gunoi cu succes</string>
@@ -510,9 +510,9 @@
     <string name="context_no_removed" context="error message">Eroare. Ștergerea a eșuat</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d elemente eliminate cu succes de pe MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d elemente nu au fost mutate cu succes</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d foldere părăsite cu succes</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d foldere lăsate cu succes.</string>
     <string name="share_left" context="Message shown when a share has been left">Partajare părăsită</string>
-    <string name="number_no_leaved" context="error message when moving a node">%d foldere nu au fost părăsite cu succes</string>
+    <string name="number_no_leaved" context="error message when moving a node">%d foldere nu au fost lăsate cu succes</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">Fișiere trimise cu succes către %d contacte</string>
     <string name="number_no_sent" context="error message when sending multiple files">Fișierul nu a fost trimis către %d contacte</string>
     <string name="number_correctly_sent_multifile" context="success message when sending multiple files">%d fișiere trimise cu succes</string>
@@ -725,7 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">Verifică-ți contul</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Contul tău a fost blocat temporar din cauza unor posibile abuzuri. Te rugăm să verifici numărul de telefon pentru a-ți debloca contul.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Țară</string>
-    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Region</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Regiune</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Numărul tău de telefon</string>
     <string name="general_back_button" context="Button label - go to previous page">Înapoi</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Nu acum</string>
@@ -895,7 +895,7 @@
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Adresa 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Adresa 2 (opțional)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">Oraș</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Județ / Provincie</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Județ/Provincie</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">Țară</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Cod poștal</string>
 
@@ -1108,7 +1108,7 @@
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">Cheia de decriptare furnizată pentru linkul folderului este nevalidă.</string>
 
-    <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">Credențialele mele</string>
+    <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">Acreditările mele</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limitat</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">Chat</string>
@@ -2025,7 +2025,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Prea multe cereri. Te rugăm să aștepți.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">Se anulează procesul de autentificare. Te rugăm să aștepți&#8230;</string>
 
-    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Tipul fișierului nesuportat.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Eroare. Fișierul este corupt sau nu există.</string>
 
 
@@ -2212,7 +2212,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">Ai adăugat deja contactul %s.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Partajezi cu %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">Chat de group nou</string>
-    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Send contacts</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Trimite contacte</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Deconectat</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Contul tău a fost activat. Te rugăm să te autentifici.</string>
@@ -2263,7 +2263,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]din %2$s folosiți[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Schimbi pe un server de test?</string>
-    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">Sigur vrei să schimbi pe un server de test? Contul tău poate suferi probleme irecuperabile</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">Sigur vrei să schimbi pe un server de test? Contul tău poate suferi probleme irecuperabile.</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Deschizi camera?</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Dacă deschizi camera, transmisia video va fi pusă pe pauză în apelul actual.</string>
@@ -2813,21 +2813,21 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]You must act immediately to save your data.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 day</item>
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 zi</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d zile</item>
     </plurals>
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
     <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
     <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
 
-    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verifică credențialele</string>
+    <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verifică acreditările</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Neverificate</string>
     <string name="label_verified" context="Action indicating something was verified.">Verificat</string>
-    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Credențiale de autenticitate</string>
+    <string name="authenticity_credentials_label" context="”Verify user” dialog title">Acreditări de autenticitate</string>
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Acest lucru este realizat cel mai bine întâlnindu-vă față în față. Dacă ai un alt canal verificat deja precum OTR sau PGP verificat, l-ai putea folosi și pe acela.</string>
-    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Credențialele tale</string>
+    <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Acreditările tale</string>
     <string name="action_reset" context="Button to reset credentials">Resetează</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Please try again later.</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Se actualizează acreditările. Te rugăm să încerci din nou mai târziu.</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Se alătură&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Se părăsește&#8230;</string>
@@ -2842,12 +2842,12 @@
     <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">Contul tău a fost eliminat de către administrator. Te rugăm să contactezi administratorul contului tău business pentru detalii suplimentare.</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modifică</string>
-    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
-    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modifică numărul de telefon</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Elimină numărul de telefon</string>
     <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">Această operație îți va elimina numărul de telefon actual și va începe procesul de asociere a unui nou număr de telefon cu contul tău.</string>
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">Acest lucru va elimina numărul de telefon asociat din cont. Dacă ulterior alegi să adaugi un număr de telefon, ți se va cere să îl verifici.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Vezi</string>
-    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credențialele lui %s</string>
+    <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Acreditările lui %s</string>
 
 </resources>
