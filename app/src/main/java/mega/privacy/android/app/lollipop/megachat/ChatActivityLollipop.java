@@ -8590,8 +8590,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @param call The current call in progress.
      */
     private void startChronometers(MegaChatCall call) {
+        if (callInProgressChrono == null) {
+            return;
+        }
+
         activateChrono(true, callInProgressChrono, call);
         callInProgressChrono.setOnChronometerTickListener(chronometer -> {
+            if (subtitleChronoCall == null) {
+                return;
+            }
+
             subtitleChronoCall.setVisibility(View.VISIBLE);
             subtitleChronoCall.setText(chronometer.getText());
         });
@@ -8603,9 +8611,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @param call The current call in progress.
      */
     private void stopChronometers(MegaChatCall call) {
-        activateChrono(false, callInProgressChrono, call);
-        callInProgressChrono.setOnChronometerTickListener(null);
-        subtitleChronoCall.setVisibility(View.GONE);
+        if (callInProgressChrono != null) {
+            activateChrono(false, callInProgressChrono, call);
+            callInProgressChrono.setOnChronometerTickListener(null);
+        }
+
+        if (subtitleChronoCall != null) {
+            subtitleChronoCall.setVisibility(View.GONE);
+        }
     }
 
     /**

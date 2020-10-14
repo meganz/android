@@ -1580,9 +1580,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						for(MegaChatRoom item : chatListItems){
 							idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
 							pos++;
-						}
-					}
-					intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+                        }
+                    }
+                    intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
+                    intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
 					intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
@@ -1616,6 +1617,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						pos++;
 					}
 				}
+                intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
 				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);

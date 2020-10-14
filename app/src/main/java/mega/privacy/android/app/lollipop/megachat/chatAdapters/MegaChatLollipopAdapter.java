@@ -251,13 +251,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         @Override
         protected void onPostExecute(Integer param) {
             if (param == 0) {
-                int position = holder.getAdapterPosition();
-                if (position > messages.size()) {
+                AndroidMegaChatMessage message = getMessageAtAdapterPosition(holder.getAdapterPosition());
+                if (message == null) {
                     logWarning("Messages removed");
                     return;
                 }
 
-                AndroidMegaChatMessage message = messages.get(position - 1);
                 if (message.getMessage() != null && message.getMessage().getMegaNodeList() != null
                         && message.getMessage().getMegaNodeList().get(0) != null) {
                     long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();

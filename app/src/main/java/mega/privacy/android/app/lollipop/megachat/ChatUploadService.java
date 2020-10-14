@@ -33,7 +33,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -89,6 +88,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	private boolean isForeground = false;
 	private boolean canceled;
+
+    private HashMap<String, String> fileNames = new HashMap<>();
 
 	boolean sendOriginalAttachments=false;
 
@@ -245,6 +246,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
 		parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE));
+		if (intent.hasExtra(EXTRA_NAME_EDITED)) {
+            fileNames = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_NAME_EDITED);
+        }
 
 		if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
 			fileExplorerUpload = true;
@@ -378,7 +382,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				uploadPath = pendingMsg.getFilePath();
 			}
 
-			megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+            String fileName = fileNames.get(pendingMsg.name);
+			if (fileName != null) {
+                megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, fileName);
+            } else {
+                megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+            }
 		} else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
 			logDebug("DATA connection is Mp4Video");
 
@@ -419,7 +428,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						pendingMessages.add(pendMsg);
 					}
 
-					megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+                    String fileName = fileNames.get(pendingMsg.name);
+                    if (fileName != null) {
+                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, fileName);
+                    } else {
+                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+                    }
 				}
 				else{
 					for (PendingMessageSingle pendMsg : pendingMsgs) {
@@ -438,7 +452,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					pendingMessages.add(pendMsg);
 				}
 
-				megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+                String fileName = fileNames.get(pendingMsg.name);
+                if (fileName != null) {
+                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false, fileName);
+                } else {
+                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+                }
 				logError("EXCEPTION: Video cannot be downsampled", throwable);
 			}
 		}
@@ -450,7 +469,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if((type!=null)&&(type.equals(EXTRA_VOICE_CLIP))){
 				data = EXTRA_VOICE_CLIP+"-"+data;
 			}
-			megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
+
+            String fileName = fileNames.get(pendingMsg.name);
+            if (fileName != null) {
+                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false, fileName);
+            } else {
+                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
+            }
 		}
 	}
 
@@ -537,6 +562,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		numberVideosPending--;
 
 		File downFile = null;
+		String fileName = null;
 
 		if(success){
 			mapVideoDownsampling.put(returnedFile, 100);
@@ -544,6 +570,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			for(int i=0; i<pendingMessages.size();i++){
 				PendingMessageSingle pendMsg = pendingMessages.get(i);
+
+				if (idPendingMessage == pendMsg.id) {
+                    fileName = fileNames.get(pendMsg.name);
+                }
+
 				if(pendMsg.getVideoDownSampled()!=null && pendMsg.getVideoDownSampled().equals(returnedFile)){
 					String fingerPrint = megaApi.getFingerprint(returnedFile);
 					if (fingerPrint != null) {
@@ -557,6 +588,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			for(int i=0; i<pendingMessages.size();i++){
 				PendingMessageSingle pendMsg = pendingMessages.get(i);
+
+                if (idPendingMessage == pendMsg.id) {
+                    fileName = fileNames.get(pendMsg.name);
+                }
 
 				if(pendMsg.getVideoDownSampled()!=null){
 					if(pendMsg.getVideoDownSampled().equals(returnedFile)){
@@ -575,9 +610,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		if(downFile!=null){
-			megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+idPendingMessage, false);
-		}
+        if (downFile != null) {
+            if (fileName != null) {
+                megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + idPendingMessage, false, fileName);
+            } else {
+                megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, UPLOAD_APP_DATA_CHAT + ">" + idPendingMessage, false);
+            }
+        }
 	}
 
 	private void showOverquotaNotification() {
