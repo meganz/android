@@ -43,8 +43,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;

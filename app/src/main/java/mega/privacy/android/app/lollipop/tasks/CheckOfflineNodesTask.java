@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 

@@ -104,13 +104,6 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.Preference
-			android:key="settings_local_camera_upload_folder_sdcard"
-			android:title="@string/settings_local_camera_upload_folder"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
 			android:key="settings_mega_camera_folder"
 			android:title="@string/settings_mega_camera_upload_folder"
 			app:allowDividerAbove="true"

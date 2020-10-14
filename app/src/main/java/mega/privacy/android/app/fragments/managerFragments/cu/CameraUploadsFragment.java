@@ -78,7 +78,7 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
 import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtils.findVideoLocalPath;
+import static mega.privacy.android.app.utils.FileUtil.findVideoLocalPath;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
