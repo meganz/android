@@ -345,14 +345,14 @@ class HomepageFragment : Fragment() {
         fabMaskLayout.fab_chat.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
-                openChatActivity()
+                openNewChatActivity()
             }
         }
 
         fabMaskLayout.text_chat.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
-                openChatActivity()
+                openNewChatActivity()
             }
         }
 
@@ -387,7 +387,7 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun openChatActivity() {
+    private fun openNewChatActivity() {
         doIfOnline(true) {
             val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
                 putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)

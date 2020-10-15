@@ -22,6 +22,7 @@ import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtils
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.Util.getCircleAvatar
 import nz.mega.sdk.*
@@ -94,7 +95,7 @@ class HomePageViewModel @ViewModelInject constructor(
     private fun createAvatar() {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
+            buildAvatarFile(context, megaApi.myEmail + FileUtils.JPG_EXTENSION).absolutePath,
             object : DefaultMegaRequestListener {
                 override fun onRequestFinish(
                     api: MegaApiJava,

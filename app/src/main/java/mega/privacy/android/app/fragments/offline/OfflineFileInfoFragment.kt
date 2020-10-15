@@ -108,13 +108,11 @@ class OfflineFileInfoFragment : Fragment() {
                         if (offset == 0) {
                             // Expanded
                             setColorFilterWhite()
+                        } else if (offset < 0 && abs(offset) >= appBarLayout.totalScrollRange / 2) {
+                            // Collapsed
+                            setColorFilterBlack()
                         } else {
-                            if (offset < 0 && abs(offset) >= appBarLayout.totalScrollRange / 2) {
-                                // Collapsed
-                                setColorFilterBlack()
-                            } else {
-                                setColorFilterWhite()
-                            }
+                            setColorFilterWhite()
                         }
                     })
                 }
@@ -155,8 +153,11 @@ class OfflineFileInfoFragment : Fragment() {
 
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
-            .setPositiveButton(R.string.general_remove, dialogClickListener)
-            .setNegativeButton(R.string.general_cancel, dialogClickListener)
+            .setPositiveButton(R.string.general_remove) { _, _ ->
+                NodeController(requireContext()).deleteOffline(node)
+                onConfirmed()
+            }
+            .setNegativeButton(R.string.general_cancel, null)
             .show()
     }
 

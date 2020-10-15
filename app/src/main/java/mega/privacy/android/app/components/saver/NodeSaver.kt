@@ -341,11 +341,8 @@ abstract class NodeSaver(
                 requestLocalFolder(
                     null, context.getString(R.string.no_external_SD_card_detected), activityStarter
                 )
+                return
             }
-        }
-
-        if (externalSDCard && sdCardOperator == null) {
-            return
         }
 
         if (sdCardOperator != null && sdCardOperator.isNewSDCardPath(parentPath)) {

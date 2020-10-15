@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaNode
 import java.io.File
 
@@ -8,7 +9,7 @@ data class PhotoNodeItem(
     val type: Int,
     var photoIndex: Int,       // Index of real photo node
     override var node: MegaNode? = null,
-    override var index: Int = -1,      // Index of Node including TYPE_TITLE node (RecyclerView Layout position)
+    override var index: Int = INVALID_POSITION,      // Index of Node including TYPE_TITLE node (RecyclerView Layout position)
     override var modifiedDate: String = "",
     override var thumbnail: File? = null,
     override var selected: Boolean = false,

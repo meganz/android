@@ -57,6 +57,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     // For recent
     public static final int MODE6 = 6;
 
+    private static final String SAVED_STATE_KEY_MODE = "MODE";
+
     private int mMode;
 
     private MegaNode node = null;
@@ -86,6 +88,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             if (context instanceof ManagerActivityLollipop) {
                 drawerItem = ManagerActivityLollipop.getDrawerItem();
             }
+            mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, MODE0);
         } else {
             if (context instanceof ManagerActivityLollipop) {
                 node = ((ManagerActivityLollipop) context).getSelectedNode();
@@ -1122,6 +1125,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);
+        outState.putInt(SAVED_STATE_KEY_MODE, mMode);
     }
 
     private void mapDrawerItemToMode(ManagerActivityLollipop.DrawerItem drawerItem) {

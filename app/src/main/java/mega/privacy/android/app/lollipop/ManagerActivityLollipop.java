@@ -11474,7 +11474,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationRemoveSomeFromOffline(final List<MegaOffline> documents){
+	public void showConfirmationRemoveSomeFromOffline(List<MegaOffline> documents,
+			Runnable onConfirmed) {
 		logDebug("showConfirmationRemoveSomeFromOffline");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -11489,6 +11490,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						if (getSettingsFragment() != null) {
 							sttFLol.taskGetSizeOffline();
 						}
+						onConfirmed.run();
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {

@@ -918,8 +918,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 viewModel.clearSelection()
             }
             R.id.cab_menu_delete -> {
-                callManager { it.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes()) }
-                viewModel.clearSelection()
+                callManager {
+                    it.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes()) {
+                        viewModel.clearSelection()
+                    }
+                }
             }
             R.id.cab_menu_select_all -> {
                 viewModel.selectAll()
