@@ -123,7 +123,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -528,34 +528,54 @@ public class Util {
 	    }
 	    return false;
 	}
-	
-	public static String getSizeString(long size){
-		String sizeString = "";
-		DecimalFormat decf = new DecimalFormat("###.##");
+
+	/**
+	 * Gets a speed or size string.
+	 *
+	 * @param unit		the unit to show in the string
+	 * @param isSpeed	true if the string is a speed, false if it is a size
+	 * @return The speed or size string.
+	 */
+	private static String getUnitString(long unit, boolean isSpeed) {
+		Context context = MegaApplication.getInstance().getApplicationContext();
+		DecimalFormat df = new DecimalFormat("#.##");
 
 		float KB = 1024;
 		float MB = KB * 1024;
 		float GB = MB * 1024;
 		float TB = GB * 1024;
 
-		Context context = MegaApplication.getInstance().getApplicationContext();
-		if (size < KB){
-			sizeString = context.getString(R.string.label_file_size_byte, Long.toString(size));
+		if (unit < KB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
+		} else if (unit < MB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
+		} else if (unit < GB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
+		} else if (unit < TB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+		} else {
+			return context.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
 		}
-		else if (size < MB){
-			sizeString = context.getString(R.string.label_file_size_kilo_byte, decf.format(size/KB));
-		}
-		else if (size < GB){
-			sizeString = context.getString(R.string.label_file_size_mega_byte, decf.format(size/MB));
-		}
-		else if (size < TB){
-			sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(size/GB));
-		}
-		else{
-			sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(size/TB));
-		}
-		
-		return sizeString;
+	}
+
+	/**
+	 * Gets a speed string.
+	 *
+	 * @param speed	the speed to show in the string
+	 * @return The speed string.
+	 */
+	public static String getSpeedString (long speed){
+		return getUnitString(speed, true);
+	}
+
+	/**
+	 * Gets a size string.
+	 *
+	 * @param size	the size to show in the string
+	 * @return The size string.
+	 */
+	public static String getSizeString(long size){
+		return getUnitString(size, false);
 	}
 
     public static String getSizeStringGBBased(long gbSize){
@@ -632,37 +652,6 @@ public class Util {
 				Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 		return sb;
 	}
-
-	public static String getSpeedString (long speed){
-		String speedString = "";
-		double speedDouble = 0;
-		DecimalFormat df = new DecimalFormat("#.##");
-		
-		if (speed > 1024){
-			if (speed > 1024*1024){
-				if (speed > 1024*1024*1024){
-					speedDouble = speed / (1024.0*1024.0*1024.0);
-					speedString = df.format(speedDouble) + " GB/s";
-				}
-				else{
-					speedDouble = speed / (1024.0*1024.0);
-					speedString = df.format(speedDouble) + " MB/s";
-				}
-			}
-			else{
-				speedDouble = speed / 1024.0;
-				speedString = df.format(speedDouble) + " KB/s";	
-			}
-		}
-		else{
-			speedDouble = speed;
-			speedString = df.format(speedDouble) + " B/s";
-		}
-		
-		return speedString;
-	}
-
-
 
 	public static String getPhotoSyncName (long timeStamp, String fileName){
         DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
@@ -1835,6 +1824,14 @@ public class Util {
 
 	public static boolean isAndroid10() {
 		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
+	}
+
+	public static boolean isAndroidOreoOrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+	}
+
+	public static boolean isAndroidNougatOrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
 	}
 
 	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){

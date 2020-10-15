@@ -18,7 +18,6 @@ import android.view.Window
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -109,7 +108,7 @@ class HomepageFragment : Fragment() {
         setupBottomSheetBehavior()
         setupFabs()
 
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+        requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
         )
     }
@@ -126,7 +125,7 @@ class HomepageFragment : Fragment() {
         super.onDestroyView()
 
         tabsChildren.clear()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(networkReceiver)
+        requireContext().unregisterReceiver(networkReceiver)
     }
 
     private fun showOnlineMode() {

@@ -27,7 +27,6 @@ import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
@@ -146,7 +145,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     override fun onResume() {
         super.onResume()
 
-        LocalBroadcastManager.getInstance(requireContext())
+        requireContext()
             .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
 
         viewModel.loadOfflineNodes()
@@ -155,8 +154,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     override fun onPause() {
         super.onPause()
 
-        LocalBroadcastManager.getInstance(requireContext())
-            .unregisterReceiver(receiverRefreshOffline)
+        requireContext().unregisterReceiver(receiverRefreshOffline)
     }
 
     override fun onStop() {
@@ -177,7 +175,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+        requireContext().registerReceiver(
             receiverUpdatePosition,
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION)
         )
@@ -216,8 +214,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         super.onDestroyView()
 
         viewModel.clearEmptySearchQuery()
-        LocalBroadcastManager.getInstance(requireContext())
-            .unregisterReceiver(receiverUpdatePosition)
+        requireContext().unregisterReceiver(receiverUpdatePosition)
     }
 
     private fun setupView() {
@@ -906,7 +903,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         res[1] += res[3] / 2
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, res)
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        requireContext().sendBroadcast(intent)
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {

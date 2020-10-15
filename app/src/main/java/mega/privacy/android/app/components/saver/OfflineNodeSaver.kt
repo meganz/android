@@ -6,7 +6,7 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.FileUtils.copyFile
+import mega.privacy.android.app.utils.FileUtil.copyFile
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getTotalSize

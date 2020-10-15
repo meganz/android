@@ -15,7 +15,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,12 +52,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
-import mega.privacy.android.app.utils.FileUtils.getLocalFile
-import mega.privacy.android.app.utils.FileUtils.isInternalIntent
-import mega.privacy.android.app.utils.FileUtils.isLocalFile
-import mega.privacy.android.app.utils.FileUtils.isOpusFile
-import mega.privacy.android.app.utils.FileUtils.setLocalIntentParams
-import mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams
+import mega.privacy.android.app.utils.FileUtil.getLocalFile
+import mega.privacy.android.app.utils.FileUtil.isInternalIntent
+import mega.privacy.android.app.utils.FileUtil.isLocalFile
+import mega.privacy.android.app.utils.FileUtil.isOpusFile
+import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
+import mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -242,7 +241,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             }
 
         val localPath = getLocalFile(context, file.name, file.size)
-        var paramsSetSuccessfully = if (isLocalFile(context, node, megaApi, localPath)) {
+        var paramsSetSuccessfully = if (isLocalFile(node, megaApi, localPath)) {
             setLocalIntentParams(activity, node, intent, localPath, false)
         } else {
             setStreamingIntentParams(activity, node, megaApi, intent)
@@ -526,7 +525,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        requireContext().sendBroadcast(intent)
     }
 
     companion object {

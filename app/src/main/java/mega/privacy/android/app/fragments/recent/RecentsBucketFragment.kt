@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -156,7 +155,7 @@ class RecentsBucketFragment : BaseFragment() {
         if (isImage) {
             MimeTypeList.typeForName(it.name).isImage
         } else {
-            FileUtils.isAudioOrVideo(it) && FileUtils.isInternalIntent(it)
+            FileUtil.isAudioOrVideo(it) && FileUtil.isInternalIntent(it)
         }
     }?.map { it.handle }?.toLongArray()
 
@@ -171,14 +170,14 @@ class RecentsBucketFragment : BaseFragment() {
 
         val mime = MimeTypeList.typeForName(node.name)
         val localPath =
-            FileUtils.getLocalFile(activity, node.name, node.size)
+            FileUtil.getLocalFile(activity, node.name, node.size)
         logDebug("Open node: ${node.name} which mime is: ${mime.type}, local path is: $localPath")
 
         when {
             mime.isImage -> {
                 openImage(screenPosition, node)
             }
-            FileUtils.isAudioOrVideo(node) -> {
+            FileUtil.isAudioOrVideo(node) -> {
                 openAudioVideo(screenPosition, node, isMedia, localPath)
             }
             mime.isURL -> {
@@ -202,10 +201,10 @@ class RecentsBucketFragment : BaseFragment() {
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
 
         val paramsSetSuccessfully =
-            if (FileUtils.isLocalFile(activity, node, megaApi, localPath)) {
-                FileUtils.setLocalIntentParams(activity, node, intent, localPath, false)
+            if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+                FileUtil.setLocalIntentParams(activity, node, intent, localPath, false)
             } else {
-                FileUtils.setStreamingIntentParams(activity, node, megaApi, intent)
+                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
             }
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
@@ -217,14 +216,8 @@ class RecentsBucketFragment : BaseFragment() {
     ) {
         val intent = Intent(Intent.ACTION_VIEW)
         val paramsSetSuccessfully =
-            if (FileUtils.isLocalFile(
-                    activity,
-                    node,
-                    megaApi,
-                    localPath
-                )
-            ) {
-                FileUtils.setURLIntentParams(context, node, intent, localPath)
+            if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+                FileUtil.setURLIntentParams(context, node, intent, localPath)
             } else false
 
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
@@ -236,7 +229,7 @@ class RecentsBucketFragment : BaseFragment() {
         isMedia: Boolean,
         localPath: String?
     ) {
-        val intent = if (FileUtils.isInternalIntent(node)) {
+        val intent = if (FileUtil.isInternalIntent(node)) {
             Intent(activity, AudioVideoPlayerLollipop::class.java)
         } else {
             Intent(Intent.ACTION_VIEW)
@@ -254,16 +247,16 @@ class RecentsBucketFragment : BaseFragment() {
         }
 
         val paramsSetSuccessfully =
-            if (FileUtils.isLocalFile(activity, node, megaApi, localPath)) {
-                FileUtils.setLocalIntentParams(activity, node, intent, localPath, false)
+            if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+                FileUtil.setLocalIntentParams(activity, node, intent, localPath, false)
             } else {
-                FileUtils.setStreamingIntentParams(activity, node, megaApi, intent)
+                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
             }
 
         if (paramsSetSuccessfully) {
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
 
-            if (FileUtils.isOpusFile(node)) {
+            if (FileUtil.isOpusFile(node)) {
                 intent.setDataAndType(intent.data, "audio/*")
             }
         }
@@ -377,7 +370,7 @@ class RecentsBucketFragment : BaseFragment() {
 
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+        context.sendBroadcast(intent)
     }
 
     companion object {

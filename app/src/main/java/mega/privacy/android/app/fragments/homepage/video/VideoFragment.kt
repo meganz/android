@@ -15,7 +15,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -347,7 +346,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
     private fun openNode(node: MegaNode, index: Int) {
         val file: MegaNode = node
 
-        val internalIntent = FileUtils.isInternalIntent(node)
+        val internalIntent = FileUtil.isInternalIntent(node)
         val intent = if (internalIntent) {
             Intent(context, AudioVideoPlayerLollipop::class.java)
         } else {
@@ -371,14 +370,14 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
             }
 
-        val localPath = FileUtils.getLocalFile(context, file.name, file.size)
-        var paramsSetSuccessfully = if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-            FileUtils.setLocalIntentParams(context, node, intent, localPath, false)
+        val localPath = FileUtil.getLocalFile(context, file.name, file.size)
+        var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+            FileUtil.setLocalIntentParams(context, node, intent, localPath, false)
         } else {
-            FileUtils.setStreamingIntentParams(context, node, megaApi, intent)
+            FileUtil.setStreamingIntentParams(context, node, megaApi, intent)
         }
 
-        if (paramsSetSuccessfully && FileUtils.isOpusFile(node)) {
+        if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {
             intent.setDataAndType(intent.data, "audio/*")
         }
 
@@ -509,6 +508,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        requireContext().sendBroadcast(intent)
     }
 }

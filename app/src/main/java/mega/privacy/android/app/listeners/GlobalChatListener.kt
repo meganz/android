@@ -1,7 +1,6 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.fragments.homepage.notifyChatOnlineStatusChange
 import mega.privacy.android.app.utils.Constants
@@ -36,7 +35,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
         if (config?.isPending == false) {
             LogUtil.logDebug("Launch local broadcast")
             val intent = Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
-            LocalBroadcastManager.getInstance(application).sendBroadcast(intent)
+            application.sendBroadcast(intent)
         }
     }
 

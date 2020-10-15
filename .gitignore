@@ -31,6 +31,7 @@
 .idea/encodings.xml
 .idea/misc.xml
 .idea/vcs.xml
+.idea/modules.xml
 .gradle
 
 #Captures
@@ -42,6 +43,7 @@ captures
 /.idea/codeStyles/Project.xml
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/caches/build_file_checksums.ser
+/.idea/caches/gradle_models.ser
 
 ## Google API key files
 /app/src/debug/res/values/google_maps_api.xml

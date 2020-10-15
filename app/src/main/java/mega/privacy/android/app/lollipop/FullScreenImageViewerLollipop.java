@@ -118,14 +118,14 @@ import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLo
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 
 	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
 			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -259,8 +259,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			megaApi.removeGlobalListener(this);
 		}
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+		unregisterReceiver(receiver);
+		unregisterReceiver(receiverToFinish);
 
 		DRAGGING_THUMBNAIL_CALLBACKS.clear();
 
@@ -846,8 +846,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		handler = new Handler();
 		fullScreenImageViewer = this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+		registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1487,7 +1487,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
 		intent.putExtra("handle", handle);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	public void updateScrollPosition(){
@@ -1543,7 +1543,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		intent.putExtra("adapterType", adapterType);
 		intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount );
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	@Override
@@ -2232,8 +2232,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				}
 				nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
 			}
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 

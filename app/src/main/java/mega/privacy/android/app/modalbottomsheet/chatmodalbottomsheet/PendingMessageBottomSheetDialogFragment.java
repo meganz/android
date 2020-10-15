@@ -5,14 +5,18 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -23,6 +27,8 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
     private MegaChatRoom selectedChat;
     private long chatId;
     private long messageId;
+
+    private boolean isUploadingMessage;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,20 +63,30 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
         LinearLayout separator = contentView.findViewById(R.id.separator);
 
         PendingMessageSingle pMsg = dbH.findPendingMessageById(messageId);
-        if (pMsg != null && pMsg.getState() == PendingMessageSingle.STATE_UPLOADING) {
-            optionRetryLayout.setVisibility(View.GONE);
-            optionRetryLayout.setOnClickListener(null);
-            titleSlidingPanel.setText(getString(R.string.title_message_uploading_options));
-            separator.setVisibility(View.GONE);
+        isUploadingMessage = pMsg != null && pMsg.getState() != PendingMessageSingle.STATE_ERROR_UPLOADING && pMsg.getState() != PendingMessageSingle.STATE_ERROR_ATTACHING;
+
+        if (isUploadingMessage) {
+            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                titleSlidingPanel.setText(R.string.attachment_uploading_state_paused);
+                TextView resumeText = optionRetryLayout.findViewById(R.id.msg_not_sent_retry_text);
+                resumeText.setText(R.string.option_resume_transfers);
+                ImageView resumeIcon = optionRetryLayout.findViewById(R.id.msg_not_sent_retry_image);
+                resumeIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_resume_transfers));
+                resumeIcon.setAlpha(1F);
+                optionRetryLayout.setOnClickListener(this);
+                TextView deleteText = optionDeleteLayout.findViewById(R.id.msg_not_sent_delete_text);
+                deleteText.setText(R.string.option_cancel_transfer);
+            } else {
+                optionRetryLayout.setVisibility(View.GONE);
+                titleSlidingPanel.setText(getString(R.string.title_message_uploading_options));
+                separator.setVisibility(View.GONE);
+            }
         } else {
             titleSlidingPanel.setText(getString(R.string.title_message_not_sent_options));
             if ((selectedChat.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD) || (selectedChat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR)) {
-                optionRetryLayout.setVisibility(View.VISIBLE);
                 optionRetryLayout.setOnClickListener(this);
-                separator.setVisibility(View.VISIBLE);
             } else {
                 optionRetryLayout.setVisibility(View.GONE);
-                optionRetryLayout.setOnClickListener(null);
                 separator.setVisibility(View.GONE);
             }
         }
@@ -83,7 +99,12 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.msg_not_sent_retry_layout:
-                ((ChatActivityLollipop) context).retryPendingMessage(messageId);
+                if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD) && isUploadingMessage) {
+                    megaApi.pauseTransfers(false);
+                    ((ChatActivityLollipop) context).updatePausedUploadingMessages();
+                } else {
+                    ((ChatActivityLollipop) context).retryPendingMessage(messageId);
+                }
                 break;
 
             case R.id.msg_not_sent_delete_layout:

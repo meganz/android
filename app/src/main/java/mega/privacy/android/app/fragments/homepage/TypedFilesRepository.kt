@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.FileUtils
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
@@ -76,7 +76,7 @@ class TypedFilesRepository @Inject constructor(
     private fun getThumbnail(node: MegaNode): File? {
         val thumbFile = File(
             getThumbFolder(context),
-            node.base64Handle.plus(FileUtils.JPG_EXTENSION)
+            node.base64Handle.plus(FileUtil.JPG_EXTENSION)
         )
 
         return if (thumbFile.exists()) {

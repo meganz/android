@@ -46,7 +46,7 @@ import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
-import mega.privacy.android.app.utils.FileUtils
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
@@ -420,7 +420,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
 
         var screenPosition: IntArray? = null
-        val localPath = FileUtils.getLocalFile(context, node.name, node.size)
+        val localPath = FileUtil.getLocalFile(context, node.name, node.size)
 
         listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
@@ -441,10 +441,10 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
 
             val paramsSetSuccessfully =
-                if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-                    FileUtils.setLocalIntentParams(activity, node, intent, localPath, false)
+                if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+                    FileUtil.setLocalIntentParams(activity, node, intent, localPath, false)
                 } else {
-                    FileUtils.setStreamingIntentParams(activity, node, megaApi, intent)
+                    FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
                 }
 
             intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)

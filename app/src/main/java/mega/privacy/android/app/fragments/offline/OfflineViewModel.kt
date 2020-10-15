@@ -24,7 +24,7 @@ import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
 import mega.privacy.android.app.utils.Constants.BACK_PRESS_NOT_HANDLED
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
-import mega.privacy.android.app.utils.FileUtils.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile

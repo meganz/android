@@ -90,7 +90,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- NOTIFICATIONS LAYOUT -->
 
@@ -135,7 +135,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- SHARED FILES LAYOUT -->
 
@@ -174,7 +174,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- CHAT LINK LAYOUT -->
 
@@ -225,7 +225,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- CLEAR LAYOUT -->
 
@@ -262,7 +262,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- ARCHIVE LAYOUT -->
 
@@ -298,7 +298,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="72dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- LEAVE LAYOUT -->
 
@@ -334,7 +334,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- MAKE PRIVATE LAYOUT -->
 
@@ -376,7 +376,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- Title Observer LAYOUT -->
 
@@ -441,7 +441,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
     <!-- Title Participants LAYOUT -->
 

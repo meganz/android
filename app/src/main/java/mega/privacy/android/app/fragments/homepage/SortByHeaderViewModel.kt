@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
@@ -58,7 +57,7 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     fun switchListGrid() {
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_VIEW)
         intent.putExtra(Constants.INTENT_EXTRA_KEY_IS_LIST, !isList)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+        context.sendBroadcast(intent)
     }
 
     override fun onCleared() {

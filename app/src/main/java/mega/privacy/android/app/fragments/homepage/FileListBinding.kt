@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.FileUtils.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
 import java.io.File
 

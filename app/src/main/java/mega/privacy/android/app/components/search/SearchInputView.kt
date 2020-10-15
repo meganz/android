@@ -24,15 +24,15 @@ class SearchInputView : AppCompatEditText {
             false
         }
 
-    constructor(context: Context?) : super(context) {
+    constructor(context: Context) : super(context) {
         init()
     }
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         init()
     }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int)
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int)
             : super(context, attrs, defStyle) {
         init()
     }
