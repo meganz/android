@@ -155,10 +155,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if (intent == null || intent.getAction() == null)
                 return;
 
-            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
-                if(adapter != null) {
-                    adapter.checkNotifications(chatHandle);
-                }
+            if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) && adapter != null) {
+                adapter.checkNotifications(chatHandle);
             }
         }
     };

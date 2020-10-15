@@ -377,6 +377,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if (holder == null) {
 			holder = getHolder(position);
 		}
+
 		if (holder == null)
 			return;
 
@@ -384,6 +385,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			holder.muteIcon.setVisibility(View.GONE);
 			return;
 		}
+
 		holder.muteIcon.setVisibility(isEnableChatNotifications(chat.getChatId()) ? View.GONE : View.VISIBLE);
 	}
 

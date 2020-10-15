@@ -359,6 +359,10 @@ public class ChatController {
                 showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
                 break;
 
+            case NOTIFICATIONS_DISABLED:
+                showSnackbar(context, context.getString(R.string.notifications_are_already_muted));
+                break;
+
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
                 showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));

@@ -116,7 +116,6 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
                 Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
                 chatSoundPreference.setSummary(defaultSound2.getTitle(context));
                 dbH.setNotificationSoundChat(defaultSoundUri2.toString());
-
             } else {
                 Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
                 if (sound != null) {

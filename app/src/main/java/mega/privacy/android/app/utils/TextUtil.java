@@ -24,7 +24,7 @@ public class TextUtil {
             text = text.replace("[C]", "");
             text = text.replace("[/C]", "");
         } catch (Exception e) {
-            logWarning("Error replacing text.");
+            logWarning("Error replacing text. ", e);
         }
         return text;
     }

@@ -196,6 +196,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
                 optionMuteChatText.setText(getString(R.string.general_unmute));
             }
+
             ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
             if(chatPrefs == null) {
                 MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());

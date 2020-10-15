@@ -391,6 +391,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         holderHeader.notificationsLayout.setVisibility(View.GONE);
                         holderHeader.dividerNotifications.setVisibility(View.GONE);
                     }
+
                     checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
                 }
 

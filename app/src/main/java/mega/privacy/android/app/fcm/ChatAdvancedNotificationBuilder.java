@@ -1227,7 +1227,7 @@ public final class ChatAdvancedNotificationBuilder {
         });
 
         logDebug("Generate chat notification for: " + chats.size() + " chats");
-        if(chats!=null && (!(chats.isEmpty())) && isEnableGeneralChatNotifications()){
+        if (!chats.isEmpty() && isEnableGeneralChatNotifications()) {
             showChatNotificationPreN(request, beep, chats.get(0).getChatId());
         }else{
             removeAllChatNotifications();
