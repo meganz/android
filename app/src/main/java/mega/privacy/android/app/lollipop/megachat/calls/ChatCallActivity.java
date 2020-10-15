@@ -656,8 +656,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         parentBigCameraGroupCall.setLayoutParams(paramsBigCameraGroupCall);
-        parentBigCameraGroupCall.setOnClickListener(this);
-
         fragmentBigCameraGroupCall = findViewById(R.id.fragment_big_camera_group_call);
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
         microFragmentBigCameraGroupCall = findViewById(R.id.micro_fragment_big_camera_group_call);
@@ -732,7 +730,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             myAvatarLayout.setVisibility(View.GONE);
             myImage = findViewById(R.id.call_chat_my_image);
             contactAvatarLayout = findViewById(R.id.call_chat_contact_image_rl);
-            contactAvatarLayout.setOnClickListener(this);
             contactAvatarLayout.setVisibility(View.GONE);
             contactImage = findViewById(R.id.call_chat_contact_image);
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
