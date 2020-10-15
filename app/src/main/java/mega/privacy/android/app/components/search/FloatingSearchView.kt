@@ -166,7 +166,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
      *
      * @param listener
      */
-    fun setOnLeftMenuClickListener(listener: OnLeftMenuClickListener?) {
+    private fun setOnLeftMenuClickListener(listener: OnLeftMenuClickListener?) {
         menuClickListener = listener
     }
 
@@ -275,7 +275,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         leftAction.setImageDrawable(menuBtnDrawable)
         menuBtnDrawable?.progress = MENU_BUTTON_PROGRESS_HAMBURGER
 
-        leftAction.setOnClickListener { _ ->
+        leftAction.setOnClickListener {
             if (isInputFocused) {
                 setSearchFocusedInternal(false)
             } else {
@@ -313,16 +313,22 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
             searchInput.requestFocus()
             Util.showKeyboardDelayed(searchInput)
             changeMenuDrawable(withAnim = true, isOpen = true)
-            if (menuOpen) closeMenu(false)
+
+            if (menuOpen) {
+                closeMenu(false)
+            }
+
             searchInput.apply {
                 isLongClickable = true
                 clearBtn.visibility = if (text!!.isEmpty()) View.INVISIBLE else View.VISIBLE
             }
+
             focusChangeListener?.onFocus()
         } else {
             searchInput.apply {
                 setText("")
             }
+
             getHostActivity()?.let { Util.hideKeyboard(it) }
             searchInput.clearFocus()
             changeMenuDrawable(withAnim = true, isOpen = false)
@@ -340,18 +346,18 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         return query
     }
 
-    private fun changeMenuDrawable(
-        withAnim: Boolean, isOpen: Boolean
-    ) {
+    private fun changeMenuDrawable(withAnim: Boolean, isOpen: Boolean) {
         val startValue = if (isOpen) MENU_BUTTON_PROGRESS_HAMBURGER else MENU_BUTTON_PROGRESS_ARROW
         val endValue = if (isOpen) MENU_BUTTON_PROGRESS_ARROW else MENU_BUTTON_PROGRESS_HAMBURGER
 
         if (withAnim) {
             val anim = ValueAnimator.ofFloat(startValue, endValue)
+
             anim.addUpdateListener { animation ->
                 val value = animation.animatedValue as Float
                 menuBtnDrawable?.progress = value
             }
+
             anim.duration = MENU_ICON_ANIM_DURATION
             anim.start()
         } else {
@@ -413,10 +419,12 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
     private fun getHostActivity(): Activity? {
         var context = context
+
         while (context is ContextWrapper) {
             if (context is Activity) {
                 return context
             }
+
             context = context.baseContext
         }
 

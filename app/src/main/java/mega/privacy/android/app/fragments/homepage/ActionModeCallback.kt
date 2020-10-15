@@ -15,7 +15,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaShare
-import java.util.*
+import java.util.ArrayList
 
 class ActionModeCallback constructor(
     private val mainActivity: ManagerActivityLollipop,
@@ -50,7 +50,7 @@ class ActionModeCallback constructor(
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 LogUtil.logDebug("Public link option")
                 if (selectedNodes.size == 1) {
-                    selectedNodes[0]?.let {
+                    selectedNodes[0].let {
                         if (it.handle != MegaApiJava.INVALID_HANDLE) {
                             mainActivity.showGetLinkActivity(it.handle)
                         }

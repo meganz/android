@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.FileUtils.isFileAvailable
 import mega.privacy.android.app.utils.Util
 import java.io.File
 
@@ -25,17 +26,13 @@ fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
 @BindingAdapter("thumbnail", "selected")
 fun setGridItemThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
     with(imageView) {
-        if (file == null || !file.exists()) setImageResource(R.drawable.ic_image_thumbnail) else setImageURI(
-            Uri.fromFile(
-                file
-            )
-        )
-
-        if (selected) {
-            hierarchy.roundingParams = getRoundingParams(context)
+        if (isFileAvailable(file)) {
+            setImageURI(Uri.fromFile(file))
         } else {
-            hierarchy.roundingParams = null
+            setActualImageResource(R.drawable.ic_image_thumbnail)
         }
+
+        hierarchy.roundingParams = if (selected) getRoundingParams(context) else null
     }
 }
 
@@ -47,16 +44,16 @@ fun setListItemThumbnail(
     defaultThumbnail: Int
 ) {
     with(imageView) {
-        if (selected) {
-            setActualImageResource(R.drawable.ic_select_folder)
-        } else {
-            if (file == null || !file.exists()) {
-                setImageResource(defaultThumbnail)
-            } else setImageURI(
-                Uri.fromFile(
-                    file
-                )
-            )
+        when {
+            selected -> {
+                setActualImageResource(R.drawable.ic_select_folder)
+            }
+            isFileAvailable(file) -> {
+                setImageURI(Uri.fromFile(file))
+            }
+            else -> {
+                setActualImageResource(defaultThumbnail)
+            }
         }
     }
 }
@@ -64,10 +61,10 @@ fun setListItemThumbnail(
 @BindingAdapter("thumbnail", "defaultThumbnail")
 fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbnail: Int) {
     with(imageView) {
-        if (file == null) {
-            setActualImageResource(defaultThumbnail)
-        } else {
+        if (isFileAvailable(file)) {
             setImageURI(Uri.fromFile(file))
+        } else {
+            setActualImageResource(defaultThumbnail)
         }
 
         val params = layoutParams
@@ -76,19 +73,20 @@ fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbn
             val defaultThumbnailSize =
                 resources.getDimensionPixelSize(R.dimen.grid_node_default_thumbnail_size)
             val defaultThumbnailMarginTop = (realThumbnailSize - defaultThumbnailSize) / 2
+
             params.width =
                 if (file == null) defaultThumbnailSize else ViewGroup.LayoutParams.MATCH_PARENT
+
             params.height = if (file == null) defaultThumbnailSize else realThumbnailSize
+
             params.topMargin = if (file == null) defaultThumbnailMarginTop else 0
+
             layoutParams = params
         }
 
         val radius = resources.getDimensionPixelSize(R.dimen.homepage_node_grid_round_corner_radius)
             .toFloat()
-        hierarchy.roundingParams = RoundingParams.fromCornersRadii(
-            radius, radius, 0F,
-            0F
-        )
+        hierarchy.roundingParams = RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
     }
 }
 

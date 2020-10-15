@@ -41,7 +41,9 @@ class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
         nodeItem.uiDirty = true
 
         _animNodeIndices.value = hashSetOf(nodeItem.index)
+
         if (nodeItem.selected) selectedNodeList.add(nodeItem) else selectedNodeList.remove(nodeItem)
+
         _selectedNodes.value = selectedNodeList
     }
 
