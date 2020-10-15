@@ -47,7 +47,6 @@ class HomepageFragment : Fragment() {
 
     private val viewModel: HomePageViewModel by viewModels()
 
-    private lateinit var activity: ManagerActivityLollipop
     private lateinit var viewDataBinding: FragmentHomepageBinding
     private lateinit var rootView: View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
@@ -95,8 +94,6 @@ class HomepageFragment : Fragment() {
     ): View? {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
-
-        activity = (getActivity() as ManagerActivityLollipop)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
@@ -183,6 +180,8 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupSearchView() {
+        val activity = activity as ManagerActivityLollipop
+
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
             activity.drawerLayout!!
@@ -248,7 +247,7 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupMask() {
-        windowContent = activity.window?.findViewById(Window.ID_ANDROID_CONTENT)
+        windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
         fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
     }
 
@@ -381,7 +380,7 @@ class HomepageFragment : Fragment() {
         if (isOnline(context)) {
             operation()
         } else if (showSnackBar) {
-            activity.showSnackbar(
+            (activity as ManagerActivityLollipop).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.error_server_connection_problem),
                 INVALID_HANDLE
@@ -395,13 +394,13 @@ class HomepageFragment : Fragment() {
                 putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
             }
 
-            activity.startActivityForResult(intent, REQUEST_CREATE_CHAT)
+            activity?.startActivityForResult(intent, REQUEST_CREATE_CHAT)
         }
     }
 
     private fun showUploadPanel() {
         doIfOnline(true) {
-            activity.showUploadPanel()
+            (activity as ManagerActivityLollipop).showUploadPanel()
         }
     }
 

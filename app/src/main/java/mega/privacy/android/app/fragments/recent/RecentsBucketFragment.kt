@@ -38,8 +38,6 @@ import java.util.*
 @AndroidEntryPoint
 class RecentsBucketFragment : BaseFragment() {
 
-    private lateinit var managerActivity: ManagerActivityLollipop
-
     private val viewModel by viewModels<RecentsBucketViewModel>()
 
     private val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
@@ -67,7 +65,6 @@ class RecentsBucketFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        managerActivity = requireActivity() as ManagerActivityLollipop
 
         val selectedBucket = selectedBucketModel.selected.value
         bucket = BucketSaved(selectedBucket)
@@ -90,21 +87,20 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun setupListView(nodes: List<MegaNode>) {
-        mAdapter = MultipleBucketAdapter(managerActivity, this, nodes, bucket.isMedia)
+        mAdapter = MultipleBucketAdapter(activity, this, nodes, bucket.isMedia)
 
         if (bucket.isMedia) {
-            val numCells: Int = if (Util.isScreenInPortrait(managerActivity)) 4 else 6
+            val numCells: Int = if (Util.isScreenInPortrait(activity)) 4 else 6
             val gridLayoutManager =
-                GridLayoutManager(
-                    managerActivity, numCells, GridLayoutManager.VERTICAL, false
-                )
+                GridLayoutManager(activity, numCells, GridLayoutManager.VERTICAL, false)
+            listView.layoutManager = gridLayoutManager
 
             listView.layoutManager = gridLayoutManager
         } else {
-            val linearLayoutManager = LinearLayoutManager(managerActivity)
+            val linearLayoutManager = LinearLayoutManager(activity)
 
             listView.layoutManager = linearLayoutManager
-            listView.addItemDecoration(SimpleDividerItemDecoration(managerActivity, outMetrics))
+            listView.addItemDecoration(SimpleDividerItemDecoration(activity, outMetrics))
         }
 
         listView.adapter = mAdapter
@@ -140,20 +136,21 @@ class RecentsBucketFragment : BaseFragment() {
                 binding.actionImage.setImageResource(R.drawable.ic_recents_up)
             }
 
-            binding.dateText.text = TimeUtils.formatBucketDate(managerActivity, bucket.timestamp)
+            binding.dateText.text =
+                TimeUtils.formatBucketDate(activity, bucket.timestamp)
             binding.headerInfoLayout.visibility = View.VISIBLE
         }
     }
 
     private fun setupToolbar() {
-        managerActivity.setToolbarTitle(
+        (activity as ManagerActivityLollipop).setToolbarTitle(
             "${viewModel.items.value?.size} ${getString(R.string.general_files).toUpperCase(Locale.ROOT)}"
         )
     }
 
     private fun checkScroll() {
         val canScroll = listView.canScrollVertically(-1)
-        managerActivity.changeActionBarElevation(canScroll)
+        (activity as ManagerActivityLollipop).changeActionBarElevation(canScroll)
     }
 
     private fun getNodesHandles(isImage: Boolean): LongArray? = viewModel.items.value?.filter {
@@ -174,7 +171,8 @@ class RecentsBucketFragment : BaseFragment() {
         draggingNodeHandle = node.handle
 
         val mime = MimeTypeList.typeForName(node.name)
-        val localPath = FileUtils.getLocalFile(managerActivity, node.name, node.size)
+        val localPath =
+            FileUtils.getLocalFile(activity, node.name, node.size)
         logDebug("Open node: ${node.name} which mime is: ${mime.type}, local path is: $localPath")
 
         when {
@@ -205,10 +203,10 @@ class RecentsBucketFragment : BaseFragment() {
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
 
         val paramsSetSuccessfully =
-            if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
-                FileUtils.setLocalIntentParams(managerActivity, node, intent, localPath, false)
+            if (FileUtils.isLocalFile(activity, node, megaApi, localPath)) {
+                FileUtils.setLocalIntentParams(activity, node, intent, localPath, false)
             } else {
-                FileUtils.setStreamingIntentParams(managerActivity, node, megaApi, intent)
+                FileUtils.setStreamingIntentParams(activity, node, megaApi, intent)
             }
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
@@ -220,7 +218,13 @@ class RecentsBucketFragment : BaseFragment() {
     ) {
         val intent = Intent(Intent.ACTION_VIEW)
         val paramsSetSuccessfully =
-            if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
+            if (FileUtils.isLocalFile(
+                    activity,
+                    node,
+                    megaApi,
+                    localPath
+                )
+            ) {
                 FileUtils.setURLIntentParams(context, node, intent, localPath)
             } else false
 
@@ -234,10 +238,11 @@ class RecentsBucketFragment : BaseFragment() {
         localPath: String?
     ) {
         val intent = if (FileUtils.isInternalIntent(node)) {
-            Intent(managerActivity, AudioVideoPlayerLollipop::class.java)
+            Intent(activity, AudioVideoPlayerLollipop::class.java)
         } else {
             Intent(Intent.ACTION_VIEW)
         }
+
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
@@ -250,10 +255,10 @@ class RecentsBucketFragment : BaseFragment() {
         }
 
         val paramsSetSuccessfully =
-            if (FileUtils.isLocalFile(managerActivity, node, megaApi, localPath)) {
-                FileUtils.setLocalIntentParams(managerActivity, node, intent, localPath, false)
+            if (FileUtils.isLocalFile(activity, node, megaApi, localPath)) {
+                FileUtils.setLocalIntentParams(activity, node, intent, localPath, false)
             } else {
-                FileUtils.setStreamingIntentParams(managerActivity, node, megaApi, intent)
+                FileUtils.setStreamingIntentParams(activity, node, megaApi, intent)
             }
 
         if (paramsSetSuccessfully) {
@@ -272,11 +277,11 @@ class RecentsBucketFragment : BaseFragment() {
         paramsSetSuccessfully: Boolean,
         handle: Long
     ) {
-        if (paramsSetSuccessfully && MegaApiUtils.isIntentAvailable(managerActivity, intent)) {
-            managerActivity.startActivity(intent)
-            managerActivity.overridePendingTransition(0, 0)
+        if (paramsSetSuccessfully && MegaApiUtils.isIntentAvailable(activity, intent)) {
+            activity?.startActivity(intent)
+            activity?.overridePendingTransition(0, 0)
         } else {
-            managerActivity.showSnackbar(
+            (activity as ManagerActivityLollipop).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
                 -1
@@ -289,7 +294,7 @@ class RecentsBucketFragment : BaseFragment() {
         screenPosition: IntArray,
         node: MegaNode
     ) {
-        val intent = Intent(managerActivity, FullScreenImageViewerLollipop::class.java)
+        val intent = Intent(activity, FullScreenImageViewerLollipop::class.java)
 
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
@@ -297,13 +302,13 @@ class RecentsBucketFragment : BaseFragment() {
         intent.putExtra(NODE_HANDLES, getNodesHandles(true))
 
         startActivity(intent)
-        managerActivity.overridePendingTransition(0, 0)
+        activity?.overridePendingTransition(0, 0)
     }
 
     private fun download(handle: Long) {
         val handleList = ArrayList<Long>()
         handleList.add(handle)
-        val nC = NodeController(managerActivity)
+        val nC = NodeController(activity)
         nC.prepareForDownload(handleList, true)
     }
 
@@ -373,7 +378,7 @@ class RecentsBucketFragment : BaseFragment() {
 
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(managerActivity).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     companion object {
