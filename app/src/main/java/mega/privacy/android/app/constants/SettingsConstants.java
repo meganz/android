@@ -56,6 +56,8 @@ public class SettingsConstants {
     public static final String KEY_STORAGE_DOWNLOAD_CATEGORY = "download_setting";
     public static final String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
     public static final String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
+    public static final String KEY_CAMERA_UPLOAD_ON_OFF = "settings_camera_upload_on_off";
+
     public static final String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
     public static final String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
     public static final String KEY_CAMERA_UPLOAD_INCLUDE_GPS = "settings_camera_upload_include_gps";

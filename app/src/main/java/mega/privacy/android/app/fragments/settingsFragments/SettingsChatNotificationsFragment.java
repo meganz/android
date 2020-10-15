@@ -33,7 +33,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class SettingsChatNotificationsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
-    ChatSettings chatSettings;
+    private ChatSettings chatSettings;
 
     private SwitchPreferenceCompat chatNotificationsSwitch;
     private Preference chatSoundPreference;

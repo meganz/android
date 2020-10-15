@@ -5,6 +5,7 @@ import android.content.Context;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
@@ -112,7 +113,7 @@ public class SetAttrUserListener extends BaseListener {
                         }
                     }
 
-                   if (context instanceof ManagerActivityLollipop && fragmentTag == SETTINGS) {
+                    if ((context instanceof ManagerActivityLollipop || context instanceof CameraUploadsPreferencesActivity) && fragmentTag == SETTINGS) {
                         SettingsFragmentLollipop settingsFragment = ((ManagerActivityLollipop) context).getSettingsFragment();
                         if (settingsFragment != null) {
                             if (primaryHandle != INVALID_HANDLE) {
