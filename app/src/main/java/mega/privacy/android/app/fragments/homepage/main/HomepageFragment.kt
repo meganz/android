@@ -142,10 +142,15 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showOfflineMode() {
-        viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
         viewPager.isUserInputEnabled = false
-        rootView.category.isVisible = false
-        fullyExpandBottomSheet()
+        post {
+            // other code is doing too much work when enter offline mode,
+            // to prevent janky frame when change several UI elements together,
+            // we have to post to end of UI thread.
+            viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
+            rootView.category.isVisible = false
+            fullyExpandBottomSheet()
+        }
 
         if (tabsChildren.isEmpty()) {
             tabLayout.touchables.forEach { tab ->
@@ -160,17 +165,15 @@ class HomepageFragment : Fragment() {
     }
 
     private fun fullyExpandBottomSheet() {
+        val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
         bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_EXPANDED
         bottomSheetBehavior.isDraggable = false
         viewDataBinding.backgroundMask.alpha = 1F
-        viewDataBinding.homepageBottomSheet.root.elevation = 0F
+        bottomSheetRoot.elevation = 0F
 
-        val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
-        bottomSheetRoot.post {
-            val layoutParams = bottomSheetRoot.layoutParams
-            layoutParams.height = rootView.height - searchInputView.bottom
-            bottomSheetRoot.layoutParams = layoutParams
-        }
+        val layoutParams = bottomSheetRoot.layoutParams
+        layoutParams.height = rootView.height - searchInputView.bottom
+        bottomSheetRoot.layoutParams = layoutParams
     }
 
     private fun fullyCollapseBottomSheet() {
@@ -196,13 +199,13 @@ class HomepageFragment : Fragment() {
             searchInputView.setChatStatus(it != 0, it)
         }
 
-        searchInputView.setAvatarClickListener(OnClickListener {
+        searchInputView.setAvatarClickListener {
             doIfOnline(false) { activity.showMyAccount() }
-        })
+        }
 
-        searchInputView.setOnSearchInputClickListener(OnClickListener {
+        searchInputView.setOnSearchInputClickListener {
             doIfOnline(false) { activity.homepageToSearch() }
-        })
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -222,6 +225,11 @@ class HomepageFragment : Fragment() {
             tab.text = getTabTitle(position)
         }
         mediator.attach()
+
+        if (!isOnline(context)) {
+            viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
+            rootView.category.isVisible = false
+        }
 
         // Pass selected page view to HomepageBottomSheetBehavior which would seek for
         // the nested scrolling child views and deal with the logic of nested scrolling
@@ -376,7 +384,7 @@ class HomepageFragment : Fragment() {
     }
 
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
-        if (isOnline(context)) {
+        if (isOnline(context) && !viewModel.isRootNodeNull()) {
             operation()
         } else if (showSnackBar) {
             (activity as ManagerActivityLollipop).showSnackbar(
