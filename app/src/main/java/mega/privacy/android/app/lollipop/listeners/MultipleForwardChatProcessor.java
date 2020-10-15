@@ -88,33 +88,44 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
     private void checkTypeMeta(MegaChatMessage msg, int value) {
 
         MegaChatContainsMeta meta = msg.getContainsMeta();
-        String text = "";
-        if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
-            text = meta.getRichPreview().getText();
-            if (chatHandles[value] == idChat) {
-                ((ChatActivityLollipop) context).sendMessage(text);
-            } else {
-                megaChatApi.sendMessage(chatHandles[value], text);
-            }
-        } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-            String image = meta.getGeolocation().getImage();
-            float latitude = meta.getGeolocation().getLatitude();
-            float longitude = meta.getGeolocation().getLongitude();
+        if (meta == null) {
+            logWarning("Meta is null");
+            return;
+        }
 
-            if (chatHandles[value] == idChat) {
-                ((ChatActivityLollipop) context).sendLocationMessage(longitude, latitude, image);
-            } else {
-                megaChatApi.sendGeolocation(chatHandles[value], longitude, latitude, image);
-            }
-        } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY) {
-            MegaChatGiphy giphy = meta.getGiphy();
+        switch (meta.getType()) {
+            case MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW:
+                String text = meta.getRichPreview().getText();
 
-            if (chatHandles[value] == idChat) {
-                ((ChatActivityLollipop) context).sendGiphyMessageFromMegaChatGiphy(giphy);
-            } else {
-                megaChatApi.sendGiphy(chatHandles[value], giphy.getMp4Src(), giphy.getWebpSrc(), giphy.getMp4Size(), giphy.getWebpSize()
-                        , giphy.getWidth(), giphy.getHeight(), giphy.getTitle());
-            }
+                if (chatHandles[value] == idChat) {
+                    ((ChatActivityLollipop) context).sendMessage(text);
+                } else {
+                    megaChatApi.sendMessage(chatHandles[value], text);
+                }
+                break;
+
+            case MegaChatContainsMeta.CONTAINS_META_GEOLOCATION:
+                String image = meta.getGeolocation().getImage();
+                float latitude = meta.getGeolocation().getLatitude();
+                float longitude = meta.getGeolocation().getLongitude();
+
+                if (chatHandles[value] == idChat) {
+                    ((ChatActivityLollipop) context).sendLocationMessage(longitude, latitude, image);
+                } else {
+                    megaChatApi.sendGeolocation(chatHandles[value], longitude, latitude, image);
+                }
+                break;
+
+            case MegaChatContainsMeta.CONTAINS_META_GIPHY:
+                MegaChatGiphy giphy = meta.getGiphy();
+
+                if (chatHandles[value] == idChat) {
+                    ((ChatActivityLollipop) context).sendGiphyMessageFromMegaChatGiphy(giphy);
+                } else {
+                    megaChatApi.sendGiphy(chatHandles[value], giphy.getMp4Src(), giphy.getWebpSrc(), giphy.getMp4Size(), giphy.getWebpSize()
+                            , giphy.getWidth(), giphy.getHeight(), giphy.getTitle());
+                }
+                break;
         }
 
         checkTotalMessages();

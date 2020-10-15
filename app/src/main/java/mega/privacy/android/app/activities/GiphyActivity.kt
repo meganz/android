@@ -299,8 +299,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         }
 
         val factor = screenGifWidth.toFloat() / gifWidth.toFloat()
-        val screenGifHeight = gifHeight * factor
 
-        return screenGifHeight.toInt()
+        return (gifHeight * factor).toInt()
     }
 }

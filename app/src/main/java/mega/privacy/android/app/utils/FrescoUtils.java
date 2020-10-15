@@ -61,16 +61,12 @@ public class FrescoUtils {
 
                     @Override
                     public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                        if (pb != null) {
-                            pb.setVisibility(View.GONE);
-                        }
+                        hideProgressBar(pb);
                     }
 
                     @Override
                     public void onFailure(String id, Throwable throwable) {
-                        if (pb != null) {
-                            pb.setVisibility(View.GONE);
-                        }
+                        hideProgressBar(pb);
                         logWarning("Load gif failed, error: " + throwable.getMessage());
                     }
                 })
@@ -123,7 +119,7 @@ public class FrescoUtils {
                 if (bitmap != null && !bitmap.isRecycled()) {
                     // Work around: bitmap will be recylced by Fresco soon, create a copy then use the copy.
                     Bitmap copy = bitmap.copy(Bitmap.Config.ARGB_8888, false);
-                    pb.setVisibility(View.GONE);
+                    hideProgressBar(pb);
                     imageView.setImageBitmap(copy);
                 }
             }
@@ -167,9 +163,7 @@ public class FrescoUtils {
                     public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
                         updateViewDimensions(gifImgDisplay, imageInfo.getWidth(), imageInfo.getHeight());
 
-                        if (pb != null) {
-                            pb.setVisibility(View.GONE);
-                        }
+                        hideProgressBar(pb);
 
                         if (fileView != null && fileView.getVisibility() != View.GONE) {
                             fileView.setVisibility(View.GONE);
@@ -188,5 +182,11 @@ public class FrescoUtils {
                 .build();
 
         gifImgDisplay.setController(controller);
+    }
+
+    private static void hideProgressBar(ProgressBar pb) {
+        if (pb != null) {
+            pb.setVisibility(View.GONE);
+        }
     }
 }

@@ -165,7 +165,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         } else {
             int typeMessage = message.getMessage().getType();
-            boolean isGiphyMessage = message.getMessage().getContainsMeta() != null && message.getMessage().getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY;
 
             if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
                 nodeList = message.getMessage().getMegaNodeList();
@@ -203,7 +202,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
                 if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()
                         && message.getMessage().isEditable()
-                        && typeMessage == MegaChatMessage.TYPE_NORMAL || (typeMessage == MegaChatMessage.TYPE_CONTAINS_META && !isGiphyMessage)) {
+                        && (typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META)) {
                     optionEdit.setVisibility(View.VISIBLE);
                 } else {
                     optionEdit.setVisibility(View.GONE);
