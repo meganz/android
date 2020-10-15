@@ -1,7 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:gravity="bottom"
     android:orientation="vertical"
     >
@@ -98,11 +97,10 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="6dp"
-        android:background="@drawable/white_rounded_corners_button"
-        android:elevation="@dimen/elevation_upgrade_low"
-        android:stateListAnimator="@anim/button_upgrade_elevation"
         android:text="@string/general_skip"
-        android:textColor="@color/name_my_account"
+        style="@style/Button"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/dark_grey"
         />
 
     <Button
@@ -112,12 +110,8 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="6dp"
-        android:background="@drawable/ripple_upgrade"
-        android:elevation="@dimen/elevation_upgrade_low"
-        android:stateListAnimator="@anim/button_upgrade_elevation"
         android:text="@string/general_ok"
-        android:textColor="@color/white"
-        android:tint="@android:color/white"
+        style="@style/Button"
         />
   </LinearLayout>
 </LinearLayout>

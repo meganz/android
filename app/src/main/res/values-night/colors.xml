@@ -33,6 +33,7 @@
     <color name="list_item_divider">@color/white_alpha_012</color>
 
     <color name="text_color_primary_solid">@color/white</color>
+    <color name="color_secondary_night_grey">@color/dark_grey</color>
 
     <color name="grid_item_bg_stoke_color">@color/white_alpha_012</color>
     <color name="grid_item_bg_solid_color">@color/white_alpha_005</color>
@@ -56,7 +57,6 @@
     <color name="drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>
     <color name="drawer_notification_count_color">@color/red_300</color>
     <color name="drawer_notification_count_color_disabled">@color/red_300_alpha_038</color>
-    <color name="drawer_upgrade_button_text_color">@color/dark_grey</color>
 
     <color name="free_account">#8CD670</color>
     <color name="upgrade_orange">#FFA500</color>

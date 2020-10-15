@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -80,7 +79,6 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.Util.checkFingerprint;
-import static mega.privacy.android.app.utils.Util.px2dp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -344,8 +342,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return;
         }
 
-        mBinding.turnOnCuLayout.setVisibility(View.VISIBLE);
-        mBinding.turnOnCuText.setText(
+        mBinding.turnOnCuButton.setVisibility(View.VISIBLE);
+        mBinding.turnOnCuButton.setText(
                 getString(R.string.settings_camera_upload_turn_on).toUpperCase(
                         Locale.getDefault()));
     }
@@ -493,16 +491,16 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         if (mCamera == TYPE_CAMERA) {
-            mBinding.turnOnCuText.setText(
+            mBinding.turnOnCuButton.setText(
                     getString(R.string.settings_camera_upload_turn_on).toUpperCase(
                             Locale.getDefault()));
         } else {
-            mBinding.turnOnCuText.setText(
+            mBinding.turnOnCuButton.setText(
                     getString(R.string.settings_set_up_automatic_uploads).toUpperCase(
                             Locale.getDefault()));
         }
 
-        mBinding.turnOnCuLayout.setOnClickListener(v -> {
+        mBinding.turnOnCuButton.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
             String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
 
@@ -597,19 +595,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
         });
 
-        mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
-            mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
-            if (!enabled) {
-                FrameLayout.LayoutParams params =
-                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
-                mBinding.cuList.setLayoutParams(params);
-
-                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
-                mBinding.scroller.setLayoutParams(params);
-            }
-        });
+        mViewModel.camSyncEnabled()
+                .observe(getViewLifecycleOwner(), enabled -> mBinding.turnOnCuButton.setVisibility(
+                        enabled ? View.GONE : View.VISIBLE));
     }
 
     @Override
