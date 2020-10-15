@@ -22,6 +22,12 @@ val avatarChange: LiveData<Boolean> = avatarChange_
 private val scrolling_ = MutableLiveData<Pair<Scrollable, Boolean>>()
 val scrolling: LiveData<Pair<Scrollable, Boolean>> = scrolling_
 
+private val notificationCountChange_ = MutableLiveData<Int>()
+val notificationCountChange: LiveData<Int> = notificationCountChange_
+
+private val chatOnlineStatusChange_ = MutableLiveData<Int>()
+val chatOnlineStatusChange: LiveData<Int> = chatOnlineStatusChange_
+
 fun notifyNodesChange(forceUpdate: Boolean) {
     nodesChange_.value = forceUpdate
 }
@@ -40,4 +46,12 @@ fun notifyAvatarChange(isSet: Boolean) {
 
 fun onScrolling(scrollingFragment: Pair<Scrollable, Boolean>) {
     scrolling_.value = scrollingFragment
+}
+
+fun notifyNotificationCountChange(count: Int) {
+    notificationCountChange_.value = count
+}
+
+fun notifyChatOnlineStatusChange(status: Int) {
+    chatOnlineStatusChange_.value = status
 }

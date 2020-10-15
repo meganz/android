@@ -38,6 +38,7 @@ import android.util.Log;
 
 import javax.inject.Inject;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 
 	final String TAG = "MegaApplication";
 
@@ -191,6 +192,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private PowerManager.WakeLock wakeLock;
 	private CallListener callListener = new CallListener();
+	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
     @Override
 	public void networkAvailable() {
@@ -776,7 +778,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			if (megaChatApi != null) {
 				megaChatApi.removeChatRequestListener(this);
 				megaChatApi.removeChatNotificationListener(this);
-				megaChatApi.removeChatListener(this);
+				megaChatApi.removeChatListener(globalChatListener);
 				megaChatApi.removeChatCallListener(callListener);
 				registeredChatListeners = false;
 			}
@@ -811,7 +813,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			logDebug("Add listeners of megaChatApi");
 			megaChatApi.addChatRequestListener(this);
 			megaChatApi.addChatNotificationListener(this);
-			megaChatApi.addChatListener(this);
+			megaChatApi.addChatListener(globalChatListener);
 			megaChatApi.addChatCallListener(callListener);
 			registeredChatListeners = true;
 		}
@@ -1064,7 +1066,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				if (megaChatApi != null){
 					megaChatApi.removeChatRequestListener(this);
 					megaChatApi.removeChatNotificationListener(this);
-					megaChatApi.removeChatListener(this);
+					megaChatApi.removeChatListener(globalChatListener);
 					megaChatApi.removeChatCallListener(callListener);
 					registeredChatListeners = false;
 				}
@@ -1159,41 +1161,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 		sendBroadcastUpdateAccountDetails();
 	}
-
-	@Override
-	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-	}
-
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-	}
-
-	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-	}
-
-	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		if(config.isPending()==false){
-			logDebug("Launch local broadcast");
-			Intent intent = new Intent(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
-			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-		}
-	}
-
-	@Override
-	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-	}
-
-	@Override
-	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
-	}
-
 
 	public void updateAppBadge(){
 		logDebug("updateAppBadge");
