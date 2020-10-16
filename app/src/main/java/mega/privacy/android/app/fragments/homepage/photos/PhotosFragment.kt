@@ -14,8 +14,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.facebook.drawee.view.SimpleDraweeView
@@ -57,8 +55,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
-    private lateinit var activity: ManagerActivityLollipop
-
     private var draggingPhotoHandle = INVALID_HANDLE
 
     private lateinit var itemDecoration: SimpleDividerItemDecoration
@@ -78,7 +74,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        activity = getActivity() as ManagerActivityLollipop
 
         setupEmptyHint()
         setupListView()
@@ -90,7 +85,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
-                activity.invalidateOptionsMenu()  // Hide the search icon if no photo
+                activity?.invalidateOptionsMenu()  // Hide the search icon if no photo
             }
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
@@ -108,6 +103,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         if (Util.isOnline(context)) {
             operation()
         } else {
+            val activity = activity as ManagerActivityLollipop
+
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
                 SNACKBAR_TYPE,
@@ -124,7 +121,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline {
-                activity.showNodeOptionsPanel(
+                (activity as ManagerActivityLollipop).showNodeOptionsPanel(
                     it.node,
                     MODE5
                 )
@@ -143,6 +140,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<PhotoNodeItem>(it)
+
         if (viewModel.searchMode) {
             searchAdapter.submitList(newList)
         } else {
@@ -152,6 +150,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -160,13 +159,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        activity.changeActionBarElevation(v!!.canScrollVertically(-1))
+        (activity as ManagerActivityLollipop).changeActionBarElevation(v!!.canScrollVertically(-1))
     }
 
     private fun setupListView() {
         listView = binding.photoList
         preventListItemBlink()
         elevateToolbarWhenScrolling()
+
         itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
 
@@ -175,7 +175,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupActionMode() {
-        actionModeCallback = ActionModeCallback(activity, actionModeViewModel, megaApi)
+        actionModeCallback =
+            ActionModeCallback(activity as ManagerActivityLollipop, actionModeViewModel, megaApi)
 
         observeItemLongClick()
         observeSelectedItems()
@@ -198,7 +199,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 actionModeCallback.nodeCount = viewModel.getRealPhotoCount()
 
                 if (actionMode == null) {
-                    activity.hideKeyboardSearch()
+                    (activity as ManagerActivityLollipop).hideKeyboardSearch()
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
@@ -281,7 +282,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
-            activity.showKeyboardForSearch()
+            (activity as ManagerActivityLollipop).showKeyboardForSearch()
         })
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
@@ -310,8 +311,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            RunOnUIThreadUtils.post { activity.hideKeyboardSearch() }
+            RunOnUIThreadUtils.post { (activity as ManagerActivityLollipop).hideKeyboardSearch() }
         }
+
         if (viewModel.searchMode) return
 
         listView.switchToLinear()
@@ -350,6 +352,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
+
         viewModel.searchQuery = query
         viewModel.loadPhotos()
     }
@@ -415,7 +418,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+        context.sendBroadcast(intent)
     }
 
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {

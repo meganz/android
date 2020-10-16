@@ -5,21 +5,11 @@
     android:id="@+id/file_explorer_item_layout" >
 
     <ImageView
-        android:id="@+id/file_list_saved_offline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_cloud_saved_offline"
-        android:background="@null"
-        android:layout_centerVertical="true"
-        android:visibility="invisible"/>
-
-    <ImageView
         android:id="@+id/file_explorer_thumbnail"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_centerVertical="true"
-        android:scaleType="fitCenter"
-        android:layout_toRightOf="@id/file_list_saved_offline"/>
+        android:scaleType="fitCenter"/>
 
     <HorizontalScrollView
         android:id="@+id/scroll_view_filename"

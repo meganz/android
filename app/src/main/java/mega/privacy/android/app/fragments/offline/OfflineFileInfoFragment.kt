@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -61,7 +60,6 @@ class OfflineFileInfoFragment : Fragment() {
             if (it == null) {
                 requireActivity().finish()
             } else {
-
                 if (it.node.isFolder || it.thumbnail == null) {
                     binding.toolbarNodeIcon.setImageResource(
                         if (it.node.isFolder) {
@@ -72,6 +70,7 @@ class OfflineFileInfoFragment : Fragment() {
                     )
 
                     binding.toolbarNodeIcon.isVisible = true
+
                     if (it.node.isFolder) {
                         binding.containsTitle.isVisible = true
                         binding.containsValue.isVisible = true
@@ -90,12 +89,14 @@ class OfflineFileInfoFragment : Fragment() {
                             R.color.name_my_account
                         )
                     )
+
                     binding.collapseToolbar.setExpandedTitleColor(
                         ContextCompat.getColor(
                             requireContext(),
                             R.color.white
                         )
                     )
+
                     binding.collapseToolbar.setStatusBarScrimColor(
                         ContextCompat.getColor(
                             requireContext(),
@@ -107,16 +108,15 @@ class OfflineFileInfoFragment : Fragment() {
                         if (offset == 0) {
                             // Expanded
                             setColorFilterWhite()
+                        } else if (offset < 0 && abs(offset) >= appBarLayout.totalScrollRange / 2) {
+                            // Collapsed
+                            setColorFilterBlack()
                         } else {
-                            if (offset < 0 && abs(offset) >= appBarLayout.totalScrollRange / 2) {
-                                // Collapsed
-                                setColorFilterBlack()
-                            } else {
-                                setColorFilterWhite()
-                            }
+                            setColorFilterWhite()
                         }
                     })
                 }
+
                 binding.collapseToolbar.title = it.node.name
 
                 binding.availableOfflineSwitch.setOnClickListener { _ ->
@@ -127,12 +127,15 @@ class OfflineFileInfoFragment : Fragment() {
                 }
             }
         }
+
         viewModel.totalSize.observe(viewLifecycleOwner) {
             binding.totalSizeValue.text = it
         }
+
         viewModel.contains.observe(viewLifecycleOwner) {
             binding.containsValue.text = it
         }
+
         viewModel.added.observe(viewLifecycleOwner) {
             binding.addedValue.text = it
         }
@@ -150,8 +153,11 @@ class OfflineFileInfoFragment : Fragment() {
 
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
-            .setPositiveButton(R.string.general_remove, dialogClickListener)
-            .setNegativeButton(R.string.general_cancel, dialogClickListener)
+            .setPositiveButton(R.string.general_remove) { _, _ ->
+                NodeController(requireContext()).deleteOffline(node)
+                onConfirmed()
+            }
+            .setNegativeButton(R.string.general_cancel, null)
             .show()
     }
 

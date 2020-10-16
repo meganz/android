@@ -15,7 +15,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +27,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentDocumentsBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
@@ -47,7 +47,7 @@ import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
-import mega.privacy.android.app.utils.FileUtils
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
@@ -176,6 +176,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
+
             if (listView.itemDecorationCount == 0) {
                 listView.addItemDecoration(itemDecoration)
             }
@@ -195,6 +196,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<NodeItem>(it)
+
         if (sortByHeaderViewModel.isList) {
             listAdapter.submitList(newList)
         } else {
@@ -204,6 +206,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -305,12 +308,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
+                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
-                        if (gridAdapter.getItemViewType(pos) != NodeGridAdapter.TYPE_HEADER) {
+                        if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
                         }
                         itemView.findViewById(R.id.ic_selected)
@@ -416,9 +419,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         if (node == null) {
             return
         }
-        var screenPosition: IntArray? = null
 
-        val localPath = FileUtils.getLocalFile(context, node.name, node.size)
+        var screenPosition: IntArray? = null
+        val localPath = FileUtil.getLocalFile(context, node.name, node.size)
 
         listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
@@ -439,10 +442,10 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
 
             val paramsSetSuccessfully =
-                if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-                    FileUtils.setLocalIntentParams(activity, node, intent, localPath, false)
+                if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+                    FileUtil.setLocalIntentParams(activity, node, intent, localPath, false)
                 } else {
-                    FileUtils.setStreamingIntentParams(activity, node, megaApi, intent)
+                    FileUtil.setStreamingIntentParams(activity, node, megaApi, intent)
                 }
 
             intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)

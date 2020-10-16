@@ -41,24 +41,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             >
-            <mega.privacy.android.app.components.NewGridRecyclerView
-                android:id="@+id/file_grid_view_browser"
+            <include layout="@layout/transfer_over_quota_banner"/>
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:choiceMode="multipleChoice"
-                android:columnWidth ="172dp"
-                android:paddingRight="4dp"
-                android:paddingLeft="4dp"
-                />
+                >
+                <mega.privacy.android.app.components.NewGridRecyclerView
+                    android:id="@+id/file_grid_view_browser"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:choiceMode="multipleChoice"
+                    android:columnWidth ="172dp"
+                    android:paddingRight="4dp"
+                    android:paddingLeft="4dp"
+                    />
 
-            <mega.privacy.android.app.components.scrollBar.FastScroller
-                android:id="@+id/fastscroll"
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:gravity="end"
-                />
+                <mega.privacy.android.app.components.scrollBar.FastScroller
+                    android:id="@+id/fastscroll"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:gravity="end"
+                    />
+            </FrameLayout>
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

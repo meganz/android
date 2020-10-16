@@ -138,7 +138,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/file_grid_thumbnail_layout_for_file"
-            android:background="@color/divider_upgrade_account" />
+            android:background="@color/black_12_alpha" />
 
         <RelativeLayout
             android:id="@+id/grid_bottom_container"

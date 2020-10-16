@@ -52,11 +52,11 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
-import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiAndroid;
@@ -78,13 +78,13 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ChatFullScreenImageViewer extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
 	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	int[] screenPosition;
@@ -793,10 +793,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 			logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			chatC.prepareForDownload(intent, parentPath);
-		} else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, true, null);
-        }
-		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
 			if(!isOnline(this)||megaApi==null) {

@@ -23,7 +23,7 @@
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/category_document"
-            app:name="@string/category_photos"
+            app:name="@string/sortby_type_photo_first"
             app:icon="@drawable/ic_photos" />
 
         <mega.privacy.android.app.components.CategoryButton
@@ -45,7 +45,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_document"
             app:layout_constraintTop_toTopOf="@+id/category_video"
-            app:name="@string/category_audio"
+            app:name="@string/upload_to_audio"
             app:icon="@drawable/ic_audios" />
 
         <mega.privacy.android.app.components.CategoryButton
@@ -56,7 +56,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_audio"
             app:layout_constraintTop_toTopOf="parent"
-            app:name="@string/category_video"
+            app:name="@string/upload_to_video"
             app:icon="@drawable/ic_videos"
             tools:layout_editor_absoluteY="16dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>

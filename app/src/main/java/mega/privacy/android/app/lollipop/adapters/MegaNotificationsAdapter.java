@@ -27,8 +27,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;

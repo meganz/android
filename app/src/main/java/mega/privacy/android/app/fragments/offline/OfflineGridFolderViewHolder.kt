@@ -10,6 +10,7 @@ class OfflineGridFolderViewHolder(
     listener: OfflineAdapterListener,
     itemGetter: (Int) -> OfflineNode
 ) : OfflineViewHolder(binding.root, listener, itemGetter) {
+
     init {
         binding.threeDots.setOnClickListener {
             val position = adapterPosition

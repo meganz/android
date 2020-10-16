@@ -67,8 +67,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -701,7 +701,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     void update2FASetting () {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS);
         intent.putExtra("enabled", true);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     void pasteClipboard() {

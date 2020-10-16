@@ -11,5 +11,4 @@
     <string name="pro2_account" context="PRO II account" translatable="false">PRO II</string>
     <string name="pro3_account" context="PRO III account" translatable="false">PRO III</string>
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code" translatable="false">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
-    <string name="homepage_bottom_sheet_behavior" translatable="false">mega.privacy.android.app.fragments.homepage.main.HomepageBottomSheetBehavior</string>
 </resources>

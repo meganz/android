@@ -9,6 +9,7 @@ class OfflineSortedByViewHolder(
     listener: OfflineAdapterListener,
     itemGetter: (Int) -> OfflineNode
 ) : OfflineViewHolder(binding.root, listener, itemGetter) {
+
     override fun bind(position: Int, node: OfflineNode) {
         binding.apply {
             this.orderNameStringId =

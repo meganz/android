@@ -49,7 +49,7 @@
 			android:id="@+id/storage_separator"
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
-			android:background="@color/divider_upgrade_account"
+			android:background="@color/black_12_alpha"
 			android:orientation="horizontal" />
 
 		<LinearLayout
@@ -80,7 +80,7 @@
 			android:id="@+id/transfer_separator"
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
-			android:background="@color/divider_upgrade_account"
+			android:background="@color/black_12_alpha"
 			android:orientation="horizontal" />
 
 
@@ -128,7 +128,7 @@
 					android:id="@+id/cloud_drive_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"
 					android:layout_alignParentBottom="true"/>
 
@@ -163,7 +163,7 @@
 					android:id="@+id/inbox_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"
 					android:layout_alignParentBottom="true"/>
 
@@ -197,7 +197,7 @@
 					android:id="@+id/incoming_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"
 					android:layout_alignParentBottom="true"/>
 
@@ -231,7 +231,7 @@
 					android:id="@+id/rubbish_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"
 					android:layout_alignParentBottom="true"/>
 

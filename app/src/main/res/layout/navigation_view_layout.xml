@@ -222,6 +222,30 @@
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/transfers_section"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/drawer_item_height">
+
+            <TextView
+                android:id="@+id/transfers_section_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="start|center_vertical"
+                android:text="@string/section_transfers"
+                android:textAppearance="@style/Drawer.Item"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="16dp"
+                android:background="@color/list_item_divider"
+                />
+        </FrameLayout>
+
+        <FrameLayout
             android:id="@+id/offline_section"
             android:layout_width="match_parent"
             android:layout_height="@dimen/drawer_item_height">
@@ -231,7 +255,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
-                android:text="@string/tab_offline"
+                android:text="@string/section_saved_for_offline_new"
                 android:textAppearance="@style/Drawer.Item"
                 />
 

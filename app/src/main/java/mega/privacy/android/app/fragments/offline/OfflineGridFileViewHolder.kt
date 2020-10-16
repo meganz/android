@@ -16,6 +16,7 @@ class OfflineGridFileViewHolder(
     listener: OfflineAdapterListener,
     itemGetter: (Int) -> OfflineNode
 ) : OfflineViewHolder(binding.root, listener, itemGetter) {
+
     init {
         binding.filenameContainer.setOnClickListener {
             val position = adapterPosition
@@ -35,12 +36,14 @@ class OfflineGridFileViewHolder(
         }
 
         val params = binding.thumbnail.layoutParams
+
         if (params is FrameLayout.LayoutParams) {
             val realThumbnailSize =
                 binding.root.resources.getDimensionPixelSize(R.dimen.grid_node_item_width)
             val defaultThumbnailSize =
                 binding.root.resources.getDimensionPixelSize(R.dimen.grid_node_default_thumbnail_size)
             val defaultThumbnailMarginTop = (realThumbnailSize - defaultThumbnailSize) / 2
+
             params.width =
                 if (node.thumbnail == null) defaultThumbnailSize else ViewGroup.LayoutParams.MATCH_PARENT
             params.height = if (node.thumbnail == null) defaultThumbnailSize else realThumbnailSize

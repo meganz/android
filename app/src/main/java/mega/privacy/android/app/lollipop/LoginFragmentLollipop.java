@@ -936,9 +936,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             ((LoginActivityLollipop) context).startCameraUploadService(false, 5 * 60 * 1000);
                         }
 
-                        logDebug("Empty completed transfers data");
-                        dbH.emptyCompletedTransfers();
-
                         this.startActivity(intent);
                         ((LoginActivityLollipop) context).finish();
                     }
@@ -1001,8 +998,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                     }
 
-                    logDebug("Empty completed transfers data");
-                    dbH.emptyCompletedTransfers();
                     this.startActivity(intent);
                     ((LoginActivityLollipop) context).finish();
                 }
@@ -1759,8 +1754,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             logDebug("value of resumeSession: " + resumeSesion);
 
             if((action!=null)&&(url!=null)) {
-                logDebug("Empty completed transfers data");
-                dbH.emptyCompletedTransfers();
 
                 if (action.equals(ACTION_CHANGE_MAIL)) {
                     logDebug("Action change mail after fetch nodes");
@@ -1897,9 +1890,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
-
-                    logDebug("Empty completed transfers data");
-                    dbH.emptyCompletedTransfers();
 
                     if (twoFA){
                         intent.setAction(ACTION_REFRESH_STAGING);

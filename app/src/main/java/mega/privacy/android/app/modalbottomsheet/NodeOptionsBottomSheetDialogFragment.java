@@ -32,7 +32,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -56,6 +56,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public static final int MODE5 = 5;
     // For recent
     public static final int MODE6 = 6;
+
+    private static final String SAVED_STATE_KEY_MODE = "MODE";
 
     private int mMode;
 
@@ -86,6 +88,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             if (context instanceof ManagerActivityLollipop) {
                 drawerItem = ManagerActivityLollipop.getDrawerItem();
             }
+            mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, MODE0);
         } else {
             if (context instanceof ManagerActivityLollipop) {
                 node = ((ManagerActivityLollipop) context).getSelectedNode();
@@ -1114,7 +1117,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         // Save the new file to offline
-        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
+        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context);
     }
 
     @Override
@@ -1122,6 +1125,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);
+        outState.putInt(SAVED_STATE_KEY_MODE, mMode);
     }
 
     private void mapDrawerItemToMode(ManagerActivityLollipop.DrawerItem drawerItem) {

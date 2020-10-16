@@ -69,9 +69,9 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
 import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtils.findVideoLocalPath;
-import static mega.privacy.android.app.utils.FileUtils.setLocalIntentParams;
-import static mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams;
+import static mega.privacy.android.app.utils.FileUtil.findVideoLocalPath;
+import static mega.privacy.android.app.utils.FileUtil.setLocalIntentParams;
+import static mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -214,7 +214,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         res[1] += res[3] / 2;
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
         intent.putExtra("screenPosition", res);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     private void skipInitialCUSetup() {

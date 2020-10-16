@@ -34,7 +34,7 @@
     <fragment
         android:id="@+id/photosFragment"
         android:name="mega.privacy.android.app.fragments.homepage.photos.PhotosFragment"
-        android:label="@string/category_photos" />
+        android:label="@string/sortby_type_photo_first" />
     <fragment
         android:id="@+id/recentBucketFragment"
         android:name="mega.privacy.android.app.fragments.recent.RecentsBucketFragment"/>

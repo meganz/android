@@ -58,7 +58,7 @@ import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
@@ -143,6 +143,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             switch (item.getItemId()) {
                 case R.id.cab_menu_download:
                     nC.prepareForDownload(handleList, false);
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_rename:

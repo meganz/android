@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/get_more_quota_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/white_layout_with_broder_shadow">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:layout_toStartOf="@+id/get_more_quota_upgrade_button"
+        android:text="@string/label_get_more_transfer_quota"
+        android:textColor="@color/transparent_black2"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/get_more_quota_upgrade_button"
+        style="@style/AccentBorderBackgroundButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:text="@string/my_account_upgrade_pro" />
+
+</RelativeLayout>

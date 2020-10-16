@@ -8,7 +8,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.FileUtils
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.SortUtil.sortOfflineByModificationDateAscending
@@ -219,7 +219,7 @@ class MegaNodeRepo @Inject constructor(
             }
 
             if (node.name.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)) &&
-                FileUtils.isFileAvailable(getOfflineFile(context, node))
+                FileUtil.isFileAvailable(getOfflineFile(context, node))
             ) {
                 result.add(node)
             }

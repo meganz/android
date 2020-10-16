@@ -15,45 +15,40 @@ import android.text.TextUtils
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.R.style
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_FROM_SETTINGS
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_PATH
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_PROMPT
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_SD_ROOT
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
+import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
-import mega.privacy.android.app.utils.FileUtils.getDownloadLocation
-import mega.privacy.android.app.utils.FileUtils.isBasedOnFileStorage
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.SDCardOperator.SDCardException
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.askMe
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.Util.scaleWidthPx
 import mega.privacy.android.app.utils.Util.showNotEnoughSpaceSnackbar
-import java.io.File
+import nz.mega.sdk.MegaApiJava
 
 /**
  * A class that encapsulate all the procedure of saving a node into device,
@@ -173,15 +168,8 @@ abstract class NodeSaver(
                 val downloadLocationDefaultPath = getDownloadLocation()
 
                 if (askMe(context)) {
-                    val fs = context.getExternalFilesDirs(null)
-
-                    if (fs.size <= 1 || fs[1] == null) {
-                        requestLocalFolder(null, null, activityStarter)
-                    } else {
-                        runOnUiThread { showSelectDownloadLocationDialog(activityStarter) }
-                    }
+                    requestLocalFolder(null, activityStarter)
                 } else {
-                    File(downloadLocationDefaultPath).mkdirs()
                     checkSizeBeforeDownload(downloadLocationDefaultPath)
                 }
             }
@@ -189,68 +177,13 @@ abstract class NodeSaver(
             .subscribe(IGNORE, logErr("NodeSaver save")))
     }
 
-    private fun showSelectDownloadLocationDialog(activityStarter: (Intent, Int) -> Unit) {
-        MaterialAlertDialogBuilder(context, style.MaterialAlertDialogStyle)
-            .setTitle(R.string.title_select_download_location)
-            .setNegativeButton(R.string.general_cancel) { dialog, _ -> dialog.cancel() }
-            .setItems(R.array.settings_storage_download_location_array) { _, which ->
-                when (which) {
-                    0 -> requestLocalFolder(null, null, activityStarter)
-                    1 -> handleSdCard(activityStarter)
-                }
-            }
-            .create()
-            .show()
-    }
-
-    private fun handleSdCard(activityStarter: (Intent, Int) -> Unit) {
-        try {
-            val sdCardOperator = SDCardOperator(context)
-            val sdCardRoot = sdCardOperator.sdCardRoot
-
-            if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
-                requestLocalFolder(sdCardRoot, null, activityStarter)
-            } else {
-                if (isBasedOnFileStorage()) {
-                    try {
-                        sdCardOperator.initDocumentFileRoot(dbHandler.sdCardUri)
-                        requestLocalFolder(sdCardRoot, null, activityStarter)
-                    } catch (e: SDCardException) {
-                        logError(
-                            "SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e
-                        )
-                        requestSDCardPermission(sdCardRoot, activityStarter)
-                    }
-                } else {
-                    requestSDCardPermission(sdCardRoot, activityStarter)
-                }
-            }
-        } catch (e: SDCardException) {
-            logError("Initialize SDCardOperator failed", e)
-            // sd card is available, choose internal storage location
-            requestLocalFolder(null, null, activityStarter)
-        }
-    }
-
-    private fun requestSDCardPermission(
-        sdCardRoot: String,
-        activityStarter: (Intent, Int) -> Unit
-    ) {
-        val intent = SDCardOperator.getRequestPermissionIntent(context, sdCardRoot)
-        activityStarter(intent, REQUEST_CODE_TREE)
-    }
-
     private fun requestLocalFolder(
-        sdRoot: String?, prompt: String?, activityStarter: (Intent, Int) -> Unit
+        prompt: String?, activityStarter: (Intent, Int) -> Unit
     ) {
         val intent = Intent(PICK_FOLDER.action)
         intent.putExtra(EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select))
         intent.putExtra(EXTRA_FROM_SETTINGS, false)
         intent.setClass(context, FileStorageActivityLollipop::class.java)
-
-        if (sdRoot != null) {
-            intent.putExtra(EXTRA_SD_ROOT, sdRoot)
-        }
 
         if (prompt != null) {
             intent.putExtra(EXTRA_PROMPT, prompt)
@@ -330,49 +263,21 @@ abstract class NodeSaver(
     }
 
     private fun checkParentPathAndDownload(parentPath: String) {
-        val externalSDCard = SDCardOperator.isSDCardPath(parentPath)
-        var sdCardOperator: SDCardOperator? = null
-
-        if (externalSDCard) {
-            try {
-                sdCardOperator = SDCardOperator(context)
-            } catch (e: SDCardException) {
-                logError("Initialize SDCardOperator failed", e)
-                requestLocalFolder(
-                    null, context.getString(R.string.no_external_SD_card_detected), activityStarter
-                )
-            }
-        }
-
-        if (externalSDCard && sdCardOperator == null) {
+        if (MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning()
             return
         }
 
-        if (sdCardOperator != null && sdCardOperator.isNewSDCardPath(parentPath)) {
-            logDebug("new sd card, check permission.")
-            runOnUiThread {
-                Toast.makeText(
-                    context, R.string.old_sdcard_unavailable, Toast.LENGTH_LONG
-                ).show()
-            }
-
-            runOnUiThreadDelayed(1500) {
-                showSelectDownloadLocationDialog(activityStarter)
-            }
+        val sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath)
+        if (sdCardOperator == null) {
+            requestLocalFolder(
+                context.getString(R.string.no_external_SD_card_detected),
+                activityStarter
+            )
             return
         }
 
-        if (sdCardOperator != null && !sdCardOperator.canWriteWithFile(parentPath)) {
-            try {
-                sdCardOperator.initDocumentFileRoot(dbHandler.sdCardUri);
-            } catch (e: SDCardException) {
-                logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e)
-                requestSDCardPermission(sdCardOperator.sdCardRoot, activityStarter)
-                return
-            }
-        }
-
-        doDownload(parentPath, externalSDCard, sdCardOperator)
+        doDownload(parentPath, SDCardOperator.isSDCardPath(parentPath), sdCardOperator)
     }
 
     /**

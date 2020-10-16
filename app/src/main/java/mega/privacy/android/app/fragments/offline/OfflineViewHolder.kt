@@ -8,11 +8,13 @@ abstract class OfflineViewHolder(
     protected val listener: OfflineAdapterListener,
     protected val itemGetter: (Int) -> OfflineNode
 ) : RecyclerView.ViewHolder(itemView) {
+
     init {
         itemView.setOnClickListener {
             val position = adapterPosition
             listener.onNodeClicked(position, itemGetter(position))
         }
+
         itemView.setOnLongClickListener {
             val position = adapterPosition
             listener.onNodeLongClicked(position, itemGetter(position))

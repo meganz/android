@@ -18,8 +18,6 @@ import android.view.Window
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -47,7 +45,6 @@ class HomepageFragment : Fragment() {
 
     private val viewModel: HomePageViewModel by viewModels()
 
-    private lateinit var activity: ManagerActivityLollipop
     private lateinit var viewDataBinding: FragmentHomepageBinding
     private lateinit var rootView: View
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
@@ -96,8 +93,6 @@ class HomepageFragment : Fragment() {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
 
-        activity = (getActivity() as ManagerActivityLollipop)
-
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
         return rootView
@@ -113,7 +108,7 @@ class HomepageFragment : Fragment() {
         setupBottomSheetBehavior()
         setupFabs()
 
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
+        requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
         )
     }
@@ -130,7 +125,7 @@ class HomepageFragment : Fragment() {
         super.onDestroyView()
 
         tabsChildren.clear()
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(networkReceiver)
+        requireContext().unregisterReceiver(networkReceiver)
     }
 
     private fun showOnlineMode() {
@@ -146,10 +141,15 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showOfflineMode() {
-        viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
         viewPager.isUserInputEnabled = false
-        rootView.category.isVisible = false
-        fullyExpandBottomSheet()
+        post {
+            // other code is doing too much work when enter offline mode,
+            // to prevent janky frame when change several UI elements together,
+            // we have to post to end of UI thread.
+            viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
+            rootView.category.isVisible = false
+            fullyExpandBottomSheet()
+        }
 
         if (tabsChildren.isEmpty()) {
             tabLayout.touchables.forEach { tab ->
@@ -164,17 +164,15 @@ class HomepageFragment : Fragment() {
     }
 
     private fun fullyExpandBottomSheet() {
+        val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
         bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_EXPANDED
         bottomSheetBehavior.isDraggable = false
         viewDataBinding.backgroundMask.alpha = 1F
-        viewDataBinding.homepageBottomSheet.root.elevation = 0F
+        bottomSheetRoot.elevation = 0F
 
-        val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
-        bottomSheetRoot.post {
-            val layoutParams = bottomSheetRoot.layoutParams
-            layoutParams.height = rootView.height - searchInputView.bottom
-            bottomSheetRoot.layoutParams = layoutParams
-        }
+        val layoutParams = bottomSheetRoot.layoutParams
+        layoutParams.height = rootView.height - searchInputView.bottom
+        bottomSheetRoot.layoutParams = layoutParams
     }
 
     private fun fullyCollapseBottomSheet() {
@@ -183,6 +181,8 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupSearchView() {
+        val activity = activity as ManagerActivityLollipop
+
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
             activity.drawerLayout!!
@@ -198,13 +198,13 @@ class HomepageFragment : Fragment() {
             searchInputView.setChatStatus(it != 0, it)
         }
 
-        searchInputView.setAvatarClickListener(OnClickListener {
+        searchInputView.setAvatarClickListener {
             doIfOnline(false) { activity.showMyAccount() }
-        })
+        }
 
-        searchInputView.setOnSearchInputClickListener(OnClickListener {
+        searchInputView.setOnSearchInputClickListener {
             doIfOnline(false) { activity.homepageToSearch() }
-        })
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -224,6 +224,11 @@ class HomepageFragment : Fragment() {
             tab.text = getTabTitle(position)
         }
         mediator.attach()
+
+        if (!isOnline(context)) {
+            viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
+            rootView.category.isVisible = false
+        }
 
         // Pass selected page view to HomepageBottomSheetBehavior which would seek for
         // the nested scrolling child views and deal with the logic of nested scrolling
@@ -248,7 +253,7 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupMask() {
-        windowContent = activity.window?.findViewById(Window.ID_ANDROID_CONTENT)
+        windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
         fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
     }
 
@@ -261,8 +266,8 @@ class HomepageFragment : Fragment() {
 
     private fun getTabTitle(position: Int): String? {
         when (position) {
-            BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.tab_recents)
-            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.tab_offline)
+            BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.recents_label)
+            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.section_saved_for_offline_new)
         }
 
         return ""
@@ -347,14 +352,14 @@ class HomepageFragment : Fragment() {
         fabMaskLayout.fab_chat.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
-                openChatActivity()
+                openNewChatActivity()
             }
         }
 
         fabMaskLayout.text_chat.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
-                openChatActivity()
+                openNewChatActivity()
             }
         }
 
@@ -378,10 +383,10 @@ class HomepageFragment : Fragment() {
     }
 
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
-        if (isOnline(context)) {
+        if (isOnline(context) && !viewModel.isRootNodeNull()) {
             operation()
         } else if (showSnackBar) {
-            activity.showSnackbar(
+            (activity as ManagerActivityLollipop).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.error_server_connection_problem),
                 INVALID_HANDLE
@@ -389,19 +394,19 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun openChatActivity() {
+    private fun openNewChatActivity() {
         doIfOnline(true) {
             val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
                 putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
             }
 
-            activity.startActivityForResult(intent, REQUEST_CREATE_CHAT)
+            activity?.startActivityForResult(intent, REQUEST_CREATE_CHAT)
         }
     }
 
     private fun showUploadPanel() {
         doIfOnline(true) {
-            activity.showUploadPanel()
+            (activity as ManagerActivityLollipop).showUploadPanel()
         }
     }
 

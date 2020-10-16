@@ -15,8 +15,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +26,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
@@ -54,12 +53,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.DraggingThumbnailCallback
-import mega.privacy.android.app.utils.FileUtils.getLocalFile
-import mega.privacy.android.app.utils.FileUtils.isInternalIntent
-import mega.privacy.android.app.utils.FileUtils.isLocalFile
-import mega.privacy.android.app.utils.FileUtils.isOpusFile
-import mega.privacy.android.app.utils.FileUtils.setLocalIntentParams
-import mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams
+import mega.privacy.android.app.utils.FileUtil.getLocalFile
+import mega.privacy.android.app.utils.FileUtil.isInternalIntent
+import mega.privacy.android.app.utils.FileUtil.isLocalFile
+import mega.privacy.android.app.utils.FileUtil.isOpusFile
+import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
+import mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -91,7 +90,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
-    @Inject lateinit var megaApi: MegaApiAndroid
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
     private var draggingNodeHandle = INVALID_HANDLE
 
@@ -195,6 +195,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
+
             if (listView.itemDecorationCount == 0) {
                 listView.addItemDecoration(itemDecoration)
             }
@@ -213,6 +214,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (node == null) {
             return
         }
+
         val file: MegaNode = node
 
         val internalIntent = isInternalIntent(node)
@@ -240,7 +242,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             }
 
         val localPath = getLocalFile(context, file.name, file.size)
-        var paramsSetSuccessfully = if (isLocalFile(context, node, megaApi, localPath)) {
+        var paramsSetSuccessfully = if (isLocalFile(node, megaApi, localPath)) {
             setLocalIntentParams(activity, node, intent, localPath, false)
         } else {
             setStreamingIntentParams(activity, node, megaApi, intent)
@@ -277,6 +279,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<NodeItem>(it)
+
         if (sortByHeaderViewModel.isList) {
             listAdapter.submitList(newList)
         } else {
@@ -286,6 +289,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -387,12 +391,12 @@ class AudioFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
+                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
-                        if (gridAdapter.getItemViewType(pos) != NodeGridAdapter.TYPE_HEADER) {
+                        if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
                         }
                         itemView.findViewById(R.id.ic_selected)
@@ -476,6 +480,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
+
         viewModel.searchQuery = query
         viewModel.loadAudio()
     }
@@ -490,6 +495,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {
         val position = viewModel.getNodePositionByHandle(handle)
         val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
+
         return viewHolder.itemView.findViewById(R.id.thumbnail)
     }
 
@@ -520,12 +526,13 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        requireContext().sendBroadcast(intent)
     }
 
     companion object {
-        private class AudioDraggingThumbnailCallback(private val fragmentRef: WeakReference<AudioFragment>) :
-            DraggingThumbnailCallback {
+        private class AudioDraggingThumbnailCallback(
+            private val fragmentRef: WeakReference<AudioFragment>
+        ) : DraggingThumbnailCallback {
 
             override fun setVisibility(visibility: Int) {
                 val fragment = fragmentRef.get() ?: return
