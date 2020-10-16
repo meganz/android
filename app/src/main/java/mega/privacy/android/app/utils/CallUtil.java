@@ -243,7 +243,8 @@ public class CallUtil {
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
         } else {
-            callInProgressText.setText(context.getString(call.isOnHold() || isSessionOnHold(chatId) ? R.string.call_on_hold : R.string.call_in_progress_layout));
+
+            callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
 
             if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {

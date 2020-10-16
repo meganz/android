@@ -21,7 +21,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -410,6 +409,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 callStatus <= MegaChatCall.CALL_STATUS_IN_PROGRESS) ||
                 (callStatus >= MegaChatCall.CALL_STATUS_USER_NO_PRESENT &&
                         callStatus <= MegaChatCall.CALL_STATUS_RECONNECTING)) {
+
             MegaApplication.setCallLayoutStatus(chatId, true);
         }
 
@@ -2714,6 +2714,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkTerminatingCall() {
         ArrayList<Long> calls = getCallsParticipating();
+        MegaApplication.setCallLayoutStatus(chatId, false);
+
         if(calls == null || calls.isEmpty()){
             clearHandlers();
             MegaApplication.setSpeakerStatus(chatId, false);

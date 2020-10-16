@@ -1664,7 +1664,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		logDebug("Launch call: " + getTitleChat(chatRoom));
-		if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+		if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
 			setCallLayoutStatus(call.getChatid(), true);
 		}
 	}

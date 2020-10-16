@@ -8690,7 +8690,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if ((anotherActiveCall != null || anotherOnHoldCall != null) &&
                     MegaApplication.getCallLayoutStatus(anotherActiveCall != null ? anotherActiveCall.getChatid() : anotherOnHoldCall.getChatid())) {
                 updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                        getString(anotherActiveCall != null ? R.string.call_in_progress_layout : R.string.call_on_hold));
+                        getString(R.string.call_in_progress_layout));
                 returnCallOnHoldButton.setVisibility(View.GONE);
             } else {
                 hideCallBar(null);
@@ -8717,12 +8717,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS && (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid()))) {
             if (anotherActiveCall != null || anotherOnHoldCall != null) {
                 updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                        getString(anotherActiveCall != null ? R.string.call_in_progress_layout : R.string.call_on_hold));
+                        getString(R.string.call_in_progress_layout));
                 returnCallOnHoldButtonText.setText(getResources().getString(R.string.call_on_hold));
                 returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_transfers_pause);
                 returnCallOnHoldButton.setVisibility(View.VISIBLE);
             } else {
-                updateCallInProgressLayout(callInThisChat, getString(R.string.call_on_hold));
+                updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                 returnCallOnHoldButton.setVisibility(View.GONE);
             }
             return;
@@ -8730,7 +8730,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         returnCallOnHoldButton.setVisibility(View.GONE);
 
-        if ((anotherActiveCall == null && anotherOnHoldCall == null) && (callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING)) {
+        if ((anotherActiveCall == null && anotherOnHoldCall == null) && callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
             MegaApplication.setCallLayoutStatus(idChat, false);
         }
 
@@ -8756,13 +8756,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         tapToReturnLayout(callInThisChat, textLayout);
                     }else{
                         updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                                getString(anotherActiveCall != null ? R.string.call_in_progress_layout : R.string.call_on_hold));
+                                getString(R.string.call_in_progress_layout));
                         returnCallOnHoldButton.setVisibility(View.VISIBLE);
                         returnCallOnHoldButtonText.setText(getResources().getString(R.string.title_join_call));
                         returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
                     }
                 }else{
-
                     if(callStatus == MegaChatCall.CALL_STATUS_USER_NO_PRESENT &&
                             isAfterReconnecting(this, callInProgressLayout, callInProgressText))
                         break;
@@ -8773,11 +8772,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                             break;
                         }
-
                         hideCallBar(callInThisChat);
                     }else{
                         updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                                getString(anotherActiveCall != null ? R.string.call_in_progress_layout : R.string.call_on_hold));
+                                getString(R.string.call_in_progress_layout));
                     }
                 }
                 break;
