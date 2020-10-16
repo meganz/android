@@ -296,11 +296,7 @@ public class BillingManager implements PurchasesUpdatedListener {
         String payload = purchase.getDeveloperPayload();
         String id = purchase.getAccountIdentifiers() == null ? null : purchase.getAccountIdentifiers().getObfuscatedAccountId();
 
-        if(TextUtil.isTextEmpty(payload) && TextUtil.isTextEmpty(id)) {
-            // Very old version, both value are null
-            logDebug("Very old version, purchase with empty payload and account id.");
-            return true;
-        } else if(!TextUtil.isTextEmpty(payload) && megaAccountHandle.equals(payload)) {
+        if(!TextUtil.isTextEmpty(payload) && megaAccountHandle.equals(payload)) {
             // Old version, only has payload set, so need to make sure payload is the same.
             logDebug("Old version, purchase has valid payload.");
             return true;
