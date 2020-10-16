@@ -243,7 +243,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -5003,16 +5002,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				switch (mHomepageScreen) {
 					case PHOTOS:
-						titleId = R.string.category_photos;
+						titleId = R.string.sortby_type_photo_first;
 						break;
 					case DOCUMENTS:
 						titleId = R.string.category_documents;
 						break;
 					case AUDIO:
-						titleId = R.string.category_audio;
+						titleId = R.string.upload_to_audio;
 						break;
                     case VIDEO:
-                        titleId = R.string.category_video;
+                        titleId = R.string.upload_to_video;
                         break;
 				}
 

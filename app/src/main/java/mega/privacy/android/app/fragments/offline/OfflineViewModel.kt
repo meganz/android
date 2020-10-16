@@ -351,7 +351,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 context.getString(R.string.action_search).toUpperCase(Locale.ROOT) + ": " + query
             }
             path == OFFLINE_ROOT || path == "" -> {
-                context.getString(R.string.tab_offline).toUpperCase(Locale.ROOT)
+                context.getString(R.string.section_saved_for_offline_new).toUpperCase(Locale.ROOT)
             }
             else -> {
                 val pathWithoutLastSlash = path.substring(0, path.length - 1)
