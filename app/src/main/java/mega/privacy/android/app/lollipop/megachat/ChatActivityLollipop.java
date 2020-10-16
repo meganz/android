@@ -5730,8 +5730,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("STATUS_SERVER_REJECTED: " + msg.getStatus());
         }
 
-        if(!msg.isManagementMessage()){
-            logDebug("isNOTManagementMessage!");
+        if (!msg.isManagementMessage() || msg.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
             if(positionNewMessagesLayout!=-1){
                 logDebug("Layout unread messages shown: " + generalUnreadCount);
                 if(generalUnreadCount<0){
