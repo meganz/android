@@ -26,6 +26,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
@@ -390,12 +391,12 @@ class AudioFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
+                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
-                        if (gridAdapter.getItemViewType(pos) != NodeGridAdapter.TYPE_HEADER) {
+                        if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
                         }
                         itemView.findViewById(R.id.ic_selected)

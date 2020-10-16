@@ -266,7 +266,7 @@
                 android:layout_centerVertical="true"
                 android:fontFamily="sans-serif-light"
                 android:gravity="start|center_vertical"
-                android:text="@string/tab_offline"
+                android:text="@string/section_saved_for_offline_new"
                 android:textColor="@color/name_my_account"
                 android:textSize="14sp"
                 android:textStyle="bold" />

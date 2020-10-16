@@ -25,6 +25,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentVideoBinding
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -267,7 +268,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
+                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
                         }
                         itemView.findViewById(R.id.thumbnail)

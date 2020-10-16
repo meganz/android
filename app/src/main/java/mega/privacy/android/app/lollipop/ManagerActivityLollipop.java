@@ -5069,16 +5069,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				switch (mHomepageScreen) {
 					case PHOTOS:
-						titleId = R.string.category_photos;
+						titleId = R.string.sortby_type_photo_first;
 						break;
 					case DOCUMENTS:
 						titleId = R.string.category_documents;
 						break;
 					case AUDIO:
-						titleId = R.string.category_audio;
+						titleId = R.string.upload_to_audio;
 						break;
                     case VIDEO:
-                        titleId = R.string.category_video;
+                        titleId = R.string.upload_to_video;
                         break;
 				}
 

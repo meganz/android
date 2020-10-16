@@ -266,8 +266,8 @@ class HomepageFragment : Fragment() {
 
     private fun getTabTitle(position: Int): String? {
         when (position) {
-            BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.tab_recents)
-            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.tab_offline)
+            BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.recents_label)
+            BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.section_saved_for_offline_new)
         }
 
         return ""
