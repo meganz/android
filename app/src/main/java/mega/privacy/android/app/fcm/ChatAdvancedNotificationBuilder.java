@@ -49,7 +49,7 @@ import nz.mega.sdk.MegaNodeList;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -1227,7 +1227,7 @@ public final class ChatAdvancedNotificationBuilder {
         });
 
         logDebug("Generate chat notification for: " + chats.size() + " chats");
-        if(chats!=null && (!(chats.isEmpty())) && isEnableGeneralChatNotifications()){
+        if (!chats.isEmpty() && isEnableGeneralChatNotifications()) {
             showChatNotificationPreN(request, beep, chats.get(0).getChatId());
         }else{
             removeAllChatNotifications();

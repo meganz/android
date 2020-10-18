@@ -736,17 +736,30 @@ public class ChatUtil {
     }
 
     /**
-     * Method to display a dialog to mute a specific chat room or general chats notifications.
+     * Method to display a dialog to mute a specific chat.
+     * @param context Context of Activity.
+     * @param chatId Chat ID.
+     */
+    public static void createMuteNotificationsAlertDialogOfAChat(Activity context, long chatId) {
+        ArrayList<MegaChatListItem> chats = new ArrayList<>();
+        MegaChatListItem chat = MegaApplication.getInstance().getMegaChatApi().getChatListItem(chatId);
+        if (chat != null) {
+            chats.add(chat);
+            createMuteNotificationsChatAlertDialog(context, chats);
+        }
+    }
+
+    /**
+     * Method to display a dialog to mute general chat notifications or several specific chats.
      *
      * @param context Context of Activity.
-     * @param chatId  Chat ID. If the chatId is MEGACHAT_INVALID_HANDLE, it's for the general chats notifications.
+     * @param chats  Chats. If the chats is null, it's for the general chats notifications.
      */
-    public static void createMuteNotificationsChatAlertDialog(Activity context, long chatId) {
+    public static void createMuteNotificationsChatAlertDialog(Activity context, ArrayList<MegaChatListItem> chats) {
 
         final AlertDialog muteDialog;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-
-        if (chatId == MEGACHAT_INVALID_HANDLE) {
+        if (chats == null) {
             View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
             dialogBuilder.setCustomTitle(view);
         } else {
@@ -754,12 +767,12 @@ public class ChatUtil {
         }
 
         boolean isUntilThisMorning = isUntilThisMorning();
-        String optionUntil = chatId != MEGACHAT_INVALID_HANDLE ?
+        String optionUntil = chats != null ?
                 context.getString(R.string.mute_chatroom_notification_option_forever) :
                 (isUntilThisMorning ? context.getString(R.string.mute_chatroom_notification_option_until_this_morning) :
                         context.getString(R.string.mute_chatroom_notification_option_until_tomorrow_morning));
 
-        String optionSelected = chatId != MEGACHAT_INVALID_HANDLE ?
+        String optionSelected = chats != null ?
                 NOTIFICATIONS_DISABLED :
                 (isUntilThisMorning ? NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING :
                         NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING);
@@ -767,10 +780,10 @@ public class ChatUtil {
         AtomicReference<Integer> itemClicked = new AtomicReference<>();
 
         ArrayList<String> stringsArray = new ArrayList<>();
-        stringsArray.add(0, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
-        stringsArray.add(1, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
-        stringsArray.add(2, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
-        stringsArray.add(3, getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
+        stringsArray.add(0, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30)));
+        stringsArray.add(1, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1)));
+        stringsArray.add(2, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6)));
+        stringsArray.add(3, removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24)));
         stringsArray.add(4, optionUntil);
 
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
@@ -784,7 +797,7 @@ public class ChatUtil {
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
-                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), optionSelected), chatId);
+                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeMute(itemClicked.get(), optionSelected), chats);
                     dialog.dismiss();
                 });
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
@@ -804,13 +817,13 @@ public class ChatUtil {
         Context context = MegaApplication.getInstance().getBaseContext();
         switch (option) {
             case NOTIFICATIONS_30_MINUTES:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, 30, 30));
             case NOTIFICATIONS_1_HOUR:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 1, 1));
             case NOTIFICATIONS_6_HOURS:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 6, 6));
             case NOTIFICATIONS_24_HOURS:
-                return getStringPlural(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
+                return removeFormatPlaceholder(context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, 24, 24));
         }
 
         return null;

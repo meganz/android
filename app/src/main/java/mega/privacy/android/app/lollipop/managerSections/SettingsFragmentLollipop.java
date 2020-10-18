@@ -2,10 +2,8 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +12,6 @@ import android.os.Handler;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -40,7 +37,6 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
@@ -72,11 +68,14 @@ import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
+import static mega.privacy.android.app.utils.SDCardUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -104,6 +103,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 	Preference advancedPreference;
 
 	PreferenceCategory helpCategory;
+
 	Preference helpSendFeedback;
 
 	PreferenceCategory aboutCategory;
@@ -141,7 +141,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 	boolean autoAccept = true;
 
 	String camSyncLocalPath = "";
-	boolean isExternalSDCard = false;
+	private boolean isExternalSDCardCU;
 	Long camSyncHandle = null;
 	MegaNode camSyncMegaNode = null;
 	String camSyncMegaPath = "";
@@ -155,6 +155,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 	Long handleSecondaryMediaFolder = null;
 	MegaNode megaNodeSecondaryMediaFolder = null;
 	String megaPathSecMediaFolder = "";
+	private boolean isExternalSDCardMU;
 
 	public int numberOfClicksSDK = 0;
 	public int numberOfClicksKarere = 0;
@@ -231,9 +232,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 		boolean autoPlayEnabled = prefs.isAutoPlayEnabled();
         autoPlaySwitch.setChecked(autoPlayEnabled);
 
-
-
-
 //		useHttpsOnly = (TwoLineCheckPreference) findPreference("settings_use_https_only");
 //		useHttpsOnly.setOnPreferenceClickListener(this);
 //		useHttpsOnly.setVisible(false);
@@ -294,7 +292,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 			pinLock = false;
 		}
 		else{
-
 
 			if (prefs.getPinLockEnabled() == null){
 				dbH.setPinLockEnabled(false);
@@ -395,6 +392,28 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 queueSizeInput.setSelection(input.length());
             }
         }
+	}
+
+	/**
+	 * Checks the Media Uploads local path.
+	 */
+	private void checkMediaUploadsPath() {
+		localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
+
+		if (isTextEmpty(localSecondaryFolderPath) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
+			logWarning("Secondary ON: invalid localSecondaryFolderPath");
+			localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+			Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
+			if (!isFileAvailable(new File(localSecondaryFolderPath))) {
+				dbH.setSecondaryFolderPath(INVALID_PATH);
+			}
+		} else if (isExternalSDCardMU) {
+			Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+			String pickedDirName = getSDCardDirName(uri);
+			if (pickedDirName!= null) {
+				localSecondaryFolderPath = pickedDirName;
+			}
+		}
 	}
 
 	public void updateCancelAccountSetting() {
@@ -720,7 +739,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
-
 			if(!enableVersionsSwitch.isChecked()){
 				megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
 			}
@@ -916,14 +934,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 return;
             }
 
-			prefs.setCamSyncLocalPath(cameraPath);
-			camSyncLocalPath = cameraPath;
-			dbH.setCamSyncLocalPath(cameraPath);
-			dbH.setCameraFolderExternalSDCard(false);
-			isExternalSDCard = false;
-			localCameraUploadFolder.setSummary(cameraPath);
-			localCameraUploadFolderSDCard.setSummary(cameraPath);
-            resetCUTimestampsAndCache();
+			isExternalSDCardCU = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
+			camSyncLocalPath = isExternalSDCardCU ? getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard())) : cameraPath;
+			prefs.setCamSyncLocalPath(camSyncLocalPath);
+			dbH.setCamSyncLocalPath(camSyncLocalPath);
+			localCameraUploadFolder.setSummary(camSyncLocalPath);
+			resetCUTimestampsAndCache();
             rescheduleCameraUpload(context);
 		}
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
@@ -937,7 +953,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 			dbH.setSecondaryFolderPath(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
 			dbH.setSecVideoSyncTimeStamp(0);
-			prefs.setLocalPathSecondaryFolder(secondaryPath);
 			rescheduleCameraUpload(context);
 		}
 		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
@@ -1182,8 +1197,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 			daysRbSchedulerPreference.setSummary(getString(R.string.settings_rb_scheduler_select_days_subtitle, daysCount));
 		}
 	}
-
-
 	public void cancelSetPinLock(){
 		logDebug("cancelSetPinkLock");
 		pinLock = false;

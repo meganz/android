@@ -93,6 +93,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
@@ -103,8 +104,8 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LinksUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -251,13 +252,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         @Override
         protected void onPostExecute(Integer param) {
             if (param == 0) {
-                int position = holder.getAdapterPosition();
-                if (position > messages.size()) {
+                AndroidMegaChatMessage message = getMessageAtAdapterPosition(holder.getAdapterPosition());
+                if (message == null) {
                     logWarning("Messages removed");
                     return;
                 }
 
-                AndroidMegaChatMessage message = messages.get(position - 1);
                 if (message.getMessage() != null && message.getMessage().getMegaNodeList() != null
                         && message.getMessage().getMegaNodeList().get(0) != null) {
                     long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
@@ -1368,6 +1368,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).errorUploadingRichLink.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).retryAlert.setText(R.string.manual_retry_alert);
 
         ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
 
@@ -1428,6 +1429,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             File voiceClipDir = getCacheFolder(context, VOICE_CLIP_FOLDER);
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
+
+            boolean areTransfersPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+            if (areTransfersPaused
+                    && message.getPendingMessage().getState() != PendingMessageSingle.STATE_ERROR_UPLOADING
+                    && message.getPendingMessage().getState() != PendingMessageSingle.STATE_ERROR_ATTACHING) {
+                ((ViewHolderMessageChat) holder).retryAlert.setText(R.string.manual_resume_alert);
+            }
+
             if (path != null) {
                 if(isVoiceClip(path) && (type==TYPE_VOICE_CLIP) || path.contains(voiceClipDir.getAbsolutePath())){
                     logDebug("TYPE_VOICE_CLIP - message.getPendingMessage().getState() " + message.getPendingMessage().getState());
@@ -1455,7 +1464,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.GONE);
                     ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
-                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
+                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING || areTransfersPaused) {
                         ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
@@ -1470,38 +1479,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setVisibility(View.VISIBLE);
 
-                    Bitmap preview = null;
                     ((ViewHolderMessageChat) holder).filePathUploading = path;
-                    logDebug("Path of the file: " + path);
 
+                    Bitmap preview = null;
                     if (MimeTypeList.typeForName(path).isImage() || MimeTypeList.typeForName(path).isPdf() || MimeTypeList.typeForName(path).isVideo()) {
-                        logDebug("isImage, isPdf or isVideo");
-
                         ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.GONE);
 
-                        preview = getPreview(path, context);
+                         preview = getPreview(path, context);
 
                         if (preview != null) {
                             setUploadingPreview((ViewHolderMessageChat) holder, preview);
-                            logDebug("preview!");
                         } else {
-                            logWarning("No preview!");
-                            if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
-                                ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.VISIBLE);
-                                ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
-                            }
                             try {
                                 new ChatUploadingPreviewAsyncTask(this, position).execute(path);
                             } catch (Exception e) {
                                 logWarning("Error creating preview (Too many AsyncTasks)", e);
                             }
                         }
-                    } else {
+                    }
 
-                        if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
-                            ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
-                        }
+                    if (preview == null && (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING
+                            || areTransfersPaused)) {
+                        ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                     }
 
                     logDebug("Node handle: " + message.getPendingMessage().getNodeHandle());
@@ -1525,9 +1525,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     logDebug("State of the message: " + message.getPendingMessage().getState());
                     if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
                         ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
-                    } else {
+                    } else if (!areTransfersPaused){
                         ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
                     }
+
+                    ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setVisibility(areTransfersPaused ? View.GONE : View.VISIBLE);
                 }
 
             } else {
@@ -6960,7 +6962,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
                     }
 
-                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
+                    boolean areTransfersPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+
+                    if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING
+                            || areTransfersPaused) {
                         logWarning("Message is on ERROR state");
                         holder.urlOwnMessageLayout.setVisibility(View.GONE);
                         String name = holder.contentOwnMessageFileName.getText().toString();
@@ -8039,5 +8044,40 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public MegaChatRoom getChatRoom() {
         return chatRoom;
+    }
+
+    /**
+     * Updates the uploading messages which are on paused state and are visible.
+     *
+     * @param firstVisibleMessage   first visible position on the adapter
+     * @param lastVisibleMessage    last visible position on the adapter
+     */
+    public void updatePausedUploadingMessages(int firstVisibleMessage, int lastVisibleMessage) {
+        if (lastVisibleMessage == INVALID_POSITION || lastVisibleMessage == 0) {
+            //No visible items, no need to update
+            return;
+        }
+
+        if (lastVisibleMessage == getItemCount() || lastVisibleMessage >= messages.size()) {
+            //Wrong index, replace by the latest message
+            lastVisibleMessage = messages.size() - 1;
+        }
+
+        if (firstVisibleMessage == INVALID_POSITION) {
+            //Wrong index, replace by the first message
+            firstVisibleMessage = 0;
+        }
+
+        for (int i = firstVisibleMessage; i <= lastVisibleMessage; i++) {
+            AndroidMegaChatMessage message = messages.get(i);
+            if (message == null) {
+                continue;
+            }
+
+            if (message.isUploading()) {
+                // Update message with uploading state. Increment one position to take into account the header message.l
+                notifyItemChanged(i + 1);
+            }
+        }
     }
 }

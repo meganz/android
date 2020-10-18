@@ -103,6 +103,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
             chatAttachmentsChatListPreference.setValue(1 + "");
         } else {
             chatAttachmentsChatListPreference.setValue(0 + "");
+
         }
         chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
 

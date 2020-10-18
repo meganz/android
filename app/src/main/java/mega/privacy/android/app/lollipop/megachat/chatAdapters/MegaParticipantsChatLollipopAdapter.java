@@ -38,7 +38,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -391,6 +391,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         holderHeader.notificationsLayout.setVisibility(View.GONE);
                         holderHeader.dividerNotifications.setVisibility(View.GONE);
                     }
+
                     checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
                 }
 
@@ -611,9 +612,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
                 if (holderHeader != null) {
                     if (holderHeader.notificationsSwitch.isChecked()) {
-                        createMuteNotificationsChatAlertDialog(groupChatInfoActivity, chatId);
+                        createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
                     } else {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
                     }
                 }
                 break;

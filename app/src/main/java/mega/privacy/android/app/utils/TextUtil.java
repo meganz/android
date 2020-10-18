@@ -10,12 +10,12 @@ public class TextUtil {
     }
 
     /**
-     * Method for the treatment of plurals in the strings
+     * Method to remove the format placeholders.
      *
-     * @param text The string to update.
-     * @return The updated string.
+     * @param text The string to be processed.
+     * @return The processed string.
      */
-    public static String getStringPlural(String text) {
+    public static String removeFormatPlaceholder(String text) {
         try {
             text = text.replace("[A]", "");
             text = text.replace("[/A]", "");
@@ -24,7 +24,7 @@ public class TextUtil {
             text = text.replace("[C]", "");
             text = text.replace("[/C]", "");
         } catch (Exception e) {
-            logWarning("Error replacing text.");
+            logWarning("Error replacing text. ", e);
         }
         return text;
     }

@@ -196,6 +196,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
                 optionMuteChatText.setText(getString(R.string.general_unmute));
             }
+
             ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
             if(chatPrefs == null) {
                 MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
@@ -281,9 +282,9 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             case R.id.chat_list_mute_chat_layout:
                 if (context instanceof ManagerActivityLollipop) {
                     if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
-                        createMuteNotificationsChatAlertDialog((Activity) context, chat.getChatId());
+                        createMuteNotificationsAlertDialogOfAChat((Activity) context, chat.getChatId());
                     } else {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chat.getChatId());
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(context, NOTIFICATIONS_ENABLED, chat.getChatId());
                     }
                 }
                 break;

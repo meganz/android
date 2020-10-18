@@ -13,6 +13,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_SESSION_UPDATE = "INTENT_SESSION_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE";
     public static final String BROADCAST_ACTION_INTENT_MUTE_CHATROOM = "INTENT_MUTE_CHATROOM";
+    public static final String BROADCAST_ACTION_INTENT_TRANSFER_UPDATE = "BROADCAST_ACTION_INTENT_TRANSFER_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR = "INTENT_PROXIMITY_SENSOR";
     public static final String BROADCAST_ACTION_INTENT_LEFT_CHAT = "INTENT_LEFT_CHAT";
     public static final String BROADCAST_ACTION_SHOW_SNACKBAR = "INTENT_SHOW_SNACKBAR";
@@ -20,6 +21,8 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE = "INTENT_RICH_LINK_SETTING_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE = "INTENT_STATUS_SETTING_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_NOTIFICATIONS_CHAT_SETTING_UPDATE = "INTENT_NOTIFICATIONS_CHAT_SETTING_UPDATE";
+    public static final String BROADCAST_ACTION_RESUME_TRANSFERS = "INTENT_RESUME_TRANSFERS";
+    public static final String BROADCAST_ACTION_TRANSFER_FINISH = "INTENT_TRANSFER_FINISH";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -32,12 +35,14 @@ public class BroadcastConstants {
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
     public static final String ACTION_UPDATE_PUSH_NOTIFICATION_SETTING = "ACTION_UPDATE_PUSH_NOTIFICATION_SETTING";
+    public static final String ACTION_TRANSFER_OVER_QUOTA = "ACTION_TRANSFER_OVER_QUOTA";
     public static final String ACTION_UPDATE_NICKNAME = "ACTION_UPDATE_NICKNAME";
     public static final String ACTION_UPDATE_FIRST_NAME = "ACTION_UPDATE_FIRST_NAME";
     public static final String ACTION_UPDATE_LAST_NAME = "ACTION_UPDATE_LAST_NAME";
     public static final String ACTION_UPDATE_CREDENTIALS = "ACTION_UPDATE_CREDENTIALS";
     public static final String ACTION_LEFT_CHAT = "ACTION_LEFT_CHAT";
     public static final String ACTION_CLOSE_CHAT_AFTER_IMPORT = "ACTION_CLOSE_CHAT_AFTER_IMPORT";
+    public static final String ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS = "ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
@@ -63,7 +68,9 @@ public class BroadcastConstants {
     public static final String MUTE_CHATROOM_ID = "MUTE_CHATROOM_ID";
     public static final String TYPE_MUTE = "TYPE_MUTE";
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";
+    public static final int EXTRA_BROADCAST_INVALID_VALUE = -1;
     public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
     public static final String SNACKBAR_TEXT = "SNACKBAR_TEXT";
     public static final String PRESENCE_CANCELLED = "PRESENCE_CANCELLED";
+    public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
 }

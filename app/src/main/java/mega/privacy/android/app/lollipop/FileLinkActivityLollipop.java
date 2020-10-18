@@ -45,6 +45,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import nz.mega.sdk.MegaApiAndroid;
@@ -64,7 +65,8 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
+public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
+
 	private static final String TAG_DECRYPT = "decrypt";
 
 	FileLinkActivityLollipop fileLinkActivity = this;
@@ -116,7 +118,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
-		{	
+		{
 			megaApi.removeRequestListener(this);
 		}
 		
@@ -221,6 +223,10 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		importButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
+
+		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
+
+		registerTransfersReceiver();
 
 		try{
 			statusDialog.dismiss();
@@ -788,10 +794,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, null);
-        }
-		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {
 				try {
 					statusDialog.dismiss();

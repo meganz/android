@@ -159,13 +159,6 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="ActionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-        <item name="srcCompat">@drawable/ic_dots_vertical_white</item>
-        <item name="android:src">@drawable/ic_dots_vertical_white</item>
-        <item name="background">@drawable/ic_dots_vertical_white</item>
-        <item name="android:background">@drawable/ic_dots_vertical_white</item>
-    </style>
-
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/dark_primary_color</item>
         <item name="tabIndicatorHeight">2dp</item>
@@ -196,13 +189,22 @@
 
     <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">@color/accentColor</item>
-        <item name="android:positiveButtonText">@color/accentColor</item>
-        <item name="android:negativeButtonText">@color/accentColor</item>
+        <item name="buttonBarNegativeButtonStyle">@style/ButtonAlertDialogStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/ButtonAlertDialogStyle</item>
         <item name="android:content">@color/mail_my_account</item>
         <item name="colorControlNormal">@color/mail_my_account</item>
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:windowMinWidthMajor">85%</item>
         <item name="android:windowMinWidthMinor">85%</item>
+    </style>
+
+    <style name="ResumeTransfersWarning" parent="AppCompatAlertDialogStyle">
+        <item name="android:textColor">@color/name_my_account</item>
+        <item name="android:textColorPrimary">@color/transparent_black2</item>
+    </style>
+
+    <style name="ButtonAlertDialogStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accentColor</item>
     </style>
 
     <style name="MaterialAlertDialogStyle" parent="Theme.MaterialComponents.Light.Dialog.Alert.Bridge">

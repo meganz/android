@@ -46,7 +46,7 @@ public class SnackbarNavigateOption implements View.OnClickListener {
 
         if (context instanceof ManagerActivityLollipop) {
             if (type == MUTE_NOTIFICATIONS_SNACKBAR_TYPE) {
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, null);
             } else if (isSentAsMessageSnackbar) {
                 ((ManagerActivityLollipop) context).moveToChatSection(idChat);
             } else {

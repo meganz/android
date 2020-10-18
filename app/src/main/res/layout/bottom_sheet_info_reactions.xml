@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/horizontalScroll"
-        android:background="@color/divider_upgrade_account" />
+        android:background="@color/black_12_alpha" />
 
         <RelativeLayout
             android:id="@+id/info_reactions_divider"

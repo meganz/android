@@ -114,8 +114,8 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -131,7 +131,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 	private ChatController chatC;
@@ -630,8 +630,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             askForDisplayOverDialog.showDialog();
         }
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
 		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
@@ -639,7 +638,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		userNameUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
-		LocalBroadcastManager.getInstance(this).registerReceiver(userNameReceiver, userNameUpdateFilter);
+		registerReceiver(userNameReceiver, userNameUpdateFilter);
 
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
@@ -898,6 +897,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intentOpenChat);
 				}
+
+				finish();
 			}
 		}
 	}
@@ -1227,9 +1228,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 			case R.id.chat_contact_properties_layout:
 				if (notificationsSwitch.isChecked()) {
-					createMuteNotificationsChatAlertDialog(this, chatHandle);
+					createMuteNotificationsAlertDialogOfAChat(this, chatHandle);
 				} else {
-					MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(this, NOTIFICATIONS_ENABLED, chatHandle);
+					MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatHandle);
 				}
 				break;
 
@@ -1393,8 +1394,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");
@@ -1713,9 +1712,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             askForDisplayOverDialog.recycle();
         }
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(userNameReceiver);
+		unregisterReceiver(manageShareReceiver);
+		unregisterReceiver(userNameReceiver);
 		unregisterReceiver(destroyActionModeReceiver);
 	}
 
