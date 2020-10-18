@@ -2836,6 +2836,21 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                app.muteOrUnmute(false);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                app.muteOrUnmute(true);
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
+    }
+
     /**
      * Stop the countdown timer.
      */
