@@ -6,76 +6,6 @@
 	android:background="@color/white">
 
 	<androidx.preference.PreferenceCategory
-		android:key="settings_file_management"
-		android:title="@string/settings_file_management_category"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false">
-
-		<androidx.preference.Preference
-			android:key="settings_file_management_offline"
-			android:title="@string/settings_advanced_features_offline"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_file_management_rubbish"
-			android:title="@string/context_clear_rubbish"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_rb_scheduler_switch"
-			android:title="@string/settings_rb_scheduler_enable_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_days_rb_scheduler"
-			android:title="@string/settings_rb_scheduler_select_days_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_file_versioning_switch"
-			android:title="@string/settings_enable_file_versioning_title"
-			android:summary="@string/settings_enable_file_versioning_subtitle"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_file_management_file_version"
-			android:title="@string/settings_file_management_file_versions_title"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_file_management_clear_version"
-			android:layout="@layout/delete_versions_preferences"
-			android:title="@string/settings_file_management_delete_versions"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="auto_play_switch"
-			android:title="@string/settings_auto_play_label"
-			android:defaultValue="false"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-	</androidx.preference.PreferenceCategory>
-
-
-
-
-	<androidx.preference.PreferenceCategory
 		android:key="settings_features"
 		android:title="@string/settings_features"
 		app:allowDividerAbove="false"
@@ -101,7 +31,7 @@
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
 		<androidx.preference.Preference
-			android:key="settings_storage_download_location"
+			android:key="settings_nested_download_location"
 			android:title="@string/download_location"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
@@ -120,15 +50,15 @@
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
 		<androidx.preference.Preference
-			android:key="settings_security_recovey_key"
+			android:key="settings_recovery_key"
 			android:title="@string/settings_recovery_key_title"
 			android:summary="@string/settings_recovery_key_summary"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_pin_lock_enable"
+		<androidx.preference.Preference
+			android:key="settings_pin_lock"
 			android:title="@string/settings_pin_lock_switch"
 			android:defaultValue="false"
 			app:allowDividerAbove="true"
@@ -136,21 +66,14 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.Preference
-			android:key="settings_pin_lock_code"
-			android:title="@string/settings_reset_lock_code"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
-			android:key="settings_security_change_password"
+			android:key="settings_change_password"
 			android:title="@string/my_account_change_password"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_security_2fa"
+			android:key="settings_2fa_activated"
 			android:title="@string/settings_2fa"
 			android:summary="@string/setting_subtitle_2fa"
 			app:allowDividerAbove="true"
@@ -158,7 +81,7 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.SwitchPreferenceCompat
-			android:key="settings_security_qrcode"
+			android:key="settings_qrcode_autoaccept"
 			android:title="@string/section_qr_code"
 			android:summary="@string/setting_subtitle_qrcode_autoccept"
 			app:allowDividerAbove="true"
@@ -250,7 +173,7 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.Preference
-			android:key="settings_about_delete_account"
+			android:key="settings_about_cancel_account"
 			android:layout="@layout/cancel_account_preferences"
 			android:title="@string/settings_delete_account"
 			app:allowDividerAbove="true"

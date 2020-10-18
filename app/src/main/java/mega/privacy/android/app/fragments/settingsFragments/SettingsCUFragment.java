@@ -123,15 +123,15 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 public class SettingsCUFragment  extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     private SwitchPreferenceCompat cameraUploadOnOff;
+
     private ListPreference cameraUploadHow;
     private ListPreference cameraUploadWhat;
+    private SwitchPreferenceCompat cameraUploadIncludeGPS;
     private ListPreference videoQuality;
     private SwitchPreferenceCompat cameraUploadCharging;
-    private SwitchPreferenceCompat cameraUploadIncludeGPS;
     private Preference cameraUploadVideoQueueSize;
     private TwoLineCheckPreference keepFileNames;
     private Preference localCameraUploadFolder;
-    private Preference localCameraUploadFolderSDCard;
     private Preference megaCameraFolder;
     private Preference secondaryMediaFolderOn;
     private Preference localSecondaryFolder;
@@ -207,13 +207,14 @@ public class SettingsCUFragment  extends SettingsBaseFragment implements Prefere
         cameraUploadWhat = findPreference(KEY_CAMERA_UPLOAD_WHAT_TO);
         cameraUploadWhat.setOnPreferenceChangeListener(this);
 
-
-
         videoQuality = findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUALITY);
         videoQuality.setOnPreferenceChangeListener(this);
 
         prefs = dbH.getPreferences();
         setAttrUserListener = new SetAttrUserListener(context, SETTINGS);
+
+        cameraUploadOnOff.setChecked();
+
 
         if (prefs == null){
             logWarning("pref is NULL");
@@ -231,12 +232,15 @@ public class SettingsCUFragment  extends SettingsBaseFragment implements Prefere
             dbH.setPinLockCode("");
             cameraUpload = false;
             charging = true;
+            fileNames = false;
+            pinLock = false;
         }
         else{
             if (prefs.getCamSyncEnabled() == null){
                 dbH.setCamSyncEnabled(false);
                 cameraUpload = false;
                 charging = true;
+                fileNames = false;
             }
             else{
                 cameraUpload = Boolean.parseBoolean(prefs.getCamSyncEnabled());
@@ -373,11 +377,83 @@ public class SettingsCUFragment  extends SettingsBaseFragment implements Prefere
                 isExternalSDCardMU = dbH.getMediaFolderExternalSdCard();
             }
 
+            if (prefs.getPinLockEnabled() == null){
+                dbH.setPinLockEnabled(false);
+                dbH.setPinLockCode("");
+                pinLock = false;
+                pinLockEnableSwitch.setChecked(pinLock);
+            }
+            else{
+                pinLock = Boolean.parseBoolean(prefs.getPinLockEnabled());
+                pinLockEnableSwitch.setChecked(pinLock);
+                pinLockCodeTxt = prefs.getPinLockCode();
+                if (pinLockCodeTxt == null){
+                    pinLockCodeTxt = "";
+                    dbH.setPinLockCode(pinLockCodeTxt);
+                }
+            }
         }
 
-        if (cameraUpload){
-            cameraUploadOnOff.setChecked(false);
+        if (chatSettings == null) {
+            dbH.setVibrationEnabledChat(true + "");
+        }
 
+        //Get chat status
+        statusConfig = megaChatApi.getPresenceConfig();
+        if (statusConfig != null) {
+            logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
+            logDebug("Status: " + statusConfig.getOnlineStatus());
+
+            statusChatListPreference.setValue(statusConfig.getOnlineStatus() + "");
+            if (statusConfig.getOnlineStatus() == MegaChatApi.STATUS_INVALID) {
+                statusChatListPreference.setSummary(getString(R.string.recovering_info));
+            } else {
+                statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+            }
+
+            showPresenceChatConfig();
+
+            if (megaChatApi.isSignalActivityRequired()) {
+                megaChatApi.signalPresenceActivity();
+            }
+        } else {
+            waitPresenceConfig();
+        }
+
+        boolean sendOriginalAttachment = isSendOriginalAttachments();
+        if (sendOriginalAttachment) {
+            chatAttachmentsChatListPreference.setValue(1 + "");
+        } else {
+            chatAttachmentsChatListPreference.setValue(0 + "");
+        }
+        chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+
+        boolean richLinks = MegaApplication.isEnabledRichLinks();
+        richLinksSwitch.setChecked(richLinks);
+
+        cacheAdvancedOptions.setSummary(getString(R.string.settings_advanced_features_calculating));
+        offlineFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+        if(((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo()==null){
+            fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+            rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+            fileManagementCategory.removePreference(clearVersionsFileManagement);
+        }
+        else{
+            rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
+            if(((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getNumVersions() == -1){
+                fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+                fileManagementCategory.removePreference(clearVersionsFileManagement);
+            }
+            else{
+                setVersionsInfo();
+            }
+        }
+
+        taskGetSizeCache();
+        taskGetSizeOffline();
+
+        if (cameraUpload){
+            cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
             cameraUploadHow.setSummary(wifi);
             localCameraUploadFolder.setSummary(camSyncLocalPath);
             megaCameraFolder.setSummary(camSyncMegaPath);
@@ -385,13 +461,13 @@ public class SettingsCUFragment  extends SettingsBaseFragment implements Prefere
             cameraUploadWhat.setSummary(fileUpload);
             cameraUploadCharging.setChecked(charging);
             keepFileNames.setChecked(fileNames);
-            cameraUploadHow.setVisible(true);
-            cameraUploadWhat.setVisible(true);
+            cameraUploadCategory.addPreference(cameraUploadHow);
+            cameraUploadCategory.addPreference(cameraUploadWhat);
             if(!charging){
                 disableVideoCompressionSizeSettings();
             }
-            keepFileNames.setVisible(true);
-            localCameraUploadFolder.setVisible(true);
+            cameraUploadCategory.addPreference(keepFileNames);
+            cameraUploadCategory.addPreference(localCameraUploadFolder);
 
             if(secondaryUpload){
                 //Check if the node exists in MEGA
@@ -432,36 +508,54 @@ public class SettingsCUFragment  extends SettingsBaseFragment implements Prefere
                 megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
                 localSecondaryFolder.setSummary(localSecondaryFolderPath);
                 secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_off));
-                localSecondaryFolder.setVisible(true);
-                megaSecondaryFolder.setVisible(true);
+                cameraUploadCategory.addPreference(localSecondaryFolder);
+                cameraUploadCategory.addPreference(megaSecondaryFolder);
 
             }
             else{
                 secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
-                localSecondaryFolder.setVisible(false);
-                megaSecondaryFolder.setVisible(false);
+                cameraUploadCategory.removePreference(localSecondaryFolder);
+                cameraUploadCategory.removePreference(megaSecondaryFolder);
             }
         }
         else{
-            cameraUploadOnOff.setChecked(true);
+            cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+            cameraUploadOn.setSummary("");
             cameraUploadHow.setSummary("");
             localCameraUploadFolder.setSummary("");
             megaCameraFolder.setSummary("");
             localSecondaryFolder.setSummary("");
             megaSecondaryFolder.setSummary("");
             cameraUploadWhat.setSummary("");
+            cameraUploadCategory.removePreference(localCameraUploadFolder);
             hideVideoQualitySettingsSection();
             removeRemoveGPS();
-            localCameraUploadFolder.setVisible(false);
-            keepFileNames.setVisible(false);
-            megaCameraFolder.setVisible(false);
-            cameraUploadHow.setVisible(false);
-            cameraUploadWhat.setVisible(false);
-            secondaryMediaFolderOn.setVisible(false);
-            localSecondaryFolder.setVisible(false);
-            megaSecondaryFolder.setVisible(false);
+            cameraUploadCategory.removePreference(keepFileNames);
+            cameraUploadCategory.removePreference(megaCameraFolder);
+            cameraUploadCategory.removePreference(cameraUploadHow);
+            cameraUploadCategory.removePreference(cameraUploadWhat);
 
+            //Remove Secondary Folder
+            cameraUploadCategory.removePreference(secondaryMediaFolderOn);
+            cameraUploadCategory.removePreference(localSecondaryFolder);
+            cameraUploadCategory.removePreference(megaSecondaryFolder);
         }
+
+
+
+
+
+        setAutoaccept = false;
+        autoAccept = true;
+        if (megaApi.multiFactorAuthAvailable()) {
+            preferenceScreen.addPreference(twoFACategory);
+            megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+        }
+        else {
+            preferenceScreen.removePreference(twoFACategory);
+        }
+        megaApi.getContactLinksOption((ManagerActivityLollipop) context);
+        megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
 
         String sizeInDB = prefs.getChargingOnSize();
         String size;

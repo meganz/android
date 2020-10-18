@@ -30,9 +30,16 @@ public class SettingsConstants {
 
     public static final String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
     public static final String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
+    public static final String KEY_PIN_LOCK = "settings_pin_lock";
+    public static final String KEY_STORAGE_DOWNLOAD = "settings_nested_download_location";
     public static final String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
+    public static final String KEY_CHANGE_PASSWORD= "settings_change_password";
+    public static final String KEY_2FA = "settings_2fa_activated";
+    public static final String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
+
+
     public static final String KEY_STORAGE_FILE_MANAGEMENT = "settings_storage_file_management";
-    public static final String KEY_SECURITY_RECOVERY_KEY = "settings_security_recovey_key";
+    public static final String KEY_RECOVERY_KEY= "settings_recovery_key";
     public static final String KEY_SECURITY_CHANGE_PASSWORD = "settings_security_change_password";
     public static final String KEY_SECURITY_2FA = "settings_security_2fa";
     public static final String KEY_SECURITY_QRCODE= "settings_security_qrcode";
@@ -45,7 +52,7 @@ public class SettingsConstants {
     public static final String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
     public static final String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
     public static final String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
-    public static final String KEY_ABOUT_DELETE_ACCOUNT = "settings_about_delete_account";
+    public static final String KEY_CANCEL_ACCOUNT = "settings_about_cancel_account";
 
     public static final String CATEGORY_CHAT_ENABLED = "settings_chat";
     public static final String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";

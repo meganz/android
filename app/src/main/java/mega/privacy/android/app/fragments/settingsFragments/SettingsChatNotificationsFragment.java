@@ -165,7 +165,7 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
 
         switch (preference.getKey()) {
             case KEY_CHAT_NOTIFICATIONS:
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, MEGACHAT_INVALID_HANDLE);
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, null);
                 break;
 
             case KEY_CHAT_VIBRATE:
