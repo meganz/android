@@ -220,6 +220,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -5918,6 +5919,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
 				showGlobalAlertDialogsIfNeeded();
+                showHideBottomNavigationView(false);
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -16581,11 +16583,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
 
-		if (bNVHidden) {
-			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		} else {
-			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-		}
+        if (bNVHidden) {
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        } else {
+            if (drawerItem == DrawerItem.HOMEPAGE) {
+                params.bottomMargin = Util.dp2px(86, outMetrics);
+                params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            } else {
+                params.bottomMargin = 0;
+            }
+        }
 
 		transfersWidgetLayout.setLayoutParams(params);
 	}
