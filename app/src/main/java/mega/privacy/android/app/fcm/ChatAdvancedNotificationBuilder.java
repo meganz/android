@@ -63,6 +63,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatMessage.TYPE_CALL_ENDED;
 
 public final class ChatAdvancedNotificationBuilder {
 
@@ -457,7 +458,8 @@ public final class ChatAdvancedNotificationBuilder {
             MegaChatMessage msg = unreadMessageList.get(i);
             logDebug("getMessage: chatID: " + chat.getChatId() + " " + unreadMessageList.get(i));
             if (msg != null) {
-                String messageContent = converterShortCodes(getMessageContent(msg));
+                String messageContent = msg.getType() == TYPE_CALL_ENDED ?
+                        context.getString(R.string.missed_call_notification_title) : converterShortCodes(getMessageContent(msg));
                 String sender = converterShortCodes(getSender(msg, chat));
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

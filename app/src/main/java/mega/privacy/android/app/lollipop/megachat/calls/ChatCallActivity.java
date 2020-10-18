@@ -714,6 +714,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         smallElementsIndividualCallLayout.setVisibility(View.GONE);
         bigElementsIndividualCallLayout = findViewById(R.id.big_elements_individual_call);
         bigElementsIndividualCallLayout.setVisibility(View.GONE);
+        bigElementsIndividualCallLayout.setOnClickListener(this);
         linearFAB = findViewById(R.id.linear_buttons);
         displayLinearFAB(false);
         infoUsersBar = findViewById(R.id.info_users_bar);
@@ -1263,6 +1264,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 returnToAnotherCall();
                 break;
 
+            case R.id.big_elements_individual_call:
+                remoteCameraClick();
+                break;
+
             case R.id.video_fab:
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
@@ -1337,6 +1342,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
                 sendSignalPresence();
                 break;
+
         }
     }
 

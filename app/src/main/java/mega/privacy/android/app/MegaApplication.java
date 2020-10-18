@@ -1603,7 +1603,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             rtcAudioManager.setOnProximitySensorListener(isNear -> {
                 Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
                 intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                sendBroadcast(intent);
             });
         }
     }
