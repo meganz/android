@@ -1,32 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".RubbishBinFragmentLollipop" >
-    
-    <RelativeLayout
-        android:id="@+id/rubbishbin_content_text_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="36dp"
-        android:background="@color/new_background_fragment">
-
-			<TextView
-				android:id="@+id/rubbishbin_list_content_text"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:textColor="@color/mail_my_account"
-				android:layout_centerVertical="true"
-				android:layout_marginLeft="72dp"
-				android:textSize="14sp"/>
-    </RelativeLayout>
-    
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rubbishbin_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:choiceMode="multipleChoice"
-        android:layout_below="@id/rubbishbin_content_text_layout"/>
+    >
+	<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/rubbishbin_list_view"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:choiceMode="multipleChoice"
+			/>
 
 	<RelativeLayout
 		android:layout_width="wrap_content"
@@ -50,8 +31,6 @@
 				android:id="@+id/rubbishbin_list_empty_text_first"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textColor="@color/text_secondary"
-				android:fontFamily="sans-serif"
 				android:textSize="18sp"/>
 	</LinearLayout>
 	</RelativeLayout>

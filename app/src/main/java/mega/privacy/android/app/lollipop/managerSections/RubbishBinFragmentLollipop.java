@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,7 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +61,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -92,9 +91,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	TextView contentText;
-	RelativeLayout contentTextLayout;
-
 	MegaApiAndroid megaApi;
 	
 	public ActionMode actionMode;
@@ -108,7 +104,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath;
-	////
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -176,8 +171,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
                 fileCount++;
             }
         }
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
         if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -375,7 +368,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
 
-//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			//Add bottom padding for recyclerView like in other fragments.
@@ -394,30 +386,13 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text_first);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
-			
-//			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleRubbish(), recyclerView, null, RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				adapter.setListFragment(recyclerView);
-//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-			}
-
-			if(megaApi.getRubbishNode()!=null){
-				logDebug("Set content of the Rubbish Bin: " + ((ManagerActivityLollipop)context).getParentHandleRubbish());
-				if (((ManagerActivityLollipop)context).getParentHandleRubbish() == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
-					contentText.setText(getInfoFolder(megaApi.getRubbishNode(), context));
-
-				}
-				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-					contentText.setText(getInfoFolder(infoNode, context));
-				}
 			}
 
 			adapter.setMultipleSelect(false);
@@ -429,22 +404,25 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
 				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 					}else{
-						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
 
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
@@ -456,18 +434,20 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 					}
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
@@ -482,7 +462,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -496,12 +475,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//				@Override
-//			      public int getSpanSize(int position) {
-//					return 1;
-//				}
-//			});
 			
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -516,9 +489,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_first);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_grid_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);
-			
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleRubbish(), recyclerView, null, RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
@@ -530,16 +500,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
-			if(megaApi.getRubbishNode()!=null){
-				if (((ManagerActivityLollipop)context).getParentHandleRubbish() == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
-					contentText.setText(getInfoFolder(megaApi.getRubbishNode(), context));
-				}
-				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-					contentText.setText(getInfoFolder(infoNode, context));
-				}
-			}
-
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
@@ -549,22 +509,25 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
 				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 					}else{
-						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
 
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
@@ -576,18 +539,20 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 					}
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
@@ -602,7 +567,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
@@ -652,9 +616,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-				contentText.setText(getInfoFolder(infoNode, context));
-
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -664,23 +625,26 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
-					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
 					if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+							emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 						}else{
-							emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+							emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
 						}
 
 						String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
 
 						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+									+ "\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+									+ "\'>");
 							textToShow = textToShow.replace("[/B]", "</font>");
 						}
 						catch (Exception e){}
@@ -693,18 +657,20 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						emptyTextViewFirst.setText(result);
 
 					} else {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+							emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 						}else{
-							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+							emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 						}
 						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+									+ "\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+									+ "\'>");
 							textToShow = textToShow.replace("[/B]", "</font>");
 						}
 						catch (Exception e){}
@@ -719,7 +685,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -1009,23 +974,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 		}
 		
-		Resources res = getActivity().getResources();
-		/*String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}*/
-
 		String title;
 		int sum=files+folders;
 
@@ -1087,7 +1035,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish()));
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -1115,36 +1062,11 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 				}
 
-//			adapter.setParentHandle(parentHandle);
-				contentText.setText(getInfoFolder(parentNode, context));
 				return 2;
 			}
 			else{
 				return 0;
 			}
-		}
-	}
-	
-	public void setContentText(){
-		logDebug("setContentText");
-		MegaNode rN = megaApi.getRubbishNode();
-		if(rN!=null){
-			if (((ManagerActivityLollipop)context).getParentHandleRubbish() == rN.getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
-				contentText.setText(getInfoFolder(rN, context));
-
-			}
-			else{
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-				if (infoNode !=  null){
-					contentText.setText(getInfoFolder(infoNode, context));
-				}
-				else{
-					logWarning("INFO NODE null");
-				}
-			}
-		}
-		else{
-			logWarning("INFO NODE null");
 		}
 	}
 
@@ -1179,22 +1101,25 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			adapter.setNodes(this.nodes);
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
 				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape);
 					}else{
-						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+						emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_portrait);
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
 
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
@@ -1206,18 +1131,20 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 					}
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
@@ -1232,13 +1159,10 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}			
 		}
-
-		setContentText();
 	}
 
 	public void notifyDataSetChanged(){

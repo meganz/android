@@ -1,37 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".RubbishBinFragmentLollipop" >
-    
-   <RelativeLayout
-        android:id="@+id/rubbishbin_grid_content_text_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="36dp"
-        android:background="@color/white">
-
-		   <TextView
-			   android:id="@+id/rubbishbin_grid_content_text"
-			   android:layout_width="match_parent"
-			   android:layout_height="wrap_content"
-			   android:textColor="@color/mail_my_account"
-			   android:layout_centerVertical="true"
-			   android:layout_marginLeft="72dp"
-			   android:textSize="14sp"/>
-    </RelativeLayout>
-
-    <mega.privacy.android.app.components.NewGridRecyclerView
-        android:id="@+id/rubbishbin_grid_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-		android:layout_centerHorizontal="true"
-		android:layout_centerInParent="true"
-        android:choiceMode="multipleChoice" 
-		android:layout_below="@id/rubbishbin_grid_content_text_layout"
-		android:columnWidth="172dp"
-		android:paddingRight="4dp"
-		android:paddingLeft="4dp"/>
+    >
+	<mega.privacy.android.app.components.NewGridRecyclerView
+			android:id="@+id/rubbishbin_grid_view"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_centerHorizontal="true"
+			android:layout_centerInParent="true"
+			android:choiceMode="multipleChoice"
+			android:columnWidth="172dp"
+			android:paddingRight="4dp"
+			android:paddingLeft="4dp"/>
 
 	<RelativeLayout
 		android:layout_width="wrap_content"
@@ -56,8 +36,6 @@
 				android:id="@+id/rubbishbin_grid_empty_text_first"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textColor="@color/text_secondary"
-				android:fontFamily="sans-serif"
 				android:textSize="18sp"/>
 		</LinearLayout>
 	</RelativeLayout>
