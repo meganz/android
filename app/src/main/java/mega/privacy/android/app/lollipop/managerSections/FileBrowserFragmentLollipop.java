@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -571,14 +572,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 emptyTextView.setVisibility(View.GONE);
             }
 
-			// Create an ad request.
-			MobileAds.setRequestConfiguration(
-					new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("0091B3C4EC4436CA1BA032C562D3B583"))
-							.build());
-			PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
-			adView = v.findViewById(R.id.ad_view);
-			// Start loading the ad in the background.
-			adView.loadAd(adRequest);
+//			// Create an ad request.
+//			MobileAds.setRequestConfiguration(
+//					new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("0091B3C4EC4436CA1BA032C562D3B583"))
+//							.build());
+//			PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+//			adView = v.findViewById(R.id.ad_view);
+//			// Start loading the ad in the background.
+//			adView.loadAd(adRequest);
+
+			GoogleAdsLoader.Companion.bindGoogleAdsLoader(this, v.findViewById(R.id.ad_view_container), ((ManagerActivityLollipop)getActivity()).getOutMetrics());
+            return v;
         } else {
 			logDebug("Grid View");
             v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);

@@ -11,22 +11,22 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
-		<com.google.android.gms.ads.doubleclick.PublisherAdView
-			android:id="@+id/ad_view"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true"
-			android:layout_centerHorizontal="true"
-			ads:adSize="BANNER"
-		    ads:adUnitId="/6499/example/banner"/>
-<!--			ads:adUnitId="/6253334/dfp_example_ad" />-->
-
 		<include layout="@layout/item_call_in_progress_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:visibility="gone"
+			android:visibility="visible"
 			tools:visibility="visible"
 			android:layout_alignParentTop="true" />
+
+<!--		<com.google.android.gms.ads.doubleclick.PublisherAdView-->
+<!--			android:id="@+id/ad_view"-->
+<!--			android:layout_width="match_parent"-->
+<!--			android:layout_height="wrap_content"-->
+<!--			android:layout_below="@id/call_in_progress_layout"-->
+<!--			android:layout_centerHorizontal="true"-->
+<!--			ads:adSize="BANNER"-->
+<!--			ads:adUnitId="/6499/example/banner"/>-->
+		<!--			ads:adUnitId="/6253334/dfp_example_ad" />-->
 
 		<RelativeLayout
 			android:id="@+id/relative_layout_file_list_browser_camera_upload_on_off"
@@ -82,11 +82,18 @@
 			android:layout_height="wrap_content"
 			android:layout_below="@+id/call_in_progress_layout"/>
 
+		<FrameLayout
+			android:id="@+id/ad_view_container"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_centerInParent="true"
+			android:layout_below="@id/transfer_over_quota_banner" />
+
 		<RelativeLayout
 			android:id="@+id/relative_layout_recycler"
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_below="@id/transfer_over_quota_banner"
+			android:layout_below="@id/ad_view_container"
 			android:layout_above="@id/relative_layout_file_list_browser_camera_upload_on_off">
 
 			<androidx.recyclerview.widget.RecyclerView

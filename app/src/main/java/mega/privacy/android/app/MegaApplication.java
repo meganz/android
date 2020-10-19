@@ -38,9 +38,13 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -719,8 +723,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
-	}
 
+		MobileAds.initialize(this);
+		// Create an ad request.
+		MobileAds.setRequestConfiguration(
+				new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("0091B3C4EC4436CA1BA032C562D3B583"))
+						.build());
+	}
 
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");
