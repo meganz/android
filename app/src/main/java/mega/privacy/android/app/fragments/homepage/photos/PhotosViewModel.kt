@@ -28,7 +28,7 @@ class PhotosViewModel @ViewModelInject constructor(
     val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(NODE_PHOTO, ORDER_MODIFICATION_DESC)
+                repository.getFiles(FILE_TYPE_PHOTO, ORDER_MODIFICATION_DESC)
             }
         } else {
             repository.emitFiles()

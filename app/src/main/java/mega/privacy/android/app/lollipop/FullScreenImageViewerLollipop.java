@@ -1110,7 +1110,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
 			// TODO: use constants
-			getImageHandles(megaApi.searchByType(null, null, null, true, orderGetChildren, 1, 3), savedInstanceState);
+			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
 		} else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){

@@ -39,7 +39,7 @@ class DocumentsViewModel @ViewModelInject constructor(
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_DOCUMENT, order)
+                repository.getFiles(MegaApiJava.FILE_TYPE_DOCUMENT, order)
             }
         } else {
             repository.emitFiles()

@@ -31,7 +31,7 @@ class TypedFilesRepository @Inject constructor(
 ) {
 
     private var order = ORDER_DEFAULT_ASC
-    private var type = NODE_UNKNOWN
+    private var type = FILE_TYPE_DEFAULT
 
     // LinkedHashMap guarantees that the index order of elements is consistent with
     // the order of putting. Moreover, it has a quick element search[O(1)] (for
@@ -131,7 +131,7 @@ class TypedFilesRepository @Inject constructor(
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
 
             // Photo "Month-Year" section headers
-            if (type == NODE_PHOTO && (lastModifyDate == null
+            if (type == FILE_TYPE_PHOTO && (lastModifyDate == null
                         || YearMonth.from(lastModifyDate) != YearMonth.from(
                     modifyDate
                 ))
@@ -145,7 +145,7 @@ class TypedFilesRepository @Inject constructor(
             val selected = savedFileNodesMap[node.handle]?.selected ?: false
             var nodeItem: NodeItem?
 
-            if (type == NODE_PHOTO) {
+            if (type == FILE_TYPE_PHOTO) {
                 nodeItem = PhotoNodeItem(
                     PhotoNodeItem.TYPE_PHOTO,
                     -1,
@@ -159,7 +159,7 @@ class TypedFilesRepository @Inject constructor(
                 nodeItem = NodeItem(
                     node,
                     -1,
-                    type == NODE_VIDEO,
+                    type == FILE_TYPE_VIDEO,
                     dateString,
                     thumbnail,
                     selected
@@ -171,10 +171,7 @@ class TypedFilesRepository @Inject constructor(
     }
 
     private fun getMegaNodes(): List<MegaNode> {
-        return megaApi.searchByType(
-            null, null, null,
-            true, order, type, TARGET_ROOTNODES
-        )
+        return megaApi.searchByType(order, type, SEARCH_TARGET_ROOTNODE)
     }
 
     companion object {

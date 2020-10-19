@@ -41,7 +41,7 @@ class AudioViewModel @ViewModelInject constructor(
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.NODE_AUDIO, order)
+                repository.getFiles(MegaApiJava.FILE_TYPE_AUDIO, order)
             }
         } else {
             repository.emitFiles()
