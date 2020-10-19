@@ -15,11 +15,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class CallListener implements MegaChatCallListenerInterface {
-
-    private MegaApplication megaApplication;
-
     public CallListener() {
-        megaApplication = MegaApplication.getInstance();
     }
 
     @Override
@@ -29,11 +25,13 @@ public class CallListener implements MegaChatCallListenerInterface {
             return;
         }
 
+        MegaApplication megaApplication = MegaApplication.getInstance();
+
         Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
         intentGeneral.setAction(ACTION_UPDATE_CALL);
         intentGeneral.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
         intentGeneral.putExtra(UPDATE_CALL_ID, call.getId());
-        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentGeneral);
+        megaApplication.sendBroadcast(intentGeneral);
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
             int callStatus = call.getStatus();
@@ -48,7 +46,7 @@ public class CallListener implements MegaChatCallListenerInterface {
                 intentStatus.putExtra(UPDATE_CALL_IGNORE, call.isIgnored());
                 intentStatus.putExtra(UPDATE_CALL_LOCAL_TERM_CODE, call.isLocalTermCode());
             }
-            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentStatus);
+            megaApplication.sendBroadcast(intentStatus);
         }
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
@@ -57,7 +55,7 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentLocalFlags.setAction(ACTION_CHANGE_LOCAL_AVFLAGS);
             intentLocalFlags.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
             intentLocalFlags.putExtra(UPDATE_CALL_ID, call.getId());
-            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentLocalFlags);
+            megaApplication.sendBroadcast(intentLocalFlags);
         }
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.getCallCompositionChange() != 0) {
@@ -69,7 +67,7 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentComposition.putExtra(TYPE_CHANGE_COMPOSITION, call.getCallCompositionChange());
             intentComposition.putExtra(UPDATE_PEER_ID, call.getPeeridCallCompositionChange());
             intentComposition.putExtra(UPDATE_CLIENT_ID, call.getClientidCallCompositionChange());
-            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentComposition);
+            megaApplication.sendBroadcast(intentComposition);
         }
     }
 
@@ -80,11 +78,13 @@ public class CallListener implements MegaChatCallListenerInterface {
             return;
         }
 
+        MegaApplication megaApplication = MegaApplication.getInstance();
+
         Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
         intentGeneral.setAction(ACTION_UPDATE_CALL);
         intentGeneral.putExtra(UPDATE_CHAT_CALL_ID, chatid);
         intentGeneral.putExtra(UPDATE_CALL_ID, callid);
-        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentGeneral);
+        megaApplication.sendBroadcast(intentGeneral);
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS)) {
             logDebug("Changes in remote av flags ");
@@ -94,7 +94,7 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentRemoteFlags.putExtra(UPDATE_CALL_ID, callid);
             intentRemoteFlags.putExtra(UPDATE_PEER_ID, session.getPeerid());
             intentRemoteFlags.putExtra(UPDATE_CLIENT_ID, session.getClientid());
-            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentRemoteFlags);
+            megaApplication.sendBroadcast(intentRemoteFlags);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_AUDIO_LEVEL)) {
@@ -104,7 +104,7 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentAudio.putExtra(UPDATE_CALL_ID, callid);
             intentAudio.putExtra(UPDATE_PEER_ID, session.getPeerid());
             intentAudio.putExtra(UPDATE_CLIENT_ID, session.getClientid());
-            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentAudio);
+            megaApplication.sendBroadcast(intentAudio);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_NETWORK_QUALITY)) {
@@ -114,7 +114,7 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentNetwork.putExtra(UPDATE_CALL_ID, callid);
             intentNetwork.putExtra(UPDATE_PEER_ID, session.getPeerid());
             intentNetwork.putExtra(UPDATE_CLIENT_ID, session.getClientid());
-            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentNetwork);
+            megaApplication.sendBroadcast(intentNetwork);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
@@ -132,7 +132,7 @@ public class CallListener implements MegaChatCallListenerInterface {
             intentStatus.putExtra(UPDATE_CALL_ID, callid);
             intentStatus.putExtra(UPDATE_PEER_ID, session.getPeerid());
             intentStatus.putExtra(UPDATE_CLIENT_ID, session.getClientid());
-            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentStatus);
+            megaApplication.sendBroadcast(intentStatus);
         }
     }
 }

@@ -91,7 +91,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ContactFileListActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface, UploadBottomSheetDialogActionListener {
+public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, UploadBottomSheetDialogActionListener {
 
 	FrameLayout fragmentContainer;
 
@@ -221,7 +221,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 	@Override
 	public void uploadFromSystem() {
-		chooseFromSystem(this);
+		pickFileFromFileSystem(this);
 	}
 
 	@Override
@@ -511,7 +511,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 					Intent intent1 = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
-					LocalBroadcastManager.getInstance(contactPropertiesMainActivity).sendBroadcast(intent1);
+					sendBroadcast(intent1);
 				}
 			}
 		}
@@ -561,10 +561,8 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 		contactPropertiesMainActivity = this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
-		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+		registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
 
@@ -731,8 +729,8 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			megaApi.removeRequestListener(this);
 		}
 
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+		unregisterReceiver(receiver);
+		unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(destroyActionModeReceiver);
 	}
 
@@ -1031,9 +1029,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		} else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
-        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}

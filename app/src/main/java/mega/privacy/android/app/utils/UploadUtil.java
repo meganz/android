@@ -1,9 +1,7 @@
 package mega.privacy.android.app.utils;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 
 import java.io.File;
@@ -18,7 +16,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
@@ -91,54 +89,6 @@ public class UploadUtil {
         activity.startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
     }
 
-    /**
-     * This method is to start system folder from Activity to choose files or folders to upload
-     *
-     * @param activity the activity the camera would start from
-     */
-    public static void chooseFromSystem(final Activity activity) {
-        final File[] fs = activity.getExternalFilesDirs(null);
-        //has SD card
-        if (fs.length > 1) {
-            Dialog localCameraDialog;
-            String[] sdCardOptions = activity.getResources().getStringArray(R.array.settings_storage_download_location_array);
-            androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(activity);
-
-            b.setTitle(activity.getResources().getString(R.string.upload_to_filesystem_from));
-            b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case 0: {
-                            pickFileFromFileSystem(false, activity);
-                            break;
-                        }
-                        case 1: {
-                            if (fs[1] != null) {
-                                pickFileFromFileSystem(true, activity);
-                            } else {
-                                pickFileFromFileSystem(false, activity);
-                            }
-                            break;
-                        }
-                    }
-                }
-            });
-            b.setNegativeButton(activity.getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            localCameraDialog = b.create();
-            localCameraDialog.show();
-        } else {
-            pickFileFromFileSystem(false, activity);
-        }
-    }
-
-
     /** The method is to return sdcard root of the file
      * @param sd the sd card file
      * @return where the file's sd card root is
@@ -162,19 +112,14 @@ public class UploadUtil {
 
 
     /** The method is to open FileStorageActivity to select file or folder
-     * @param fromSDCard whether from SD card root or not
+     *
      * @param activity the activity where the FileStorageActivity would start
      */
-    public static void pickFileFromFileSystem(boolean fromSDCard, Activity activity) {
+    public static void pickFileFromFileSystem(Activity activity) {
         Intent intent = new Intent();
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
         intent.setClass(activity, FileStorageActivityLollipop.class);
-        if (fromSDCard) {
-            File[] fs = activity.getExternalFilesDirs(null);
-            String sdRoot = getSDCardRoot(fs[1]);
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
-        }
         activity.startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
     }
 }

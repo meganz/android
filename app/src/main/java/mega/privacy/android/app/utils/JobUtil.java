@@ -7,10 +7,11 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+
+import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
@@ -22,8 +23,9 @@ import mega.privacy.android.app.jobservices.CameraUploadsService;
 import nz.mega.sdk.MegaApiJava;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.EXTRA_IGNORE_ATTR_CHECK;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 
 @TargetApi(21)
 public class JobUtil {
@@ -80,12 +82,7 @@ public class JobUtil {
     }
 
     public static synchronized void startCameraUploadServiceIgnoreAttr(final Context context) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                start(context, true);
-            }
-        }, CU_RESCHEDULE_INTERVAL);
+        new Handler().postDelayed(() -> start(context, true), CU_RESCHEDULE_INTERVAL);
     }
 
     private static void start(Context context, boolean shouldIgnoreAttr) {
@@ -99,7 +96,7 @@ public class JobUtil {
         if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission && isEnabled) {
             Intent newIntent = new Intent(context, CameraUploadsService.class);
             newIntent.putExtra(EXTRA_IGNORE_ATTR_CHECK, shouldIgnoreAttr);
-            postIntent(context, newIntent);
+            ContextCompat.startForegroundService(context, newIntent);
         }
     }
 
@@ -110,38 +107,25 @@ public class JobUtil {
 
     public static synchronized void stopRunningCameraUploadService(Context context) {
         logDebug("stopRunningCameraUploadService");
+        if (!isCameraUploadEnabled(context) && !CameraUploadsService.running) return;
         Intent stopIntent = new Intent(context, CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_STOP);
-        postIntent(context, stopIntent);
+        ContextCompat.startForegroundService(context, stopIntent);
     }
 
     public static synchronized void cancelAllUploads(Context context) {
         logDebug("stopRunningCameraUploadService");
         Intent stopIntent = new Intent(context, CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_CANCEL_ALL);
-        postIntent(context, stopIntent);
-    }
-
-    private static void postIntent(Context context, Intent intent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            logDebug("Starting on Oreo or above");
-            context.startForegroundService(intent);
-        } else {
-            logDebug("Starting below Oreo");
-            context.startService(intent);
-        }
+        ContextCompat.startForegroundService(context, stopIntent);
     }
 
     public static void rescheduleCameraUpload(final Context context) {
         stopRunningCameraUploadService(context);
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                logDebug("Rescheduling CU");
-                scheduleCameraUploadJob(context);
-            }
+        handler.postDelayed(() -> {
+            logDebug("Rescheduling CU");
+            scheduleCameraUploadJob(context);
         }, CU_RESCHEDULE_INTERVAL);
     }
 

@@ -1,31 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/transfers_bottom_sheet"
+    android:id="@+id/manage_transfer_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:orientation="vertical">
 
-    <!-- Title -->
-    <LinearLayout
-        android:id="@+id/transfers_title_layout"
+    <RelativeLayout
+        android:id="@+id/manage_transfer_title_layout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:layout_height="72dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_vertical" >
+
+        <ImageView
+            android:id="@+id/manage_transfer_thumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="18dp"
+            android:scaleType="fitCenter"
+            android:layout_centerVertical="true"/>
+
+        <ImageView
+            android:id="@+id/manage_transfer_small_icon"
+            android:layout_width="21dp"
+            android:layout_height="21dp"
+            android:src="@drawable/ic_download_transfers"
+            android:layout_alignEnd="@id/manage_transfer_thumbnail"
+            android:layout_alignTop="@id/manage_transfer_thumbnail" />
 
         <TextView
-            android:id="@+id/transfers_title_text"
+            android:id="@+id/manage_transfer_filename"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/section_transfers"
-            android:textColor="@color/transparent_black"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            android:layout_toEndOf="@id/manage_transfer_thumbnail"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="13dp"
+            android:layout_marginRight="13dp"
+            android:textColor="@color/file_list_first_row"
+            android:ellipsize="middle"
+            android:textSize="16sp"
+            android:singleLine="true"/>
+
+        <ImageView
+            android:id="@+id/manage_transfer_completed_image"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginBottom="14dp"
+            android:layout_toEndOf="@id/manage_transfer_thumbnail"
+            android:layout_below="@id/manage_transfer_filename"
+            android:layout_alignStart="@id/manage_transfer_filename" />
+
+        <TextView
+            android:id="@+id/manage_transfer_location"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_toEndOf="@id/manage_transfer_completed_image"
+            android:layout_below="@+id/manage_transfer_filename"
+            android:textColor="@color/file_list_second_row"
+            android:layout_marginEnd="13dp"
+            android:singleLine="true"
+            android:ellipsize="middle"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/sliding_panel_separator"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -33,124 +76,130 @@
         android:scrollbars="vertical">
 
         <LinearLayout
-            android:id="@+id/items_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/item_list_bottom_sheet_contact_file">
 
             <!-- Options -->
             <LinearLayout
-                android:id="@+id/transfers_manager_option_layout"
+                android:id="@+id/option_view_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/transfers_option_manager"
+                    android:id="@+id/option_view_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_transfer_manager"
+                    android:src="@drawable/ic_b_search"
                     android:visibility="visible" />
 
                 <TextView
-                    android:id="@+id/transfers_option_manager_text"
+                    android:id="@+id/option_view_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:text="@string/option_to_transfer_manager"
-                    android:layout_marginLeft="18dp"
+                    android:text="@string/view_in_folder_label"
+                    android:layout_marginStart="18dp"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/transfers_pause_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/transfers_option_pause"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:alpha="0.54"
-                    android:src="@drawable/ic_pause"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/transfers_option_pause_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
-                    android:text="@string/option_to_pause_transfers"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/transfers_clear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/transfers_option_clear"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_clear_transfers"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/transfers_option_clear_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
-                    android:text="@string/option_to_clear_transfers"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/separator_delete"
+            <View
+                android:id="@+id/separator_get_link"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:layout_marginStart="72dp"
+                android:background="@color/sliding_panel_separator"/>
 
             <LinearLayout
-                android:id="@+id/transfers_cancel_layout"
+                android:id="@+id/option_get_link_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/transfers_option_cancel"
+                    android:id="@+id/option_get_link_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
+                    android:alpha="0.54"
+                    android:layout_marginStart="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/link_ic"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_get_link_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
+                    android:text="@string/context_get_link_menu"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/option_retry_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_retry_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_retry"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_retry_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
+                    android:text="@string/general_retry"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <View
+                android:id="@+id/separator_clear"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/sliding_panel_separator"/>
+
+            <LinearLayout
+                android:id="@+id/option_clear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_clear_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:tint="@color/dark_primary_color"
@@ -158,13 +207,13 @@
                     android:visibility="visible" />
 
                 <TextView
-                    android:id="@+id/transfers_option_cancel_text"
+                    android:id="@+id/option_clear_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
-                    android:text="@string/menu_cancel_all_transfers"
+                    android:layout_marginStart="18dp"
+                    android:text="@string/general_clear"
                     android:textColor="@color/dark_primary_color"
                     android:textSize="16sp"/>
             </LinearLayout>

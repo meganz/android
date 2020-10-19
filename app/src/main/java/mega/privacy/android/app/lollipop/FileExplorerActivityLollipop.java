@@ -103,7 +103,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -1391,12 +1391,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void finishActivity(){
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			super.finishAndRemoveTask();
-		}
-		else {
-			super.finish();
-		}
+		finishAndRemoveTask();
 	}
 
 	@Override
@@ -1586,9 +1581,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						for(MegaChatRoom item : chatListItems){
 							idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
 							pos++;
-						}
-					}
-					intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+                        }
+                    }
+                    intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
+                    intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
 					intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
@@ -1622,6 +1618,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						pos++;
 					}
 				}
+                intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
 				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
@@ -1952,6 +1949,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		logDebug("handle: " + handle);
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class)
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
 				.putExtra(NUMBER_UPLOADS, numberUploads);
 		if(handle!=-1){
@@ -3316,7 +3314,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void updateManagerView () {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_VIEW);
 		intent.putExtra("isList", isList);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	public void collapseSearchView () {

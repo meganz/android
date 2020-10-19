@@ -82,7 +82,6 @@ public class ShareListener extends BaseListener {
     private void sendManageSharesBroadcast() {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_MANAGE_SHARE);
         intent.putExtra(TYPE_SHARE, typeShare);
-        LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
-
+        MegaApplication.getInstance().sendBroadcast(intent);
     }
 }

@@ -32,7 +32,7 @@ public class VerifyCredentialsListener extends BaseListener {
 
         MegaApplication.setVerifyingCredentials(false);
 
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
+        context.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
                 .setAction(ACTION_UPDATE_CREDENTIALS)
                 .putExtra(EXTRA_USER_HANDLE, request.getNodeHandle()));
 

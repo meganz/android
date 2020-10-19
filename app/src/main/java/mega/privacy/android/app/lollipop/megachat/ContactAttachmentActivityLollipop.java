@@ -240,7 +240,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-		LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+		registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 
 	@Override
@@ -263,7 +263,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     		megaApi.removeRequestListener(this);
     	}
 
-    	LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
+    	unregisterReceiver(contactUpdateReceiver);
     }
 
 	public void showOptionsPanel(String email){
