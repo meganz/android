@@ -194,8 +194,6 @@ public class Constants {
     public static final String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
     public static final String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
     public static final String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
-    public static final String ACTION_CHILD_UPLOADED_OK = "ACTION_CHILD_UPLOADED_OK";
-    public static final String ACTION_CHILD_UPLOADED_FAILED = "ACTION_CHILD_UPLOADED_FAILED";
     public static final String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
     public static final String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
     public static final String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
@@ -220,6 +218,7 @@ public class Constants {
     public static final String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
     public static final String ACTION_LOG_OUT = "ACTION_LOG_OUT";
+    public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
@@ -400,6 +399,7 @@ public class Constants {
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+    public static final String CU_UPLOAD = "CU_UPLOAD";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
@@ -470,10 +470,13 @@ public class Constants {
     public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
     public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
     public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
+    public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
+    public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
     public static final int INVALID_TYPE_PERMISSIONS = -1;
+    public static final int INVALID_VOLUME = -1;
     public static final int INVALID_DIMENSION = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";

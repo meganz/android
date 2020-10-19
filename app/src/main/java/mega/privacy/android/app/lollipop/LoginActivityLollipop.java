@@ -89,8 +89,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     private MegaApiAndroid megaApi;
     private MegaApiAndroid megaApiFolder;
 
-    private androidx.appcompat.app.AlertDialog alertDialogTransferOverquota;
-
     boolean waitingForConfirmAccount = false;
     String emailTemp = null;
     String passwdTemp = null;
@@ -159,8 +157,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         app.setIsLoggingRunning(false);
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onAccountUpdateReceiver);
+        unregisterReceiver(updateMyAccountReceiver);
+        unregisterReceiver(onAccountUpdateReceiver);
 
         super.onDestroy();
     }
@@ -226,11 +224,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             megaApi.resumeCreateAccount(sessionTemp, this);
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+        registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 
         IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         filter.addAction(ACTION_ON_ACCOUNT_UPDATE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(onAccountUpdateReceiver, filter);
+        registerReceiver(onAccountUpdateReceiver, filter);
 
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
@@ -405,74 +403,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         }
     }
 
-    public void showTransferOverquotaDialog() {
-        logDebug("showTransferOverquotaDialog");
-
-        boolean show = true;
-
-        if(alertDialogTransferOverquota!=null){
-            if(alertDialogTransferOverquota.isShowing()){
-                logDebug("Change show to false");
-                show = false;
-            }
-        }
-
-        if(show){
-            androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
-
-            LayoutInflater inflater = this.getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.transfer_overquota_layout_not_logged, null);
-            dialogBuilder.setView(dialogView);
-
-            TextView title = (TextView) dialogView.findViewById(R.id.not_logged_transfer_overquota_title);
-            title.setText(getString(R.string.title_depleted_transfer_overquota));
-
-            ImageView icon = (ImageView) dialogView.findViewById(R.id.not_logged_image_transfer_overquota);
-            icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
-
-            TextView text = (TextView) dialogView.findViewById(R.id.not_logged_text_transfer_overquota);
-            text.setText(getString(R.string.text_depleted_transfer_overquota));
-
-            Button continueButton = (Button) dialogView.findViewById(R.id.not_logged_transfer_overquota_button_dissmiss);
-            continueButton.setText(getString(R.string.login_text));
-
-            Button paymentButton = (Button) dialogView.findViewById(R.id.not_logged_transfer_overquota_button_payment);
-            paymentButton.setText(getString(R.string.continue_without_account_transfer_overquota));
-
-            Button cancelButton = (Button) dialogView.findViewById(R.id.not_logged_transfer_overquota_button_cancel);
-            cancelButton.setText(getString(R.string.menu_cancel_all_transfers));
-
-            alertDialogTransferOverquota = dialogBuilder.create();
-
-            continueButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    alertDialogTransferOverquota.dismiss();
-                }
-
-            });
-
-            paymentButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    alertDialogTransferOverquota.dismiss();
-                }
-
-            });
-
-            cancelButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    alertDialogTransferOverquota.dismiss();
-                    showConfirmationCancelAllTransfers();
-
-                }
-
-            });
-
-            alertDialogTransferOverquota.setCancelable(false);
-            alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-            alertDialogTransferOverquota.show();
-        }
-    }
-
     public void startCameraUploadService(boolean firstTimeCam, int time) {
         logDebug("firstTimeCam: " + firstNameTemp + "time: " + time);
         if (firstTimeCam) {
@@ -528,8 +458,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
         builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-        builder.setPositiveButton(R.string.context_delete, dialogClickListener);
-        builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+        builder.setPositiveButton(R.string.cancel_all_action, dialogClickListener);
+        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
 
         builder.show();
     }
@@ -608,8 +538,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     showConfirmationCancelAllTransfers();
                 }
                 else if (intent.getAction().equals(ACTION_OVERQUOTA_TRANSFER)) {
-                    showTransferOverquotaDialog();
-
+                    showGeneralTransferOverQuotaWarning();
                 }
                 intent.setAction(null);
             }
