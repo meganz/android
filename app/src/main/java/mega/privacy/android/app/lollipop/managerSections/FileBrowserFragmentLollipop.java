@@ -23,6 +23,7 @@ import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -480,6 +481,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+		Log.i("Alex", "onCreateView");
 		logDebug("onCreateView");
 		if (!isAdded()) {
 			return null;
@@ -571,18 +573,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
-
-//			// Create an ad request.
-//			MobileAds.setRequestConfiguration(
-//					new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("0091B3C4EC4436CA1BA032C562D3B583"))
-//							.build());
-//			PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
-//			adView = v.findViewById(R.id.ad_view);
-//			// Start loading the ad in the background.
-//			adView.loadAd(adRequest);
-
-			GoogleAdsLoader.Companion.bindGoogleAdsLoader(this, v.findViewById(R.id.ad_view_container), ((ManagerActivityLollipop)getActivity()).getOutMetrics());
-            return v;
         } else {
 			logDebug("Grid View");
             v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
@@ -642,6 +632,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		});
 
 		setTransferOverQuotaBannerVisibility();
+
+		Log.i("Alex", "call ads loader");
+		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this, v.findViewById(R.id.ad_view_container), ((ManagerActivityLollipop)getActivity()).getOutMetrics());
 
 		return v;
     }

@@ -37,6 +37,7 @@ class GoogleAdsLoader(
         }
 
     init {
+        Log.i("Alex", "addObserver")
         lifecycleOwner.lifecycle.addObserver(this)
     }
 
@@ -64,6 +65,7 @@ class GoogleAdsLoader(
         adViewContainer.addView(adView)
         adViewContainer.viewTreeObserver.addOnGlobalLayoutListener {
             if (!initialLayoutComplete) {
+                Log.i("Alex", "object:$this")
                 initialLayoutComplete = true
                 loadBanner(adSize)
             }
