@@ -103,7 +103,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -1389,12 +1389,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void finishActivity(){
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			super.finishAndRemoveTask();
-		}
-		else {
-			super.finish();
-		}
+		finishAndRemoveTask();
 	}
 
 	@Override
@@ -1948,6 +1943,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		logDebug("handle: " + handle);
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class)
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
 				.putExtra(NUMBER_UPLOADS, numberUploads);
 		if(handle!=-1){
@@ -3312,7 +3308,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void updateManagerView () {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_VIEW);
 		intent.putExtra("isList", isList);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	public void collapseSearchView () {

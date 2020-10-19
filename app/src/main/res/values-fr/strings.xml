@@ -1546,7 +1546,6 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importer</string>
     <string name="save_for_offline" context="Menu option to choose save to Offline section">Enregistrer Hors ligne</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Ajouter au disque nuagique</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">Enregistrer Hors ligne</string>
 
     <string name="general_view_contacts" context="Menu option">Visualiser les contacts</string>
 

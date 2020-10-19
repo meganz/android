@@ -38,7 +38,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
@@ -109,7 +109,7 @@ public class CallService extends Service{
 
         IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
         filter.addAction(ACTION_CALL_STATUS_UPDATE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+        registerReceiver(chatCallUpdateReceiver, filter);
     }
 
     @Override
@@ -345,7 +345,7 @@ public class CallService extends Service{
     public void onDestroy() {
         logDebug("onDestroy");
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(chatCallUpdateReceiver);
 
         mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
         MegaApplication.setOpenCallChatId(-1);

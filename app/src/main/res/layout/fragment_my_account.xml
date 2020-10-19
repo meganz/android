@@ -159,7 +159,7 @@
 					android:id="@+id/my_data_account_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"/>
 
 				<LinearLayout
@@ -211,7 +211,7 @@
 					android:id="@+id/my_account_achievements_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"/>
 
 				<LinearLayout
@@ -283,7 +283,7 @@
 					android:id="@+id/my_account_type_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"/>
 
 				<LinearLayout
@@ -317,7 +317,7 @@
 					android:id="@+id/expiry_renew_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"/>
 
 				<LinearLayout
@@ -377,7 +377,7 @@
 						android:id="@+id/business_account_type_separator"
 						android:layout_width="match_parent"
 						android:layout_height="1dp"
-						android:background="@color/divider_upgrade_account"
+						android:background="@color/black_12_alpha"
 						android:orientation="horizontal"/>
 
 					<LinearLayout
@@ -446,7 +446,7 @@
 						android:id="@+id/business_account_status_separator"
 						android:layout_width="match_parent"
 						android:layout_height="1dp"
-						android:background="@color/divider_upgrade_account"
+						android:background="@color/black_12_alpha"
 						android:orientation="horizontal"/>
 
 				</LinearLayout>
@@ -491,7 +491,7 @@
 					android:id="@+id/my_account_type_buttons_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"/>
 
 				<RelativeLayout
@@ -544,7 +544,7 @@
 					android:id="@+id/my_account_connections_separator"
 					android:layout_width="match_parent"
 					android:layout_height="1dp"
-					android:background="@color/divider_upgrade_account"
+					android:background="@color/black_12_alpha"
 					android:orientation="horizontal"/>
 
 				<LinearLayout
