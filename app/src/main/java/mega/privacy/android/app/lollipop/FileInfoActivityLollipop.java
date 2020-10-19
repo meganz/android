@@ -112,10 +112,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -130,7 +130,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
+public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -898,15 +898,14 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+        registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
         contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-        LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+        registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
@@ -1737,7 +1736,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 						}
 
                         logDebug("Handle to save for offline : " + node.getHandle());
-                        saveOffline(destination, node, this, fileInfoActivityLollipop, megaApi);
+                        saveOffline(destination, node, this, fileInfoActivityLollipop);
 
 						supportInvalidateOptionsMenu();
 					}
@@ -1772,7 +1771,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 									return;
 								}
 							}
-							saveOffline(destination, node, this, fileInfoActivityLollipop, megaApi);
+							saveOffline(destination, node, this, fileInfoActivityLollipop);
 						}
 						else{
                             logWarning("result=findIncomingParentHandle NOT result!");
@@ -2251,7 +2250,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                 Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                sendBroadcast(intent);
                 finish();
             } else{
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
@@ -2390,8 +2389,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 nC = new NodeController(this);
             }
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
@@ -2827,8 +2824,8 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (drawableLeave != null) drawableLeave.setColorFilter(null);
         if (drawableCopy != null) drawableCopy.setColorFilter(null);
         if (drawableChat != null) drawableChat.setColorFilter(null);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+        unregisterReceiver(contactUpdateReceiver);
+        unregisterReceiver(manageShareReceiver);
     }
 
 	@Override

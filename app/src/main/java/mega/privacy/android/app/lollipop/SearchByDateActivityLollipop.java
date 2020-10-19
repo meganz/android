@@ -196,7 +196,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         textViewTo.setText(weekDay);
 
         buttonApply.setEnabled(false);
-        buttonApply.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+        buttonApply.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
         buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 
         selectedDate = new long[5];
@@ -360,18 +360,18 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             textViewDay.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
             removeDay.setVisibility(View.VISIBLE);
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
 
             relativeLayoutFrom.setEnabled(false);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(false);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodTo.setVisibility(View.GONE);
 
         }else if (option.equals("from")){
@@ -391,14 +391,14 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
                 textViewFrom.setText(weekDay);
-                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+                textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
                 removePeriodFrom.setVisibility(View.GONE);
             }
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removeDay.setVisibility(View.GONE);
 
         }else if(option.equals("to")){
@@ -418,22 +418,22 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
                 textViewTo.setText(weekDay);
-                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+                textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
                 removePeriodTo.setVisibility(View.GONE);
             }
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             relativeLayoutDay.setEnabled(false);
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removeDay.setVisibility(View.GONE);
         }
 
         buttonLastMonth.setEnabled(false);
-        buttonLastMonth.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+        buttonLastMonth.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
 
         buttonLastYear.setEnabled(false);
-        buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+        buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
 
         if(((optionPeriodFrom == true) && (optionPeriodTo == true))|| (option.equals(("day")))){
             buttonApply.setEnabled(true);
@@ -441,7 +441,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
         }else{
             buttonApply.setEnabled(false);
-            buttonApply.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            buttonApply.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
         }
 
@@ -456,7 +456,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             tsDay = 0;
 
             textViewDay.setText(weekDay);
-            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewDay.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removeDay.setVisibility(View.GONE);
 
             buttonLastMonth.setEnabled(true);
@@ -470,20 +470,20 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             relativeLayoutFrom.setEnabled(true);
             textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(true);
             textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodTo.setVisibility(View.GONE);
 
         }else if(element.equals("from")){
             optionPeriodFrom = false;
             tsFrom = 0;
             textViewFrom.setText(weekDay);
-            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodFrom.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
@@ -501,7 +501,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             optionPeriodTo = false;
             tsTo = 0;
             textViewTo.setText(weekDay);
-            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+            textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodTo.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
@@ -518,7 +518,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         }
 
         buttonApply.setEnabled(false);
-        buttonApply.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
+        buttonApply.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
         buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
     }
 

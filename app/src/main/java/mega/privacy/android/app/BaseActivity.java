@@ -1,7 +1,6 @@
 package mega.privacy.android.app;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,12 +11,13 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -32,17 +32,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.listeners.ChatLogoutListener;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -53,6 +58,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class BaseActivity extends AppCompatActivity {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
+    private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
+    private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
 
     private BaseActivity baseActivity;
 
@@ -72,6 +79,9 @@ public class BaseActivity extends AppCompatActivity {
     private boolean permissionLoggerSDK = false;
     //Indicates if app is requesting the required permissions to enable the Karere logger
     private boolean permissionLoggerKarere = false;
+
+    private boolean isGeneralTransferOverQuotaWarningShown;
+    private AlertDialog transferGeneralOverQuotaWarning;
 
     public BaseActivity() {
         app = MegaApplication.getInstance();
@@ -95,6 +105,9 @@ public class BaseActivity extends AppCompatActivity {
     //Indicates when the activity should finish due to some error
     private static boolean finishActivityAtError;
 
+    private boolean isResumeTransfersWarningShown;
+    private AlertDialog resumeTransfersWarning;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -107,31 +120,48 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         checkMegaObjects();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(sslErrorReceiver,
+        registerReceiver(sslErrorReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
+        registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
 
         registerReceiver(accountBlockedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
+        registerReceiver(businessExpiredReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
+        registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
         registerReceiver(transferFinishedReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
+        IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
+        filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
+        registerReceiver(transferOverQuotaReceiver, filterTransfers);
+
         registerReceiver(showSnackbarReceiver,
                 new IntentFilter(BROADCAST_ACTION_SHOW_SNACKBAR));
+
+        registerReceiver(resumeTransfersReceiver,
+                new IntentFilter(BROADCAST_ACTION_RESUME_TRANSFERS));
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
                 showExpiredBusinessAlert();
+            }
+
+            isGeneralTransferOverQuotaWarningShown = savedInstanceState.getBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, false);
+            if (isGeneralTransferOverQuotaWarningShown) {
+                showGeneralTransferOverQuotaWarning();
+            }
+
+            isResumeTransfersWarningShown = savedInstanceState.getBoolean(RESUME_TRANSFERS_WARNING_SHOWN, false);
+            if (isResumeTransfersWarningShown) {
+                showResumeTransfersWarning(this);
             }
         }
     }
@@ -139,6 +169,8 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
+        outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
+        outState.putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown);
 
         super.onSaveInstanceState(outState);
     }
@@ -162,16 +194,35 @@ public class BaseActivity extends AppCompatActivity {
         retryConnectionsAndSignalPresence();
     }
 
+    /**
+     * Checks if the current activity is in foreground.
+     *
+     * @return True if the current activity is in foreground, false otherwise.
+     */
+    protected boolean isActivityInForeground() {
+        return !isPaused;
+    }
+
     @Override
     protected void onDestroy() {
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
+        unregisterReceiver(sslErrorReceiver);
+        unregisterReceiver(signalPresenceReceiver);
         unregisterReceiver(accountBlockedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
+        unregisterReceiver(businessExpiredReceiver);
+        unregisterReceiver(takenDownFilesReceiver);
         unregisterReceiver(transferFinishedReceiver);
         unregisterReceiver(showSnackbarReceiver);
+        unregisterReceiver(transferOverQuotaReceiver);
+        unregisterReceiver(resumeTransfersReceiver);
+
+        if (transferGeneralOverQuotaWarning != null) {
+            transferGeneralOverQuotaWarning.dismiss();
+        }
+
+        if (resumeTransfersWarning != null) {
+            resumeTransfersWarning.dismiss();
+        }
 
         super.onDestroy();
     }
@@ -315,6 +366,41 @@ public class BaseActivity extends AppCompatActivity {
             if (!isTextEmpty(message)) {
                 Util.showSnackbar(baseActivity, message);
             }
+        }
+    };
+
+    /**
+     * Broadcast to show a warning when transfer over quota occurs.
+     */
+    private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA)
+                    || !isActivityInForeground()) {
+                return;
+            }
+
+            showGeneralTransferOverQuotaWarning();
+        }
+    };
+
+    /**
+     * Broadcast to show a warning when it tries to upload files to a chat conversation
+     * and the transfers are paused.
+     */
+    private BroadcastReceiver resumeTransfersReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_RESUME_TRANSFERS)
+                    || isResumeTransfersWarningShown()
+                    || !isActivityInForeground()) {
+                return;
+            }
+
+            MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(true);
+            showResumeTransfersWarning(baseActivity);
         }
     };
 
@@ -725,6 +811,77 @@ public class BaseActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }
 
+    /**
+     * Shows a warning indicating transfer over quota occurred.
+     */
+    public void showGeneralTransferOverQuotaWarning() {
+        if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
+        builder.setView(dialogView)
+                .setOnDismissListener(dialog -> {
+                    isGeneralTransferOverQuotaWarningShown = false;
+                    transferGeneralOverQuotaWarning = null;
+                    MegaApplication.getTransfersManagement().resetTransferOverQuotaTimestamp();
+                })
+                .setCancelable(false);
+
+        transferGeneralOverQuotaWarning = builder.create();
+        transferGeneralOverQuotaWarning.setCanceledOnTouchOutside(false);
+
+        TextView text = dialogView.findViewById(R.id.text_transfer_overquota);
+        final int stringResource = MegaApplication.getTransfersManagement().isCurrentTransferOverQuota() ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota;
+        text.setText(getString(stringResource, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())));
+
+        Button dismissButton = dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
+        dismissButton.setOnClickListener(v -> transferGeneralOverQuotaWarning.dismiss());
+
+        Button paymentButton = dialogView.findViewById(R.id.transfer_overquota_button_payment);
+
+        final boolean isLoggedIn = megaApi.isLoggedIn() != 0 && dbH.getCredentials() != null;
+        if (isLoggedIn) {
+            boolean isFreeAccount = MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            paymentButton.setText(getString(isFreeAccount ? R.string.my_account_upgrade_pro : R.string.plans_depleted_transfer_overquota));
+        } else {
+            paymentButton.setText(getString(R.string.login_text));
+        }
+
+        paymentButton.setOnClickListener(v -> {
+            transferGeneralOverQuotaWarning.dismiss();
+
+            if (isLoggedIn) {
+                navigateToUpgradeAccount();
+            } else {
+                navigateToLogin();
+            }
+        });
+
+        createAndShowCountDownTimer(stringResource, transferGeneralOverQuotaWarning, text);
+        transferGeneralOverQuotaWarning.show();
+        isGeneralTransferOverQuotaWarningShown = true;
+    }
+
+    /**
+     * Launches an intent to navigate to Login screen.
+     */
+    protected void navigateToLogin() {
+        Intent intent = new Intent(this, LoginActivityLollipop.class);
+        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    /**
+     * Launches an intent to navigate to Upgrade Account screen.
+     */
+    protected void navigateToUpgradeAccount() {
+        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         logDebug("Request Code: " + requestCode);
@@ -746,5 +903,31 @@ public class BaseActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public void unregisterReceiver(BroadcastReceiver receiver) {
+        try {
+            //If the receiver is not registered, it throws an IllegalArgumentException
+            super.unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            logWarning("IllegalArgumentException unregistering transfersUpdateReceiver", e);
+        }
+    }
+
+    public boolean isResumeTransfersWarningShown() {
+        return isResumeTransfersWarningShown;
+    }
+
+    public void setIsResumeTransfersWarningShown(boolean isResumeTransfersWarningShown) {
+        this.isResumeTransfersWarningShown = isResumeTransfersWarningShown;
+    }
+
+    public void setResumeTransfersWarning(AlertDialog resumeTransfersWarning) {
+        this.resumeTransfersWarning = resumeTransfersWarning;
+    }
+
+    public AlertDialog getResumeTransfersWarning() {
+        return resumeTransfersWarning;
     }
 }
