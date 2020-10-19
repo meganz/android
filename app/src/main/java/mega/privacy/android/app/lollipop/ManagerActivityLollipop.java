@@ -45,6 +45,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -9284,9 +9285,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (openLinkDialog != null) {
 			if (show) {
 				openLinkDialogIsErrorShown = true;
-				openLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-				openLinkText.getBackground().mutate().clearColorFilter();
-				openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+				openLinkText.setTextColor(ViewExtensionsKt.themeColor(this, R.attr.colorError));
+				ColorUtils.setEditTextUnderlineColorAttr(openLinkText, R.attr.colorError);
 				openLinkError.setVisibility(View.VISIBLE);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 					if (openLinkText.getText().toString().isEmpty()) {
@@ -9295,13 +9295,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
                     switch (error) {
                         case CHAT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ViewExtensionsKt.themeColor(this,
+									android.R.attr.textColorPrimary));
                             openLinkErrorText.setText(R.string.valid_chat_link);
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
                         case CONTACT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ViewExtensionsKt.themeColor(this,
+									android.R.attr.textColorPrimary));
                             openLinkErrorText.setText(R.string.valid_contact_link);
                             openLinkOpenButton.setText(R.string.action_open_contact_link);
                             break;
@@ -9323,9 +9325,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else {
 				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
-					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-					openLinkText.getBackground().mutate().clearColorFilter();
-					openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					openLinkText.setTextColor(ViewExtensionsKt.themeColor(this,
+							android.R.attr.textColorPrimary));
+					ColorUtils.resetEditTextUnderlineColor(openLinkText);
 					openLinkError.setVisibility(View.GONE);
 					openLinkOpenButton.setText(R.string.context_open_link);
 				}
@@ -9397,8 +9399,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void showOpenLinkDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this,
-				R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
+				R.style.MEGAMaterialAlertDialogStyle);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 		builder.setView(v).setPositiveButton(R.string.context_open_link, null)

@@ -204,7 +204,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     public void showRecoveryKeyDialog(String recoveryKeyUrl) {
         logDebug("link: " + recoveryKeyUrl);
 
-        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context, R.style.MEGAMaterialAlertDialogStyle);
         dialogBuilder.setView(R.layout.dialog_recovery_key);
         dialogBuilder.setTitle(R.string.title_dialog_insert_MK);
         dialogBuilder.setMessage(R.string.text_dialog_insert_MK);

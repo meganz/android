@@ -151,7 +151,7 @@ class OfflineFileInfoFragment : Fragment() {
             }
         }
 
-        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(requireContext(), R.style.MEGAMaterialAlertDialogStyle)
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
             .setPositiveButton(R.string.general_remove) { _, _ ->
                 NodeController(requireContext()).deleteOffline(node)

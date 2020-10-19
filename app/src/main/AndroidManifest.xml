@@ -286,7 +286,7 @@
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.Dialog">
+            android:theme="@style/Theme.MaterialComponents.DayNight.Dialog">
         </activity>
 
         <activity

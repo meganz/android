@@ -48,7 +48,7 @@ object ColorUtils {
     private fun doSetEditTextUnderlineColor(
         editText: EditText,
         reset: Boolean,
-        @ColorRes color: Int
+        color: Int
     ) {
         var editTextBackground = editText.background ?: return
         if (DrawableUtils.canSafelyMutateDrawable(editTextBackground)) {
@@ -60,14 +60,19 @@ object ColorUtils {
             editText.refreshDrawableState()
         } else {
             editTextBackground.colorFilter = AppCompatDrawableManager.getPorterDuffColorFilter(
-                editText.resources.getColor(color), SRC_IN
+                color, SRC_IN
             )
         }
     }
 
     @JvmStatic
     fun setEditTextUnderlineColor(editText: EditText, @ColorRes color: Int) {
-        doSetEditTextUnderlineColor(editText, false, color)
+        doSetEditTextUnderlineColor(editText, false, editText.resources.getColor(color))
+    }
+
+    @JvmStatic
+    fun setEditTextUnderlineColorAttr(editText: EditText, @AttrRes color: Int) {
+        doSetEditTextUnderlineColor(editText, false, editText.context.themeColor(color))
     }
 
     @JvmStatic

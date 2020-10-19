@@ -3,6 +3,7 @@
     Do not redefine title/message(top pane) and buttons (bottom pane)
     as they are already defined by Google default and reusable -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="24dp"
@@ -13,9 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:textColor="@color/emoji_icons"
         android:layout_marginTop="30dp"
-        android:textColorLink="@color/name_my_account"/>
+        />
 
     <RelativeLayout
         android:id="@+id/error"
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:textColor="@color/dark_primary_color"
+            android:textColor="?attr/colorError"
             android:layout_centerVertical="true"/>
 
         <ImageView
@@ -42,7 +42,7 @@
             android:src="@drawable/ic_input_warning"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:tint="@color/dark_primary_color"/>
+            app:tint="?attr/colorError"/>
 
     </RelativeLayout>
 </RelativeLayout>

@@ -56,7 +56,7 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
 
         <item name="preferenceTheme">@style/PreferenceStyle</item>
-        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/MEGABottomSheetDialogTheme</item>
 
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>

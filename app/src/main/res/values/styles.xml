@@ -59,7 +59,7 @@
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
-        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/MEGABottomSheetDialogTheme</item>
     </style>
 
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
@@ -215,13 +215,6 @@
 
     <style name="ButtonAlertDialogStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/accentColor</item>
-    </style>
-
-    <style name="MaterialAlertDialogStyle" parent="Theme.MaterialComponents.Light.Dialog.Alert.Bridge">
-        <item name="colorSurface">@color/white</item>
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/mail_my_account</item>
-        <item name="android:textColorPrimary">@color/black</item>
     </style>
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
@@ -600,8 +593,8 @@
         <item name="android:textColor">@color/pass_strong</item>
     </style>
 
-    <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    <style name="MEGABottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/MEGAModalStyle</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
 
@@ -609,8 +602,24 @@
         <item name="android:navigationBarColor">@color/bottom_sheet_navigation_bar_color</item>
     </style>
 
-    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+    <style name="MEGAModalStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/background_bottomsheet_round_top</item>
     </style>
 
+    <style name="MEGAMaterialAlertDialogStyle" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="materialAlertDialogTitleTextStyle">@style/MEGAAlertDialogTitleStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MEGANegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MEGAPositiveButtonStyle</item>
+    </style>
+    <style name="MEGAAlertDialogTitleStyle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <!-- Fake Roboto Medium. -->
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="MEGANegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+    <style name="MEGAPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
 </resources>
