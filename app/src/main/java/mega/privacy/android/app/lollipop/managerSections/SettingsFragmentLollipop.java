@@ -504,6 +504,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         }
     }
 
+    public void hidePreferencesChat(){
+        chatPreference.setEnabled(false);
+    }
+
     public void update2FAPreference(boolean enabled) {
         twoFASwitch.setChecked(enabled);
     }

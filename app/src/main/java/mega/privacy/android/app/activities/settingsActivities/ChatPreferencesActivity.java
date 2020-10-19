@@ -41,10 +41,10 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
+            if (intent == null || intent.getAction() == null || sttChat == null)
                 return;
 
-            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) && sttChat != null){
+            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
                 sttChat.updateNotifChat();
             }
         }
@@ -53,10 +53,10 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     private BroadcastReceiver richLinksUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
+            if (intent == null || intent.getAction() == null || sttChat == null)
                 return;
 
-            if(intent.getAction().equals(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE) && sttChat != null){
+            if(intent.getAction().equals(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE)){
                 sttChat.updateEnabledRichLinks();
             }
         }
@@ -65,10 +65,10 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     private BroadcastReceiver statusUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
+            if (intent == null || intent.getAction() == null || sttChat == null)
                 return;
 
-            if(intent.getAction().equals(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE) && sttChat != null){
+            if(intent.getAction().equals(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE)){
                 boolean cancelled = intent.getBooleanExtra(PRESENCE_CANCELLED, false);
                 sttChat.updatePresenceConfigChat(cancelled);
             }

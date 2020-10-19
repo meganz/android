@@ -37,6 +37,11 @@ public class BroadcastConstants {
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
     public static final String ACTION_UPDATE_PUSH_NOTIFICATION_SETTING = "ACTION_UPDATE_PUSH_NOTIFICATION_SETTING";
     public static final String ACTION_UPDATE_ONLINE_OPTIONS_SETTING = "ACTION_UPDATE_ONLINE_OPTIONS_SETTING";
+    public static final String ACTION_UPDATE_CACHE_SIZE_SETTING = "ACTION_UPDATE_CACHE_SIZE_SETTING";
+    public static final String ACTION_UPDATE_OFFLINE_SIZE_SETTING = "ACTION_UPDATE_OFFLINE_SIZE_SETTING";
+    public static final String ACTION_GET_SIZE_OFFLINE_SETTING = "ACTION_GET_SIZE_OFFLINE_SETTING";
+    public static final String ACTION_SET_VERSION_INFO_SETTING = "ACTION_SET_VERSION_INFO_SETTING";
+    public static final String ACTION_RESET_VERSION_INFO_SETTING = "ACTION_RESET_VERSION_INFO_SETTING";
 
     public static final String ACTION_TRANSFER_OVER_QUOTA = "ACTION_TRANSFER_OVER_QUOTA";
     public static final String ACTION_UPDATE_NICKNAME = "ACTION_UPDATE_NICKNAME";
@@ -75,7 +80,10 @@ public class BroadcastConstants {
     public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
     public static final String SNACKBAR_TEXT = "SNACKBAR_TEXT";
     public static final String PRESENCE_CANCELLED = "PRESENCE_CANCELLED";
+    public static final String CACHE_SIZE = "CACHE_SIZE";
+    public static final String OFFLINE_SIZE = "OFFLINE_SIZE";
     public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
     public static final String ONLINE_OPTION = "ONLINE_OPTION";
+    public static final String ACTION_TYPE = "actionType";
 
 }

@@ -915,10 +915,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							}
 						}
 
-						if(getSettingsFragment() != null){
-							sttFLol.setRubbishInfo();
-						}
-
 						checkBusinessStatus();
 
 						if (megaApi.isBusinessAccount()) {
@@ -1362,9 +1358,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
                         break;
                     case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
-                        if (getSettingsFragment() != null) {
-                            sttFLol.taskGetSizeOffline();
-                        }
+                        sendBroadcast(new Intent(ACTION_GET_SIZE_OFFLINE_SETTING));
                         break;
                 }
             }
@@ -9772,224 +9766,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 	}
 
-	public void showRBNotDisabledDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LayoutInflater inflater = this.getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_two_vertical_buttons, null);
-		builder.setView(v);
-
-		TextView title = (TextView) v.findViewById(R.id.dialog_title);
-		title.setText(getString(R.string.settings_rb_scheduler_enable_title));
-		TextView text = (TextView) v.findViewById(R.id.dialog_text);
-		text.setText(getString(R.string.settings_rb_scheduler_alert_disabling));
-
-		Button firstButton = (Button) v.findViewById(R.id.dialog_first_button);
-		firstButton.setText(getString(R.string.button_plans_almost_full_warning));
-		firstButton.setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				generalDialog.dismiss();
-				//Show UpgradeAccountActivity
-				drawerItemPreUpgradeAccount = drawerItem;
-				drawerItem = DrawerItem.ACCOUNT;
-				accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
-				selectDrawerItemAccount();
-				setTabsVisibility();
-			}
-		});
-
-		Button secondButton = (Button) v.findViewById(R.id.dialog_second_button);
-		secondButton.setText(getString(R.string.button_not_now_rich_links));
-		secondButton.setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				generalDialog.dismiss();
-			}
-		});
-
-		generalDialog = builder.create();
-		generalDialog.show();
-	}
-
-	public void showRbSchedulerValueDialog(final boolean isEnabling){
-		logDebug("showRbSchedulerValueDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layout.addView(input, params);
-
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.hint_days));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-
-					try{
-						int daysCount = Integer.parseInt(value);
-
-						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-							//PRO account
-							if(daysCount>6){
-								//Set new value
-								setRBSchedulerValue(value);
-								newFolderDialog.dismiss();
-							}
-							else{
-								//Show again the dialog
-								input.setText("");
-								input.requestFocus();
-							}
-						}
-						else{
-							//PRO account
-							if(daysCount>6 && daysCount<31){
-								//Set new value
-								setRBSchedulerValue(value);
-								newFolderDialog.dismiss();
-							}
-							else{
-								//Show again the dialog
-								input.setText("");
-								input.requestFocus();
-							}
-						}
-					}
-					catch (Exception e){
-						//Show again the dialog
-						input.setText("");
-						input.requestFocus();
-					}
-
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.requestFocus();
-
-		final TextView text = new TextView(ManagerActivityLollipop.this);
-
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-			text.setText(getString(R.string.settings_rb_scheduler_enable_period_PRO));
-		}
-		else{
-			text.setText(getString(R.string.settings_rb_scheduler_enable_period_FREE));
-		}
-
-		float density = getResources().getDisplayMetrics().density;
-		float scaleW = getScaleW(outMetrics, density);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (11*scaleW));
-		layout.addView(text);
-
-		LinearLayout.LayoutParams params_text_error = (LinearLayout.LayoutParams) text.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-//		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-//		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(25, outMetrics), 0,scaleWidthPx(25, outMetrics),0);
-		text.setLayoutParams(params_text_error);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
-		builder.setPositiveButton(getString(R.string.general_ok),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new android.content.DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if(isEnabling && getSettingsFragment() != null){
-					sttFLol.updateRBScheduler(0);
-				}
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-
-		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-
-				String value = input.getText().toString().trim();
-
-				if (value.length() == 0) {
-					return;
-				}
-
-				try{
-					int daysCount = Integer.parseInt(value);
-
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-						//PRO account
-						if(daysCount>6){
-							//Set new value
-							setRBSchedulerValue(value);
-							newFolderDialog.dismiss();
-						}
-						else{
-							//Show again the dialog
-							input.setText("");
-							input.requestFocus();
-						}
-					}
-					else{
-						//PRO account
-						if(daysCount>6 && daysCount<31){
-							//Set new value
-							setRBSchedulerValue(value);
-							newFolderDialog.dismiss();
-						}
-						else{
-							//Show again the dialog
-							input.setText("");
-							input.requestFocus();
-						}
-					}
-				}
-				catch (Exception e){
-					//Show again the dialog
-					input.setText("");
-					input.requestFocus();
-				}
-			}
-		});
-	}
-
-	public void setRBSchedulerValue(String value){
-		logDebug("Value: "+ value);
-		int intValue = Integer.parseInt(value);
-
-		if(megaApi!=null){
-			megaApi.setRubbishBinAutopurgePeriod(intValue, this);
-		}
-	}
-
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
 			MegaNode rootNode = megaApi.getRootNode();
@@ -10134,24 +9910,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						nC.cleanRubbishBin();
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		clearRubbishBinDialog = builder.create();
-		clearRubbishBinDialog.show();
-	}
-
-	public void showConfirmationClearAllVersions(){
-		logDebug("showConfirmationClearAllVersions");
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.settings_file_management_delete_versions));
-		builder.setMessage(getString(R.string.text_confirmation_dialog_delete_versions));
-
-		builder.setPositiveButton(getString(R.string.context_delete),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						nC.clearAllVersions();
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -11319,10 +11077,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-
-                        if (getSettingsFragment() != null) {
-                        	sttFLol.taskGetSizeOffline();
-                        }
+						sendBroadcast(new Intent(ACTION_GET_SIZE_OFFLINE_SETTING));
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -11353,9 +11108,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							nC.deleteOffline(documents.get(i));
 						}
 						updateOfflineView(documents.get(0));
-						if (getSettingsFragment() != null) {
-							sttFLol.taskGetSizeOffline();
-						}
+						sendBroadcast(new Intent(ACTION_GET_SIZE_OFFLINE_SETTING));
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13354,10 +13107,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				if (e.getErrorCode() != MegaError.API_OK) {
 					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-					if(getSettingsFragment() != null){
-						sttFLol.updateEnabledFileVersions();
-					}
-
 					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 					if(mStorageFLol!=null){
 						mStorageFLol.refreshVersionsInfo();
@@ -13365,17 +13114,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				else{
 					logDebug("File versioning attribute changed correctly");
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
-				logDebug("change RB scheduler - USER_ATTR_RUBBISH_TIME finished");
-				if(getSettingsFragment() != null){
-					if (e.getErrorCode() != MegaError.API_OK){
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
-					}
-					else{
-						sttFLol.updateRBScheduler(request.getNumber());
-					}
 				}
 			}
 		}
@@ -13551,28 +13289,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
-				if(getSettingsFragment() != null){
-					sttFLol.updateEnabledFileVersions();
-				}
-
 				mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 				if(mStorageFLol!=null){
 					mStorageFLol.refreshVersionsInfo();
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
-				if(getSettingsFragment() != null){
-					if (e.getErrorCode() == MegaError.API_ENOENT){
-						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-							sttFLol.updateRBScheduler(30);
-						}
-						else{
-							sttFLol.updateRBScheduler(90);
-						}
-					}
-					else{
-						sttFLol.updateRBScheduler(request.getNumber());
-					}
 				}
 			}
 		}
@@ -14084,9 +13803,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
 				resetAccountDetailsTimeStamp();
-				if (getSettingsFragment() != null) {
-					sttFLol.resetRubbishInfo();
-				}
 			}
 			else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_no_emptied), -1);
@@ -14097,9 +13813,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("OK MegaRequest.TYPE_REMOVE_VERSIONS");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.success_delete_versions), -1);
 
-				if(getSettingsFragment() != null) {
-					sttFLol.resetVersionsInfo();
-				}
+				sendBroadcast(new Intent(ACTION_RESET_VERSION_INFO_SETTING));
+
 				//Get info of the version again (after 10 seconds)
 				final Handler handler = new Handler();
 				handler.postDelayed(new Runnable() {
@@ -14188,10 +13903,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mStorageFLol.refreshVersionsInfo();
 			}
 
-			//Refresh Settings if it is shown
-			if(getSettingsFragment() != null) {
-				sttFLol.setVersionsInfo();
-			}
+			sendBroadcast(new Intent(ACTION_SET_VERSION_INFO_SETTING));
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
 			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
@@ -14242,17 +13954,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						if(megaApi.getMyUser()!=null) {
 							if (user.getHandle() == megaApi.getMyUser().getHandle()) {
 								logDebug("Change on my account from another client");
-								if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
-									logDebug("Change on CHANGE_TYPE_DISABLE_VERSIONS");
-									megaApi.getFileVersionsOption(this);
-								}
+
 
 								if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
 									logDebug("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
 									megaApi.getContactLinksOption(this);
-								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
-									logDebug("Change on CHANGE_TYPE_RUBBISH_TIME");
-									megaApi.getRubbishBinAutopurgePeriod(this);
 								}
 							}
 						}

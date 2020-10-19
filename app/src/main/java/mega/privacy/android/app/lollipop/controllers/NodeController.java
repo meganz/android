@@ -27,6 +27,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.ShareListener;
@@ -1341,7 +1342,11 @@ public class NodeController {
 
     public void cleanRubbishBin(){
         logDebug("cleanRubbishBin");
-        megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
+        if(context instanceof FileManagementPreferencesActivity){
+            megaApi.cleanRubbishBin((FileManagementPreferencesActivity) context);
+        }else{
+            megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
+        }
     }
 
     public void clearAllVersions(){

@@ -18,7 +18,7 @@ public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
     private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
+            if (intent == null || intent.getAction() == null || sttAdvanced == null)
                 return;
 
             if (intent.getAction().equals(ACTION_UPDATE_ONLINE_OPTIONS_SETTING)) {
@@ -33,7 +33,6 @@ public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
         super.onCreate(savedInstanceState);
 
         aB.setTitle(getString(R.string.settings_advanced_features).toUpperCase());
-
         sttAdvanced = new AdvancedSettingsFragment();
         replaceFragment(sttAdvanced);
         registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));

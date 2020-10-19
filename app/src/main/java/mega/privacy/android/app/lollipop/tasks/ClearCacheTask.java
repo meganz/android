@@ -1,11 +1,11 @@
 package mega.privacy.android.app.lollipop.tasks;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
-
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
-
+import mega.privacy.android.app.MegaApplication;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -31,9 +31,8 @@ public class ClearCacheTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String size) {
         logDebug("ClearCacheTask::onPostExecute");
-        SettingsFragmentLollipop sttFLol = ((ManagerActivityLollipop)context).getSettingsFragment();
-        if(sttFLol!=null){
-            sttFLol.setCacheSize(size);
-        }
+        Intent intent = new Intent(ACTION_UPDATE_CACHE_SIZE_SETTING);
+        intent.putExtra(CACHE_SIZE, size);
+        MegaApplication.getInstance().sendBroadcast(intent);
     }
 }
