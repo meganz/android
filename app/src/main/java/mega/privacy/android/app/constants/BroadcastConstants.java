@@ -36,6 +36,8 @@ public class BroadcastConstants {
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
     public static final String ACTION_UPDATE_PUSH_NOTIFICATION_SETTING = "ACTION_UPDATE_PUSH_NOTIFICATION_SETTING";
+    public static final String ACTION_UPDATE_ONLINE_OPTIONS_SETTING = "ACTION_UPDATE_ONLINE_OPTIONS_SETTING";
+
     public static final String ACTION_TRANSFER_OVER_QUOTA = "ACTION_TRANSFER_OVER_QUOTA";
     public static final String ACTION_UPDATE_NICKNAME = "ACTION_UPDATE_NICKNAME";
     public static final String ACTION_UPDATE_FIRST_NAME = "ACTION_UPDATE_FIRST_NAME";
@@ -74,4 +76,6 @@ public class BroadcastConstants {
     public static final String SNACKBAR_TEXT = "SNACKBAR_TEXT";
     public static final String PRESENCE_CANCELLED = "PRESENCE_CANCELLED";
     public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
+    public static final String ONLINE_OPTION = "ONLINE_OPTION";
+
 }

@@ -5196,6 +5196,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 					clickDrawerItemLollipop(drawerItem);
 
+					senOnlineBroadcast(true);
 					if (getSettingsFragment() != null) {
 						sttFLol.setOnlineOptions(true);
 					}
@@ -5287,6 +5288,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
 					megaChatApi.getMyFullname());
+
+			senOnlineBroadcast(false);
 
 			if (getSettingsFragment() != null) {
 				sttFLol.setOnlineOptions(false);
@@ -16442,6 +16445,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		for (AndroidCompletedTransfer transfer : failedOrCancelledTransfers) {
 			retryTransfer(transfer);
 		}
+	}
+
+	private void senOnlineBroadcast(boolean isOnline){
+		Intent intent =  new Intent(ACTION_UPDATE_ONLINE_OPTIONS_SETTING);
+		intent.putExtra(ONLINE_OPTION, isOnline);
+		sendBroadcast(intent);
 	}
 
     /**

@@ -36,7 +36,7 @@ public class SettingsConstants {
     public static final String KEY_CHANGE_PASSWORD= "settings_change_password";
     public static final String KEY_2FA = "settings_2fa_activated";
     public static final String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
-
+    public static final String KEY_HTTPS_ONLY = "settings_use_https_only";
 
     public static final String KEY_STORAGE_FILE_MANAGEMENT = "settings_storage_file_management";
     public static final String KEY_RECOVERY_KEY= "settings_recovery_key";
