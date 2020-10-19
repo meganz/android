@@ -2,12 +2,12 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.os.Build
 import android.view.LayoutInflater
 import android.widget.TextView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.themeColor
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
@@ -16,7 +16,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 
 class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
 
@@ -65,11 +65,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun setSelectedColor(text: TextView) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            text.setTextColor(resources.getColor(R.color.accentColor, null))
-        } else {
-            text.setTextColor(resources.getColor(R.color.accentColor))
-        }
+        text.setTextColor(context.themeColor(R.attr.colorSecondary))
     }
 
     private fun setCloudOrder(managerActivity: ManagerActivityLollipop, order: Int) {

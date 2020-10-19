@@ -7451,7 +7451,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	return true;
 	        }
 	        case R.id.action_menu_sort_by:{
-				showSortOptions(managerActivity, outMetrics);
+				showNewSortByPanel();
 	        	return true;
 	        }
 			case R.id.action_search_by_date:{
