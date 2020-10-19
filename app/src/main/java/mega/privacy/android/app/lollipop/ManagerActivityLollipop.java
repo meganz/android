@@ -10955,13 +10955,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void showNodeOptionsPanel(MegaNode node){
-		logDebug("showNodeOptionsPanel");
-
-		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-		selectedNode = node;
-		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.MODE0);
 	}
 
 	public void showNodeOptionsPanel(MegaNode node, int mode){
@@ -15946,7 +15940,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		try {
 			if (enable) {
 				textToShow = textToShow.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(this, R.color.drawer_notification_count_color)
+						+ ColorUtils.getColorHexString(this, R.color.color_primary_red)
 						+ "\'>");
 			}
 			else {

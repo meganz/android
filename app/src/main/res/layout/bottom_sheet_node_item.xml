@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/node_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -48,7 +48,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:maxLines="1"
                     android:ellipsize="middle"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
@@ -66,8 +65,9 @@
                         android:id="@+id/node_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:alpha="0.35"
-                        android:background="@null"/>
+                        android:background="@null"
+                        app:tint="?android:attr/textColorSecondary"
+                        />
 
                 </RelativeLayout>
 
@@ -83,11 +83,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_versions_small"
-                    android:alpha="0.76"
                     android:background="@null"
                     android:layout_marginRight="8dp"
                     android:layout_centerVertical="true"
-                    android:visibility="visible"/>
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/node_info_text"
@@ -97,7 +97,6 @@
                     android:textSize="14sp"
                     android:singleLine="true"
                     android:layout_toRightOf="@id/node_info_versions_icon"
-                    android:maxLines="1"
                     android:ellipsize="middle"/>
             </RelativeLayout>
 
@@ -110,8 +109,8 @@
             android:layout_marginEnd="47dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:alpha="0.35"
-            android:background="@null"/>
+            android:background="@null"
+            app:tint="?android:attr/textColorSecondary"/>
 
     </RelativeLayout>
 
@@ -119,7 +118,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/sliding_panel_separator"/>
+        android:background="@color/list_item_divider"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -150,12 +149,12 @@
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:alpha="0.54"
                         android:layout_marginLeft="5dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/info_ic"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        app:tint="?android:attr/textColorSecondary" />
 
                     <TextView
                         android:id="@+id/option_properties_text"
@@ -172,7 +171,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="72dp"
-                    android:background="@color/black_12_alpha"/>
+                    android:background="@color/list_item_divider"/>
             </LinearLayout>
 
             <LinearLayout
@@ -190,9 +189,9 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
                     android:src="@drawable/ic_b_save_to_device"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_download_text"
@@ -221,9 +220,9 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
                     android:src="@drawable/ic_b_save_offline"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_offline_text"
@@ -253,7 +252,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/list_item_divider"/>
 
             <LinearLayout
                 android:id="@+id/option_link_layout"
@@ -267,12 +266,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/link_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_link_text"
@@ -298,12 +297,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_remove_link"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_remove_link_text"
@@ -329,13 +328,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/black"
                     android:src="@drawable/ic_social_share_white"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_share_text"
@@ -361,12 +359,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_share"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_share_folder_text"
@@ -395,9 +393,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
                     android:src="@drawable/ic_send_to_contact"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/send_chat_text"
@@ -423,12 +421,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_remove_share"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_clear_share_text"
@@ -448,7 +446,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/list_item_divider"/>
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
@@ -462,12 +460,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_rename"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_rename_text"
@@ -493,12 +491,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_move"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_move_text"
@@ -524,12 +522,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_menu_copy"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_copy_text"
@@ -559,7 +557,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_restore"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_restore_text"
@@ -579,7 +578,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/list_item_divider"/>
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -593,12 +592,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_open_with"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_open_with_text"
@@ -624,12 +623,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_upload_pick_file"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_open_folder_text"
@@ -649,7 +648,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/list_item_divider"/>
 
             <LinearLayout
                 android:id="@+id/option_leave_share_layout"
@@ -666,9 +665,9 @@
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
                     android:src="@drawable/leave_share_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="@color/color_primary_red"/>
 
                 <TextView
                     android:id="@+id/option_leave_share_text"
@@ -678,8 +677,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/alert_leave_share"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red"/>
             </LinearLayout>
 
             <LinearLayout
@@ -697,9 +695,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
                     android:src="@drawable/ic_rubbish_bin"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="@color/color_primary_red" />
 
                 <TextView
                     android:id="@+id/option_rubbish_bin_text"
@@ -709,8 +707,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_move_to_trash"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red"/>
             </LinearLayout>
 
             <LinearLayout
@@ -728,9 +725,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
                     android:src="@drawable/ic_remove"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="@color/color_primary_red"/>
 
                 <TextView
                     android:id="@+id/option_remove_text"
@@ -740,8 +737,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_remove"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red"/>
             </LinearLayout>
 
         </LinearLayout>

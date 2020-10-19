@@ -45,6 +45,10 @@
     <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:letterSpacing">0.009375</item>
     </style>
+    <style name="TextAppearance.Mega.Body1.Red" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:letterSpacing">0.009375</item>
+        <item name="android:textColor">@color/color_primary_red</item>
+    </style>
 
     <!-- Medium, 14sp, textColorPrimary -->
     <style name="Drawer.Item" parent="TextAppearance.MaterialComponents.Body2">

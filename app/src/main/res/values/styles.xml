@@ -62,14 +62,6 @@
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
 
-    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/AppModalStyle</item>
-    </style>
-
-    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/background_bottomsheet_round_top</item>
-    </style>
-
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
@@ -589,7 +581,7 @@
     </style>
 
     <style name="InputTextAppearanceVeryWeak" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_very_weak</item>
+        <item name="android:textColor">@color/color_primary_red</item>
     </style>
 
     <style name="InputTextAppearanceWeak" parent="TextAppearance.Design.Error">
@@ -607,4 +599,18 @@
     <style name="InputTextAppearanceStrong" parent="TextAppearance.Design.Error">
         <item name="android:textColor">@color/pass_strong</item>
     </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <!-- reference ?attr/colorPrimary doesn't work, need define a separate color -->
+        <item name="android:navigationBarColor">@color/bottom_sheet_navigation_bar_color</item>
+    </style>
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/background_bottomsheet_round_top</item>
+    </style>
+
 </resources>

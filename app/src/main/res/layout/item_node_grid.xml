@@ -117,7 +117,7 @@
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:text="@{item.node.name}"
-                android:textColor="@{item.node.isTakenDown() ? @color/dark_primary_color : @color/black_87_opacity }"
+                android:textColor="@{item.node.isTakenDown() ? @color/dark_primary_color : @color/grey_alpha_087 }"
                 android:textSize="14sp"
                 tools:text="2048.jpg"
                 />

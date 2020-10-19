@@ -26,7 +26,7 @@
 			android:layout_marginStart="40dp"
 			android:ellipsize="middle"
 			android:singleLine="true"
-			android:textColor="@color/black_87_opacity"
+			android:textColor="@color/grey_alpha_087"
 			android:textSize="14sp"
 			tools:text="Folder"
 			/>

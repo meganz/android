@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true" android:color="@color/bottom_nav_menu_color_checked"/>
+    <item android:state_checked="true" android:color="@color/color_primary_red"/>
     <item android:state_enabled="false" android:color="@color/bottom_nav_menu_color_disabled"/>
     <item android:color="@color/bottom_nav_menu_color_normal"/>
 </selector>

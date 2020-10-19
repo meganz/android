@@ -336,14 +336,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_very_weak));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.pass_very_weak));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.color_primary_red));
 
             passwdAdvice.setText(getString(R.string.passwd_weak));
 
             passwdValid = false;
 
             userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceVeryWeak);
-            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.pass_very_weak);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.color_primary_red);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_weak));

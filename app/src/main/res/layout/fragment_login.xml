@@ -356,7 +356,7 @@
                 android:layout_height="200dp"
                 android:layout_marginTop="20dp"
                 android:src="@drawable/logo_loading_ic"
-                android:tint="@color/login_loading_logo_color"
+                app:tint="@color/color_primary_red"
                 />
 
             <TextView
