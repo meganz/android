@@ -2,6 +2,7 @@ package mega.privacy.android.app;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -15,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -35,7 +37,6 @@ import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
-
 import com.facebook.drawee.backends.pipeline.Fresco;
 import org.webrtc.ContextUtils;
 
@@ -193,7 +194,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private PowerManager.WakeLock wakeLock;
 	private CallListener callListener = new CallListener();
 
-    @Override
+	@Override
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
@@ -527,6 +528,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							logError("Calls not found");
 							return;
 						}
+
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
 							createRTCAudioManager(false, callStatus);
 						}
@@ -558,6 +560,57 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 		}
 	};
+
+	/**
+	 * Broadcast for controlling changes in screen.
+	 */
+	BroadcastReceiver screenOnOffReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+				muteOrUnmute(true);
+			}
+		}
+	};
+
+	/**
+	 * Broadcast for controlling changes in the volume.
+	 */
+	BroadcastReceiver volumeReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			if (intent.getAction().equals(VOLUME_CHANGED_ACTION) && rtcAudioManagerRingInCall != null) {
+				int newVolume = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_VALUE);
+				if (newVolume != INVALID_VOLUME) {
+					rtcAudioManagerRingInCall.checkVolume(newVolume);
+				}
+			}
+		}
+	};
+
+	BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+				muteOrUnmute(true);
+			}
+		}
+	};
+
+	public void muteOrUnmute(boolean mute){
+		if (rtcAudioManagerRingInCall != null) {
+			rtcAudioManagerRingInCall.muteOrUnmuteIncomingCall(mute);
+		}
+	}
 
 	/**
 	 * Broadcast for controlling changes in sessions.
@@ -1412,7 +1465,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
-		if (callToLaunch == null || callToLaunch.getStatus() > MegaChatCall.CALL_STATUS_IN_PROGRESS){
+		int callStatus = callToLaunch.getStatus();
+		if (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS){
 			logWarning("Launch not in correct status");
 			return;
 		}
@@ -1522,7 +1576,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
             if (rtcAudioManagerRingInCall != null) {
                 removeRTCAudioManagerRingIn();
             }
-            rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
+
+			IntentFilter filterScreen = new IntentFilter();
+			filterScreen.addAction(Intent.ACTION_SCREEN_ON);
+			filterScreen.addAction(Intent.ACTION_SCREEN_OFF);
+			filterScreen.addAction(Intent.ACTION_USER_PRESENT);
+			registerReceiver(screenOnOffReceiver, filterScreen);
+
+			registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
+			registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+
+			rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
         } else {
             if (rtcAudioManager != null) {
                 return;
@@ -1542,8 +1606,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
         try {
             logDebug("Removing RTC Audio Manager");
             rtcAudioManagerRingInCall.stop();
-            rtcAudioManagerRingInCall = null;
-        } catch (Exception e) {
+			rtcAudioManagerRingInCall = null;
+
+			unregisterReceiver(screenOnOffReceiver);
+			unregisterReceiver(volumeReceiver);
+			unregisterReceiver(becomingNoisyReceiver);
+		} catch (Exception e) {
             logError("Exception stopping speaker audio manager", e);
         }
     }
@@ -1642,7 +1710,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
 	public void checkQueuedCalls() {
-		logDebug("checkQueuedCalls");
 		try {
 			stopService(new Intent(this, IncomingCallService.class));
 			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
@@ -1654,17 +1721,19 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus()));
-        openCallService(call.getChatid());
+		openCallService(call.getChatid());
 		MegaApplication.setShowPinScreen(false);
+		int callStatus = call.getStatus();
+
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra(CHAT_ID, call.getChatid());
 		i.putExtra(CALL_ID, call.getId());
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(i);
+		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(i);
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		logDebug("Launch call: " + getTitleChat(chatRoom));
-		if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+		if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
 			setCallLayoutStatus(call.getChatid(), true);
 		}
 	}
