@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/upload_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <!-- Title -->
@@ -23,8 +23,7 @@
             android:paddingTop="2dp"
             android:layout_marginLeft="18dp"
             android:text="@string/action_add"
-            android:textColor="@color/transparent_black"
-            android:textSize="16sp"/>
+            android:textAppearance="@style/TextAppearance.Mega.Body1.Secondary"/>
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -54,9 +53,9 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
                     android:src="@drawable/ic_b_from_device"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/upload_option_from_device_text"
@@ -66,8 +65,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/attachment_upload_panel_photo"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -82,12 +80,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_pick_file_system"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/upload_option_from_system_text"
@@ -97,15 +95,14 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/upload_to_filesystem"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1"/>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/list_item_divider"/>
 
             <LinearLayout
                 android:id="@+id/scan_document_layout"
@@ -123,9 +120,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
                     android:src="@drawable/ic_b_scan_document"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/scan_document_text"
@@ -134,8 +131,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -154,7 +150,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_media"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/take_picture_text"
@@ -164,8 +161,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/menu_take_picture"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -173,7 +169,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/black_12_alpha"
+                android:background="@color/list_item_divider"
                 android:orientation="vertical"/>
 
             <LinearLayout
@@ -191,9 +187,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
                     android:src="@drawable/ic_b_new_folder"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/new_folder_text"
@@ -203,8 +199,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/action_create_folder"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1"/>
             </LinearLayout>
         </LinearLayout>
 
