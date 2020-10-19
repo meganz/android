@@ -9407,6 +9407,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.setNegativeButton(R.string.general_cancel, null);
 
 		openLinkText = v.findViewById(R.id.text);
+
 		openLinkText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -9431,6 +9432,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				return false;
 			}
 		});
+
+		Util.showKeyboardDelayed(openLinkText);
 
 		openLinkError = v.findViewById(R.id.error);
 		openLinkErrorText = v.findViewById(R.id.error_text);
@@ -9676,151 +9679,96 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showNewFolderDialog() {
 		logDebug("showNewFolderDialogKitLollipop");
 
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(ManagerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		ViewGroup errorLayout = v.findViewById(R.id.error);
+		TextView errorText = v.findViewById(R.id.error_text);
+		EditText input = v.findViewById(R.id.text);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
 			}
 
 			@Override
 			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
 			}
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				if (error_layout.getVisibility() == View.VISIBLE) {
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				if (errorLayout.getVisibility() == View.VISIBLE) {
+					errorLayout.setVisibility(View.GONE);
+					ColorUtils.resetEditTextUnderlineColor(input);
 				}
 			}
 		});
 
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		Runnable validateInput = () -> {
+			String value = input.getText().toString().trim();
+			if (value.length() == 0) {
+				ColorUtils.setEditTextUnderlineColorAttr(input, R.attr.colorError);
+				errorText.setText(getString(R.string.invalid_string));
+				errorLayout.setVisibility(View.VISIBLE);
+				input.requestFocus();
+			} else {
+				boolean result = matches(regex, value);
+				if (result) {
+					ColorUtils.setEditTextUnderlineColorAttr(input, R.attr.colorError);
+					errorText.setText(getString(R.string.invalid_characters));
+					errorLayout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				} else {
+					createFolder(value);
+					newFolderDialog.dismiss();
+				}
+			}
+		};
+
 		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					} else {
-						boolean result = matches(regex, value);
-						if (result) {
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						} else {
-							createFolder(value);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
 		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
 		input.requestFocus();
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
+		input.setOnEditorActionListener((v1, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE) {
+				validateInput.run();
+				return true;
+			}
+			return false;
+		});
+
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
+				R.style.MEGAMaterialAlertDialogStyle);
+		builder.setView(v)
+				.setTitle(getString(R.string.menu_new_folder))
+				.setPositiveButton(getString(R.string.general_create),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								String value = input.getText().toString().trim();
+								if (value.length() == 0) {
+									return;
+								}
+								createFolder(value);
+							}
+						})
+				.setNegativeButton(getString(android.R.string.cancel),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialogInterface, int i) {
+								input.getBackground().clearColorFilter();
+							}
+						});
+		newFolderDialog = builder.create();
+		newFolderDialog.getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+		newFolderDialog.show();
+		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						validateInput.run();
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String value = input.getText().toString().trim();
-				 if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-
-				} else {
-					boolean result = matches(regex, value);
-					if (result) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					} else {
-						createFolder(value);
-						newFolderDialog.dismiss();
-					}
-				}
-			}
-		});
 	}
 
 	public void showRBNotDisabledDialog() {

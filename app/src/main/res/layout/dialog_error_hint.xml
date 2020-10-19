@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_marginTop="30dp"
+        android:singleLine="true"
         />
 
     <RelativeLayout
