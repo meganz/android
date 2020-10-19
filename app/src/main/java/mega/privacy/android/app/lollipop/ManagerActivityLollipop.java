@@ -672,7 +672,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
 	private AlertDialog generalDialog;
-	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
 	private AlertDialog alertDialogSMSVerification;
@@ -10155,78 +10154,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		clearRubbishBinDialog = builder.create();
 		clearRubbishBinDialog.show();
-	}
-
-	public void showPanelSetPinLock(){
-		logDebug("showPanelSetPinLock");
-
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
-
-		getSettingsFragment();
-
-		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				setPinDialog.dismiss();
-				switch(item) {
-					case 0:{
-						dbH.setPinLockType(PIN_4);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-					case 1:{
-						dbH.setPinLockType(PIN_6);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-					case 2:{
-						dbH.setPinLockType(PIN_ALPHANUMERIC);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-				}
-			}
-		});
-		dialogBuilder.setTitle(getString(R.string.pin_lock_type));
-
-		dialogBuilder.setOnKeyListener(new Dialog.OnKeyListener() {
-
-			@Override
-			public boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
-				logDebug("onKeyListener: " + keyCode);
-				if (keyCode == KeyEvent.KEYCODE_BACK) {
-					logDebug("Cancel set pin action");
-					setPinDialog.dismiss();
-					if(sttFLol!=null){
-						sttFLol.cancelSetPinLock();
-					}
-				}
-				return true;
-			}
-		});
-
-		dialogBuilder.setOnCancelListener(
-				new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						logDebug("setOnCancelListener setPin");
-						setPinDialog.dismiss();
-						if(sttFLol!=null){
-							sttFLol.cancelSetPinLock();
-						}
-					}
-				}
-		);
-
-		setPinDialog = dialogBuilder.create();
-		setPinDialog.setCanceledOnTouchOutside(true);
-		setPinDialog.show();
 	}
 
 	public void chooseAddContactDialog(boolean isMegaContact) {
