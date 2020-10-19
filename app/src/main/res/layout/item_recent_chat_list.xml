@@ -43,6 +43,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toRightOf="@+id/recent_chat_list_relative_layout_avatar"
@@ -62,7 +63,7 @@
                 rounded:emojiSize="14sp"
                 android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="13dp"
+                android:layout_gravity="center_vertical"
                 android:singleLine="true"
                 android:maxLines="1"
                 android:textColor="@color/file_list_first_row" />
@@ -71,9 +72,8 @@
                 android:id="@+id/recent_chat_list_contact_state"
                 android:layout_width="6dp"
                 android:layout_height="6dp"
-                android:layout_gravity="center_vertical"
                 android:layout_toRightOf="@id/recent_chat_list_name"
-                android:layout_marginTop="2dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="6dp"
                 android:src="@drawable/circle_status_contact_offline" />
 
@@ -81,18 +81,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/recent_chat_list_contact_state"
-                android:layout_marginTop="13dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
                 android:layout_marginLeft="4dp">
 
                 <ImageView
                     android:id="@+id/recent_chat_list_call_in_progress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/circle_call_ongoing"
-                    android:layout_marginRight="4dp"
-                    android:src="@drawable/ic_call_ongoing" />
+                    android:src="@drawable/ongoing_call_green_item"
+                    android:background="@null"
+                    android:layout_marginRight="4dp" />
 
                 <ImageView
                     android:id="@+id/recent_chat_list_private_icon"
@@ -110,8 +109,7 @@
                     android:layout_height="wrap_content"
                     android:alpha="0.54"
                     android:src="@drawable/ic_mute_list"
-                    android:background="@null"
-                    android:layout_gravity="center_vertical" />
+                    android:background="@null" />
             </LinearLayout>
 
         </LinearLayout>

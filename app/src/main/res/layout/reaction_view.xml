@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/reaction_layout"
+    android:layout_width="52dp"
+    android:layout_height="62dp"
+    android:layout_marginEnd="14dp"
+    android:background="@null"
+    android:descendantFocusability="blocksDescendants">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center">
+
+        <mega.privacy.android.app.components.twemoji.EmojiImageView
+            android:id="@+id/reaction_image"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:adjustViewBounds="true"
+            android:layout_marginEnd="3dp"
+            android:layout_centerVertical="true"
+            android:background="@null" />
+
+        <TextView
+            android:id="@+id/reaction_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:maxLines="1"
+            android:layout_toEndOf="@id/reaction_image"
+            android:textSize="14sp"
+            android:textColor="@color/mail_my_account"
+            android:background="@null" />
+    </RelativeLayout>
+</RelativeLayout>
