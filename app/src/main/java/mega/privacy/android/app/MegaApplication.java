@@ -108,7 +108,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.9_327";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.0_329";
 
 	private static TransfersManagement transfersManagement;
 
