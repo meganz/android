@@ -30,6 +30,6 @@ public class TextUtil {
     }
 
     public static boolean isEmail(String str) {
-        return EMAIL_ADDRESS.matcher(str).matches();
+        return !isTextEmpty(str) && EMAIL_ADDRESS.matcher(str).matches();
     }
 }

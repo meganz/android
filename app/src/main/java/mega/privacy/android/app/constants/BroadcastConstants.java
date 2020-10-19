@@ -68,5 +68,6 @@ public class BroadcastConstants {
     public static final int EXTRA_BROADCAST_INVALID_VALUE = -1;
     public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
     public static final String SNACKBAR_TEXT = "SNACKBAR_TEXT";
+    public static final String VOLUME_CALL = "VOLUME_CALL";
     public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
 }
