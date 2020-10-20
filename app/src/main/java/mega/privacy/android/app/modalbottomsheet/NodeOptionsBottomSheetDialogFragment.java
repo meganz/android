@@ -95,12 +95,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
         TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
-//      counterSave
+//      optionFavourite
         LinearLayout optionFavourite = contentView.findViewById(R.id.option_favourite_layout);
         ImageView imageFavourite = contentView.findViewById(R.id.option_favourite_image);
         TextView textFavourite = contentView.findViewById(R.id.option_favourite_text);
+//      optionLabel
         LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
         TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
+//      counterSave
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
         SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);

@@ -9,17 +9,16 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
 
-public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragment {
+public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
 
     private BottomSheetNodeLabelBinding binding;
     private MegaApiAndroid megaApi; // TODO Inject MegaApiAndroid when available
