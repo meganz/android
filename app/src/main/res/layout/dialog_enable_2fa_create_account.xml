@@ -45,26 +45,22 @@
             android:id="@+id/enable_2fa_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:fontFamily="roboto"
-            android:background="@drawable/background_accent_button"
+            style="@style/Button"
             android:layout_gravity="center"
             android:text="@string/general_enable"
-            android:layout_marginTop="32dp"/>
+            android:layout_marginTop="32dp"
+            />
 
         <Button
             android:id="@+id/skip_enable_2fa_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp"
-            android:fontFamily="roboto"
+            style="?attr/borderlessButtonStyle"
             android:layout_gravity="center"
-            android:text="@string/general_skip"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="12dp"
-            style="?android:attr/borderlessButtonStyle"/>
+            android:text="@string/general_skip"
+            />
 
     </LinearLayout>
 </ScrollView>

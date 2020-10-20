@@ -61,7 +61,7 @@
                 android:layout_centerVertical="true"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
-                android:tint="@color/list_item_more"
+                android:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </RelativeLayout>
@@ -166,7 +166,7 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="22dp"
                 android:src="@drawable/ic_input_warning"
-                android:tint="?attr/colorError"
+                app:tint="?attr/colorError"
                 tools:ignore="ContentDescription" />
 
             <ImageButton
@@ -177,7 +177,7 @@
                 android:layout_centerVertical="true"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
-                android:tint="@color/list_item_more"
+                android:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </RelativeLayout>
@@ -205,7 +205,7 @@
             android:layout_marginEnd="22dp"
             android:background="@null"
             android:src="@drawable/link_ic"
-            android:tint="@color/transparency_white"
+            app:tint="@color/transparency_white"
             tools:ignore="ContentDescription" />
 
         <View
