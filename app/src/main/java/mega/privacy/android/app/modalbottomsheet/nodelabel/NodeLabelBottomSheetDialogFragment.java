@@ -9,11 +9,9 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
@@ -21,7 +19,6 @@ import static mega.privacy.android.app.utils.Constants.HANDLE;
 public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
 
     private BottomSheetNodeLabelBinding binding;
-    private MegaApiAndroid megaApi; // TODO Inject MegaApiAndroid when available
     private MegaNode node = null;
 
     public static NodeLabelBottomSheetDialogFragment newInstance(long nodeHandle) {
@@ -41,7 +38,6 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        megaApi = MegaApplication.getInstance().getMegaApi();
         node = megaApi.getNodeByHandle(getArguments().getLong(HANDLE));
 
         showCurrentNodeLabel();
