@@ -535,6 +535,21 @@
         <item name="borderWidth">0dp</item>
     </style>
 
+    <style name="CheckBoxStyleStyle" parent="Theme.Megaactionbar">
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="android:colorControlNormal">@color/mail_my_account</item>
+        <item name="colorControlNormal">@color/mail_my_account</item>
+    </style>
+
+    <style name="GalleryImageShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="GalleryImageShape.Selected">
+        <item name="cornerSize">@dimen/cu_fragment_selected_round_corner_radius</item>
+    </style>
+
     <style name="AppBottomSheetDialogThemeReactions" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/AppModalStyleReactions</item>
     </style>
