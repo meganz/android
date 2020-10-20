@@ -37,6 +37,12 @@ public class BroadcastConstants {
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
     public static final String ACTION_UPDATE_PUSH_NOTIFICATION_SETTING = "ACTION_UPDATE_PUSH_NOTIFICATION_SETTING";
     public static final String ACTION_UPDATE_ONLINE_OPTIONS_SETTING = "ACTION_UPDATE_ONLINE_OPTIONS_SETTING";
+    public static final String ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING = "ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING";
+    public static final String ACTION_UPDATE_ENABLE_CU_SETTING = "ACTION_UPDATE_ENABLE_CU_SETTING";
+    public static final String ACTION_UPDATE_DISABLE_MU_SETTING = "ACTION_UPDATE_DISABLE_MU_SETTING";
+    public static final String ACTION_UPDATE_DISABLE_CU_SETTING = "ACTION_UPDATE_DISABLE_CU_SETTING";
+    public static final String ACTION_UPDATE_DISABLE_CU_UI_SETTING = "ACTION_UPDATE_DISABLE_CU_UI_SETTING";
+
     public static final String ACTION_UPDATE_CACHE_SIZE_SETTING = "ACTION_UPDATE_CACHE_SIZE_SETTING";
     public static final String ACTION_UPDATE_OFFLINE_SIZE_SETTING = "ACTION_UPDATE_OFFLINE_SIZE_SETTING";
     public static final String ACTION_GET_SIZE_OFFLINE_SETTING = "ACTION_GET_SIZE_OFFLINE_SETTING";
@@ -84,6 +90,8 @@ public class BroadcastConstants {
     public static final String OFFLINE_SIZE = "OFFLINE_SIZE";
     public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
     public static final String ONLINE_OPTION = "ONLINE_OPTION";
+    public static final String SECONDARY_FOLDER = "SECONDARY_FOLDER";
+    public static final String PRIMARY_HANDLE = "PRIMARY_HANDLE";
     public static final String ACTION_TYPE = "actionType";
 
 }

@@ -6,7 +6,7 @@
     <!--  Camera Upload  -->
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_camera_upload_on_off"
-        android:title="@string/settings_camera_upload_on"
+        android:title="@string/section_photo_sync"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />

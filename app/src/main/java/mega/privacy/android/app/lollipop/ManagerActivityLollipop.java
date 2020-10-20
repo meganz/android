@@ -985,11 +985,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					cameraUploadsClicked();
 				}
 
-				//refresh settings if user is on that page
-				if (getSettingsFragment() != null) {
-					getSettingsFragment().setCUDestinationFolder(isSecondary, handleInUserAttr);
-				}
-
 				//update folder icon
 				onNodesCloudDriveUpdate();
 			}
@@ -1341,29 +1336,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	};
 
-    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null && intent.getAction() != null) {
-                switch (intent.getAction()) {
-                    case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
-                        if (getSettingsFragment() != null) {
-                            sttFLol.refreshCameraUploadsSettings();
-                        }
-                        break;
-                    case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
-                        // disable UI elements of media upload omly
-                        if (getSettingsFragment() != null) {
-                            sttFLol.disableMediaUploadUIProcess();
-                        }
-                        break;
-                    case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
-                        sendBroadcast(new Intent(ACTION_GET_SIZE_OFFLINE_SETTING));
-                        break;
-                }
-            }
-        }
-    };
+	private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING) && getSettingsFragment() != null) {
+				sttFLol.refreshCameraUploadsSettings();
+			}
+		}
+	};
 
     public void launchPayment(String productId) {
         //start purchase/subscription flow
@@ -2057,8 +2037,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
-		filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
@@ -3473,11 +3451,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     }
 
     private void enableCU() {
-        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_SETTINGS)) {
-            if (getSettingsFragment() != null) {
-                sttFLol.enableCameraUpload();
-            }
-        } else if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
+		sendBroadcast(new Intent(ACTION_UPDATE_ENABLE_CU_SETTING));
+        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
             cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
             if (cuFragment == null) {
@@ -3992,9 +3967,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
-									if(sttFLol != null  && sttFLol.isResumed()){
-										sttFLol.disableCameraUpload();
-									}
+                                    sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
 									if (cuFragment != null && cuFragment.isResumed()) {
 										cuFragment.resetSwitchButtonLabel();
 									}
@@ -5190,7 +5163,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 					clickDrawerItemLollipop(drawerItem);
 
-					senOnlineBroadcast(true);
+					sendOnlineBroadcast(true);
 					if (getSettingsFragment() != null) {
 						sttFLol.setOnlineOptions(true);
 					}
@@ -5283,7 +5256,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
 					megaChatApi.getMyFullname());
 
-			senOnlineBroadcast(false);
+			sendOnlineBroadcast(false);
 
 			if (getSettingsFragment() != null) {
 				sttFLol.setOnlineOptions(false);
@@ -7604,9 +7577,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Back up timestamps and disabled MU upload.
                 backupTimestampsAndFolderHandle();
                 disableMediaUploadProcess();
-                if (getSettingsFragment() != null) {
-                    sttFLol.disableMediaUploadUIProcess();
-                }
+                sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_MU_SETTING));
             } else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);
@@ -7618,10 +7589,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Disable both CU and MU.
                 backupTimestampsAndFolderHandle();
                 disableCameraUploadSettingProcess(false);
-                if (getSettingsFragment() != null) {
-                    sttFLol.disableCameraUploadUIProcess();
-                }
-            } else {
+				sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
+			} else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);
             }
@@ -16153,7 +16122,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	private void senOnlineBroadcast(boolean isOnline){
+	private void sendOnlineBroadcast(boolean isOnline){
 		Intent intent =  new Intent(ACTION_UPDATE_ONLINE_OPTIONS_SETTING);
 		intent.putExtra(ONLINE_OPTION, isOnline);
 		sendBroadcast(intent);

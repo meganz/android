@@ -48,6 +48,9 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
+import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING;
+import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING;
+import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -113,13 +116,13 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver getSizeOfflineReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
-            if (intent.getAction().equals(ACTION_GET_SIZE_OFFLINE_SETTING)) {
+            if(intent.getAction().equals(ACTION_REFRESH_CLEAR_OFFLINE_SETTING) ){
                 sttFileManagment.taskGetSizeOffline();
             }
         }
@@ -168,7 +171,11 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         registerReceiver(offlineSizeUpdateReceiver, new IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING));
         registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
         registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
-        registerReceiver(getSizeOfflineReceiver, new IntentFilter(ACTION_GET_SIZE_OFFLINE_SETTING));
+
+        IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+        filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+        registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
+
         registerReceiver(setVersionInfoReceiver, new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
         registerReceiver(resetVersionInfoReceiver, new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
     }
@@ -180,7 +187,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         unregisterReceiver(offlineSizeUpdateReceiver);
         unregisterReceiver(offlineReceiver);
         unregisterReceiver(updateMyAccountReceiver);
-        unregisterReceiver(getSizeOfflineReceiver);
+        unregisterReceiver(updateCUSettingsReceiver);
         unregisterReceiver(setVersionInfoReceiver);
         unregisterReceiver(resetVersionInfoReceiver);
     }

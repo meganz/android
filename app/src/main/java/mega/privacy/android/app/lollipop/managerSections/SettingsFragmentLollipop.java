@@ -57,7 +57,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
     Preference advancedPreference;
     RecyclerView listView;
-    boolean cameraUpload = false;
     boolean pinLock = false;
     boolean setAutoaccept = false;
     boolean autoAccept = true;
@@ -145,8 +144,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         autoAccept = true;
     }
 
-    public void updateCUSubtitle() {
-        cameraUploadsPreference.setSummary(getString(cameraUpload ? R.string.mute_chatroom_notification_option_off : R.string.mute_chat_notification_option_on));
+    public void updateCUSubtitle(boolean isCameraUploadOn) {
+        cameraUploadsPreference.setSummary(getString(isCameraUploadOn ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off));
     }
 
     private void updatePasscodeLock() {
@@ -167,14 +166,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      * Refresh the Camera Uploads service settings depending on the service status.
      */
     public void refreshCameraUploadsSettings() {
-        if (prefs == null || prefs.getCamSyncEnabled() == null) {
-            cameraUpload = false;
-            dbH.setCamSyncEnabled(false);
-            dbH.setSecondaryUploadEnabled(false);
-        } else {
-            cameraUpload = Boolean.parseBoolean(prefs.getCamSyncEnabled());
+        boolean isCameraUploadOn = false;
+        if(prefs != null && prefs.getCamSyncEnabled() != null){
+            isCameraUploadOn = Boolean.parseBoolean(prefs.getCamSyncEnabled());
         }
-        updateCUSubtitle();
+        updateCUSubtitle(isCameraUploadOn);
     }
 
     @Override
