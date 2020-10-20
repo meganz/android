@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +30,6 @@ import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
@@ -37,12 +37,14 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.components.flowlayoutmanager.cache.Line;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
@@ -430,6 +432,13 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupOtherViews();
         observeLiveData();
         setDraggingThumbnailCallback();
+        setupGoogledAds();
+    }
+
+    private void setupGoogledAds() {
+        GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
+                mBinding.adViewContainer,
+                ((ManagerActivityLollipop) getActivity()).getOutMetrics());
     }
 
     private void setDraggingThumbnailCallback() {
@@ -605,14 +614,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), enabled -> {
             mBinding.turnOnCuLayout.setVisibility(enabled ? View.GONE : View.VISIBLE);
             if (!enabled) {
-                FrameLayout.LayoutParams params =
-                        (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mBinding.layoutContent.getLayoutParams();
                 params.bottomMargin = px2dp(48, outMetrics);
-                mBinding.cuList.setLayoutParams(params);
-
-                params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
-                mBinding.scroller.setLayoutParams(params);
+                mBinding.layoutContent.setLayoutParams(params);
             }
         });
     }
