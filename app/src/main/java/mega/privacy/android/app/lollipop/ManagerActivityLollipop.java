@@ -230,6 +230,7 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -690,6 +691,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem refreshMenuItem;
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
+	private MenuItem doNotDisturbMenuItem;
 	private MenuItem upgradeAccountMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
@@ -1366,6 +1368,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setCallWidget();
 				} else {
 					supportInvalidateOptionsMenu();
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+				if (getChatsFragment() != null) {
+					rChatFL.notifyPushChanged();
+				}
+				if(getSettingsFragment() != null){
+					sttFLol.updateNotifChat();
 				}
 			}
 		}
@@ -2079,12 +2098,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
 
 		registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
-		registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
 
+		registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
 		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
 		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
 		registerReceiver(chatCallUpdateReceiver, filterCall);
 
+		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
 		registerTransfersReceiver();
@@ -2116,6 +2136,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("retryChatPendingConnections()");
 			megaChatApi.retryPendingConnections(false, null);
 		}
+
+		MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
 
 		transfersInProgress = new ArrayList<Integer>();
 
@@ -4258,14 +4280,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void showMuteIcon(MegaChatListItem item){
-		logDebug("showMuteIcon");
-		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-		if (rChatFL != null) {
-			rChatFL.showMuteIcon(item);
-		}
-	}
-
 	public void setProfileAvatar() {
 		logDebug("setProfileAvatar");
 		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
@@ -4707,6 +4721,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		unregisterReceiver(chatCallUpdateReceiver);
 		unregisterReceiver(chatSessionUpdateReceiver);
+		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(contactUpdateReceiver);
 		unregisterReceiver(receiverUpdatePosition);
 		unregisterReceiver(updateMyAccountReceiver);
@@ -6569,6 +6584,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		refreshMenuItem = menu.findItem(R.id.action_menu_refresh);
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
+		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
 		rubbishBinMenuItem = menu.findItem(R.id.action_menu_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
@@ -6812,6 +6828,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if (searchExpand) {
 						openSearchView();
 					} else {
+						doNotDisturbMenuItem.setVisible(true);
 						inviteMenuItem.setVisible(true);
 						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
 							searchMenuItem.setVisible(true);
@@ -7034,6 +7051,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
+					doNotDisturbMenuItem.setVisible(false);
 				}
 				return true;
 			}
@@ -7109,6 +7127,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				return true;
 			}
+			case R.id.action_menu_do_not_disturb:
+				if (drawerItem == DrawerItem.CHAT) {
+					if (getGeneralNotification().equals(NOTIFICATIONS_ENABLED)) {
+						createMuteNotificationsChatAlertDialog(this, null);
+					} else {
+						showSnackbar(MUTE_NOTIFICATIONS_SNACKBAR_TYPE, null, -1);
+					}
+				}
+				return true;
+
 	        case R.id.action_menu_kill_all_sessions:{
 				showConfirmationCloseAllSessions();
 	        	return true;
@@ -13356,7 +13384,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
-
 		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.cancel_subscription_ok), -1);
@@ -13383,7 +13410,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             checkBeforeShow();
         }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
-			logDebug("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				logDebug("request.getText(): "+request.getText());
 				countUserAttributes--;

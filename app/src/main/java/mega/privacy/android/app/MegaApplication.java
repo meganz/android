@@ -39,12 +39,12 @@ import android.text.Spanned;
 import android.util.Log;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import org.webrtc.ContextUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
@@ -111,11 +111,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.9_327";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.0_329";
 
+    private static PushNotificationSettingManagement pushNotificationSettingManagement;
+    DatabaseHandler dbH;
 	private static TransfersManagement transfersManagement;
 
-	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -325,7 +326,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (e.getErrorCode() == MegaError.API_OK) {
+				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+					if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+						pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
+					}
+				}else if (e.getErrorCode() == MegaError.API_OK) {
 					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
 						if (megaApi != null && request.getEmail() != null) {
 							MegaUser user = megaApi.getContact(request.getEmail());
@@ -347,6 +352,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 								logWarning("User is NULL");
 							}
 						}
+					}
+				}
+			}else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
+				if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
+					if (e.getErrorCode() == MegaError.API_OK) {
+						pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
+					} else {
+						logError("Chat notification settings cannot be updated");
 					}
 				}
 			}
@@ -530,7 +543,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						}
 
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-							createRTCAudioManager(false, callStatus);
+							createRTCAudioManager(false, callStatus, chatId);
 						}
 
 						if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS ||
@@ -540,10 +553,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							clearIncomingCallNotification(callId);
 						}
 
-						if (listAllCalls.size() == 1) {
-							checkOneCall(listAllCalls.get(0));
-						} else {
-							checkSeveralCall(listAllCalls, callStatus);
+						if(megaApi.isChatNotifiable(chatId)) {
+							if (listAllCalls.size() == 1) {
+								checkOneCall(listAllCalls.get(0));
+							} else {
+								checkSeveralCall(listAllCalls, callStatus);
+							}
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
@@ -689,6 +704,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
+        pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
 
 		boolean staging = false;
@@ -717,6 +733,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
 
+
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
 		registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
@@ -736,6 +753,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 }
             }
         };
+
 		registerReceiver(logoutReceiver, new IntentFilter(ACTION_LOG_OUT));
 		EmojiManager.install(new TwitterEmojiProvider());
 
@@ -775,7 +793,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		Fresco.initialize(this);
 	}
-
 
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");
@@ -839,7 +856,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			askForPaymentMethods();
 		}
 	}
-	
+
 	public MegaApiAndroid getMegaApiFolder(){
 		if (megaApiFolder == null){
 			PackageManager m = getPackageManager();
@@ -1545,7 +1562,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			if ((termCode == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || termCode == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !isIgnored) {
 				logDebug("TERM_CODE_ANSWER_TIMEOUT");
-				if (!isLocalTermCode) {
+				if (!isLocalTermCode && megaApi.isChatNotifiable(chatId)) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
@@ -1571,22 +1588,23 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param isSpeakerOn Speaker status.
      * @param callStatus  Call status.
      */
-    public void createRTCAudioManager(boolean isSpeakerOn, int callStatus) {
+    public void createRTCAudioManager(boolean isSpeakerOn, int callStatus, long chatId) {
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-            if (rtcAudioManagerRingInCall != null) {
-                removeRTCAudioManagerRingIn();
-            }
+        	if(megaApi.isChatNotifiable(chatId)) {
+				if (rtcAudioManagerRingInCall != null) {
+					removeRTCAudioManagerRingIn();
+				}
 
-			IntentFilter filterScreen = new IntentFilter();
-			filterScreen.addAction(Intent.ACTION_SCREEN_ON);
-			filterScreen.addAction(Intent.ACTION_SCREEN_OFF);
-			filterScreen.addAction(Intent.ACTION_USER_PRESENT);
-			registerReceiver(screenOnOffReceiver, filterScreen);
+				IntentFilter filterScreen = new IntentFilter();
+				filterScreen.addAction(Intent.ACTION_SCREEN_ON);
+				filterScreen.addAction(Intent.ACTION_SCREEN_OFF);
+				filterScreen.addAction(Intent.ACTION_USER_PRESENT);
+				registerReceiver(screenOnOffReceiver, filterScreen);
+				registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
+				registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
-			registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
-			registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-
-			rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
+				rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, callStatus);
+			}
         } else {
             if (rtcAudioManager != null) {
                 return;
@@ -1652,13 +1670,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param isSpeakerOn If the speaker is on.
      * @param callStatus  Call status.
      */
-    public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus) {
+    public void updateSpeakerStatus(boolean isSpeakerOn, int callStatus, long chatId) {
         if (rtcAudioManager != null) {
             rtcAudioManager.updateSpeakerStatus(isSpeakerOn, callStatus);
             return;
         }
 
-        createRTCAudioManager(isSpeakerOn, callStatus);
+        createRTCAudioManager(isSpeakerOn, callStatus, chatId);
     }
 
     /**
@@ -1909,6 +1927,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
 		MegaApplication.wasLocalVideoEnable = wasLocalVideoEnable;
 	}
+
+    public static PushNotificationSettingManagement getPushNotificationSettingManagement() {
+        return pushNotificationSettingManagement;
+    }
 
 	public static TransfersManagement getTransfersManagement() {
 		return transfersManagement;

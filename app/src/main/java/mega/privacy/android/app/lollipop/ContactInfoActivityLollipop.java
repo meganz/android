@@ -82,8 +82,6 @@ import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
@@ -108,6 +106,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -128,6 +127,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -170,15 +170,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	RelativeLayout videoCallLayout;
 
 	LinearLayout notificationsLayout;
+	private RelativeLayout notificationsSwitchLayout;
 	SwitchCompat notificationsSwitch;
 	TextView notificationsTitle;
+	private TextView notificationsSubTitle;
 	View dividerNotificationsLayout;
 
-	ChatSettings chatSettings = null;
-	ChatItemPreferences chatPrefs = null;
-	boolean generalChatNotifications = true;
+    private String newMuteOption = null;
 
-	boolean startVideo = false;
+    boolean startVideo = false;
 
 	private RelativeLayout verifyCredentialsLayout;
 	private TextView verifiedText;
@@ -295,6 +295,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	};
 
+
 	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -349,6 +350,19 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 	};
+
+
+		private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (intent == null || intent.getAction() == null)
+					return;
+
+				if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
+					checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
+				}
+			}
+		};
 
 	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
 		@Override
@@ -507,11 +521,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//Notifications Layout
 			notificationsLayout = findViewById(R.id.chat_contact_properties_notifications_layout);
 			notificationsLayout.setVisibility(View.VISIBLE);
-
 			notificationsTitle = findViewById(R.id.chat_contact_properties_notifications_text);
-
+			notificationsSubTitle = findViewById(R.id.chat_contact_properties_notifications_muted_text);
+			notificationsSubTitle.setVisibility(View.GONE);
+			notificationsSwitchLayout = findViewById(R.id.chat_contact_properties_layout);
+			notificationsSwitchLayout.setOnClickListener(this);
 			notificationsSwitch = findViewById(R.id.chat_contact_properties_switch);
-			notificationsSwitch.setOnClickListener(this);
+			notificationsSwitch.setClickable(false);
+
 
 			dividerNotificationsLayout = findViewById(R.id.divider_notifications_layout);
 
@@ -558,11 +575,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			chatHandle = extras.getLong("handle",-1);
 			userEmailExtra = extras.getString(NAME);
-
 			if (megaChatApi == null) {
 				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 			}
-
 			if (chatHandle != -1) {
 				logDebug("From chat!!");
 				fromContacts = false;
@@ -572,8 +587,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 				user = megaApi.getContact(userHandleEncoded);
-				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
-
 				if (user != null) {
 					checkNickname(user.getHandle());
 				} else {
@@ -606,8 +619,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 						sharedFilesLayout.setVisibility(View.GONE);
 						dividerSharedFilesLayout.setVisibility(View.GONE);
-					} else {
-						chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 					}
 				} else {
 					notificationsLayout.setVisibility(View.GONE);
@@ -687,31 +698,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
 
-			chatSettings = dbH.getChatSettings();
-			if (chatSettings == null) {
-				logDebug("Chat settings null - notifications ON");
-				setUpIndividualChatNotifications();
-			} else {
-				logDebug("There is chat settings");
-				if (chatSettings.getNotificationsEnabled() == null) {
-					generalChatNotifications = true;
-
-				} else {
-					generalChatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
-				}
-
-				if (generalChatNotifications) {
-					setUpIndividualChatNotifications();
-
-				} else {
-					logDebug("General notifications OFF");
-					boolean notificationsEnabled = false;
-					notificationsSwitch.setChecked(notificationsEnabled);
-
-					notificationsLayout.setVisibility(View.VISIBLE);
-					dividerNotificationsLayout.setVisibility(View.VISIBLE);
-				}
-			}
+			checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
+			notificationsLayout.setVisibility(View.VISIBLE);
+			dividerNotificationsLayout.setVisibility(View.VISIBLE);
 
 		} else {
 			logWarning("Extras is NULL");
@@ -722,6 +711,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         }
 
 		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+
+		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
 		IntentFilter userNameUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
@@ -828,27 +819,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 		visibilityStateIcon();
-	}
-
-	public void setUpIndividualChatNotifications(){
-		logDebug("setUpIndividualChatNotifications");
-		//SET Preferences (if exist)
-		if(chatPrefs!=null){
-			logDebug("There is individual chat preferences");
-
-			boolean notificationsEnabled = true;
-			if (chatPrefs.getNotificationsEnabled() != null){
-				notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-			}
-			notificationsSwitch.setChecked(notificationsEnabled);
-		}
-		else{
-			logDebug("NO individual chat preferences");
-			notificationsSwitch.setChecked(true);
-		}
-
-		notificationsLayout.setVisibility(View.VISIBLE);
-		dividerNotificationsLayout.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -1357,36 +1327,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				sharedFolderClicked();
 				break;
 			}
-			case R.id.chat_contact_properties_switch:{
-				logDebug("Change notification switch");
-
-				if(!generalChatNotifications){
-					notificationsSwitch.setChecked(false);
-					showSnackbar(SNACKBAR_TYPE, "The chat notifications are disabled, go to settings to set up them", -1);
-				}
-				else{
-					boolean enabled = notificationsSwitch.isChecked();
-					if (enabled) {
-						chatC.unmuteChat(chatHandle);
-					} else {
-						chatC.muteChat(chatHandle);
-					}
-
-					if(chatPrefs!=null){
-						chatPrefs.setNotificationsEnabled(Boolean.toString(enabled));
-					}
-					else{
-						if(chat!=null){
-							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-						}
-					}
-
-					if(enabled){
-						setUpIndividualChatNotifications();
-					}
+			case R.id.chat_contact_properties_layout:
+				if (notificationsSwitch.isChecked()) {
+					createMuteNotificationsAlertDialogOfAChat(this, chatHandle);
+				} else {
+					MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatHandle);
 				}
 				break;
-			}
+
 			case R.id.chat_contact_properties_chat_files_shared_layout:{
 				Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
 				if(chat!=null){
@@ -1695,11 +1643,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	@SuppressLint("NewApi")
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
 		logDebug("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
-
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-
 			logDebug("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK) {
 				File avatar = buildAvatarFile(this, request.getEmail() + ".jpg");
@@ -1716,7 +1661,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 							if (imBitmap != null && !imBitmap.isRecycled()) {
 								Palette palette = Palette.from(imBitmap).generate();
-								Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
+								Palette.Swatch swatch = palette.getDarkVibrantSwatch();
 								imageLayout.setBackgroundColor(swatch.getBodyTextColor());
 							}
 						}
@@ -1876,6 +1821,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		unregisterReceiver(chatCallUpdateReceiver);
 		unregisterReceiver(chatSessionUpdateReceiver);
+		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(userNameReceiver);
 		unregisterReceiver(destroyActionModeReceiver);
@@ -2338,7 +2284,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             }
         });
     }
-    
+
     private void rename(MegaNode document, String newName) {
         if (newName.equals(document.getName())) {
             return;

@@ -363,7 +363,10 @@
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d caricamenti sono stati terminati</item>
     </plurals>
 
-    <string name="folder_empty" context="Warning shown when it tries to download an empty folder">Folder is empty</string>
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">La cartella è vuota.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Le cartelle sono vuote.</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -489,7 +492,7 @@
     <string name="context_no_copied" context="error message">Copia fallita a causa di un errore</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">Per favore, scegli una cartella di destinazione</string>
     <string name="context_correctly_moved" context="success message when moving a node">Spostato</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d oggetti mossi con successo</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d oggetti mossi con successo.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d oggetti non sono stati spostati con successo</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Spostamento nel Cestino avvenuto con successo</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d oggetti spostati con successo nel Cestino</string>
@@ -507,7 +510,7 @@
     <string name="context_no_removed" context="error message">Cancellazione fallita a causa di un errore</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d oggetti rimossi con successo da MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d oggetti non sono stati rimossi con successo</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d cartelle lasciate con successo</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d cartelle lasciate con successo.</string>
     <string name="share_left" context="Message shown when a share has been left">Condivisione abbandonata</string>
     <string name="number_no_leaved" context="error message when moving a node">%d cartelle non sono state lasciate con successo</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">File inviato a %d contatti con successo</string>
@@ -722,7 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">Verifica il tuo account</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Il tuo account è stato temporaneamente bloccato a causa di un potenziale abuso. Per favore, verifica il tuo numero di telefono per sbloccare il tuo account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Nazione</string>
-    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Region</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Regione</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Il tuo numero di telefono</string>
     <string name="general_back_button" context="Button label - go to previous page">Indietro</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Non ora</string>
@@ -892,7 +895,7 @@
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Indirizzo 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Indirizzo 2 (opzionale)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">Città</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Stato / Provincia</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Stato/Provincia</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">Nazione</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Codice postale</string>
 
@@ -1112,6 +1115,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">Archivia</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1727,7 +1731,7 @@
 
     <plurals name="confirmation_leave_share_folder">
         <item context="Confirmation message before leaving an incoming shared folder" quantity="one">Se lasci la cartella, non sarai in grado di vederla di nuovo.</item>
-        <item context="confirmation message before leaving some incoming shared folders" quantity="other">If you leave the folders, you will not be able to see them again.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">Se lasci queste cartelle, non potrai vederle più.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Nessuna cartella condivisa</string>
@@ -2020,7 +2024,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Troppe richieste. Per favore, aspetta.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">Annullamento del processo di login in corso. Per favore, attendi&#8230;</string>
 
-    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Tipo di file non supportato.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Errore. Il file è corrotto o non esiste.</string>
 
 
@@ -2108,7 +2112,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Anteprima del contenuto</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Lo streaming non può essere eseguito e il file non è stato scaricato</string>
-    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">We were not able to open the file due to the lack of network connection.</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">Non siamo stati capaci di aprire il file a causa della mancanza di connessione.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Il file già esiste nella sezione Offline</string>
 
     <plurals name="error_forwarding_messages">
@@ -2207,7 +2211,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">Hai già aggiunto il contatto %s.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Condividere con %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">Nuova chat di gruppo</string>
-    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Send contacts</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Invia contatti</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Disconnesso</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Il tuo account è già stato attivato. Per favore, effettua il login.</string>
@@ -2258,7 +2262,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s[/A] [B]di %2$s utilizzati[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Vuoi cambiare con un server di test?</string>
-    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">Sei sicuro di voler cambiare con un server di test? Il tuo account potrebbe avere dei problemi incurabili</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">Sei sicuro di voler cambiare con un server di test? Il tuo account potrebbe avere dei problemi incurabili.</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Aprire la fotocamera?</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Se apri la fotocamera, la tua trasmissione video sarà interrotta nella chiamata corrente.</string>
@@ -2289,7 +2293,7 @@
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Attiva la rotazione della chiave criptata</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è disabilitata per le chat con più di 100 partecipanti.</string>
-    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Unable to convert this chat to private because the participants limit was exceeded.</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">È stato impossibile convertire questa chat in chat privata in quanto il limite di partecipanti è stato superato.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A] [B]ha creato il link della chat.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A] [B]ha rimosso il link della chat.[/B]</string>
@@ -2453,7 +2457,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d partecipanti</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more”&gt;%1$s and %2$d more.">%1$s e altri %2$d</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s e altri %2$d</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Prima di generare un link per questa chat, devi impostare una descrizione:</string>
 
@@ -2514,9 +2518,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s si è unito alla chiamata</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s ha abbandonato la chiamata</string>
 
-    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">You are not allowed to start a call because the participants limit was exceeded.</string>
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">Non ti è permesso di iniziare una chiamata perché il limite di partecipanti è stato superato.</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Non ti è permesso di partecipare a questa chiamata in quanto ha raggiunto il massimo numero di partecipanti.</string>
-    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">You are not allowed to join this call as the group has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">Non ti è permesso di unirti a questa chiamata in quanto il gruppo ha raggiunto il numero massimo di partecipanti nella chat.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Non ti è permesso di attivare il video in questa chiamata in quanto ha raggiunto il massimo numero di partecipanti che utilizzano il video.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Errore. Il file non può essere aperto.</string>
@@ -2741,7 +2745,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Qualcosa è andato storto</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contatta l\'amministratore del tuo account business per risolvere il problema ed attivare il tuo account.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Per vere intenzioni di business.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Archiviazione[/A] ILLIMITATA**</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Archiviazione[/A] ILLIMITATA**</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Banda di trasferimento[/A] ILLIMITATA**</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quando effettui il logout, i file presenti nella sezione Offline verranno eliminati dal tuo dispositivo.</string>
@@ -2799,16 +2803,16 @@
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Archivio pieno</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">I tuoi dati sono a rischio!</string>
     <plurals name="over_disk_quota_paywall_text">
-        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have %5$s.</item>
-        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">We have contacted you by email to %1$s on %2$s and %3$s, but you still have %4$s files taking up %5$s in your MEGA account, which requires you to have %6$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">Ti abbiamo contattato tramite email a %1$s il %2$s, ma hai ancora %3$s file che occupano %4$s nel tuo account MEGA, il che richede che tu abbia %5$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">Ti abbiamo contattato tramite email a %1$s il %2$s e il %3$s, ma hai ancora %4$s file che occupano %5$s nel tuo account MEGA, il che richede che tu abbia %6$s.</item>
     </plurals>
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">Ti abbiamo contattato tramite email a %1$s, ma hai ancora %2$s che occupano %3$s nel tuo account MEGA, il che richede che tu abbia %4$s.</string>
     <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
     <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left">[B]You must act immediately to save your data[/B].</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Devi agire immediatamente per salvare i tuoi dati.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 day</item>
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 giorno</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d giorni</item>
     </plurals>
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
@@ -2822,7 +2826,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Sarebbe meglio farlo faccia a faccia nella vita reale. Se hai un altro canale di comunicazione verificato come OTR o PGP, puoi utilizzarlo.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Le tue credenziali</string>
     <string name="action_reset" context="Button to reset credentials">Reset</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Aggiornamento credenziali in corso. Per favore, riprova più tardi.</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Unione in corso&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Abbandono in corso&#8230;</string>
@@ -2833,10 +2837,12 @@
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">L\'account che stai cercando di ripristinare è bloccato.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Il tuo account è stato bloccato. Si prega di contattare support&#64;mega.nz</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Il tuo account è stato disabilitato dal tuo amministratore. Per favore, contatta il tuo amministratore degli account business per ottenere maggiori dettagli.</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">Il tuo account è stato rimosso dal tuo amministratore. Per favore, contatta il tuo amministratore degli account business per ottenere maggiori dettagli.</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modifica</string>
-    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
-    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modifica numero di telefono</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Rimuovi numero di telefono</string>
     <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">Questa operazione rimuoverà il tuo numero di telefono corrente e inizierà il processo di associare un nuovo numero di telefono con il tuo account.</string>
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">Questo rimuoverà il numero del telefono che hai associato a questo account. Se in futuro scegli di aggiungere un numero di telefono ti verrà richiesto di verificarlo.</string>
 

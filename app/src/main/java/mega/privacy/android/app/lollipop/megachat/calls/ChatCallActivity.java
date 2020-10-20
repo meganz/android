@@ -1690,7 +1690,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
 
         boolean isSpeakerOn = MegaApplication.getSpeakerStatus(callChat.getChatid());
-        app.updateSpeakerStatus(isSpeakerOn, callChat.getStatus());
+        app.updateSpeakerStatus(isSpeakerOn, callChat.getStatus(), callChat.getChatid());
+
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
