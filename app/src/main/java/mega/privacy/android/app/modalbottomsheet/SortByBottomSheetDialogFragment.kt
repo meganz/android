@@ -16,7 +16,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 
 class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
 
@@ -61,7 +61,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         mainLinearLayout = binding.root
         items_layout = binding.root
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false)
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
     }
 
     private fun setSelectedColor(text: TextView) {
