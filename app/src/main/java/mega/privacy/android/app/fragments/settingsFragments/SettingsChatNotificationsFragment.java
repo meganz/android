@@ -65,9 +65,9 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
         chatDndSwitch.setVisible(false);
         chatDndSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
             if (((SwitchPreferenceCompat) preference).isChecked()) {
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, MEGACHAT_INVALID_HANDLE);
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, null);
             } else {
-                createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), MEGACHAT_INVALID_HANDLE);
+                createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), null);
             }
             return false;
         });
@@ -103,10 +103,6 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
 
         chatNotificationsSwitch.setChecked(option.equals(NOTIFICATIONS_ENABLED));
 
-        if(chatSettings == null){
-            chatSettings = dbH.getChatSettings();
-        }
-
         if (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled())) {
             dbH.setVibrationEnabledChat(true + "");
             chatSettings.setVibrationEnabled(true + "");
@@ -130,7 +126,6 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
                 Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
                 chatSoundPreference.setSummary(defaultSound2.getTitle(context));
                 dbH.setNotificationSoundChat(defaultSoundUri2.toString());
-
             } else {
                 Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
                 if (sound != null) {
@@ -165,7 +160,8 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
 
         switch (preference.getKey()) {
             case KEY_CHAT_NOTIFICATIONS:
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, null);
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ?
+                        NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, null);
                 break;
 
             case KEY_CHAT_VIBRATE:
@@ -187,19 +183,17 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
     }
 
     public void setNotificationSound (Uri uri){
-        String chosenSound = "-1";
+
+        String chosenSound = INVALID_OPTION;
         if(uri!=null){
             Ringtone sound = RingtoneManager.getRingtone(context, uri);
-
             String title = sound.getTitle(context);
-
             if(title!=null){
                 logDebug("Title sound notification: " + title);
                 chatSoundPreference.setSummary(title);
             }
             chosenSound = uri.toString();
-        }
-        else{
+        } else{
             chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
         }
 
@@ -207,11 +201,11 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment impl
             chatSettings = new ChatSettings();
             chatSettings.setNotificationsSound(chosenSound);
             dbH.setChatSettings(chatSettings);
-        }
-        else{
+        } else{
             chatSettings.setNotificationsSound(chosenSound);
             dbH.setNotificationSoundChat(chosenSound);
         }
+
     }
 }
 

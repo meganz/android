@@ -2,6 +2,11 @@ package mega.privacy.android.app.fragments.settingsFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
@@ -10,11 +15,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.SETTINGS;
 import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -22,11 +29,10 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
 public class SettingsChatFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
-    MegaChatPresenceConfig statusConfig;
 
+    private MegaChatPresenceConfig statusConfig;
     private Preference chatNotificationsPreference;
     private ListPreference statusChatListPreference;
-
     private SwitchPreferenceCompat autoAwaySwitch;
     private Preference chatAutoAwayPreference;
 
@@ -78,15 +84,11 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         //Get chat status
         statusConfig = megaChatApi.getPresenceConfig();
         if (statusConfig != null) {
-            logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
-            logDebug("Status: " + statusConfig.getOnlineStatus());
+            logDebug("ChatStatus pending: " + statusConfig.isPending()+", status "+statusConfig.getOnlineStatus());
 
             statusChatListPreference.setValue(statusConfig.getOnlineStatus() + "");
-            if (statusConfig.getOnlineStatus() == MegaChatApi.STATUS_INVALID) {
-                statusChatListPreference.setSummary(getString(R.string.recovering_info));
-            } else {
-                statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-            }
+            statusChatListPreference.setSummary(statusConfig.getOnlineStatus() == MegaChatApi.STATUS_INVALID ?
+                    getString(R.string.recovering_info) : statusChatListPreference.getEntry());
 
             showPresenceChatConfig();
 
@@ -108,10 +110,17 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
         chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
 
         /*Rich URL Previews*/
-        boolean richLinks = MegaApplication.isEnabledRichLinks();
-        richLinksSwitch.setChecked(richLinks);
+        richLinksSwitch.setChecked(MegaApplication.isEnabledRichLinks());
         richLinksSwitch.setVisible(false);
 
+    }
+
+    private boolean isOffline(){
+        if (!isOnline(context)){
+            Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -127,10 +136,9 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
                 break;
 
             case KEY_CHAT_AUTOAWAY_SWITCH:
-                if (!isOnline(context)){
-                    Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
+                if (isOffline())
                     return false;
-                }
+
                 statusConfig = megaChatApi.getPresenceConfig();
                 if(statusConfig!=null){
                     if(statusConfig.isAutoawayEnabled()){
@@ -147,57 +155,31 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
                 break;
 
             case KEY_CHAT_AUTOAWAY_PREFERENCE:
-                if (!isOnline(context)){
-                    Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
+                if (isOffline())
                     return false;
-                }
+
                 ((ChatPreferencesActivity)context).showAutoAwayValueDialog();
                 break;
 
             case KEY_CHAT_PERSISTENCE:
-                if (!isOnline(context)){
-                    Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
+                if (isOffline())
                     return false;
-                }
 
-                if(statusConfig.isPersist()){
-                    logDebug("Change persistence chat to false");
-                    megaChatApi.setPresencePersist(false);
-                }
-                else{
-                    logDebug("Change persistence chat to true");
-                    megaChatApi.setPresencePersist(true);
-                }
+                megaChatApi.setPresencePersist(!statusConfig.isPersist());
                 break;
 
             case KEY_CHAT_LAST_GREEN:
-                if (!isOnline(context)){
-                    Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
+                if (isOffline())
                     return false;
-                }
 
-                if(!enableLastGreenChatSwitch.isChecked()){
-                    logDebug("Disable last green");
-                    ((ChatPreferencesActivity)context).enableLastGreen(false);
-                }
-                else{
-                    logDebug("Enable last green");
-                    ((ChatPreferencesActivity)context).enableLastGreen(true);
-                }
+                ((ChatPreferencesActivity)context).enableLastGreen(enableLastGreenChatSwitch.isChecked());
                 break;
-            case KEY_CHAT_RICH_LINK:
-                if (!isOnline(context)) {
-                    Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
-                    return false;
-                }
 
-                if (richLinksSwitch.isChecked()) {
-                    logDebug("Enable rich links");
-                    megaApi.enableRichPreviews(true, (ChatPreferencesActivity) context);
-                } else {
-                    logDebug("Disable rich links");
-                    megaApi.enableRichPreviews(false, (ChatPreferencesActivity) context);
-                }
+            case KEY_CHAT_RICH_LINK:
+                if (isOffline())
+                    return false;
+
+                megaApi.enableRichPreviews(richLinksSwitch.isChecked(), (ChatPreferencesActivity) context);
                 break;
         }
 
@@ -215,28 +197,25 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
                 break;
 
             case KEY_CHAT_STATUS:
-                if (!isOnline(context)){
-                    Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
+                if (isOffline())
                     return false;
-                }
+
                 statusChatListPreference.setSummary(statusChatListPreference.getEntry());
                 newStatus= Integer.parseInt((String)newValue);
                 megaChatApi.setOnlineStatus(newStatus, (ChatPreferencesActivity) context);
                 break;
 
             case KEY_CHAT_SEND_ORIGINALS:
-                if (!isOnline(context)) {
-                    Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
+                if (isOffline())
                     return false;
-                }
 
                 newStatus = Integer.parseInt((String) newValue);
                 if (newStatus == 0) {
                     dbH.setSendOriginalAttachments(false + "");
-                    chatAttachmentsChatListPreference.setValue(0 + "");
+                    chatAttachmentsChatListPreference.setValue(newStatus + "");
                 } else if (newStatus == 1) {
                     dbH.setSendOriginalAttachments(true + "");
-                    chatAttachmentsChatListPreference.setValue(1 + "");
+                    chatAttachmentsChatListPreference.setValue(newStatus + "");
                 }
                 chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
                 break;
@@ -310,6 +289,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
 
         } else {
             chatPersistenceCheck.setVisible(true);
+            chatPersistenceCheck.setChecked(statusConfig.isPersist());
 
             //I'm online
             if(statusConfig.isPersist()){
@@ -329,26 +309,34 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
             }
         }
 
-
-        //Show configuration last green
-        if(statusConfig.isLastGreenVisible()){
-            logDebug("Last visible ON");
-            enableLastGreenChatSwitch.setEnabled(true);
-            if(!enableLastGreenChatSwitch.isChecked()){
-                enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
-                enableLastGreenChatSwitch.setChecked(true);
-            }
-            enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
+        enableLastGreenChatSwitch.setEnabled(true);
+        if (!enableLastGreenChatSwitch.isChecked()) {
+            enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
+            enableLastGreenChatSwitch.setChecked(statusConfig.isLastGreenVisible());
         }
-        else{
-            logDebug("Last visible OFF");
-            enableLastGreenChatSwitch.setEnabled(true);
-            if(enableLastGreenChatSwitch.isChecked()){
-                enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
-                enableLastGreenChatSwitch.setChecked(false);
-            }
-            enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
-        }
+        enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        final ListView lv = v.findViewById(android.R.id.list);
+        if (lv != null) {
+            lv.setPadding(0, 0, 0, 0);
+        }
+
+        setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
+        return v;
+    }
+
+    public void setOnlineOptions(boolean isOnline){
+        chatNotificationsPreference.setEnabled(isOnline);
+        statusChatListPreference.setEnabled(isOnline);
+        autoAwaySwitch.setEnabled(isOnline);
+        chatAutoAwayPreference.setEnabled(isOnline);
+        chatPersistenceCheck.setEnabled(isOnline);
+        enableLastGreenChatSwitch.setEnabled(isOnline);
+        chatAttachmentsChatListPreference.setEnabled(isOnline);
+        richLinksSwitch.setEnabled(isOnline);
+    }
 }

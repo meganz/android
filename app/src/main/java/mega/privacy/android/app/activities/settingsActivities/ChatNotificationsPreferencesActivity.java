@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatNotificationsFragment;
+
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
 import static mega.privacy.android.app.utils.Constants.SELECT_NOTIFICATION_SOUND;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -25,7 +26,7 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
             if (intent == null || intent.getAction() == null)
                 return;
 
-            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+            if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
                 sttChatNotifications.updateSwitch();
             }
         }
@@ -68,25 +69,20 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
         logDebug("Result code: " + resultCode);
 
         if (resultCode == RESULT_OK && requestCode == SELECT_NOTIFICATION_SOUND) {
             logDebug("Selected notification sound OK");
-
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-
-            if (sttChatNotifications != null) {
-                if (sttChatNotifications.isAdded()) {
-                    sttChatNotifications.setNotificationSound(uri);
-                }
+            if (sttChatNotifications != null && sttChatNotifications.isAdded()) {
+                sttChatNotifications.setNotificationSound(uri);
             }
         }
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(chatRoomMuteUpdateReceiver);
     }

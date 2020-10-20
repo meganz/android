@@ -171,7 +171,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         registerReceiver(getSizeOfflineReceiver, new IntentFilter(ACTION_GET_SIZE_OFFLINE_SETTING));
         registerReceiver(setVersionInfoReceiver, new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
         registerReceiver(resetVersionInfoReceiver, new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
-
     }
 
     @Override
@@ -184,7 +183,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         unregisterReceiver(getSizeOfflineReceiver);
         unregisterReceiver(setVersionInfoReceiver);
         unregisterReceiver(resetVersionInfoReceiver);
-
     }
 
     public void showClearRubbishBinDialog() {

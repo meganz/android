@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,17 +8,18 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
 import nz.mega.sdk.MegaApiJava;
@@ -25,18 +27,39 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
 import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class ChatPreferencesActivity extends PreferencesBaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface {
+public class ChatPreferencesActivity extends PreferencesBaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaGlobalListenerInterface {
 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
+
+
+    private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || sttChat == null)
+                return;
+
+            if (intent.getAction().equals(ACTION_UPDATE_ONLINE_OPTIONS_SETTING)) {
+                boolean isOnline = intent.getBooleanExtra(ONLINE_OPTION, false);
+                sttChat.setOnlineOptions(isOnline);
+            }
+        }
+    };
 
     private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -44,7 +67,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
             if (intent == null || intent.getAction() == null || sttChat == null)
                 return;
 
-            if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+            if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
                 sttChat.updateNotifChat();
             }
         }
@@ -56,7 +79,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
             if (intent == null || intent.getAction() == null || sttChat == null)
                 return;
 
-            if(intent.getAction().equals(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE)){
+            if (intent.getAction().equals(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE)) {
                 sttChat.updateEnabledRichLinks();
             }
         }
@@ -68,7 +91,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
             if (intent == null || intent.getAction() == null || sttChat == null)
                 return;
 
-            if(intent.getAction().equals(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE)){
+            if (intent.getAction().equals(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE)) {
                 boolean cancelled = intent.getBooleanExtra(PRESENCE_CANCELLED, false);
                 sttChat.updatePresenceConfigChat(cancelled);
             }
@@ -82,14 +105,13 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         aB.setTitle(getString(R.string.section_chat).toUpperCase());
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
+        registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
         registerReceiver(richLinksUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
         registerReceiver(statusUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
-    public void showAutoAwayValueDialog(){
-        logDebug("showAutoAwayValueDialog");
-
+    public void showAutoAwayValueDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_autoaway, null);
@@ -99,55 +121,45 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
-        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    String value = validateAutoAway(v.getText());
-                    if (value != null) {
-                        setAutoAwayValue(value, false);
-                    }
-                    newFolderDialog.dismiss();
-                    return true;
-                }
-                return false;
-            }
-        });
-        input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-        input.requestFocus();
 
-        builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
-        Button set = (Button) v.findViewById(R.id.autoaway_set_button);
-        set.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String value = validateAutoAway(input.getText());
+        input.setOnEditorActionListener((v1, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                String value = validateAutoAway(v1.getText());
                 if (value != null) {
                     setAutoAwayValue(value, false);
                 }
                 newFolderDialog.dismiss();
+                return true;
             }
+            return false;
         });
-        Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAutoAwayValue("-1", true);
-                newFolderDialog.dismiss();
+        input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
+        input.requestFocus();
+
+        builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
+        Button set = v.findViewById(R.id.autoaway_set_button);
+        set.setOnClickListener(v12 -> {
+            String value = validateAutoAway(input.getText());
+            if (value != null) {
+                setAutoAwayValue(value, false);
             }
+            newFolderDialog.dismiss();
+        });
+
+        Button cancel = v.findViewById(R.id.autoaway_cancel_button);
+        cancel.setOnClickListener(v13 -> {
+            setAutoAwayValue(INVALID_OPTION, true);
+            newFolderDialog.dismiss();
         });
 
         newFolderDialog = builder.create();
@@ -171,32 +183,81 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         }
     }
 
-    private void setAutoAwayValue(String value, boolean cancelled){
+    private void setAutoAwayValue(String value, boolean cancelled) {
         logDebug("Value: " + value);
-        if(cancelled){
-            Intent intentPresence = new Intent(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE);
-            intentPresence.putExtra(PRESENCE_CANCELLED, true);
-            sendBroadcast(intentPresence);
-        }
-        else{
+        if (cancelled) {
+            if (sttChat != null) {
+                sttChat.updatePresenceConfigChat(cancelled);
+            }
+        } else {
             int timeout = Integer.parseInt(value);
-            if(megaChatApi!=null){
-                megaChatApi.setPresenceAutoaway(true, timeout*60);
+            if (megaChatApi != null) {
+                megaChatApi.setPresenceAutoaway(true, timeout * 60);
             }
         }
     }
 
-    public void enableLastGreen(boolean enable){
-        logDebug("Enable Last Green: "+ enable);
+    public void enableLastGreen(boolean enable) {
+        logDebug("Enable Last Green: " + enable);
 
-        if(megaChatApi!=null){
+        if (megaChatApi != null) {
             megaChatApi.setLastGreenVisible(enable, this);
         }
     }
 
     @Override
-    protected void onDestroy(){
+    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+        if (users != null) {
+            for (int i = 0; i < users.size(); i++) {
+                MegaUser user = users.get(i);
+                if (user != null) {
+                    if (user.isOwnChange() > 0) {
+                        if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)) {
+                            megaApi.shouldShowRichLinkWarning(this);
+                            megaApi.isRichPreviewsEnabled(this);
+                        }
+                    }
+                } else {
+                    continue;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+
+    }
+
+    @Override
+    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
+
+    }
+
+    @Override
+    public void onReloadNeeded(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onAccountUpdate(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+
+    }
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
+
+    }
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(offlineReceiver);
         unregisterReceiver(richLinksUpdateReceiver);
         unregisterReceiver(statusUpdateReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);
@@ -214,18 +275,18 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        if(request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE){
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+        if (request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE) {
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: " + request.getFlag());
-            }
-            else{
+            } else {
                 logError("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: " + e.getErrorType());
             }
         }
     }
 
     @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) { }
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+    }
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
@@ -237,13 +298,25 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
 
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
-            logDebug("change isRickLinkEnabled - USER_ATTR_RICH_PREVIEWS finished");
-            if (e.getErrorCode() != MegaError.API_OK){
-                logError("ERROR:USER_ATTR_RICH_PREVIEWS");
+        if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
+            if (e.getErrorCode() != MegaError.API_OK && sttChat != null) {
                 sttChat.updateEnabledRichLinks();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
+            if (e.getErrorCode() == MegaError.API_ENOENT) {
+                logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
+            }
+            if (request.getNumDetails() == 1) {
+                MegaApplication.setShowRichLinkWarning(request.getFlag());
+                MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
+            } else if (request.getNumDetails() == 0) {
+                MegaApplication.setEnabledRichLinks(request.getFlag());
+                if (sttChat != null) {
+                    sttChat.updateEnabledRichLinks();
+                }
             }
         }
     }
@@ -252,4 +325,5 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
+
 }
