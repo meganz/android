@@ -1803,7 +1803,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateLocalSpeakerStatus() {
         if (getCall() == null || (!statusCallInProgress(callChat.getStatus()) && callChat.getStatus() != MegaChatCall.CALL_STATUS_RING_IN)) return;
         boolean isSpeakerOn = application.getSpeakerStatus(callChat.getChatid());
-        application.updateSpeakerStatus(isSpeakerOn, callChat.getStatus());
+        application.updateSpeakerStatus(isSpeakerOn, callChat.getStatus(), callChat.getChatid());
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
