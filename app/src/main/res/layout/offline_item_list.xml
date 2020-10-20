@@ -1,9 +1,9 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    >
+    android:layout_height="72dp">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/thumbnail"
@@ -12,17 +12,16 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="12dp"
         android:clickable="false"
-        app:actualImageScaleType="fitCenter"
-        />
+        app:actualImageScaleType="fitCenter" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginEnd="50dp"
         android:layout_marginStart="73dp"
         android:layout_marginTop="16dp"
-        android:orientation="vertical"
-        >
+        android:layout_marginEnd="50dp"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/filename"
             android:layout_width="wrap_content"
@@ -31,8 +30,7 @@
             android:singleLine="true"
             android:textColor="@color/file_list_first_row"
             android:textSize="16sp"
-            tools:text="2048.jpg"
-            />
+            tools:text="2048.jpg" />
 
         <TextView
             android:id="@+id/node_info"
@@ -42,17 +40,15 @@
             android:maxLines="1"
             android:textColor="@color/file_list_second_row"
             android:textSize="14sp"
-            tools:text="55.86KB . 24 Jul 2020 20:49"
-            />
+            tools:text="55.86KB . 24 Jul 2020 20:49" />
     </LinearLayout>
 
     <ImageView
-      android:id="@+id/three_dots"
-      android:layout_width="44dp"
-      android:layout_height="44dp"
-      android:layout_gravity="center_vertical|end"
-      android:padding="10dp"
-      android:background="@null"
-      android:src="@drawable/ic_dots_vertical_grey"
-      />
+        android:id="@+id/three_dots"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_vertical|end"
+        android:background="@null"
+        android:padding="10dp"
+        android:src="@drawable/ic_dots_vertical_grey" />
 </FrameLayout>

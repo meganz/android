@@ -35,6 +35,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.ref.WeakReference
 import java.util.Locale
 
@@ -109,7 +110,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             activity.showSnackbar(
                 SNACKBAR_TYPE,
                 context.getString(R.string.error_server_connection_problem),
-                -1
+                MEGACHAT_INVALID_HANDLE
             )
         }
     }

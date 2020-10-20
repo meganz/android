@@ -38,7 +38,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -389,7 +389,7 @@ class HomepageFragment : Fragment() {
             (activity as ManagerActivityLollipop).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.error_server_connection_problem),
-                INVALID_HANDLE
+                MEGACHAT_INVALID_HANDLE
             )
         }
     }

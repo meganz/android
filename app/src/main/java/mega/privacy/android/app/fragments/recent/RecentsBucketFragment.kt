@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 import java.util.*
@@ -91,7 +92,6 @@ class RecentsBucketFragment : BaseFragment() {
             val numCells: Int = if (Util.isScreenInPortrait(activity)) 4 else 6
             val gridLayoutManager =
                 GridLayoutManager(activity, numCells, GridLayoutManager.VERTICAL, false)
-            listView.layoutManager = gridLayoutManager
 
             listView.layoutManager = gridLayoutManager
         } else {
@@ -276,7 +276,7 @@ class RecentsBucketFragment : BaseFragment() {
             (activity as ManagerActivityLollipop).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
-                -1
+                MEGACHAT_INVALID_HANDLE
             )
             download(handle)
         }

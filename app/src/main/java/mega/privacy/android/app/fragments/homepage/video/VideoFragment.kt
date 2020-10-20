@@ -35,6 +35,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 import java.util.Locale
@@ -145,7 +146,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 it.showSnackbar(
                     SNACKBAR_TYPE,
                     getString(R.string.error_server_connection_problem),
-                    -1
+                    MEGACHAT_INVALID_HANDLE
                 )
             }
         }
@@ -388,7 +389,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 context,
                 SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
-                -1
+                MEGACHAT_INVALID_HANDLE
             )
         }
 
@@ -407,7 +408,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 context,
                 SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
-                -1
+                MEGACHAT_INVALID_HANDLE
             )
             val nC = NodeController(context)
             nC.prepareForDownload(arrayListOf(node.handle), true)
