@@ -119,7 +119,6 @@
             android:layout_height="16dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="3dp"
-            android:layout_marginEnd="6dp"
             android:layout_toEndOf="@+id/img_label"
             android:layout_alignBottom="@id/file_list_filename"
             android:layout_alignTop="@id/file_list_filename"
@@ -131,12 +130,17 @@
         <ImageView
             android:id="@+id/file_list_taken_down"
             style="@style/taken_down_icon"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="6dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="3dp"
             android:layout_marginEnd="6dp"
-            android:layout_toEndOf="@+id/file_list_filename"
+            android:layout_toEndOf="@+id/file_list_public_link"
             android:src="@drawable/ic_input_warning"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:visibility="visible" />
 
     </RelativeLayout>
 
