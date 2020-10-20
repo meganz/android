@@ -1,8 +1,11 @@
 package mega.privacy.android.app
 
+import android.app.Activity
 import android.util.DisplayMetrics
 import android.util.Log
+import android.util.LogPrinter
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -13,13 +16,14 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.google.android.gms.ads.doubleclick.PublisherAdView
 
 class GoogleAdsLoader(
-    lifecycleOwner: LifecycleOwner,
+    private val lifecycleOwner: LifecycleOwner,
     private val adViewContainer: ViewGroup,
-    private val displayMetrics: DisplayMetrics
+    private val displayMetrics: DisplayMetrics,
 ) : LifecycleObserver {
 
     private var initialLayoutComplete = false
     private lateinit var adView: PublisherAdView
+
     private val adSize : AdSize
         get() {
             val density = displayMetrics.density
@@ -55,6 +59,10 @@ class GoogleAdsLoader(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun start() {
+        if (lifecycleOwner is Fragment) setUpBanner()
+    }
+
+    private fun setUpBanner() {
         adView = PublisherAdView(MegaApplication.getInstance())
         adView.adListener = object : AdListener() {
             override fun onAdLoaded() {
@@ -70,6 +78,11 @@ class GoogleAdsLoader(
                 loadBanner(adSize)
             }
         }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun create() {
+        if (lifecycleOwner is Activity) setUpBanner()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

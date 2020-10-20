@@ -40,7 +40,9 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import java.io.File;
 import java.util.Locale;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -239,6 +241,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		else{
 			logWarning("url NULL");
 		}
+
+		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
+				findViewById(R.id.ad_view_container), getOutMetrics());
 	}
 
 	@Override
