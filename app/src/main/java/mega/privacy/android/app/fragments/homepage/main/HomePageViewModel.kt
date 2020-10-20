@@ -18,13 +18,13 @@ import mega.privacy.android.app.fragments.homepage.chatOnlineStatusChange
 import mega.privacy.android.app.fragments.homepage.notificationCountChange
 import mega.privacy.android.app.fragments.homepage.scrolling
 import mega.privacy.android.app.listeners.DefaultMegaRequestListener
+import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.RxUtil.logErr
-import mega.privacy.android.app.utils.Util.getCircleAvatar
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApi.*
 

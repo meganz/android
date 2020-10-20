@@ -2891,7 +2891,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								selectDrawerItemLollipop(drawerItem);
 								selectDrawerItemPending=false;
 								openFullscreenOfflineFragment(
-										getIntent().getStringExtra("pathNavigation"));
+										getIntent().getStringExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION));
 							}
 							else {
 								long fragmentHandle = getIntent().getLongExtra("fragmentHandle", -1);
@@ -16606,14 +16606,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         if (bNVHidden) {
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        } else {
-            if (drawerItem == DrawerItem.HOMEPAGE) {
-                params.bottomMargin = Util.dp2px(86, outMetrics);
-                params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            } else {
-                params.bottomMargin = 0;
-            }
-        }
+        } else if (drawerItem == DrawerItem.HOMEPAGE) {
+			params.bottomMargin = Util.dp2px(86, outMetrics);
+			params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		} else {
+			params.bottomMargin = 0;
+		}
 
 		transfersWidgetLayout.setLayoutParams(params);
 	}

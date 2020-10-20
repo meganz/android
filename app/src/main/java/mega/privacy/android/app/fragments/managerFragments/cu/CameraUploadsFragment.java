@@ -25,7 +25,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
@@ -83,6 +82,7 @@ import static mega.privacy.android.app.utils.Util.checkFingerprint;
 import static mega.privacy.android.app.utils.Util.px2dp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
     public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
@@ -666,8 +666,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             setDraggingThumbnailCallback();
             launchNodeViewer(intent, node.getHandle());
         } else if (mime.isVideoReproducible()) {
-            String mimeType = mime.getType();
-
             Intent mediaIntent;
             boolean internalIntent;
             if (mime.isVideoNotSupported()) {
@@ -699,7 +697,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
             if (!isIntentAvailable(context, mediaIntent)) {
                 mManagerActivity.showSnackbar(SNACKBAR_TYPE,
-                        getString(R.string.intent_not_available), -1);
+                        getString(R.string.intent_not_available), MEGACHAT_INVALID_HANDLE);
                 paramsSetSuccessfully = false;
             }
             if (paramsSetSuccessfully) {

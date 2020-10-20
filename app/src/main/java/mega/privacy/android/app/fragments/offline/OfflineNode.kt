@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.offline
 
 import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.utils.Constants.INVALID_ID
 import java.io.File
 
 class OfflineNode(
@@ -12,7 +13,13 @@ class OfflineNode(
 ) {
     companion object {
         val PLACE_HOLDER =
-            OfflineNode(MegaOffline(-1, "-1", "", "", -1, "", -1, ""), null, "", false)
-        val HEADER = OfflineNode(MegaOffline(-1, "-2", "", "", -1, "", -1, ""), null, "", false)
+            OfflineNode(
+                MegaOffline(INVALID_ID, "-1", "", "", INVALID_ID, "", INVALID_ID, ""),
+                null, "", false
+            )
+        val HEADER = OfflineNode(
+            MegaOffline(INVALID_ID, "-2", "", "", INVALID_ID, "", INVALID_ID, ""),
+            null, "", false
+        )
     }
 }

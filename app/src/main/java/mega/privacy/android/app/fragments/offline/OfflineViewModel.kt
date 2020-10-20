@@ -305,7 +305,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
         // has active search, should exit search mode
         if (query != null) {
-            logDebug("navigateOut exit search mode, path $path")
+            logDebug("navigateOut exit search mode")
             navigateTo(path, titleFromPath(path), 0)
             return BACK_PRESS_HANDLED
         }
@@ -318,7 +318,7 @@ class OfflineViewModel @ViewModelInject constructor(
             // and if back stack is empty, then should re-enter search mode
             if (navigationDepthInSearch == 0) {
                 searchQuery = historySearchQuery
-                logDebug("navigateOut from searchPath $searchPath")
+                logDebug("navigateOut from searchPath")
                 path = searchPath
                 historySearchQuery = null
                 historySearchPath = null
@@ -327,7 +327,6 @@ class OfflineViewModel @ViewModelInject constructor(
             }
         }
 
-        logDebug("navigateOut from $path")
         // if back stack isn't empty, or no search action in back stack, just navigate out
         path = path.substring(0, path.length - 1)
         path = path.substring(0, path.lastIndexOf("/") + 1)
@@ -363,8 +362,6 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun navigateTo(path: String, title: String, autoScrollPos: Int = -1) {
-        logDebug("navigateTo path $path, title $title")
-
         this.path = path
         _pathLiveData.value = path
         _actionBarTitle.value = title
@@ -402,7 +399,7 @@ class OfflineViewModel @ViewModelInject constructor(
         path: String,
         order: Int
     ) {
-        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList, path $path")
+        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList")
 
         this.rootFolderOnly = rootFolderOnly
         this.isList = isList

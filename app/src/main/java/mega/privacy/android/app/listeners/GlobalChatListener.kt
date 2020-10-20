@@ -23,7 +23,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
         status: Int,
         inProgress: Boolean
     ) {
-        if (userhandle == application.megaChatApi.myUserHandle) {
+        if (userhandle == api?.myUserHandle) {
             notifyChatOnlineStatusChange(status)
         }
     }

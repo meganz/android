@@ -68,6 +68,7 @@ import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 import java.util.Locale
@@ -152,7 +153,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
                 it.showSnackbar(
                     SNACKBAR_TYPE,
                     getString(R.string.error_server_connection_problem),
-                    -1
+                    MEGACHAT_INVALID_HANDLE
                 )
             }
         }
@@ -254,7 +255,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         if (!isIntentAvailable(context, intent)) {
             paramsSetSuccessfully = false
-            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
+            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available),
+                MEGACHAT_INVALID_HANDLE)
         }
 
         if (paramsSetSuccessfully) {
@@ -268,7 +270,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
             }
         } else {
             logWarning("itemClick:noAvailableIntent")
-            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
+            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available),
+                MEGACHAT_INVALID_HANDLE)
             val nC = NodeController(context)
             nC.prepareForDownload(arrayListOf(node.handle), true)
         }

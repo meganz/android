@@ -663,4 +663,17 @@ public class Constants {
     public static final int LOCATION_INDEX_TOP = 1;
 
     public static final String OFFLINE_ROOT = "/";
+
+    public static final int SEARCH_BY_DATE_FILTER_POS_TYPE = 0;
+    public static final int SEARCH_BY_DATE_FILTER_POS_THE_DAY = 1;
+    public static final int SEARCH_BY_DATE_FILTER_POS_MONTH_OR_YEAR = 2;
+    public static final int SEARCH_BY_DATE_FILTER_POS_START_DAY = 3;
+    public static final int SEARCH_BY_DATE_FILTER_POS_END_DAY = 4;
+
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_ONE_DAY = 1;
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_LAST_MONTH_OR_YEAR = 2;
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_BETWEEN_TWO_DAYS = 3;
+
+    public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
+    public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
 }
