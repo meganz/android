@@ -5,27 +5,24 @@
     android:id="@+id/node_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/txt_title"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:padding="16dp"
         android:text="@string/title_label"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="#99000000"
-        />
+        android:textColor="@color/transparent_black2" />
 
     <RadioGroup
         android:id="@+id/radio_group_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        >
+        android:paddingEnd="16dp">
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_label_red"
@@ -33,8 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="@string/label_red"
-            app:buttonTint="@color/label_red"
-            />
+            app:buttonTint="@color/label_red" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_label_orange"
@@ -42,8 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="@string/label_orange"
-            app:buttonTint="@color/label_orange"
-            />
+            app:buttonTint="@color/label_orange" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_label_yellow"
@@ -51,8 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="@string/label_yellow"
-            app:buttonTint="@color/label_yellow"
-            />
+            app:buttonTint="@color/label_yellow" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_label_green"
@@ -60,8 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="@string/label_green"
-            app:buttonTint="@color/label_green"
-            />
+            app:buttonTint="@color/label_green" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_label_blue"
@@ -69,8 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="@string/label_blue"
-            app:buttonTint="@color/label_blue"
-            />
+            app:buttonTint="@color/label_blue" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_label_purple"
@@ -78,8 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="@string/label_purple"
-            app:buttonTint="@color/label_purple"
-            />
+            app:buttonTint="@color/label_purple" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_label_grey"
@@ -87,8 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="@string/label_grey"
-            app:buttonTint="@color/label_grey"
-            />
+            app:buttonTint="@color/label_grey" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/radio_remove"
@@ -97,10 +87,9 @@
             android:layout_height="56dp"
             android:button="@drawable/ic_close_white"
             android:text="@string/action_remove_label"
-            android:textColor="#F30C14"
+            android:textColor="@color/dark_primary_color"
             android:visibility="gone"
-            app:buttonTint="#F30C14"
-            tools:visibility="visible"
-            />
+            app:buttonTint="@color/dark_primary_color"
+            tools:visibility="visible" />
     </RadioGroup>
 </LinearLayout>
