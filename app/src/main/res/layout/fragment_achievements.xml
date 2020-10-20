@@ -12,6 +12,12 @@
         android:layout_height="wrap_content"
         android:background="@color/grey_my_account_background"
         android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/ad_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <RelativeLayout
             android:id="@+id/unlocked_rewards_layout"
             android:layout_width="match_parent"

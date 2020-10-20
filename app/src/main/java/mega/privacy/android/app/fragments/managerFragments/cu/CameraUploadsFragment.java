@@ -36,6 +36,8 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Locale;
+
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
@@ -438,7 +440,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private void setupGoogledAds() {
         GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
                 mBinding.adViewContainer,
-                ((ManagerActivityLollipop) getActivity()).getOutMetrics());
+                ((BaseActivity) getActivity()).getOutMetrics());
     }
 
     private void setDraggingThumbnailCallback() {

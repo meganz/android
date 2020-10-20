@@ -21,10 +21,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import mega.privacy.android.app.BaseActivity;
+import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
@@ -327,6 +330,10 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		if (sFetcher != null) {
 			sFetcher.setDataCallback(this);
 		}
+
+		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
+				getView().findViewById(R.id.ad_view_container),
+				((BaseActivity) getActivity()).getOutMetrics());
 	}
 
 	@Override

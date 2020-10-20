@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
@@ -633,8 +634,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 		setTransferOverQuotaBannerVisibility();
 
-		Log.i("Alex", "call ads loader");
-		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this, v.findViewById(R.id.ad_view_container), ((ManagerActivityLollipop)getActivity()).getOutMetrics());
+		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this, v.findViewById(R.id.ad_view_container), ((BaseActivity)getActivity()).getOutMetrics());
 
 		return v;
     }

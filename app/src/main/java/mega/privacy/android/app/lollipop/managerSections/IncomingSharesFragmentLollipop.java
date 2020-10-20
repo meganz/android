@@ -1,6 +1,9 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import android.view.LayoutInflater;
@@ -13,6 +16,8 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.BaseActivity;
+import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
@@ -96,6 +101,14 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	public static IncomingSharesFragmentLollipop newInstance() {
 		return new IncomingSharesFragmentLollipop();
+	}
+
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
+				view.findViewById(R.id.ad_view_container),
+				((BaseActivity) getActivity()).getOutMetrics());
 	}
 
 	@Override
