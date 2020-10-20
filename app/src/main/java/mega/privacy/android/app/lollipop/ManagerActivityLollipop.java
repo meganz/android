@@ -5799,6 +5799,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	/**
+	 * Set up a listener for navigating to a new destination (screen)
+	 * This only for Homepage for the time being since it is the only module to
+	 * which Jetpack Navigation applies.
+	 * It updates the status variable such as mHomepageScreen, as well as updating
+	 * BNV, Toolbar title, etc.
+	 */
 	private void setupNavDestListener() {
 		mNavController = Navigation.findNavController(mNavHostView);
 
@@ -5806,40 +5813,33 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			int destinationId = destination.getId();
 			mHomepageSearchable = null;
 
-			switch (destinationId) {
-				case R.id.homepageFragment:
-					mHomepageScreen = HomepageScreen.HOMEPAGE;
-					// Showing the bottom navigation view immediately because the initial dimension
-					// of Homepage bottom sheet is calculated based on it
-					showBNVImmediate();
-					if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
-						abL.setVisibility(View.GONE);
-					}
-					setDrawerLockMode(false);
-					return;
-				case R.id.photosFragment:
-					mHomepageScreen = HomepageScreen.PHOTOS;
-					break;
-				case R.id.documentsFragment:
-					mHomepageScreen = HomepageScreen.DOCUMENTS;
-					break;
-				case R.id.audioFragment:
-					mHomepageScreen = HomepageScreen.AUDIO;
-					break;
-                case R.id.videoFragment:
-                    mHomepageScreen = HomepageScreen.VIDEO;
-                    break;
-				case R.id.fullscreen_offline:
-					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
-					break;
-				case R.id.offline_file_info:
-					mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+			if (destinationId == R.id.homepageFragment) {
+				mHomepageScreen = HomepageScreen.HOMEPAGE;
+				// Showing the bottom navigation view immediately because the initial dimension
+				// of Homepage bottom sheet is calculated based on it
+				showBNVImmediate();
+				if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
 					abL.setVisibility(View.GONE);
-					showHideBottomNavigationView(true);
-					return;
-                case R.id.recentBucketFragment:
-                    mHomepageScreen = HomepageScreen.RECENT_BUCKET;
-                    break;
+				}
+				setDrawerLockMode(false);
+				return;
+			} else if (destinationId == R.id.photosFragment) {
+				mHomepageScreen = HomepageScreen.PHOTOS;
+			} else if (destinationId == R.id.documentsFragment) {
+				mHomepageScreen = HomepageScreen.DOCUMENTS;
+			} else if (destinationId == R.id.audioFragment) {
+				mHomepageScreen = HomepageScreen.AUDIO;
+			} else if (destinationId == R.id.videoFragment) {
+				mHomepageScreen = HomepageScreen.VIDEO;
+			} else if (destinationId == R.id.fullscreen_offline) {
+				mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
+			} else if (destinationId == R.id.offline_file_info) {
+				mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+				abL.setVisibility(View.GONE);
+				showHideBottomNavigationView(true);
+				return;
+			} else if (destinationId == R.id.recentBucketFragment) {
+				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
 			abL.setVisibility(View.VISIBLE);

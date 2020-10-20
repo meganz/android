@@ -173,36 +173,29 @@ public class Util {
 		if(activity == null){
 			return;
 		}
-		
-		try{ 
+
+		try{
 			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(
-				activity.getString(android.R.string.ok),
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-						if (finish) {
-							activity.finish();
-						}
-					}
-				});
-			dialogBuilder.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					if (finish) {
-						activity.finish();
-					}
+			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
+				dialog.dismiss();
+				if (finish) {
+					activity.finish();
 				}
 			});
-		
-		
+			dialogBuilder.setOnCancelListener(dialog -> {
+				if (finish) {
+					activity.finish();
+				}
+			});
+
 			AlertDialog dialog = dialogBuilder.create();
-			dialog.show(); 
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.setCancelable(false);
+			dialog.show();
 			brandAlertDialog(dialog);
 		}
 		catch(Exception ex){
-			Util.showToast(activity, message); 
+			Util.showToast(activity, message);
 		}
 	}
 	
