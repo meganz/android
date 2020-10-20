@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
+import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import nz.mega.sdk.MegaAccountSession;
@@ -319,6 +320,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 					//Ask for MU and CU folder when App in init state
                     megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
+
+					//Login transfers resumption
+					enableTransfersResumption();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -651,6 +655,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+
+        //Logout transfers resumption
+		enableTransfersResumption();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1651,6 +1658,22 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		} catch (Exception e) {
 			logError("EXCEPTION", e);
 		}
+	}
+
+	private void enableTransfersResumption() {
+		megaApi.enableTransferResumption();
+
+		new Handler().postDelayed(() -> {
+			if (megaApi.getNumPendingDownloads() > 0) {
+				Intent downloadService = new Intent(getInstance(), DownloadService.class);
+				startService(downloadService);
+			}
+
+			if (megaApi.getNumPendingUploads() > 0) {
+				startService(new Intent(getInstance(), UploadService.class));
+				startService(new Intent(getInstance(), ChatUploadService.class));
+			}
+		}, 5000);
 	}
 
 	public static boolean isShowRichLinkWarning() {
