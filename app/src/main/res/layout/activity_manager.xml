@@ -73,8 +73,6 @@
                         android:layout_height="wrap_content"
                         style="@style/MyCustomTabLayout"/>
 
-                <include layout="@layout/item_transfers_overview"/>
-
                 <include layout="@layout/item_call_in_progress_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -128,12 +126,19 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize">
 
+            <include
+                layout="@layout/transfers_widget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/floating_button"
+                android:layout_alignParentEnd="true" />
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
-                android:elevation="@dimen/elevation_low"
-                android:layout_margin="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white"

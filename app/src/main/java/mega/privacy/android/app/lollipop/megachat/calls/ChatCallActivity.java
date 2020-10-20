@@ -84,7 +84,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -579,6 +579,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         smallElementsIndividualCallLayout.setVisibility(View.GONE);
         bigElementsIndividualCallLayout = findViewById(R.id.big_elements_individual_call);
         bigElementsIndividualCallLayout.setVisibility(View.GONE);
+        bigElementsIndividualCallLayout.setOnClickListener(this);
         linearFAB = findViewById(R.id.linear_buttons);
         displayLinearFAB(false);
         infoUsersBar = findViewById(R.id.info_users_bar);
@@ -655,8 +656,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         parentBigCameraGroupCall.setLayoutParams(paramsBigCameraGroupCall);
-        parentBigCameraGroupCall.setOnClickListener(this);
-
         fragmentBigCameraGroupCall = findViewById(R.id.fragment_big_camera_group_call);
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
         microFragmentBigCameraGroupCall = findViewById(R.id.micro_fragment_big_camera_group_call);
@@ -731,7 +730,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             myAvatarLayout.setVisibility(View.GONE);
             myImage = findViewById(R.id.call_chat_my_image);
             contactAvatarLayout = findViewById(R.id.call_chat_contact_image_rl);
-            contactAvatarLayout.setOnClickListener(this);
             contactAvatarLayout.setVisibility(View.GONE);
             contactImage = findViewById(R.id.call_chat_contact_image);
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
@@ -748,7 +746,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
+        registerReceiver(chatCallUpdateReceiver, filterCall);
 
         IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
         filterSession.addAction(ACTION_UPDATE_CALL);
@@ -756,10 +754,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         filterSession.addAction(ACTION_CHANGE_AUDIO_LEVEL);
         filterSession.addAction(ACTION_CHANGE_NETWORK_QUALITY);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
+        registerReceiver(chatSessionUpdateReceiver, filterSession);
 
         IntentFilter filterProximitySensor = new IntentFilter(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
-        LocalBroadcastManager.getInstance(this).registerReceiver(proximitySensorReceiver, filterProximitySensor);
+        registerReceiver(proximitySensorReceiver, filterProximitySensor);
     }
 
     private void setAvatarLayout() {
@@ -1052,9 +1050,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             bigRecyclerView.setAdapter(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(proximitySensorReceiver);
+        unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(chatSessionUpdateReceiver);
+        unregisterReceiver(proximitySensorReceiver);
 
         super.onDestroy();
     }
@@ -1204,11 +1202,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (getCall() == null) return;
 
         switch (v.getId()) {
-            case R.id.call_chat_contact_image_rl:
-            case R.id.parent_layout_big_camera_group_call: {
+            case R.id.big_elements_individual_call:
                 remoteCameraClick();
                 break;
-            }
+
             case R.id.video_fab: {
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
@@ -1806,7 +1803,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateLocalSpeakerStatus() {
         if (getCall() == null || (!statusCallInProgress(callChat.getStatus()) && callChat.getStatus() != MegaChatCall.CALL_STATUS_RING_IN)) return;
         boolean isSpeakerOn = application.getSpeakerStatus(callChat.getChatid());
-        application.updateSpeakerStatus(isSpeakerOn, callChat.getStatus());
+        application.updateSpeakerStatus(isSpeakerOn, callChat.getStatus(), callChat.getChatid());
 
         if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -2836,6 +2833,21 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         } else if (megaChatApi.isAudioLevelMonitorEnabled(chatId)) {
             megaChatApi.enableAudioLevelMonitor(false, chatId);
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                app.muteOrUnmute(false);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                app.muteOrUnmute(true);
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
         }
     }
 

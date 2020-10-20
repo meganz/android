@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 
 /**
  * Used to display console log from app, SDK and chatSDK,

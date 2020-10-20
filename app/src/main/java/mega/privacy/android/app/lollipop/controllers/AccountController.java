@@ -45,12 +45,11 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -484,7 +483,7 @@ public class AccountController {
 
         Intent intent = new Intent();
         intent.setAction(ACTION_LOG_OUT);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     static public void logoutConfirmed(Context context){
