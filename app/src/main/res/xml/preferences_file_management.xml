@@ -53,4 +53,20 @@
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
+
+    <androidx.preference.Preference
+        android:key="settings_file_management_clear_version"
+        android:layout="@layout/delete_versions_preferences"
+        android:title="@string/settings_file_management_delete_versions"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="auto_play_switch"
+        android:title="@string/settings_auto_play_label"
+        android:defaultValue="false"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
 </androidx.preference.PreferenceScreen>

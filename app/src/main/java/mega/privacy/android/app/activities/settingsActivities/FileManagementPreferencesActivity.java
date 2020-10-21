@@ -44,6 +44,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
@@ -432,11 +433,15 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
                 }
                 if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS) {
                     MegaApplication.setDisableFileVersions(Boolean.valueOf(request.getText()));
-                    if (e.getErrorCode() == MegaError.API_OK) {
-                        logDebug("File versioning attribute changed correctly");
+
+                    if (e.getErrorCode() != MegaError.API_OK) {
+                        logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
+                        if (sttFileManagment != null) {
+                            sttFileManagment.updateEnabledFileVersions();
+                        }
                     }
-                    if (sttFileManagment != null) {
-                        sttFileManagment.updateEnabledFileVersions();
+                    else{
+                        logDebug("File versioning attribute changed correctly");
                     }
                 }
                 break;
