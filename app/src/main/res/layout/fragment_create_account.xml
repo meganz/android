@@ -2,8 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -14,13 +13,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/create_account_create_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -35,10 +34,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="left"
-                        android:text="@string/create_account_title"
                         android:layout_marginTop="17dp"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        />
+                        android:text="@string/create_account_title"
+                        android:textAppearance="?attr/textAppearanceHeadline6" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -50,17 +48,15 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
                             android:hint="@string/first_name_text"
-                            app:errorEnabled="true"
-                            >
+                            app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                />
+                                android:textSize="16sp" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -68,11 +64,11 @@
                             android:id="@+id/create_account_name_text_error_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignBottom="@+id/create_account_name_text_layout"
                             android:layout_alignParentRight="true"
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
-                            android:tint="?attr/colorError"
-                            android:layout_alignBottom="@+id/create_account_name_text_layout"/>
+                            android:tint="?attr/colorError" />
 
                     </RelativeLayout>
 
@@ -86,17 +82,15 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/lastname_text"
-                            app:errorEnabled="true"
-                            >
+                            app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_last_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                />
+                                android:textSize="16sp" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -104,11 +98,11 @@
                             android:id="@+id/create_account_last_name_text_error_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignBottom="@+id/create_account_last_name_text_layout"
                             android:layout_alignParentRight="true"
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
-                            android:tint="?attr/colorError"
-                            android:layout_alignBottom="@+id/create_account_last_name_text_layout"/>
+                            android:tint="?attr/colorError" />
 
                     </RelativeLayout>
 
@@ -122,17 +116,15 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/email_text"
-                            app:errorEnabled="true"
-                            >
+                            app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_email_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textEmailAddress"
-                                />
+                                android:textSize="16sp" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -140,11 +132,11 @@
                             android:id="@+id/create_account_email_text_error_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignBottom="@+id/create_account_email_text_layout"
                             android:layout_alignParentRight="true"
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
-                            android:tint="?attr/colorError"
-                            android:layout_alignBottom="@+id/create_account_email_text_layout"/>
+                            android:tint="?attr/colorError" />
 
                     </RelativeLayout>
 
@@ -154,44 +146,42 @@
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_layout"
+                            style="@style/TextInputLayout.Password"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/password_text"
-                            style="@style/TextInputLayout.Password"
                             android:theme="@style/TextInputLayout.Password"
-                            app:errorEnabled="true"
-                            >
+                            app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_password_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textPassword"
-                                />
+                                android:textSize="16sp" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
+                            android:id="@+id/create_account_password_text_error_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/create_account_password_text_error_icon"
+                            android:layout_alignBottom="@+id/create_account_password_text_layout"
                             android:layout_alignParentRight="true"
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
-                            android:tint="?attr/colorError"
-                            android:layout_alignBottom="@+id/create_account_password_text_layout"/>
+                            android:tint="?attr/colorError" />
 
                         <LinearLayout
                             android:id="@+id/container_passwd_elements"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginTop="60dp"
-                            android:paddingBottom="20dp"
                             android:layout_alignTop="@+id/create_account_password_text_layout"
+                            android:layout_marginTop="60dp"
+                            android:orientation="vertical"
+                            android:paddingBottom="20dp"
                             android:visibility="gone">
 
                             <LinearLayout
@@ -202,42 +192,46 @@
                                     android:id="@+id/shape_passwd_first"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
-                                    android:background="@drawable/passwd_very_weak"/>
+                                    android:layout_weight="1"
+                                    android:background="@drawable/passwd_very_weak" />
+
                                 <ImageView
                                     android:id="@+id/shape_passwd_second"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
-                                    android:background="@drawable/shape_password"/>
+                                    android:layout_weight="1"
+                                    android:background="@drawable/shape_password" />
+
                                 <ImageView
                                     android:id="@+id/shape_passwd_third"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
-                                    android:background="@drawable/shape_password"/>
+                                    android:layout_weight="1"
+                                    android:background="@drawable/shape_password" />
+
                                 <ImageView
                                     android:id="@+id/shape_passwd_fourth"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
-                                    android:background="@drawable/shape_password"/>
+                                    android:layout_weight="1"
+                                    android:background="@drawable/shape_password" />
+
                                 <ImageView
                                     android:id="@+id/shape_passwd_fifth"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
-                                    android:background="@drawable/shape_password"/>
+                                    android:layout_weight="1"
+                                    android:background="@drawable/shape_password" />
 
                             </LinearLayout>
 
@@ -245,21 +239,21 @@
                                 android:id="@+id/password_type"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="14sp"
-                                android:textColor="@color/login_warning"
-                                android:layout_marginTop="8dp"
                                 android:layout_marginLeft="5dp"
-                                android:text="@string/pass_very_weak"/>
+                                android:layout_marginTop="8dp"
+                                android:text="@string/pass_very_weak"
+                                android:textColor="@color/login_warning"
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/password_advice_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="14sp"
-                                android:layout_marginTop="6dp"
                                 android:layout_marginLeft="5dp"
+                                android:layout_marginTop="6dp"
+                                android:text="@string/passwd_weak"
                                 android:textColor="@color/name_my_account"
-                                android:text="@string/passwd_weak"/>
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
@@ -271,35 +265,33 @@
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_confirm_layout"
+                            style="@style/TextInputLayout.Password"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/confirm_password_text"
-                            style="@style/TextInputLayout.Password"
                             android:theme="@style/TextInputLayout.Password"
-                            app:errorEnabled="true"
-                            >
+                            app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/create_account_password_text_confirm"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
                                 android:imeOptions="actionDone"
                                 android:inputType="textPassword"
-                                />
+                                android:textSize="16sp" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
+                            android:id="@+id/create_account_password_text_confirm_error_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/create_account_password_text_confirm_error_icon"
+                            android:layout_alignBottom="@+id/create_account_password_text_confirm_layout"
                             android:layout_alignParentRight="true"
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
-                            android:tint="?attr/colorError"
-                            android:layout_alignBottom="@+id/create_account_password_text_confirm_layout"/>
+                            android:tint="?attr/colorError" />
 
                     </RelativeLayout>
 
@@ -312,7 +304,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:gravity="center_horizontal|center_vertical"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/create_account_mega_logo"
@@ -337,12 +329,12 @@
 
                 <com.google.android.material.progressindicator.ProgressIndicator
                     android:id="@+id/create_account_progress_bar"
+                    style="@style/ProgressIndicator.Linear"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    style="@style/ProgressIndicator.Linear"
                     android:layout_gravity="center"
                     android:layout_marginTop="30dp"
-                    android:layout_marginBottom="30dp"/>
+                    android:layout_marginBottom="30dp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -358,25 +350,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/background_create_account"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginTop="18dp"
                 android:layout_marginStart="20dp"
+                android:layout_marginTop="18dp"
                 android:layout_marginEnd="13dp"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <CheckBox
                     android:id="@+id/create_account_chkTOS"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:theme="@style/CheckBoxStyle"
-                    />
-
+                    android:layout_gravity="center_vertical" />
 
                 <TextView
                     android:id="@+id/tos"
@@ -386,9 +375,7 @@
                     android:layout_marginRight="16dp"
                     android:singleLine="false"
                     android:textAppearance="@style/TextAppearance.Mega.Caption2"
-                    tools:text="term of service"
-                    />
-
+                    tools:text="term of service" />
             </LinearLayout>
 
             <include
@@ -396,37 +383,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="13dp"
                 android:layout_marginTop="8dp"
-                />
+                android:layout_marginEnd="13dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_gravity="start"
-                android:layout_marginTop="20dp"
                 android:layout_marginStart="24dp"
-                android:layout_marginBottom="20dp">
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/button_create_account_create"
+                    style="@style/Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Button"
                     android:layout_gravity="center_vertical"
-                    tools:text="create account"
-                    />
+                    tools:text="create account" />
 
                 <Button
                     android:id="@+id/button_login_create"
+                    style="?attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="?attr/borderlessButtonStyle"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="8dp"
-                    tools:text="login"
-                    />
+                    tools:text="login" />
 
             </LinearLayout>
 

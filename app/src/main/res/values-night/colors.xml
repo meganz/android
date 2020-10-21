@@ -11,8 +11,6 @@
     <color name="pass_good">#9FF4A1</color>
     <color name="pass_strong">#5BB5DE</color>
 
-    <color name="checkbox_border">@color/white_alpha_054</color>
-
     <!-- ProgressIndicator -->
     <color name="linear_progress_track">@color/white_alpha_023</color>
 

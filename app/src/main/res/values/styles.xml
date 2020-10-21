@@ -556,13 +556,6 @@
         <item name="endIconTint">@color/password_color_toggle</item>
     </style>
 
-    <style name="CheckBoxStyle" parent="Theme.AppCompat">
-        <item name="android:colorControlNormal">@color/checkbox_border</item>
-        <item name="colorControlNormal">@color/checkbox_border</item>
-        <item name="android:colorAccent">?attr/colorSecondary</item>
-        <item name="colorAccent">?attr/colorSecondary</item>
-    </style>
-
     <style name="ProgressIndicator.Linear" parent="Widget.MaterialComponents.ProgressIndicator.Linear.Indeterminate">
         <item name="indicatorColor">@color/linear_progress_indicator</item>
         <item name="trackColor">@color/linear_progress_track</item>

@@ -198,7 +198,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private CallListener callListener = new CallListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
-	public static int sNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+	public static int sNightMode = AppCompatDelegate.MODE_NIGHT_YES;
 
     @Override
 	public void networkAvailable() {

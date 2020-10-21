@@ -298,10 +298,6 @@
      let's just keep them. -->
     <color name="name_my_account">@color/grey_alpha_087</color>
 
-    <!-- reference ?android:attr/textColorSecondary doesn't work,
-     need define a separate color -->
-    <color name="checkbox_border">@color/grey_alpha_054</color>
-
     <!-- ProgressIndicator -->
     <color name="linear_progress_indicator">@color/teal_300</color>
     <color name="linear_progress_track">@color/grey_alpha_012</color>
