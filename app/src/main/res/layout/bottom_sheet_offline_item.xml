@@ -121,7 +121,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -160,7 +160,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_delete_offline_layout"

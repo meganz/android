@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -85,12 +86,13 @@ import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
@@ -106,12 +108,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private GroupChatInfoActivityLollipop groupChatInfoActivity;
     private MegaChatRoom chat;
+    private String newMuteOption = null;
     private AlertDialog permissionsDialog;
     private AlertDialog changeTitleDialog;
     private AlertDialog chatLinkDialog;
-
-    private ChatItemPreferences chatPrefs = null;
-    private ChatSettings chatSettings = null;
 
     private LinearLayout containerLayout;
     private Toolbar toolbar;
@@ -145,6 +145,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 || intent.getAction().equals(ACTION_UPDATE_LAST_NAME)
                 || intent.getAction().equals(ACTION_UPDATE_CREDENTIALS)) {
                 updateAdapter(intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE));
+            }
+        }
+    };
+
+    private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
+
+            if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) && adapter != null) {
+                adapter.checkNotifications(chatHandle);
             }
         }
     };
@@ -184,7 +196,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 return;
             }
 
-            chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
+            dbH = MegaApplication.getInstance().getDbH();
             setContentView(R.layout.activity_group_chat_properties);
 
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -223,50 +235,37 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             });
 
-            if (!chat.isPreview()) {
-                chatSettings = dbH.getChatSettings();
-
-                if (chatSettings == null || areGeneralChatNotificationsAvailable()) {
-                    if (chatPrefs != null) {
-                        boolean notificationsEnabled = true;
-
-                        if (chatPrefs.getNotificationsEnabled() != null) {
-                            notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-                        }
-
-                        chatMuted = !notificationsEnabled;
-                    } else {
-                        chatMuted = false;
-                    }
-                } else {
-                    chatMuted = true;
-                }
-            }
-
             if (megaChatApi.isSignalActivityRequired()) {
                 megaChatApi.signalPresenceActivity();
             }
+
+            registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
             IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
             contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-            LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+            registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
             setParticipants();
             updateAdapterHeader();
+            if(adapter != null){
+                adapter.checkNotifications(chatHandle);
+            }
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
+        unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(contactUpdateReceiver);
     }
 
     private void setParticipants() {
@@ -762,7 +761,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     logDebug("Chat archived");
                     Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP);
                     intent.putExtra(CHAT_TITLE, chatTitle);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    sendBroadcast(intent);
                     finish();
                 } else {
                     logDebug("Chat unarchived");
@@ -1410,25 +1409,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         return selectedHandleParticipant;
     }
 
-    /**
-     * Checks if the notifications of the chat are enabled.
-     *
-     * @return true if the notifications of the chat are enabled, false otherwise
-     */
-    public boolean areGeneralChatNotificationsAvailable() {
-        return chatSettings != null || chatSettings.getNotificationsEnabled() == null ? true : Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
-    }
-
     public void setChatLink(String chatLink) {
         this.chatLink = chatLink;
-    }
-
-    public void setChatMuted() {
-        chatMuted = !chatMuted;
-    }
-
-    public boolean isChatMuted() {
-        return chatMuted;
     }
 
     public ChatController getChatC() {
@@ -1436,6 +1418,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void updateParticipants() {
+        MegaChatRoom chatRoomUpdated = megaChatApi.getChatRoom(chatHandle);
+        if (chatRoomUpdated == null) {
+            logWarning("The chatRoom updated is null");
+            return;
+        }
+
+        chat = chatRoomUpdated;
         participants.clear();
         setParticipants();
     }

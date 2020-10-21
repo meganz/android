@@ -50,10 +50,11 @@ public class QueryRecoveryLinkListener extends BaseListener {
                         intent.setAction(ACTION_CANCEL_ACCOUNT);
                     } else if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
                         intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
-                        intent.putExtra(VISIBLE_FRAGMENT, TOUR_FRAGMENT);
                         if (request.getFlag()) {
+                            intent.putExtra(VISIBLE_FRAGMENT, TOUR_FRAGMENT);
                             intent.setAction(ACTION_RESET_PASS);
                         } else {
+                            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                             intent.setAction(ACTION_PARK_ACCOUNT);
                         }
                     } else if (matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {

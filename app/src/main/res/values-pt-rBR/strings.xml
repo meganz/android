@@ -89,7 +89,6 @@
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
 
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
@@ -363,6 +362,11 @@
         <item context="Message when a download finishes. Singular 1 file" quantity="one">O upload foi concluído</item>
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads foram concluídos</item>
     </plurals>
+
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">A pasta está vazia.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">As pastas estão vazias.</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -488,7 +492,7 @@
     <string name="context_no_copied" context="error message">Erro. Não foi copiado</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">Escolha a pasta de destino</string>
     <string name="context_correctly_moved" context="success message when moving a node">Movido corretamente</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d itens movidos com êxito</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d itens movidos corretamente.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d itens não foram movidos</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Movido à lixeira</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d itens movidos para a Lixeira com sucesso</string>
@@ -506,7 +510,8 @@
     <string name="context_no_removed" context="error message">Erro. Não foi removido do MEGA</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d itens removidos corretamente do MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d itens não foram removidos</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">Você saiu de %d pastas corretamente</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">Você saiu de %d pastas corretamente</string>
+    <string name="share_left" context="Message shown when a share has been left">esquerda compartilhada</string>
     <string name="number_no_leaved" context="error message when moving a node">%d pastas não foram deixadas corretamente</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">O arquivo foi enviado a %d contatos</string>
     <string name="number_no_sent" context="error message when sending multiple files">O arquivo não foi enviado a %d contatos</string>
@@ -720,6 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">Confirme a sua conta</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">A sua conta foi temporariamente bloqueada devido a uma suspeita de infração. Por favor, confirme o seu número de telefone para desbloquear a sua conta.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">País</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">País</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">O seu telefone</string>
     <string name="general_back_button" context="Button label - go to previous page">Voltar</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Agora não</string>
@@ -889,7 +895,7 @@
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Endereço 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Endereço 2 (opcional)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">Cidade</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Estado / Cidade</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Estado/Província</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">País</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">CEP</string>
 
@@ -1109,6 +1115,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">Arquivar</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1543,7 +1550,6 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importar</string>
     <string name="save_for_offline" context="Menu option to choose save to Offline section">Salvar para uso offline</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Adicionar à Nuvem de arquivos</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">Salvar para uso offline</string>
 
     <string name="general_view_contacts" context="Menu option">Ver contatos</string>
 
@@ -1667,7 +1673,6 @@
     <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">Você tem certeza de que quer mover esta pasta para a Lixeira? Fazer isso desativará o upload secundário de mídia.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Mover para a lixeira?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Deletar do MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Se você sair desta pasta, não será possível acessá-la novamente.</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">Enviando&#8230;</string>
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Notificações de chat</string>
@@ -1722,6 +1727,11 @@
     <plurals name="context_share_folders">
         <item context="menu item" quantity="one">Compartilhar pasta</item>
         <item context="menu items" quantity="other">Pastas compartilhadas</item>
+    </plurals>
+
+    <plurals name="confirmation_leave_share_folder">
+        <item context="Confirmation message before leaving an incoming shared folder" quantity="one">Se você sair desta pasta, não será possível acessá-la novamente.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">Se você sair destas pastas compartilhadas, não poderá acessá-las novamente.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Não há pastas compartilhadas</string>
@@ -2014,6 +2024,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Solicitações em excesso. Por favor, aguarde.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">Cancelando o processo de login. Por favor, espere&#8230;</string>
 
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Formato de arquivo não suportado</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Erro. O arquivo é corrupto ou não existe.</string>
 
 
@@ -2101,6 +2112,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Visualização do conteúdo</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">O streaming não pode ser feito e o arquivo não foi baixado</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">O arquivo não pôde ser aberto devido à falta de conexão.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">O arquivo já foi salvo em Offline</string>
 
     <plurals name="error_forwarding_messages">
@@ -2167,7 +2179,7 @@
 
     <string name="join_call_layout" context="Title of the layout to join a group call from the chat screen">Pressione para entrar na chamada</string>
 
-    <string name="invite_contacts" context="Label shown when the user wants to add contacts into his MEGA account">Adicione os seus contatos</string>
+    <string name="invite_contacts" context="Label shown when the user wants to add contacts into his MEGA account">Adicione contatos</string>
     <string name="share_with" cotext="Label shown when the user wants to share something with other contacts">Compartilhar com</string>
     <string name="contacts_list_empty_text_loading_share" context="Message shown while the contact list from the device and from MEGA is being read and then shown to the user">Carregando contatos&#8230;</string>
     <string name="title_new_group" context="Title of the screen New Group">Novo grupo</string>
@@ -2199,7 +2211,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">Você já adicionou o contato %s.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Compartilhar com %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">Novo chat de grupo</string>
-    <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Add contatos</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Enviar contatos</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Desconectado</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">A sua conta está ativa. Por favor, faça login.</string>
@@ -2250,7 +2262,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]de %2$s usados[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Alterar para um servidor de teste?</string>
-    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">Você tem certeza de que quer alterar para um servidor de teste? A sua conta pode sofrer danos irreparáveis</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">Você tem certeza de que quer alterar para um servidor de teste? A sua conta pode sofrer danos irreparáveis.</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Abrir a câmera?</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Se você abrir a câmera, a sua transmissão de vídeo na chamada atual será pausada.</string>
@@ -2267,7 +2279,7 @@
 	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">O tamanho mínimo é de %1$s e o máximo é de %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Remover arquivos com mais de</string>
-    <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d dias</string>
+    <string name="settings_rb_scheduler_select_days_subtitle" context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics">%d dias</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Avise-me quando o tamanho for maior que</string>
 
 	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Se os vídeos a comprimir forem maiores que</string>
@@ -2280,6 +2292,8 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Ativar a rotação da chave de criptografia</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">A rotação de chaves é um pouco mais segura, mas não permite criar um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">A rotação de chaves está desativada nos chats com mais de 100 participantes.</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Não é possível converter em chat privado porque o número máximo de participantes foi atingido.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] criou um link para o chat.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] eliminou o link do chat.[/B]</string>
@@ -2443,6 +2457,8 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participantes</item>
     </plurals>
 
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s e mais %2$d</string>
+
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Antes de poder gerar um link para este chat, você precisa adicionar uma descrição:</string>
 
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Link do chat copiado para a área de transferência</string>
@@ -2502,7 +2518,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s entrou na chamada</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s saiu da chamada</string>
 
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">Não é possível fazer uma chamada porque o número máximo de participantes foi atingido.</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Você não pode participar desta chamada porque o número máximo de participantes foi alcançado.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">Não é possível participar desta chamada porque o número máximo de participantes no chat de grupo foi atingido.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Você não tem permissão para ativar o vídeo, pois essa chamada alcançou o número máximo de participantes usando o vídeo.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Erro. Não foi possível abrir o arquivo.</string>
@@ -2553,7 +2571,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contato já está no MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contatos já estão no MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Convidar um contato?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Adicionar um contato?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Encontre os seus contatos no MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Permita que o MEGA acesse o seu catálogo de endereços para descobrir quais dos seus contatos já estão no MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Carregando contatos no MEGA&#8230;</string>
@@ -2565,7 +2583,6 @@
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Preparando arquivos</string>
     <string name="sent_as_message" context="Label indicating some content has been sent as message">Enviado como mensagem.</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Erro. O arquivo não foi enviado a nenhum dos chats selecionados.</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Não há[/A] [B]items[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">Deletar versões anteriores</string>
     <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Deletar versões anteriores?</string>
@@ -2644,7 +2661,7 @@
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Novo link do chat</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Digite o nome do grupo</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">Você precisa nomear o grupo para poder criar um link de chat.</string>
-    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Convide contatos e comece a conversar com segurança com o chat criptografado do MEGA.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Adicione contatos e converse com segurança no chat criptografado do MEGA.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Converse com segurança com os seus contatos usando criptografia de ponta a ponta</string>
 
     <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Olá! Converse com segurança no MEGA comigo e obtenha até 50 GB de armazenamento gratuito. %1$s</string>
@@ -2665,7 +2682,7 @@
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Deslize para cancelar</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Esta mensagem de voz não está disponível</string>
 
-    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Convidar um amigo por</string>
+    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Adicionar um amigo por</string>
     <string name="invite_contact_action_button" context="Action button label">Convidar um amigo por&#8230;</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">Já foi feito o download de %d arquivo.&#160;</item>
@@ -2711,7 +2728,8 @@
     <string name="user_label" context="Business user role">Usuário</string>
     <string name="status_label" context="General label to show the status of something or someone">Status</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Ativa</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Período de carência</string>
+    <string name="payment_required_label" context="Business account status. Payment is overdue, but the account still active in grace period">Pagamento necessário</string>
+    <string name="payment_overdue_label" context="Business expired account Overdue payment page header.">Pagamento atrasado</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">O gerenciamento de usuários somente está disponível no navegador de um computador.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Uso</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Informações sobre o uso do armazenamento</string>
@@ -2727,7 +2745,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Algo deu errado</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Entre em contato com o administrador de conta Business, para que ele possa solucionar o problema e reativar a sua conta.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Para uso corporativo legítimo.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Armazenamento[/A] ILIMITADO **</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Armazenamento[/A] ILIMITADO **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Cota de transferência[/A] ILIMITADA **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quando você fizer logout, os arquivos da seção Offline serão deletados do seu dispositivo.</string>
@@ -2760,6 +2778,7 @@
     <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Apelido removido</string>
     <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">Não foi possível adicionar o apelido</string>
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Apelido</string>
+    <string name="phonenumber_title" context="Text related to verified phone number. Used as title or cell description.">Telefone</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconectando</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Você voltou.</string>
@@ -2781,6 +2800,25 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat criado em %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Selecionar mensagens</string>
 
+    <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Armazenamento completo</string>
+    <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Os seus dados estão em perigo!</string>
+    <plurals name="over_disk_quota_paywall_text">
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">Enviamos um email de notificação a %1$s em %2$s, mas você ainda tem %3$s arquivos ocupando %4$s na sua conta do MEGA, o que requer que você tenha um plano %5$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">Enviamos um email de notificação a %1$s em %2$s e em %3$s  mas você ainda tem %4$s arquivos ocupando %5$s na sua conta do MEGA, o que requer que você tenha um plano %6$s.</item>
+    </plurals>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">Enviamos um email de notificação a %1$s, mas você ainda tem %2$s arquivos ocupando %3$s na sua conta do MEGA, o que requer que você tenha um plano %4$s.</string>
+    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Você deve agir imediatamente para não perder os seus arquivos.[/B]</string>
+
+    <plurals name="label_time_in_days_full">
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 dia</item>
+        <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d dias</item>
+    </plurals>
+    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
+    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
+    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
+
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">Verifique as credenciais</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">Verificação pendente</string>
     <string name="label_verified" context="Action indicating something was verified.">Verificado</string>
@@ -2788,11 +2826,25 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">O melhor jeito de fazer isso é pessoalmente, na vida real. Se você tiver outro canal confiável como OTR ou PGP, você também pode usá-lo.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Suas credenciais</string>
     <string name="action_reset" context="Button to reset credentials">Resetar</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Atualizando as credenciais - tente novamente mais tarde.</string>
+
+    <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Entrando&#8230;</string>
+    <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Saindo&#8230;</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">Você quer remover o seu telefone?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">O seu número de telefone foi removido corretamente.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Não foi possível remover o seu telefone.</string>
+
+    <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">A conta que você está tentando resetar está bloqueada.</string>
+    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Sua conta foi bloqueada. Por favor, entre em contato com support&#64;mega.nz</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">A sua conta foi desativada pelo seu administrador. Você deve entrar em contato com o administrador da sua conta business para obter mais informações.</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">A sua conta foi eliminada pelo seu administrador. Você deve entrar em contato com o administrador da sua conta business para obter mais informações.</string>
+
+    <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Alterar</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Alterar o telefone</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remover número de telefone</string>
+    <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">Esta operação removerá o seu número de telefone atual e iniciará o processo de associação de um novo número de telefone à sua conta.</string>
+    <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">Esta ação removerá o número de telefone atualmente associado à sua conta. Se você optar por adicionar um número de telefone no futuro, será necessário confirmá-lo.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Visualizar</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenciais de %s</string>

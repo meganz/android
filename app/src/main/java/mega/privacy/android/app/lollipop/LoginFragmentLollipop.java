@@ -173,7 +173,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String action = null;
     private String url = null;
     private long parentHandle = -1;
-    private long idChatToJoin = -1;
 
     private String emailTemp = null;
     private String passwdTemp = null;
@@ -882,7 +881,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
-                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
 
                     MegaNode rootNode = megaApi.getRootNode();
@@ -935,9 +933,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                             ((LoginActivityLollipop) context).startCameraUploadService(false, 5 * 60 * 1000);
                         }
-
-                        logDebug("Empty completed transfers data");
-                        dbH.emptyCompletedTransfers();
 
                         this.startActivity(intent);
                         ((LoginActivityLollipop) context).finish();
@@ -1001,8 +996,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                     }
 
-                    logDebug("Empty completed transfers data");
-                    dbH.emptyCompletedTransfers();
                     this.startActivity(intent);
                     ((LoginActivityLollipop) context).finish();
                 }
@@ -1033,7 +1026,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         url = intentReceived.getDataString();
-                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
                 }
             }
@@ -1782,8 +1774,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             logDebug("value of resumeSession: " + resumeSesion);
 
             if((action!=null)&&(url!=null)) {
-                logDebug("Empty completed transfers data");
-                dbH.emptyCompletedTransfers();
 
                 if (action.equals(ACTION_CHANGE_MAIL)) {
                     logDebug("Action change mail after fetch nodes");
@@ -1834,9 +1824,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
                                 intent.setAction(action);
                                 intent.setData(Uri.parse(url));
-                                if (idChatToJoin != -1) {
-                                    intent.putExtra("idChatToJoin", idChatToJoin);
-                                }
                             }
                         }
                     }
@@ -1900,11 +1887,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
                                     intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
                                 }
-                                else if (action.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-                                    if (idChatToJoin != -1) {
-                                        intent.putExtra("idChatToJoin", idChatToJoin);
-                                    }
-                                }
+
                                 intent.setAction(action);
                                 if (url != null){
                                     intent.setData(Uri.parse(url));
@@ -1927,9 +1910,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
-
-                    logDebug("Empty completed transfers data");
-                    dbH.emptyCompletedTransfers();
 
                     if (twoFA){
                         intent.setAction(ACTION_REFRESH_STAGING);

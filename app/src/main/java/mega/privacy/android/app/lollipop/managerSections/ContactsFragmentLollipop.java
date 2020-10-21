@@ -78,7 +78,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -109,8 +109,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	MyAccountInfo myAccountInfo;
-	TextView initialLetter;
-
 	Context context;
 	RecyclerView recyclerView;
 	MegaContactsLollipopAdapter adapter;
