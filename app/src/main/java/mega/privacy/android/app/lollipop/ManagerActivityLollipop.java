@@ -227,6 +227,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.ViewExtensionsKt;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -338,8 +339,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private static final int SHARED_BNV = 4;
 	private static final int HIDDEN_BNV = 5;
 	private static final int MEDIA_UPLOADS_BNV = 6;
+	// 16dp + 16dp + 56dp(Fab's size)
+    public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 88;
 
-	private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
+    private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
 	public int accountFragment;
 
@@ -706,6 +709,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem refreshMenuItem;
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
+	private MenuItem doNotDisturbMenuItem;
 	private MenuItem upgradeAccountMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
@@ -1396,6 +1400,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	};
 
+	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			if(intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)){
+				if (getChatsFragment() != null) {
+					rChatFL.notifyPushChanged();
+				}
+				if(getSettingsFragment() != null){
+					sttFLol.updateNotifChat();
+				}
+			}
+		}
+	};
+
     private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -2077,7 +2098,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
 
 		registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
-
+		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
 		registerTransfersReceiver();
@@ -2109,6 +2130,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("retryChatPendingConnections()");
 			megaChatApi.retryPendingConnections(false, null);
 		}
+
+		MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
 
 		transfersInProgress = new ArrayList<Integer>();
 
@@ -2882,7 +2905,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								selectDrawerItemLollipop(drawerItem);
 								selectDrawerItemPending=false;
 								openFullscreenOfflineFragment(
-										getIntent().getStringExtra("pathNavigation"));
+										getIntent().getStringExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION));
 							}
 							else {
 								long fragmentHandle = getIntent().getLongExtra("fragmentHandle", -1);
@@ -4238,14 +4261,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void showMuteIcon(MegaChatListItem item){
-		logDebug("showMuteIcon");
-		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-		if (rChatFL != null) {
-			rChatFL.showMuteIcon(item);
-		}
-	}
-
 	public void setProfileAvatar() {
 		logDebug("setProfileAvatar");
 		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
@@ -4685,6 +4700,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 		isStorageStatusDialogShown = false;
 
+		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(contactUpdateReceiver);
 		unregisterReceiver(receiverUpdatePosition);
 		unregisterReceiver(updateMyAccountReceiver);
@@ -4698,7 +4714,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		unregisterReceiver(receiverCUAttrChanged);
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);
-
         unregisterReceiver(cameraUploadLauncherReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
 
@@ -5801,6 +5816,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	/**
+	 * Set up a listener for navigating to a new destination (screen)
+	 * This only for Homepage for the time being since it is the only module to
+	 * which Jetpack Navigation applies.
+	 * It updates the status variable such as mHomepageScreen, as well as updating
+	 * BNV, Toolbar title, etc.
+	 */
 	private void setupNavDestListener() {
 		mNavController = Navigation.findNavController(mNavHostView);
 
@@ -5808,40 +5830,33 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			int destinationId = destination.getId();
 			mHomepageSearchable = null;
 
-			switch (destinationId) {
-				case R.id.homepageFragment:
-					mHomepageScreen = HomepageScreen.HOMEPAGE;
-					// Showing the bottom navigation view immediately because the initial dimension
-					// of Homepage bottom sheet is calculated based on it
-					showBNVImmediate();
-					if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
-						abL.setVisibility(View.GONE);
-					}
-					setDrawerLockMode(false);
-					return;
-				case R.id.photosFragment:
-					mHomepageScreen = HomepageScreen.PHOTOS;
-					break;
-				case R.id.documentsFragment:
-					mHomepageScreen = HomepageScreen.DOCUMENTS;
-					break;
-				case R.id.audioFragment:
-					mHomepageScreen = HomepageScreen.AUDIO;
-					break;
-                case R.id.videoFragment:
-                    mHomepageScreen = HomepageScreen.VIDEO;
-                    break;
-				case R.id.fullscreen_offline:
-					mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
-					break;
-				case R.id.offline_file_info:
-					mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+			if (destinationId == R.id.homepageFragment) {
+				mHomepageScreen = HomepageScreen.HOMEPAGE;
+				// Showing the bottom navigation view immediately because the initial dimension
+				// of Homepage bottom sheet is calculated based on it
+				showBNVImmediate();
+				if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
 					abL.setVisibility(View.GONE);
-					showHideBottomNavigationView(true);
-					return;
-                case R.id.recentBucketFragment:
-                    mHomepageScreen = HomepageScreen.RECENT_BUCKET;
-                    break;
+				}
+				setDrawerLockMode(false);
+				return;
+			} else if (destinationId == R.id.photosFragment) {
+				mHomepageScreen = HomepageScreen.PHOTOS;
+			} else if (destinationId == R.id.documentsFragment) {
+				mHomepageScreen = HomepageScreen.DOCUMENTS;
+			} else if (destinationId == R.id.audioFragment) {
+				mHomepageScreen = HomepageScreen.AUDIO;
+			} else if (destinationId == R.id.videoFragment) {
+				mHomepageScreen = HomepageScreen.VIDEO;
+			} else if (destinationId == R.id.fullscreen_offline) {
+				mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
+			} else if (destinationId == R.id.offline_file_info) {
+				mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+				abL.setVisibility(View.GONE);
+				showHideBottomNavigationView(true);
+				return;
+			} else if (destinationId == R.id.recentBucketFragment) {
+				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
 			abL.setVisibility(View.VISIBLE);
@@ -5917,17 +5932,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 			case HOMEPAGE: {
+			    // Don't use fabButton.hide() here.
+			    fabButton.setVisibility(View.GONE);
 				if (mHomepageScreen == HomepageScreen.HOMEPAGE) {
 					showBNVImmediate();
 					abL.setVisibility(View.GONE);
+                    showHideBottomNavigationView(false);
 				} else {
 					// For example, back from Rubbish Bin to Photos
 					setToolbarTitle();
 					invalidateOptionsMenu();
+                    showHideBottomNavigationView(true);
 				}
 
 				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
-				showFabButton();
+
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
@@ -6647,6 +6666,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		refreshMenuItem = menu.findItem(R.id.action_menu_refresh);
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
+		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
 		rubbishBinMenuItem = menu.findItem(R.id.action_menu_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
@@ -6879,6 +6899,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if (searchExpand) {
 						openSearchView();
 					} else {
+						doNotDisturbMenuItem.setVisible(true);
 						inviteMenuItem.setVisible(true);
 						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
 							searchMenuItem.setVisible(true);
@@ -7225,6 +7246,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				return true;
 			}
+			case R.id.action_menu_do_not_disturb:
+				if (drawerItem == DrawerItem.CHAT) {
+					if (getGeneralNotification().equals(NOTIFICATIONS_ENABLED)) {
+						createMuteNotificationsChatAlertDialog(this, null);
+					} else {
+						showSnackbar(MUTE_NOTIFICATIONS_SNACKBAR_TYPE, null, -1);
+					}
+				}
+				return true;
+
 	        case R.id.action_menu_kill_all_sessions:{
 				showConfirmationCloseAllSessions();
 	        	return true;
@@ -7988,6 +8019,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             } else {
                 super.onBackPressed();
             }
+        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen != HomepageScreen.FULLSCREEN_OFFLINE) {
+		    // Back from other pages in homepage fragment, like recent, audio, video fragment.
+            adjustTransferWidgetPositionInHomepage();
+            super.onBackPressed();
         } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
 		}
@@ -8001,11 +8036,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (bottomNavigationCurrentItem != HOMEPAGE_BNV) {
 				backToDrawerItem(bottomNavigationCurrentItem);
 			} else {
+                adjustTransferWidgetPositionInHomepage();
 				drawerItem = DrawerItem.HOMEPAGE;
 			}
 			super.onBackPressed();
 		}
 	}
+
+	private void adjustTransferWidgetPositionInHomepage() {
+        RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
+        if (transfersWidgetLayout == null) return;
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+        params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
+        params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+    }
 
 	private void closeUpgradeAccountFragment() {
 		setFirstNavigationLevel(true);
@@ -13429,7 +13474,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
-
 		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.cancel_subscription_ok), -1);
@@ -13456,7 +13500,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             checkBeforeShowSMSVerificationDialog();
         }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
-			logDebug("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				logDebug("request.getText(): "+request.getText());
 				countUserAttributes--;
@@ -16559,20 +16602,25 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
      *
      * @param bNVHidden  true if the bottom navigation view is hidden, false otherwise
      */
-	public void updateTransfersWidgetPosition(boolean bNVHidden) {
-		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
-		if (transfersWidgetLayout == null) return;
+    public void updateTransfersWidgetPosition(boolean bNVHidden) {
+        RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
+        if (transfersWidgetLayout == null) return;
 
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
 
-		if (bNVHidden) {
-			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		} else {
-			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-		}
+        if (bNVHidden) {
+            params.bottomMargin = 0;
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+            params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
+            params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        } else {
+            params.bottomMargin = 0;
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+        }
 
-		transfersWidgetLayout.setLayoutParams(params);
-	}
+        transfersWidgetLayout.setLayoutParams(params);
+    }
 
     /**
      * Updates values of TransfersManagement object after the activity comes from background.

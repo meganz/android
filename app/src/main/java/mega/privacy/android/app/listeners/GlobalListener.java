@@ -45,6 +45,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
 
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
+                MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
+            }
+
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
                 api.getMyChatFilesFolder(new GetAttrUserListener(megaApplication, true));
             }
@@ -61,11 +65,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
         megaApplication.updateAppBadge();
 
-        notifyNotificationCountChange();
+        notifyNotificationCountChange(api);
     }
 
-    private void notifyNotificationCountChange() {
-        MegaApiAndroid api = megaApplication.getMegaApi();
+    private void notifyNotificationCountChange(MegaApiJava api) {
         ArrayList<MegaContactRequest> incomingContactRequests = api.getIncomingContactRequests();
         EventNotifierKt.notifyNotificationCountChange(api.getNumUnreadUserAlerts()
                 + (incomingContactRequests == null ? 0 : incomingContactRequests.size()));
@@ -109,7 +112,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         megaApplication.updateAppBadge();
 
-        notifyNotificationCountChange();
+        notifyNotificationCountChange(api);
 
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);

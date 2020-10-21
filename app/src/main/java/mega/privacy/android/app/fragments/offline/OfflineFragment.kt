@@ -10,20 +10,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.text.Html
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -48,32 +40,16 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.DraggingThumbnailCallback
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.scaleHeightPx
-import mega.privacy.android.app.utils.autoCleared
-import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -98,16 +74,14 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0)
                 == Constants.OFFLINE_ADAPTER
             ) {
-                val handle = intent.getLongExtra("handle", INVALID_HANDLE)
+                val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
 
-                when (intent.getIntExtra("actionType", -1)) {
+                when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
                     Constants.SCROLL_TO_POSITION -> {
                         scrollToNode(handle)
                     }
                     Constants.UPDATE_IMAGE_DRAG -> {
                         hideDraggingThumbnail(handle)
-                    }
-                    else -> {
                     }
                 }
             }
@@ -305,11 +279,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             logError("Exception formatting string", e)
         }
 
-        binding.emptyHintText.text = if (VERSION.SDK_INT >= VERSION_CODES.N) {
-            Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-        } else {
-            Html.fromHtml(textToShow)
-        }
+        binding.emptyHintText.text = Util.getSpannedHtmlText(textToShow)
     }
 
     private fun setupRecyclerView(rv: RecyclerView) {
@@ -368,7 +338,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         })
 
         viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner, EventObserver {
-            openFile(it, MimeTypeList.typeForName(it.name))
+            openFile(it)
         })
 
         if (args.rootFolderOnly) {
@@ -614,57 +584,51 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
+
                 val screenPosition = getThumbnailScreenPosition(position)
                 if (screenPosition != null) {
                     mediaIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
                 }
+
                 mediaIntent.putExtra(
                     INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
                 )
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                if (VERSION.SDK_INT >= VERSION_CODES.N) {
-                    mediaIntent.setDataAndType(
-                        FileProvider.getUriForFile(
-                            requireContext(),
-                            "mega.privacy.android.app.providers.fileprovider",
-                            file
-                        ), mime.type
+                if (!setLocalIntentParams(
+                        context, node.node, mediaIntent, file.absolutePath,
+                        false
                     )
-                } else {
-                    mediaIntent.setDataAndType(Uri.fromFile(file), mime.type)
+                ) {
+                    return
                 }
+
                 if (opusFile) {
                     mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
                 }
+
                 if (internalIntent) {
                     draggingNodeHandle = node.node.handle.toLong()
                     setupDraggingThumbnailCallback()
                     startActivity(mediaIntent)
                     requireActivity().overridePendingTransition(0, 0)
+                } else if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+                    startActivity(mediaIntent)
                 } else {
-                    if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
-                        startActivity(mediaIntent)
-                    } else {
-                        callManager {
-                            it.showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.intent_not_available),
-                                -1
-                            )
-                        }
-                        val intentShare = Intent(Intent.ACTION_SEND)
-                        if (VERSION.SDK_INT >= VERSION_CODES.N) {
-                            intentShare.setDataAndType(
-                                FileProvider.getUriForFile(
-                                    requireContext(),
-                                    "mega.privacy.android.app.providers.fileprovider",
-                                    file
-                                ), mime.type
-                            )
-                        } else {
-                            intentShare.setDataAndType(Uri.fromFile(file), mime.type)
-                        }
+                    callManager {
+                        it.showSnackbar(
+                            Constants.SNACKBAR_TYPE,
+                            getString(R.string.intent_not_available),
+                            MEGACHAT_INVALID_HANDLE
+                        )
+                    }
+
+                    val intentShare = Intent(Intent.ACTION_SEND)
+                    if (setLocalIntentParams(
+                            context, node.node, intentShare, file.absolutePath,
+                            false
+                        )
+                    ) {
                         intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
                             logDebug("Call to startActivity(intentShare)")
@@ -683,33 +647,26 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
+
                 val screenPosition = getThumbnailScreenPosition(position)
                 if (screenPosition != null) {
                     pdfIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition)
                 }
-                if (VERSION.SDK_INT >= VERSION_CODES.N) {
-                    pdfIntent.setDataAndType(
-                        FileProvider.getUriForFile(
-                            requireContext(),
-                            "mega.privacy.android.app.providers.fileprovider",
-                            file
-                        ), mime.type
-                    )
-                } else {
-                    pdfIntent.setDataAndType(Uri.fromFile(file), mime.type)
+
+                if (setLocalIntentParams(context, node.node, pdfIntent, file.absolutePath, false)) {
+                    pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    draggingNodeHandle = node.node.handle.toLong()
+                    setupDraggingThumbnailCallback()
+                    startActivity(pdfIntent)
+                    requireActivity().overridePendingTransition(0, 0)
                 }
-                pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                draggingNodeHandle = node.node.handle.toLong()
-                setupDraggingThumbnailCallback()
-                startActivity(pdfIntent)
-                requireActivity().overridePendingTransition(0, 0)
             }
             mime.isURL -> {
                 logDebug("Is URL file")
                 viewModel.processUrlFile(file)
             }
             else -> {
-                openFile(file, mime)
+                openFile(file)
             }
         }
     }
@@ -719,20 +676,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         return adapter?.getThumbnailLocationOnScreen(viewHolder)
     }
 
-    private fun openFile(file: File, mime: MimeTypeList) {
+    private fun openFile(file: File) {
         logDebug("openFile")
         val viewIntent = Intent(Intent.ACTION_VIEW)
 
-        if (VERSION.SDK_INT >= VERSION_CODES.N) {
-            viewIntent.setDataAndType(
-                FileProvider.getUriForFile(
-                    requireContext(),
-                    "mega.privacy.android.app.providers.fileprovider",
-                    file
-                ), mime.type
-            )
-        } else {
-            viewIntent.setDataAndType(Uri.fromFile(file), mime.type)
+        if (!setLocalIntentParams(context, file.name, viewIntent, file.absolutePath, false)) {
+            return
         }
 
         viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -742,19 +691,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         } else {
             val intentShare = Intent(Intent.ACTION_SEND)
 
-            if (VERSION.SDK_INT >= VERSION_CODES.N) {
-                intentShare.setDataAndType(
-                    FileProvider.getUriForFile(
-                        requireContext(),
-                        "mega.privacy.android.app.providers.fileprovider",
-                        file
-                    ), mime.type
-                )
-            } else {
-                intentShare.setDataAndType(
-                    Uri.fromFile(file),
-                    MimeTypeList.typeForName(file.name).type
-                )
+            if (!setLocalIntentParams(context, file.name, intentShare, file.absolutePath, false)) {
+                return
             }
 
             intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -948,7 +886,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         menu!!.findItem(R.id.cab_menu_select_all).isVisible =
             (viewModel.getSelectedNodesCount()
                     < getItemCount() - viewModel.placeholderCount)
-        menu.findItem(R.id.cab_menu_share_out).isVisible = !viewModel.folderSelected()
 
         return true
     }

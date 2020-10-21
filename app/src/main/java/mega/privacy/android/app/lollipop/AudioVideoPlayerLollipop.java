@@ -883,12 +883,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 long[] handles = getIntent().getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH);
                 getMediaHandles(getSearchedNodes(handles));
             } else if (adapterType == AUDIO_BROWSE_ADAPTER) {
-                getMediaHandles(megaApi.searchByType(null, null, null, true, orderGetChildren,
-                        MegaApiJava.NODE_AUDIO, MegaApiJava.TARGET_ROOTNODES));
+                getMediaHandles(megaApi.searchByType(orderGetChildren, MegaApiJava.FILE_TYPE_AUDIO, MegaApiJava.SEARCH_TARGET_ROOTNODE));
             } else if (adapterType == VIDEO_BROWSE_ADAPTER) {
-                getMediaHandles(megaApi.searchByType(null, null, null, true, orderGetChildren,
-                        MegaApiJava.NODE_VIDEO, MegaApiJava.TARGET_ROOTNODES));
-            }else if (adapterType == FILE_LINK_ADAPTER) {
+                getMediaHandles(megaApi.searchByType(orderGetChildren, MegaApiJava.FILE_TYPE_VIDEO, MegaApiJava.SEARCH_TARGET_ROOTNODE));
+            } else if (adapterType == FILE_LINK_ADAPTER) {
                 if (currentDocument != null) {
                     logDebug("File link node NOT null");
                     size = 1;

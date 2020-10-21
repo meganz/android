@@ -34,7 +34,7 @@ class VideoViewModel @ViewModelInject constructor(
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(NODE_VIDEO, order)
+                repository.getFiles(FILE_TYPE_VIDEO, order)
             }
         } else {
             repository.emitFiles()

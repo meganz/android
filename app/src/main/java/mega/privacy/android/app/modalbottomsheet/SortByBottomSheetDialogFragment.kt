@@ -61,7 +61,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         mainLinearLayout = binding.root
         items_layout = binding.root
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false)
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
     }
 
     private fun setSelectedColor(text: TextView) {

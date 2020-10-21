@@ -4,13 +4,18 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View.OnKeyListener
+import androidx.appcompat.R
 import androidx.appcompat.widget.AppCompatEditText
 
 /**
  * The EditText in the Floating Search View,
  * at where the user keys in the searching keyword
  */
-class SearchInputView : AppCompatEditText {
+class SearchInputView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.editTextStyle
+) : AppCompatEditText(context, attrs, defStyleAttr)  {
     private var mSearchKeyListener: OnKeyboardSearchKeyClickListener? = null
     private var mOnKeyboardDismissedListener: OnKeyboardDismissedListener? = null
     private val mOnKeyListener =
@@ -24,20 +29,8 @@ class SearchInputView : AppCompatEditText {
             false
         }
 
-    constructor(context: Context) : super(context) {
-        init()
-    }
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init()
-    }
-
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int)
-            : super(context, attrs, defStyle) {
-        init()
-    }
-
-    private fun init() {
+    init {
         setOnKeyListener(mOnKeyListener)
     }
 

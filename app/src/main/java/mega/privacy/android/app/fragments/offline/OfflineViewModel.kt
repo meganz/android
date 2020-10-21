@@ -20,15 +20,10 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
-import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
-import mega.privacy.android.app.utils.Constants.BACK_PRESS_NOT_HANDLED
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
+import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -38,8 +33,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.util.Locale
-import java.util.Stack
+import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
@@ -147,16 +141,6 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun getDisplayedNodesCount(): Int = nodes.value?.first?.size ?: 0
-
-    fun folderSelected(): Boolean {
-        for (i in 0 until selectedNodes.size()) {
-            if (selectedNodes.valueAt(i).isFolder) {
-                return true
-            }
-        }
-
-        return false
-    }
 
     fun selectAll() {
         val nodeList = nodes.value?.first ?: return
@@ -305,7 +289,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
         // has active search, should exit search mode
         if (query != null) {
-            logDebug("navigateOut exit search mode, path $path")
+            logDebug("navigateOut exit search mode")
             navigateTo(path, titleFromPath(path), 0)
             return BACK_PRESS_HANDLED
         }
@@ -318,7 +302,7 @@ class OfflineViewModel @ViewModelInject constructor(
             // and if back stack is empty, then should re-enter search mode
             if (navigationDepthInSearch == 0) {
                 searchQuery = historySearchQuery
-                logDebug("navigateOut from searchPath $searchPath")
+                logDebug("navigateOut from searchPath")
                 path = searchPath
                 historySearchQuery = null
                 historySearchPath = null
@@ -327,7 +311,6 @@ class OfflineViewModel @ViewModelInject constructor(
             }
         }
 
-        logDebug("navigateOut from $path")
         // if back stack isn't empty, or no search action in back stack, just navigate out
         path = path.substring(0, path.length - 1)
         path = path.substring(0, path.lastIndexOf("/") + 1)
@@ -363,8 +346,6 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun navigateTo(path: String, title: String, autoScrollPos: Int = -1) {
-        logDebug("navigateTo path $path, title $title")
-
         this.path = path
         _pathLiveData.value = path
         _actionBarTitle.value = title
@@ -402,7 +383,7 @@ class OfflineViewModel @ViewModelInject constructor(
         path: String,
         order: Int
     ) {
-        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList, path $path")
+        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList")
 
         this.rootFolderOnly = rootFolderOnly
         this.isList = isList
