@@ -8,9 +8,7 @@ import androidx.appcompat.app.AlertDialog;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.PasscodeLockSettingsFragment;
 
-import static mega.privacy.android.app.utils.Constants.PIN_4;
-import static mega.privacy.android.app.utils.Constants.PIN_6;
-import static mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC;
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class PasscodePreferencesActivity extends PreferencesBaseActivity {
 
@@ -30,6 +28,9 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
         replaceFragment(sttPasscodeLock);
     }
 
+    /**
+     * Method for show the Panel to update the pin.
+     */
     public void showPanelSetPinLock() {
         if (sttPasscodeLock == null)
             return;
@@ -60,21 +61,22 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
 
         dialogBuilder.setOnKeyListener((arg0, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                setPinDialog.dismiss();
-                sttPasscodeLock.cancelSetPinLock();
+                dissmissDialog();
             }
             return true;
         });
 
         dialogBuilder.setOnCancelListener(
-                dialog -> {
-                    setPinDialog.dismiss();
-                    sttPasscodeLock.cancelSetPinLock();
-                }
+                dialog -> dissmissDialog()
         );
 
         setPinDialog = dialogBuilder.create();
         setPinDialog.setCanceledOnTouchOutside(true);
         setPinDialog.show();
+    }
+
+    private void dissmissDialog() {
+        setPinDialog.dismiss();
+        sttPasscodeLock.cancelSetPinLock();
     }
 }

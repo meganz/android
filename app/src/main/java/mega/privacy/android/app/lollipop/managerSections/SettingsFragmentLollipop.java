@@ -41,6 +41,7 @@ import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment {
@@ -48,17 +49,17 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public int numberOfClicksSDK = 0;
     public int numberOfClicksKarere = 0;
     public int numberOfClicksAppVersion = 0;
-    PreferenceCategory securityCategory;
-    Preference recoveryKey;
-    Preference pinLockPreference;
-    Preference changePass;
-    SwitchPreferenceCompat twoFASwitch;
-    SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
-    Preference advancedPreference;
-    RecyclerView listView;
-    boolean pinLock = false;
-    boolean setAutoaccept = false;
-    boolean autoAccept = true;
+    private PreferenceCategory securityCategory;
+    private Preference recoveryKey;
+    private Preference pinLockPreference;
+    private Preference changePass;
+    private SwitchPreferenceCompat twoFASwitch;
+    private SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
+    private Preference advancedPreference;
+    private RecyclerView listView;
+    private boolean pinLock = false;
+    private boolean setAutoaccept = false;
+    private boolean autoAccept = true;
     private Preference cameraUploadsPreference;
     private Preference chatPreference;
     private PreferenceCategory storageCategory;
@@ -143,6 +144,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         autoAccept = true;
     }
 
+    /**
+     * Method for update the Passcode lock section.
+     */
     private void updatePasscodeLock() {
         if (prefs == null || prefs.getPinLockEnabled() == null) {
             pinLock = false;
@@ -163,7 +167,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public void refreshCameraUploadsSettings() {
         boolean isCameraUploadOn = false;
         prefs = dbH.getPreferences();
-        if(prefs != null && prefs.getCamSyncEnabled() != null){
+        if (prefs != null && prefs.getCamSyncEnabled() != null) {
             isCameraUploadOn = Boolean.parseBoolean(prefs.getCamSyncEnabled());
         }
 
@@ -191,13 +195,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         }
     }
 
+    /**
+     * Method for controlling whether or not to display the action bar elevation.
+     */
     public void checkScroll() {
         if (listView != null) {
-            if (listView.canScrollVertically(-1)) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-            } else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-            }
+            ((ManagerActivityLollipop) context).changeActionBarElevation(listView.canScrollVertically(-1));
         }
     }
 
@@ -209,20 +212,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             lv.setPadding(0, 0, 0, 0);
         }
 
-        if (isOnline(context)) {
-            if (megaApi == null || megaApi.getRootNode() == null) {
-                setOnlineOptions(false);
-            } else {
-                setOnlineOptions(true);
-            }
-        } else {
-            logDebug("Offline");
-            setOnlineOptions(false);
-        }
-
+        setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
         return v;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -232,11 +224,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        logDebug("onPreferenceChange");
-        prefs = dbH.getPreferences();
-        switch (preference.getKey()) {
-        }
-
         return true;
     }
 
@@ -330,11 +317,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                     if (!MegaApplication.isShowInfoChatMessages()) {
                         MegaApplication.setShowInfoChatMessages(true);
                         numberOfClicksAppVersion = 0;
-                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
+                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", MEGACHAT_INVALID_HANDLE);
                     } else {
                         MegaApplication.setShowInfoChatMessages(false);
                         numberOfClicksAppVersion = 0;
-                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
+                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", MEGACHAT_INVALID_HANDLE);
                     }
                 }
                 break;
@@ -343,13 +330,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 numberOfClicksSDK++;
                 if (numberOfClicksSDK == 5) {
                     MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerSDK() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
-                            numberOfClicksSDK = 0;
-                            setStatusLoggerSDK(context, false);
-                        } else {
-                            ((ManagerActivityLollipop) context).showConfirmationEnableLogsSDK();
-                        }
+
+                    if (attrs != null && attrs.getFileLoggerSDK() != null && Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
+                        numberOfClicksSDK = 0;
+                        setStatusLoggerSDK(context, false);
                     } else {
                         logWarning("SDK file logger attribute is NULL");
                         ((ManagerActivityLollipop) context).showConfirmationEnableLogsSDK();
@@ -361,13 +345,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 numberOfClicksKarere++;
                 if (numberOfClicksKarere == 5) {
                     MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerKarere() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
-                            numberOfClicksKarere = 0;
-                            setStatusLoggerKarere(context, false);
-                        } else {
-                            ((ManagerActivityLollipop) context).showConfirmationEnableLogsKarere();
-                        }
+
+                    if (attrs != null && attrs.getFileLoggerKarere() != null && Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
+                        numberOfClicksKarere = 0;
+                        setStatusLoggerKarere(context, false);
                     } else {
                         logWarning("Karere file logger attribute is NULL");
                         ((ManagerActivityLollipop) context).showConfirmationEnableLogsKarere();
@@ -382,14 +363,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_STORAGE_DOWNLOAD_LOCATION:
                 startActivity(new Intent(context, DownloadPreferencesActivity.class));
                 break;
-
-            case KEY_PIN_LOCK_ENABLE:
-
-                break;
-
-            default:
-                break;
-
         }
 
         if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) != 0) {
@@ -406,24 +379,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         return true;
     }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        logDebug("onActivityResult");
-
-        prefs = dbH.getPreferences();
-        logDebug("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
-        switch (requestCode) {
-            case SET_PIN:
-                if (resultCode == Activity.RESULT_OK) {
-                } else {
-                    logWarning("Set PIN ERROR");
-                }
-                break;
-        }
-    }
-
 
     @Override
     public void onResume() {
@@ -444,7 +399,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         super.onPause();
     }
 
-
+    /**
+     * Update the Cancel Account settings.
+     */
     public void updateCancelAccountSetting() {
         if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
             aboutCategory.removePreference(cancelAccount);
@@ -459,15 +416,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         scrollToPreference(qrCodeAutoAcceptSwitch);
     }
 
-
     private void refreshAccountInfo() {
-        logDebug("refreshAccountInfo");
-
         //Check if the call is recently
         logDebug("Check the last call to getAccountDetails");
         MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
         if (callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
-            logDebug("megaApi.getAccountDetails SEND");
             ((MegaApplication) ((Activity) context).getApplication()).askForAccountDetails();
         }
     }
@@ -497,7 +450,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         }
     }
 
-    public void hidePreferencesChat(){
+    public void hidePreferencesChat() {
         chatPreference.setEnabled(false);
     }
 
@@ -523,10 +476,5 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     public void setAutoacceptSetting(boolean autoAccept) {
         this.autoAccept = autoAccept;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
     }
 }
