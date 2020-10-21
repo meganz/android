@@ -47,7 +47,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
 
-
     private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -105,12 +104,16 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         aB.setTitle(getString(R.string.section_chat).toUpperCase());
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
+
         registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
         registerReceiver(richLinksUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
         registerReceiver(statusUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
+    /**
+     * Method for displaying the AutoAwayValu dialogue.
+     */
     public void showAutoAwayValueDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -167,6 +170,12 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         newFolderDialog.show();
     }
 
+    /**
+     * Method to validate AutoAway.
+     *
+     * @param value The introduced string
+     * @return The result string.
+     */
     private String validateAutoAway(CharSequence value) {
         int timeout;
         try {
@@ -177,12 +186,19 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
                 timeout = MAX_AUTOAWAY_TIMEOUT;
             }
             return String.valueOf(timeout);
+
         } catch (Exception e) {
             logWarning("Unable to parse user input, user entered: '" + value + "'");
             return null;
         }
     }
 
+    /**
+     * Establishing the value of Auto Away.
+     *
+     * @param value     The value.
+     * @param cancelled If it is cancelled.
+     */
     private void setAutoAwayValue(String value, boolean cancelled) {
         logDebug("Value: " + value);
         if (cancelled) {
@@ -197,6 +213,11 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         }
     }
 
+    /**
+     * Enable or disable the visibility of last seen.
+     *
+     * @param enable True to enable. False to disable.
+     */
     public void enableLastGreen(boolean enable) {
         logDebug("Enable Last Green: " + enable);
 
@@ -252,15 +273,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     @Override
     public void onEvent(MegaApiJava api, MegaEvent event) {
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(offlineReceiver);
-        unregisterReceiver(richLinksUpdateReceiver);
-        unregisterReceiver(statusUpdateReceiver);
-        unregisterReceiver(chatRoomMuteUpdateReceiver);
     }
 
     @Override
@@ -325,5 +337,15 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(offlineReceiver);
+        unregisterReceiver(richLinksUpdateReceiver);
+        unregisterReceiver(statusUpdateReceiver);
+        unregisterReceiver(chatRoomMuteUpdateReceiver);
+    }
+
 
 }

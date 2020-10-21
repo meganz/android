@@ -39,7 +39,8 @@
     <!--  Status persistence  -->
     <mega.privacy.android.app.components.TwoLineCheckPreference
         android:key="settings_chat_persistence"
-        android:title="@string/settings_persistence_subtitle"
+        android:title="@string/settings_persistence_title"
+        android:summary="@string/settings_persistence_subtitle"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />

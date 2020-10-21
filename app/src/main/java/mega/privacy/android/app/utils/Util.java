@@ -1816,4 +1816,17 @@ public class Util {
 		return LocalDate.from(
 				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
+
+	/**
+	 * Method for displaying a snack bar when is Offline.
+	 *
+	 * @return True, is is Offline. False it is Online.
+	 */
+	public static boolean isOffline(Context context) {
+		if (!isOnline(context)) {
+			Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+			return true;
+		}
+		return false;
+	}
 }

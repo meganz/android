@@ -44,6 +44,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
@@ -382,19 +383,6 @@ public class SettingsCUFragment extends SettingsBaseFragment implements Preferen
         camSyncMegaPath = getString(R.string.section_photo_sync);
     }
 
-    /**
-     * Method for displaying a snack bar when is Offline.
-     *
-     * @return True, is is Offline. False it is Online.
-     */
-    private boolean isOffline() {
-        if (!isOnline(context)) {
-            Util.showSnackbar(context, getString(R.string.error_server_connection_problem));
-            return true;
-        }
-        return false;
-    }
-
     public synchronized void setCUDestinationFolder(boolean isSecondary, long handle) {
         MegaNode targetNode = megaApi.getNodeByHandle(handle);
         if (targetNode == null) return;
@@ -465,7 +453,7 @@ public class SettingsCUFragment extends SettingsBaseFragment implements Preferen
         Intent intent;
         switch (preference.getKey()) {
             case KEY_CAMERA_UPLOAD_ON_OFF:
-                if (cameraUpload && isOffline()) {
+                if (cameraUpload && isOffline(context)) {
                     return false;
                 }
 
@@ -509,7 +497,7 @@ public class SettingsCUFragment extends SettingsBaseFragment implements Preferen
                 break;
 
             case KEY_CAMERA_UPLOAD_MEGA_FOLDER:
-                if (isOffline())
+                if (isOffline(context))
                     return false;
 
                 intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -518,7 +506,7 @@ public class SettingsCUFragment extends SettingsBaseFragment implements Preferen
                 break;
 
             case KEY_SECONDARY_MEDIA_FOLDER_ON:
-                if (isOffline())
+                if (isOffline(context))
                     return false;
 
                 secondaryUpload = !secondaryUpload;
@@ -558,7 +546,7 @@ public class SettingsCUFragment extends SettingsBaseFragment implements Preferen
                 break;
 
             case KEY_MEGA_SECONDARY_MEDIA_FOLDER:
-                if (isOffline())
+                if (isOffline(context))
                     return false;
 
                 intent = new Intent(context, FileExplorerActivityLollipop.class);

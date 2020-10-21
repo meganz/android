@@ -102,5 +102,4 @@
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
-
 </androidx.preference.PreferenceScreen>

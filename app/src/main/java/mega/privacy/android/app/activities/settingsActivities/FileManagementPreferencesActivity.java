@@ -40,7 +40,6 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
