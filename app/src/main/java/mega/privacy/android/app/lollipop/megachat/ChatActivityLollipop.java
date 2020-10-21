@@ -3666,6 +3666,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
                 if (callInThisChat == null)
                     break;
+
                 if (callInThisChat.getStatus() != MegaChatCall.CALL_STATUS_RING_IN &&
                         ((callInThisChat.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT &&
                                 callInThisChat.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) ||
@@ -3673,6 +3674,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (callInThisChat.isOnHold()) {
                         returnCall(this, chatRoom.getChatId());
                     }
+
                 } else if (chatRoom.isGroup()) {
                     MegaChatCall anotherCall = getAnotherActiveCall(chatRoom.getChatId());
                     if (anotherCall == null) {
@@ -7378,12 +7380,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else if (request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug(" The call has been started success");
-                MegaApplication.setShowPinScreen(false);
-                Intent i = new Intent(this, ChatCallActivity.class);
-                i.putExtra(CHAT_ID, idChat);
-                i.setAction(SECOND_CALL);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                this.startActivity(i);
+                openCall();
             } else {
                 logError("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
@@ -7391,13 +7388,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("The call has been answered success");
-                MegaApplication.setShowPinScreen(false);
-                Intent i = new Intent(this, ChatCallActivity.class);
-                i.putExtra(CHAT_ID, idChat);
-                i.setAction(SECOND_CALL);
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                this.startActivity(i);
-                //getFlag - Returns true if it is a video-audio call or false for audio call
+                openCall();
             } else {
                 logError("ERROR WHEN TYPE_ANSWER_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
                 if (e.getErrorCode() == MegaChatError.ERROR_TOOMANY) {
@@ -8680,32 +8671,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     /**
-     * Method to get another call in progress
-     *
-     * @return The another call.
-     */
-    private MegaChatCall getAnotherActiveCall(long currentChatId) {
-        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
-        if (chatsIDsWithCallActive != null && !chatsIDsWithCallActive.isEmpty()) {
-            for (Long anotherChatId : chatsIDsWithCallActive) {
-                if (anotherChatId != currentChatId && megaChatApi.getChatCall(anotherChatId) != null && !megaChatApi.getChatCall(anotherChatId).isOnHold()) {
-                    return megaChatApi.getChatCall(anotherChatId);
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Method to get another call on hold.
      *
+     * @param currentChatId Call id.
      * @return The another call.
      */
     private MegaChatCall getAnotherOnHoldCall(long currentChatId) {
+        return getAnotherOnHoldOrActiveCall(currentChatId, false);
+    }
+
+    /**
+     * Method to get another call in progress.
+     *
+     * @param currentChatId Call id.
+     * @return The another call.
+     */
+    private MegaChatCall getAnotherActiveCall(long currentChatId) {
+        return getAnotherOnHoldOrActiveCall(currentChatId, true);
+    }
+
+    /**
+     * Method to get another call in progress or on hold.
+     *
+     * @param currentChatId Call id.
+     * @param isActiveCall  True if wants to get a call in progress,
+     *                      false if wants to get a call on hold.
+     * @return The another call.
+     */
+    private MegaChatCall getAnotherOnHoldOrActiveCall(long currentChatId, boolean isActiveCall) {
         ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
         if (chatsIDsWithCallActive != null && !chatsIDsWithCallActive.isEmpty()) {
             for (Long anotherChatId : chatsIDsWithCallActive) {
-                if (anotherChatId != currentChatId && megaChatApi.getChatCall(anotherChatId) != null && megaChatApi.getChatCall(anotherChatId).isOnHold()) {
+                if (anotherChatId != currentChatId && megaChatApi.getChatCall(anotherChatId) != null &&
+                        ((isActiveCall && !megaChatApi.getChatCall(anotherChatId).isOnHold()) ||
+                                (!isActiveCall && megaChatApi.getChatCall(anotherChatId).isOnHold()))) {
                     return megaChatApi.getChatCall(anotherChatId);
                 }
             }
@@ -8813,7 +8812,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(anotherActiveCall == null && anotherOnHoldCall == null) {
                         if(callStatus == MegaChatCall.CALL_STATUS_RING_IN &&
-                                (app.getCallLayoutStatus(idChat) ||  !megaApi.isChatNotifiable(idChat))){
+                                (MegaApplication.getCallLayoutStatus(idChat) || !megaApi.isChatNotifiable(idChat))){
                             tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                             break;
                         }
@@ -9382,6 +9381,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         adapter.updatePausedUploadingMessages(mLayoutManager.findFirstVisibleItemPosition(),
                 mLayoutManager.findLastVisibleItemPosition());
+    }
+
+    /**
+     * Method for opening the Call Activity.
+     */
+    private void openCall(){
+        MegaApplication.setShowPinScreen(false);
+        Intent i = new Intent(this, ChatCallActivity.class);
+        i.putExtra(CHAT_ID, idChat);
+        i.setAction(SECOND_CALL);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.startActivity(i);
     }
 
 

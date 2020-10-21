@@ -10,35 +10,25 @@
         android:id="@+id/avatar_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left|top"
-        android:layout_marginRight="12dp"
+        android:layout_gravity="start|top"
+        android:layout_marginEnd="12dp"
         android:visibility="visible">
-        <RelativeLayout
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center_vertical|left">
             <ImageView
                 android:id="@+id/avatar_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter" />
         </RelativeLayout>
-    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left|top"
+        android:layout_gravity="start|top"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/title_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <RelativeLayout
+        <RelativeLayout
                 android:id="@+id/title_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -48,7 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:layout_marginRight="4dp"
+                    android:layout_marginEnd="4dp"
                     android:maxLines="1"
                     android:textColor="@color/file_list_first_row"
                     android:textSize="14sp" />
@@ -59,7 +49,7 @@
                     android:layout_height="12dp"
                     android:layout_marginTop="4dp"
                     android:layout_alignTop="@id/chat_title"
-                    android:layout_toRightOf="@id/chat_title"
+                    android:layout_toEndOf="@id/chat_title"
                     android:background="@null"
                     android:src="@drawable/ic_offline"
                     android:visibility="gone"/>
@@ -73,45 +63,44 @@
                     android:src="@drawable/ic_collapse_notification_arrow"/>
             </RelativeLayout>
 
-            <TextView
+        <TextView
                 android:id="@+id/call_title"
                 style="@style/TextAppearance.Compat.Notification.Info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/chat_title"
+                android:layout_below="@id/title_chat_layout"
                 android:maxLines="1"
                 android:textColor="@color/grey_info_menu"
                 android:textSize="14sp" />
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/small_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:layout_gravity="left"
+            android:gravity="start"
+            android:layout_gravity="start"
             android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/decline_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|bottom"
-                android:layout_gravity="left|bottom"
+                android:gravity="start|bottom"
+                android:layout_gravity="start|bottom"
                 android:paddingTop="20dp">
 
                 <ImageView
                     android:id="@+id/decline_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_remove_not" />
                 <TextView
                     android:id="@+id/decline_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="11dp"
-                    android:layout_toRightOf="@id/decline_image"
+                    android:layout_marginEnd="11dp"
+                    android:layout_toEndOf="@id/decline_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
                     android:fontFamily="Roboto"
@@ -122,24 +111,24 @@
                 android:id="@+id/answer_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|bottom"
-                android:layout_gravity="left|bottom"
+                android:gravity="start|bottom"
+                android:layout_gravity="start|bottom"
                 android:paddingTop="20dp">
 
                 <ImageView
                     android:id="@+id/answer_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="13dp"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="13dp"
+                    android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_call"/>
 
                 <TextView
                     android:id="@+id/answer_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
-                    android:layout_toRightOf="@id/answer_image"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toEndOf="@id/answer_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
                     android:fontFamily="Roboto"
@@ -151,15 +140,15 @@
             android:id="@+id/big_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:layout_gravity="left"
+            android:gravity="start"
+            android:layout_gravity="start"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/first_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:paddingTop="24dp"
                 android:paddingBottom="14dp">
 
@@ -167,14 +156,14 @@
                     android:id="@+id/first_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_remove_not" />
                 <TextView
                     android:id="@+id/first_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:layout_toRightOf="@id/first_image"
+                    android:layout_marginEnd="15dp"
+                    android:layout_toEndOf="@id/first_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
                     android:fontFamily="Roboto"
@@ -185,7 +174,7 @@
                 android:id="@+id/second_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:paddingTop="14dp"
                 android:paddingBottom="14dp">
 
@@ -193,15 +182,15 @@
                     android:id="@+id/second_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_transfers_pause" />
 
                 <TextView
                     android:id="@+id/second_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:layout_toRightOf="@id/second_image"
+                    android:layout_marginEnd="15dp"
+                    android:layout_toEndOf="@id/second_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
                     android:fontFamily="Roboto"
@@ -213,21 +202,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="14dp"
-                android:gravity="left">
+                android:gravity="start">
 
                 <ImageView
                     android:id="@+id/third_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_call" />
 
                 <TextView
                     android:id="@+id/third_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:layout_toRightOf="@id/third_image"
+                    android:layout_marginEnd="15dp"
+                    android:layout_toEndOf="@id/third_image"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp"
                     android:fontFamily="Roboto"

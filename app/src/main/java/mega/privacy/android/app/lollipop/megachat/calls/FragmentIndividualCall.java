@@ -126,14 +126,11 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
 
         chatRoom = megaChatApi.getChatRoom(chatId);
 
-        /*Default Avatar*/
-        Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peerid);
-        avatarImage.setImageBitmap(defaultBitmap);
-
         /*Avatar*/
-        Bitmap bitmap = getImageAvatarCall(context, chatRoom, peerid);
+        Bitmap bitmap = getImageAvatarCall(chatRoom, peerid);
         if (bitmap != null) {
-            avatarImage.setImageBitmap(bitmap);
+            avatarImage.setImageBitmap(bitmap != null ? bitmap :
+                    getDefaultAvatarCall(context, chatRoom, peerid));
         }
     }
 
@@ -215,19 +212,27 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
             videoLayout.setVisibility(View.GONE);
         }
 
-        if (listener != null) {
-            logDebug("Removing remote video listener");
-            if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
-            } else {
-                megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
-            }
-            listener = null;
-        }
+        removeChatVideoListener();
 
         if (isSmallCamera) {
             checkIndividualAudioCall();
         }
+    }
+
+    /**
+     * Method for removing the video listener.
+     */
+    private void removeChatVideoListener() {
+        if (listener == null)
+            return;
+
+        logDebug("Removing remote video listener");
+        if (isItMe(chatId, peerid, clientid)) {
+            megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
+        } else {
+            megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
+        }
+        listener = null;
     }
 
     /**
@@ -389,15 +394,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
             }
         }
 
-        if (listener != null) {
-            logDebug("Removing remote video listener");
-            if (isItMe(chatId, peerid, clientid)) {
-                megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE, listener);
-            } else {
-                megaChatApi.removeChatVideoListener(chatId, peerid, clientid, listener);
-            }
-            listener = null;
-        }
+        removeChatVideoListener();
     }
 
     @Override

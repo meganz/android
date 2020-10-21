@@ -187,8 +187,8 @@
                         android:layout_marginBottom="12dp"
                         android:animateLayoutChanges="true"
                         android:background="@drawable/border_call_on_hold"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="21dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="21dp"
                         android:visibility="gone">
 
                         <LinearLayout
@@ -200,7 +200,7 @@
                                 android:id="@+id/call_on_hold_icon"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginRight="15dp"
+                                android:layout_marginEnd="15dp"
                                 android:src="@drawable/ic_transfers_pause"/>
                             <TextView
                                 android:id="@+id/call_on_hold_text"

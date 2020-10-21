@@ -310,14 +310,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				switch (callStatus) {
-					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 					case MegaChatCall.CALL_STATUS_RING_IN:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 					case MegaChatCall.CALL_STATUS_RECONNECTING:
 					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_DESTROYED:
 					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						if (callStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT || MegaApplication.getCallLayoutStatus(chatIdReceived)) {
+						if (MegaApplication.getCallLayoutStatus(chatIdReceived)) {
 							checkScreenRotationToShowCall();
 						}
 						break;
@@ -1299,7 +1298,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			case R.id.chat_contact_properties_chat_video_layout:
 			case R.id.chat_contact_properties_chat_call_layout:
-				if (isCallOptionEnabled(user.getHandle())) {
+				if (isCallOptionEnabled()) {
 					startingACall(v.getId() == R.id.chat_contact_properties_chat_video_layout);
 				} else {
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allowed_to_start_call), MEGACHAT_INVALID_HANDLE);

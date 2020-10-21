@@ -46,6 +46,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CallService extends Service{
@@ -151,36 +152,33 @@ public class CallService extends Service{
         logDebug("Updating notification");
         Notification notif;
         int notificationId = getCurrentCallNotifId();
+        String contentText = null;
 
         MegaChatCall call = megaChatApi.getChatCall(currentChatId);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (call == null) {
-                mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
-            } else {
+        if (call == null) {
+            contentText = getString(R.string.action_notification_call_in_progress);
+        } else if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+            contentText = getString(R.string.outgoing_call_starting);
+        } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+            contentText = getString(R.string.title_notification_incoming_call);
+        } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+            contentText = getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress);
+        }
 
-                if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                    mBuilderCompatO.setContentText(getString(R.string.outgoing_call_starting));
-                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-                    mBuilderCompatO.setContentText(getString(R.string.title_notification_incoming_call));
-                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    mBuilderCompatO.setContentText(getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress));
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!isTextEmpty(contentText)) {
+                mBuilderCompatO.setContentText(contentText);
             }
+
             notif = mBuilderCompatO.build();
         } else {
-            if (call == null) {
-                mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));
-            } else {
-                if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                    mBuilderCompat.setContentText(getString(R.string.outgoing_call_starting));
-                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-                    mBuilderCompat.setContentText(getString(R.string.title_notification_incoming_call));
-                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    mBuilderCompat.setContentText(getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress));
-                }
+            if (!isTextEmpty(contentText)) {
+                mBuilderCompat.setContentText(contentText);
             }
+
             notif = mBuilderCompat.build();
         }
+
         startForeground(notificationId, notif);
     }
 
@@ -198,12 +196,13 @@ public class CallService extends Service{
             PendingIntent intentCall = getPendingIntentCall(this, currentChatId, notificationId+1);
 
             mBuilderCompatO = new NotificationCompat.Builder(this, notificationChannelId);
-            mBuilderCompatO.setSmallIcon(R.drawable.ic_stat_notify);
-            mBuilderCompatO.addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), intentCall);
-            mBuilderCompatO.setContentIntent(intentCall);
-            mBuilderCompatO.setAutoCancel(false);
-            mBuilderCompatO.setOngoing(false);
-            mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+            mBuilderCompatO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(intentCall)
+                    .setAutoCancel(false)
+                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), intentCall)
+                    .setOngoing(false)
+                    .setColor(ContextCompat.getColor(this, R.color.mega));
 
             String title;
             String email;
@@ -246,12 +245,12 @@ public class CallService extends Service{
 
             PendingIntent intentCall = getPendingIntentCall(this, currentChatId, notificationId+1);
 
-            mBuilderCompat = new NotificationCompat.Builder(this, notificationChannelId);
-            mBuilderCompat.setSmallIcon(R.drawable.ic_stat_notify);
-            mBuilderCompat.addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), intentCall);
-            mBuilderCompat.setContentIntent(intentCall);
-            mBuilderCompat.setAutoCancel(false);
-            mBuilderCompat.setOngoing(false);
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(intentCall)
+                    .setAutoCancel(false)
+                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), intentCall)
+                    .setOngoing(false);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));

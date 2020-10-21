@@ -52,7 +52,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     private MegaChatApiAndroid megaChatApi = null;
     private Display display;
     private DisplayMetrics outMetrics;
-    private float widthScreenPX, heightScreenPX;
     private RecyclerView recyclerViewFragment;
     private ArrayList<InfoPeerGroupCall> peers;
     private long chatId;
@@ -90,8 +89,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         display = ((ChatCallActivity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        widthScreenPX = outMetrics.widthPixels;
-        heightScreenPX = outMetrics.heightPixels;
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
 
@@ -100,8 +97,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
         }
 
-        maxScreenHeight = (int) heightScreenPX - statusBarHeight;
-        maxScreenWidth = (int) widthScreenPX;
+        maxScreenHeight = outMetrics.heightPixels - statusBarHeight;
+        maxScreenWidth = outMetrics.widthPixels;
 
         holderGrid = new ViewHolderGroupCallGrid(v);
 
@@ -430,7 +427,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
 
         holder.avatarImage.setImageBitmap(defaultBitmap);
-        Bitmap bitmap = getImageAvatarCall(context, chatRoom, peer.getPeerId());
+        Bitmap bitmap = getImageAvatarCall(chatRoom, peer.getPeerId());
         if (bitmap != null) {
             holder.avatarImage.setImageBitmap(bitmap);
         }
@@ -589,7 +586,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         for (InfoPeerGroupCall peer : peers) {
             if (peer.getEmail().equals(email)) {
-                Bitmap avatar = getImageAvatarCall(context, chatRoom, peer.getPeerId());
+                Bitmap avatar = getImageAvatarCall(chatRoom, peer.getPeerId());
                 if(avatar != null){
                     int position = peers.indexOf(peer);
                     ViewHolderGroupCall holder = getHolder(position);

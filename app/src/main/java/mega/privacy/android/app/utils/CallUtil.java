@@ -28,6 +28,7 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -198,6 +199,7 @@ public class CallUtil {
                 intent.putExtra(CHAT_ID, call.getChatid());
                 intent.putExtra(CALL_ID, call.getId());
                 context.startActivity(intent);
+                return;
             }
         }
     }
@@ -207,7 +209,7 @@ public class CallUtil {
      *
      * @return The session.
      */
-    public static MegaChatSession getSesionIndividualCall(MegaChatCall callChat) {
+    public static MegaChatSession getSessionIndividualCall(MegaChatCall callChat) {
         if(callChat == null)
             return null;
 
@@ -224,7 +226,7 @@ public class CallUtil {
         if (chat == null || chat.isGroup())
             return false;
 
-        MegaChatSession session = getSesionIndividualCall(MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId));
+        MegaChatSession session = getSessionIndividualCall(MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId));
         if (session == null)
             return false;
 
@@ -654,34 +656,29 @@ public class CallUtil {
      * @return Bitmap with the default avatar created.
      */
     public static Bitmap getDefaultAvatarCall(Context context, MegaChatRoom chat, long peerId) {
-        return AvatarUtil.getDefaultAvatar(getColorAvatar(peerId), getUserNameCall(chat, peerId), px2dp(AVATAR_SIZE_CALLS, ((ChatCallActivity) context).getOutMetrics()), true);
+        return AvatarUtil.getDefaultAvatar(getColorAvatar(peerId), getUserNameCall(context, peerId),
+                px2dp(AVATAR_SIZE_CALLS, ((ChatCallActivity) context).getOutMetrics()), true);
     }
 
     /**
      * Method to get the image avatar in calls.
      *
-     * @param context Context of the Activity.
      * @param chat    Chat room identifier where the call is.
      * @param peerId  User handle from whom the avatar is obtained.
      * @return Bitmap with the image avatar created.
      */
-    public static Bitmap getImageAvatarCall(Context context, MegaChatRoom chat, long peerId) {
-        /*Avatar*/
+    public static Bitmap getImageAvatarCall(MegaChatRoom chat, long peerId) {
         String mail = getUserMailCall(chat, peerId);
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
         String userHandleString = MegaApiAndroid.userHandleToBase64(peerId);
         String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
         if (userHandleString.equals(myUserHandleEncoded)) {
-            Bitmap bitmap = getAvatarBitmap(mail);
-            return bitmap;
-        } else {
-            String nameFileHandle = userHandleString;
-            String nameFileEmail = mail;
-            Bitmap bitmap = isTextEmpty(nameFileEmail) ? getAvatarBitmap(nameFileHandle) : getUserAvatar(nameFileHandle, nameFileEmail);
-            return bitmap;
+            return getAvatarBitmap(mail);
         }
 
+        return isTextEmpty(mail) ? getAvatarBitmap(userHandleString)
+                    : getUserAvatar(userHandleString, mail);
     }
 
     /**
@@ -702,11 +699,11 @@ public class CallUtil {
     /**
      * Method to get the name from a handle.
      *
-     * @param chat   Chat room identifier.
+     * @param context  Activity context.
      * @param peerId User handle from whom the name is obtained.
      * @return The name.
      */
-    public static String getUserNameCall(MegaChatRoom chat, long peerId){
+    public static String getUserNameCall(Context context, long peerId){
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (peerId == megaChatApi.getMyUserHandle()) {
             return megaChatApi.getMyFullname();
@@ -717,11 +714,7 @@ public class CallUtil {
             return nickname;
         }
 
-        String name = chat.getPeerFirstnameByHandle(peerId);
-        if(name != null){
-            return name;
-        }
-        return  chat.getPeerEmailByHandle(peerId);
+        return new ChatController(context).getParticipantFirstName(peerId);
     }
 
     /**
@@ -824,15 +817,19 @@ public class CallUtil {
      * @return The height of actionbar.
      */
     public static int getActionBarHeight(Context context) {
-        int actionBarHeight = ((ChatCallActivity) context).getSupportActionBar().getHeight();
-        if (actionBarHeight != 0) {
-            return actionBarHeight;
+        int actionBarHeight = 0;
+
+        if (((ChatCallActivity) context).getSupportActionBar() != null) {
+            actionBarHeight = ((ChatCallActivity) context).getSupportActionBar().getHeight();
         }
 
-        final TypedValue tv = new TypedValue();
-        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+        if (actionBarHeight == 0) {
+            final TypedValue tv = new TypedValue();
+            if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+            }
         }
+
         return actionBarHeight;
     }
 
@@ -896,10 +893,9 @@ public class CallUtil {
     /**
      * Method for knowing if the call start button should be enabled or not.
      *
-     * @param userHandle User handle.
      * @return True, if it should be enabled or false otherwise.
      */
-    public static boolean isCallOptionEnabled(long userHandle) {
+    public static boolean isCallOptionEnabled() {
         return !participatingInACall();
     }
 /**

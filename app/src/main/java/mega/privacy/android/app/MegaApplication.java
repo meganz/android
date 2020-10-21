@@ -534,6 +534,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				switch (callStatus) {
 					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 					case MegaChatCall.CALL_STATUS_RING_IN:
+					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 					case MegaChatCall.CALL_STATUS_RECONNECTING:
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
@@ -1318,7 +1319,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-		if (!item.isGroup())
+		if (!item.isGroup() || notificationShown == null)
 			return;
 
 		if (item.getChanges() == 0 && !currentActiveGroupChat.contains(item)) {
@@ -1329,9 +1330,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			if (item.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
 				if (!currentActiveGroupChat.contains(item)) {
 					currentActiveGroupChat.add(item);
-					MegaChatCall call = megaChatApi.getChatCall(item.getChatId());
+					MegaChatCall call = api.getChatCall(item.getChatId());
 					if (call != null && call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-						if (notificationShown == null || notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
+						if (notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
 							notificationShown.add(item.getChatId());
 							showGroupCallNotification(item.getChatId());
 						}
@@ -1517,8 +1518,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		MegaHandleList handleList = megaChatApi.getChatCalls(callStatus);
-		if (handleList == null || handleList.size() == 0) return;
+		if (handleList == null || handleList.size() == 0)
+			return;
+
 		MegaChatCall callToLaunch = null;
+
 		for (int i = 0; i < handleList.size(); i++) {
 			if (openCallChatId != handleList.get(i)) {
 				if (megaChatApi.getChatCall(handleList.get(i)) != null && !megaChatApi.getChatCall(handleList.get(i)).isOnHold()) {
@@ -1920,7 +1924,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return isLoggingRunning;
 	}
 
-	public static boolean isWasLocalVideoEnable() {
+	public static boolean wasLocalVideoEnable() {
 		return wasLocalVideoEnable;
 	}
 

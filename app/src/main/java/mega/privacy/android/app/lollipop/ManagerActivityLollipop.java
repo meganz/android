@@ -1301,12 +1301,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (intent == null || intent.getAction() == null)
 				return;
 
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+				return;
+
 			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
-
-				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-					return;
-
 				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				switch (callStatus) {
 					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
@@ -1316,35 +1316,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_DESTROYED:
 					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-						if (rChatFL != null && rChatFL.isVisible()) {
-							rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
-						}
-
-						if (isScreenInPortrait(ManagerActivityLollipop.this)) {
-							setCallWidget();
-						} else {
-							supportInvalidateOptionsMenu();
-						}
-
+						updateVisibleCallElements(chatIdReceived);
 						break;
 				}
 			}
 
 			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
-
-				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
-					return;
-
-				if (getChatsFragment()  != null && rChatFL.isVisible()) {
-					rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
-				}
-				if (isScreenInPortrait(ManagerActivityLollipop.this)) {
-					setCallWidget();
-				} else {
-					supportInvalidateOptionsMenu();
-				}
+				updateVisibleCallElements(chatIdReceived);
 			}
 		}
 	};
@@ -1361,14 +1339,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				return;
 
 			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
-				if (getChatsFragment() != null && rChatFL.isVisible()) {
-					rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
-				}
-				if (isScreenInPortrait(ManagerActivityLollipop.this)) {
-					setCallWidget();
-				} else {
-					supportInvalidateOptionsMenu();
-				}
+				updateVisibleCallElements(chatIdReceived);
 			}
 		}
 	};
@@ -1571,6 +1542,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if (upAFL != null) {
 			upAFL.setPricing();
+		}
+	}
+
+	/**
+	 * Method for updating the visible elements related to a call.
+	 *
+	 * @param chatIdReceived The chat ID of a call.
+	 */
+	private void updateVisibleCallElements(long chatIdReceived) {
+		if (getChatsFragment() != null && rChatFL.isVisible()) {
+			rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
+		}
+
+		if (isScreenInPortrait(ManagerActivityLollipop.this)) {
+			setCallWidget();
+		} else {
+			supportInvalidateOptionsMenu();
 		}
 	}
 

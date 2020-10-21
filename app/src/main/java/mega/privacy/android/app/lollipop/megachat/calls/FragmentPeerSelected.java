@@ -102,15 +102,9 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
 
         chatRoom = megaChatApi.getChatRoom(chatId);
 
-        /*Default Avatar*/
-        Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peerid);
-        avatarImage.setImageBitmap(defaultBitmap);
-
-        /*Avatar*/
-        Bitmap bitmap = getImageAvatarCall(context, chatRoom, peerid);
-        if (bitmap != null) {
-            avatarImage.setImageBitmap(bitmap);
-        }
+        Bitmap bitmap = getImageAvatarCall(chatRoom, peerid);
+        avatarImage.setImageBitmap(bitmap != null ? bitmap :
+                getDefaultAvatarCall(context, chatRoom, peerid));
     }
 
     /**

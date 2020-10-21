@@ -59,7 +59,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="424dp"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:background="@android:color/transparent"
                     android:visibility="gone">
 
@@ -235,8 +235,8 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="72dp"
-                        android:gravity="left"
+                        android:layout_marginStart="72dp"
+                        android:gravity="start"
                         android:orientation="vertical">
                         <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/another_call_title"
@@ -244,7 +244,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dp"
                             android:background="@null"
-                            android:gravity="left"
+                            android:gravity="start"
                             android:ellipsize="end"
                             android:fontFamily="roboto"
                             android:maxLines="1"
@@ -259,7 +259,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@null"
-                            android:gravity="left"
+                            android:gravity="start"
                             android:ellipsize="end"
                             android:fontFamily="roboto"
                             android:maxLines="1"
@@ -414,7 +414,7 @@
                         android:id="@+id/small_camera_fragment"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:layout_marginRight="20dp"
                         android:layout_marginBottom="10dp"
@@ -468,7 +468,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
-                    android:layout_marginRight="36dp">
+                    android:layout_marginEnd="36dp">
 
                     <!-- PAUSE -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton

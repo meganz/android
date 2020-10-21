@@ -431,7 +431,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
 
-        updateAVFlags(getSesionIndividualCall(callChat));
+        updateAVFlags(getSessionIndividualCall(callChat));
         updateLocalSpeakerStatus();
     }
 
@@ -905,7 +905,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         logDebug("Type: " + request.getType());
         if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && e.getErrorCode() != MegaError.API_OK) {
 
-            Bitmap avatar = getImageAvatarCall(this, chat, chat.getPeerHandle(0));
+            Bitmap avatar = getImageAvatarCall(chat, chat.getPeerHandle(0));
             if (avatar == null) {
                 logWarning("No avatar found, no change needed");
                 return;
@@ -2402,13 +2402,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (peerSelected == null) {
                 peerSelected = peersOnCall.get(0);
                 updateParticipantSelectedLayer(peerSelected, false);
+            } else if (peersOnCall.contains(peerSelected)) {
+                updateParticipantSelectedLayer(peerSelected, false);
             } else {
-                if (peersOnCall.contains(peerSelected)) {
-                    updateParticipantSelectedLayer(peerSelected, false);
-                } else {
-                    peerSelected = peersOnCall.get(0);
-                    updateParticipantSelectedLayer(peerSelected, true);
-                }
+                peerSelected = peersOnCall.get(0);
+                updateParticipantSelectedLayer(peerSelected, true);
             }
         }
 
@@ -2681,7 +2679,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (!chat.isGroup()) {
             createSmallFragment();
             createFullScreenFragment();
-            updateAVFlags(getSesionIndividualCall(callChat));
+            updateAVFlags(getSessionIndividualCall(callChat));
         }
 
         answerCallFAB.setOnTouchListener(null);
@@ -2771,8 +2769,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (chat.isGroup())
             return true;
 
-        MegaChatSession session = getSesionIndividualCall(callChat);
-        if (session != null && session.isOnHold() && MegaApplication.isWasLocalVideoEnable())
+        MegaChatSession session = getSessionIndividualCall(callChat);
+        if (session != null && session.isOnHold() && MegaApplication.wasLocalVideoEnable())
             return false;
 
         return session == null || (!callChat.hasLocalVideo() && !session.hasVideo());
@@ -2824,7 +2822,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         } else {
-            MegaChatSession session = getSesionIndividualCall(callChat);
+            MegaChatSession session = getSessionIndividualCall(callChat);
             if (session != null) {
                 updateRemoteVideoStatus(session);
             }

@@ -729,21 +729,6 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     /**
-     * Method for obtaining the name of the chat participant.
-     *
-     * @param chat The chat room.
-     * @return The name.
-     */
-    private String getFullName(MegaChatRoom chat) {
-        String fullName = getNicknameContact(chat.getPeerHandle(0));
-        if (fullName == null) {
-            fullName = chat.getPeerFullname(0);
-        }
-
-        return fullName;
-    }
-
-    /**
      * Method for knowing how many buttons need to be displayed in notifications.
      */
     private String getNumberButtons() {
@@ -766,10 +751,12 @@ public final class ChatAdvancedNotificationBuilder {
             if ((!callsActive.isEmpty() && callsOnHold.isEmpty()) || (callsActive.isEmpty() && !callsOnHold.isEmpty())) {
                 return THREE_BUTTONS;
             }
-            if(!callsActive.isEmpty() && !callsOnHold.isEmpty()){
+
+            if(!callsActive.isEmpty()){
                 return VERTICAL_TWO_BUTTONS;
             }
         }
+
         return HORIZONTAL_TWO_BUTTONS;
     }
 
@@ -818,32 +805,6 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     /**
-     * Method for obtaining the contact status bitmap.
-     *
-     * @param userStatus The contact status.
-     * @return The final bitmap.
-     */
-    private Bitmap getStatusBitmap(int userStatus) {
-        switch (userStatus) {
-            case MegaChatApi.STATUS_ONLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_online);
-
-            case MegaChatApi.STATUS_AWAY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_away);
-
-            case MegaChatApi.STATUS_BUSY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_busy);
-
-            case MegaChatApi.STATUS_OFFLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_offline);
-
-            case MegaChatApi.STATUS_INVALID:
-            default:
-                return null;
-        }
-    }
-
-    /**
      * Method for showing the incoming call notification, when exists another call in progress exists.
      *
      * @param callToAnswer The call that is being received.
@@ -876,7 +837,7 @@ public final class ChatAdvancedNotificationBuilder {
             titleCall = context.getString(R.string.title_notification_incoming_group_call);
         } else {
             statusIcon = getStatusBitmap(megaChatApi.getUserOnlineStatus(chatToAnswer.getPeerHandle(0)));
-            titleChat = getFullName(chatToAnswer);
+            titleChat = chatC.getParticipantFullName(chatToAnswer.getPeerHandle(0));
             titleCall = context.getString(hasVideoInitialCall ?
                     R.string.title_notification_incoming_individual_video_call :
                     R.string.title_notification_incoming_individual_audio_call);
@@ -940,13 +901,14 @@ public final class ChatAdvancedNotificationBuilder {
                 expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming));
                 expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join));
                 expandedView.setOnClickPendingIntent(R.id.decline_button_layout, getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId));
-                expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(hasVideoInitialCall, isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER, notificationId));
             } else {
                 expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.contact_decline));
                 expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.answer_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.decline_button_layout, getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.DECLINE, notificationId));
-                expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(hasVideoInitialCall, isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER, notificationId));
             }
+
+            expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(hasVideoInitialCall, isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER, notificationId));
+
         } else {
             expandedView.setViewVisibility(R.id.big_layout, View.VISIBLE);
             expandedView.setViewVisibility(R.id.small_layout, GONE);
@@ -1003,7 +965,9 @@ public final class ChatAdvancedNotificationBuilder {
                     .setVibrate(patternIncomingCall)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
+
             notifyCall(notificationId, notificationBuilderO.build());
+
         } else {
             long[] pattern = {0, 1000};
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -1024,11 +988,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setSound(defaultSoundUri)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            } else {
-                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            }
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1161,11 +1121,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setSound(defaultSoundUri)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            } else {
-                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            }
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
