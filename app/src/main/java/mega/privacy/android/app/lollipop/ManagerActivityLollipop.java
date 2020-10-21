@@ -330,8 +330,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private static final int SHARED_BNV = 4;
 	private static final int HIDDEN_BNV = 5;
 	private static final int MEDIA_UPLOADS_BNV = 6;
+	// 16dp + 16dp + 56dp(Fab's size)
+    public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 88;
 
-	private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
+    private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
 	public int accountFragment;
 
@@ -5915,22 +5917,25 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 			case HOMEPAGE: {
+			    // Don't use fabButton.hide() here.
+			    fabButton.setVisibility(View.GONE);
 				if (mHomepageScreen == HomepageScreen.HOMEPAGE) {
 					showBNVImmediate();
 					abL.setVisibility(View.GONE);
+                    showHideBottomNavigationView(false);
 				} else {
 					// For example, back from Rubbish Bin to Photos
 					setToolbarTitle();
 					invalidateOptionsMenu();
+                    showHideBottomNavigationView(true);
 				}
 
 				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
-				showFabButton();
+
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
 				showGlobalAlertDialogsIfNeeded();
-                showHideBottomNavigationView(false);
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -8010,6 +8015,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             } else {
                 super.onBackPressed();
             }
+        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen != HomepageScreen.FULLSCREEN_OFFLINE) {
+		    // Back from other pages in homepage fragment, like recent, audio, video fragment.
+            adjustTransferWidgetPositionInHomepage();
+            super.onBackPressed();
         } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
 		}
@@ -8023,11 +8032,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (bottomNavigationCurrentItem != HOMEPAGE_BNV) {
 				backToDrawerItem(bottomNavigationCurrentItem);
 			} else {
+                adjustTransferWidgetPositionInHomepage();
 				drawerItem = DrawerItem.HOMEPAGE;
 			}
 			super.onBackPressed();
 		}
 	}
+
+	private void adjustTransferWidgetPositionInHomepage() {
+        RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
+        if (transfersWidgetLayout == null) return;
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+        params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
+        params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+    }
 
 	private void closeUpgradeAccountFragment() {
 		setFirstNavigationLevel(true);
@@ -16598,23 +16617,25 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
      *
      * @param bNVHidden  true if the bottom navigation view is hidden, false otherwise
      */
-	public void updateTransfersWidgetPosition(boolean bNVHidden) {
-		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
-		if (transfersWidgetLayout == null) return;
+    public void updateTransfersWidgetPosition(boolean bNVHidden) {
+        RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
+        if (transfersWidgetLayout == null) return;
 
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
 
         if (bNVHidden) {
+            params.bottomMargin = 0;
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        } else if (drawerItem == DrawerItem.HOMEPAGE) {
-			params.bottomMargin = Util.dp2px(86, outMetrics);
-			params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		} else {
-			params.bottomMargin = 0;
-		}
+        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+            params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
+            params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        } else {
+            params.bottomMargin = 0;
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+        }
 
-		transfersWidgetLayout.setLayoutParams(params);
-	}
+        transfersWidgetLayout.setLayoutParams(params);
+    }
 
     /**
      * Updates values of TransfersManagement object after the activity comes from background.
