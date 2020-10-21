@@ -169,6 +169,9 @@ import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.services.GiphyService.BASE_URL;
+import static mega.privacy.android.app.services.GiphyService.GIPHY_URL;
+import static mega.privacy.android.app.services.GiphyService.TEST_URL;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -3845,11 +3848,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * @param title     Title of the giphy
      */
     public void sendGiphyMessage(String srcMp4, String srcWebp, long sizeMp4, long sizeWebp, int width, int height, String title) {
-        MegaChatMessage giphyMessage = megaChatApi.sendGiphy(idChat, srcMp4, srcWebp, sizeMp4, sizeWebp, width, height, title);
+        MegaChatMessage giphyMessage = megaChatApi.sendGiphy(idChat, getGiphySrc(srcMp4), getGiphySrc(srcWebp),
+                sizeMp4, sizeWebp, width, height, title);
         if (giphyMessage == null) return;
 
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(giphyMessage);
         sendMessageToUI(androidMsgSent);
+    }
+
+    /**
+     * Modifies the original src of a Giphy by replacing the endpoint to GIPHY_URL.
+     *
+     * @param originalSrc   Original src of a Giphy with the original endpoint.
+     * @return The final src with GIPHY_URL.
+     */
+    private String getGiphySrc(String originalSrc) {
+        if (originalSrc.contains(BASE_URL)) {
+            return originalSrc.replace(BASE_URL, GIPHY_URL);
+        } else if (originalSrc.contains(TEST_URL)) {
+            return originalSrc.replace(TEST_URL, GIPHY_URL);
+        }
+
+        return originalSrc;
     }
 
     public void hideNewMessagesLayout(){

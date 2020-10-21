@@ -7,9 +7,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 object GiphyService {
     const val TEST_URL = "https://giphy-sandbox3.developers.mega.co.nz/"
     const val BASE_URL = "https://giphy.mega.nz/"
+    const val GIPHY_URL = "giphy://"
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(TEST_URL)
+        .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 

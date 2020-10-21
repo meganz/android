@@ -111,6 +111,8 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 
 import static mega.privacy.android.app.activities.GiphyActivity.GIF_DATA;
+import static mega.privacy.android.app.services.GiphyService.BASE_URL;
+import static mega.privacy.android.app.services.GiphyService.GIPHY_URL;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat.getFormattedText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -5146,7 +5148,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         updateGifViewBackgroundAndDimensions(holder, ContextCompat.getColor(context, R.color.giphy_loading_background),
                 isPortrait, isOwnMessage, giphy.getWidth(), giphy.getHeight());
-        setGIFAndGiphyProperties(shouldAutoPlay, shouldAutoPlay ? Uri.parse(giphy.getWebpSrc()) : null, holder, isPortrait, isOwnMessage);
+        setGIFAndGiphyProperties(shouldAutoPlay, shouldAutoPlay ? getOriginalGiphySrc(giphy.getWebpSrc()) : null, holder, isPortrait, isOwnMessage);
+    }
+
+    /**
+     * Gets the original src of a Giphy by replacing GIPHY_URL to the endpoint.
+     *
+     * @param giphyUri Uri of a Giphy with the GIPHY_URL beginning.
+     * @return The final src with real endpoint.
+     */
+    private Uri getOriginalGiphySrc(String giphyUri) {
+        if (isTextEmpty(giphyUri)) {
+            logWarning("giphyUri is null");
+            return null;
+        }
+
+        if (giphyUri.contains(GIPHY_URL)) {
+            return Uri.parse(giphyUri.replace(GIPHY_URL, BASE_URL));
+        }
+
+        logError("Wrong giphyUri: " + giphyUri);
+        return null;
     }
 
     /**

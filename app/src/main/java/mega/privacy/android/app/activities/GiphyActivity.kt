@@ -57,6 +57,8 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
     private var trendingData: ArrayList<Data>? = null
     private var searchData = HashMap<String, ArrayList<Data>?>()
 
+    private var searchMenuItem: MenuItem? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGiphyBinding.inflate(layoutInflater)
@@ -69,27 +71,33 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_grey)
         binding.giphyToolbar.title = getString(R.string.search_giphy_title)
+        binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
 
         screenOrientation = resources.configuration.orientation
         updateView()
 
         binding.giphyList.apply {
             setHasFixedSize(true)
-            clipToPadding = false
             layoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
             itemAnimator = DefaultItemAnimator()
         }
 
+        binding.giphyListView.visibility = GONE
         binding.emptyGiphyView.visibility = GONE
 
+        var endOfList = getString(R.string.end_of_results_giphy)
         var emptyTextSearch = getString(R.string.empty_search_giphy)
+
         try {
+            endOfList = endOfList.replace("[A]", "<font color=\'#999999\'>")
+            endOfList = endOfList.replace("[/A]", "</font>")
             emptyTextSearch = emptyTextSearch.replace("[A]", "<font color=\'#000000\'>")
             emptyTextSearch = emptyTextSearch.replace("[/A]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)
         }
 
+        binding.giphyEndList.text = getSpannedHtmlText(endOfList)
         binding.emptyGiphyText.text = getSpannedHtmlText(emptyTextSearch)
 
         giphyService = GiphyService.buildService()
@@ -218,15 +226,18 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         if (giphyAdapter == null) {
             giphyAdapter = GiphyAdapter(gifsData, this@GiphyActivity)
             binding.giphyList.adapter = giphyAdapter
+            binding.giphyListView.visibility = VISIBLE
         } else {
             giphyAdapter?.setGifs(gifsData)
         }
+
+        binding.giphyList.scrollToPosition(0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_giphy, menu)
 
-        val searchMenuItem = menu?.findItem(R.id.action_search)
+        searchMenuItem = menu?.findItem(R.id.action_search)
         val searchView = searchMenuItem?.actionView as SearchView
         searchView.maxWidth = Int.MAX_VALUE
 
@@ -236,9 +247,9 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         val searchAutoComplete =
             searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
         searchAutoComplete.setTextColor(resources.getColor(R.color.giphy_search_text))
-        searchAutoComplete.hint = ""
+        searchAutoComplete.hint = getString(R.string.search_giphy_title)
 
-        searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+        searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
                 return true
             }
@@ -256,7 +267,12 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (!isTextEmpty(newText)) requestSearchData(newText.toString())
+                if (isTextEmpty(newText)) {
+                    requestTrendingData()
+                } else {
+                    requestSearchData(newText.toString())
+                }
+
                 return true
             }
 
@@ -286,10 +302,10 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
     override fun setEmptyState(emptyState: Boolean) {
         if (emptyState) {
             binding.emptyGiphyView.visibility = VISIBLE
-            binding.giphyList.visibility = GONE
+            binding.giphyListView.visibility = GONE
         } else {
             binding.emptyGiphyView.visibility = GONE
-            binding.giphyList.visibility = VISIBLE
+            binding.giphyListView.visibility = VISIBLE
         }
     }
 
