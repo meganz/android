@@ -39,7 +39,6 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
@@ -61,7 +60,6 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 public class SettingsCUFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     private static final int CAM_SYNC_INVALID_HANDLE = -1;
-
     private SwitchPreferenceCompat cameraUploadOnOff;
     private ListPreference cameraUploadHow;
     private ListPreference cameraUploadWhat;

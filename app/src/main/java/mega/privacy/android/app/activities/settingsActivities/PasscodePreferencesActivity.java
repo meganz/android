@@ -1,11 +1,13 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
-
 import android.os.Bundle;
 import android.view.KeyEvent;
+
 import androidx.appcompat.app.AlertDialog;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.PasscodeLockSettingsFragment;
+
 import static mega.privacy.android.app.utils.Constants.PIN_4;
 import static mega.privacy.android.app.utils.Constants.PIN_6;
 import static mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC;

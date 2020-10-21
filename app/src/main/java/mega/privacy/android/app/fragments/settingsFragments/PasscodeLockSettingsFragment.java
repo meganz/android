@@ -3,11 +3,14 @@ package mega.privacy.android.app.fragments.settingsFragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
+
 import static mega.privacy.android.app.constants.SettingsConstants.KEY_PIN_LOCK_CODE;
 import static mega.privacy.android.app.constants.SettingsConstants.KEY_PIN_LOCK_ENABLE;
 import static mega.privacy.android.app.utils.Constants.SET_PIN;
@@ -17,9 +20,9 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
 
     private SwitchPreferenceCompat pinLockEnableSwitch;
     private Preference pinLockCode;
-    String ast = "";
-    String pinLockCodeTxt = "";
-    boolean pinLock = false;
+    private String ast = "";
+    private String pinLockCodeTxt = "";
+    private boolean pinLock = false;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -34,20 +37,18 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
 
         updatePinLock();
 
-        if (pinLock){
+        if (pinLock) {
             ast = "";
-            if (pinLockCodeTxt.compareTo("") == 0){
+            if (pinLockCodeTxt.compareTo("") == 0) {
                 ast = getString(R.string.settings_pin_lock_code_not_set);
-            }
-            else{
-                for (int i=0;i<pinLockCodeTxt.length();i++){
+            } else {
+                for (int i = 0; i < pinLockCodeTxt.length(); i++) {
                     ast = ast + "*";
                 }
             }
             pinLockCode.setSummary(ast);
             getPreferenceScreen().addPreference(pinLockCode);
-        }
-        else{
+        } else {
             getPreferenceScreen().removePreference(pinLockCode);
         }
     }
@@ -58,9 +59,9 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
         switch (preference.getKey()) {
             case KEY_PIN_LOCK_ENABLE:
                 pinLock = !pinLock;
-                if (pinLock){
-                    ((PasscodePreferencesActivity)getActivity()).showPanelSetPinLock();
-                } else{
+                if (pinLock) {
+                    ((PasscodePreferencesActivity) getActivity()).showPanelSetPinLock();
+                } else {
                     dbH.setPinLockEnabled(false);
                     dbH.setPinLockCode("");
                     getPreferenceScreen().removePreference(pinLockCode);
@@ -74,6 +75,7 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
 
         return true;
     }
+
     @Override
     public void onResume() {
         prefs = dbH.getPreferences();
@@ -83,7 +85,7 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
 
     private void updatePinLock() {
         if (prefs == null || prefs.getPinLockEnabled() == null) {
-           cancelSetPinLock();
+            cancelSetPinLock();
         } else {
             pinLock = Boolean.parseBoolean(prefs.getPinLockEnabled());
             pinLockEnableSwitch.setChecked(pinLock);
@@ -98,16 +100,15 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         prefs = dbH.getPreferences();
-        if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
+        if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0) {
             pinLockCodeTxt = (String) newValue;
             dbH.setPinLockCode(pinLockCodeTxt);
 
             ast = "";
-            if (pinLockCodeTxt.compareTo("") == 0){
+            if (pinLockCodeTxt.compareTo("") == 0) {
                 ast = getString(R.string.settings_pin_lock_code_not_set);
-            }
-            else{
-                for (int i=0;i<pinLockCodeTxt.length();i++){
+            } else {
+                for (int i = 0; i < pinLockCodeTxt.length(); i++) {
                     ast = ast + "*";
                 }
             }
@@ -130,10 +131,10 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
 
     }
 
-    private void afterSetPinLock(){
+    private void afterSetPinLock() {
         prefs = dbH.getPreferences();
 
-        if(prefs != null) {
+        if (prefs != null) {
             pinLockCodeTxt = prefs.getPinLockCode();
             if (pinLockCodeTxt == null) {
                 pinLockCodeTxt = "";
@@ -154,20 +155,20 @@ public class PasscodeLockSettingsFragment extends SettingsBaseFragment implement
         }
     }
 
-    public void cancelSetPinLock(){
+    public void cancelSetPinLock() {
         pinLock = false;
         pinLockEnableSwitch.setChecked(pinLock);
         dbH.setPinLockEnabled(false);
         dbH.setPinLockCode("");
     }
 
-    private void resetPinLock(){
+    private void resetPinLock() {
         Intent intent = new Intent(context, PinLockActivityLollipop.class);
         intent.setAction(PinLockActivityLollipop.ACTION_RESET_PIN_LOCK);
         startActivity(intent);
     }
 
-    public void intentToPinLock(){
+    public void intentToPinLock() {
         Intent intent = new Intent(context, PinLockActivityLollipop.class);
         intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
         startActivityForResult(intent, SET_PIN);

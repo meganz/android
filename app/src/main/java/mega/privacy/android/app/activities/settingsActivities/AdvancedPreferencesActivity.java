@@ -10,20 +10,29 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.AdvancedSettingsFragment;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
+import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
+import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
 
     private AdvancedSettingsFragment sttAdvanced;
 
-    private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttAdvanced == null)
+            logDebug("Network broadcast received!");
+            if (intent != null || intent.getAction() == null || sttAdvanced == null)
                 return;
 
-            if (intent.getAction().equals(ACTION_UPDATE_ONLINE_OPTIONS_SETTING)) {
-                boolean isOnline = intent.getBooleanExtra(ONLINE_OPTION, false);
-                sttAdvanced.setOnlineOptions(isOnline);
+            int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
+
+            if (actionType == GO_OFFLINE) {
+                sttAdvanced.setOnlineOptions(false);
+            } else if (actionType == GO_ONLINE) {
+                sttAdvanced.setOnlineOptions(true);
             }
         }
     };
@@ -33,14 +42,17 @@ public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
         super.onCreate(savedInstanceState);
 
         aB.setTitle(getString(R.string.settings_advanced_features).toUpperCase());
+
         sttAdvanced = new AdvancedSettingsFragment();
         replaceFragment(sttAdvanced);
-        registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
+
+        registerReceiver(networkReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(offlineReceiver);
+        unregisterReceiver(networkReceiver);
     }
 }

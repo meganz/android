@@ -15,8 +15,8 @@ import mega.privacy.android.app.fragments.settingsFragments.SettingsCUFragment;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
@@ -24,15 +24,19 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     private SettingsCUFragment sttCameraUploads;
     private AlertDialog businessCUAlert;
 
-    private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
+            logDebug("Network broadcast received!");
+            if (intent != null || intent.getAction() == null || sttCameraUploads == null)
                 return;
 
-            if (intent.getAction().equals(ACTION_UPDATE_ONLINE_OPTIONS_SETTING)) {
-                boolean isOnline = intent.getBooleanExtra(ONLINE_OPTION, false);
-                sttCameraUploads.setOnlineOptions(isOnline);
+            int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
+
+            if (actionType == GO_OFFLINE) {
+                sttCameraUploads.setOnlineOptions(false);
+            } else if (actionType == GO_ONLINE) {
+                sttCameraUploads.setOnlineOptions(true);
             }
         }
     };
@@ -139,8 +143,8 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         sttCameraUploads = new SettingsCUFragment();
         replaceFragment(sttCameraUploads);
 
-        registerReceiver(offlineReceiver,
-                new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
+        registerReceiver(networkReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
         registerReceiver(cameraUploadDestinationReceiver,
                 new IntentFilter(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING));
         registerReceiver(enableCameraUploadReceiver,
@@ -217,7 +221,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(offlineReceiver);
+        unregisterReceiver(networkReceiver);
         unregisterReceiver(cameraUploadDestinationReceiver);
         unregisterReceiver(enableCameraUploadReceiver);
         unregisterReceiver(updateCUSettingsReceiver);

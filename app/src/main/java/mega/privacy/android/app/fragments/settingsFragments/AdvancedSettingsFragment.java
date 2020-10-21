@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,7 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 
 public class AdvancedSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
-    boolean useHttpsOnlyValue = false;
+    private boolean useHttpsOnlyValue = false;
     private TwoLineCheckPreference useHttpsOnly;
 
     @Override

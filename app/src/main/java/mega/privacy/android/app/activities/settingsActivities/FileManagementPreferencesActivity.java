@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -47,7 +48,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
 
-    static FileManagementPreferencesActivity activity = null;
+    private static FileManagementPreferencesActivity activity = null;
     private FileManagementSettingsFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
@@ -90,7 +91,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-
     private BroadcastReceiver offlineSizeUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -110,7 +110,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
-            if(intent.getAction().equals(ACTION_REFRESH_CLEAR_OFFLINE_SETTING) ){
+            if (intent.getAction().equals(ACTION_REFRESH_CLEAR_OFFLINE_SETTING)) {
                 sttFileManagment.taskGetSizeOffline();
             }
         }
@@ -133,15 +133,19 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            logDebug("Network broadcast received!");
+            if (intent != null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
-            if (intent.getAction().equals(ACTION_UPDATE_ONLINE_OPTIONS_SETTING)) {
-                boolean isOnline = intent.getBooleanExtra(ONLINE_OPTION, false);
-                sttFileManagment.setOnlineOptions(isOnline);
+            int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
+
+            if (actionType == GO_OFFLINE) {
+                sttFileManagment.setOnlineOptions(false);
+            } else if (actionType == GO_ONLINE) {
+                sttFileManagment.setOnlineOptions(true);
             }
         }
     };
@@ -155,17 +159,24 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
 
         sttFileManagment = new FileManagementSettingsFragment();
         replaceFragment(sttFileManagment);
-        registerReceiver(cacheSizeUpdateReceiver, new IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING));
-        registerReceiver(offlineSizeUpdateReceiver, new IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING));
-        registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
-        registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+        registerReceiver(cacheSizeUpdateReceiver,
+                new IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING));
+        registerReceiver(offlineSizeUpdateReceiver,
+                new IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING));
+        registerReceiver(networkReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+        registerReceiver(updateMyAccountReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 
-        IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+        IntentFilter filterUpdateCUSettings =
+                new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
-        registerReceiver(setVersionInfoReceiver, new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
-        registerReceiver(resetVersionInfoReceiver, new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
+        registerReceiver(setVersionInfoReceiver,
+                new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
+        registerReceiver(resetVersionInfoReceiver,
+                new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
     }
 
     @Override
@@ -173,13 +184,16 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         super.onDestroy();
         unregisterReceiver(cacheSizeUpdateReceiver);
         unregisterReceiver(offlineSizeUpdateReceiver);
-        unregisterReceiver(offlineReceiver);
+        unregisterReceiver(networkReceiver);
         unregisterReceiver(updateMyAccountReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
         unregisterReceiver(setVersionInfoReceiver);
         unregisterReceiver(resetVersionInfoReceiver);
     }
 
+    /**
+     * Show Clear Rubbish Bin dialog.
+     */
     public void showClearRubbishBinDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.context_clear_rubbish));
@@ -195,6 +209,9 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         clearRubbishBinDialog.show();
     }
 
+    /**
+     * Show confirmation clear all versions dialog.
+     */
     public void showConfirmationClearAllVersions() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.settings_file_management_delete_versions));
@@ -210,6 +227,9 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         clearRubbishBinDialog.show();
     }
 
+    /**
+     * Show Rubbish bin not disabled dialog.
+     */
     public void showRBNotDisabledDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -233,6 +253,11 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         generalDialog.show();
     }
 
+    /**
+     * Update the Rubbish bin Scheduler value.
+     *
+     * @param value the new value.
+     */
     public void setRBSchedulerValue(String value) {
         logDebug("Value: " + value);
         int intValue = Integer.parseInt(value);
@@ -242,6 +267,9 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     }
 
+    /**
+     * Show Rubbish bin scheduler value dialog.
+     */
     public void showRbSchedulerValueDialog(final boolean isEnabling) {
         logDebug("showRbSchedulerValueDialog");
         DisplayMetrics outMetrics = getOutMetrics();

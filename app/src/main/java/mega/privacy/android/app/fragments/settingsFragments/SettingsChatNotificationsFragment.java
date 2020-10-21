@@ -32,7 +32,6 @@ import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDepending
 public class SettingsChatNotificationsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     private ChatSettings chatSettings;
-
     private SwitchPreferenceCompat chatNotificationsSwitch;
     private Preference chatSoundPreference;
     private SwitchPreferenceCompat chatVibrateSwitch;

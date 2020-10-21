@@ -38,7 +38,11 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
+import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
+import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -47,15 +51,19 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
 
-    private BroadcastReceiver offlineReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttChat == null)
+            logDebug("Network broadcast received!");
+            if (intent != null || intent.getAction() == null || sttChat == null)
                 return;
 
-            if (intent.getAction().equals(ACTION_UPDATE_ONLINE_OPTIONS_SETTING)) {
-                boolean isOnline = intent.getBooleanExtra(ONLINE_OPTION, false);
-                sttChat.setOnlineOptions(isOnline);
+            int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
+
+            if (actionType == GO_OFFLINE) {
+                sttChat.setOnlineOptions(false);
+            } else if (actionType == GO_ONLINE) {
+                sttChat.setOnlineOptions(true);
             }
         }
     };
@@ -105,10 +113,14 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
 
-        registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
-        registerReceiver(richLinksUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
-        registerReceiver(statusUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
-        registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+        registerReceiver(networkReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+        registerReceiver(richLinksUpdateReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
+        registerReceiver(statusUpdateReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
+        registerReceiver(chatRoomMuteUpdateReceiver,
+                new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
     /**
@@ -341,7 +353,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(offlineReceiver);
+        unregisterReceiver(networkReceiver);
         unregisterReceiver(richLinksUpdateReceiver);
         unregisterReceiver(statusUpdateReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);

@@ -40,7 +40,8 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
 
         sttChatNotifications = new SettingsChatNotificationsFragment();
         replaceFragment(sttChatNotifications);
-        registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+        registerReceiver(chatRoomMuteUpdateReceiver,
+                new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
     public void changeSound(String soundString) {
