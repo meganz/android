@@ -37,7 +37,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.ref.WeakReference
-import java.util.Locale
+import java.util.*
 
 @AndroidEntryPoint
 class PhotosFragment : BaseFragment(), HomepageSearchable {

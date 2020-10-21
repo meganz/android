@@ -40,7 +40,8 @@ class PhotoViewHolder(private val binding: ViewDataBinding) :
                     // image when the user long press an item for the very first time
                     if (actionModeViewModel.selectedNodes.value?.isEmpty() == true ||
                         actionModeViewModel.longClick.value?.peekContent()?.index != item.index ||
-                            !item.selected) {
+                        !item.selected
+                    ) {
                         thumbnail.hierarchy.setPlaceholderImage(R.drawable.ic_image_list)
                     } else {
                         thumbnail.hierarchy.setPlaceholderImage(null)
