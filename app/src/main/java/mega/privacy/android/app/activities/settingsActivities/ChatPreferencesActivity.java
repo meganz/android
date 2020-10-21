@@ -25,6 +25,9 @@ import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
@@ -46,7 +49,7 @@ import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class ChatPreferencesActivity extends PreferencesBaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaGlobalListenerInterface {
+public class ChatPreferencesActivity extends PreferencesBaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatListenerInterface {
 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
@@ -121,6 +124,44 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
                 new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
         registerReceiver(chatRoomMuteUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+    }
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+    }
+
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+        if (config != null) {
+            if (config.isPending()) {
+                logDebug("Config is pending - do not update UI");
+            } else if (sttChat != null) {
+                sttChat.updatePresenceConfigChat(false);
+            }
+        } else {
+            logWarning("Config is null");
+        }
+    }
+
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
     }
 
     /**

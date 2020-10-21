@@ -439,8 +439,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
                         if (sttFileManagment != null) {
                             sttFileManagment.updateEnabledFileVersions();
                         }
-                    }
-                    else{
+                    } else {
                         logDebug("File versioning attribute changed correctly");
                     }
                 }
@@ -449,11 +448,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
             case MegaRequest.TYPE_GET_ATTR_USER:
                 if (request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME && sttFileManagment != null) {
                     if (e.getErrorCode() == MegaError.API_ENOENT) {
-                        if (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                            sttFileManagment.updateRBScheduler(30);
-                        } else {
-                            sttFileManagment.updateRBScheduler(90);
-                        }
+                        sttFileManagment.updateRBScheduler(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE ?
+                                30 : 90);
                     } else {
                         sttFileManagment.updateRBScheduler(request.getNumber());
                     }
@@ -464,8 +460,24 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
                     sttFileManagment.updateEnabledFileVersions();
                 }
                 break;
-        }
 
+            case MegaRequest.TYPE_REMOVE_VERSIONS:
+                if (e.getErrorCode() == MegaError.API_OK){
+                    Util.showSnackbar(activity, getString(R.string.success_delete_versions));
+                    if(sttFileManagment != null) {
+                        sttFileManagment.resetVersionsInfo();
+                    }
+                } else{
+                    Util.showSnackbar(activity, getString(R.string.error_delete_versions));
+                }
+                break;
+
+            case MegaRequest.TYPE_FOLDER_INFO:
+                if (sttFileManagment != null) {
+                    sttFileManagment.setVersionsInfo();
+                }
+                break;
+        }
     }
 
     @Override
@@ -492,15 +504,13 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
                     } else {
                         logDebug("Changes: " + user.getChanges());
 
-                        if (megaApi.getMyUser() != null) {
-                            if (user.getHandle() == megaApi.getMyUser().getHandle()) {
-                                if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
-                                    megaApi.getRubbishBinAutopurgePeriod(this);
-                                }
+                        if (megaApi.getMyUser() != null && user.getHandle() == megaApi.getMyUser().getHandle()) {
+                            if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
+                                megaApi.getRubbishBinAutopurgePeriod(this);
+                            }
 
-                                if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
-                                    megaApi.getFileVersionsOption(this);
-                                }
+                            if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
+                                megaApi.getFileVersionsOption(this);
                             }
                         }
                     }

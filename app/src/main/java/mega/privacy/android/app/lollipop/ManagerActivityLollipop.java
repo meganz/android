@@ -1340,7 +1340,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null && intent.getAction() != null && (intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING) || intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE)) && getSettingsFragment() != null) {
-				logDebug("************* ManagerActivityLollipop --> refreshCameraUploadsSettings()");
 				sttFLol.refreshCameraUploadsSettings();
 			}
 		}
@@ -7516,7 +7515,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		supportInvalidateOptionsMenu();
 		hideFabButton();
 	}
-
 
 	public void refreshAfterMovingToRubbish(){
 		logDebug("refreshAfterMovingToRubbish");
