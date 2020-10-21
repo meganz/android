@@ -39,6 +39,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         private const val NUM_COLUMNS_PORTRAIT = 2
         private const val NUM_COLUMNS_LANDSCAPE = 4
         private const val GIF_MARGIN = 4F
+        private const val DEFAULT_LIMIT = 25
 
         const val GIF_DATA = "GIF_DATA"
     }
@@ -46,6 +47,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
     private lateinit var binding: ActivityGiphyBinding
 
     private var giphyAdapter: GiphyAdapter? = null
+    private var staggeredGridLayoutManager: StaggeredGridLayoutManager? = null
 
     private var giphyService: GiphyEndPointsInterface? = null
 
@@ -54,10 +56,14 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
     private var screenGifWidth = 0
 
     private var previousRequest: Call<GiphyResponse>? = null
-    private var trendingData: ArrayList<Data>? = null
-    private var searchData = HashMap<String, ArrayList<Data>?>()
+    private var trendingData: ArrayList<Data> = ArrayList()
+    private var searchData = hashMapOf<String, ArrayList<Data>>()
 
     private var searchMenuItem: MenuItem? = null
+
+    private var currentQuery: String? = null
+    private var queryOffset = DEFAULT_LIMIT
+    private var isEndOfList = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,8 +84,11 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
 
         binding.giphyList.apply {
             setHasFixedSize(true)
-            layoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
+            staggeredGridLayoutManager =
+                StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
+            layoutManager = staggeredGridLayoutManager
             itemAnimator = DefaultItemAnimator()
+            addScrollBehaviour()
         }
 
         binding.giphyListView.visibility = GONE
@@ -98,10 +107,45 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         }
 
         binding.giphyEndList.text = getSpannedHtmlText(endOfList)
+        binding.giphyEndList.visibility = GONE
         binding.emptyGiphyText.text = getSpannedHtmlText(emptyTextSearch)
 
         giphyService = GiphyService.buildService()
-        requestTrendingData()
+        requestTrendingData(false)
+    }
+
+    private fun addScrollBehaviour() {
+        binding.giphyList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val latestPosition = staggeredGridLayoutManager?.itemCount?.minus(1)
+                val lastVisibleItems =
+                    staggeredGridLayoutManager?.findLastVisibleItemPositions(IntArray(numColumns))
+                        ?: return
+
+                var latestIsVisible = false
+                for (visibleItem in lastVisibleItems) {
+                    if (latestPosition == visibleItem) {
+                        latestIsVisible = true
+
+                        if (!isEndOfList) {
+                            if (searchMenuItem?.isActionViewExpanded == true && !isTextEmpty(
+                                    currentQuery
+                                )
+                            ) requestSearchData(
+                                currentQuery.toString(),
+                                true
+                            ) else requestTrendingData(true)
+                        }
+
+                        break
+                    }
+                }
+
+                binding.giphyEndList.visibility =
+                    if (latestIsVisible && isEndOfList) VISIBLE else GONE
+            }
+        })
     }
 
     override fun onBackPressed() {
@@ -146,36 +190,59 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         }
 
         screenGifWidth = (widthScreen / numColumns) - (px2dp(GIF_MARGIN, outMetrics) * numColumns)
-        binding.giphyList.layoutManager =
-            StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
+        staggeredGridLayoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
+        binding.giphyList.layoutManager = staggeredGridLayoutManager
+
         giphyAdapter?.notifyDataSetChanged()
     }
 
     /**
      * Requests trending data to the Giphy API.
+     *
+     * @param scrolling True if the query corresponds to an scrolling action to the user,
+     *                  false otherwise
      */
-    private fun requestTrendingData() {
-        if (trendingData == null) getAndSetData(giphyService?.getGiphyTrending(), null)
-        else {
+    private fun requestTrendingData(scrolling: Boolean) {
+        if (scrolling && isEndOfList) return
+
+        if (trendingData.isEmpty() || scrolling) {
+            if (trendingData.isEmpty()) resetQueryValues()
+
+            getAndSetData(giphyService?.getGiphyTrending(DEFAULT_LIMIT, queryOffset), null)
+        } else {
             cancelPreviousRequests()
-            updateAdapter(trendingData)
+            queryOffset = trendingData.size
+            updateAdapter(trendingData, true)
         }
     }
 
     /**
      * Requests search data to the Giphy API.
      *
-     * @param query The search String.
+     * @param query     The search String.
+     * @param scrolling True if the query corresponds to an scrolling action to the user,
+     *                  false otherwise
      */
-    private fun requestSearchData(query: String) {
+    private fun requestSearchData(query: String, scrolling: Boolean) {
+        if (scrolling && isEndOfList) return
+
         val searchValue = searchData[query]
 
-        if (searchValue == null) {
-            getAndSetData(giphyService?.getGiphySearch(query), query)
+        if (searchValue == null || scrolling) {
+            if (searchValue == null) resetQueryValues()
+
+            getAndSetData(giphyService?.getGiphySearch(query, DEFAULT_LIMIT, queryOffset), query)
         } else {
             cancelPreviousRequests()
-            updateAdapter(searchValue)
+            queryOffset = searchValue.size
+            updateAdapter(searchValue, true)
         }
+    }
+
+    private fun resetQueryValues() {
+        binding.giphyEndList.visibility = GONE
+        queryOffset = DEFAULT_LIMIT
+        isEndOfList = false
     }
 
     /**
@@ -183,8 +250,8 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
      *  showing the result on screen if everything was correct.
      *  If there is already a request in progress, cancels it to launch the new one.
      *
-     * @param call              Indicates the type of the request. It can be Trending or Search.
-     * @param query             Search query if is a search request, null otherwise.
+     * @param call  Indicates the type of the request. It can be Trending or Search.
+     * @param query Search query if is a search request, null otherwise.
      */
     private fun getAndSetData(call: Call<GiphyResponse>?, query: String?) {
         cancelPreviousRequests()
@@ -192,11 +259,35 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
         call?.enqueue(object : Callback<GiphyResponse> {
             override fun onResponse(call: Call<GiphyResponse>, response: Response<GiphyResponse>) {
                 if (response.isSuccessful) {
+                    isEndOfList = false
+
                     val gifData = response.body()?.data
+                    if (gifData == null || gifData.isEmpty()) {
+                        if (query == null || (searchData[query] != null && searchData[query]?.isNotEmpty() == true)) {
+                            isEndOfList = true
+                        } else {
+                            searchData[query] = ArrayList()
+                            updateAdapter(searchData[query], false)
+                        }
 
-                    if (query == null) trendingData = gifData else searchData[query] = gifData
+                        return
+                    }
 
-                    updateAdapter(gifData)
+                    if (gifData.size < DEFAULT_LIMIT) isEndOfList = true
+                    else queryOffset += DEFAULT_LIMIT
+
+                    if (query == null) {
+                        trendingData.addAll(gifData)
+                        updateAdapter(trendingData, false)
+                    } else {
+                        var searchDataValue = searchData[query]
+
+                        if (searchDataValue == null) searchDataValue = gifData
+                        else searchDataValue.addAll(gifData)
+
+                        searchData[query] = searchDataValue
+                        updateAdapter(searchData[query], false)
+                    }
                 } else {
                     logError("GiphyResponse failed.")
                 }
@@ -221,17 +312,26 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
 
     /**
      * Updates the adapter with new data.
+     *
+     * @param gifsData          Data to set in the adapter
+     * @param isChangeOfType    True if the adapter has to change from trending to search data
+     *                          or vice versa, false otherwise
      */
-    private fun updateAdapter(gifsData: ArrayList<Data>?) {
-        if (giphyAdapter == null) {
-            giphyAdapter = GiphyAdapter(gifsData, this@GiphyActivity)
-            binding.giphyList.adapter = giphyAdapter
-            binding.giphyListView.visibility = VISIBLE
-        } else {
-            giphyAdapter?.setGifs(gifsData)
+    private fun updateAdapter(gifsData: ArrayList<Data>?, isChangeOfType: Boolean) {
+        when {
+            giphyAdapter == null -> {
+                giphyAdapter = GiphyAdapter(gifsData, this@GiphyActivity)
+                binding.giphyList.adapter = giphyAdapter
+                binding.giphyListView.visibility = VISIBLE
+            }
+            isChangeOfType || gifsData?.size!! <= DEFAULT_LIMIT -> {
+                giphyAdapter?.setGifs(gifsData)
+                binding.giphyList.scrollToPosition(0)
+            }
+            else -> {
+                giphyAdapter?.addGifs(gifsData)
+            }
         }
-
-        binding.giphyList.scrollToPosition(0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -255,7 +355,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                requestTrendingData()
+                requestTrendingData(false)
                 return true
             }
         })
@@ -267,10 +367,11 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                currentQuery = newText
                 if (isTextEmpty(newText)) {
-                    requestTrendingData()
+                    requestTrendingData(false)
                 } else {
-                    requestSearchData(newText.toString())
+                    requestSearchData(newText.toString(), false)
                 }
 
                 return true

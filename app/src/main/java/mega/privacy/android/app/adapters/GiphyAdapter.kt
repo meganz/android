@@ -32,6 +32,13 @@ class GiphyAdapter(private var gifs: List<Data>?, private val giphyInterface: Gi
         notifyDataSetChanged()
     }
 
+    fun addGifs(newGifs: ArrayList<Data>?) {
+        val oldLatestPosition = itemCount
+        gifs = newGifs
+        giphyInterface.setEmptyState(gifs?.isEmpty() ?: true)
+        notifyItemRangeInserted(oldLatestPosition, gifs?.size!!)
+    }
+
     override fun onClick(v: View?) {
         val holder = v?.tag as GiphyViewHolder
         giphyInterface.openGifViewer(holder.gifData)
