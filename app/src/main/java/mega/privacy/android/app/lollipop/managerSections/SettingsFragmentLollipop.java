@@ -10,7 +10,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
-import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -144,10 +143,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         autoAccept = true;
     }
 
-    public void updateCUSubtitle(boolean isCameraUploadOn) {
-        cameraUploadsPreference.setSummary(getString(isCameraUploadOn ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off));
-    }
-
     private void updatePasscodeLock() {
         if (prefs == null || prefs.getPinLockEnabled() == null) {
             pinLock = false;
@@ -167,10 +162,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      */
     public void refreshCameraUploadsSettings() {
         boolean isCameraUploadOn = false;
+        prefs = dbH.getPreferences();
         if(prefs != null && prefs.getCamSyncEnabled() != null){
             isCameraUploadOn = Boolean.parseBoolean(prefs.getCamSyncEnabled());
         }
-        updateCUSubtitle(isCameraUploadOn);
+
+        cameraUploadsPreference.setSummary(getString(isCameraUploadOn ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off));
     }
 
     @Override

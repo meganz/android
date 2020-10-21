@@ -6,14 +6,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCUFragment;
 import mega.privacy.android.app.utils.Util;
+
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
@@ -33,18 +37,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private BroadcastReceiver disableMediaUploadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_UPDATE_DISABLE_MU_SETTING)) {
-                sttCameraUploads.disableMediaUploadUIProcess();
-            }
-        }
-    };
-
     private BroadcastReceiver disableCameraUploadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -53,6 +45,18 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
             if (intent.getAction().equals(ACTION_UPDATE_DISABLE_CU_SETTING)) {
                 sttCameraUploads.disableCameraUpload();
+            }
+        }
+    };
+
+    private BroadcastReceiver disableMediaUploadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
+                return;
+
+            if (intent.getAction().equals(ACTION_UPDATE_DISABLE_MU_SETTING)) {
+                sttCameraUploads.disableMediaUploadUIProcess();
             }
         }
     };
@@ -90,7 +94,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                 return;
 
             synchronized (this) {
-                long handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, -1);
+                long handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, INVALID_HANDLE);
                 boolean isSecondary = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false);
                 sttCameraUploads.setCUDestinationFolder(isSecondary, handleInUserAttr);
             }
@@ -130,27 +134,31 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
         sttCameraUploads = new SettingsCUFragment();
         replaceFragment(sttCameraUploads);
 
-        registerReceiver(offlineReceiver, new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
-        registerReceiver(cameraUploadDestinationReceiver, new IntentFilter(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING));
-        registerReceiver(enableCameraUploadReceiver, new IntentFilter(ACTION_UPDATE_ENABLE_CU_SETTING));
-        registerReceiver(disableCameraUploadUIReceiver, new IntentFilter(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
-
-        registerReceiver(disableCameraUploadReceiver, new IntentFilter(ACTION_UPDATE_DISABLE_CU_SETTING));
-        registerReceiver(disableMediaUploadReceiver, new IntentFilter(ACTION_UPDATE_DISABLE_MU_SETTING));
-
-        IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+        registerReceiver(offlineReceiver,
+                new IntentFilter(ACTION_UPDATE_ONLINE_OPTIONS_SETTING));
+        registerReceiver(cameraUploadDestinationReceiver,
+                new IntentFilter(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING));
+        registerReceiver(enableCameraUploadReceiver,
+                new IntentFilter(ACTION_UPDATE_ENABLE_CU_SETTING));
+        registerReceiver(disableCameraUploadUIReceiver,
+                new IntentFilter(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
+        registerReceiver(disableCameraUploadReceiver,
+                new IntentFilter(ACTION_UPDATE_DISABLE_CU_SETTING));
+        registerReceiver(disableMediaUploadReceiver,
+                new IntentFilter(ACTION_UPDATE_DISABLE_MU_SETTING));
+        IntentFilter filterUpdateCUSettings =
+                new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
-
         registerReceiver(receiverCUAttrChanged,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -158,23 +166,28 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         switch (requestCode) {
             case REQUEST_CAMERA_UPLOAD: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert(false);
+                    checkIfShouldShowBusinessCUAlert();
                 } else {
                     Util.showSnackbar(this, getString(R.string.on_refuse_storage_permission));
                 }
-
                 break;
             }
         }
     }
 
+    /**
+     * Method for enabling Camera Uploads.
+     */
     private void enableCU() {
         if (sttCameraUploads != null) {
             sttCameraUploads.enableCameraUpload();
         }
     }
 
-    public void checkIfShouldShowBusinessCUAlert(boolean firstTime) {
+    /**
+     * Method to check if Business alert needs to be displayed before enabling Camera Uploads.
+     */
+    public void checkIfShouldShowBusinessCUAlert() {
         if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
             showBusinessCUAlert();
         } else {
@@ -182,6 +195,9 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     }
 
+    /**
+     * Method for displaying the Business alert.
+     */
     private void showBusinessCUAlert() {
         if (businessCUAlert != null && businessCUAlert.isShowing()) {
             return;
@@ -197,7 +213,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         businessCUAlert = builder.create();
         businessCUAlert.show();
     }
-
 
     @Override
     protected void onDestroy() {

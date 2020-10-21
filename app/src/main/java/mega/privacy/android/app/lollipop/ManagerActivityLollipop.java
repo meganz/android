@@ -1339,7 +1339,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING) && getSettingsFragment() != null) {
+			if (intent != null && intent.getAction() != null && (intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING) || intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE)) && getSettingsFragment() != null) {
+				logDebug("************* ManagerActivityLollipop --> refreshCameraUploadsSettings()");
 				sttFLol.refreshCameraUploadsSettings();
 			}
 		}
@@ -2037,6 +2038,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
