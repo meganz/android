@@ -11,7 +11,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/divider_upgrade_account"
+        android:background="@color/black_12_alpha"
         app:layout_constraintTop_toTopOf="parent"
         />
     <com.facebook.drawee.view.SimpleDraweeView
