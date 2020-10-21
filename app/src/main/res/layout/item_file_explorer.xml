@@ -26,25 +26,23 @@
             android:layout_height="wrap_content"
             android:scrollHorizontally="true"
             android:layout_marginTop="16dp"
-            android:textColor="@color/file_list_first_row"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textSize="16sp"/>
+            android:textAppearance="@style/TextAppearance.Mega.Body1" />
     </HorizontalScrollView>
-    
+
     <TextView
         android:id="@+id/file_explorer_filesize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/file_explorer_thumbnail"
         android:layout_below="@+id/scroll_view_filename"
-        android:textColor="@color/file_list_second_row"
         android:layout_marginLeft="13dp"
         android:layout_marginRight="12dp"
-        android:textSize="14sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
     <ImageView
         android:id="@+id/file_explorer_permissions"

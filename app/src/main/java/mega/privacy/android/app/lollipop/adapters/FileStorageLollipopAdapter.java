@@ -112,11 +112,13 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
             case PICK_FILE:
                 boolean isReadable = document.getFile().canRead();
                 setViewAlpha(holder.imageView, isReadable ? 1 : .4f);
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, isReadable ? android.R.color.black : R.color.text_secondary));
 
                 boolean isReadableAndSelected = isReadable && multipleSelect && isItemChecked(position);
-                holder.itemLayout.setBackgroundColor(isReadableAndSelected ? ContextCompat.getColor(context, R.color.new_multiselect_color) : Color.WHITE);
-
+                if (isReadableAndSelected) {
+                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+                } else {
+                    holder.itemLayout.setBackground(null);
+                }
 
                 if (document.isFolder()) {
                     holder.imageView.setImageResource(isReadableAndSelected ? R.drawable.ic_select_folder
@@ -139,12 +141,8 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
                 if (document.isFolder()) {
                     holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                    setViewAlpha(holder.imageView, 1);
-                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
                 } else {
                     holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-                    setViewAlpha(holder.imageView, .4f);
-                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
                 }
                 break;
 
@@ -155,8 +153,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
                     holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
                     ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
                 }
-
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
                 break;
         }
     }

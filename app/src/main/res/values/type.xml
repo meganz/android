@@ -35,6 +35,9 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:letterSpacing">0.017857143</item>
     </style>
+    <style name="TextAppearance.Mega.Body2.Primary" parent="TextAppearance.Mega.Body2">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
 
     <!-- Regular, 14sp, -0.05px, textColorPrimary-->
     <style name="ListView.Header.Item" parent="TextAppearance.MaterialComponents.Body2">
@@ -50,6 +53,11 @@
     </style>
     <style name="TextAppearance.Mega.Body1.Secondary" parent="TextAppearance.Mega.Body1">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="TextAppearance.Mega.Body1.Medium" parent="TextAppearance.Mega.Body1">
+        <!-- Fake Roboto Medium. -->
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- Medium, 14sp, textColorPrimary -->

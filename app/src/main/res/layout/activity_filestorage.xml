@@ -1,23 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/file_storage_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fitsSystemWindows="true"
-    tools:context=".FileStorageActivityLollipop">
+    android:fitsSystemWindows="true" >
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_filestorage"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:popupTheme="@style/Theme.Megaactionbar"
         app:subtitleTextAppearance="@style/ToolbarSubtitle"
-        app:theme="@style/Theme.Megaactionbar"
         app:titleTextAppearance="@style/ToolbarTitle"
-        tools:context=".FolderLinkActivityLollipop" />
+        style="@style/MEGAToolBar" />
 
     <TextView
         android:id="@+id/file_storage_content_text"
@@ -25,14 +19,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar_filestorage"
         android:ellipsize="start"
-        android:fontFamily="sans-serif-light"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:paddingTop="3dp"
         android:paddingBottom="3dp"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Primary" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -58,7 +49,6 @@
                 android:id="@+id/file_storage_empty_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
                 android:textSize="16sp" />
         </LinearLayout>
     </RelativeLayout>
@@ -81,19 +71,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_internal_storage"/>
+                android:src="@drawable/ic_internal_storage"
+                app:tint="?attr/colorOnPrimary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
                 android:layout_marginEnd="21dp"
-                android:layout_toRightOf="@id/internal_extorage_image"
+                android:layout_toEndOf="@id/internal_extorage_image"
                 android:layout_centerVertical="true"
-                android:textSize="16sp"
-                android:textColor="@color/name_my_account"
-                android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
+                android:textAppearance="@style/TextAppearance.Mega.Body1.Medium"
                 android:text="@string/internal_storage_label"/>
 
         </RelativeLayout>
@@ -101,8 +89,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="60dp"
-            android:background="@color/black_12_alpha"/>
+            android:layout_marginStart="60dp"
+            android:background="@color/list_item_divider"/>
 
         <RelativeLayout
             android:id="@+id/external_storage_layout"
@@ -115,19 +103,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_external_storage"/>
+                android:src="@drawable/ic_external_storage"
+                app:tint="?attr/colorOnPrimary"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
                 android:layout_marginEnd="21dp"
-                android:layout_toRightOf="@id/external_extorage_image"
+                android:layout_toEndOf="@id/external_extorage_image"
                 android:layout_centerVertical="true"
-                android:textSize="16sp"
-                android:textColor="@color/name_my_account"
-                android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
+                android:textAppearance="@style/TextAppearance.Mega.Body1.Medium"
                 android:text="@string/external_storage_label"/>
 
         </RelativeLayout>
@@ -135,8 +121,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="60dp"
-            android:background="@color/black_12_alpha"/>
+            android:layout_marginStart="60dp"
+            android:background="@color/list_item_divider"/>
 
     </LinearLayout>
 
@@ -146,17 +132,17 @@
         android:layout_height="match_parent"
         android:layout_below="@id/file_storage_content_text"
         android:choiceMode="multipleChoice"
-		android:layout_above="@+id/options_file_storage_layout"/>
+		    android:layout_above="@+id/options_file_storage_layout"/>
 
     <LinearLayout
         android:id="@+id/options_file_storage_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-		android:layout_alignParentEnd="true"
+		    android:layout_alignParentEnd="true"
         android:layout_marginBottom="16dp"
-		android:padding="5dp"
-        android:gravity="right|center_vertical"
+		    android:padding="5dp"
+        android:gravity="end|center_vertical"
         android:orientation="horizontal">
 
         <Button
@@ -164,15 +150,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:textColor="@color/accentColor"
-            style="@style/ButtonStyleWithoutBorder" />
+            style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/file_storage_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="19dp"
-            style="@style/ButtonStyleWithoutBorder" />
+            style="@style/Button" />
 
     </LinearLayout>
 
