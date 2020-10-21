@@ -887,7 +887,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         menu!!.findItem(R.id.cab_menu_select_all).isVisible =
             (viewModel.getSelectedNodesCount()
                     < getItemCount() - viewModel.placeholderCount)
-        menu.findItem(R.id.cab_menu_share_out).isVisible = !viewModel.folderSelected()
 
         return true
     }
