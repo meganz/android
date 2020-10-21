@@ -84,6 +84,7 @@ public class BroadcastConstants {
     public static final String PRESENCE_CANCELLED = "PRESENCE_CANCELLED";
     public static final String CACHE_SIZE = "CACHE_SIZE";
     public static final String OFFLINE_SIZE = "OFFLINE_SIZE";
+    public static final String VOLUME_CALL = "VOLUME_CALL";
     public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
     public static final String SECONDARY_FOLDER = "SECONDARY_FOLDER";
     public static final String PRIMARY_HANDLE = "PRIMARY_HANDLE";

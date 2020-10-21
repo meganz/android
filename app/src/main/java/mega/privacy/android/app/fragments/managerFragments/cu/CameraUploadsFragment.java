@@ -222,7 +222,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         res[1] += res[3] / 2;
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
         intent.putExtra("screenPosition", res);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     private void navigateToCloudDrive() {
