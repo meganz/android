@@ -141,7 +141,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 nodeThumb.setImageResource(R.drawable.ic_folder_list);
             }
 
-            if (nodeOffline.isFolder()) {
+            if (nodeOffline.isFolder() && !isOnline(context)) {
                 optionShare.setVisibility(View.GONE);
                 contentView.findViewById(R.id.separator_share).setVisibility(View.GONE);
             }

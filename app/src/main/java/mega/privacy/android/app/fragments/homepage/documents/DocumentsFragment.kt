@@ -25,39 +25,21 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentDocumentsBinding
-import mega.privacy.android.app.fragments.homepage.ActionModeCallback
-import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
-import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
-import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
-import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.NodeListAdapter
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
-import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
-import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.DraggingThumbnailCallback
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.app.utils.displayMetrics
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -77,7 +59,8 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
-    @Inject lateinit var megaApi: MegaApiAndroid
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
     private var openingNodeHandle = INVALID_HANDLE
 

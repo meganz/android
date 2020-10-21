@@ -12,15 +12,9 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.fragments.homepage.avatarChange
-import mega.privacy.android.app.fragments.homepage.chatOnlineStatusChange
-import mega.privacy.android.app.fragments.homepage.notificationCountChange
-import mega.privacy.android.app.fragments.homepage.scrolling
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.listeners.DefaultMegaRequestListener
-import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
-import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
-import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
+import mega.privacy.android.app.utils.AvatarUtil.*
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil

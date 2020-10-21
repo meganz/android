@@ -20,15 +20,10 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
-import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
-import mega.privacy.android.app.utils.Constants.BACK_PRESS_NOT_HANDLED
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
+import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -38,8 +33,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.util.Locale
-import java.util.Stack
+import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
@@ -147,16 +141,6 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun getDisplayedNodesCount(): Int = nodes.value?.first?.size ?: 0
-
-    fun folderSelected(): Boolean {
-        for (i in 0 until selectedNodes.size()) {
-            if (selectedNodes.valueAt(i).isFolder) {
-                return true
-            }
-        }
-
-        return false
-    }
 
     fun selectAll() {
         val nodeList = nodes.value?.first ?: return

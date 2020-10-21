@@ -10,19 +10,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -47,34 +40,13 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG
-import mega.privacy.android.app.utils.Constants.HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ACTION_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.DraggingThumbnailCallback
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.scaleHeightPx
-import mega.privacy.android.app.utils.autoCleared
-import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -623,8 +595,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 )
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                if (!setLocalIntentParams(context, node.node, mediaIntent, file.absolutePath,
-                        false)) {
+                if (!setLocalIntentParams(
+                        context, node.node, mediaIntent, file.absolutePath,
+                        false
+                    )
+                ) {
                     return
                 }
 
@@ -649,8 +624,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     }
 
                     val intentShare = Intent(Intent.ACTION_SEND)
-                    if (setLocalIntentParams(context, node.node, intentShare, file.absolutePath,
-                            false)) {
+                    if (setLocalIntentParams(
+                            context, node.node, intentShare, file.absolutePath,
+                            false
+                        )
+                    ) {
                         intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
                             logDebug("Call to startActivity(intentShare)")
@@ -909,7 +887,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         menu!!.findItem(R.id.cab_menu_select_all).isVisible =
             (viewModel.getSelectedNodesCount()
                     < getItemCount() - viewModel.placeholderCount)
-        menu.findItem(R.id.cab_menu_share_out).isVisible = !viewModel.folderSelected()
 
         return true
     }

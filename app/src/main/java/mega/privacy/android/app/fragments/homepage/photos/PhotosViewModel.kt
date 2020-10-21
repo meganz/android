@@ -3,7 +3,8 @@ package mega.privacy.android.app.fragments.homepage.photos
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
+import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.*
@@ -22,6 +23,7 @@ class PhotosViewModel @ViewModelInject constructor(
 
     // Whether a photo loading is in progress
     private var loadInProgress = false
+
     // Whether another photo loading should be executed after current loading
     private var pendingLoad = false
 
@@ -114,7 +116,7 @@ class PhotosViewModel @ViewModelInject constructor(
      * the underlying meta data of items may have been changed.
      */
     fun refreshUi() {
-        items.value?.forEach {item ->
+        items.value?.forEach { item ->
             item.uiDirty = true
         }
         loadPhotos()

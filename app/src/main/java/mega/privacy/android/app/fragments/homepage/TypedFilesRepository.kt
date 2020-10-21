@@ -12,17 +12,13 @@ import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 class TypedFilesRepository @Inject constructor(

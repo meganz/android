@@ -4,6 +4,7 @@ interface HomepageSearchable {
     fun shouldShowSearchMenu(): Boolean {
         return true
     }
+
     fun searchReady() {}
     fun exitSearch() {}
     fun searchQuery(query: String) {}
