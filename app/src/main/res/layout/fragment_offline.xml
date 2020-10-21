@@ -1,58 +1,53 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    >
+    android:background="@color/white">
 
-  <LinearLayout
-      android:id="@+id/empty_hint"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/recycler_view_separator"
-      android:gravity="center_horizontal"
-      android:layout_gravity="center_horizontal"
-      android:orientation="vertical"
-      android:visibility="gone"
-      tools:visibility="visible"
-      >
-
-    <ImageView
-        android:id="@+id/empty_hint_image"
+    <LinearLayout
+        android:id="@+id/empty_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:src="@drawable/ic_empty_offline"
-        />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/recycler_view_separator"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-    <TextView
-        android:id="@+id/empty_hint_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/text_secondary"
-        android:textSize="18sp"
-        tools:text="@string/context_empty_offline"
-        />
-  </LinearLayout>
+        <ImageView
+            android:id="@+id/empty_hint_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:src="@drawable/ic_empty_offline" />
 
-  <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/offline_browser_list"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:visibility="gone"
-      tools:visibility="visible"
-      />
+        <TextView
+            android:id="@+id/empty_hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/text_secondary"
+            android:textSize="18sp"
+            tools:text="@string/context_empty_offline" />
+    </LinearLayout>
 
-  <mega.privacy.android.app.components.NewGridRecyclerView
-      android:id="@+id/offline_browser_grid"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:choiceMode="multipleChoice"
-      android:columnWidth="172dp"
-      android:paddingLeft="4dp"
-      android:paddingRight="4dp"
-      android:visibility="gone"
-      tools:visibility="visible"
-      />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/offline_browser_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <mega.privacy.android.app.components.NewGridRecyclerView
+        android:id="@+id/offline_browser_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="multipleChoice"
+        android:columnWidth="172dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </FrameLayout>

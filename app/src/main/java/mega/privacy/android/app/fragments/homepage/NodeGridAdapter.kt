@@ -1,12 +1,9 @@
 package mega.privacy.android.app.fragments.homepage
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemNodeGridBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 

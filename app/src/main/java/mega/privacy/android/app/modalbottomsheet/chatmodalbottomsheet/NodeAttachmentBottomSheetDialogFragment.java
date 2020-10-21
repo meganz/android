@@ -12,9 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -30,6 +33,8 @@ import nz.mega.sdk.MegaNodeList;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -110,6 +115,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionImport = contentView.findViewById(R.id.option_import_layout);
         LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
+        SwitchMaterial offlineSwitch = contentView.findViewById(R.id.option_save_offline_switch);
 
         optionDownload.setOnClickListener(this);
         optionView.setOnClickListener(this);
@@ -176,6 +182,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             showSingleNodeSelected();
         }
 
+        offlineSwitch.setChecked(availableOffline(context, node));
+        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
     }
@@ -250,13 +258,20 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 chatC.importNode(messageId, chatId);
                 break;
 
+            case R.id.option_save_offline_switch:
             case R.id.option_save_offline_layout:
-                if (message != null) {
+                if (message == null) {
+                    logWarning("Message is NULL");
+                    return;
+                }
+
+                if (availableOffline(context, node)) {
+                    MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
+                    removeOffline(mOffDelete, dbH, context);
+                } else {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
                     chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
-                } else {
-                    logWarning("Message is NULL");
                 }
                 break;
         }

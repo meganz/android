@@ -1,7 +1,5 @@
 package mega.privacy.android.app.fragments.offline
 
-import android.content.DialogInterface
-import android.content.DialogInterface.OnClickListener
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -142,15 +140,6 @@ class OfflineFileInfoFragment : Fragment() {
     }
 
     private fun removeFromOffline(node: MegaOffline, onConfirmed: () -> Unit) {
-        val dialogClickListener = OnClickListener { _, which ->
-            when (which) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    NodeController(requireContext()).deleteOffline(node)
-                    onConfirmed()
-                }
-            }
-        }
-
         MaterialAlertDialogBuilder(requireContext(), R.style.MEGAMaterialAlertDialogStyle)
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
             .setPositiveButton(R.string.general_remove) { _, _ ->

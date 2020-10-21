@@ -6,14 +6,12 @@ import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
-import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaShare
-import java.util.ArrayList
+import java.util.*
 
 class ActionModeCallback constructor(
     private val mainActivity: ManagerActivityLollipop,

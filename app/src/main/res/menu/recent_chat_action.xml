@@ -3,6 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/cab_menu_mute"
+        android:icon="@drawable/ic_mute_white"
+        android:orderInCategory="90"
+        android:title="@string/general_mute"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/cab_menu_unmute"
+        android:icon="@drawable/ic_unmute_white"
+        android:orderInCategory="90"
+        android:title="@string/general_unmute"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/cab_menu_archive"
         android:icon="@drawable/ic_w_archive"
         android:orderInCategory="100"
@@ -15,22 +31,6 @@
         android:icon="@drawable/ic_w_unarchive"
         android:orderInCategory="100"
         android:title="@string/general_unarchive"
-        app:iconTint="?attr/colorSecondary"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/cab_menu_mute"
-        android:icon="@drawable/ic_mute_white"
-        android:orderInCategory="100"
-        android:title="@string/general_mute"
-        app:iconTint="?attr/colorSecondary"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/cab_menu_unmute"
-        android:icon="@drawable/ic_unmute_white"
-        android:orderInCategory="100"
-        android:title="@string/general_unmute"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />
 

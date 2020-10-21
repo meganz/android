@@ -201,10 +201,17 @@
       android:visible="false"
       app:showAsAction="never" />
 
-  <item
+    <item
+        android:id="@+id/action_menu_do_not_disturb"
+        android:orderInCategory="140"
+        android:title="@string/title_dialog_mute_chat_notifications"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
       android:id="@+id/action_menu_upgrade_account"
       android:icon="@drawable/ic_action_bar_null"
-      android:orderInCategory="140"
+      android:orderInCategory="145"
       android:title="@string/action_upgrade_account"
       android:visible="false"
       app:showAsAction="never" />

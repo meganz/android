@@ -56,4 +56,16 @@
       android:orderInCategory="125"
       android:title="@string/general_leave"
       app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_mute_chat"
+        android:orderInCategory="130"
+        android:title="@string/general_mute"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_unmute_chat"
+        android:orderInCategory="130"
+        android:title="@string/general_unmute"
+        app:showAsAction="never" />
 </menu>

@@ -755,7 +755,8 @@ public class OfflineUtils {
     }
 
     /**
-     * Shares multiple offline nodes, only files are supported.
+     * Shares multiple offline nodes. If any node is a folder and the app has network connection,
+     * then share links, otherwise share files.
      *
      * @param context the current Context
      * @param offlineNodes offline nodes to share
@@ -774,6 +775,16 @@ public class OfflineUtils {
                 files.add(getOfflineFile(context, offlineNode));
             }
             shareFiles(context, files);
+        } else if (isOnline(context)) {
+            List<MegaNode> nodes = new ArrayList<>();
+            for (MegaOffline offlineNode : offlineNodes) {
+                MegaNode node = MegaApplication.getInstance().getMegaApi()
+                    .getNodeByHandle(Long.parseLong(offlineNode.getHandle()));
+                if (node != null) {
+                    nodes.add(node);
+                }
+            }
+            shareNodes(context, nodes);
         }
     }
 }

@@ -10,12 +10,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
+import nz.mega.sdk.MegaApiJava.*
 
 class SortByHeaderViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context

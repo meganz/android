@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import java.util.Objects;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.TextUtil;
 
 public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
@@ -56,7 +57,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
         final Rect bounds = getBounds();
 
-        if (text == null || text.length() == 0) {
+        if (TextUtil.isTextEmpty(text)) {
             return;
         }
 
