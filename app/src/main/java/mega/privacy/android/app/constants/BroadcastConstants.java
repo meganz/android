@@ -12,6 +12,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_CALL_UPDATE = "INTENT_CALL_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_SESSION_UPDATE = "INTENT_SESSION_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE";
+    public static final String BROADCAST_ACTION_INTENT_MUTE_CHATROOM = "INTENT_MUTE_CHATROOM";
     public static final String BROADCAST_ACTION_INTENT_TRANSFER_UPDATE = "BROADCAST_ACTION_INTENT_TRANSFER_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR = "INTENT_PROXIMITY_SENSOR";
     public static final String BROADCAST_ACTION_INTENT_LEFT_CHAT = "INTENT_LEFT_CHAT";
@@ -30,6 +31,7 @@ public class BroadcastConstants {
     public static final String ACTION_CHANGE_AUDIO_LEVEL = "ACTION_CHANGE_AUDIO_LEVEL";
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
+    public static final String ACTION_UPDATE_PUSH_NOTIFICATION_SETTING = "ACTION_UPDATE_PUSH_NOTIFICATION_SETTING";
     public static final String ACTION_TRANSFER_OVER_QUOTA = "ACTION_TRANSFER_OVER_QUOTA";
     public static final String ACTION_UPDATE_NICKNAME = "ACTION_UPDATE_NICKNAME";
     public static final String ACTION_UPDATE_FIRST_NAME = "ACTION_UPDATE_FIRST_NAME";
@@ -60,9 +62,12 @@ public class BroadcastConstants {
     public static final String UPDATE_SESSION_STATUS = "UPDATE_SESSION_STATUS";
     public static final String UPDATE_SESSION_TERM_CODE = "UPDATE_SESSION_TERM_CODE";
     public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
+    public static final String MUTE_CHATROOM_ID = "MUTE_CHATROOM_ID";
+    public static final String TYPE_MUTE = "TYPE_MUTE";
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";
     public static final int EXTRA_BROADCAST_INVALID_VALUE = -1;
     public static final String FILE_EXPLORER_CHAT_UPLOAD = "FILE_EXPLORER_CHAT_UPLOAD";
     public static final String SNACKBAR_TEXT = "SNACKBAR_TEXT";
+    public static final String VOLUME_CALL = "VOLUME_CALL";
     public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
 }
