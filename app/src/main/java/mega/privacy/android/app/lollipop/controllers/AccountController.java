@@ -41,6 +41,8 @@ import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
@@ -411,6 +413,15 @@ public class AccountController {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         dbH.clearCredentials();
 
+        CuSyncManager manager = new CuSyncManager();
+        if (CameraUploadUtil.isPrimaryEnabled()) {
+            manager.removePrimaryBackup();
+        }
+
+        if (CameraUploadUtil.isSecondaryEnabled()) {
+            manager.removePrimaryBackup();
+        }
+
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
@@ -434,6 +445,8 @@ public class AccountController {
         dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
         dbH.clearChatSettings();
+
+        dbH.clearBackups();
 
         //clear mega contacts and reset last sync time.
         dbH.clearMegaContacts();

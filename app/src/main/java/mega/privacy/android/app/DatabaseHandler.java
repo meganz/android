@@ -2937,7 +2937,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (enabled) {
             syncManager.setPrimaryBackup();
         } else {
-            syncManager.deletePrimaryBackup();
+            syncManager.removePrimaryBackup();
         }
 	}
 
@@ -2960,7 +2960,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (enabled) {
             syncManager.setSecondaryBackup();
         } else {
-            syncManager.deleteSecondaryBackup();
+            syncManager.removeSecondaryBackup();
         }
 	}
 

@@ -226,11 +226,11 @@ class CuSyncManager {
         )
     }
 
-    fun deletePrimaryBackup() {
+    fun removePrimaryBackup() {
         removeBackup(databaseHandler.cuSyncPair?.backupId)
     }
 
-    fun deleteSecondaryBackup() {
+    fun removeSecondaryBackup() {
         removeBackup(databaseHandler.muSyncPair?.backupId)
     }
 
