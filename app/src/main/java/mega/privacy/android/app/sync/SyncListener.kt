@@ -1,9 +1,7 @@
 package mega.privacy.android.app.sync
 
 import android.content.Context
-import mega.privacy.android.app.sync.mock.MockListener
-import mega.privacy.android.app.sync.mock.RequestType
-import mega.privacy.android.app.sync.mock.SyncEventResult
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError

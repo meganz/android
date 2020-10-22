@@ -89,7 +89,7 @@ class CuSyncManager {
             return
         }
 
-        val cuSync = databaseHandler.cuSyncPair
+        val cuSync = databaseHandler.cuBackup
         if (cuSync == null) {
             setPrimaryBackup()
         } else {
@@ -119,7 +119,7 @@ class CuSyncManager {
             return
         }
 
-        val muSync = databaseHandler.muSyncPair
+        val muSync = databaseHandler.muBackup
         if (muSync == null) {
             setSecondaryBackup()
         } else {
@@ -149,7 +149,7 @@ class CuSyncManager {
             return
         }
 
-        val cuSync = databaseHandler.cuSyncPair
+        val cuSync = databaseHandler.cuBackup
         if (cuSync == null) {
             setPrimaryBackup()
         } else {
@@ -179,7 +179,7 @@ class CuSyncManager {
             return
         }
 
-        val muSync = databaseHandler.muSyncPair
+        val muSync = databaseHandler.muBackup
         if (muSync == null) {
             setSecondaryBackup()
         } else {
@@ -227,11 +227,11 @@ class CuSyncManager {
     }
 
     fun removePrimaryBackup() {
-        removeBackup(databaseHandler.cuSyncPair?.backupId)
+        removeBackup(databaseHandler.cuBackup?.backupId)
     }
 
     fun removeSecondaryBackup() {
-        removeBackup(databaseHandler.muSyncPair?.backupId)
+        removeBackup(databaseHandler.muBackup?.backupId)
     }
 
     private fun removeBackup(id: Long?) {

@@ -17,14 +17,15 @@ class RemoveBackupCallback : SyncEventCallback {
         error: MegaError?
     ) {
         request?.let {
-            getDatabase().deleteSyncPairById(it.parentHandle)
+            getDatabase().deleteBackupById(it.parentHandle)
             logDebug("Successful callback: delete ${it.parentHandle}.")
-            TL.log("Successful callback: delete ${it.parentHandle}.")
         }
     }
 
-    override fun onFail(result: SyncEventResult, error: MegaError?) {
-        logDebug("Delete sync with id ${result.syncId} failed.")
-        getDatabase().setSyncPairAsOutdated(result.syncId)
+    override fun onFail(request: MegaRequest?, error: MegaError?) {
+        logDebug("Delete sync with id ${request?.parentHandle} failed.")
+        request?.let {
+            getDatabase().setBackupAsOutdated(request.parentHandle)
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import static mega.privacy.android.app.sync.cusync.CuSyncManager.TYPE_BACKUP_SEC
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -4104,6 +4106,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_BACKUP_TARGET_NODE_PATH, encrypt(backup.getTargetFolderPath()));
         values.put(KEY_BACKUP_EX, encrypt(Boolean.toString(backup.isExcludeSubFolders())));
         values.put(KEY_BACKUP_DEL, encrypt(Boolean.toString(backup.isDeleteEmptySubFolders())));
+        values.put(KEY_BACKUP_NAME, encrypt(backup.getName()));
         // Default value is false.
         values.put(KEY_BACKUP_OUTDATED, encrypt(Boolean.toString(false)));
         long result = db.insertOrThrow(TABLE_BACKUPS, null, values);
@@ -4116,15 +4119,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public Backup getCuSyncPair() {
-        return getSyncPairByType(TYPE_BACKUP_PRIMARY);
+    public Backup getCuBackup() {
+        return getBackupByType(TYPE_BACKUP_PRIMARY);
     }
 
-    public Backup getMuSyncPair() {
-        return getSyncPairByType(TYPE_BACKUP_SECONDARY);
+    public Backup getMuBackup() {
+        return getBackupByType(TYPE_BACKUP_SECONDARY);
     }
 
-    private Backup getSyncPairByType(int type) {
+    private Backup getBackupByType(int type) {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_TYPE + " = " + type +
                 " AND " + KEY_BACKUP_OUTDATED + " = '" + decrypt(Boolean.FALSE.toString()) + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -4137,13 +4140,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void setSyncPairAsOutdated(long id) {
-        Backup backup = getSyncPairBySyncId(id);
+    public void setBackupAsOutdated(long id) {
+        Backup backup = getBackupById(id);
         backup.setOutdated(true);
-        updateSync(backup);
+        updateBackup(backup);
     }
 
-    public Backup getSyncPairBySyncId(long id) {
+    public Backup getBackupById(long id) {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_ID + " = '" + encrypt(Long.toString(id)) + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -4155,7 +4158,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public List<Backup> getAllSyncPairs() {
+    public List<Backup> getAllBackups() {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS;
         Cursor cursor = db.rawQuery(selectQuery, null);
         List<Backup> list = new ArrayList<>();
@@ -4188,11 +4191,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         );
     }
 
-    public void deleteSyncPairById(long id) {
+    public void deleteBackupById(long id) {
         db.execSQL(ToolsKt.deleteSQL(id));
     }
 
-    public void updateSync(Backup backup) {
+    public void updateBackup(Backup backup) {
         db.execSQL(ToolsKt.updateSQL(backup));
     }
 

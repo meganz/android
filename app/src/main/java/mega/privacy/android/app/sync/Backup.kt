@@ -14,10 +14,10 @@ data class Backup(
     var extraData: String = "",
     @ClientOnly var startTimestamp: Long = 0L,
     @ClientOnly var lastFinishTimestamp: Long = 0L,
-    @ClientOnly var targetFolderPath: String? = null,
+    @ClientOnly var targetFolderPath: String? = "null",
     @ClientOnly var isExcludeSubFolders: Boolean = false,
     @ClientOnly var isDeleteEmptySubFolders: Boolean = false,
-    @ClientOnly var name: String = "",
+    @ClientOnly var name: String = "null",
     @ClientOnly var outdated: Boolean = false
 ) {
 

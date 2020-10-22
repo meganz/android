@@ -17,7 +17,7 @@ class UpdateBackupCallback: SyncEventCallback {
         error: MegaError?
     ) {
         request?.let {
-            val backup = getDatabase().getSyncPairBySyncId(it.parentHandle)
+            val backup = getDatabase().getBackupById(it.parentHandle)
 
             if (backup != null && !backup.outdated) {
                 backup.apply {
@@ -26,7 +26,7 @@ class UpdateBackupCallback: SyncEventCallback {
                     state = it.access
                     subState = it.numDetails
                 }
-                getDatabase().updateSync(backup)
+                getDatabase().updateBackup(backup)
                 logDebug("Successful callback: update $backup.")
             }
         }

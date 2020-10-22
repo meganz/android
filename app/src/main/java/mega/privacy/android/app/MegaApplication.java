@@ -681,11 +681,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * If the client has enabled CU, but hasn't set backup, here create the backup for current account.
      */
     private void initCuSync() {
-	    if(CameraUploadUtil.isPrimaryEnabled() && dbH.getCuSyncPair() == null) {
+	    if(CameraUploadUtil.isPrimaryEnabled() && dbH.getCuBackup() == null) {
 	        new CuSyncManager().setPrimaryBackup();
         }
 
-        if(CameraUploadUtil.isSecondaryEnabled() && dbH.getMuSyncPair() == null) {
+        if(CameraUploadUtil.isSecondaryEnabled() && dbH.getMuBackup() == null) {
             new CuSyncManager().setSecondaryBackup();
         }
     }
