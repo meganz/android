@@ -79,7 +79,7 @@
 					android:layout_height="86dp"
 					android:layout_toRightOf="@id/upgrade_monthly_annualy_left_side"
 					android:layout_centerVertical="true"
-					android:background="@color/divider_upgrade_account" />
+					android:background="@color/black_12_alpha" />
 
 				<!-- Right side (storage and bandwidth)-->
 				<RelativeLayout

@@ -33,8 +33,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
-import static mega.privacy.android.app.utils.FileUtils.buildDefaultDownloadDir;
-import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
+import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.RxUtil.ignore;
 import static mega.privacy.android.app.utils.RxUtil.logErr;

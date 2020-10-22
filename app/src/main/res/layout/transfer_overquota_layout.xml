@@ -1,80 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="344dp"
-    android:layout_height="395dp">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/transfer_overquota_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="24dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/title_depleted_transfer_overquota"
+            android:textColor="@color/name_my_account"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/image_transfer_overquota"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="25dp"
+            android:src="@drawable/transfer_quota_empty" />
+
+        <TextView
+            android:id="@+id/text_transfer_overquota"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="24dp"
+            android:textColor="@color/dialog_text"
+            android:textSize="16sp"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/transfer_overquota_title"
+            <Button
+                android:id="@+id/transfer_overquota_button_dissmiss"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
+                android:layout_marginEnd="8dp"
+                android:text="@string/general_dismiss" />
+
+            <Button
+                android:id="@+id/transfer_overquota_button_payment"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_marginTop="24dp"
-                android:textColor="@color/name_my_account"
-                android:layout_gravity="center_horizontal"/>
-
-            <ImageView
-                android:id="@+id/image_transfer_overquota"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="34dp"
-                android:layout_gravity="center_horizontal"/>
-
-            <TextView
-                android:id="@+id/text_transfer_overquota"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="28dp"
-                android:layout_marginLeft="28dp"
-                android:layout_marginTop="30dp"
-                android:textSize="16sp"
-                android:gravity="center_horizontal"
-                android:textColor="@color/mail_my_account"
-                android:layout_gravity="center_horizontal"/>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="35dp"
-                android:layout_marginBottom="24dp"
-                android:layout_gravity="right"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/transfer_overquota_button_dissmiss"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
-                    android:text="@string/general_dismiss"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"/>
-
-                <Button
-                    android:id="@+id/transfer_overquota_button_payment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginLeft="22dp"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:stateListAnimator="@null"/>
-
-            </LinearLayout>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
-    </ScrollView>
+    </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

@@ -36,6 +36,7 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -57,7 +58,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -147,6 +148,15 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public TextView textViewFileNameForFile;
         public ImageView takenDownImageForFile;
         public ImageView fileGridSelected;
+    }
+
+    public static class ViewHolderOverQuotaBanner extends ViewHolderBrowser {
+
+        private ViewHolderOverQuotaBanner(View v) {
+            super(v);
+        }
+
+        TextView transferOverQuotaBannerText;
     }
 
     @Override
@@ -1259,7 +1269,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     /*
      * Get document at specified position
      */
-    public MegaNode getNodeAt(int position) {
+    private MegaNode getNodeAt(int position) {
         try {
             if (nodes != null) {
                 return nodes.get(position);

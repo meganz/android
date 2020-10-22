@@ -444,33 +444,43 @@
                         android:textSize="16sp"/>
                 </RelativeLayout>
 
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/option_save_offline_layout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.54"
-                        android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
                         android:src="@drawable/ic_b_save_offline"
                         android:visibility="visible" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/option_offline_text"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="72dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="15dp"
-                        android:text="@string/save_to_offline"
+                        android:layout_marginStart="15dp"
+                        android:layout_weight="5"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="@string/file_properties_available_offline"
                         android:textColor="@color/name_my_account"
-                        android:textSize="16sp"/>
-                </RelativeLayout>
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/file_properties_switch"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="16dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/delete_separator"
