@@ -48,6 +48,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
                             android:hint="@string/first_name_text"
+                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -82,6 +83,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/lastname_text"
+                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -116,6 +118,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/email_text"
+                            android:theme="@style/TextInputLayout"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText

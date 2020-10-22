@@ -72,6 +72,8 @@
         <!-- Used by the hint text color of TextInputLayout -->
         <item name="textColorHint">@color/grey_alpha_038</item>
 
+        <!-- Besides the global style, the TextInputLayout should apply android:theme to make its
+          child view TextInputEditText to have the correct underline color -->
         <item name="textInputStyle">@style/TextInputLayout</item>
 
         <!-- This Material style has a min width and height for enlarging the clickable area of checkbox.

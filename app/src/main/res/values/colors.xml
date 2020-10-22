@@ -262,7 +262,7 @@
     <!-- Entire screen background -->
     <color name="background">@color/white</color>
 
-    <color name="textinputlayout_underline_unfocused">@color/grey_alpha_038</color>
+    <color name="textinputlayout_underline_unfocused">@color/grey_alpha_012</color>
 
     <!-- The "eye" icon -->
     <color name="password_visible_icon">@color/grey_alpha_012</color>

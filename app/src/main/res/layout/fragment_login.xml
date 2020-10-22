@@ -44,6 +44,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="44dp"
                         android:hint="@string/email_text"
+                        android:theme="@style/TextInputLayout"
                         app:errorEnabled="true">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -73,11 +74,11 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/login_password_text_layout"
-                        style="@style/TextInputLayout.Password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
                         android:hint="@string/password_text"
+                        style="@style/TextInputLayout.Password"
                         android:theme="@style/TextInputLayout.Password"
                         app:errorEnabled="true">
 

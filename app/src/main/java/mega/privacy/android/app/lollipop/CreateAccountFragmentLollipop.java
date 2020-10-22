@@ -223,6 +223,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             @Override
             public void afterTextChanged(Editable editable) {
+                quitError(userPassword);
             }
         });
 
