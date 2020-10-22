@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.RelativeLayout
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
@@ -181,13 +182,25 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
     private fun updateView() {
         var widthScreen = 0
 
+        var paramsEmptyImage = binding.emptyGiphyImage.layoutParams as RelativeLayout.LayoutParams
+        var paramsEmptyText = binding.emptyGiphyText.layoutParams as RelativeLayout.LayoutParams
+
         if (screenOrientation == ORIENTATION_PORTRAIT) {
             numColumns = NUM_COLUMNS_PORTRAIT
             widthScreen = outMetrics.widthPixels
+
+            paramsEmptyImage.topMargin = px2dp(152F, resources.displayMetrics)
+            paramsEmptyText.topMargin = px2dp(12F, resources.displayMetrics)
         } else if (screenOrientation == ORIENTATION_LANDSCAPE) {
             numColumns = NUM_COLUMNS_LANDSCAPE
             widthScreen = outMetrics.heightPixels
+
+            paramsEmptyImage.topMargin = px2dp(20F, resources.displayMetrics)
+            paramsEmptyText.topMargin = 0
         }
+
+        binding.emptyGiphyImage.layoutParams = paramsEmptyImage
+        binding.emptyGiphyText.layoutParams = paramsEmptyText
 
         screenGifWidth = (widthScreen / numColumns) - (px2dp(GIF_MARGIN, outMetrics) * numColumns)
         staggeredGridLayoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)

@@ -61,7 +61,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="152dp"
                 android:src="@drawable/ic_no_gifs" />
 
             <TextView
@@ -70,7 +69,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/empty_giphy_image"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="12dp"
                 android:textAllCaps="true"
                 android:textColor="@color/grey_info_menu"
                 android:textSize="14sp" />
