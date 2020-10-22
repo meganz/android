@@ -11,9 +11,6 @@
     <color name="pass_good">#9FF4A1</color>
     <color name="pass_strong">#5BB5DE</color>
 
-    <!-- ProgressIndicator -->
-    <color name="linear_progress_track">@color/white_alpha_023</color>
-
     <color name="textinputlayout_underline_unfocused">@color/white_alpha_012</color>
 
     <color name="password_visible_icon">@color/white_alpha_038</color>

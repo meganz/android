@@ -298,10 +298,6 @@
      let's just keep them. -->
     <color name="name_my_account">@color/grey_alpha_087</color>
 
-    <!-- ProgressIndicator -->
-    <color name="linear_progress_indicator">@color/teal_300</color>
-    <color name="linear_progress_track">@color/grey_alpha_012</color>
-
     <!-- grid item background related colors -->
     <color name="grid_item_bg_stoke_color">@color/grey_alpha_012</color>
     <color name="grid_item_bg_solid_color">?android:attr/colorBackground</color>

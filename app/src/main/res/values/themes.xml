@@ -74,6 +74,14 @@
 
         <item name="textInputStyle">@style/TextInputLayout</item>
 
+        <!-- This Material style has a min width and height for enlarging the clickable area of checkbox.
+             It uses textColorSecondary as colorControlNormal that complies with Invision design -->
+        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox</item>
+
+        <!-- Progress indicator -->
+        <item name="indicatorColor">?attr/colorSecondary</item>
+        <item name="trackColor">@color/grey_alpha_012</item>
+
 <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->
         <!--<item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>-->
@@ -87,10 +95,6 @@
         <!--<item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>-->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
         <!--<item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>-->
-
-        <!-- This Material style has a min width and height for enlarging the clickable area of checkbox.
-             It uses textColorSecondary as colorControlNormal that complies with Invision design -->
-        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox</item>
     </style>
 </resources>
 

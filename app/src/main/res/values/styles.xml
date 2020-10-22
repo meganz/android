@@ -531,7 +531,6 @@
 
     <style name="AppModalStyleReactions" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
-        >>>>>>> homepage
     </style>
 
     <!-- =================== Dark mode refactor start ======================= -->
@@ -569,12 +568,6 @@
         <item name="endIconMode">password_toggle</item>
         <item name="endIconDrawable">@drawable/ic_b_see</item>
         <item name="endIconTint">@color/password_color_toggle</item>
-    </style>
-
-    <style name="ProgressIndicator.Linear" parent="Widget.MaterialComponents.ProgressIndicator.Linear.Indeterminate">
-        <item name="indicatorColor">@color/linear_progress_indicator</item>
-        <item name="trackColor">@color/linear_progress_track</item>
-        <item name="indicatorWidth">@dimen/linear_progress_size</item>
     </style>
 
     <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">

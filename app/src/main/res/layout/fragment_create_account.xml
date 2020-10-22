@@ -329,7 +329,7 @@
 
                 <com.google.android.material.progressindicator.ProgressIndicator
                     android:id="@+id/create_account_progress_bar"
-                    style="@style/ProgressIndicator.Linear"
+                    android:indeterminate="true"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -419,3 +419,4 @@
     </RelativeLayout>
 
 </RelativeLayout>
+<!--    style="@style/ProgressIndicator.Linear"-->
