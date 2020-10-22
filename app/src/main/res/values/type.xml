@@ -30,16 +30,6 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
-    <!--List view item file info, Regular, 14sp, 0.25px, textColorSecondary-->
-    <style name="TextAppearance.Mega.Body2" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
-        <item name="android:letterSpacing">0.017857143</item>
-    </style>
-
-    <style name="TextAppearance.Mega.Body2.Primary" parent="TextAppearance.Mega.Body2">
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-    </style>
-
     <!-- Regular, 14sp, -0.05px, textColorPrimary-->
     <style name="ListView.Header.Item" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:letterSpacing">-0.003571429</item>
@@ -62,6 +52,22 @@
         <!-- Fake Roboto Medium. -->
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!--List view item file info, Regular, 14sp, 0.25px, textColorPrimary-->
+    <style name="TextAppearance.Mega.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:letterSpacing">0.017857143</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Secondary" parent="TextAppearance.Mega.Body2">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Regular, 12sp, 0.25px, 0.6 alpha black/white -->
+    <style name="TextAppearance.Mega.Body3" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/color_primary_alpha_060</item>
+        <item name="android:letterSpacing">0.017857143</item>
     </style>
 
     <!-- Medium, 14sp, textColorPrimary -->

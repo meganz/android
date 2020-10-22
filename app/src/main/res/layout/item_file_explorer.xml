@@ -42,7 +42,7 @@
         android:ellipsize="end"
         android:singleLine="true"
         android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.Mega.Body2" />
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
     <ImageView
         android:id="@+id/file_explorer_permissions"

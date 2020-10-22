@@ -133,7 +133,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text='@{String.format("%s . %s", Util.getSizeString(item.node.size), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
-                android:textAppearance="?attr/textAppearanceBody2"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                 app:layout_constraintStart_toEndOf="@id/versions_icon"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="8.27 MB . June 2020 10:39:12" />
