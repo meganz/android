@@ -181,8 +181,6 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -204,6 +202,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private static final String JOINING_OR_LEAVING = "JOINING_OR_LEAVING";
     private static final String JOINING_OR_LEAVING_ACTION = "JOINING_OR_LEAVING_ACTION";
     private static final String OPENING_AND_JOINING_ACTION = "OPENING_AND_JOINING_ACTION";
+    private static final String ERROR_REACTION_DIALOG = "ERROR_REACTION_DIALOG";
+    private static final String TYPE_ERROR_REACTION = "TYPE_ERROR_REACTION";
 
     private final static int NUMBER_MESSAGES_TO_LOAD = 32;
     private final static int MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN = 256;
@@ -276,6 +276,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
+    private AlertDialog errorReactionsDialog;
+    private boolean errorReactionsDialogIsShown = false;
+    private long typeErrorReaction = 0;
 
     ProgressDialog dialog;
     ProgressDialog statusDialog;
@@ -1324,6 +1327,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         joiningOrLeaving = savedInstanceState.getBoolean(JOINING_OR_LEAVING, false);
                         joiningOrLeavingAction = savedInstanceState.getString(JOINING_OR_LEAVING_ACTION);
                         openingAndJoining = savedInstanceState.getBoolean(OPENING_AND_JOINING_ACTION, false);
+                        errorReactionsDialogIsShown = savedInstanceState.getBoolean(ERROR_REACTION_DIALOG, false);
+                        typeErrorReaction = savedInstanceState.getLong(TYPE_ERROR_REACTION, 0);
+                        if(errorReactionsDialogIsShown && typeErrorReaction != 0){
+                            createLimitReactionsAlertDialog(typeErrorReaction);
+                        }
                     }
 
                     String text = null;
@@ -7899,6 +7907,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putBoolean(JOINING_OR_LEAVING, joiningOrLeaving);
         outState.putString(JOINING_OR_LEAVING_ACTION, joiningOrLeavingAction);
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
+        outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
+        outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -9166,5 +9176,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         return INVALID_POSITION;
+    }
+
+    /**
+     * Method to display a dialog to show the error related with the chat reactions.
+     *
+     * @param typeError Type of Error.
+     */
+    public void createLimitReactionsAlertDialog(long typeError) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        dialogBuilder.setMessage(getString(typeError == 1 ? R.string.limit_reaction_per_user : R.string.limit_reaction_per_message));
+        dialogBuilder.setOnDismissListener(dialog->{
+            errorReactionsDialogIsShown = false;
+            typeErrorReaction = 0;
+        });
+        dialogBuilder.setPositiveButton(getString(R.string.general_ok),
+                (dialog, which) -> {
+                    dialog.dismiss();
+                });
+
+        errorReactionsDialog = dialogBuilder.create();
+        errorReactionsDialog.show();
+        errorReactionsDialogIsShown = true;
+        typeErrorReaction = typeError;
     }
 }

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
-
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiJava;
@@ -39,9 +37,15 @@ public class ManageReactionListener extends ChatBaseListener {
                 break;
 
             case MegaError.API_EEXIST:
-                if (hasReactionBeenAdded && !MegaApplication.isIsReactionFromKeyboard()) {
+                if (hasReactionBeenAdded) {
                     logDebug("This reaction is already added in this message, so it should be removed");
-                    api.delReaction(request.getChatHandle(), api.getMessage(chatId, msgId).getMsgId(), reaction, ManageReactionListener.this);
+                }
+                break;
+
+            case MegaChatError.ERROR_TOOMANY:
+                long numberOfError = request.getNumber();
+                if (context instanceof ChatActivityLollipop && (numberOfError == 1 || numberOfError == -1)) {
+                    ((ChatActivityLollipop) context).createLimitReactionsAlertDialog(numberOfError);
                 }
                 break;
         }

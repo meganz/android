@@ -1776,14 +1776,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return isBlockedDueToWeakAccount;
 	}
 
-	public static boolean isIsReactionFromKeyboard() {
-		return isReactionFromKeyboard;
-	}
-
-	public static void setIsReactionFromKeyboard(boolean isReactionFromKeyboard) {
-		MegaApplication.isReactionFromKeyboard = isReactionFromKeyboard;
-	}
-
 	public static void setIsWebOpenDueToEmailVerification(boolean isWebOpenDueToEmailVerification) {
 		MegaApplication.isWebOpenDueToEmailVerification = isWebOpenDueToEmailVerification;
 	}

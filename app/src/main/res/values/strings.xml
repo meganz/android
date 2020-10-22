@@ -2908,4 +2908,8 @@
     <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don't remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more.">You\'ve reached the limit of 24 reactions.</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more.">This message reached the limit of 50 reactions.</string>
+
 </resources>
