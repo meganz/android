@@ -2812,13 +2812,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         switch (editText.getId()){
             case R.id.login_email_text:{
                 et_userLayout.setError(error);
-                et_userLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                et_userLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 et_userError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.login_password_text:{
                 et_passwordLayout.setError(error);
-                et_passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                et_passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 et_passwordError.setVisibility(View.VISIBLE);
                 break;
             }

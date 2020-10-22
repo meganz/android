@@ -570,30 +570,6 @@
         <item name="endIconTint">@color/password_color_toggle</item>
     </style>
 
-    <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">?attr/colorError</item>
-    </style>
-
-    <style name="InputTextAppearanceVeryWeak" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/color_primary_red</item>
-    </style>
-
-    <style name="InputTextAppearanceWeak" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_weak</item>
-    </style>
-
-    <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_medium</item>
-    </style>
-
-    <style name="InputTextAppearanceGood" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_good</item>
-    </style>
-
-    <style name="InputTextAppearanceStrong" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_strong</item>
-    </style>
-
     <style name="MEGABottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/MEGAModalStyle</item>
         <item name="android:windowIsFloating">false</item>

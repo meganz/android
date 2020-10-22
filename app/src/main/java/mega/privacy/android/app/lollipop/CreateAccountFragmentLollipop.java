@@ -342,7 +342,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             passwdValid = false;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceVeryWeak);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.color_primary_red);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK){
@@ -359,7 +359,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceWeak);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.pass_weak);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM){
@@ -376,7 +376,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceMedium);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.pass_medium);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD){
@@ -393,7 +393,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceGood);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.pass_good);
         }
         else {
@@ -410,7 +410,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             passwdValid = true;
 
-            userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceStrong);
+            userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong);
             ColorUtils.setEditTextUnderlineColor(userPassword, R.color.pass_strong);
         }
 
@@ -707,32 +707,32 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         switch (editText.getId()){
             case R.id.create_account_email_text:{
                 userEmailLayout.setError(error);
-                userEmailLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userEmailLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userEmailError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_password_text_confirm:{
                 userPasswordConfirmLayout.setError(error);
-                userPasswordConfirmLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userPasswordConfirmLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordConfirmError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_name_text:{
                 userNameLayout.setError(error);
-                userNameLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userNameLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userNameError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_last_name_text:{
                 userLastNameLayout.setError(error);
-                userLastNameLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userLastNameLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userLastNameError.setVisibility(View.VISIBLE);
                 break;
             }
             case R.id.create_account_password_text:{
                 userPasswordLayout.setError(error);
-                userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
-                userPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError);
+                userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
+                userPasswordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordError.setVisibility(View.VISIBLE);
                 break;
             }

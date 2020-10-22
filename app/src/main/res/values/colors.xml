@@ -275,6 +275,12 @@
     <color name="badge_text_color">@color/white</color>
     <color name="badge_text_color_secondary">@color/red_390</color>
 
+    <!-- password strength -->
+    <color name="pass_weak">#FFD300</color>
+    <color name="pass_medium">#31B500</color>
+    <color name="pass_good">#13E03C</color>
+    <color name="pass_strong">#2BA6DE</color>
+
     <!-- The divider between List view items -->
     <color name="list_item_divider">@color/grey_alpha_012</color>
 
@@ -282,12 +288,6 @@
     <color name="text_color_primary_solid">@color/black</color>
     <color name="color_secondary_night_grey">@color/teal_300</color>
     <color name="color_primary_red">@color/red_600</color>
-
-    <!-- password strength -->
-    <color name="pass_weak">#FFD300</color>
-    <color name="pass_medium">#31B500</color>
-    <color name="pass_good">#13E03C</color>
-    <color name="pass_strong">#2BA6DE</color>
 
     <!-- at first, #FF333A should be replaced by red_600, but since these 2 colors are used so
      widely in the project, to avoid too many changes, let's just keep them. -->

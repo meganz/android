@@ -239,8 +239,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
         if (correct){
             passwordLayout.setError(getString(R.string.test_pwd_accepted));
-            passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceMedium);
-            passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceMedium);
+            passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
+            passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium);
             icon = ContextCompat.getDrawable(this, R.drawable.ic_accept_test);
             icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_unlocked_rewards), PorterDuff.Mode.SRC_ATOP));
             passwordErrorImage.setImageDrawable(icon);
@@ -251,8 +251,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         else {
             counter++;
             passwordLayout.setError(getString(R.string.test_pwd_wrong));
-            passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
-            passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError);
+            passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
+            passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error);
             icon = ContextCompat.getDrawable(this, R.drawable.ic_input_warning);
             icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP));
             passwordErrorImage.setImageDrawable(icon);

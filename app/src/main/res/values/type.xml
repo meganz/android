@@ -71,4 +71,33 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
+    <!-- Password strength hint text -->
+    <style name="TextAppearance.InputHint" parent="TextAppearance.Design.Error">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Error">
+        <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.VeryWeak">
+        <item name="android:textColor">@color/color_primary_red</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Weak">
+        <item name="android:textColor">@color/pass_weak</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Medium">
+        <item name="android:textColor">@color/pass_medium</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Good">
+        <item name="android:textColor">@color/pass_good</item>
+    </style>
+
+    <style name="TextAppearance.InputHint.Strong">
+        <item name="android:textColor">@color/pass_strong</item>
+    </style>
+
 </resources>

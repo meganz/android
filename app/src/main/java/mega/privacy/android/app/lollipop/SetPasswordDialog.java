@@ -268,13 +268,13 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
         switch (editText.getId()) {
             case R.id.password_text:
                 userPasswordLayout.setError(error);
-                userPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordError.setVisibility(View.VISIBLE);
                 break;
 
             case R.id.confirm_password_text:
                 userPasswordConfimrLayout.setError(error);
-                userPasswordConfimrLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                userPasswordConfimrLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                 userPasswordConfirmError.setVisibility(View.VISIBLE);
                 break;
         }

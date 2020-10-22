@@ -233,7 +233,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 
 		if (emailError != null && !emailError.isEmpty()) {
 			newEmailLayout.setError(emailError);
-			newEmailLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+			newEmailLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
 			errorNewEmail.setVisibility(View.VISIBLE);
 			return false;
 		}

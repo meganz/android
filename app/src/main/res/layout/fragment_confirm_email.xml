@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/email_text"
                 app:errorEnabled="true"
-                app:errorTextAppearance="@style/InputTextAppearanceError">
+                app:errorTextAppearance="@style/TextAppearance.InputHint.Error">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/confirm_email_new_email"

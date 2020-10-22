@@ -730,7 +730,7 @@ public class PDFView extends RelativeLayout {
                     passwordText.setText(text);
                     passwordText.setSelection(text.length());
                     passwordLayout.setError(pdfViewer.getString(R.string.error_enter_password));
-                    passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                    passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
                     passwordError.setVisibility(View.VISIBLE);
                     passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 } else {
