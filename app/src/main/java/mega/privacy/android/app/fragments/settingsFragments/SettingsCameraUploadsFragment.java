@@ -57,7 +57,7 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
-public class SettingsCUFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsCameraUploadsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     private static final int CAM_SYNC_INVALID_HANDLE = -1;
     private SwitchPreferenceCompat cameraUploadOnOff;
@@ -99,7 +99,7 @@ public class SettingsCUFragment extends SettingsBaseFragment implements Preferen
     private boolean isExternalSDCardMU;
     private SetAttrUserListener setAttrUserListener;
 
-    public SettingsCUFragment() {
+    public SettingsCameraUploadsFragment() {
         super();
     }
 

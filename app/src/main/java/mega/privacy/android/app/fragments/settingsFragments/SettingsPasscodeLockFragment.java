@@ -16,7 +16,7 @@ import static mega.privacy.android.app.constants.SettingsConstants.KEY_PIN_LOCK_
 import static mega.privacy.android.app.utils.Constants.SET_PIN;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
-public class PasscodeLockSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsPasscodeLockFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     private SwitchPreferenceCompat pinLockEnableSwitch;
     private Preference pinLockCode;

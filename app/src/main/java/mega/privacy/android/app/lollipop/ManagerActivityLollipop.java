@@ -3453,6 +3453,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     private void enableCU() {
 		sendBroadcast(new Intent(ACTION_UPDATE_ENABLE_CU_SETTING));
+
         if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
             cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -7575,7 +7576,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Back up timestamps and disabled MU upload.
                 backupTimestampsAndFolderHandle();
                 disableMediaUploadProcess();
-                sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_MU_SETTING));
+                sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_MU_UI_SETTING));
             } else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);

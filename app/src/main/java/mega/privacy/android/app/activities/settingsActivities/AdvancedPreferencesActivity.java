@@ -7,7 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.settingsFragments.AdvancedSettingsFragment;
+import mega.privacy.android.app.fragments.settingsFragments.SettingsAdvancedFragment;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
@@ -18,7 +18,7 @@ import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
 
-    private AdvancedSettingsFragment sttAdvanced;
+    private SettingsAdvancedFragment sttAdvanced;
 
     private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
@@ -43,7 +43,7 @@ public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
 
         aB.setTitle(getString(R.string.settings_advanced_features).toUpperCase());
 
-        sttAdvanced = new AdvancedSettingsFragment();
+        sttAdvanced = new SettingsAdvancedFragment();
         replaceFragment(sttAdvanced);
 
         registerReceiver(networkReceiver,

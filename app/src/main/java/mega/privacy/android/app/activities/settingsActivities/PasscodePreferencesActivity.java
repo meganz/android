@@ -6,7 +6,7 @@ import android.view.KeyEvent;
 import androidx.appcompat.app.AlertDialog;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.settingsFragments.PasscodeLockSettingsFragment;
+import mega.privacy.android.app.fragments.settingsFragments.SettingsPasscodeLockFragment;
 
 import static mega.privacy.android.app.utils.Constants.*;
 
@@ -17,14 +17,14 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
     public static final int PIN_6_OPTION = 1;
     public static final int PIN_ALPHANUMERIC_OPTION = 2;
 
-    private PasscodeLockSettingsFragment sttPasscodeLock;
+    private SettingsPasscodeLockFragment sttPasscodeLock;
     private AlertDialog setPinDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         aB.setTitle(getString(R.string.settings_pin_lock_switch).toUpperCase());
-        sttPasscodeLock = new PasscodeLockSettingsFragment();
+        sttPasscodeLock = new SettingsPasscodeLockFragment();
         replaceFragment(sttPasscodeLock);
     }
 

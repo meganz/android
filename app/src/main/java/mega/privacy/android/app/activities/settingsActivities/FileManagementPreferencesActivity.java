@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.settingsFragments.FileManagementSettingsFragment;
+import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
@@ -50,7 +50,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
 
     private static FileManagementPreferencesActivity activity = null;
-    private FileManagementSettingsFragment sttFileManagment;
+    private SettingsFileManagementFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog generalDialog;
@@ -158,7 +158,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
 
         aB.setTitle(getString(R.string.settings_file_management_category).toUpperCase());
 
-        sttFileManagment = new FileManagementSettingsFragment();
+        sttFileManagment = new SettingsFileManagementFragment();
         replaceFragment(sttFileManagment);
         registerReceiver(cacheSizeUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING));

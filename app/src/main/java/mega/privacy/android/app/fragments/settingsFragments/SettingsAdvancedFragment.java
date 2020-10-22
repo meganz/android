@@ -14,7 +14,7 @@ import mega.privacy.android.app.components.TwoLineCheckPreference;
 import static mega.privacy.android.app.constants.SettingsConstants.KEY_HTTPS_ONLY;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
-public class AdvancedSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsAdvancedFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     private boolean useHttpsOnlyValue = false;
     private TwoLineCheckPreference useHttpsOnly;

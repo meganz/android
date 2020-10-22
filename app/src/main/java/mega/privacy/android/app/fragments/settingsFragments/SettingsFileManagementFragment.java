@@ -24,7 +24,7 @@ import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileManagementSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsFileManagementFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
     private final static String INITIAL_VALUE = "0";
     private Preference offlineFileManagement;

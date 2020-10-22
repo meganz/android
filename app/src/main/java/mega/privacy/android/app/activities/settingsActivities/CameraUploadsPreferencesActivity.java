@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.settingsFragments.SettingsCUFragment;
+import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -21,7 +21,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
-    private SettingsCUFragment sttCameraUploads;
+    private SettingsCameraUploadsFragment sttCameraUploads;
     private AlertDialog businessCUAlert;
 
     private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
@@ -37,82 +37,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                 sttCameraUploads.setOnlineOptions(false);
             } else if (actionType == GO_ONLINE) {
                 sttCameraUploads.setOnlineOptions(true);
-            }
-        }
-    };
-
-    private BroadcastReceiver disableCameraUploadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_UPDATE_DISABLE_CU_SETTING)) {
-                sttCameraUploads.disableCameraUpload();
-            }
-        }
-    };
-
-    private BroadcastReceiver disableMediaUploadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_UPDATE_DISABLE_MU_SETTING)) {
-                sttCameraUploads.disableMediaUploadUIProcess();
-            }
-        }
-    };
-
-    private BroadcastReceiver disableCameraUploadUIReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_UPDATE_DISABLE_CU_UI_SETTING)) {
-                sttCameraUploads.disableCameraUploadUIProcess();
-            }
-        }
-    };
-
-    private BroadcastReceiver cameraUploadDestinationReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING)) {
-                boolean isSecondary = intent.getBooleanExtra(SECONDARY_FOLDER, false);
-                long primaryHandle = intent.getLongExtra(PRIMARY_HANDLE, -1);
-                sttCameraUploads.setCUDestinationFolder(isSecondary, primaryHandle);
-            }
-        }
-    };
-
-    private BroadcastReceiver receiverCUAttrChanged = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
-                return;
-
-            synchronized (this) {
-                long handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, INVALID_HANDLE);
-                boolean isSecondary = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false);
-                sttCameraUploads.setCUDestinationFolder(isSecondary, handleInUserAttr);
-            }
-        }
-    };
-
-    private BroadcastReceiver enableCameraUploadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_UPDATE_ENABLE_CU_SETTING)) {
-                sttCameraUploads.enableCameraUpload();
             }
         }
     };
@@ -135,31 +59,88 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
+    private BroadcastReceiver enableDisableCameraUploadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
+                return;
+
+            switch (intent.getAction()){
+                case ACTION_UPDATE_ENABLE_CU_SETTING:
+                    sttCameraUploads.enableCameraUpload();
+                    break;
+
+                case ACTION_UPDATE_DISABLE_CU_SETTING:
+                    sttCameraUploads.disableCameraUpload();
+                    break;
+
+                case ACTION_UPDATE_DISABLE_CU_UI_SETTING:
+                    sttCameraUploads.disableCameraUploadUIProcess();
+                    break;
+
+                case ACTION_UPDATE_DISABLE_MU_UI_SETTING:
+                    sttCameraUploads.disableMediaUploadUIProcess();
+                    break;
+            }
+
+        }
+    };
+
+    private BroadcastReceiver cameraUploadDestinationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
+                return;
+
+            if (intent.getAction().equals(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING)) {
+                boolean isSecondary = intent.getBooleanExtra(SECONDARY_FOLDER, false);
+                long primaryHandle = intent.getLongExtra(PRIMARY_HANDLE, INVALID_HANDLE);
+                sttCameraUploads.setCUDestinationFolder(isSecondary, primaryHandle);
+            }
+        }
+    };
+
+    private BroadcastReceiver receiverCUAttrChanged = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || sttCameraUploads == null)
+                return;
+
+            synchronized (this) {
+                long handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, INVALID_HANDLE);
+                boolean isSecondary = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false);
+                sttCameraUploads.setCUDestinationFolder(isSecondary, handleInUserAttr);
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
-        sttCameraUploads = new SettingsCUFragment();
+        sttCameraUploads = new SettingsCameraUploadsFragment();
         replaceFragment(sttCameraUploads);
 
         registerReceiver(networkReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+
         registerReceiver(cameraUploadDestinationReceiver,
                 new IntentFilter(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING));
-        registerReceiver(enableCameraUploadReceiver,
-                new IntentFilter(ACTION_UPDATE_ENABLE_CU_SETTING));
-        registerReceiver(disableCameraUploadUIReceiver,
-                new IntentFilter(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
-        registerReceiver(disableCameraUploadReceiver,
-                new IntentFilter(ACTION_UPDATE_DISABLE_CU_SETTING));
-        registerReceiver(disableMediaUploadReceiver,
-                new IntentFilter(ACTION_UPDATE_DISABLE_MU_SETTING));
+
+        IntentFilter filterCUMUSettings =
+                new IntentFilter(ACTION_UPDATE_ENABLE_CU_SETTING);
+        filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_SETTING);
+        filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_UI_SETTING);
+        filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_MU_UI_SETTING);
+        registerReceiver(enableDisableCameraUploadReceiver, filterCUMUSettings);
+
         IntentFilter filterUpdateCUSettings =
                 new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
+
         registerReceiver(receiverCUAttrChanged,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
     }
@@ -223,11 +204,8 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         super.onDestroy();
         unregisterReceiver(networkReceiver);
         unregisterReceiver(cameraUploadDestinationReceiver);
-        unregisterReceiver(enableCameraUploadReceiver);
+        unregisterReceiver(enableDisableCameraUploadReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
-        unregisterReceiver(disableCameraUploadUIReceiver);
-        unregisterReceiver(disableCameraUploadReceiver);
-        unregisterReceiver(disableMediaUploadReceiver);
         unregisterReceiver(receiverCUAttrChanged);
     }
 }
