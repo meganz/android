@@ -11,8 +11,8 @@
         android:id="@+id/node_title_layout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center_vertical">
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="8dp">
 
         <RelativeLayout
             android:id="@+id/node_relative_layout_thumb"
@@ -35,8 +35,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
-            android:layout_toEndOf="@id/node_relative_layout_thumb"
-            android:layout_toStartOf="@+id/permissions_icon">
+            android:layout_toStartOf="@+id/permissions_icon"
+            android:layout_toEndOf="@id/node_relative_layout_thumb">
 
             <RelativeLayout
                 android:id="@+id/node_name_layout"
@@ -47,18 +47,18 @@
                     android:id="@+id/node_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
                     android:ellipsize="middle"
+                    android:singleLine="true"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginLeft="6dp"
                     android:layout_centerVertical="true"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginTop="3dp"
                     android:layout_toRightOf="@id/node_name_text">
 
                     <ImageView
@@ -66,8 +66,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        app:tint="?android:attr/textColorSecondary"
-                        />
+                        app:tint="?android:attr/textColorSecondary" />
 
                 </RelativeLayout>
 
@@ -82,22 +81,22 @@
                     android:id="@+id/node_info_versions_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_versions_small"
-                    android:background="@null"
-                    android:layout_marginRight="8dp"
                     android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_versions_small"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/node_info_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/mail_my_account"
-                    android:textSize="14sp"
-                    android:singleLine="true"
                     android:layout_toRightOf="@id/node_info_versions_icon"
-                    android:ellipsize="middle"/>
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14sp" />
             </RelativeLayout>
 
         </RelativeLayout>
@@ -106,11 +105,11 @@
             android:id="@+id/permissions_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="47dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="47dp"
             android:background="@null"
-            app:tint="?android:attr/textColorSecondary"/>
+            app:tint="?android:attr/textColorSecondary" />
 
     </RelativeLayout>
 
@@ -118,7 +117,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/list_item_divider"/>
+        android:background="@color/list_item_divider" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -126,10 +125,10 @@
         android:scrollbars="vertical">
 
         <LinearLayout
+            android:id="@+id/items_layout_bottom_sheet_node"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/items_layout_bottom_sheet_node">
+            android:orientation="vertical">
 
             <!-- Options -->
             <LinearLayout
@@ -142,7 +141,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal" >
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/option_properties_image"
@@ -150,8 +149,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
-                        android:paddingBottom="2dp"
                         android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
                         android:src="@drawable/info_ic"
                         android:visibility="visible"
                         app:tint="?android:attr/textColorSecondary" />
@@ -160,18 +159,18 @@
                         android:id="@+id/option_properties_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="2dp"
-                        android:paddingTop="2dp"
                         android:layout_marginLeft="18dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
                         android:textColor="@color/name_my_account"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="72dp"
-                    android:background="@color/list_item_divider"/>
+                    android:background="@color/list_item_divider" />
             </LinearLayout>
 
             <LinearLayout
@@ -179,16 +178,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_download_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_b_save_to_device"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
@@ -197,12 +196,12 @@
                     android:id="@+id/option_download_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/general_save_to_device"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -210,19 +209,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_offline_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_b_save_offline"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_offline_text"
@@ -234,16 +233,14 @@
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_available_offline"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"
-                    />
+                    android:textSize="16sp" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/file_properties_switch"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="16dp"
-                    android:layout_weight="1"
-                    />
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <LinearLayout
@@ -251,15 +248,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/list_item_divider"/>
+                android:background="@color/list_item_divider"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/option_link_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_link_image"
@@ -267,22 +264,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/link_ic"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_link_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_get_link_menu"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -290,7 +287,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_remove_link_image"
@@ -298,22 +295,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_remove_link"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_remove_link_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_remove_link_menu"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -321,7 +318,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_share_image"
@@ -329,8 +326,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_social_share_white"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
@@ -339,12 +336,12 @@
                     android:id="@+id/option_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/general_share"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -352,7 +349,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_share_folder_image"
@@ -360,22 +357,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_share"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_share_folder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_share_folder"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -383,7 +380,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/send_chat_image"
@@ -391,22 +388,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_send_to_contact"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/send_chat_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_send_file_to_chat"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -414,7 +411,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_clear_share_image"
@@ -422,8 +419,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_remove_share"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
@@ -432,12 +429,12 @@
                     android:id="@+id/option_clear_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_clean_shares_menu"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -445,15 +442,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/list_item_divider"/>
+                android:background="@color/list_item_divider"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_rename_image"
@@ -461,22 +458,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_rename"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_rename_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_rename"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -484,7 +481,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_move_image"
@@ -492,22 +489,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_move"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_move_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/general_move_to"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -515,7 +512,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_copy_image"
@@ -523,22 +520,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_menu_copy"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_copy_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_copy"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -546,7 +543,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_restore_image"
@@ -554,22 +551,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_b_restore"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_restore_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_restore"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -577,15 +574,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/list_item_divider"/>
+                android:background="@color/list_item_divider"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_open_with_image"
@@ -593,22 +590,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_b_open_with"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_open_with_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/external_play"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -616,7 +613,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_open_folder_image"
@@ -624,22 +621,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_upload_pick_file"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_open_folder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/search_open_location"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -647,15 +644,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/list_item_divider"/>
+                android:background="@color/list_item_divider"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/option_leave_share_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_leave_share_image"
@@ -663,21 +660,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/leave_share_ic"
                     android:visibility="visible"
-                    app:tint="@color/color_primary_red"/>
+                    app:tint="@color/color_primary_red" />
 
                 <TextView
                     android:id="@+id/option_leave_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/alert_leave_share"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red" />
             </LinearLayout>
 
             <LinearLayout
@@ -685,7 +682,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_rubbish_bin_image"
@@ -693,8 +690,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_rubbish_bin"
                     android:visibility="visible"
                     app:tint="@color/color_primary_red" />
@@ -703,11 +700,11 @@
                     android:id="@+id/option_rubbish_bin_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_move_to_trash"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red" />
             </LinearLayout>
 
             <LinearLayout
@@ -715,7 +712,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/option_remove_image"
@@ -723,21 +720,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible"
-                    app:tint="@color/color_primary_red"/>
+                    app:tint="@color/color_primary_red" />
 
                 <TextView
                     android:id="@+id/option_remove_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_remove"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red" />
             </LinearLayout>
 
         </LinearLayout>

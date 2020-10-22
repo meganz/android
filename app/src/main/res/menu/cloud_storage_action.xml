@@ -2,141 +2,141 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-  <item
-      android:id="@+id/cab_menu_select_all"
-      android:orderInCategory="100"
-      android:title="@string/action_select_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="100"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_clear_selection"
-      android:orderInCategory="110"
-      android:title="@string/action_unselect_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_clear_selection"
+        android:orderInCategory="110"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_download"
-      android:icon="@drawable/ic_download_white"
-      android:orderInCategory="120"
-      android:title="@string/general_save_to_device"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_download"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="120"
+        android:title="@string/general_save_to_device"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_remove_link"
-      android:icon="@drawable/ic_remove_link_w"
-      android:orderInCategory="130"
-      android:title="@string/context_remove_link_menu"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_remove_link"
+        android:icon="@drawable/ic_remove_link_w"
+        android:orderInCategory="130"
+        android:title="@string/context_remove_link_menu"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_remove_share"
-      android:icon="@drawable/ic_remove_share"
-      android:orderInCategory="140"
-      android:title="@string/context_clean_shares_menu"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_remove_share"
+        android:icon="@drawable/ic_remove_share"
+        android:orderInCategory="140"
+        android:title="@string/context_clean_shares_menu"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_rename"
-      android:icon="@drawable/ic_rename_white"
-      android:orderInCategory="150"
-      android:title="@string/context_rename"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_rename"
+        android:icon="@drawable/ic_rename_white"
+        android:orderInCategory="150"
+        android:title="@string/context_rename"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_share_link"
-      android:icon="@drawable/ic_link_white"
-      android:orderInCategory="160"
-      android:title="@string/context_get_link_menu"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_share_link"
+        android:icon="@drawable/ic_link_white"
+        android:orderInCategory="160"
+        android:title="@string/context_get_link_menu"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_edit_link"
-      android:icon="@drawable/ic_link_white"
-      android:orderInCategory="161"
-      android:title="@string/edit_link_option"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_edit_link"
+        android:icon="@drawable/ic_link_white"
+        android:orderInCategory="161"
+        android:title="@string/edit_link_option"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_share_folder"
-      android:icon="@drawable/ic_share_white"
-      android:orderInCategory="170"
-      android:title="@string/context_share_folder"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_share_folder"
+        android:icon="@drawable/ic_share_white"
+        android:orderInCategory="170"
+        android:title="@string/context_share_folder"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_send_to_chat"
-      android:icon="@drawable/ic_send_to_contact"
-      android:orderInCategory="171"
-      android:title="@string/context_send_file_to_chat"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_send_to_chat"
+        android:icon="@drawable/ic_send_to_contact"
+        android:orderInCategory="171"
+        android:title="@string/context_send_file_to_chat"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_share_out"
-      android:icon="@drawable/ic_social_share_white"
-      android:orderInCategory="190"
-      android:title="@string/general_share"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_share_out"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="190"
+        android:title="@string/general_share"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_move"
-      android:icon="@drawable/ic_move_white"
-      android:orderInCategory="200"
-      android:title="@string/context_move"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_move"
+        android:icon="@drawable/ic_move_white"
+        android:orderInCategory="200"
+        android:title="@string/context_move"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_copy"
-      android:icon="@drawable/ic_copy_white"
-      android:orderInCategory="210"
-      android:title="@string/context_copy"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_copy"
+        android:icon="@drawable/ic_copy_white"
+        android:orderInCategory="210"
+        android:title="@string/context_copy"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_leave_share"
-      android:icon="@drawable/ic_leave_share_w"
-      android:orderInCategory="220"
-      android:title="@string/alert_leave_share"
-      android:visible="false"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never"
-      tools:visible="true" />
+    <item
+        android:id="@+id/cab_menu_leave_share"
+        android:icon="@drawable/ic_leave_share_w"
+        android:orderInCategory="220"
+        android:title="@string/alert_leave_share"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 
-  <item
-      android:id="@+id/cab_menu_trash"
-      android:icon="@drawable/ic_close_white"
-      android:orderInCategory="230"
-      android:title="@string/context_move_to_trash"
-      app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_trash"
+        android:icon="@drawable/ic_close_white"
+        android:orderInCategory="230"
+        android:title="@string/context_move_to_trash"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
 </menu>

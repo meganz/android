@@ -531,7 +531,6 @@
 
     <style name="AppModalStyleReactions" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
-        >>>>>>> homepage
     </style>
 
     <!-- =================== Dark mode refactor start ======================= -->
@@ -620,17 +619,21 @@
         <item name="buttonBarNegativeButtonStyle">@style/MEGANegativeButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/MEGAPositiveButtonStyle</item>
     </style>
+
     <style name="MEGAAlertDialogTitleStyle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <!-- Fake Roboto Medium. -->
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
+
     <style name="MEGAAlertDialogBodyStyle" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
+
     <style name="MEGANegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
+
     <style name="MEGAPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>

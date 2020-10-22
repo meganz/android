@@ -1,33 +1,33 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <item
-      android:id="@+id/action_search"
-      android:icon="@drawable/ic_b_search"
-      android:orderInCategory="100"
-      android:title="@string/action_search"
-      app:actionViewClass="androidx.appcompat.widget.SearchView"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_b_search"
+        android:orderInCategory="100"
+        android:title="@string/action_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always|collapseActionView" />
 
-  <item
-      android:id="@+id/action_scan_qr"
-      android:orderInCategory="100"
-      android:title="@string/menu_item_scan_code"
-      android:visible="false"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/action_scan_qr"
+        android:orderInCategory="100"
+        android:title="@string/menu_item_scan_code"
+        android:visible="false"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/action_invite_contact"
-      android:orderInCategory="100"
-      android:title="@string/invite_contacts"
-      android:visible="false"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/action_invite_contact"
+        android:orderInCategory="100"
+        android:title="@string/invite_contacts"
+        android:visible="false"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/action_send_invitation"
-      android:orderInCategory="100"
-      android:title="@string/context_send"
-      android:visible="false"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/action_send_invitation"
+        android:orderInCategory="100"
+        android:title="@string/context_send"
+        android:visible="false"
+        app:showAsAction="always" />
 </menu>

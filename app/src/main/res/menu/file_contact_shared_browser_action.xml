@@ -1,31 +1,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <item
-      android:id="@+id/cab_menu_select_all"
-      android:orderInCategory="110"
-      android:title="@string/action_select_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="110"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_unselect_all"
-      android:orderInCategory="110"
-      android:title="@string/action_unselect_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_unselect_all"
+        android:orderInCategory="110"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/action_file_contact_list_permissions"
-      android:icon="@drawable/ic_change_permissions_w"
-      android:orderInCategory="115"
-      android:title="@string/file_properties_shared_folder_change_permissions"
-			app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/action_file_contact_list_permissions"
+        android:icon="@drawable/ic_change_permissions_w"
+        android:orderInCategory="115"
+        android:title="@string/file_properties_shared_folder_change_permissions"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/action_file_contact_list_delete"
-      android:icon="@drawable/ic_close_white"
-      android:orderInCategory="120"
-      android:title="@string/context_remove"
-			app:iconTint="?attr/colorSecondary"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/action_file_contact_list_delete"
+        android:icon="@drawable/ic_close_white"
+        android:orderInCategory="120"
+        android:title="@string/context_remove"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
 </menu>

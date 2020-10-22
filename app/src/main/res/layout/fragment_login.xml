@@ -1,39 +1,38 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_view_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stackFromBottom="true"
-    >
+    android:stackFromBottom="true">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="left"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/login_login_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="22dp"
-                android:layout_marginRight="22dp"
-                android:orientation="vertical" >
+                android:layout_marginStart="22dp"
+                android:layout_marginEnd="22dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/login_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:text="@string/login_to_mega"
+                    android:layout_gravity="start"
                     android:layout_marginTop="17dp"
-                    android:textAppearance="?attr/textAppearanceHeadline6"/>
+                    android:text="@string/login_to_mega"
+                    android:textAppearance="?attr/textAppearanceHeadline6" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -45,27 +44,26 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="44dp"
                         android:hint="@string/email_text"
-                        app:errorEnabled="true"
-                        >
+                        app:errorEnabled="true">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/login_email_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="16sp"
                             android:imeOptions="actionNext"
-                            android:inputType="textEmailAddress"/>
+                            android:inputType="textEmailAddress"
+                            android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <ImageView
+                        android:id="@+id/login_email_text_error_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/login_email_text_error_icon"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="2dp"
+                        android:layout_alignBottom="@+id/login_email_text_layout"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="2dp"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="?attr/colorError"
-                        android:layout_alignBottom="@+id/login_email_text_layout"/>
+                        android:tint="?attr/colorError" />
 
                 </RelativeLayout>
 
@@ -75,83 +73,83 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/login_password_text_layout"
-                        android:layout_width="match_parent"
                         style="@style/TextInputLayout.Password"
-                        android:theme="@style/TextInputLayout.Password"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
                         android:hint="@string/password_text"
+                        android:theme="@style/TextInputLayout.Password"
                         app:errorEnabled="true">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/login_password_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="16sp"
                             android:imeOptions="actionNext"
-                            android:inputType="textPassword" />
+                            android:inputType="textPassword"
+                            android:textSize="16sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <ImageView
+                        android:id="@+id/login_password_text_error_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/login_password_text_error_icon"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="2dp"
+                        android:layout_alignBottom="@+id/login_password_text_layout"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="2dp"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="?attr/colorError"
-                        android:layout_alignBottom="@+id/login_password_text_layout"/>
+                        android:tint="?attr/colorError" />
 
                 </RelativeLayout>
 
                 <Button
                     android:id="@+id/button_login_login"
+                    style="@style/Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="10dp"
-                    style="@style/Button"
                     android:elevation="8dp"
-                    tools:text="LOGIN"/>
+                    tools:text="LOGIN" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="34dp">
+                    android:layout_marginBottom="34dp"
+                    android:orientation="horizontal">
 
                     <ProgressBar
                         android:id="@+id/pb_login_in_progress"
                         style="?android:attr/progressBarStyleLargeInverse"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="3dp"
-                        android:visibility="gone"/>
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="3dp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/text_login_tip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="6dp"
+                        android:layout_marginStart="6dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/accentColor"
                         android:textSize="12sp"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/button_forgot_pass"
+                    style="@style/BorderlessButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="18dp"
-                    android:paddingLeft="3dp"
-                    style="@style/BorderlessButton"
-                    tools:text="FORGET YOUR PASSWORD?"/>
+                    android:paddingStart="3dp"
+                    tools:text="FORGET YOUR PASSWORD?" />
 
             </LinearLayout>
 
@@ -159,8 +157,8 @@
                 android:id="@+id/login_create_account_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="left"
-                android:orientation="horizontal" >
+                android:gravity="start"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/text_newToMega"
@@ -172,10 +170,10 @@
 
                 <TextView
                     android:id="@+id/button_create_account_login"
+                    style="@style/BorderlessButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    style="@style/BorderlessButton" />
+                    android:layout_marginBottom="24dp" />
 
             </LinearLayout>
         </LinearLayout>
@@ -188,111 +186,109 @@
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar_login"
-                app:title="@string/login_verification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                />
+                app:title="@string/login_verification" />
 
             <RelativeLayout
                 android:id="@+id/container_confirm_2fa_login"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/explain_confirm_2fa_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="40dp"
+                    android:fontFamily="roboto"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
                     android:text="@string/explain_confirm_2fa"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:fontFamily="roboto"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:layout_marginTop="40dp"
-                    android:layout_centerHorizontal="true"/>
+                    android:textSize="16sp" />
 
                 <LinearLayout
                     android:id="@+id/six_pin_login_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/explain_confirm_2fa_login"
-                    android:layout_marginTop="36dp"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginTop="36dp"
                     android:orientation="horizontal">
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_first_login"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:layout_gravity="start"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_second_login"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:layout_gravity="start"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_third_login"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:layout_gravity="start"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fouth_login"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:layout_gravity="start"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fifth_login"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:layout_gravity="start"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_sixth_login"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:layout_gravity="start"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
                 </LinearLayout>
 
@@ -300,32 +296,32 @@
                     android:id="@+id/pin_2fa_error_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="40dp"
-                    android:text="@string/pin_error_2fa"
-                    android:textColor="?attr/colorError"
-                    android:fontFamily="roboto"
                     android:layout_below="@+id/six_pin_login_layout"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="40dp"
+                    android:fontFamily="roboto"
+                    android:text="@string/pin_error_2fa"
+                    android:textColor="?attr/colorError"
+                    android:textSize="12sp" />
 
                 <RelativeLayout
                     android:id="@+id/lost_authentication_device"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/six_pin_login_layout"
-                    android:padding="10dp"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginTop="29dp"
-                    android:layout_centerHorizontal="true">
+                    android:padding="10dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
                         android:text="@string/lost_your_authenticator_device"
                         android:textColor="?attr/colorSecondary"
-                        android:textSize="13sp"
-                        android:layout_centerHorizontal="true"/>
+                        android:textSize="13sp" />
 
                 </RelativeLayout>
 
@@ -336,7 +332,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
             </RelativeLayout>
 
@@ -347,8 +343,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center_horizontal"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/login_mega_logo"
@@ -356,8 +351,7 @@
                 android:layout_height="200dp"
                 android:layout_marginTop="20dp"
                 android:src="@drawable/logo_loading_ic"
-                app:tint="@color/color_primary_red"
-                />
+                app:tint="@color/color_primary_red" />
 
             <TextView
                 android:id="@+id/login_query_signup_link_text"
@@ -421,25 +415,25 @@
                 android:id="@+id/login_servers_busy_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginLeft="20dp"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
                 android:gravity="center_horizontal"
                 android:text="@string/servers_busy" />
         </LinearLayout>
 
         <include
+            layout="@layout/forgot_password_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            layout="@layout/forgot_password_layout"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <include
+            layout="@layout/park_account_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            layout="@layout/park_account_layout"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </LinearLayout>
 
 </ScrollView>

@@ -1,4 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/rubbish_bin_empty_landscape">
-</bitmap>
+    android:src="@drawable/rubbish_bin_empty_landscape" />

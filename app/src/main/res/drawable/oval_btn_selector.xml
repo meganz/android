@@ -3,21 +3,21 @@
 
     <!-- pressed state -->
     <item android:state_pressed="true">
-        <shape android:shape="oval" >
+        <shape android:shape="oval">
             <solid android:color="@color/pressed_color" />
         </shape>
     </item>
 
     <!-- focused state -->
     <item android:state_focused="true">
-        <shape android:shape="oval" >
+        <shape android:shape="oval">
             <solid android:color="@android:color/transparent" />
         </shape>
     </item>
 
     <!-- normal state -->
     <item>
-        <shape android:shape="oval" >
+        <shape android:shape="oval">
             <solid android:color="@android:color/transparent" />
         </shape>
     </item>

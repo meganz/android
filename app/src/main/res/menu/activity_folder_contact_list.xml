@@ -1,31 +1,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <item
-      android:id="@+id/action_delete_version_history"
-      android:icon="@drawable/ic_remove_versions"
-      android:orderInCategory="110"
-      android:title="@string/delete_versions"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/action_delete_version_history"
+        android:icon="@drawable/ic_remove_versions"
+        android:orderInCategory="110"
+        android:title="@string/delete_versions"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/action_select"
-      android:orderInCategory="110"
-      android:title="@string/action_select_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/action_select"
+        android:orderInCategory="110"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/action_unselect"
-      android:orderInCategory="110"
-      android:title="@string/action_unselect_all"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/action_unselect"
+        android:orderInCategory="110"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/action_folder_contacts_list_share_folder"
-      android:icon="@drawable/ic_share_white"
-      android:orderInCategory="115"
-      android:title="@string/context_share_folder"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/action_folder_contacts_list_share_folder"
+        android:icon="@drawable/ic_share_white"
+        android:orderInCategory="115"
+        android:title="@string/context_share_folder"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="never" />
 </menu>

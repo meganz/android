@@ -1,752 +1,807 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:id="@+id/rl_view_upgrade">
+    android:id="@+id/rl_view_upgrade"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-	<ScrollView
-		android:id="@+id/scroll_view_upgrade"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		>
+    <ScrollView
+        android:id="@+id/scroll_view_upgrade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-		<LinearLayout
-			android:id="@+id/linear_layout_upgrade"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="vertical">
-			<RelativeLayout
-				android:id="@+id/title_my_account_type"
-				android:layout_width="match_parent"
-				android:layout_height="36dp"
-				android:layout_gravity="center_vertical"
-				android:gravity="center_vertical"
-				android:paddingLeft="72dp">
-				<TextView
-					android:id="@+id/text_of_my_account"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textColor="@color/mail_my_account"
-					android:textSize="14sp"/>
-			</RelativeLayout>
-			<!-- Pro Lite -->
-			<RelativeLayout
-				android:id="@+id/upgrade_prolite_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:paddingTop="8dp">
+        <LinearLayout
+            android:id="@+id/linear_layout_upgrade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-				<RelativeLayout
-					android:id="@+id/upgrade_prolite_layout_content"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					>
+            <RelativeLayout
+                android:id="@+id/title_my_account_type"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:paddingStart="72dp">
 
-					<!-- Left side (image and title) -->
-					<RelativeLayout
-						android:id="@+id/upgrade_prolite_left_side"
-						android:layout_width="121dp"
-						android:layout_height="wrap_content"
-						android:gravity="center_horizontal">
-						<RelativeLayout
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:paddingTop="4dp">
-							<ImageView
-								android:id="@+id/image_lite"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:background="@null"
-								android:layout_centerHorizontal="true"
-								android:layout_marginBottom="5dp"
-								android:src="@drawable/ic_lite_crest"/>
-							<TextView
-								android:id="@+id/upgrade_prolite_title_text"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:textColor="@color/upgrade_orange"
-								android:text="@string/lite_account"
-								android:layout_below="@+id/image_lite"
-								android:textAllCaps="true"
-								android:textSize="18sp"/>
-						</RelativeLayout>
-					</RelativeLayout>
+                <TextView
+                    android:id="@+id/text_of_my_account"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+            <!-- Pro Lite -->
+            <RelativeLayout
+                android:id="@+id/upgrade_prolite_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
 
-					<!-- Right side (price, storage and bandwidth)-->
-					<RelativeLayout
-						android:id="@+id/upgrade_prolite_right_side"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_toRightOf="@id/upgrade_prolite_left_side"
-						android:gravity="center_vertical"
-						android:layout_centerVertical="true">
+                <RelativeLayout
+                    android:id="@+id/upgrade_prolite_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-						<TableLayout
-							android:id="@+id/table_lite"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_prolite_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
 
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:background="@drawable/border_lite"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/month_lite"
-										android:textStyle="bold"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/name_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/storage_lite"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="16dp">
-									<TextView
-										android:id="@+id/bandwidth_lite"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
-								</RelativeLayout>
-							</TableRow>
-						</TableLayout>
-					</RelativeLayout>
-				</RelativeLayout>
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
 
-				<LinearLayout
-					android:id="@+id/linear_divider"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_marginLeft="16dp"
-					android:layout_marginRight="16dp"
-					android:layout_alignBottom="@id/upgrade_prolite_layout_content"
-					android:background="@color/list_item_divider"
-					android:orientation="horizontal" />
+                            <ImageView
+                                android:id="@+id/image_lite"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_lite_crest" />
 
-				<RelativeLayout
-					android:id="@+id/upgrade_prolite_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="95dp"
-					android:visibility="gone"
-					android:background="#90ffffff"/>
+                            <TextView
+                                android:id="@+id/upgrade_prolite_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_lite"
+                                android:text="@string/lite_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/upgrade_orange"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
 
-			</RelativeLayout>
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_prolite_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_prolite_left_side"
+                        android:gravity="center_vertical">
 
-			<!-- Pro I -->
-			<RelativeLayout
-				android:id="@+id/upgrade_pro_i_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:paddingTop="8dp">
-				<RelativeLayout
-					android:id="@+id/upgrade_pro_i_layout_content"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+                        <TableLayout
+                            android:id="@+id/table_lite"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
 
-					<!-- Left side (image and title) -->
-					<RelativeLayout
-						android:id="@+id/upgrade_pro_i_left_side"
-						android:layout_width="121dp"
-						android:layout_height="wrap_content"
-						android:gravity="center_horizontal">
-						<RelativeLayout
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="4dp">
-							<ImageView
-								android:id="@+id/image_pro_i"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:layout_centerHorizontal="true"
-								android:layout_marginBottom="5dp"
-								android:src="@drawable/ic_pro_1_crest"/>
+                            <TableRow>
 
-							<TextView
-								android:id="@+id/upgrade_pro_i_title_text"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:textColor="@color/upgrade_red"
-								android:text="@string/pro1_account"
-								android:layout_below="@+id/image_pro_i"
-								android:textAllCaps="true"
-								android:textSize="18sp"/>
-						</RelativeLayout>
-					</RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_lite">
 
-					<!-- Right side (price, storage and bandwidth)-->
-					<RelativeLayout
-						android:id="@+id/upgrade_pro_i_right_side"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_toRightOf="@id/upgrade_pro_i_left_side"
-						android:gravity="center_vertical"
-						android:layout_centerVertical="true">
+                                    <TextView
+                                        android:id="@+id/month_lite"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/name_my_account"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
 
-						<TableLayout
-							android:id="@+id/table_pro_i"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+                            <TableRow>
 
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:background="@drawable/border_pro"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/month_pro_i"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/storage_pro_i"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="16dp">
-									<TextView
-										android:id="@+id/bandwidth_pro_i"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-						</TableLayout>
-					</RelativeLayout>
-				</RelativeLayout>
-				<LinearLayout
-					android:id="@+id/linear_divider_pro_i"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_marginLeft="16dp"
-					android:layout_marginRight="16dp"
-					android:layout_alignBottom="@id/upgrade_pro_i_layout_content"
-					android:background="@color/list_item_divider"
-					android:orientation="horizontal" />
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
 
-				<RelativeLayout
-					android:id="@+id/upgrade_pro_i_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="93dp"
-					android:visibility="gone"
-					android:background="#90ffffff"/>
+                                    <TextView
+                                        android:id="@+id/storage_lite"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
 
-			</RelativeLayout>
+                            <TableRow>
 
-			<!-- Pro II -->
-			<RelativeLayout
-				android:id="@+id/upgrade_pro_ii_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:paddingTop="8dp">
-				<RelativeLayout
-					android:id="@+id/upgrade_pro_ii_layout_content"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
 
-					<!-- Left side (image and title) -->
-					<RelativeLayout
-						android:id="@+id/upgrade_pro_ii_left_side"
-						android:layout_width="121dp"
-						android:layout_height="wrap_content"
-						android:gravity="center_horizontal">
-						<RelativeLayout
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:paddingTop="4dp">
-							<ImageView
-								android:id="@+id/image_pro_ii"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:layout_centerHorizontal="true"
-								android:layout_marginBottom="5dp"
-								android:src="@drawable/ic_pro_2_crest"/>
+                                    <TextView
+                                        android:id="@+id/bandwidth_lite"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
 
-							<TextView
-								android:id="@+id/upgrade_pro_ii_title_text"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:textColor="@color/upgrade_red"
-								android:text="@string/pro2_account"
-								android:layout_below="@+id/image_pro_ii"
-								android:textAllCaps="true"
-								android:textSize="18sp"/>
-						</RelativeLayout>
-					</RelativeLayout>
+                <LinearLayout
+                    android:id="@+id/linear_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/upgrade_prolite_layout_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/list_item_divider"
+                    android:orientation="horizontal" />
 
-					<!-- Right side (price, storage and bandwidth)-->
-					<RelativeLayout
-						android:id="@+id/upgrade_pro_ii_right_side"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_toRightOf="@id/upgrade_pro_ii_left_side"
-						android:gravity="center_vertical"
-						android:layout_centerVertical="true">
+                <RelativeLayout
+                    android:id="@+id/upgrade_prolite_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="95dp"
+                    android:background="#90ffffff"
+                    android:visibility="gone" />
 
-						<TableLayout
-							android:id="@+id/table_pro_ii"
-							android:layout_width="match_parent"
-							android:layout_height="match_parent"
-							android:layout_centerVertical="true">
+            </RelativeLayout>
 
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:background="@drawable/border_pro"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/month_pro_ii"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/storage_pro_ii"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="16dp">
-									<TextView
-										android:id="@+id/bandwidth_pro_ii"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-						</TableLayout>
+            <!-- Pro I -->
+            <RelativeLayout
+                android:id="@+id/upgrade_pro_i_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
 
-					</RelativeLayout>
-				</RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_i_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-				<LinearLayout
-					android:id="@+id/linear_divider_pro_ii"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_marginLeft="16dp"
-					android:layout_marginRight="16dp"
-					android:layout_alignBottom="@id/upgrade_pro_ii_layout_content"
-					android:background="@color/list_item_divider"
-					android:orientation="horizontal" />
-				<RelativeLayout
-					android:id="@+id/upgrade_pro_ii_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="93dp"
-					android:visibility="gone"
-					android:background="#90ffffff"/>
-			</RelativeLayout>
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_i_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
 
-			<!-- Pro III -->
-			<RelativeLayout
-				android:id="@+id/upgrade_pro_iii_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:paddingTop="8dp">
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp">
 
-			<RelativeLayout
-					android:id="@+id/upgrade_pro_iii_layout_content"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+                            <ImageView
+                                android:id="@+id/image_pro_i"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/ic_pro_1_crest" />
 
-					<!-- Left side (image and title) -->
-					<RelativeLayout
-						android:id="@+id/upgrade_pro_iii_left_side"
-						android:layout_width="121dp"
-						android:layout_height="wrap_content"
-						android:gravity="center_horizontal">
-						<RelativeLayout
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:paddingTop="4dp">
-							<ImageView
-								android:id="@+id/image_pro_iii"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:layout_centerHorizontal="true"
-								android:layout_marginBottom="5dp"
-								android:src="@drawable/ic_pro_3_crest"/>
+                            <TextView
+                                android:id="@+id/upgrade_pro_i_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_pro_i"
+                                android:text="@string/pro1_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/upgrade_red"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
 
-							<TextView
-								android:id="@+id/upgrade_pro_iii_title_text"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:textColor="@color/upgrade_red"
-								android:text="@string/pro3_account"
-								android:layout_below="@+id/image_pro_iii"
-								android:textAllCaps="true"
-								android:textSize="18sp"/>
-						</RelativeLayout>
-					</RelativeLayout>
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_i_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_pro_i_left_side"
+                        android:gravity="center_vertical">
 
-					<!-- Right side (price, storage and bandwidth)-->
-					<RelativeLayout
-						android:id="@+id/upgrade_pro_iii_right_side"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_toRightOf="@id/upgrade_pro_iii_left_side"
-						android:gravity="center_vertical"
-						android:layout_centerVertical="true">
+                        <TableLayout
+                            android:id="@+id/table_pro_i"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
 
-						<TableLayout
-							android:id="@+id/table_pro_iii"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+                            <TableRow>
 
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:background="@drawable/border_pro"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/month_pro_iii"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/storage_pro_iii"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_pro">
 
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="16dp">
-									<TextView
-										android:id="@+id/bandwidth_pro_iii"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-						</TableLayout>
-					</RelativeLayout>
-				</RelativeLayout>
+                                    <TextView
+                                        android:id="@+id/month_pro_i"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/name_my_account"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
 
-				<RelativeLayout
-					android:id="@+id/upgrade_pro_iii_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="93dp"
-					android:visibility="gone"
-					android:background="#90ffffff"/>
+                            <TableRow>
 
-			</RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
 
-			<TextView
-				android:id="@+id/lbl_custom_plan"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:layout_marginTop="4dp"
-				android:layout_marginBottom="7dp"
-				android:textSize="13sp"
-				android:text="@string/label_custom_plan"/>
+                                    <TextView
+                                        android:id="@+id/storage_pro_i"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
 
-			<LinearLayout
-				android:id="@+id/linear_divider_pro_iii"
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:background="@color/list_item_divider"
-				android:orientation="horizontal" />
+                            <TableRow>
 
-			<!-- Business -->
-			<RelativeLayout
-				android:id="@+id/upgrade_business_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
-				android:paddingTop="8dp">
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
 
-				<RelativeLayout
-					android:id="@+id/upgrade_business_layout_content"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+                                    <TextView
+                                        android:id="@+id/bandwidth_pro_i"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
 
-					<!-- Left side (image and title) -->
-					<RelativeLayout
-						android:id="@+id/upgrade_business_left_side"
-						android:layout_width="121dp"
-						android:layout_height="wrap_content"
-						android:gravity="center_horizontal">
-						<RelativeLayout
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:paddingTop="4dp">
-							<ImageView
-								android:id="@+id/image_business"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:layout_centerHorizontal="true"
-								android:layout_marginBottom="5dp"
-								android:src="@drawable/ic_business_crest"/>
+                <LinearLayout
+                    android:id="@+id/linear_divider_pro_i"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/upgrade_pro_i_layout_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/list_item_divider"
+                    android:orientation="horizontal" />
 
-							<TextView
-								android:id="@+id/upgrade_business_title_text"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:textColor="@color/business_color"
-								android:text="@string/business_label"
-								android:layout_below="@+id/image_business"
-								android:textAllCaps="true"
-								android:textSize="18sp"/>
-						</RelativeLayout>
-					</RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_i_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="93dp"
+                    android:background="#90ffffff"
+                    android:visibility="gone" />
 
-					<!-- Right side (price, storage and bandwidth)-->
-					<RelativeLayout
-						android:id="@+id/upgrade_business_right_side"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_toRightOf="@id/upgrade_business_left_side"
-						android:gravity="center_vertical"
-						android:layout_centerVertical="true">
+            </RelativeLayout>
 
-						<TableLayout
-							android:id="@+id/table_business"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+            <!-- Pro II -->
+            <RelativeLayout
+                android:id="@+id/upgrade_pro_ii_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
 
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:background="@drawable/border_business"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/month_business"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/storage_business"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/text_color_primary_solid"
-										android:textSize="15sp"/>
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_ii_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:paddingLeft="8dp"
-									android:layout_marginBottom="16dp">
-									<TextView
-										android:id="@+id/bandwidth_business"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/text_color_primary_solid"
-										android:textSize="15sp" />
-								</RelativeLayout>
-							</TableRow>
-						</TableLayout>
-					</RelativeLayout>
-				</RelativeLayout>
-				<LinearLayout
-					android:id="@+id/linear_divider_business"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_marginLeft="16dp"
-					android:layout_marginRight="16dp"
-					android:layout_alignBottom="@id/upgrade_business_layout_content"
-					android:background="@color/list_item_divider"
-					android:orientation="horizontal" />
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_ii_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
 
-			</RelativeLayout>
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
 
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:layout_marginTop="10dp"
-				android:layout_marginBottom="30dp"
-				android:orientation="vertical">
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/upgrade_comment"
-					android:textColor="@color/mail_my_account"
-					android:gravity="left"
-					android:textSize="12sp"/>
+                            <ImageView
+                                android:id="@+id/image_pro_ii"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/ic_pro_2_crest" />
 
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/business_account_clarification"
-					android:textColor="@color/mail_my_account"
-					android:gravity="left"
-					android:textSize="12sp"
-					android:layout_marginTop="4dp"/>
+                            <TextView
+                                android:id="@+id/upgrade_pro_ii_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_pro_ii"
+                                android:text="@string/pro2_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/upgrade_red"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
 
-			</LinearLayout>
-		</LinearLayout>
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_ii_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_pro_ii_left_side"
+                        android:gravity="center_vertical">
 
-	</ScrollView>
+                        <TableLayout
+                            android:id="@+id/table_pro_ii"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true">
 
-	<RelativeLayout
-		android:id="@+id/semitransparent_layer"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@color/status_bar_login"
-		android:visibility="gone"/>
+                            <TableRow>
 
-	<include
-		android:id="@+id/available_payment_methods_prolite"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="36dp"
-		android:layout_marginRight="8dp"
-		android:layout_marginLeft="8dp"
-		android:layout_marginBottom="36dp"
-		android:visibility="gone"
-		android:layout_centerHorizontal="true"
-		layout="@layout/available_payment_methods" />
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_pro">
 
-	<include
-		android:id="@+id/available_payment_methods_pro_i"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="36dp"
-		android:layout_marginRight="8dp"
-		android:layout_marginLeft="8dp"
-		android:layout_marginBottom="36dp"
-		android:visibility="gone"
-		android:layout_centerHorizontal="true"
-		layout="@layout/available_payment_methods" />
+                                    <TextView
+                                        android:id="@+id/month_pro_ii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/name_my_account"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
 
-	<include
-		android:id="@+id/available_payment_methods_pro_ii"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="36dp"
-		android:layout_marginRight="8dp"
-		android:layout_marginLeft="8dp"
-		android:layout_marginBottom="36dp"
-		android:visibility="gone"
-		android:layout_centerHorizontal="true"
-		layout="@layout/available_payment_methods" />
+                            <TableRow>
 
-	<include
-		android:id="@+id/available_payment_methods_pro_iii"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="36dp"
-		android:layout_marginRight="8dp"
-		android:layout_marginLeft="8dp"
-		android:layout_marginBottom="36dp"
-		android:visibility="gone"
-		android:layout_centerHorizontal="true"
-		layout="@layout/available_payment_methods" />
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_pro_ii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_pro_ii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_divider_pro_ii"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/upgrade_pro_ii_layout_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/list_item_divider"
+                    android:orientation="horizontal" />
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_ii_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="93dp"
+                    android:background="#90ffffff"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+            <!-- Pro III -->
+            <RelativeLayout
+                android:id="@+id/upgrade_pro_iii_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_iii_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_iii_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_pro_iii"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/ic_pro_3_crest" />
+
+                            <TextView
+                                android:id="@+id/upgrade_pro_iii_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_pro_iii"
+                                android:text="@string/pro3_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/upgrade_red"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_iii_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_pro_iii_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_pro_iii"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_pro">
+
+                                    <TextView
+                                        android:id="@+id/month_pro_iii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/name_my_account"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_pro_iii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_pro_iii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/mail_my_account"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_iii_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="93dp"
+                    android:background="#90ffffff"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/lbl_custom_plan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="7dp"
+                android:text="@string/label_custom_plan"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:id="@+id/linear_divider_pro_iii"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@color/list_item_divider"
+                android:orientation="horizontal" />
+
+            <!-- Business -->
+            <RelativeLayout
+                android:id="@+id/upgrade_business_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_business_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_business_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_business"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/ic_business_crest" />
+
+                            <TextView
+                                android:id="@+id/upgrade_business_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_business"
+                                android:text="@string/business_label"
+                                android:textAllCaps="true"
+                                android:textColor="@color/business_color"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_business_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_business_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_business"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_business">
+
+                                    <TextView
+                                        android:id="@+id/month_business"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/name_my_account"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_business"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/text_color_primary_solid"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_business"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/text_color_primary_solid"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_divider_business"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/upgrade_business_layout_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/list_item_divider"
+                    android:orientation="horizontal" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="30dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="@string/upgrade_comment"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="start"
+                    android:text="@string/business_account_clarification"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/semitransparent_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/status_bar_login"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/available_payment_methods_prolite"
+        layout="@layout/available_payment_methods"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="36dp"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/available_payment_methods_pro_i"
+        layout="@layout/available_payment_methods"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="36dp"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/available_payment_methods_pro_ii"
+        layout="@layout/available_payment_methods"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="36dp"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/available_payment_methods_pro_iii"
+        layout="@layout/available_payment_methods"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="36dp"
+        android:visibility="gone" />
 
 </RelativeLayout>

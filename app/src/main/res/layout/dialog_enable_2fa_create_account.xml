@@ -4,63 +4,61 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp">
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textColor="@color/name_my_account"
-            android:text="@string/title_enable_2fa"
-            android:gravity="center"
+            android:layout_gravity="center"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_gravity="center"
-            android:fontFamily="roboto"/>
+            android:fontFamily="roboto"
+            android:gravity="center"
+            android:text="@string/title_enable_2fa"
+            android:textColor="@color/name_my_account"
+            android:textSize="20sp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_2fa"/>
+            android:src="@drawable/ic_2fa" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@color/mail_my_account"
-            android:fontFamily="roboto"
+            android:layout_gravity="center"
             android:layout_marginTop="16dp"
+            android:fontFamily="roboto"
             android:gravity="center"
             android:text="@string/two_factor_authentication_explain"
-            android:layout_gravity="center"/>
+            android:textColor="@color/mail_my_account"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/enable_2fa_button"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Button"
             android:layout_gravity="center"
-            android:text="@string/general_enable"
             android:layout_marginTop="32dp"
-            />
+            android:text="@string/general_enable" />
 
         <Button
             android:id="@+id/skip_enable_2fa_button"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="?attr/borderlessButtonStyle"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="12dp"
-            android:text="@string/general_skip"
-            />
+            android:text="@string/general_skip" />
 
     </LinearLayout>
 </ScrollView>
